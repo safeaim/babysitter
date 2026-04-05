@@ -1,3 +1,5 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import { BreakpointResult, BreakpointRoutingOptions, BreakpointStrategy, DefinedTask, TaskInvokeOptions } from "../types";
 import { runTaskIntrinsic, TaskIntrinsicContext } from "./task";
 import { InternalProcessContext } from "../processContext";
@@ -44,10 +46,28 @@ export function runBreakpointIntrinsic<T = unknown>(
   const ctx = context as Partial<InternalProcessContext>;
   if (ctx.nonInteractive) {
     const bpLabel = options?.label ?? "unnamed";
+
+    let logSeq: number;
+    if (ctx.logSeq !== undefined && ctx.recordedLogSeqs !== undefined) {
+      logSeq = ++ctx.logSeq;
+      if (ctx.recordedLogSeqs.has(logSeq)) {
+        return Promise.resolve({ approved: true, response: "Auto-approved (non-interactive mode)" });
+      }
+      ctx.recordedLogSeqs.add(logSeq);
+      void fs.appendFile(
+        path.join(context.runDir, "state", "logSeqs.txt"),
+        `${logSeq}\n`,
+      ).catch(() => {
+        // Never let logging break orchestration.
+      });
+    } else {
+      logSeq = -1;
+    }
+
     void appendEvent({
       runDir: context.runDir,
       eventType: "PROCESS_LOG",
-      event: { logSeq: -1, label: "breakpoint:skipped", message: `Breakpoint '${bpLabel}' auto-approved (non-interactive mode)` },
+      event: { logSeq, label: "breakpoint:skipped", message: `Breakpoint '${bpLabel}' auto-approved (non-interactive mode)` },
     }).catch(() => {
       // Never let logging break orchestration.
     });

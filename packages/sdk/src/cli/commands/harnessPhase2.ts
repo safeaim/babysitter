@@ -364,7 +364,8 @@ function isRetryableEffectError(error: unknown): boolean {
     lower.includes("temporarily unavailable") ||
     lower.includes("please retry") ||
     lower.includes("killed") ||
-    lower.includes("signal")
+    lower.includes("signal") ||
+    lower.includes("already processing")
   );
 }
 

@@ -648,7 +648,8 @@ export function isRetryablePiPromptFailure(error: unknown): boolean {
     normalized.includes("too many requests") ||
     normalized.includes("pitimeouterror") ||
     normalized.includes("pi prompt timed out") ||
-    normalized.includes("deadline exceeded");
+    normalized.includes("deadline exceeded") ||
+    normalized.includes("already processing");
 }
 
 export function isIgnorablePiPromptFailure(output: string): boolean {

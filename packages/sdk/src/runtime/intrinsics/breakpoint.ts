@@ -9,9 +9,12 @@ interface BreakpointArgs<T = unknown> {
   payload: T;
   label: string;
   requestedAt: string;
+  breakpointId: string;
   expert?: string | string[];
   tags?: string[];
   strategy?: BreakpointStrategy;
+  autoApproveAfterN?: number;
+  presentAlwaysApprove?: boolean;
 }
 
 const BREAKPOINT_TASK_ID = "__sdk.breakpoint";
@@ -35,7 +38,7 @@ const breakpointTask: DefinedTask<BreakpointArgs, BreakpointResult> = {
   },
 };
 
-export function runBreakpointIntrinsic<T = unknown>(
+export async function runBreakpointIntrinsic<T = unknown>(
   payload: T,
   context: TaskIntrinsicContext,
   options?: TaskInvokeOptions & BreakpointRoutingOptions
@@ -64,14 +67,16 @@ export function runBreakpointIntrinsic<T = unknown>(
       logSeq = -1;
     }
 
-    void appendEvent({
-      runDir: context.runDir,
-      eventType: "PROCESS_LOG",
-      event: { logSeq, label: "breakpoint:skipped", message: `Breakpoint '${bpLabel}' auto-approved (non-interactive mode)` },
-    }).catch(() => {
+    try {
+      await appendEvent({
+        runDir: context.runDir,
+        eventType: "PROCESS_LOG",
+        event: { logSeq, label: "breakpoint:skipped", message: `Breakpoint '${bpLabel}' auto-approved (non-interactive mode)` },
+      });
+    } catch {
       // Never let logging break orchestration.
-    });
-    return Promise.resolve({ approved: true, response: "Auto-approved (non-interactive mode)" });
+    }
+    return { approved: true, response: "Auto-approved (non-interactive mode)" };
   }
 
   const invokeOptions = { ...options, label };

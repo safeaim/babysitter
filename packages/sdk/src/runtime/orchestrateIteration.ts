@@ -1,7 +1,8 @@
 import path from "path";
 import { pathToFileURL } from "url";
-import { appendEvent } from "../storage/journal";
+import { appendEvent, loadJournal } from "../storage/journal";
 import { writeRunOutput } from "../storage/runFiles";
+import { extractCostEvents, computeRunCostStats } from "../cost/journal";
 import { withRunLock } from "../storage/lock";
 import { createReplayEngine, type ReplayEngine } from "./replay/createReplayEngine";
 import { rebuildStateCache } from "./replay/stateCache";
@@ -72,11 +73,25 @@ export async function orchestrateIteration(options: OrchestrateOptions): Promise
         processFn(inputs, engine.context, options.context)
       );
       const outputRef = await writeRunOutput(options.runDir, output);
+
+      // Compute cost stats for run completion
+      let costStats: unknown = undefined;
+      try {
+        const journalEvents = await loadJournal(options.runDir);
+        const costEvents = extractCostEvents(journalEvents);
+        if (costEvents.length > 0) {
+          costStats = computeRunCostStats(engine.runId, journalEvents);
+        }
+      } catch {
+        // Cost stats are optional - don't fail the run
+      }
+
       await appendEvent({
         runDir: options.runDir,
         eventType: "RUN_COMPLETED",
         event: {
           outputRef,
+          costStats,
         },
       });
 

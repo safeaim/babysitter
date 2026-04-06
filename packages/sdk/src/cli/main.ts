@@ -54,6 +54,7 @@ import {
 } from "./commands/plugin";
 import type { PluginCommandArgs } from "./commands/plugin";
 import { handleTokensStats } from "./commands/tokensStats";
+import { handleCostStats } from "./commands/costStats";
 import { handleCompressionStatus } from "./commands/compressionStatus";
 import { handleCompressionToggle } from "./commands/compressionToggle";
 import { handleCompressionReset } from "./commands/compressionReset";
@@ -126,6 +127,7 @@ Other commands (agents should never call these directly unless explicitly instru
   babysitter plugin:update-registry [<pluginName>] [--plugin-name <name>] [--plugin-version <ver>] [--global|--project] [--json] [--verbose]
   babysitter plugin:remove-from-registry [<pluginName>] [--plugin-name <name>] [--global|--project] [--json] [--verbose]
   babysitter tokens:stats [runId] [--all] [--runs-dir <dir>] [--json]
+  babysitter cost:stats [runId] [--all] [--runs-dir <dir>] [--json]
   babysitter compression:status [--json]
   babysitter compression:toggle <layer> <on|off> [--json]
   babysitter compression:set <layer.key> <value> [--json]
@@ -263,6 +265,9 @@ interface ParsedArgs {
   // tokens:stats flags
   tokensAll?: boolean;
   tokensRunId?: string;
+  // cost:stats flags
+  costAll?: boolean;
+  costRunId?: string;
   // harness command flags
   positional?: string[];
   workspace?: string;
@@ -690,9 +695,10 @@ function parseArgs(argv: string[]): ParsedArgs {
       parsed.keepDays = parsePositiveInteger(raw, "--keep-days");
       continue;
     }
-    // tokens:stats flags
+    // tokens:stats / cost:stats flags
     if (arg === "--all") {
       parsed.tokensAll = true;
+      parsed.costAll = true;
       parsed.retrospectAll = true;
       continue;
     }
@@ -723,6 +729,8 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
   } else if (parsed.command === "tokens:stats") {
     [parsed.tokensRunId] = positionals;
+  } else if (parsed.command === "cost:stats") {
+    [parsed.costRunId] = positionals;
   } else if (parsed.command === "compression:toggle") {
     const [layer, onOff] = positionals;
     parsed.compressionLayer = layer;
@@ -2307,6 +2315,7 @@ const VALID_COMMANDS = [
   "health",
   "configure",
   "tokens:stats",
+  "cost:stats",
   "compression:status",
   "compression:toggle",
   "compression:set",
@@ -3196,6 +3205,14 @@ export function createBabysitterCli() {
           return await handleTokensStats({
             runId: parsed.tokensRunId,
             all: parsed.tokensAll,
+            json: parsed.json,
+            runsDir: parsed.runsDir,
+          });
+        }
+        if (parsed.command === "cost:stats") {
+          return await handleCostStats({
+            runId: parsed.costRunId,
+            all: parsed.costAll,
             json: parsed.json,
             runsDir: parsed.runsDir,
           });

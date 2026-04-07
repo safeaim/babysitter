@@ -33,11 +33,11 @@
     },
     "rate-limit-handler": {
       "name": "rate-limit-handler",
-      "description": "Configure Claude Code hooks to detect and handle API rate limit errors with exponential backoff, jitter, and automatic retry. Prevents sessions from getting stuck on rate limits.",
-      "latestVersion": "1.0.0",
-      "versions": ["1.0.0"],
+      "description": "Automatically retry Claude Code sessions on Anthropic subscription rate limits. Uses claude-auto-retry to detect rate limit messages, parse reset times, wait for cooldown, and send a continuation message via tmux.",
+      "latestVersion": "2.0.0",
+      "versions": ["1.0.0", "2.0.0"],
       "packagePath": "plugins/rate-limit-handler",
-      "tags": ["rate-limit", "hooks", "retry", "backoff", "resilience", "claude-code"],
+      "tags": ["rate-limit", "retry", "auto-retry", "tmux", "resilience", "claude-code"],
       "author": "a5c-ai"
     },
     "project-deployment": {

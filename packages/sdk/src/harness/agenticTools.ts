@@ -828,25 +828,35 @@ export function createAgenticToolDefinitions(
       promptSnippet:
         "Ask the user focused clarification questions when you need missing requirements.",
       parameters: Type.Object({
-        questions: Type.Array(
-          Type.Object({
-            id: Type.String({ description: "Unique question identifier" }),
-            question: Type.String({ description: "Question text" }),
-            options: Type.Optional(
-              Type.Array(
-                Type.Object({
-                  label: Type.String({ description: "Option label" }),
-                }),
-              ),
-            ),
-            multi: Type.Optional(
-              Type.Boolean({ description: "Allow multiple selections" }),
-            ),
-            recommended: Type.Optional(
-              Type.Number({ description: "Index of recommended option" }),
-            ),
+        mode: Type.Optional(
+          Type.Union([Type.Literal("simple"), Type.Literal("structured")], {
+            description: "Interaction mode: 'simple' (single question, free-text) or 'structured' (multi-question with options). Default: 'structured'",
           }),
-          { description: "Questions to ask the user" },
+        ),
+        question: Type.Optional(
+          Type.String({ description: "Single question text (required for simple mode)" }),
+        ),
+        questions: Type.Optional(
+          Type.Array(
+            Type.Object({
+              id: Type.String({ description: "Unique question identifier" }),
+              question: Type.String({ description: "Question text" }),
+              options: Type.Optional(
+                Type.Array(
+                  Type.Object({
+                    label: Type.String({ description: "Option label" }),
+                  }),
+                ),
+              ),
+              multi: Type.Optional(
+                Type.Boolean({ description: "Allow multiple selections" }),
+              ),
+              recommended: Type.Optional(
+                Type.Number({ description: "Index of recommended option" }),
+              ),
+            }),
+            { description: "Questions to ask the user (required for structured mode)" },
+          ),
         ),
       }),
       execute: async (
@@ -858,13 +868,39 @@ export function createAgenticToolDefinitions(
             "Not in interactive mode or no askUserQuestionHandler provided.",
           );
         }
+        const mode = (params.mode as string) ?? "structured";
+
+        if (mode === "simple") {
+          const questionText = params.question as string | undefined;
+          if (!questionText) {
+            return errorResult("Error: 'question' param is required when mode='simple'.");
+          }
+          const mapped = {
+            questions: [{
+              id: "_simple",
+              text: questionText,
+              options: undefined,
+              allowMultiple: false,
+              recommendedIndex: undefined,
+            }],
+          };
+          const response = await options.askUserQuestionHandler(mapped);
+          const answers = (response as { answers?: Array<{ answer?: string }> })?.answers;
+          const answer = answers?.[0]?.answer ?? "";
+          return ok(answer);
+        }
+
+        // Structured mode
         const questions = params.questions as Array<{
           id: string;
           question: string;
           options?: Array<{ label: string }>;
           multi?: boolean;
           recommended?: number;
-        }>;
+        }> | undefined;
+        if (!questions) {
+          return errorResult("Error: 'questions' param is required when mode='structured'.");
+        }
         // Map to AskUserQuestion schema
         const mapped = {
           questions: questions.map((q) => ({

@@ -106,8 +106,8 @@
     "status-line": {
       "name": "status-line",
       "description": "Add a babysitter run indicator to the Claude Code status line. Displays the current run ID when a session is associated with a babysitter run. Uses a lightweight shell script that reads session state from YAML frontmatter.",
-      "latestVersion": "1.0.0",
-      "versions": ["1.0.0"],
+      "latestVersion": "1.1.0",
+      "versions": ["1.0.0", "1.1.0"],
       "packagePath": "plugins/status-line",
       "tags": ["status-line", "ux", "claude-code", "session", "run-indicator", "observability"],
       "author": "a5c-ai"

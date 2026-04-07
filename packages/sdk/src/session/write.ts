@@ -158,7 +158,7 @@ export function addRunToSession(
   }
 
   // Retire the old runId into history (if not already there)
-  let runIds = [...state.runIds];
+  const runIds = [...state.runIds];
   if (state.runId && !runIds.includes(state.runId)) {
     runIds.push(state.runId);
   }

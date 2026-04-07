@@ -92,6 +92,62 @@ export const MAX_CONSECUTIVE_TIMEOUTS = 3;
 // For tests
 const EFFECT_RETRY_DELAYS_OVERRIDE = process.env.VITEST ? [0, 0, 0] : undefined;
 
+// ── Verbose Pi Event Logging ─────────────────────────────────────────
+
+/**
+ * Subscribe to a Pi session's events and emit verbose logs for intermediate
+ * lifecycle events (tool executions, turns, messages, agent lifecycle).
+ *
+ * Returns an unsubscribe function.  No-ops when verbose is disabled or json
+ * mode is active (no stderr noise).
+ */
+function subscribeVerbosePiEvents(
+  session: PiSessionHandle,
+  label: string,
+  opts: { verbose: boolean; json: boolean },
+): (() => void) | null {
+  if (!opts.verbose || opts.json) return null;
+
+  // We subscribe *after* the session is initialized.  If it isn't initialized
+  // yet, the caller will call initialize() and this subscription will fire
+  // once events start flowing.
+  try {
+    return session.subscribe((event: PiSessionEvent) => {
+      const t = event.type;
+
+      if (t === "tool_execution_start") {
+        const name = (event as { name?: string }).name ?? (event as { toolName?: string }).toolName ?? "unknown";
+        process.stderr.write(`${DIM}[${label} tool:start] ${name}${RESET}\n`);
+      } else if (t === "tool_execution_end") {
+        const name = (event as { name?: string }).name ?? (event as { toolName?: string }).toolName ?? "unknown";
+        process.stderr.write(`${DIM}[${label} tool:end] ${name}${RESET}\n`);
+      } else if (t === "turn_start") {
+        process.stderr.write(`${DIM}[${label} turn:start]${RESET}\n`);
+      } else if (t === "turn_end") {
+        process.stderr.write(`${DIM}[${label} turn:end]${RESET}\n`);
+      } else if (t === "message_start") {
+        const role = (event as { role?: string; message?: { role?: string } }).role
+          ?? (event as { message?: { role?: string } }).message?.role ?? "";
+        if (role) {
+          process.stderr.write(`${DIM}[${label} message:start] role=${role}${RESET}\n`);
+        }
+      } else if (t === "agent_start") {
+        process.stderr.write(`${DIM}[${label} agent:start]${RESET}\n`);
+      } else if (t === "agent_end") {
+        process.stderr.write(`${DIM}[${label} agent:end]${RESET}\n`);
+      } else if (t === "text_delta") {
+        const text = (event as { text?: string }).text;
+        if (text) process.stderr.write(text);
+      }
+      // tool_execution_update and message_update are high-frequency streaming
+      // events; skip them to avoid drowning stderr.
+    });
+  } catch {
+    // Session not yet initialized — caller should retry after initialize().
+    return null;
+  }
+}
+
 // ── Effect Resolution ────────────────────────────────────────────────
 
 export async function resolveEffect(
@@ -800,6 +856,7 @@ export async function runOrchestrationPhase(args: {
         for (const action of result.nextActions) {
           const taskHarness = resolveTaskHarness(action, args.selectedHarnessName, args.discovered);
           let workerSession: PiSessionHandle | null = null;
+          let workerUnsub: (() => void) | null = null;
           if (action.kind === "shell" || isInternalHarness(taskHarness)) {
             workerSession = registerPiSession(createPiSession(buildPiWorkerSessionOptions({
               action,
@@ -808,12 +865,20 @@ export async function runOrchestrationPhase(args: {
             })));
           }
           const piSessionFactory = (action.kind === "shell" || isInternalHarness(taskHarness))
-            ? () => registerPiSession(createPiSession(buildPiWorkerSessionOptions({
-                action,
-                workspace: args.workspace,
-                model: args.model,
-              })))
+            ? () => {
+                const s = registerPiSession(createPiSession(buildPiWorkerSessionOptions({
+                  action,
+                  workspace: args.workspace,
+                  model: args.model,
+                })));
+                workerUnsub?.();
+                workerUnsub = subscribeVerbosePiEvents(s, `worker:${action.effectId.slice(-8)}`, args);
+                return s;
+              }
             : undefined;
+          if (workerSession) {
+            workerUnsub = subscribeVerbosePiEvents(workerSession, `worker:${action.effectId.slice(-8)}`, args);
+          }
           try {
             const effectResult = await resolveEffectWithRetry(
               action,
@@ -866,6 +931,7 @@ export async function runOrchestrationPhase(args: {
               args.verbose,
             );
           } finally {
+            workerUnsub?.();
             await shutdownPiSession(workerSession);
           }
         }
@@ -1273,12 +1339,19 @@ export async function runOrchestrationPhase(args: {
         });
         writeVerboseData("phase2 worker session options", workerSessionOptions);
         const workerSession = registerPiSession(createPiSession(workerSessionOptions));
-        const piSessionFactory = () => registerPiSession(createPiSession(buildPiWorkerSessionOptions({
-          action,
-          workspace: args.workspace,
-          model: args.model,
-          customTools: phase2AgenticTools,
-        })));
+        const shellLabel = `shell-worker:${params.effectId.slice(-8)}`;
+        let shellUnsub = subscribeVerbosePiEvents(workerSession, shellLabel, args);
+        const piSessionFactory = () => {
+          const s = registerPiSession(createPiSession(buildPiWorkerSessionOptions({
+            action,
+            workspace: args.workspace,
+            model: args.model,
+            customTools: phase2AgenticTools,
+          })));
+          shellUnsub?.();
+          shellUnsub = subscribeVerbosePiEvents(s, shellLabel, args);
+          return s;
+        };
         try {
           const effectResult = await resolveEffectWithRetry(
             action,
@@ -1306,10 +1379,7 @@ export async function runOrchestrationPhase(args: {
             "Shell effect executed on the internal PI worker and staged for task posting.",
           );
         } finally {
-          // Note: if piSessionFactory was used for retries, the last recreated
-          // session is disposed inside resolveEffectWithRetry on the next retry
-          // or returned as currentPiSession. The original workerSession may have
-          // been disposed during retry. This dispose is a safety net.
+          shellUnsub?.();
           await shutdownPiSession(workerSession);
         }
       },
@@ -1407,13 +1477,20 @@ export async function runOrchestrationPhase(args: {
           });
           writeVerboseData("phase2 worker session options", workerSessionOptions);
           const workerSession = registerPiSession(createPiSession(workerSessionOptions));
-          const shellPiSessionFactory = () => registerPiSession(createPiSession(buildPiWorkerSessionOptions({
-            action,
-            workspace: args.workspace,
-            model: args.model,
-            customTools: phase2AgenticTools,
-            delegationConfig,
-          })));
+          const dispShellLabel = `dispatch-shell:${params.effectId.slice(-8)}`;
+          let dispShellUnsub = subscribeVerbosePiEvents(workerSession, dispShellLabel, args);
+          const shellPiSessionFactory = () => {
+            const s = registerPiSession(createPiSession(buildPiWorkerSessionOptions({
+              action,
+              workspace: args.workspace,
+              model: args.model,
+              customTools: phase2AgenticTools,
+              delegationConfig,
+            })));
+            dispShellUnsub?.();
+            dispShellUnsub = subscribeVerbosePiEvents(s, dispShellLabel, args);
+            return s;
+          };
           try {
             const effectResult = await resolveEffectWithRetry(
               action,
@@ -1442,6 +1519,7 @@ export async function runOrchestrationPhase(args: {
               "Shell effect executed on the internal PI worker and staged for task posting.",
             );
           } finally {
+            dispShellUnsub?.();
             await shutdownPiSession(workerSession);
           }
         }
@@ -1457,14 +1535,21 @@ export async function runOrchestrationPhase(args: {
           delegationConfig,
         });
         let workerSession: PiSessionHandle | null = null;
+        let dispatchUnsub: (() => void) | null = null;
+        const dispatchLabel = `dispatch:${params.effectId.slice(-8)}`;
         const dispatchPiSessionFactory = isInternalHarness(taskHarness)
-          ? () => registerPiSession(createPiSession(buildPiWorkerSessionOptions({
-              action,
-              workspace: args.workspace,
-              model: args.model,
-              customTools: phase2AgenticTools,
-              delegationConfig,
-            })))
+          ? () => {
+              const s = registerPiSession(createPiSession(buildPiWorkerSessionOptions({
+                action,
+                workspace: args.workspace,
+                model: args.model,
+                customTools: phase2AgenticTools,
+                delegationConfig,
+              })));
+              dispatchUnsub?.();
+              dispatchUnsub = subscribeVerbosePiEvents(s, dispatchLabel, args);
+              return s;
+            }
           : undefined;
         if (isInternalHarness(taskHarness)) {
           workerSession = registerPiSession(createPiSession(buildPiWorkerSessionOptions({
@@ -1474,6 +1559,7 @@ export async function runOrchestrationPhase(args: {
             customTools: phase2AgenticTools,
             delegationConfig,
           })));
+          dispatchUnsub = subscribeVerbosePiEvents(workerSession, dispatchLabel, args);
           writeVerboseData("phase2 worker session options", buildPiWorkerSessionOptions({
             action,
             workspace: args.workspace,
@@ -1511,6 +1597,7 @@ export async function runOrchestrationPhase(args: {
             "Effect dispatched through the selected harness and staged for task posting.",
           );
         } finally {
+          dispatchUnsub?.();
           await shutdownPiSession(workerSession);
         }
       },
@@ -1934,12 +2021,7 @@ export async function runOrchestrationPhase(args: {
   try {
     await orchestrationSession.initialize();
     if (!args.json && args.verbose) {
-      unsubscribe = orchestrationSession.subscribe((event: PiSessionEvent) => {
-        if (event.type === "text_delta") {
-          const text = (event as { text?: string }).text;
-          if (text) process.stderr.write(text);
-        }
-      });
+      unsubscribe = subscribeVerbosePiEvents(orchestrationSession, "orchestrator", args);
     }
 
     await completeBootstrapAgentically();

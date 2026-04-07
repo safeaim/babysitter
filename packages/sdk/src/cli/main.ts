@@ -219,6 +219,7 @@ interface ParsedArgs {
   requestId?: string;
   iteration?: number;
   showConfig: boolean;
+  showStrata: boolean;
   defaultsOnly: boolean;
   configureSubcommand?: string;
   // Session command args
@@ -343,6 +344,7 @@ function parseArgs(argv: string[]): ParsedArgs {
     pendingOnly: false,
     reverseOrder: false,
     showConfig: false,
+    showStrata: false,
     defaultsOnly: false,
   };
   if (parsed.command === "--help" || parsed.command === "-h") {
@@ -487,6 +489,10 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
     if (arg === "--show-config") {
       parsed.showConfig = true;
+      continue;
+    }
+    if (arg === "--show-strata") {
+      parsed.showStrata = true;
       continue;
     }
     if (arg === "--defaults-only") {
@@ -2887,6 +2893,7 @@ export function createBabysitterCli() {
             harness: parsed.harness,
             interactive: parsed.interactive,
             json: parsed.json,
+            showStrata: parsed.showStrata,
           };
           return await handleInstructionsCommand(instructionsArgs);
         }

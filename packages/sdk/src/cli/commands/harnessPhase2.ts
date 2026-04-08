@@ -20,6 +20,8 @@ import {
   buildOrchestrationBootstrapPrompt,
   buildOrchestrationTurnPrompt,
 } from "./harnessPrompts";
+import { createPiContext } from "../../prompts/context";
+import { composeProcessCreatePrompt } from "../../prompts/compose";
 import {
   buildAgentPrompt,
   coerceAgentResultValue,
@@ -88,6 +90,14 @@ const PROCESS_MODULE_LOAD_RETRY_DELAYS_MS = process.env.VITEST
  * — but repeated timeouts indicate a persistent infrastructure issue.
  */
 export const MAX_CONSECUTIVE_TIMEOUTS = 3;
+
+/**
+ * Maximum number of consecutive process-error recoveries before the
+ * orchestration run is failed.  Each recovery feeds the error back to a PI
+ * worker so it can fix the process code, but repeated failures indicate a
+ * deeper problem.
+ */
+export const MAX_PROCESS_ERROR_RECOVERIES = 5;
 
 // For tests
 const EFFECT_RETRY_DELAYS_OVERRIDE = process.env.VITEST ? [0, 0, 0] : undefined;
@@ -824,6 +834,8 @@ export async function runOrchestrationPhase(args: {
     );
     writeVerboseData("phase2 host bind result", state.sessionBound);
 
+    let consecutiveProcessErrors = 0;
+
     while (state.iteration < args.maxIterations) {
       state.iteration += 1;
       const result = await orchestrateIterationWithProcessLoadRetry({
@@ -837,10 +849,11 @@ export async function runOrchestrationPhase(args: {
         status: result.status,
         nextActions: result.status === "waiting" ? result.nextActions : undefined,
         output: result.status === "completed" ? result.output : undefined,
-        error: result.status === "failed" ? result.error : undefined,
+        error: (result.status === "failed" || result.status === "process-error") ? result.error : undefined,
       });
 
       if (result.status === "waiting") {
+        consecutiveProcessErrors = 0;
         emitProgress(
           {
             phase: "2",
@@ -950,6 +963,107 @@ export async function runOrchestrationPhase(args: {
           args.verbose,
         );
         return 0;
+      }
+
+      // ── Process-error recovery ──────────────────────────────────────
+      // The process threw a non-fatal error (e.g. TypeError from user code).
+      // No RUN_FAILED was written to the journal, so we can feed the error
+      // to a PI worker, let it fix the process file, and retry.
+      if (result.status === "process-error") {
+        consecutiveProcessErrors += 1;
+        const errorMessage =
+          typeof result.error === "object" && result.error !== null && "message" in result.error
+            ? String((result.error as Record<string, unknown>).message)
+            : String(result.error);
+        const errorStack =
+          typeof result.error === "object" && result.error !== null && "stack" in result.error
+            ? String((result.error as Record<string, unknown>).stack)
+            : undefined;
+
+        emitProgress(
+          {
+            phase: "2",
+            status: "process-error-recovery",
+            iteration: state.iteration,
+            runStatus: "recovering",
+            attempt: consecutiveProcessErrors,
+            maxAttempts: MAX_PROCESS_ERROR_RECOVERIES,
+            error: errorMessage,
+          },
+          args.json,
+          args.verbose,
+        );
+
+        if (consecutiveProcessErrors > MAX_PROCESS_ERROR_RECOVERIES) {
+          emitProgress(
+            {
+              phase: "2",
+              status: "failed",
+              iteration: state.iteration,
+              runStatus: "failed",
+              error: `Process error recovery exhausted after ${MAX_PROCESS_ERROR_RECOVERIES} attempts. Last error: ${errorMessage}`,
+            },
+            args.json,
+            args.verbose,
+          );
+          return 1;
+        }
+
+        // Spawn a PI worker to fix the process file
+        const recoverySession = registerPiSession(createPiSession(buildPiWorkerSessionOptions({
+          action: { effectId: "process-error-recovery", invocationKey: "", kind: "node", taskDef: { title: "Fix process error" } as EffectAction["taskDef"] },
+          workspace: args.workspace,
+          model: args.model,
+        })));
+        const recoveryUnsub = subscribeVerbosePiEvents(recoverySession, "recovery", args);
+        try {
+          writeVerbose(
+            `[phase2 recovery] Process error (attempt ${consecutiveProcessErrors}/${MAX_PROCESS_ERROR_RECOVERIES}): ${errorMessage}`,
+          );
+          // Inject process-creation guidelines so the recovery agent knows
+          // the correct patterns for defineTask, ctx.task, ctx.parallel, etc.
+          const processCreationCtx = createPiContext({ interactive: false });
+          const processCreationGuidelines = composeProcessCreatePrompt(processCreationCtx);
+
+          const recoveryPrompt = [
+            `The babysitter process at ${path.resolve(args.processPath)} threw an error during execution:`,
+            "",
+            `Error: ${errorMessage}`,
+            errorStack ? `\nStack trace:\n${errorStack}` : "",
+            "",
+            "This is a bug in the process code, not in the babysitter runtime.",
+            "Read the process file, understand the error, and fix the code so the next iteration succeeds.",
+            "",
+            "--- Process Authoring Reference ---",
+            "",
+            processCreationGuidelines,
+            "",
+            "--- End Reference ---",
+            "",
+            "Fix the process file and save it. The orchestrator will retry automatically.",
+          ].join("\n");
+
+          await promptPiWithRetry({
+            session: recoverySession,
+            message: compressInternalHarnessPrompt(recoveryPrompt, args.compressionConfig, "agent"),
+            timeout: PI_WORKER_TIMEOUT_MS,
+            label: "process-error-recovery",
+            writeVerbose,
+            writeVerboseData,
+          });
+        } catch (recoveryError: unknown) {
+          writeVerbose(
+            `[phase2 recovery] PI recovery prompt failed: ${recoveryError instanceof Error ? recoveryError.message : String(recoveryError)}`,
+          );
+        } finally {
+          recoveryUnsub?.();
+          await shutdownPiSession(recoverySession);
+        }
+
+        // Do not consume an extra iteration for the recovery — the next
+        // loop tick will re-run the (hopefully fixed) process.
+        state.iteration -= 1;
+        continue;
       }
 
       emitProgress(
@@ -1240,7 +1354,7 @@ export async function runOrchestrationPhase(args: {
           status: result.status,
           nextActions: result.status === "waiting" ? result.nextActions : undefined,
           output: result.status === "completed" ? result.output : undefined,
-          error: result.status === "failed" ? result.error : undefined,
+          error: (result.status === "failed" || result.status === "process-error") ? result.error : undefined,
         });
 
         if (result.status === "waiting") {
@@ -1269,6 +1383,26 @@ export async function runOrchestrationPhase(args: {
             args.json,
             args.verbose,
           );
+        } else if (result.status === "process-error") {
+          // Recoverable process error — no RUN_FAILED in journal.
+          // Return the error to the agent so it can fix the process and retry.
+          const errorMessage =
+            typeof result.error === "object" && result.error !== null && "message" in result.error
+              ? String((result.error as Record<string, unknown>).message)
+              : String(result.error);
+          emitProgress(
+            {
+              phase: "2",
+              status: "process-error-recovery",
+              iteration: state.iteration,
+              runStatus: "recovering",
+              error: errorMessage,
+            },
+            args.json,
+            args.verbose,
+          );
+          // Roll back iteration count so the retry does not consume a slot
+          state.iteration -= 1;
         } else {
           const errorMessage =
             result.error instanceof Error
@@ -1291,12 +1425,27 @@ export async function runOrchestrationPhase(args: {
           );
         }
 
+        // For process-error, inject process-creation guidelines so the agent
+        // knows how to author valid process code (defineTask, ctx.parallel, etc.)
+        let processErrorExtra: Record<string, unknown> = {};
+        if (result.status === "process-error") {
+          const pCtx = createPiContext({ interactive: false });
+          processErrorExtra = {
+            recoverable: true,
+            hint: "The process code has a bug. Read the error and the process-authoring reference below, fix the process file, and call babysitter_run_iterate again.",
+            processAuthoringReference: composeProcessCreatePrompt(pCtx),
+          };
+        }
+
         return formatToolResult(
           {
             iteration: state.iteration,
             ...result,
+            ...processErrorExtra,
           },
-          "Iteration completed.",
+          result.status === "process-error"
+            ? "Process error — fix the process code and retry iteration."
+            : "Iteration completed.",
         );
       },
     },
@@ -2052,6 +2201,13 @@ export async function runOrchestrationPhase(args: {
             runId: state.runId,
             runDir: state.runDir,
             lastStatus: state.lastIterationResult?.status,
+            lastError: state.lastIterationResult?.status === "process-error"
+              ? (typeof state.lastIterationResult.error === "object" &&
+                  state.lastIterationResult.error !== null &&
+                  "message" in state.lastIterationResult.error
+                  ? String((state.lastIterationResult.error as Record<string, unknown>).message)
+                  : String(state.lastIterationResult.error))
+              : undefined,
             pendingEffects: describePendingActions(),
           }),
           { label: `phase2 iteration ${state.iteration + 1}` },

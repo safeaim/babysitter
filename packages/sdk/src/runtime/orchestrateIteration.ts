@@ -140,7 +140,24 @@ export async function orchestrateIteration(options: OrchestrateOptions): Promise
           metadata: createIterationMetadata(engine),
         };
       }
+
       const failure = serializeUnknownError(error);
+
+      // Distinguish truly fatal errors (RunFailedError — missing module, bad
+      // config) from recoverable process-execution errors (TypeError, user-code
+      // bugs).  Recoverable errors are returned as "process-error" WITHOUT
+      // writing RUN_FAILED to the journal, so the harness can feed the error
+      // back to the agent for self-repair and retry the iteration.
+      if (!(error instanceof RunFailedError)) {
+        const result: IterationResult = {
+          status: "process-error",
+          error: failure,
+          metadata: createIterationMetadata(engine),
+        };
+        finalStatus = result.status;
+        return result;
+      }
+
       await appendEvent({
         runDir: options.runDir,
         eventType: "RUN_FAILED",

@@ -16,3 +16,4 @@ export * from "./logging";
 export * from "./cost/index";
 export * as anycli from "./anycli/index";
 export * from "./breakpoints";
+export * as dashboard from "./dashboard";

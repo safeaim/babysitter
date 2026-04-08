@@ -161,7 +161,8 @@ export interface IterationMetadata {
 export type IterationResult =
   | { status: "completed"; output: unknown; metadata?: IterationMetadata }
   | { status: "waiting"; nextActions: EffectAction[]; metadata?: IterationMetadata }
-  | { status: "failed"; error: unknown; metadata?: IterationMetadata };
+  | { status: "failed"; error: unknown; metadata?: IterationMetadata }
+  | { status: "process-error"; error: unknown; metadata?: IterationMetadata };
 
 export interface CommitEffectResultOptions {
   runDir: string;

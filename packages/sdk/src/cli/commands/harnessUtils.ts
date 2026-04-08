@@ -63,7 +63,7 @@ export interface Phase1Progress {
 
 export interface Phase2Progress {
   phase: "2";
-  status: "started" | "resuming" | "skipped-plan-only" | "run-created" | "bound" | "iteration" | "effect" | "completed" | "failed";
+  status: "started" | "resuming" | "skipped-plan-only" | "run-created" | "bound" | "iteration" | "effect" | "completed" | "failed" | "process-error-recovery";
   runId?: string;
   runDir?: string;
   harness?: string;
@@ -79,6 +79,8 @@ export interface Phase2Progress {
   error?: string;
   output?: string;
   processPath?: string;
+  attempt?: number;
+  maxAttempts?: number;
 }
 
 export type ProgressPayload = Phase1Progress | Phase2Progress;

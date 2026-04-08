@@ -82,6 +82,10 @@ import {
   isBabysitterError,
 } from "../runtime/exceptions";
 import { CONFIG_ENV_VARS, DEFAULTS } from "../config/defaults";
+import { renderEffectTree } from "../dashboard/components/EffectTree";
+import type { EffectNode } from "../dashboard/components/EffectTree";
+import { renderEventMessage } from "../dashboard/components/messages/EventMessage";
+import type { StatusType } from "../dashboard/components/StatusBadge";
 
 const USAGE = `Usage:
 Agent commands:
@@ -220,6 +224,8 @@ interface ParsedArgs {
   iteration?: number;
   showConfig: boolean;
   showStrata: boolean;
+  tree: boolean;
+  rich: boolean;
   defaultsOnly: boolean;
   configureSubcommand?: string;
   // Session command args
@@ -345,6 +351,8 @@ function parseArgs(argv: string[]): ParsedArgs {
     reverseOrder: false,
     showConfig: false,
     showStrata: false,
+    tree: false,
+    rich: false,
     defaultsOnly: false,
   };
   if (parsed.command === "--help" || parsed.command === "-h") {
@@ -497,6 +505,14 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
     if (arg === "--defaults-only") {
       parsed.defaultsOnly = true;
+      continue;
+    }
+    if (arg === "--tree") {
+      parsed.tree = true;
+      continue;
+    }
+    if (arg === "--rich") {
+      parsed.rich = true;
       continue;
     }
     // Session command flags
@@ -800,7 +816,8 @@ function parseArgs(argv: string[]): ParsedArgs {
     parsed.command === "harness:invoke" ||
     parsed.command === "harness:install" ||
     parsed.command === "harness:install-plugin" ||
-    parsed.command === "harness:help"
+    parsed.command === "harness:help" ||
+    parsed.command === "tui"
   ) {
     parsed.positional = positionals;
   } else if (
@@ -1434,6 +1451,19 @@ async function handleRunStatus(parsed: ParsedArgs): Promise<number> {
     );
     return 0;
   }
+  if (parsed.tree) {
+    // Build EffectNode[] from all effects for tree rendering
+    const allEffects = index.listEffects();
+    const effectNodes: EffectNode[] = allEffects.map((rec: EffectRecord) => ({
+      effectId: rec.effectId,
+      kind: rec.kind ?? "unknown",
+      status: (rec.status === "resolved_ok" || rec.status === "resolved_error" ? "completed" : rec.status === "requested" ? "pending" : "running") as StatusType,
+      title: rec.taskId ?? rec.effectId,
+    }));
+    console.log(`[run:status] state=${state}`);
+    console.log(renderEffectTree(effectNodes));
+    return 0;
+  }
   const suffix = formattedMetadata.textParts.length ? ` ${formattedMetadata.textParts.join(" ")}` : "";
   const completionProof = state === "completed" ? resolveCompletionProof(metadata) : undefined;
   const secretSuffix = completionProof ? ` completionProof=${completionProof}` : "";
@@ -1531,8 +1561,18 @@ async function handleRunEvents(parsed: ParsedArgs): Promise<number> {
   if (parsed.reverseOrder) headerParts.push("order=desc");
   const metadataSuffix = formattedMetadata.textParts.length ? ` ${formattedMetadata.textParts.join(" ")}` : "";
   console.log(`[run:events] ${headerParts.join(" ")}${metadataSuffix}`);
-  for (const event of limited) {
-    console.log(`- ${formatEventLine(event)}`);
+  if (parsed.rich) {
+    for (const event of limited) {
+      console.log(renderEventMessage({
+        type: event.type,
+        recordedAt: event.recordedAt,
+        data: (event.data ?? {}) as Record<string, unknown>,
+      }));
+    }
+  } else {
+    for (const event of limited) {
+      console.log(`- ${formatEventLine(event)}`);
+    }
   }
   return 0;
 }
@@ -2375,6 +2415,7 @@ const VALID_COMMANDS = [
   "breakpoint:list-rules",
   "breakpoint:should-auto-approve",
   "breakpoint:history",
+  "tui",
   "version",
 ];
 
@@ -3329,6 +3370,18 @@ export function createBabysitterCli() {
         }
         if (parsed.command === "compress-output") {
           return handleCompressOutput({ args: parsed.compressOutputArgs ?? [] });
+        }
+        if (parsed.command === "tui") {
+          const { handleTui } = await import("./commands/tui");
+          return await handleTui({
+            runsDir: parsed.runsDir,
+            json: parsed.json,
+            verbose: parsed.verbose,
+            positional: parsed.positional,
+            harness: parsed.harness,
+            workspace: parsed.workspace,
+            prompt: parsed.prompt,
+          });
         }
 
         // This should not be reached due to the VALID_COMMANDS check above

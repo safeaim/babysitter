@@ -206,6 +206,16 @@ export function registerRunTools(server: McpServer): void {
           });
         }
 
+        if (result.status === "process-error") {
+          return toolResult({
+            status: "process-error",
+            recoverable: true,
+            error: result.error instanceof Error ? result.error.message : result.error,
+            hint: "The process code has a bug. Fix the process file and retry the iteration.",
+            metadata: result.metadata,
+          });
+        }
+
         // status === "waiting"
         return toolResult({
           status: "waiting",

@@ -3,16 +3,29 @@ import { EffectPendingError, EffectRequestedError, ParallelPendingError } from "
 import { buildParallelBatch } from "../../tasks/batching";
 
 export async function runParallelAll<T>(thunks: Array<() => T | Promise<T>>): Promise<T[]> {
+  // Detect and recover from promise-instead-of-thunk misuse.  When callers
+  // write [ctx.task(...)] instead of [() => ctx.task(...)], the promises are
+  // already executing and will reject with EffectRequestedError as orphaned
+  // unhandled rejections (crashing Node).  Convert them to thunks wrapping the
+  // existing promises so the batch-collection loop can still gather all pending
+  // effect actions without orphan rejections.
+  let recovered = false;
   for (let i = 0; i < thunks.length; i++) {
     if (typeof thunks[i] !== "function") {
       const isThenable =
         thunks[i] && typeof (thunks[i] as unknown as { then?: unknown }).then === "function";
-      const hint = isThenable
-        ? " It looks like a Promise was passed. Wrap each entry: [() => ctx.task(...)] instead of [ctx.task(...)]"
-        : " Wrap each entry as a function: [() => ctx.task(...)] instead of [ctx.task(...)]";
-      throw new TypeError(
-        `parallel.all() expects an array of functions (thunks), but element at index ${i} is ${typeof thunks[i]}.${hint}`
-      );
+      if (isThenable) {
+        if (!recovered) {
+          thunks = [...thunks]; // shallow copy to avoid mutating caller's array
+          recovered = true;
+        }
+        const promise = thunks[i] as unknown as Promise<T>;
+        thunks[i] = (() => promise) as unknown as () => T | Promise<T>;
+      } else {
+        throw new TypeError(
+          `parallel.all() expects an array of functions (thunks), but element at index ${i} is ${typeof thunks[i]}. Wrap each entry as a function: [() => ctx.task(...)] instead of [ctx.task(...)]`
+        );
+      }
     }
   }
 

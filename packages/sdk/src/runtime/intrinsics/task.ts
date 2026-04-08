@@ -32,6 +32,8 @@ import { globalTaskRegistry } from "../../tasks/registry";
 import { serializeAndWriteTaskDefinition } from "../../tasks/serializer";
 import { readRules } from "../../breakpoints/rules";
 import { evaluateAutoApproval } from "../../breakpoints/evaluator";
+import type { PolicyEngine, PolicyEvaluationContext } from "../../governance/types";
+import { logPolicyDecision } from "../../governance/logging";
 
 
 export interface TaskIntrinsicContext {
@@ -42,6 +44,7 @@ export interface TaskIntrinsicContext {
   replayCursor: ReplayCursor;
   now: () => Date;
   logger?: ProcessLogger;
+  policyEngine?: PolicyEngine;
 }
 
 export interface TaskIntrinsicInvokeOptions<TArgs, TResult> {
@@ -125,6 +128,44 @@ async function requestNewEffect<TArgs, TResult>(
   if (!taskDef || typeof taskDef.kind !== "string") {
     throw new InvalidTaskDefinitionError(`Task ${options.task.id} did not provide a kind`);
   }
+
+  // ── Governance policy evaluation (GAP-SEC-001) ──────────────────
+  // Evaluate policies BEFORE writing task artifacts or journal events.
+  if (options.context.policyEngine) {
+    const policyCtx: PolicyEvaluationContext = {
+      effectKind: taskDef.kind,
+      taskId: options.task.id,
+      processId: options.context.processId,
+      runId: options.context.runId,
+      labels: taskDef.labels,
+      metadata: taskDef.metadata as Record<string, string> | undefined,
+    };
+    const decision = options.context.policyEngine.evaluate(policyCtx);
+
+    // Audit-log every policy evaluation
+    const logDir = process.env.BABYSITTER_LOG_DIR
+      ? path.join(process.env.BABYSITTER_LOG_DIR, options.context.runId)
+      : undefined;
+    if (logDir) {
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        context: policyCtx,
+        decision,
+        ruleId: decision.rule?.id,
+      };
+      // Await the write so the audit trail is consistent before the effect
+      // error propagates (deny) or the effect is dispatched (allow/warn).
+      try { await logPolicyDecision(logDir, logEntry); } catch { /* best-effort */ }
+    }
+
+    if (!decision.allowed) {
+      throw new RunFailedError(
+        `Policy denied effect dispatch: ${decision.reason} [rule: ${decision.rule?.id ?? "unknown"}]`,
+        { details: { ruleId: decision.rule?.id, decision } },
+      );
+    }
+  }
+
   // Pre-compute autoApproval for breakpoint effects
   if (taskDef.kind === "breakpoint") {
     try {

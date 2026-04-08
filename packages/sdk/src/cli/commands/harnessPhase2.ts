@@ -7,7 +7,6 @@
  */
 
 import * as path from "node:path";
-import { getGlobalStateDir } from "../../config";
 import * as readline from "node:readline";
 import { Type } from "@sinclair/typebox";
 import { invokeHarness } from "../../harness/invoker";
@@ -811,7 +810,7 @@ export async function runOrchestrationPhase(args: {
       runId: state.runId,
       runDir: state.runDir,
       pluginRoot: adapter.resolvePluginRoot({}),
-      stateDir: getGlobalStateDir(),
+      stateDir: path.resolve(args.workspace ?? process.cwd(), ".a5c"),
       runsDir: args.runsDir,
       maxIterations: args.maxIterations,
       prompt: args.prompt ?? "",
@@ -1289,7 +1288,7 @@ export async function runOrchestrationPhase(args: {
           runId: state.runId,
           runDir: state.runDir,
           pluginRoot: adapter.resolvePluginRoot({}),
-          stateDir: getGlobalStateDir(),
+          stateDir: path.resolve(args.workspace ?? process.cwd(), ".a5c"),
           runsDir: args.runsDir,
           maxIterations: args.maxIterations,
           prompt: args.prompt ?? "",

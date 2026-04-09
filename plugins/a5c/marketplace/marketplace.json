@@ -166,16 +166,15 @@
       "tags": ["wiki", "knowledge-base", "documentation", "ingest", "schema", "search", "skills", "claude-code"],
       "author": "a5c-ai"
     },
-    "babysitter-openclaw": {
-      "name": "babysitter",
-      "description": "Babysitter orchestration plugin for OpenClaw — event-sourced workflows, multi-step process management, hook-based extensibility, and human-in-the-loop approval. Provides skills, commands, and lifecycle hooks for deterministic AI agent orchestration.",
-      "latestVersion": "0.1.0",
-      "versions": ["0.1.0"],
-      "packagePath": "plugins/babysitter-openclaw",
-      "npmPackage": "@a5c-ai/babysitter-openclaw",
-      "tags": ["openclaw", "orchestration", "workflow", "hooks", "skills", "agent", "process-management"],
-      "author": "a5c-ai",
-      "harness": "openclaw"
+    "mempalace": {
+      "name": "mempalace",
+      "description": "Install MemPalace AI memory system — mine projects and conversations into a searchable palace backed by ChromaDB. 19 MCP tools, auto-save hooks, 5 guided skills. Stores everything verbatim, makes it findable. Local only, no cloud.",
+      "latestVersion": "3.0.14",
+      "versions": ["3.0.14"],
+      "packagePath": "plugins/mempalace",
+      "tags": ["memory", "persistence", "chromadb", "mcp", "search", "mining", "conversations", "palace", "local", "rag"],
+      "author": "milla-jovovich",
+      "repository": "https://github.com/milla-jovovich/mempalace"
     }
   }
 }

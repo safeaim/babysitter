@@ -6,111 +6,16 @@
  *   borderBoxReducer(state, action) — state machine for BorderBox
  *   getBorderChars(style) — returns unicode border characters
  *
- * These are re-implemented here as specification contracts (TDD Red phase).
- * The real implementations do not exist yet.
+ * Imports the real implementations from BorderBox.tsx.
  */
 
 import { describe, it, expect } from "vitest";
-
-// ---------------------------------------------------------------------------
-// Types (specification — these will be imported from types.ts once created)
-// ---------------------------------------------------------------------------
-
-type BorderStyle = "single" | "double" | "round" | "bold" | "none";
-
-interface BorderBoxState {
-  style: BorderStyle;
-  title: string | undefined;
-  collapsed: boolean;
-  padding: number;
-}
-
-type BorderBoxAction =
-  | { type: "SET_STYLE"; style: BorderStyle }
-  | { type: "SET_TITLE"; title: string | undefined }
-  | { type: "TOGGLE_COLLAPSE" }
-  | { type: "SET_PADDING"; padding: number };
-
-interface BorderChars {
-  topLeft: string;
-  topRight: string;
-  bottomLeft: string;
-  bottomRight: string;
-  horizontal: string;
-  vertical: string;
-}
-
-// ---------------------------------------------------------------------------
-// Re-implementations (spec contracts)
-// ---------------------------------------------------------------------------
-
-function borderBoxReducer(
-  state: BorderBoxState,
-  action: BorderBoxAction
-): BorderBoxState {
-  switch (action.type) {
-    case "SET_STYLE":
-      return { ...state, style: action.style };
-    case "SET_TITLE":
-      return { ...state, title: action.title };
-    case "TOGGLE_COLLAPSE":
-      return { ...state, collapsed: !state.collapsed };
-    case "SET_PADDING": {
-      const clamped = Math.max(0, Math.min(4, action.padding));
-      return { ...state, padding: clamped };
-    }
-  }
-}
-
-function getBorderChars(style: BorderStyle): BorderChars {
-  switch (style) {
-    case "single":
-      return {
-        topLeft: "\u250c",
-        topRight: "\u2510",
-        bottomLeft: "\u2514",
-        bottomRight: "\u2518",
-        horizontal: "\u2500",
-        vertical: "\u2502",
-      };
-    case "double":
-      return {
-        topLeft: "\u2554",
-        topRight: "\u2557",
-        bottomLeft: "\u255a",
-        bottomRight: "\u255d",
-        horizontal: "\u2550",
-        vertical: "\u2551",
-      };
-    case "round":
-      return {
-        topLeft: "\u256d",
-        topRight: "\u256e",
-        bottomLeft: "\u2570",
-        bottomRight: "\u256f",
-        horizontal: "\u2500",
-        vertical: "\u2502",
-      };
-    case "bold":
-      return {
-        topLeft: "\u250f",
-        topRight: "\u2513",
-        bottomLeft: "\u2517",
-        bottomRight: "\u251b",
-        horizontal: "\u2501",
-        vertical: "\u2503",
-      };
-    case "none":
-      return {
-        topLeft: "",
-        topRight: "",
-        bottomLeft: "",
-        bottomRight: "",
-        horizontal: "",
-        vertical: "",
-      };
-  }
-}
+import {
+  getBorderChars,
+  borderBoxReducer,
+  type BorderStyle,
+  type BorderBoxState,
+} from "../components/primitives/BorderBox.js";
 
 // ---------------------------------------------------------------------------
 // Default state fixture

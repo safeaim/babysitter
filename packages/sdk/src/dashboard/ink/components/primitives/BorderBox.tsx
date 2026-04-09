@@ -18,10 +18,10 @@ import { useTheme } from "../../hooks/useTheme.js";
 export type BorderStyle = "single" | "double" | "round" | "bold" | "none";
 
 export interface BorderBoxState {
-  style: BorderStyle;
-  title: string | undefined;
-  collapsed: boolean;
-  padding: number;
+  readonly style: BorderStyle;
+  readonly title: string | undefined;
+  readonly collapsed: boolean;
+  readonly padding: number;
 }
 
 export type BorderBoxAction =
@@ -31,12 +31,12 @@ export type BorderBoxAction =
   | { type: "SET_PADDING"; padding: number };
 
 export interface BorderChars {
-  topLeft: string;
-  topRight: string;
-  bottomLeft: string;
-  bottomRight: string;
-  horizontal: string;
-  vertical: string;
+  readonly topLeft: string;
+  readonly topRight: string;
+  readonly bottomLeft: string;
+  readonly bottomRight: string;
+  readonly horizontal: string;
+  readonly vertical: string;
 }
 
 export interface BorderBoxProps {

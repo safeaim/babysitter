@@ -170,13 +170,13 @@ export interface TuiConfig {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type EffectKind = "node" | "breakpoint" | "orchestrator_task" | "sleep" | (string & {});
-export type EffectStatus = "pending" | "resolved" | "failed";
+export type TuiEffectStatus = "pending" | "resolved" | "failed";
 export type OrchestrationPhase = "planning" | "executing" | "verifying" | "waiting" | "complete" | "failed";
 
 export interface EffectSummary {
   readonly effectId: string;
   readonly kind: EffectKind;
-  readonly status: EffectStatus;
+  readonly status: TuiEffectStatus;
   readonly title?: string;
   readonly elapsedMs?: number;
   readonly error?: string;
@@ -187,7 +187,7 @@ export interface TaskSummary {
   readonly effectId: string;
   readonly kind: EffectKind;
   readonly title: string;
-  readonly status: EffectStatus;
+  readonly status: TuiEffectStatus;
   readonly startedAt?: number | string;
   readonly completedAt?: number | string;
   readonly elapsedMs?: number;

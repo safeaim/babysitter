@@ -14,15 +14,17 @@ import React from "react";
 import { useInk } from "../contexts/InkContext.js";
 import { useTheme } from "../hooks/useTheme.js";
 import type { OrchestrationStatus, OrchestrationPhase, ThemeColors } from "../types.js";
+import { truncateRunId, formatCost } from "../helpers.js";
+export { truncateRunId };
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 export interface StatusSegment {
-  text: string;
-  colorKey: string;
-  bold?: boolean;
+  readonly text: string;
+  readonly colorKey: string;
+  readonly bold?: boolean;
 }
 
 export interface StatusLineProps {
@@ -60,15 +62,8 @@ export function phaseToColorKey(phase: OrchestrationPhase): string {
   }
 }
 
-export function formatCostForStatus(cost: number): string {
-  if (cost < 1) return `$${cost.toFixed(4)}`;
-  return `$${cost.toFixed(2)}`;
-}
-
-export function truncateRunId(id: string): string {
-  if (id.length <= 12) return id;
-  return id.slice(0, 12);
-}
+/** @deprecated Use formatCost from helpers.ts instead. Re-exported for backward compatibility. */
+export const formatCostForStatus = formatCost;
 
 export function formatStatusSegments(
   status: OrchestrationStatus,
@@ -130,6 +125,13 @@ export function formatStatusSegments(
 // Component
 // ---------------------------------------------------------------------------
 
+function resolveColor(colors: ThemeColors, key: string): string {
+  if (key in colors) {
+    return colors[key as keyof ThemeColors];
+  }
+  return colors.foreground;
+}
+
 export function StatusLine({ status }: StatusLineProps): React.JSX.Element {
   const { Box, Text } = useInk();
   const { colors } = useTheme();
@@ -143,7 +145,7 @@ export function StatusLine({ status }: StatusLineProps): React.JSX.Element {
         Text as React.ComponentType<Record<string, unknown>>,
         {
           key: idx,
-          color: (colors as unknown as Record<string, string>)[seg.colorKey] ?? colors.foreground,
+          color: resolveColor(colors, seg.colorKey),
           bold: seg.bold ?? false,
         },
         seg.text,

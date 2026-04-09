@@ -6,29 +6,12 @@
  *   formatTokenCount(count: number): string
  *   formatCost(cost: number): string
  *
- * Re-implemented here as specification contracts (TDD Red phase).
+ * Imports the real implementations from StatusBar.tsx and helpers.ts.
  */
 
 import { describe, it, expect } from "vitest";
-
-// ---------------------------------------------------------------------------
-// Re-implementations (spec contracts)
-// ---------------------------------------------------------------------------
-
-function formatTokenCount(count: number): string {
-  if (count < 1000) return `${count}`;
-  if (count < 1_000_000) {
-    const k = count / 1000;
-    return `${k.toFixed(1)}k`;
-  }
-  const m = count / 1_000_000;
-  return `${m.toFixed(1)}M`;
-}
-
-function formatCost(cost: number): string {
-  if (cost < 1) return `$${cost.toFixed(4)}`;
-  return `$${cost.toFixed(2)}`;
-}
+import { formatTokenCount } from "../components/StatusBar.js";
+import { formatCost } from "../helpers.js";
 
 // ---------------------------------------------------------------------------
 // formatTokenCount

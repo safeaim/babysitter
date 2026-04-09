@@ -5,100 +5,18 @@
  * TreeNode objects into a flat list of TreeLine objects suitable for
  * line-by-line terminal rendering.
  *
- * Re-implemented here as a specification contract (TDD Red phase).
+ * Imports the real implementation from Tree.tsx.
  */
 
 import { describe, it, expect } from "vitest";
+import { buildTreeLines, type TreeNode } from "../components/primitives/Tree.js";
 
 // ---------------------------------------------------------------------------
-// Types (specification)
-// ---------------------------------------------------------------------------
-
-interface TreeNode {
-  label: string;
-  children?: TreeNode[];
-  color?: string;
-  icon?: string;
-}
-
-interface TreeLine {
-  prefix: string;
-  label: string;
-  depth: number;
-  color?: string;
-  icon?: string;
-}
-
-// ---------------------------------------------------------------------------
-// Branch characters (spec constants)
+// Branch characters (spec constants for assertions)
 // ---------------------------------------------------------------------------
 
 const BRANCH = "\u251c\u2500\u2500 "; // "├── "
 const LAST_BRANCH = "\u2514\u2500\u2500 "; // "└── "
-const CONTINUATION = "\u2502   "; // "│   "
-const SPACING = "    "; // "    "
-
-// ---------------------------------------------------------------------------
-// Re-implementation (spec contract)
-// ---------------------------------------------------------------------------
-
-function buildTreeLines(
-  nodes: TreeNode[],
-  parentPrefix: string = "",
-  depth: number = 0
-): TreeLine[] {
-  const lines: TreeLine[] = [];
-
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    const isLast = i === nodes.length - 1;
-
-    // For root-level nodes with no siblings concept at depth 0,
-    // still use branch characters if there are multiple roots
-    let prefix: string;
-    if (depth === 0 && nodes.length === 1 && !node.children?.length) {
-      // Single root with no children: empty prefix
-      prefix = "";
-    } else if (depth === 0) {
-      prefix = isLast ? LAST_BRANCH : BRANCH;
-    } else {
-      prefix = parentPrefix + (isLast ? LAST_BRANCH : BRANCH);
-    }
-
-    // Special case: single node, no children, depth 0
-    if (depth === 0 && nodes.length === 1 && !node.children?.length) {
-      lines.push({
-        prefix: "",
-        label: node.label,
-        depth,
-        ...(node.color !== undefined ? { color: node.color } : {}),
-        ...(node.icon !== undefined ? { icon: node.icon } : {}),
-      });
-    } else {
-      lines.push({
-        prefix: depth === 0 ? (isLast ? LAST_BRANCH : BRANCH) : prefix,
-        label: node.label,
-        depth,
-        ...(node.color !== undefined ? { color: node.color } : {}),
-        ...(node.icon !== undefined ? { icon: node.icon } : {}),
-      });
-    }
-
-    if (node.children && node.children.length > 0) {
-      const childPrefix =
-        depth === 0
-          ? isLast
-            ? SPACING
-            : CONTINUATION
-          : parentPrefix + (isLast ? SPACING : CONTINUATION);
-
-      const childLines = buildTreeLines(node.children, childPrefix, depth + 1);
-      lines.push(...childLines);
-    }
-  }
-
-  return lines;
-}
 
 // ---------------------------------------------------------------------------
 // Tests

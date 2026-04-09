@@ -4,60 +4,19 @@
  * Tests for the pure function renderProgressBar, which produces a text-based
  * progress bar suitable for terminal rendering.
  *
- * Re-implemented here as a specification contract (TDD Red phase).
+ * Imports the real implementation from ProgressBar.tsx.
  */
 
 import { describe, it, expect } from "vitest";
+import { renderProgressBar } from "../components/primitives/ProgressBar.js";
 
 // ---------------------------------------------------------------------------
-// Types (specification)
-// ---------------------------------------------------------------------------
-
-interface ProgressBarInput {
-  progress: number;
-  width?: number;
-  fillChar?: string;
-  emptyChar?: string;
-  showLabel?: boolean;
-}
-
-interface ProgressBarOutput {
-  bar: string;
-  label: string;
-  filledCount: number;
-}
-
-// ---------------------------------------------------------------------------
-// Defaults (specification)
+// Defaults (specification constants for assertions)
 // ---------------------------------------------------------------------------
 
 const DEFAULT_WIDTH = 20;
 const DEFAULT_FILL = "\u2588"; // "█"
 const DEFAULT_EMPTY = "\u2591"; // "░"
-
-// ---------------------------------------------------------------------------
-// Re-implementation (spec contract)
-// ---------------------------------------------------------------------------
-
-function renderProgressBar(input: ProgressBarInput): ProgressBarOutput {
-  const width = input.width ?? DEFAULT_WIDTH;
-  const fillChar = input.fillChar ?? DEFAULT_FILL;
-  const emptyChar = input.emptyChar ?? DEFAULT_EMPTY;
-  const showLabel = input.showLabel ?? false;
-
-  // Clamp progress to [0, 1]
-  const clamped = Math.max(0, Math.min(1, input.progress));
-
-  const filledCount = Math.round(clamped * width);
-  const emptyCount = width - filledCount;
-
-  const bar = fillChar.repeat(filledCount) + emptyChar.repeat(emptyCount);
-
-  const pct = Math.round(clamped * 100);
-  const label = showLabel ? ` ${pct}%` : "";
-
-  return { bar, label, filledCount };
-}
 
 // ---------------------------------------------------------------------------
 // Tests

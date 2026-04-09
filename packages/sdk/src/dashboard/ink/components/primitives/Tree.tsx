@@ -15,22 +15,22 @@ import { useTheme } from "../../hooks/useTheme.js";
 // ---------------------------------------------------------------------------
 
 export interface TreeNode {
-  label: string;
-  children?: TreeNode[];
-  color?: string;
-  icon?: string;
+  readonly label: string;
+  readonly children?: readonly TreeNode[];
+  readonly color?: string;
+  readonly icon?: string;
 }
 
 export interface TreeLine {
-  prefix: string;
-  label: string;
-  depth: number;
-  color?: string;
-  icon?: string;
+  readonly prefix: string;
+  readonly label: string;
+  readonly depth: number;
+  readonly color?: string;
+  readonly icon?: string;
 }
 
 export interface TreeProps {
-  nodes: TreeNode[];
+  readonly nodes: readonly TreeNode[];
 }
 
 // ---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ const SPACING = "    "; // "    "
 // ---------------------------------------------------------------------------
 
 export function buildTreeLines(
-  nodes: TreeNode[],
+  nodes: readonly TreeNode[],
   parentPrefix: string = "",
   depth: number = 0,
 ): TreeLine[] {
@@ -70,13 +70,9 @@ export function buildTreeLines(
       prefix,
       label: node.label,
       depth,
+      ...(node.color !== undefined ? { color: node.color } : {}),
+      ...(node.icon !== undefined ? { icon: node.icon } : {}),
     };
-    if (node.color !== undefined) {
-      line.color = node.color;
-    }
-    if (node.icon !== undefined) {
-      line.icon = node.icon;
-    }
     lines.push(line);
 
     if (node.children && node.children.length > 0) {
@@ -107,10 +103,10 @@ export function Tree({ nodes }: TreeProps): React.JSX.Element {
   return React.createElement(
     Box as React.ComponentType<Record<string, unknown>>,
     { flexDirection: "column" },
-    ...lines.map((line, idx) =>
+    ...lines.map((line) =>
       React.createElement(
         Box as React.ComponentType<Record<string, unknown>>,
-        { key: idx, flexDirection: "row" },
+        { key: `${line.depth}-${line.label}`, flexDirection: "row" },
         React.createElement(
           Text as React.ComponentType<Record<string, unknown>>,
           { color: colors.border },

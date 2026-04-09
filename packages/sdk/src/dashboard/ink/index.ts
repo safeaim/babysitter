@@ -24,7 +24,7 @@ export type {
   ThemeColors,
   TuiConfig,
   EffectKind,
-  EffectStatus,
+  TuiEffectStatus,
   EffectSummary,
   TaskSummary,
   BreakpointState,

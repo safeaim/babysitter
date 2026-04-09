@@ -16,6 +16,8 @@ import { useInk } from "../contexts/InkContext.js";
 import { RunningIndicator } from "./RunningIndicator.js";
 import { formatElapsed } from "../../components/StatusLine.js";
 import type { RunStatus } from "../types.js";
+import { truncateRunId, formatCost } from "../helpers.js";
+export { formatCost };
 
 // ---------------------------------------------------------------------------
 // Props
@@ -38,11 +40,6 @@ export interface StatusBarProps {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function truncateRunId(id: string): string {
-  if (id.length <= 12) return id;
-  return id.slice(0, 12);
-}
-
 export function formatTokenCount(count: number): string {
   if (count < 1000) return `${count}`;
   if (count < 1_000_000) {
@@ -51,11 +48,6 @@ export function formatTokenCount(count: number): string {
   }
   const m = count / 1_000_000;
   return `${m.toFixed(1)}M`;
-}
-
-export function formatCost(cost: number): string {
-  if (cost < 1) return `$${cost.toFixed(4)}`;
-  return `$${cost.toFixed(2)}`;
 }
 
 function statusToIndicator(status: RunStatus): string {

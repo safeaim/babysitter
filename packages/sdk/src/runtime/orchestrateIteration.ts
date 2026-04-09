@@ -258,13 +258,39 @@ async function loadProcessFunction(
 
 type WaitingIterationResult = Extract<IterationResult, { status: "waiting" }>;
 
-function asWaitingResult(error: unknown): WaitingIterationResult | null {
+/** @internal Exported for testing only. */
+export function asWaitingResult(error: unknown): WaitingIterationResult | null {
+  // Primary path: direct instanceof checks (same SDK copy).
   if (error instanceof ParallelPendingError) {
     return { status: "waiting", nextActions: error.batch.actions };
   }
   if (error instanceof EffectRequestedError || error instanceof EffectPendingError) {
     return { status: "waiting", nextActions: [error.action] };
   }
+
+  // Fallback: duck-type detection for cross-package instanceof failures.
+  // When the globally-installed SDK orchestrates a process that imports a
+  // workspace-local SDK copy, the two EffectRequestedError classes are
+  // different constructors and instanceof returns false.  We recover by
+  // checking the error shape (name + action property).
+  if (error && typeof error === "object") {
+    const err = error as Record<string, unknown>;
+    if (
+      (err.name === "ParallelPendingError" || err.name === "ParallelPendingError") &&
+      err.batch && typeof err.batch === "object" &&
+      Array.isArray((err.batch as Record<string, unknown>).actions)
+    ) {
+      return { status: "waiting", nextActions: (err.batch as { actions: EffectAction[] }).actions };
+    }
+    if (
+      (err.name === "EffectRequestedError" || err.name === "EffectPendingError") &&
+      err.action && typeof err.action === "object" &&
+      typeof (err.action as Record<string, unknown>).effectId === "string"
+    ) {
+      return { status: "waiting", nextActions: [err.action as EffectAction] };
+    }
+  }
+
   return null;
 }
 

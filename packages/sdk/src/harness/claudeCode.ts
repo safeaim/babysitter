@@ -1258,7 +1258,11 @@ export function createClaudeCodeAdapter(): HarnessAdapter {
     name: "claude-code",
 
     isActive(): boolean {
-      return !!(process.env.BABYSITTER_SESSION_ID || process.env.CLAUDE_ENV_FILE);
+      if (process.env.BABYSITTER_SESSION_ID || process.env.CLAUDE_ENV_FILE) return true;
+      // On Windows, session-env sourcing is unsupported so neither env var is
+      // set in Bash tool calls. Check the PID-scoped marker file instead.
+      const markerPath = getCurrentSessionIdFilePath();
+      return !!(markerPath && existsSync(markerPath));
     },
 
     autoResolvesSessionId(): boolean {

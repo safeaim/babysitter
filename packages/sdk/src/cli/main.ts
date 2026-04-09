@@ -1277,12 +1277,15 @@ async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
   const entrySpec = formatEntrypointSpecifier(result.metadata.entrypoint);
 
   // --- Harness-specific session binding ---
-  // Attempt session binding when --session-id is provided or --harness is
-  // explicitly passed (the adapter resolves session IDs from env vars).
-  const shouldBindSession = parsed.sessionId !== undefined || parsed.harness !== undefined;
-  const adapter = shouldBindSession
-    ? (parsed.harness ? getAdapterByName(parsed.harness) : getAdapter())
-    : undefined;
+  // Attempt session binding when --session-id or --harness is explicitly
+  // passed, OR when the active harness can be auto-detected (e.g. running
+  // inside Claude Code on Windows where env vars aren't set but the PID
+  // marker file exists).
+  const detectedAdapter = parsed.harness ? getAdapterByName(parsed.harness) : getAdapter();
+  const shouldBindSession = parsed.sessionId !== undefined
+    || parsed.harness !== undefined
+    || (detectedAdapter && detectedAdapter.name !== "custom");
+  const adapter = shouldBindSession ? detectedAdapter : undefined;
 
   // Reject explicit --session-id when the adapter auto-resolves it.
   if (parsed.sessionId && adapter?.autoResolvesSessionId?.()) {

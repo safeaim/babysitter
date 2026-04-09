@@ -309,7 +309,7 @@ interface ParsedArgs {
   breakpointExpert?: string;
   // task:cancel flags
   cancelReason?: string;
-  // tui:session flags
+  // tui flags
   verbosity?: string;
   tuiFlag?: boolean;
 }
@@ -771,7 +771,7 @@ function parseArgs(argv: string[]): ParsedArgs {
       parsed.retrospectAll = true;
       continue;
     }
-    // tui:session flags
+    // tui flags
     if (arg === "--verbosity") {
       parsed.verbosity = expectFlagValue(rest, ++i, "--verbosity");
       continue;
@@ -838,8 +838,7 @@ function parseArgs(argv: string[]): ParsedArgs {
     parsed.command === "harness:install" ||
     parsed.command === "harness:install-plugin" ||
     parsed.command === "harness:help" ||
-    parsed.command === "tui" ||
-    parsed.command === "tui:session"
+    parsed.command === "tui"
   ) {
     parsed.positional = positionals;
   } else if (
@@ -2493,7 +2492,6 @@ const VALID_COMMANDS = [
   "breakpoint:should-auto-approve",
   "breakpoint:history",
   "tui",
-  "tui:session",
   "version",
 ];
 
@@ -2559,14 +2557,17 @@ ${dim}Documentation: https://github.com/a5c-ai/babysitter${reset}
 }
 
 async function handleHarnessObserve(parsed: ParsedArgs): Promise<number> {
-  // --tui: launch the Ink-based TUI instead of the web observer dashboard
+  // --tui: launch the unified Ink-based dashboard instead of the web observer
   if (parsed.tuiFlag) {
-    const { handleTuiSession } = await import("./commands/tuiSession");
-    return await handleTuiSession({
-      runId: parsed.runIdOverride,
-      verbosity: parsed.verbosity as ("minimal" | "normal" | "verbose") | undefined,
+    const { handleTui } = await import("./commands/tui");
+    return await handleTui({
+      runsDir: parsed.runsDir,
+      json: false,
+      verbose: parsed.verbose,
       workspace: parsed.workspace,
       harness: parsed.harness,
+      runId: parsed.runIdOverride,
+      verbosity: parsed.verbosity as ("minimal" | "normal" | "verbose") | undefined,
     });
   }
 
@@ -3473,15 +3474,8 @@ export function createBabysitterCli() {
             harness: parsed.harness,
             workspace: parsed.workspace,
             prompt: parsed.prompt,
-          });
-        }
-        if (parsed.command === "tui:session") {
-          const { handleTuiSession } = await import("./commands/tuiSession");
-          return await handleTuiSession({
             runId: parsed.runIdOverride,
             verbosity: parsed.verbosity as ("minimal" | "normal" | "verbose") | undefined,
-            workspace: parsed.workspace,
-            harness: parsed.harness,
           });
         }
 

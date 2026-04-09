@@ -118,7 +118,11 @@ export async function createTuiSession(
   const element = React.createElement(
     InkProvider,
     { Box, Text, useInput },
-    React.createElement(App, config),
+    React.createElement(App, {
+      ...config,
+      initialView: config.initialView,
+      runsDir: config.runsDir,
+    }),
   );
 
   const instance = render(element, {

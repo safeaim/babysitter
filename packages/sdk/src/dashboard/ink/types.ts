@@ -9,6 +9,8 @@
 // Enumerations / union types
 // ---------------------------------------------------------------------------
 
+export type ViewName = "dashboard" | "session" | "run-detail";
+
 export type MessageKind =
   | "user"
   | "assistant"
@@ -156,4 +158,8 @@ export interface TuiConfig {
   readonly theme?: Theme;
   /** Whether to render to stderr instead of stdout. Defaults to true. */
   readonly useStderr?: boolean;
+  /** Initial view to display. Defaults to "dashboard". */
+  readonly initialView?: ViewName;
+  /** Directory containing runs. Defaults to ".a5c/runs". */
+  readonly runsDir?: string;
 }

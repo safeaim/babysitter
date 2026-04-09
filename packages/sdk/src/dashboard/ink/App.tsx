@@ -8,20 +8,18 @@
  * as props.  This avoids any direct static import of ESM-only modules from a
  * CommonJS compilation unit.
  *
- * Layout (column, full height):
- *   ┌──────────────────────────────┐
- *   │ StatusBar  (1 row)           │
- *   ├──────────────────────────────┤
- *   │ MessagePane  (flex: 1)       │
- *   ├──────────────────────────────┤
- *   │ PromptBar  (1–3 rows)        │
- *   └──────────────────────────────┘
+ * Layout varies by view:
+ *   dashboard → DashboardView (run list with navigation)
+ *   session   → SessionView (StatusBar + MessagePane + PromptBar)
+ *   run-detail → placeholder (future: detailed run inspector)
  */
 
 import React from "react";
 
 import { InkProvider } from "./contexts/InkContext.js";
 import { SessionProvider } from "./contexts/SessionContext.js";
+import { NavigationProvider } from "./contexts/NavigationContext.js";
+import { useNavigation } from "./hooks/useNavigation.js";
 import { ThemeProvider, neonDarkTheme } from "./contexts/ThemeContext.js";
 import { ClockProvider } from "./contexts/ClockContext.js";
 import { useInk } from "./contexts/InkContext.js";
@@ -29,7 +27,9 @@ import { useSession } from "./hooks/useSession.js";
 import { StatusBar } from "./components/StatusBar.js";
 import { MessagePane } from "./components/MessagePane.js";
 import { PromptBar } from "./components/PromptBar.js";
-import type { TuiConfig, Theme, VerbosityLevel } from "./types.js";
+import { DashboardView } from "./views/DashboardView.js";
+import { SessionView } from "./views/SessionView.js";
+import type { TuiConfig, Theme, VerbosityLevel, ViewName } from "./types.js";
 
 // Re-export InkProvider so render.ts can reference it from the same require()
 export { InkProvider };
@@ -48,32 +48,68 @@ export type InkText = React.ComponentType<Record<string, unknown> & { children?:
 
 const VERBOSITY_CYCLE: VerbosityLevel[] = ["minimal", "normal", "verbose"];
 
-function AppInner(): React.JSX.Element {
-  const { Box, useInput } = useInk();
-  const { state, dispatch } = useSession();
+interface AppInnerProps {
+  readonly runsDir: string;
+}
 
-  // 'v' key cycles verbosity at the app level
+function AppInner({ runsDir }: AppInnerProps): React.JSX.Element {
+  const { Box, Text, useInput } = useInk();
+  const { state: sessionState, dispatch: sessionDispatch } = useSession();
+  const { state: navState } = useNavigation();
+
+  // 'v' key cycles verbosity at the app level (only in session view)
   useInput(
     (input: string) => {
-      if (input === "v") {
-        const current = state.verbosity;
+      if (input === "v" && navState.currentView === "session") {
+        const current = sessionState.verbosity;
         const idx = VERBOSITY_CYCLE.indexOf(current);
         const next = VERBOSITY_CYCLE[(idx + 1) % VERBOSITY_CYCLE.length];
-        dispatch({ type: "SET_VERBOSITY", verbosity: next as VerbosityLevel });
+        sessionDispatch({ type: "SET_VERBOSITY", verbosity: next as VerbosityLevel });
       }
     },
   );
 
-  return React.createElement(
-    Box as React.ComponentType<Record<string, unknown>>,
-    {
-      flexDirection: "column",
-      height: "100%",
-    },
-    React.createElement(StatusBar, null),
-    React.createElement(MessagePane, null),
-    React.createElement(PromptBar, null),
-  );
+  switch (navState.currentView) {
+    case "dashboard":
+      return React.createElement(DashboardView, { runsDir });
+
+    case "session":
+      return React.createElement(SessionView, null);
+
+    case "run-detail":
+      // Placeholder for future run-detail view; shows a simple message
+      return React.createElement(
+        Box as React.ComponentType<Record<string, unknown>>,
+        { flexDirection: "column", height: "100%" },
+        React.createElement(
+          Box as React.ComponentType<Record<string, unknown>>,
+          { paddingX: 1, paddingY: 1 },
+          React.createElement(
+            Text as React.ComponentType<Record<string, unknown>>,
+            { color: "cyan", bold: true },
+            `Run Detail: ${navState.selectedRunId ?? "none"}`,
+          ),
+        ),
+        React.createElement(
+          Box as React.ComponentType<Record<string, unknown>>,
+          { paddingX: 1 },
+          React.createElement(
+            Text as React.ComponentType<Record<string, unknown>>,
+            { color: "#6b7280" },
+            "Run detail view coming soon. Press Escape to go back.",
+          ),
+        ),
+      );
+
+    default: {
+      const _exhaustive: never = navState.currentView;
+      return React.createElement(
+        Text as React.ComponentType<Record<string, unknown>>,
+        null,
+        "Unknown view",
+      );
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -84,16 +120,25 @@ export default function App({
   runId,
   verbosity = "normal",
   theme,
+  initialView,
+  runsDir = ".a5c/runs",
 }: TuiConfig): React.JSX.Element {
   const resolvedTheme: Theme = theme ?? neonDarkTheme;
 
+  // Determine initial view: if a runId is provided and no explicit
+  // initialView, default to session view for backward compatibility.
+  const effectiveInitialView: ViewName =
+    initialView ?? (runId ? "session" : "dashboard");
+
   return (
-    <SessionProvider initialRunId={runId} initialVerbosity={verbosity}>
-      <ThemeProvider theme={resolvedTheme}>
-        <ClockProvider intervalMs={100}>
-          <AppInner />
-        </ClockProvider>
-      </ThemeProvider>
-    </SessionProvider>
+    <NavigationProvider initialView={effectiveInitialView} initialRunId={runId}>
+      <SessionProvider initialRunId={runId} initialVerbosity={verbosity}>
+        <ThemeProvider theme={resolvedTheme}>
+          <ClockProvider intervalMs={100}>
+            <AppInner runsDir={runsDir} />
+          </ClockProvider>
+        </ThemeProvider>
+      </SessionProvider>
+    </NavigationProvider>
   );
 }

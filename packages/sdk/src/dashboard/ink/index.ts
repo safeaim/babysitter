@@ -7,6 +7,7 @@
 
 // Types
 export type {
+  ViewName,
   MessageKind,
   VerbosityLevel,
   RunStatus,
@@ -27,9 +28,16 @@ export type {
 // Session actions (useful for consumers that dispatch externally)
 export type { SessionAction } from "./contexts/SessionContext.js";
 
+// Navigation actions and state
+export type { NavigationAction, NavigationState } from "./contexts/NavigationContext.js";
+
 // Hook result types
 export type { UseSessionResult } from "./hooks/useSession.js";
 export type { UseClockResult } from "./hooks/useClock.js";
+export type { UseRunScannerResult } from "./hooks/useRunScanner.js";
+
+// Data layer types
+export type { RunSummary, RunDetail } from "./data/runScanner.js";
 
 // Runtime entry point
 export { createTuiSession, type TuiSession } from "./render.js";

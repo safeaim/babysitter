@@ -354,6 +354,20 @@ function mergeSchedulerHints(
     merged.parallelGroupId = extra.parallelGroupId;
     changed = true;
   }
+  if (
+    extra.maxConcurrency !== undefined &&
+    merged.maxConcurrency !== extra.maxConcurrency
+  ) {
+    merged.maxConcurrency = extra.maxConcurrency;
+    changed = true;
+  }
+  if (
+    extra.executionStrategy !== undefined &&
+    merged.executionStrategy !== extra.executionStrategy
+  ) {
+    merged.executionStrategy = extra.executionStrategy;
+    changed = true;
+  }
 
   if (!changed) {
     return base;

@@ -66,6 +66,10 @@ export interface EffectRecord {
   progressLabel?: string;
   currentStep?: string;
   progressEta?: string;
+  // Background effect tracking (GAP-PAR-002)
+  background?: boolean;
+  dispatchedAt?: string;
+  lastPolledAt?: string;
   // Cost tracking (GAP-SUBOBS-003)
   inputTokens?: number;
   outputTokens?: number;
@@ -79,6 +83,14 @@ export interface EffectSchedulerHints {
   pendingCount?: number;
   parallelGroupId?: string;
   sleepUntilEpochMs?: number;
+  maxConcurrency?: number;
+  executionStrategy?: 'sequential' | 'concurrent' | 'adaptive';
+  background?: boolean;
+  pollIntervalMs?: number;
+  timeoutMs?: number;
+  effectGroupId?: string;
+  groupRole?: 'coordinator' | 'worker';
+  preferredHarness?: string;
 }
 
 export interface EffectAction {

@@ -12,7 +12,10 @@
  * That is correct — this is the TDD red phase.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import {
   createAgenticToolDefinitions,
   type CustomToolDefinition,
@@ -27,7 +30,19 @@ import {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const TEST_WORKSPACE = "/tmp/test-workspace-bg";
+let TEST_WORKSPACE: string;
+
+beforeAll(() => {
+  TEST_WORKSPACE = fs.mkdtempSync(path.join(os.tmpdir(), "test-workspace-bg-"));
+});
+
+afterAll(() => {
+  try {
+    fs.rmSync(TEST_WORKSPACE, { recursive: true, force: true });
+  } catch {
+    // Ignore cleanup failures
+  }
+});
 
 function createTools(overrides?: Partial<AgenticToolOptions>): CustomToolDefinition[] {
   return createAgenticToolDefinitions({

@@ -156,7 +156,7 @@ async function tryResolveProcessLibraryRoot(): Promise<{
     if (resolved.binding?.dir) {
       const defaultSpec = getDefaultProcessLibrarySpec();
       return {
-        processLibraryRoot: resolved.binding.dir,
+        processLibraryRoot: defaultSpec.processRoot,
         processLibraryReferenceRoot: defaultSpec.referenceRoot,
       };
     }

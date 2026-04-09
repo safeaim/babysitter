@@ -26,7 +26,7 @@ function runGit(args: string[], cwd: string): void {
 }
 
 async function seedProcessLibraryRepo(repoRoot: string): Promise<void> {
-  const processDir = path.join(repoRoot, "plugins", "babysitter", "skills", "babysit", "process");
+  const processDir = path.join(repoRoot, "library");
   const referenceDir = path.join(repoRoot, "plugins", "babysitter", "reference");
   await fs.mkdir(processDir, { recursive: true });
   await fs.mkdir(referenceDir, { recursive: true });
@@ -69,11 +69,7 @@ describe("processLibrary active defaults", () => {
         "a5c-global-state",
         "process-library",
         "babysitter-repo",
-        "plugins",
-        "babysitter",
-        "skills",
-        "babysit",
-        "process",
+        "library",
       ),
     );
   });
@@ -94,7 +90,7 @@ describe("processLibrary active defaults", () => {
       expect(first.bootstrapped).toBe(true);
       expect(first.stateFile).toBe(path.join(stateDir, "active", "process-library.json"));
       expect(first.binding?.dir).toBe(
-        path.join(stateDir, "process-library", "babysitter-repo", "plugins", "babysitter", "skills", "babysit", "process"),
+        path.join(stateDir, "process-library", "babysitter-repo", "library"),
       );
 
       const second = await ensureActiveProcessLibrary();

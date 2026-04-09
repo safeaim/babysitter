@@ -66,10 +66,8 @@ try {
   const userHome = path.join(tmpRoot, 'home');
   const homePluginsRoot = path.join(codexHome, 'plugins');
   const homeMarketplacePath = path.join(userHome, '.agents', 'plugins', 'marketplace.json');
-  // Use the monorepo itself as the process library source, with
-  // BABYSITTER_PROCESS_LIBRARY_SUBPATH pointing to the actual "library/"
-  // directory.  This avoids fabricating a fake repo and stays resilient
-  // when DEFAULT_PROCESS_LIBRARY_SUBPATH changes.
+  // Use the monorepo itself as the process library source — the default
+  // subpath is "library/" which matches the monorepo layout.
   const processLibraryRepoRoot = path.resolve(PROJECT_ROOT, '..', '..');
   fs.mkdirSync(extractDir, { recursive: true });
   fs.mkdirSync(codexHome, { recursive: true });
@@ -91,7 +89,7 @@ try {
       ...process.env,
       BABYSITTER_SDK_CLI: path.join(PROJECT_ROOT, '..', '..', 'packages', 'sdk', 'dist', 'cli', 'main.js'),
       BABYSITTER_PROCESS_LIBRARY_REPO: processLibraryRepoRoot,
-      BABYSITTER_PROCESS_LIBRARY_SUBPATH: 'library',
+
       CODEX_HOME: codexHome,
       HOME: userHome,
       USERPROFILE: userHome,
@@ -175,7 +173,7 @@ try {
       ...process.env,
       BABYSITTER_SDK_CLI: path.join(PROJECT_ROOT, '..', '..', 'packages', 'sdk', 'dist', 'cli', 'main.js'),
       BABYSITTER_PROCESS_LIBRARY_REPO: processLibraryRepoRoot,
-      BABYSITTER_PROCESS_LIBRARY_SUBPATH: 'library',
+
       HOME: userHome,
       USERPROFILE: userHome,
     },

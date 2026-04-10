@@ -184,15 +184,20 @@ export function registerRunTools(server: McpServer): void {
       const runsDir = resolveRunDir(args.runsDir);
       const filterType = args.filterType?.toUpperCase();
 
+      // When reverse is requested, we cannot apply limit server-side because
+      // the API applies limit before ordering. Fetch all matching events and
+      // apply limit after reversing.
+      const apiLimit = args.reverse ? undefined : args.limit;
+
       // Fetch all events (unfiltered) to get the total count,
-      // then apply filter/limit via the API.
+      // then apply filter via the API.
       const [allResult, filteredResult] = filterType
         ? await Promise.all([
             apiRunEvents({ runId: args.runId, runsDir }),
-            apiRunEvents({ runId: args.runId, runsDir, limit: args.limit, filterType }),
+            apiRunEvents({ runId: args.runId, runsDir, limit: apiLimit, filterType }),
           ])
         : [
-            await apiRunEvents({ runId: args.runId, runsDir, limit: args.limit }),
+            await apiRunEvents({ runId: args.runId, runsDir, limit: apiLimit }),
             undefined,
           ];
 
@@ -203,14 +208,21 @@ export function registerRunTools(server: McpServer): void {
         return toolError(filteredResult.error.message);
       }
 
-      const sourceEvents = filteredResult?.ok ? filteredResult.data.events : allResult.data.events;
-      const events = args.reverse ? sourceEvents.slice().reverse() : sourceEvents;
+      const matchingEvents = filteredResult?.ok ? filteredResult.data.events : allResult.data.events;
+
+      // Apply ordering
+      const ordered = args.reverse ? matchingEvents.slice().reverse() : matchingEvents;
+
+      // Apply limit (needed when reverse deferred limit from API)
+      const limited = (args.limit !== undefined && args.reverse)
+        ? ordered.slice(0, args.limit)
+        : ordered;
 
       return toolResult({
         total: allResult.data.events.length,
-        matching: sourceEvents.length,
-        showing: events.length,
-        events,
+        matching: matchingEvents.length,
+        showing: limited.length,
+        events: limited,
       });
     }
   );

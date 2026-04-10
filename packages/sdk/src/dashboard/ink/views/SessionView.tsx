@@ -23,6 +23,7 @@ import { MessagePane } from "../components/MessagePane.js";
 import { PromptBar } from "../components/PromptBar.js";
 import { SearchBar } from "../components/SearchBar.js";
 import type { SearchBarState } from "../components/SearchBar.js";
+import { BreakpointPanel } from "../components/BreakpointPanel.js";
 import { parseStreamingLine, findMatches } from "../helpers.js";
 import { filterMessages } from "../components/MessagePane.js";
 import type { TuiMessage, VerbosityLevel } from "../types.js";
@@ -513,6 +514,30 @@ export function SessionView(): React.JSX.Element {
     [],
   );
 
+  // Breakpoint handling
+  const activeBreakpoint = sessionState.breakpoint;
+  const hasActiveBreakpoint = activeBreakpoint !== null && activeBreakpoint.approved === null;
+
+  const handleBreakpointSelect = useCallback(
+    (option: string) => {
+      if (!activeBreakpoint) return;
+      const isApproved = option.toLowerCase().includes("approve");
+      // Append a system message noting the breakpoint decision
+      const msg: TuiMessage = {
+        id: `bp-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        verbosity: "minimal",
+        content: {
+          kind: "system",
+          text: `Breakpoint "${activeBreakpoint.title}": ${isApproved ? "Approved" : "Rejected"} (${option})`,
+        },
+      };
+      sessionDispatch({ type: "APPEND_MESSAGE", message: msg });
+      sessionDispatch({ type: "CLEAR_BREAKPOINT" });
+    },
+    [activeBreakpoint, sessionDispatch],
+  );
+
   // Loading indicator element
   const loadingIndicator = chat.loading
     ? React.createElement(
@@ -540,11 +565,17 @@ export function SessionView(): React.JSX.Element {
       onSearchChange: handleSearchChange,
     }),
     loadingIndicator,
-    React.createElement(PromptBar, {
-      onSubmit: handleSubmit,
-      placeholder: chat.loading
-        ? "Waiting for response..."
-        : "Type a message... (Enter=submit, Esc=clear, /help for commands)",
-    }),
+    hasActiveBreakpoint
+      ? React.createElement(BreakpointPanel, {
+          breakpoint: activeBreakpoint,
+          onSelect: handleBreakpointSelect,
+          isActive: true,
+        })
+      : React.createElement(PromptBar, {
+          onSubmit: handleSubmit,
+          placeholder: chat.loading
+            ? "Waiting for response..."
+            : "Type a message... (Enter=submit, Esc=clear, /help for commands)",
+        }),
   );
 }

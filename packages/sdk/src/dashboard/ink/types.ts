@@ -115,6 +115,8 @@ export interface SessionState {
   readonly tokenUsage: TokenUsage | null;
   /** Accumulated cost for the current session. */
   readonly cost: number | null;
+  /** Active breakpoint awaiting user decision (null if none). */
+  readonly breakpoint: BreakpointState | null;
 }
 
 // ---------------------------------------------------------------------------

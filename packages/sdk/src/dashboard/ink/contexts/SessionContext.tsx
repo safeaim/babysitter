@@ -20,6 +20,7 @@ import type {
   RunStatus,
   VerbosityLevel,
   TokenUsage,
+  BreakpointState,
 } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -40,7 +41,9 @@ export type SessionAction =
   | { type: "TURN_STARTED"; startedAt: number }
   | { type: "TURN_FINISHED" }
   | { type: "UPDATE_TOKEN_USAGE"; tokenUsage: TokenUsage }
-  | { type: "UPDATE_COST"; cost: number };
+  | { type: "UPDATE_COST"; cost: number }
+  | { type: "SET_BREAKPOINT"; breakpoint: BreakpointState }
+  | { type: "CLEAR_BREAKPOINT" };
 
 // ---------------------------------------------------------------------------
 // Reducer
@@ -107,6 +110,12 @@ function sessionReducer(
     case "UPDATE_COST":
       return { ...state, cost: action.cost };
 
+    case "SET_BREAKPOINT":
+      return { ...state, breakpoint: action.breakpoint, inputActive: false };
+
+    case "CLEAR_BREAKPOINT":
+      return { ...state, breakpoint: null, inputActive: true };
+
     default: {
       const _exhaustive: never = action;
       return state;
@@ -129,6 +138,7 @@ const initialState: SessionState = {
   turnStartedAt: null,
   tokenUsage: null,
   cost: null,
+  breakpoint: null,
 };
 
 // ---------------------------------------------------------------------------

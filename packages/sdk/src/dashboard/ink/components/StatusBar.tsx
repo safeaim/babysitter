@@ -11,6 +11,7 @@
 
 import React from "react";
 import { useSession } from "../hooks/useSession.js";
+import { useClock } from "../hooks/useClock.js";
 import { useTheme } from "../hooks/useTheme.js";
 import { useInk } from "../contexts/InkContext.js";
 import { RunningIndicator } from "./RunningIndicator.js";
@@ -97,11 +98,10 @@ export function StatusBar({
   const { colors } = useTheme();
   const { Box, Text } = useInk();
 
+  const { now } = useClock(); // Subscribe to clock ticks for live timer updates
   const { runId, status, runStartedAt, turnStartedAt, tokenUsage, cost } = state;
   const isActive = status === "running" || status === "waiting_effect";
   const hasRun = runId !== null;
-
-  const now = Date.now();
   const elapsedMs = runStartedAt !== null ? now - runStartedAt : 0;
   const elapsedText = runStartedAt !== null ? formatElapsedClock(elapsedMs) : "--:--";
   const turnMs = turnStartedAt !== null ? now - turnStartedAt : 0;

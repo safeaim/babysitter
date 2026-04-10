@@ -386,8 +386,9 @@ export function SessionView(): React.JSX.Element {
 
       // Accumulate streamed lines for the assistant message
       const lines: string[] = [];
-      // Track active tool calls for inline display
+      // Track active tool calls: toolId → { msgId, startedAt }
       let toolCallCounter = 0;
+      const activeTools = new Map<string, { msgId: string; startedAt: number }>();
 
       chat
         .sendMessage(text, {
@@ -397,8 +398,10 @@ export function SessionView(): React.JSX.Element {
             if (event) {
               if (event.kind === "tool_start") {
                 toolCallCounter++;
+                const msgId = `tool-${Date.now()}-${toolCallCounter}`;
+                activeTools.set(event.toolId, { msgId, startedAt: Date.now() });
                 const toolMsg: TuiMessage = {
-                  id: `tool-${Date.now()}-${toolCallCounter}`,
+                  id: msgId,
                   timestamp: new Date().toISOString(),
                   verbosity: "normal",
                   content: {
@@ -408,6 +411,24 @@ export function SessionView(): React.JSX.Element {
                   },
                 };
                 sessionDispatch({ type: "APPEND_MESSAGE", message: toolMsg });
+              } else if (event.kind === "tool_end") {
+                const tracked = activeTools.get(event.toolId);
+                if (tracked) {
+                  const elapsedMs = Date.now() - tracked.startedAt;
+                  sessionDispatch({
+                    type: "UPDATE_MESSAGE",
+                    id: tracked.msgId,
+                    patch: {
+                      content: {
+                        kind: "tool_call",
+                        toolName: event.toolName,
+                        input: undefined,
+                        elapsedMs,
+                      },
+                    },
+                  });
+                  activeTools.delete(event.toolId);
+                }
               } else if (event.kind === "token_update") {
                 sessionDispatch({
                   type: "UPDATE_TOKEN_USAGE",

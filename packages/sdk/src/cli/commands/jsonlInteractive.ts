@@ -29,6 +29,11 @@ import {
   apiRemoveAutoApprovalRule,
   apiEvaluateAutoApproval,
 } from "../../api/breakpoints";
+import {
+  apiSubscribeRunEvents,
+  apiUnsubscribeRunEvents,
+  closeAllSubscriptions,
+} from "../../api/eventStream";
 import type { ApiResult } from "../../api/runs";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -68,6 +73,8 @@ export const SUPPORTED_METHODS = [
   "breakpoint.addRule",
   "breakpoint.removeRule",
   "breakpoint.evaluateAutoApproval",
+  "event.subscribe",
+  "event.unsubscribe",
   "shutdown",
 ] as const;
 
@@ -249,8 +256,28 @@ export async function dispatchJsonlMethod(
           consecutiveApprovals: p.consecutiveApprovals as number | undefined,
         });
 
+      // ── Event streaming ──
+      case "event.subscribe": {
+        const subResult = await apiSubscribeRunEvents({
+          runId: p.runId as string,
+          runsDir,
+          afterSeq: typeof p.afterSeq === "number" ? p.afterSeq : undefined,
+          pollIntervalMs: typeof p.pollIntervalMs === "number" ? p.pollIntervalMs : undefined,
+          onEvent: () => {
+            // Events are consumed via polling; JSONL doesn't push events
+          },
+        });
+        return subResult;
+      }
+
+      case "event.unsubscribe":
+        return apiUnsubscribeRunEvents({
+          subscriptionId: p.subscriptionId as string,
+        });
+
       // ── Control ──
       case "shutdown":
+        closeAllSubscriptions();
         return { ok: true, data: { ok: true } };
 
       default:

@@ -730,4 +730,85 @@ describe("GAP-JSON-004: Streaming JSONL CLI Mode", () => {
       expect(result.method).toBe("shutdown");
     });
   });
+
+  // ── AC-010/AC-011: event.subscribe/event.unsubscribe dispatch ──
+
+  describe("AC-010/AC-011: event streaming dispatch", () => {
+    it("event.subscribe dispatches to apiSubscribeRunEvents", async () => {
+      await scaffoldRunDir(testBase, "run-evt-sub");
+
+      const result = await dispatchJsonlMethod("event.subscribe", {
+        runId: "run-evt-sub",
+      }, { runsDir: testBase });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      const data = result.data as { subscriptionId: string; lastSeq: number };
+      expect(typeof data.subscriptionId).toBe("string");
+      expect(typeof data.lastSeq).toBe("number");
+
+      // Cleanup: the dispatch doesn't auto-close, so import and close
+      const { closeAllSubscriptions } = await import("../../../api/eventStream");
+      closeAllSubscriptions();
+    });
+
+    it("event.unsubscribe dispatches to apiUnsubscribeRunEvents", async () => {
+      await scaffoldRunDir(testBase, "run-evt-unsub");
+
+      // First subscribe
+      const subResult = await dispatchJsonlMethod("event.subscribe", {
+        runId: "run-evt-unsub",
+      }, { runsDir: testBase });
+      expect(subResult.ok).toBe(true);
+      if (!subResult.ok) return;
+      const subData = subResult.data as { subscriptionId: string };
+
+      // Then unsubscribe
+      const unsubResult = await dispatchJsonlMethod("event.unsubscribe", {
+        subscriptionId: subData.subscriptionId,
+      }, { runsDir: testBase });
+      expect(unsubResult.ok).toBe(true);
+      if (!unsubResult.ok) return;
+      const unsubData = unsubResult.data as { lastSeq: number };
+      expect(typeof unsubData.lastSeq).toBe("number");
+    });
+
+    it("event.subscribe returns RUN_NOT_FOUND for missing run", async () => {
+      const result = await dispatchJsonlMethod("event.subscribe", {
+        runId: "nonexistent-run",
+      }, { runsDir: testBase });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.code).toBe("RUN_NOT_FOUND");
+    });
+
+    it("event.unsubscribe returns error for unknown subscription", async () => {
+      const result = await dispatchJsonlMethod("event.unsubscribe", {
+        subscriptionId: "nonexistent-sub",
+      }, { runsDir: testBase });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.code).toBe("SUBSCRIPTION_NOT_FOUND");
+    });
+
+    it("SUPPORTED_METHODS includes event methods", () => {
+      expect(SUPPORTED_METHODS).toContain("event.subscribe");
+      expect(SUPPORTED_METHODS).toContain("event.unsubscribe");
+    });
+
+    it("shutdown cleans up active subscriptions", async () => {
+      await scaffoldRunDir(testBase, "run-evt-shutdown");
+
+      // Subscribe first
+      await dispatchJsonlMethod("event.subscribe", {
+        runId: "run-evt-shutdown",
+      }, { runsDir: testBase });
+
+      const { getActiveSubscriptions } = await import("../../../api/eventStream");
+      expect(getActiveSubscriptions().size).toBeGreaterThan(0);
+
+      // Shutdown should clean up
+      await dispatchJsonlMethod("shutdown", {}, { runsDir: testBase });
+      expect(getActiveSubscriptions().size).toBe(0);
+    });
+  });
 });

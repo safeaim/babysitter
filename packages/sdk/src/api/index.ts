@@ -53,3 +53,16 @@ export type {
   AddAutoApprovalRuleInput,
   EvaluateAutoApprovalInput,
 } from "./breakpoints";
+
+export {
+  apiSubscribeRunEvents,
+  apiUnsubscribeRunEvents,
+  getActiveSubscriptions,
+  closeAllSubscriptions,
+} from "./eventStream";
+
+export type {
+  SubscribeRunEventsInput,
+  SubscribeRunEventsOutput,
+  UnsubscribeRunEventsOutput,
+} from "./eventStream";

@@ -175,6 +175,16 @@
       "tags": ["memory", "persistence", "chromadb", "mcp", "search", "mining", "conversations", "palace", "local", "rag"],
       "author": "milla-jovovich",
       "repository": "https://github.com/milla-jovovich/mempalace"
+    },
+    "ctx": {
+      "name": "ctx",
+      "description": "Install ctx intelligent skill and agent recommendation system. Maintains a knowledge graph of 1,450+ skills and 427 agents, scans repos to detect tech stacks, recommends relevant skills per session, monitors context mid-session, and converts large skills into micro-skill pipelines. Includes lifecycle hooks and staleness tracking.",
+      "latestVersion": "1.0.0",
+      "versions": ["1.0.0"],
+      "packagePath": "plugins/ctx",
+      "tags": ["skills", "agents", "discovery", "recommendations", "knowledge-graph", "context", "micro-skills", "hooks", "claude-code"],
+      "author": "stevesolun",
+      "repository": "https://github.com/stevesolun/ctx"
     }
   }
 }

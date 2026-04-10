@@ -22,6 +22,11 @@ import { useTheme } from "../hooks/useTheme.js";
 import { useInk } from "../contexts/InkContext.js";
 import type { InkKey } from "../contexts/InkContext.js";
 import { Message } from "./Message.js";
+import {
+  clampScrollOffset,
+  computeVisibleRange,
+  shouldAutoScroll,
+} from "../helpers.js";
 import type { TuiMessage, VerbosityLevel, MessageKind } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -96,22 +101,27 @@ export function MessagePane(_props: MessagePaneProps): React.JSX.Element {
   const hasRun = state.runId !== null;
 
   // Keyboard scroll handling — disabled while user is typing in the prompt
+  // scrollOffset is bottom-based (0 = at bottom, max = at top).
+  // clampScrollOffset bounds to [0, contentLength - viewportHeight] which matches.
   useInput(
     (input: string, key: InkKey) => {
       if (visible.length === 0) return;
-      const maxOffset = Math.max(0, visible.length - VIEWPORT_SIZE);
 
       if (key.pageUp) {
-        setScrollOffset((prev) => Math.min(prev + PAGE_STEP, maxOffset));
+        setScrollOffset((prev) =>
+          clampScrollOffset(prev + PAGE_STEP, visible.length, VIEWPORT_SIZE));
       } else if (key.pageDown) {
-        setScrollOffset((prev) => Math.max(prev - PAGE_STEP, 0));
+        setScrollOffset((prev) =>
+          clampScrollOffset(prev - PAGE_STEP, visible.length, VIEWPORT_SIZE));
       } else if (key.upArrow) {
-        setScrollOffset((prev) => Math.min(prev + 1, maxOffset));
+        setScrollOffset((prev) =>
+          clampScrollOffset(prev + 1, visible.length, VIEWPORT_SIZE));
       } else if (key.downArrow) {
-        setScrollOffset((prev) => Math.max(prev - 1, 0));
+        setScrollOffset((prev) =>
+          clampScrollOffset(prev - 1, visible.length, VIEWPORT_SIZE));
       } else if (input === "g") {
-        // 'g' = go to top
-        setScrollOffset(maxOffset);
+        // 'g' = go to top (max bottom offset)
+        setScrollOffset(clampScrollOffset(visible.length, visible.length, VIEWPORT_SIZE));
       } else if (input === "G") {
         // 'G' = go to bottom
         setScrollOffset(0);
@@ -127,11 +137,17 @@ export function MessagePane(_props: MessagePaneProps): React.JSX.Element {
     });
   }
 
-  // Apply scroll window: take messages from end minus offset
-  const clampedOffset = Math.min(scrollOffset, Math.max(0, visible.length - 1));
-  const endIdx = visible.length - clampedOffset;
-  const startIdx = Math.max(0, endIdx - VIEWPORT_SIZE);
+  // Convert bottom-offset to top-offset for computeVisibleRange.
+  // bottom=0 → top=max, bottom=max → top=0
+  const maxOffset = Math.max(0, visible.length - VIEWPORT_SIZE);
+  const topOffset = maxOffset - clampScrollOffset(scrollOffset, visible.length, VIEWPORT_SIZE);
+  const { start: startIdx, end: endIdx } = computeVisibleRange(
+    topOffset,
+    visible.length,
+    VIEWPORT_SIZE,
+  );
   const windowedMessages = visible.slice(startIdx, endIdx);
+  const isAtBottom = shouldAutoScroll(topOffset, visible.length, VIEWPORT_SIZE);
 
   const messageElements = windowedMessages.map((msg) =>
     React.createElement(Message, {
@@ -141,15 +157,16 @@ export function MessagePane(_props: MessagePaneProps): React.JSX.Element {
   );
 
   // Scroll indicator shown when not at the bottom
+  const belowCount = visible.length - endIdx;
   const scrollIndicator =
-    clampedOffset > 0
+    !isAtBottom
       ? React.createElement(
           Box as React.ComponentType<Record<string, unknown>>,
           { justifyContent: "center" },
           React.createElement(
             Text as React.ComponentType<Record<string, unknown>>,
             { color: colors.muted, dimColor: true },
-            `↑ ${String(clampedOffset)} more message${clampedOffset !== 1 ? "s" : ""} below — PageDown / ↓ to scroll`,
+            `↑ ${String(belowCount)} more message${belowCount !== 1 ? "s" : ""} below — PageDown / ↓ to scroll`,
           ),
         )
       : null;

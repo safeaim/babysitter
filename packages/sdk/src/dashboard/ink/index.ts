@@ -133,6 +133,10 @@ export {
 // Component helpers — MessagePane
 export { filterMessages, VERBOSITY_ALLOWED } from "./components/MessagePane.js";
 
+// SearchBar component + helpers
+export { SearchBar, applySearchHighlight } from "./components/SearchBar.js";
+export type { SearchBarProps, SearchBarState } from "./components/SearchBar.js";
+
 // Component helpers — PromptBar
 export {
   getSlashHints,

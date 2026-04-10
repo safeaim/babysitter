@@ -204,5 +204,13 @@ export type { ViewportState } from "./helpers.js";
 // Chat context
 export type { ChatContextValue, ChatProviderProps, ChatTurn, StreamCallbacks } from "./contexts/ChatContext.js";
 
+// Effects context
+export { EffectsProvider, useEffects } from "./contexts/EffectsContext.js";
+export type { EffectsContextValue, EffectsProviderProps } from "./contexts/EffectsContext.js";
+
+// Effects panel
+export { EffectsPanel } from "./components/EffectsPanel.js";
+export type { EffectsPanelProps } from "./components/EffectsPanel.js";
+
 // Runtime entry point
 export { createTuiSession, type TuiSession } from "./render.js";

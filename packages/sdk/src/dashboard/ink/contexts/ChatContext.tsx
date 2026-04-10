@@ -1,12 +1,13 @@
 /**
  * ChatContext — provides harness invocation capabilities to the TUI.
  *
- * Wraps the harness invoker module, manages conversation history on the
- * harness side, and exposes a simple `sendMessage(text)` interface that
- * components can call to send a user message and receive an assistant reply.
+ * Wraps the harness invoker module, manages conversation history, and
+ * exposes a `sendMessage(text, callbacks)` interface. Streams harness
+ * output line-by-line via callbacks so the caller can update the UI
+ * in real time.
  *
- * The provider keeps track of whether a request is in flight (loading state)
- * and streams output lines back into the SessionContext message list.
+ * Conversation history is accumulated and included in each harness
+ * prompt so the harness sees full multi-turn context.
  */
 
 import React, {
@@ -21,15 +22,35 @@ import React, {
 // Types
 // ---------------------------------------------------------------------------
 
+/** A single turn in the conversation history. */
+export interface ChatTurn {
+  readonly role: "user" | "assistant";
+  readonly text: string;
+}
+
+/** Callbacks for streaming harness output. */
+export interface StreamCallbacks {
+  /** Called with each line of output as it arrives. */
+  onLine?: (line: string) => void;
+  /** Called when the response is complete with the full output. */
+  onComplete?: (output: string) => void;
+  /** Called if the invocation fails. */
+  onError?: (error: string) => void;
+}
+
 export interface ChatContextValue {
-  /** Send a user message to the harness. Returns when the response is complete. */
-  sendMessage: (text: string) => Promise<void>;
+  /** Send a user message to the harness with streaming callbacks. */
+  sendMessage: (text: string, callbacks?: StreamCallbacks) => Promise<string>;
   /** Whether a harness invocation is currently in flight. */
   loading: boolean;
   /** The configured harness name. */
   harness: string;
   /** Cancel the current in-flight request (if any). */
   cancel: () => void;
+  /** Conversation history. */
+  history: readonly ChatTurn[];
+  /** Clear conversation history. */
+  clearHistory: () => void;
 }
 
 export interface ChatProviderProps {
@@ -40,6 +61,32 @@ export interface ChatProviderProps {
   workspace?: string;
   /** Model override. */
   model?: string;
+}
+
+// ---------------------------------------------------------------------------
+// History formatting
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a prompt that includes conversation history for multi-turn context.
+ */
+function buildPromptWithHistory(
+  history: readonly ChatTurn[],
+  currentMessage: string,
+): string {
+  if (history.length === 0) return currentMessage;
+
+  const lines: string[] = [];
+  lines.push("<conversation_history>");
+  for (const turn of history) {
+    const tag = turn.role === "user" ? "user" : "assistant";
+    lines.push(`<${tag}>${turn.text}</${tag}>`);
+  }
+  lines.push("</conversation_history>");
+  lines.push("");
+  lines.push(currentMessage);
+
+  return lines.join("\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -59,20 +106,25 @@ export function ChatProvider({
   model,
 }: ChatProviderProps): React.JSX.Element {
   const [loading, setLoading] = React.useState(false);
+  const [history, setHistory] = React.useState<ChatTurn[]>([]);
   const abortRef = useRef<AbortController | null>(null);
+  // Keep a ref to history so the sendMessage callback always sees current state
+  const historyRef = useRef<ChatTurn[]>([]);
+  historyRef.current = history;
 
-  // We import the invoker lazily to avoid pulling Node.js modules at
-  // require()-time in the React component tree.
   const sendMessage = useCallback(
-    async (text: string): Promise<void> => {
+    async (text: string, callbacks?: StreamCallbacks): Promise<string> => {
       setLoading(true);
       abortRef.current = new AbortController();
 
       try {
+        // Build prompt with conversation history
+        const prompt = buildPromptWithHistory(historyRef.current, text);
+
         // Dynamic require to avoid top-level ESM/CJS issues in the React tree
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { invokeHarness } = require("../../../harness/invoker") as {
-          invokeHarness: (
+        const { invokeHarnessStreaming } = require("../../../harness/streamingCapture") as {
+          invokeHarnessStreaming: (
             name: string,
             options: {
               prompt: string;
@@ -92,19 +144,34 @@ export function ChatProvider({
           }>;
         };
 
-        const result = await invokeHarness(harness, {
-          prompt: text,
+        const result = await invokeHarnessStreaming(harness, {
+          prompt,
           workspace: workspace ?? process.cwd(),
           model,
-          timeout: 300_000, // 5 minutes
+          timeout: 600_000, // 10 minutes
+          streaming: {
+            onLine: (line: string, _stream: "stdout" | "stderr") => {
+              callbacks?.onLine?.(line);
+            },
+          },
         });
 
-        // Return the result via the callback — the caller (SessionView)
-        // is responsible for dispatching the assistant message.
-        return void result;
+        const output = result.output.trim();
+
+        // Update conversation history
+        setHistory((prev) => [
+          ...prev,
+          { role: "user" as const, text },
+          { role: "assistant" as const, text: output },
+        ]);
+
+        callbacks?.onComplete?.(output);
+        return output;
       } catch (err: unknown) {
         // If aborted, silently ignore
-        if (abortRef.current?.signal.aborted) return;
+        if (abortRef.current?.signal.aborted) return "";
+        const errText = err instanceof Error ? err.message : String(err);
+        callbacks?.onError?.(errText);
         throw err;
       } finally {
         setLoading(false);
@@ -118,9 +185,13 @@ export function ChatProvider({
     abortRef.current?.abort();
   }, []);
 
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+  }, []);
+
   const value = React.useMemo(
-    () => ({ sendMessage, loading, harness, cancel }),
-    [sendMessage, loading, harness, cancel],
+    () => ({ sendMessage, loading, harness, cancel, history, clearHistory }),
+    [sendMessage, loading, harness, cancel, history, clearHistory],
   );
 
   return (

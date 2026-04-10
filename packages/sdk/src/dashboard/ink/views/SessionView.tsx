@@ -134,6 +134,11 @@ export function SessionView(): React.JSX.Element {
     }
   }, [navState.selectedRunId, sessionState.runId, sessionDispatch]);
 
+  // Auto-focus the prompt when entering session view
+  React.useEffect(() => {
+    sessionDispatch({ type: "SET_INPUT_ACTIVE", active: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Escape goes back to dashboard (only when prompt input is not active)
   useInput(
     (_input: string, key: InkKey) => {
@@ -149,6 +154,10 @@ export function SessionView(): React.JSX.Element {
     (text: string) => {
       // 1. Check for slash commands first
       if (text.startsWith("/")) {
+        // Special: /clear also clears chat history
+        if (text.toLowerCase().trim() === "/clear") {
+          chat.clearHistory();
+        }
         const result = processSlashCommand(
           text,
           sessionDispatch as (action: { type: string; [key: string]: unknown }) => void,
@@ -167,41 +176,75 @@ export function SessionView(): React.JSX.Element {
       };
       sessionDispatch({ type: "APPEND_MESSAGE", message: userMessage });
 
-      // 3. Show loading indicator
-      const loadingId = `loading-${Date.now()}`;
-      const loadingMessage: TuiMessage = {
-        id: loadingId,
+      // 3. Create assistant message that will be updated with streaming output
+      const assistantId = `assistant-${Date.now()}`;
+      const assistantMessage: TuiMessage = {
+        id: assistantId,
         timestamp: new Date().toISOString(),
         verbosity: "minimal",
-        content: { kind: "system", text: `Invoking ${chat.harness}...` },
+        content: { kind: "assistant", text: "", streaming: true },
       };
-      sessionDispatch({ type: "APPEND_MESSAGE", message: loadingMessage });
+      sessionDispatch({ type: "APPEND_MESSAGE", message: assistantMessage });
       sessionDispatch({ type: "SET_STATUS", status: "running" });
 
-      // 4. Invoke the harness (async — fire and forget with error handling)
+      // 4. Invoke the harness with streaming callbacks
       if (pendingRef.current) return; // prevent double-fire
       pendingRef.current = true;
 
+      // Accumulate streamed lines for the assistant message
+      const lines: string[] = [];
+
       chat
-        .sendMessage(text)
-        .then(() => {
-          // Replace loading message with success indicator
-          sessionDispatch({
-            type: "UPDATE_MESSAGE",
-            id: loadingId,
-            patch: {
-              content: { kind: "assistant", text: "(Response received — see harness output)" },
-            },
-          });
-          sessionDispatch({ type: "SET_STATUS", status: "idle" });
+        .sendMessage(text, {
+          onLine: (line: string) => {
+            lines.push(line);
+            // Update assistant message with accumulated output
+            sessionDispatch({
+              type: "UPDATE_MESSAGE",
+              id: assistantId,
+              patch: {
+                content: {
+                  kind: "assistant",
+                  text: lines.join("\n"),
+                  streaming: true,
+                },
+              },
+            });
+          },
+          onComplete: (output: string) => {
+            // Final update with complete output, mark streaming done
+            sessionDispatch({
+              type: "UPDATE_MESSAGE",
+              id: assistantId,
+              patch: {
+                content: {
+                  kind: "assistant",
+                  text: output || lines.join("\n"),
+                  streaming: false,
+                },
+              },
+            });
+            sessionDispatch({ type: "SET_STATUS", status: "idle" });
+          },
+          onError: (errText: string) => {
+            sessionDispatch({
+              type: "UPDATE_MESSAGE",
+              id: assistantId,
+              patch: {
+                content: {
+                  kind: "error",
+                  message: `Harness error: ${errText}`,
+                },
+              },
+            });
+            sessionDispatch({ type: "SET_STATUS", status: "idle" });
+          },
         })
         .catch((err: unknown) => {
-          const errText =
-            err instanceof Error ? err.message : String(err);
-          // Replace loading with error message
+          const errText = err instanceof Error ? err.message : String(err);
           sessionDispatch({
             type: "UPDATE_MESSAGE",
-            id: loadingId,
+            id: assistantId,
             patch: {
               content: { kind: "error", message: `Harness error: ${errText}` },
             },
@@ -210,6 +253,8 @@ export function SessionView(): React.JSX.Element {
         })
         .finally(() => {
           pendingRef.current = false;
+          // Re-focus prompt after response
+          sessionDispatch({ type: "SET_INPUT_ACTIVE", active: true });
         });
     },
     [sessionDispatch, navDispatch, sessionState, chat],

@@ -202,7 +202,7 @@ export {
 export type { ViewportState } from "./helpers.js";
 
 // Chat context
-export type { ChatContextValue, ChatProviderProps } from "./contexts/ChatContext.js";
+export type { ChatContextValue, ChatProviderProps, ChatTurn, StreamCallbacks } from "./contexts/ChatContext.js";
 
 // Runtime entry point
 export { createTuiSession, type TuiSession } from "./render.js";

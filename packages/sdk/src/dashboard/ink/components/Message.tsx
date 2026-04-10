@@ -14,8 +14,17 @@ import { useTheme } from "../hooks/useTheme.js";
 import { useInk } from "../contexts/InkContext.js";
 import { stripAnsi } from "../../colors.js";
 import { renderStatusSymbol } from "../../components/StatusBadge.js";
-import { briefArgs } from "../helpers.js";
-import type { TuiMessage, RunStatus } from "../types.js";
+import {
+  briefArgs,
+  getMessageIcon,
+  getMessageColor,
+  shouldShowTimestamp,
+  formatToolCallSummary,
+  formatToolOutput,
+  formatShellOutput,
+  formatTimestamp,
+} from "../helpers.js";
+import type { TuiMessage, RunStatus, ThemeColors } from "../types.js";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -55,15 +64,17 @@ function runStatusToBadgeStatus(
 function UserMessage({
   text,
   colors,
-}: { text: string; colors: ReturnType<typeof useTheme>["colors"] }): React.JSX.Element {
+}: { text: string; colors: ThemeColors }): React.JSX.Element {
   const { Box, Text } = useInk();
+  const icon = getMessageIcon("user");
+  const color = getMessageColor("user", colors);
   return React.createElement(
     Box as React.ComponentType<Record<string, unknown>>,
     { flexDirection: "row", gap: 1 },
     React.createElement(
       Text as React.ComponentType<Record<string, unknown>>,
-      { color: colors.primary, bold: true },
-      "You:",
+      { color, bold: true },
+      `${icon} You:`,
     ),
     React.createElement(
       Text as React.ComponentType<Record<string, unknown>>,
@@ -105,43 +116,51 @@ function ToolCallMessage({
   toolName,
   input,
   elapsedMs,
+  output,
   colors,
 }: {
   toolName: string;
   input: unknown;
   elapsedMs?: number;
-  colors: ReturnType<typeof useTheme>["colors"];
+  output?: unknown;
+  colors: ThemeColors;
 }): React.JSX.Element {
   const { Box, Text } = useInk();
-  const args = briefArgs(input);
-  const elapsed =
-    elapsedMs !== undefined ? ` (${(elapsedMs / 1000).toFixed(1)}s)` : "";
+  const color = getMessageColor("tool_call", colors);
+  const summary = formatToolCallSummary(
+    toolName,
+    input,
+    elapsedMs,
+    typeof output === "string" ? output : undefined,
+  );
+  const outputLines = formatToolOutput(output);
 
   return React.createElement(
     Box as React.ComponentType<Record<string, unknown>>,
-    { flexDirection: "row", gap: 1 },
+    { flexDirection: "column" },
     React.createElement(
       Text as React.ComponentType<Record<string, unknown>>,
-      { color: colors.toolCall },
-      "⚙",
+      { color, wrap: "wrap" },
+      summary,
     ),
-    React.createElement(
-      Text as React.ComponentType<Record<string, unknown>>,
-      { color: colors.toolCall, bold: true },
-      toolName,
-    ),
-    args
+    outputLines.length > 0
       ? React.createElement(
-          Text as React.ComponentType<Record<string, unknown>>,
-          { color: colors.muted },
-          args,
-        )
-      : null,
-    elapsed
-      ? React.createElement(
-          Text as React.ComponentType<Record<string, unknown>>,
-          { color: colors.muted },
-          elapsed,
+          Box as React.ComponentType<Record<string, unknown>>,
+          { paddingLeft: 2, flexDirection: "column" },
+          ...outputLines.slice(0, 10).map((line, idx) =>
+            React.createElement(
+              Text as React.ComponentType<Record<string, unknown>>,
+              { key: `out-${idx}`, color: colors.muted, dimColor: true, wrap: "wrap" },
+              line,
+            ),
+          ),
+          outputLines.length > 10
+            ? React.createElement(
+                Text as React.ComponentType<Record<string, unknown>>,
+                { color: colors.muted, dimColor: true },
+                `... ${outputLines.length - 10} more lines`,
+              )
+            : null,
         )
       : null,
   );
@@ -156,20 +175,22 @@ function SubagentMessage({
   label: string;
   status: RunStatus;
   agentId: string;
-  colors: ReturnType<typeof useTheme>["colors"];
+  colors: ThemeColors;
 }): React.JSX.Element {
   const { Box, Text } = useInk();
   const badgeStatus = runStatusToBadgeStatus(status);
   // renderStatusSymbol returns ANSI-colored text; strip codes so Ink owns style
   const symbol = stripAnsi(renderStatusSymbol(badgeStatus));
+  const icon = getMessageIcon("subagent");
+  const color = getMessageColor("subagent", colors);
 
   return React.createElement(
     Box as React.ComponentType<Record<string, unknown>>,
     { flexDirection: "row", gap: 1 },
     React.createElement(
       Text as React.ComponentType<Record<string, unknown>>,
-      { color: colors.subagent },
-      "◈",
+      { color },
+      icon,
     ),
     React.createElement(
       Text as React.ComponentType<Record<string, unknown>>,
@@ -194,13 +215,15 @@ function SystemMessage({
   colors,
 }: {
   text: string;
-  colors: ReturnType<typeof useTheme>["colors"];
+  colors: ThemeColors;
 }): React.JSX.Element {
   const { Text } = useInk();
+  const icon = getMessageIcon("system");
+  const color = getMessageColor("system", colors);
   return React.createElement(
     Text as React.ComponentType<Record<string, unknown>>,
-    { color: colors.muted, dimColor: true, wrap: "wrap" },
-    text,
+    { color, dimColor: true, wrap: "wrap" },
+    icon ? `${icon} ${text}` : text,
   );
 }
 
@@ -211,9 +234,11 @@ function ErrorMessage({
 }: {
   message: string;
   detail?: string;
-  colors: ReturnType<typeof useTheme>["colors"];
+  colors: ThemeColors;
 }): React.JSX.Element {
   const { Box, Text } = useInk();
+  const icon = getMessageIcon("error");
+  const color = getMessageColor("error", colors);
   return React.createElement(
     Box as React.ComponentType<Record<string, unknown>>,
     { flexDirection: "column" },
@@ -222,12 +247,12 @@ function ErrorMessage({
       { flexDirection: "row", gap: 1 },
       React.createElement(
         Text as React.ComponentType<Record<string, unknown>>,
-        { color: colors.error, bold: true },
-        "✗",
+        { color, bold: true },
+        icon,
       ),
       React.createElement(
         Text as React.ComponentType<Record<string, unknown>>,
-        { color: colors.error, wrap: "wrap" },
+        { color, wrap: "wrap" },
         message,
       ),
     ),
@@ -274,6 +299,7 @@ export function Message({ message }: MessageProps): React.JSX.Element {
         toolName: content.toolName,
         input: content.input,
         elapsedMs: content.elapsedMs,
+        output: content.output,
         colors,
       });
       break;
@@ -315,9 +341,34 @@ export function Message({ message }: MessageProps): React.JSX.Element {
     }
   }
 
+  // Timestamp rendering for user/assistant/error messages
+  const showTimestamp = shouldShowTimestamp(content.kind);
+  const timestamp = showTimestamp && message.timestamp
+    ? formatTimestamp(message.timestamp)
+    : null;
+
   return React.createElement(
     Box as React.ComponentType<Record<string, unknown>>,
-    { paddingY: 0 },
+    { flexDirection: "row", paddingY: 0, gap: 1 },
     inner,
+    timestamp
+      ? React.createElement(
+          Text as React.ComponentType<Record<string, unknown>>,
+          { color: colors.muted, dimColor: true },
+          timestamp,
+        )
+      : null,
   );
+}
+
+/**
+ * Render shell-like tool output (stdout/stderr/exitCode) using formatShellOutput.
+ * Exposed for use by MessagePane or other components that have access to raw shell data.
+ */
+export function renderShellOutput(
+  stdout: string,
+  stderr: string,
+  exitCode: number,
+): { lines: string[]; hasError: boolean } {
+  return formatShellOutput(stdout, stderr, exitCode);
 }

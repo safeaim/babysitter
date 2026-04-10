@@ -153,6 +153,10 @@ export { filterMessages, VERBOSITY_ALLOWED } from "./components/MessagePane.js";
 export { SearchBar, applySearchHighlight } from "./components/SearchBar.js";
 export type { SearchBarProps, SearchBarState } from "./components/SearchBar.js";
 
+// Component helpers — ActionMenu
+export { SHORTCUTS as ACTION_MENU_SHORTCUTS, mapKeyToAction } from "./components/ActionMenu.js";
+export type { Shortcut as ActionMenuShortcut } from "./components/ActionMenu.js";
+
 // Component helpers — PromptBar
 export {
   getSlashHints,

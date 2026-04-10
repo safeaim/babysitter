@@ -51,33 +51,17 @@ export function DashboardView({
 
   const maxIndex = Math.max(0, runs.length - 1);
 
-  // Keyboard navigation
+  // Keyboard navigation — arrow keys only; action keys are handled by ActionMenu
   useInput(
     useCallback(
-      (input: string, key: InkKey) => {
+      (_input: string, key: InkKey) => {
         if (key.upArrow) {
           setSelectedIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
         } else if (key.downArrow) {
           setSelectedIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
-        } else if (key.return && runs.length > 0) {
-          const run = runs[selectedIndex];
-          if (run) {
-            navDispatch({ type: "NAVIGATE_TO_RUN_DETAIL", runId: run.runId });
-          }
-        } else if (key.escape || input === "q") {
-          onQuit?.();
-        } else if (input === "r") {
-          refresh();
-        } else if (input === "n") {
-          handleAction("new");
-        } else if (input === "s" && runs.length > 0) {
-          const run = runs[selectedIndex];
-          if (run) {
-            navDispatch({ type: "NAVIGATE_TO_SESSION", runId: run.runId });
-          }
         }
       },
-      [maxIndex, runs, selectedIndex, navDispatch, onQuit, refresh],
+      [maxIndex],
     ),
   );
 

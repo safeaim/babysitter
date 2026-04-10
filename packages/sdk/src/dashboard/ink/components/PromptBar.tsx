@@ -21,6 +21,8 @@ import {
   createInputHistory,
   addToHistory,
   navigateHistory,
+  isPasteSequence,
+  extractPasteContent,
 } from "../helpers.js";
 import type { InputHistory } from "../helpers.js";
 
@@ -142,6 +144,17 @@ export function PromptBar({
         setValue((prev) => prev.slice(0, -1));
         dispatch({ type: "SET_INPUT_BUFFER", text: value.slice(0, -1) });
       } else if (input && input.length > 0 && !key.return) {
+        // Check for bracketed paste sequences first
+        if (isPasteSequence(input)) {
+          const pastedContent = extractPasteContent(input);
+          const next = value + pastedContent;
+          setValue(next);
+          dispatch({ type: "SET_INPUT_BUFFER", text: next });
+          if (!state.inputActive) {
+            dispatch({ type: "SET_INPUT_ACTIVE", active: true });
+          }
+          return;
+        }
         // Filter to printable characters (avoid arrow keys etc. that may emit non-empty strings)
         const isPrintable = input.codePointAt(0) !== undefined && (input.codePointAt(0) ?? 0) >= 32;
         if (isPrintable) {

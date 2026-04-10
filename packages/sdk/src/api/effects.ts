@@ -5,32 +5,13 @@
  * effects.  All functions return ApiResult envelopes and never throw.
  */
 
-import { promises as fs } from "fs";
 import { loadJournal, appendEvent } from "../storage/journal";
 import { readTaskDefinition, readTaskResult } from "../storage/tasks";
 import { withRunLock } from "../storage/lock";
 import { serializeAndWriteTaskResult } from "../tasks/serializer";
+import { ok, fail, pathExists } from "./utils";
 import type { ApiResult } from "./runs";
 import type { JournalEvent, JsonRecord } from "../storage/types";
-
-// ── Result envelope helpers (mirror runs.ts) ───────────────────────────────
-
-function ok<T>(data: T): ApiResult<T> {
-  return { ok: true, data };
-}
-
-function fail<T>(code: string, message: string): ApiResult<T> {
-  return { ok: false, error: { code, message } };
-}
-
-async function pathExists(p: string): Promise<boolean> {
-  try {
-    await fs.access(p);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -198,6 +179,10 @@ export async function apiListEffects(
       }
       if (input.filter.status !== undefined) {
         const statusFilter = input.filter.status;
+        const validStatuses: EffectStatusFilter[] = ["requested", "resolved", "cancelled"];
+        if (!validStatuses.includes(statusFilter)) {
+          return fail("INVALID_INPUT", `Invalid status filter: ${statusFilter}. Must be one of: ${validStatuses.join(", ")}`);
+        }
         effects = effects.filter((e) => {
           if (statusFilter === "requested") return e.status === "requested";
           if (statusFilter === "resolved") return e.status === "resolved_ok" || e.status === "resolved_error";
@@ -250,8 +235,13 @@ export async function apiShowEffect(
       return fail("EFFECT_NOT_FOUND", `Effect not found: ${input.effectId}`);
     }
 
-    // Read task definition
-    const taskDef = await readTaskDefinition(input.runDir, input.effectId);
+    // Read task definition (may be missing if the task dir hasn't been created yet)
+    let taskDef: JsonRecord | undefined = undefined;
+    try {
+      taskDef = await readTaskDefinition(input.runDir, input.effectId);
+    } catch {
+      // task.json may not exist yet for freshly-requested effects
+    }
 
     // Read result if resolved
     let resultData: unknown = null;
@@ -268,7 +258,7 @@ export async function apiShowEffect(
       labels: info.labels,
       requestedAt: info.requestedAt,
       resolvedAt: info.resolvedAt,
-      taskDefinition: taskDef ?? undefined,
+      taskDefinition: taskDef,
       result: resultData === null ? undefined : resultData,
     };
 
@@ -369,13 +359,18 @@ export async function apiBatchCommitEffects(
       return fail("INVALID_INPUT", "effects array must not be empty");
     }
 
-    const results: BatchCommitEffectResult[] = [];
+    if (!(await pathExists(input.runDir))) {
+      return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
+    }
 
-    for (const entry of input.effects) {
-      try {
-        const commitResult = await withRunLock(input.runDir, "api:batchCommitEffect", async () => {
-          // Load journal to find the effect metadata
-          const events = await loadJournal(input.runDir);
+    // Acquire lock once for the entire batch to ensure atomicity
+    return await withRunLock(input.runDir, "api:batchCommitEffects", async () => {
+      // Load journal once for the entire batch
+      let events = await loadJournal(input.runDir);
+      const results: BatchCommitEffectResult[] = [];
+
+      for (const entry of input.effects) {
+        try {
           const requestedEvent = events.find(
             (e) => e.type === "EFFECT_REQUESTED" && (e.data as Record<string, unknown>).effectId === entry.effectId,
           );
@@ -444,25 +439,26 @@ export async function apiBatchCommitEffects(
             },
           });
 
-          return { resultRef };
-        });
+          // Reload journal so subsequent effects in the batch see this resolution
+          events = await loadJournal(input.runDir);
 
-        results.push({
-          effectId: entry.effectId,
-          ok: true,
-          resultRef: commitResult.resultRef,
-        });
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        results.push({
-          effectId: entry.effectId,
-          ok: false,
-          error: msg,
-        });
+          results.push({
+            effectId: entry.effectId,
+            ok: true,
+            resultRef,
+          });
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error);
+          results.push({
+            effectId: entry.effectId,
+            ok: false,
+            error: msg,
+          });
+        }
       }
-    }
 
-    return ok({ results });
+      return ok({ results });
+    });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     return fail("INTERNAL_ERROR", msg);

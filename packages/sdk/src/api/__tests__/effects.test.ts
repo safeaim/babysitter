@@ -1,8 +1,8 @@
 /**
- * GAP-JSON-002: Effect Dispatch and Response Protocol — TDD Red Phase
+ * GAP-JSON-002: Effect Dispatch and Response Protocol
  *
  * Tests for apiListEffects, apiShowEffect, apiCancelEffect, apiBatchCommitEffects.
- * All 15 acceptance criteria are covered with 28 test cases.
+ * All 15 acceptance criteria are covered plus adversarial edge-case tests.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -893,6 +893,289 @@ describe("GAP-JSON-002: Effect Dispatch and Response Protocol", () => {
       expect(result.ok).toBe(false);
       if (!result.ok) {
         expect(result.error.code).toBe("INVALID_INPUT");
+      }
+    });
+  });
+
+  // ── Adversarial review gap tests ─────────────────────────────────────────
+
+  describe("resolved_error status in EFFECT_RESOLVED", () => {
+    it("apiListEffects returns resolved_error status when effect resolved with error", async () => {
+      const runDir = await scaffoldRunDir(testDir, "resolved-error");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "resolved-error" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-err",
+        invocationKey: "ke",
+        stepId: "S000001",
+        taskId: "te",
+        kind: "node",
+      });
+      await appendJournalEvent(runDir, 3, "EFFECT_RESOLVED", {
+        effectId: "eff-err",
+        status: "error",
+        resultRef: "tasks/eff-err/result.json",
+      });
+
+      const result = await apiListEffects({ runDir });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.data.effects.length).toBe(1);
+        expect(result.data.effects[0].status).toBe("resolved_error");
+      }
+    });
+
+    it("apiListEffects filters resolved_error effects when status filter is 'resolved'", async () => {
+      const runDir = await scaffoldRunDir(testDir, "filter-resolved-error");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "filter-resolved-error" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-ok",
+        invocationKey: "k1",
+        stepId: "S000001",
+        taskId: "t1",
+        kind: "node",
+      });
+      await appendJournalEvent(runDir, 3, "EFFECT_RESOLVED", {
+        effectId: "eff-ok",
+        status: "ok",
+      });
+      await appendJournalEvent(runDir, 4, "EFFECT_REQUESTED", {
+        effectId: "eff-err",
+        invocationKey: "k2",
+        stepId: "S000002",
+        taskId: "t2",
+        kind: "node",
+      });
+      await appendJournalEvent(runDir, 5, "EFFECT_RESOLVED", {
+        effectId: "eff-err",
+        status: "error",
+      });
+      await appendJournalEvent(runDir, 6, "EFFECT_REQUESTED", {
+        effectId: "eff-pend",
+        invocationKey: "k3",
+        stepId: "S000003",
+        taskId: "t3",
+        kind: "node",
+      });
+
+      const result = await apiListEffects({ runDir, filter: { status: "resolved" } });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.data.effects.length).toBe(2);
+        const statuses = result.data.effects.map((e: Record<string, unknown>) => e.status);
+        expect(statuses).toContain("resolved_ok");
+        expect(statuses).toContain("resolved_error");
+      }
+    });
+  });
+
+  describe("cancelled status filter", () => {
+    it("apiListEffects filters by cancelled status", async () => {
+      const runDir = await scaffoldRunDir(testDir, "filter-cancelled");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "filter-cancelled" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-c1",
+        invocationKey: "kc1",
+        stepId: "S000001",
+        taskId: "tc1",
+        kind: "node",
+      });
+      await appendJournalEvent(runDir, 3, "EFFECT_CANCELLED", {
+        effectId: "eff-c1",
+        reason: "no longer needed",
+      });
+      await appendJournalEvent(runDir, 4, "EFFECT_REQUESTED", {
+        effectId: "eff-p1",
+        invocationKey: "kp1",
+        stepId: "S000002",
+        taskId: "tp1",
+        kind: "node",
+      });
+
+      const result = await apiListEffects({ runDir, filter: { status: "cancelled" } });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.data.effects.length).toBe(1);
+        expect(result.data.effects[0].effectId).toBe("eff-c1");
+        expect(result.data.effects[0].status).toBe("cancelled");
+      }
+    });
+  });
+
+  describe("kind as array filter", () => {
+    it("apiListEffects filters by kind when kind is a string[]", async () => {
+      const runDir = await scaffoldRunDir(testDir, "filter-kind-array");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "filter-kind-array" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-n",
+        invocationKey: "kn",
+        stepId: "S000001",
+        taskId: "tn",
+        kind: "node",
+      });
+      await appendJournalEvent(runDir, 3, "EFFECT_REQUESTED", {
+        effectId: "eff-b",
+        invocationKey: "kb",
+        stepId: "S000002",
+        taskId: "tb",
+        kind: "breakpoint",
+      });
+      await appendJournalEvent(runDir, 4, "EFFECT_REQUESTED", {
+        effectId: "eff-s",
+        invocationKey: "ks",
+        stepId: "S000003",
+        taskId: "ts",
+        kind: "sleep",
+      });
+
+      const result = await apiListEffects({
+        runDir,
+        filter: { kind: ["node", "sleep"] },
+      });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.data.effects.length).toBe(2);
+        const ids = result.data.effects.map((e: Record<string, unknown>) => e.effectId);
+        expect(ids).toContain("eff-n");
+        expect(ids).toContain("eff-s");
+        expect(ids).not.toContain("eff-b");
+      }
+    });
+  });
+
+  describe("apiShowEffect when task definition file is missing", () => {
+    it("returns effect detail with undefined taskDefinition when task.json is missing", async () => {
+      const runDir = await scaffoldRunDir(testDir, "show-no-taskdef");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "show-no-taskdef" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-notask",
+        invocationKey: "knt",
+        stepId: "S000001",
+        taskId: "notask",
+        kind: "node",
+      });
+      // No scaffoldTaskDefinition — task.json does not exist
+
+      const result = await apiShowEffect({ runDir, effectId: "eff-notask" });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.data.effectId).toBe("eff-notask");
+        expect(result.data.status).toBe("requested");
+        expect(result.data.taskDefinition).toBeUndefined();
+      }
+    });
+  });
+
+  describe("apiCancelEffect without reason", () => {
+    it("cancels a pending effect without a reason", async () => {
+      const runDir = await scaffoldRunDir(testDir, "cancel-no-reason");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "cancel-no-reason" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-cnr",
+        invocationKey: "kcnr",
+        stepId: "S000001",
+        taskId: "tcnr",
+        kind: "node",
+      });
+      await scaffoldTaskDefinition(runDir, "eff-cnr", {
+        taskId: "tcnr",
+        invocationKey: "kcnr",
+        kind: "node",
+      });
+
+      const result = await apiCancelEffect({
+        runDir,
+        effectId: "eff-cnr",
+        // no reason provided
+      });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(typeof result.data.resultRef).toBe("string");
+      }
+    });
+  });
+
+  describe("cancelling already-cancelled effect returns EFFECT_NOT_PENDING", () => {
+    it("returns EFFECT_NOT_PENDING when effect is already cancelled", async () => {
+      const runDir = await scaffoldRunDir(testDir, "cancel-twice");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "cancel-twice" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-ct",
+        invocationKey: "kct",
+        stepId: "S000001",
+        taskId: "tct",
+        kind: "node",
+      });
+      await appendJournalEvent(runDir, 3, "EFFECT_CANCELLED", {
+        effectId: "eff-ct",
+        reason: "first cancel",
+      });
+
+      const result = await apiCancelEffect({
+        runDir,
+        effectId: "eff-ct",
+        reason: "second cancel",
+      });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.code).toBe("EFFECT_NOT_PENDING");
+      }
+    });
+  });
+
+  describe("apiBatchCommitEffects with nonexistent runDir", () => {
+    it("returns RUN_NOT_FOUND when runDir does not exist", async () => {
+      const result = await apiBatchCommitEffects({
+        runDir: path.join(testDir, "nonexistent-batch-run"),
+        effects: [{ effectId: "x", result: { status: "ok", value: {} } }],
+      });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.code).toBe("RUN_NOT_FOUND");
+      }
+    });
+  });
+
+  describe("apiBatchCommitEffects with already-resolved effect", () => {
+    it("returns per-effect error for already-resolved effect in batch", async () => {
+      const runDir = await scaffoldRunDir(testDir, "batch-already-resolved");
+      await appendJournalEvent(runDir, 1, "RUN_CREATED", { runId: "batch-already-resolved" });
+      await appendJournalEvent(runDir, 2, "EFFECT_REQUESTED", {
+        effectId: "eff-ar",
+        invocationKey: "kar",
+        stepId: "S000001",
+        taskId: "tar",
+        kind: "node",
+      });
+      await appendJournalEvent(runDir, 3, "EFFECT_RESOLVED", {
+        effectId: "eff-ar",
+        status: "ok",
+        resultRef: "tasks/eff-ar/result.json",
+      });
+      await scaffoldTaskDefinition(runDir, "eff-ar", {
+        taskId: "tar",
+        invocationKey: "kar",
+        kind: "node",
+      });
+      await scaffoldTaskResult(runDir, "eff-ar");
+
+      const result = await apiBatchCommitEffects({
+        runDir,
+        effects: [{ effectId: "eff-ar", result: { status: "ok", value: { r: 1 } } }],
+      });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.data.results.length).toBe(1);
+        expect(result.data.results[0].ok).toBe(false);
+        expect(result.data.results[0].error).toContain("already resolved");
       }
     });
   });

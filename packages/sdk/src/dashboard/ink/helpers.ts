@@ -36,6 +36,25 @@ export function formatCost(cost: number): string {
 }
 
 // ---------------------------------------------------------------------------
+// formatElapsedClock
+// ---------------------------------------------------------------------------
+
+/**
+ * Format milliseconds into a clock-style duration string (MM:SS or HH:MM:SS).
+ * Used by StatusBar for the elapsed time display.
+ */
+export function formatElapsedClock(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) {
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+// ---------------------------------------------------------------------------
 // truncateOutput
 // ---------------------------------------------------------------------------
 

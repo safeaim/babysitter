@@ -14,9 +14,8 @@ import { useSession } from "../hooks/useSession.js";
 import { useTheme } from "../hooks/useTheme.js";
 import { useInk } from "../contexts/InkContext.js";
 import { RunningIndicator } from "./RunningIndicator.js";
-import { formatElapsed } from "../../components/StatusLine.js";
 import type { RunStatus } from "../types.js";
-import { truncateRunId, formatCost } from "../helpers.js";
+import { truncateRunId, formatCost, formatElapsedClock } from "../helpers.js";
 export { formatCost };
 
 // ---------------------------------------------------------------------------
@@ -104,7 +103,7 @@ export function StatusBar({
 
   const now = Date.now();
   const elapsedMs = runStartedAt !== null ? now - runStartedAt : 0;
-  const elapsedText = runStartedAt !== null ? formatElapsed(elapsedMs) : "--:--";
+  const elapsedText = runStartedAt !== null ? formatElapsedClock(elapsedMs) : "--:--";
 
   const indicatorSymbol = statusToIndicator(status);
   const indicatorColor = statusToColor(status, colors);

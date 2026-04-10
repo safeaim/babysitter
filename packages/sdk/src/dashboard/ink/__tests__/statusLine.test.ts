@@ -1,12 +1,10 @@
 /**
  * statusLine.test.ts
  *
- * Tests for the pure function formatStatusSegments, which converts an
- * OrchestrationStatus into an array of colored text segments for rendering
- * in the status line.
+ * Tests for the pure functions exported from StatusLine.tsx:
+ * formatElapsed, phaseToColorKey, formatCostForStatus, formatStatusSegments.
  *
- * Re-implemented here as a specification contract (TDD Red phase).
- * Imports types that DO NOT YET EXIST in types.ts.
+ * Also tests truncateRunId from helpers.ts (used by formatStatusSegments).
  */
 
 import { describe, it, expect } from "vitest";
@@ -15,113 +13,14 @@ import type {
   OrchestrationPhase,
   ThemeColors,
 } from "../types.js";
-
-// ---------------------------------------------------------------------------
-// Types (specification for StatusSegment — not yet in types.ts)
-// ---------------------------------------------------------------------------
-
-interface StatusSegment {
-  text: string;
-  colorKey: string;
-  bold?: boolean;
-}
-
-// ---------------------------------------------------------------------------
-// Helpers (spec contracts)
-// ---------------------------------------------------------------------------
-
-function formatElapsed(ms: number): string {
-  if (ms < 1000) return `${ms}ms`;
-  const seconds = Math.floor(ms / 1000);
-  if (seconds < 60) return `${seconds}s`;
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  if (minutes < 60) return `${minutes}m${remainingSeconds}s`;
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return `${hours}h${remainingMinutes}m`;
-}
-
-function phaseToColorKey(phase: OrchestrationPhase): string {
-  switch (phase) {
-    case "complete":
-      return "success";
-    case "failed":
-      return "error";
-    case "waiting":
-      return "warning";
-    case "planning":
-    case "executing":
-    case "verifying":
-      return "primary";
-  }
-}
-
-function formatCostForStatus(cost: number): string {
-  if (cost < 1) return `$${cost.toFixed(4)}`;
-  return `$${cost.toFixed(2)}`;
-}
-
-function truncateRunId(id: string): string {
-  if (id.length <= 12) return id;
-  return id.slice(0, 12);
-}
-
-function formatStatusSegments(
-  status: OrchestrationStatus,
-  _colors: ThemeColors
-): StatusSegment[] {
-  const segments: StatusSegment[] = [];
-
-  // Phase segment (bold)
-  segments.push({
-    text: status.phase.toUpperCase(),
-    colorKey: phaseToColorKey(status.phase),
-    bold: true,
-  });
-
-  // Run ID segment
-  segments.push({
-    text: truncateRunId(status.runId),
-    colorKey: "muted",
-  });
-
-  // Iteration segment
-  segments.push({
-    text: `iter:${status.iteration}`,
-    colorKey: "foreground",
-  });
-
-  // Effects segment
-  segments.push({
-    text: `effects:${status.resolvedEffects}/${status.totalEffects}`,
-    colorKey: status.pendingEffects > 0 ? "warning" : "success",
-  });
-
-  // Elapsed segment
-  segments.push({
-    text: formatElapsed(status.elapsedMs),
-    colorKey: "muted",
-  });
-
-  // Optional: token usage
-  if (status.tokenUsage) {
-    segments.push({
-      text: `tokens:${status.tokenUsage.total}`,
-      colorKey: "muted",
-    });
-  }
-
-  // Optional: cost
-  if (status.cost !== undefined) {
-    segments.push({
-      text: formatCostForStatus(status.cost),
-      colorKey: "muted",
-    });
-  }
-
-  return segments;
-}
+import {
+  formatElapsed,
+  phaseToColorKey,
+  formatCostForStatus,
+  formatStatusSegments,
+  type StatusSegment,
+} from "../components/StatusLine.js";
+import { truncateRunId } from "../helpers.js";
 
 // ---------------------------------------------------------------------------
 // Test fixtures

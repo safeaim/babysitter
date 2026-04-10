@@ -52,6 +52,7 @@ export {
   truncateOutput,
   formatTimestamp,
   formatElapsedCompact,
+  formatElapsedClock,
   briefArgs,
   getMessageIcon,
   getMessageColor,
@@ -67,6 +68,17 @@ export {
   groupPendingEffects,
   summarizePendingGroups,
 } from "./helpers.js";
+
+// StatusLine pure functions
+export {
+  formatElapsed,
+  phaseToColorKey,
+  formatCostForStatus,
+  formatStatusSegments,
+} from "./components/StatusLine.js";
+
+// StatusLine types
+export type { StatusSegment, StatusLineProps } from "./components/StatusLine.js";
 
 // Phase 3 types
 export type { PendingGroupSummary } from "./helpers.js";

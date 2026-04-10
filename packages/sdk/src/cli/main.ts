@@ -33,6 +33,7 @@ import { handleSessionHistory } from "./commands/sessionHistory";
 import { handleSkillDiscover, handleSkillFetchRemote, discoverSkillsInternal, discoverFromProcessFile } from "./commands/skill";
 import { handleMcpServe } from "./commands/mcpServe";
 import { handleJsonlInteractive } from "./commands/jsonlInteractive";
+import { handleDaemonStart, handleDaemonStop, handleDaemonStatus, handleDaemonRun } from "./commands/daemon";
 import { handleHookLog } from "./commands/hookLog";
 import { handleHookRun } from "./commands/hookRun";
 import { handleLog } from "./commands/log";
@@ -316,6 +317,11 @@ interface ParsedArgs {
   // tui flags
   verbosity?: string;
   tuiFlag?: boolean;
+  // daemon flags
+  daemonDir?: string;
+  configPath?: string;
+  foreground?: boolean;
+  gracePeriodMs?: number;
 }
 
 interface ActionSummary {
@@ -550,6 +556,22 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
     if (arg === "--workspace") {
       parsed.workspace = expectFlagValue(rest, ++i, "--workspace");
+      continue;
+    }
+    if (arg === "--daemon-dir") {
+      parsed.daemonDir = expectFlagValue(rest, ++i, "--daemon-dir");
+      continue;
+    }
+    if (arg === "--config-path" || arg === "--config") {
+      parsed.configPath = expectFlagValue(rest, ++i, "--config-path");
+      continue;
+    }
+    if (arg === "--foreground") {
+      parsed.foreground = true;
+      continue;
+    }
+    if (arg === "--grace-period-ms") {
+      parsed.gracePeriodMs = parseInt(expectFlagValue(rest, ++i, "--grace-period-ms"), 10);
       continue;
     }
     if (arg === "--model") {
@@ -2485,6 +2507,10 @@ const VALID_COMMANDS = [
   "instructions:breakpoint-handling",
   "mcp:serve",
   "jsonl:interactive",
+  "daemon:start",
+  "daemon:stop",
+  "daemon:status",
+  "daemon:run",
   "health",
   "configure",
   "tokens:stats",
@@ -3414,6 +3440,33 @@ export function createBabysitterCli() {
         }
         if (parsed.command === "jsonl:interactive") {
           return await handleJsonlInteractive({ runsDir: parsed.runsDir });
+        }
+        if (parsed.command === "daemon:start") {
+          return await handleDaemonStart({
+            daemonDir: parsed.daemonDir,
+            workspace: parsed.workspace,
+            configPath: parsed.configPath,
+            foreground: parsed.foreground,
+            json: parsed.json,
+          });
+        }
+        if (parsed.command === "daemon:stop") {
+          return await handleDaemonStop({
+            daemonDir: parsed.daemonDir,
+            gracePeriodMs: parsed.gracePeriodMs,
+            json: parsed.json,
+          });
+        }
+        if (parsed.command === "daemon:status") {
+          return await handleDaemonStatus({
+            daemonDir: parsed.daemonDir,
+            json: parsed.json,
+          });
+        }
+        if (parsed.command === "daemon:run") {
+          return await handleDaemonRun({
+            daemonDir: parsed.daemonDir,
+          });
         }
         if (parsed.command === "health") {
           return await handleHealthCommand({

@@ -18,3 +18,4 @@ export * as anycli from "./anycli/index";
 export * from "./breakpoints";
 export * as dashboard from "./dashboard";
 export * from "./api";
+export * from "./daemon";

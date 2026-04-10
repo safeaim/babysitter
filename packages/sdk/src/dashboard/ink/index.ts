@@ -161,6 +161,7 @@ export type { Shortcut as ActionMenuShortcut } from "./components/ActionMenu.js"
 export {
   getSlashHints,
   countLines,
+  completeSlashCommand,
   SLASH_COMMANDS,
 } from "./components/PromptBar.js";
 export type { SlashCommand as PromptBarSlashCommand } from "./components/PromptBar.js";

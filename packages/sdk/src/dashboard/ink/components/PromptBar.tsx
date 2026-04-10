@@ -69,6 +69,32 @@ export function getSlashHints(input: string): readonly SlashCommand[] {
 }
 
 // ---------------------------------------------------------------------------
+// Tab completion
+// ---------------------------------------------------------------------------
+
+/**
+ * Attempt to complete a slash command from the current input.
+ * Returns the completed string (with trailing space) if exactly one match,
+ * the longest common prefix if multiple matches, or null if no matches.
+ */
+export function completeSlashCommand(input: string): string | null {
+  if (!input.startsWith("/") || input.includes(" ")) return null;
+  const hints = getSlashHints(input);
+  if (hints.length === 0) return null;
+  if (hints.length === 1) return hints[0].name + " ";
+  // Multiple matches — find longest common prefix
+  const names = hints.map((h) => h.name);
+  let lcp = names[0];
+  for (let i = 1; i < names.length; i++) {
+    while (!names[i].startsWith(lcp)) {
+      lcp = lcp.slice(0, -1);
+    }
+  }
+  // Only return if it's longer than what the user typed
+  return lcp.length > input.length ? lcp : null;
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -140,6 +166,13 @@ export function PromptBar({
           setValue(restored);
           dispatch({ type: "SET_INPUT_BUFFER", text: restored });
           setSavedInput("");
+        }
+      } else if (key.tab) {
+        // Tab completion for slash commands
+        const completed = completeSlashCommand(value);
+        if (completed !== null) {
+          setValue(completed);
+          dispatch({ type: "SET_INPUT_BUFFER", text: completed });
         }
       } else if (key.backspace || key.delete) {
         setValue((prev) => prev.slice(0, -1));

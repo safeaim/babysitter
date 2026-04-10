@@ -99,6 +99,28 @@ export {
 // Phase 4 types
 export type { SlashCommandDef, InputHistory } from "./helpers.js";
 
+// Phase 6: Cost tracking helpers
+export {
+  formatCostRate,
+  estimateRemainingCost,
+  formatCostSummary,
+} from "./helpers.js";
+export type { CostSummary } from "./helpers.js";
+
+// Phase 6: Resume dashboard helpers
+export {
+  getResumableRuns,
+  rankRunsForResume,
+  formatRunSummaryLine,
+} from "./helpers.js";
+
+// Phase 6: Structured status view helpers
+export {
+  buildStatusSections,
+  formatStatusSection,
+} from "./helpers.js";
+export type { StatusSection, StatusEntry } from "./helpers.js";
+
 // Component helpers — RunListTable
 export {
   stateSymbol,

@@ -166,7 +166,22 @@ export async function apiIterate(
 }
 
 export async function apiCommitEffect(
-  input: { runDir: string; effectId: string; result: { status: "ok" | "error"; value?: unknown; error?: string } },
+  input: {
+    runDir: string;
+    effectId: string;
+    result: {
+      status: "ok" | "error";
+      value?: unknown;
+      error?: string;
+      stdout?: string;
+      stderr?: string;
+      stdoutRef?: string;
+      stderrRef?: string;
+      startedAt?: string;
+      finishedAt?: string;
+      metadata?: JsonRecord;
+    };
+  },
 ): Promise<ApiResult<{ resultRef: string }>> {
   try {
     if (input.result.status === "ok" && input.result.value === undefined) {
@@ -183,6 +198,13 @@ export async function apiCommitEffect(
         status: input.result.status,
         value: input.result.status === "ok" ? input.result.value : undefined,
         error: input.result.status === "error" ? input.result.error : undefined,
+        stdout: input.result.stdout,
+        stderr: input.result.stderr,
+        stdoutRef: input.result.stdoutRef,
+        stderrRef: input.result.stderrRef,
+        startedAt: input.result.startedAt,
+        finishedAt: input.result.finishedAt,
+        metadata: input.result.metadata,
       },
     });
 

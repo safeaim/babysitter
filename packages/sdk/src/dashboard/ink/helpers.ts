@@ -17,6 +17,7 @@ import type {
   BreakpointState,
 } from "./types.js";
 import type { TreeNode } from "./components/primitives/Tree.js";
+import type { RunSummary } from "./data/runScanner.js";
 
 /**
  * Truncate a run ID to at most 12 characters for display.
@@ -654,4 +655,197 @@ export function navigateHistory(
     history: { ...history, cursor: newCursor },
     entry: history.entries[newCursor],
   };
+}
+
+// ---------------------------------------------------------------------------
+// Phase 6: Cost Tracking helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Format cost rate as dollars per minute.
+ * Returns "$X.XXXX/min" for sub-dollar rates, "$X.XX/min" for dollar+ rates.
+ */
+export function formatCostRate(cost: number, elapsedMs: number): string {
+  if (elapsedMs <= 0 || cost <= 0) return "$0.0000/min";
+  const minutes = elapsedMs / 60_000;
+  const rate = cost / minutes;
+  const formatted = rate < 1 ? rate.toFixed(4) : rate.toFixed(2);
+  return `$${formatted}/min`;
+}
+
+/**
+ * Estimate remaining cost based on current spend and progress fraction (0-1).
+ * Returns 0 if progress is 0 (no data), >= 1 (complete), or cost is 0.
+ */
+export function estimateRemainingCost(currentCost: number, progress: number): number {
+  if (currentCost <= 0 || progress <= 0 || progress >= 1) return 0;
+  const clampedProgress = Math.min(1, Math.max(0, progress));
+  const projectedTotal = currentCost / clampedProgress;
+  return Math.max(0, projectedTotal - currentCost);
+}
+
+/**
+ * Summary of cost tracking data for display.
+ */
+export interface CostSummary {
+  readonly currentCost: string;
+  readonly rate: string;
+  readonly estimatedTotal: string;
+  readonly estimatedRemaining: string;
+}
+
+/**
+ * Build a structured cost summary from current cost, elapsed time, and progress.
+ */
+export function formatCostSummary(opts: {
+  currentCost: number;
+  elapsedMs: number;
+  progress: number;
+}): CostSummary {
+  const { currentCost, elapsedMs, progress } = opts;
+  const remaining = estimateRemainingCost(currentCost, progress);
+  const total = currentCost + remaining;
+
+  return {
+    currentCost: formatCost(currentCost),
+    rate: formatCostRate(currentCost, elapsedMs),
+    estimatedTotal: formatCost(total),
+    estimatedRemaining: formatCost(remaining),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Phase 6: Resume Dashboard helpers
+// ---------------------------------------------------------------------------
+
+const RESUMABLE_STATES: ReadonlySet<RunSummary["state"]> = new Set(["waiting", "created"]);
+
+/**
+ * Filter runs to only those that can be resumed (waiting or created).
+ */
+export function getResumableRuns(runs: readonly RunSummary[]): RunSummary[] {
+  return runs.filter((r) => RESUMABLE_STATES.has(r.state));
+}
+
+const STATE_PRIORITY: Record<RunSummary["state"], number> = {
+  waiting: 0,
+  created: 1,
+  completed: 2,
+  failed: 3,
+};
+
+/**
+ * Rank runs for the resume dashboard: waiting first, then created,
+ * within each state sorted by most recent first.
+ * Excludes completed and failed runs.
+ */
+export function rankRunsForResume(runs: readonly RunSummary[]): RunSummary[] {
+  return getResumableRuns(runs).sort((a, b) => {
+    const stateDiff = STATE_PRIORITY[a.state] - STATE_PRIORITY[b.state];
+    if (stateDiff !== 0) return stateDiff;
+    // More recent first
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+}
+
+/**
+ * Format a single-line summary for a run in the resume picker.
+ */
+export function formatRunSummaryLine(run: RunSummary): string {
+  const id = run.runId.length > 12 ? run.runId.slice(0, 12) : run.runId;
+  const proc = run.processId.length > 20 ? run.processId.slice(0, 19) + "\u2026" : run.processId;
+  const pending = run.pendingCount > 0 ? ` [${run.pendingCount} pending]` : "";
+  const promptExcerpt = run.prompt
+    ? ` \u2014 ${run.prompt.length > 60 ? run.prompt.slice(0, 57) + "..." : run.prompt}`
+    : "";
+  return `${id} ${run.state} ${proc}${pending}${promptExcerpt}`;
+}
+
+// ---------------------------------------------------------------------------
+// Phase 6: Structured Status View helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * A section in the structured status view.
+ */
+export interface StatusSection {
+  readonly title: string;
+  readonly entries: readonly StatusEntry[];
+}
+
+/**
+ * A key-value entry in a status section.
+ */
+export interface StatusEntry {
+  readonly label: string;
+  readonly value: string;
+}
+
+/**
+ * Build structured status sections from orchestration status.
+ */
+export function buildStatusSections(status: OrchestrationStatus): StatusSection[] {
+  const sections: StatusSection[] = [];
+
+  // Run section
+  sections.push({
+    title: "Run",
+    entries: [
+      { label: "ID", value: status.runId },
+      { label: "Phase", value: status.phase },
+      { label: "Iteration", value: String(status.iteration) },
+      { label: "Elapsed", value: formatElapsedCompact(status.elapsedMs) },
+    ],
+  });
+
+  // Effects section
+  sections.push({
+    title: "Effects",
+    entries: [
+      { label: "Total", value: String(status.totalEffects) },
+      { label: "Resolved", value: String(status.resolvedEffects) },
+      { label: "Pending", value: String(status.pendingEffects) },
+    ],
+  });
+
+  // Token section
+  if (status.tokenUsage) {
+    sections.push({
+      title: "Tokens",
+      entries: [
+        { label: "Input", value: String(status.tokenUsage.input) },
+        { label: "Output", value: String(status.tokenUsage.output) },
+        { label: "Total", value: String(status.tokenUsage.total) },
+      ],
+    });
+  }
+
+  // Cost section
+  if (status.cost !== undefined) {
+    sections.push({
+      title: "Cost",
+      entries: [
+        { label: "Current", value: formatCost(status.cost) },
+        { label: "Rate", value: formatCostRate(status.cost, status.elapsedMs) },
+      ],
+    });
+  }
+
+  return sections;
+}
+
+/**
+ * Format a status section as text lines for display.
+ * Returns an array of strings: title line followed by indented entries.
+ */
+export function formatStatusSection(section: StatusSection): string[] {
+  const lines: string[] = [`[${section.title}]`];
+  const maxLabel = section.entries.reduce(
+    (max, e) => Math.max(max, e.label.length),
+    0,
+  );
+  for (const entry of section.entries) {
+    lines.push(`  ${entry.label.padEnd(maxLabel)}  ${entry.value}`);
+  }
+  return lines;
 }

@@ -12,7 +12,7 @@
  * Box/Text are obtained from InkContext via useInk() — no prop drilling.
  */
 
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useInk } from "../contexts/InkContext.js";
 import type { InkKey } from "../contexts/InkContext.js";
 import { useNavigation } from "../hooks/useNavigation.js";
@@ -21,7 +21,10 @@ import { useChatContext } from "../contexts/ChatContext.js";
 import { StatusBar } from "../components/StatusBar.js";
 import { MessagePane } from "../components/MessagePane.js";
 import { PromptBar } from "../components/PromptBar.js";
-import { parseStreamingLine } from "../helpers.js";
+import { SearchBar } from "../components/SearchBar.js";
+import type { SearchBarState } from "../components/SearchBar.js";
+import { parseStreamingLine, findMatches } from "../helpers.js";
+import { filterMessages } from "../components/MessagePane.js";
 import type { TuiMessage, VerbosityLevel } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -70,6 +73,8 @@ const HARNESS_MODELS: Record<string, readonly string[]> = {
 
 interface SlashResult {
   handled: boolean;
+  /** When /search is handled, this carries the query to activate search. */
+  searchQuery?: string;
 }
 
 interface SlashCommandContext {
@@ -139,6 +144,7 @@ function processSlashCommand(
       "/refresh   — Refresh run data",
       "/harness   — Switch harness (e.g. /harness claude-code)",
       "/model     — Switch model (e.g. /model claude-opus-4-6)",
+      "/search    — Search messages (also Ctrl+F)",
       "/help      — Show this help",
     ].join("\n");
     const msg: TuiMessage = {
@@ -160,6 +166,13 @@ function processSlashCommand(
     };
     sessionDispatch({ type: "APPEND_MESSAGE", message: msg });
     return { handled: true };
+  }
+
+  // /search [query] — activate search bar, optionally with initial query
+  if (lower.startsWith("/search")) {
+    const parts = text.trim().split(/\s+/);
+    const query = parts.slice(1).join(" ");
+    return { handled: true, searchQuery: query };
   }
 
   // /harness [name] — switch harness or show menu
@@ -242,6 +255,12 @@ export function SessionView(): React.JSX.Element {
   const { state: sessionState, dispatch: sessionDispatch } = useSession();
   const chat = useChatContext();
   const pendingRef = useRef(false);
+  const [searchActive, setSearchActive] = useState(false);
+  const [_searchState, setSearchState] = useState<SearchBarState>({
+    query: "",
+    matches: [],
+    currentIndex: 0,
+  });
 
   // Bind the navigation runId to session state if they differ
   React.useEffect(() => {
@@ -256,10 +275,21 @@ export function SessionView(): React.JSX.Element {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Escape goes back to dashboard (only when prompt input is not active)
+  // Ctrl+F toggles search bar
   useInput(
-    (_input: string, key: InkKey) => {
+    (input: string, key: InkKey) => {
       if (key.escape) {
-        navDispatch({ type: "GO_BACK" });
+        if (searchActive) {
+          setSearchActive(false);
+          setSearchState({ query: "", matches: [], currentIndex: 0 });
+        } else {
+          navDispatch({ type: "GO_BACK" });
+        }
+        return;
+      }
+      if (input === "f" && key.ctrl) {
+        setSearchActive((prev) => !prev);
+        return;
       }
     },
     { isActive: !sessionState.inputActive },
@@ -286,7 +316,34 @@ export function SessionView(): React.JSX.Element {
             setModel: chat.setModel,
           },
         );
-        if (result.handled) return;
+        if (result.handled) {
+          if (result.searchQuery !== undefined) {
+            setSearchActive(true);
+            if (result.searchQuery) {
+              // Pre-populate search with query from /search <query>
+              const visible = filterMessages(sessionState.messages, sessionState.verbosity);
+              const corpus = visible.map((m) => {
+                const c = m.content;
+                if ("text" in c) return c.text;
+                if ("message" in c) return c.message;
+                if ("toolName" in c) return c.toolName ?? "";
+                if ("name" in c) return (c as { name?: string }).name ?? "";
+                return "";
+              }).join("\n");
+              const matches = findMatches(
+                corpus,
+                result.searchQuery,
+                { ignoreCase: true },
+              );
+              setSearchState({
+                query: result.searchQuery,
+                matches,
+                currentIndex: 0,
+              });
+            }
+          }
+          return;
+        }
       }
 
       // 2. Append user message to the conversation
@@ -434,6 +491,28 @@ export function SessionView(): React.JSX.Element {
     [sessionDispatch, navDispatch, sessionState, chat],
   );
 
+  // Build searchable corpus from visible messages
+  const searchCorpus = React.useMemo(() => {
+    const visible = filterMessages(sessionState.messages, sessionState.verbosity);
+    return visible
+      .map((m) => {
+        const c = m.content;
+        if ("text" in c) return c.text;
+        if ("message" in c) return c.message;
+        if ("toolName" in c) return c.toolName ?? "";
+        return "";
+      })
+      .join("\n");
+  }, [sessionState.messages, sessionState.verbosity]);
+
+  // Search change handler
+  const handleSearchChange = useCallback(
+    (state: SearchBarState) => {
+      setSearchState(state);
+    },
+    [],
+  );
+
   // Loading indicator element
   const loadingIndicator = chat.loading
     ? React.createElement(
@@ -455,6 +534,11 @@ export function SessionView(): React.JSX.Element {
     },
     React.createElement(StatusBar, null),
     React.createElement(MessagePane, null),
+    React.createElement(SearchBar, {
+      text: searchCorpus,
+      isActive: searchActive,
+      onSearchChange: handleSearchChange,
+    }),
     loadingIndicator,
     React.createElement(PromptBar, {
       onSubmit: handleSubmit,

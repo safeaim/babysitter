@@ -50,6 +50,7 @@ export const SLASH_COMMANDS: readonly SlashCommand[] = [
   { name: "/harness", description: "Switch harness" },
   { name: "/model", description: "Switch model" },
   { name: "/help", description: "Show available commands" },
+  { name: "/search", description: "Search messages" },
 ];
 
 export function getSlashHints(input: string): readonly SlashCommand[] {

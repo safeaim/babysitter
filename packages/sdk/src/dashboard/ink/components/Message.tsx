@@ -14,6 +14,7 @@ import { useTheme } from "../hooks/useTheme.js";
 import { useInk } from "../contexts/InkContext.js";
 import { stripAnsi } from "../../colors.js";
 import { renderStatusSymbol } from "../../components/StatusBadge.js";
+import { briefArgs } from "../helpers.js";
 import type { TuiMessage, RunStatus } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -46,24 +47,6 @@ function runStatusToBadgeStatus(
   }
 }
 
-/** Serialise an unknown tool input to a concise single-line string. */
-function briefArgs(input: unknown): string {
-  if (input === null || input === undefined) return "";
-  if (typeof input === "string") {
-    const trimmed = input.slice(0, 60);
-    return trimmed.length < input.length ? `${trimmed}…` : trimmed;
-  }
-  if (typeof input === "object") {
-    try {
-      const raw = JSON.stringify(input);
-      const trimmed = raw.slice(0, 80);
-      return trimmed.length < raw.length ? `${trimmed}…` : trimmed;
-    } catch {
-      return "[object]";
-    }
-  }
-  return String(input).slice(0, 80);
-}
 
 // ---------------------------------------------------------------------------
 // Sub-renderers (all obtain Box/Text via useInk)

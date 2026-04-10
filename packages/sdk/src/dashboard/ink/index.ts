@@ -47,5 +47,19 @@ export type { UseRunScannerResult } from "./hooks/useRunScanner.js";
 // Data layer types
 export type { RunSummary, RunDetail } from "./data/runScanner.js";
 
+// Message rendering helpers (pure functions)
+export {
+  truncateOutput,
+  formatTimestamp,
+  formatElapsedCompact,
+  briefArgs,
+  getMessageIcon,
+  getMessageColor,
+  shouldShowTimestamp,
+  formatToolCallSummary,
+  formatShellOutput,
+  formatToolOutput,
+} from "./helpers.js";
+
 // Runtime entry point
 export { createTuiSession, type TuiSession } from "./render.js";

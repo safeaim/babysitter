@@ -99,5 +99,32 @@ export {
 // Phase 4 types
 export type { SlashCommandDef, InputHistory } from "./helpers.js";
 
+// Component helpers — RunListTable
+export {
+  stateSymbol,
+  stateColor,
+  truncateId,
+  truncateProcess,
+  formatRelativeTimestamp,
+} from "./components/RunListTable.js";
+
+// Component helpers — MessagePane
+export { filterMessages, VERBOSITY_ALLOWED } from "./components/MessagePane.js";
+
+// Component helpers — PromptBar
+export {
+  getSlashHints,
+  countLines,
+  SLASH_COMMANDS,
+} from "./components/PromptBar.js";
+export type { SlashCommand as PromptBarSlashCommand } from "./components/PromptBar.js";
+
+// Component helpers — StatusBar
+export {
+  formatTokenCount,
+  statusToIndicator,
+  statusToColor,
+} from "./components/StatusBar.js";
+
 // Runtime entry point
 export { createTuiSession, type TuiSession } from "./render.js";

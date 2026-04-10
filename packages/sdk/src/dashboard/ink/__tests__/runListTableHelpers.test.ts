@@ -155,10 +155,8 @@ describe("formatRelativeTimestamp", () => {
     expect(formatRelativeTimestamp("")).toBe("???");
   });
 
-  it("returns truncated ISO for invalid date", () => {
+  it("returns truncated string for invalid date", () => {
     const result = formatRelativeTimestamp("not-a-date-string-at-all");
-    // Should gracefully handle — returns either "???" or truncated string
-    expect(typeof result).toBe("string");
-    expect(result.length).toBeGreaterThan(0);
+    expect(result).toBe("not-a-date-string-a");
   });
 });

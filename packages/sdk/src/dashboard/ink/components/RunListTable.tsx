@@ -69,6 +69,7 @@ export function formatRelativeTimestamp(iso: string, now?: Date): string {
   if (!iso) return "???";
   try {
     const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso.slice(0, 19);
     const ref = now ?? new Date();
     const diffMs = ref.getTime() - d.getTime();
     if (diffMs < 60_000) return "just now";

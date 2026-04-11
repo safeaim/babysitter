@@ -794,6 +794,147 @@ For exploratory or diagnostic contexts where you want to *know* about errors wit
 
 ---
 
+### `runtime-call-tracer`
+
+Traces runtime execution paths across a codebase by grepping for route/handler registrations and following import chains. Produces a structured map of feature areas to their traced files, dead code candidates, and dominant hot path. Designed for injection into architecture-analysis, refactoring-planning, and quality-audit processes.
+
+The module exposes two surfaces:
+- **`traceRuntimeCallPathsTask`** — standalone `defineTask` descriptor (kind: `'agent'`) for direct `ctx.task()` usage.
+- **`createCallPathTracer(options)`** — convenience factory that bakes in default `projectDir`, `maxDepth`, and `timeout` values and returns a reusable task definition.
+
+**Import**
+
+```js
+import { traceRuntimeCallPathsTask, createCallPathTracer } from './index.js';
+// or directly:
+import { traceRuntimeCallPathsTask, createCallPathTracer } from './runtime-call-tracer.js';
+```
+
+**`traceRuntimeCallPathsTask` — standalone task**
+
+Expected args:
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `featureAreas` | `Array<{ name: string, entryPoint: string }>` | yes | — | Feature areas to trace. Each `entryPoint` is a path relative to `projectDir`. |
+| `projectDir` | `string` | no | `'.'` | Root directory for resolving relative import paths. |
+| `maxDepth` | `number` | no | `8` | Maximum import-follow depth per feature area. |
+| `timeout` | `number` | no | `120000` | Task timeout in milliseconds. |
+
+Output schema:
+
+```js
+{
+  runtimeCallPaths: {
+    [featureName: string]: {
+      entryPoint:         string,    // the provided entry point path
+      tracedFiles:        string[],  // all visited source files, relative to projectDir
+      deadCodeCandidates: string[],  // "<file>:<symbol>" entries with no external callers
+      hotPath:            string,    // dominant call chain from entry to terminal effect
+    }
+  },
+  summary: string  // concise architectural overview of observed patterns
+}
+```
+
+**`createCallPathTracer(options)` — factory**
+
+```js
+function createCallPathTracer(options?: {
+  projectDir?:  string,  // default '.'
+  maxDepth?:    number,  // default 8, clamped to [1, 20]
+  timeout?:     number,  // default 120000
+  tracerName?:  string,  // default 'default'; used to differentiate task IDs in multi-tracer processes
+}): TaskDef
+```
+
+The returned task definition accepts the same `featureAreas` (and optional per-call `projectDir`, `maxDepth`, `timeout`) arguments as the standalone task. Per-call values override factory defaults.
+
+**Usage — standalone task**
+
+```js
+import { traceRuntimeCallPathsTask } from '../shared/index.js';
+
+export async function process(inputs, ctx) {
+  const result = await ctx.task(traceRuntimeCallPathsTask, {
+    featureAreas: [
+      { name: 'run-create', entryPoint: 'packages/sdk/src/cli/commands/runCreate.ts' },
+      { name: 'task-post',  entryPoint: 'packages/sdk/src/cli/commands/taskPost.ts' },
+    ],
+    projectDir: '.',
+    maxDepth: 6,
+  });
+
+  for (const [feature, paths] of Object.entries(result.runtimeCallPaths)) {
+    console.log(`${feature}: ${paths.tracedFiles.length} files, hot path: ${paths.hotPath}`);
+  }
+
+  return result;
+}
+```
+
+**Usage — factory approach**
+
+```js
+import { createCallPathTracer } from '../shared/index.js';
+
+export async function process(inputs, ctx) {
+  const tracerTask = createCallPathTracer({
+    projectDir: inputs.projectDir ?? '.',
+    maxDepth: 5,
+    tracerName: 'sdk-tracer',
+  });
+
+  // Dispatch in two batches to keep individual agent contexts focused
+  const runtimePaths = await ctx.task(tracerTask, {
+    featureAreas: [
+      { name: 'replay-engine',  entryPoint: 'src/runtime/replay/index.ts' },
+      { name: 'storage-layer',  entryPoint: 'src/storage/index.ts' },
+    ],
+  });
+
+  const taskPaths = await ctx.task(tracerTask, {
+    featureAreas: [
+      { name: 'task-dispatch', entryPoint: 'src/tasks/index.ts' },
+    ],
+  });
+
+  return {
+    callPaths: {
+      ...runtimePaths.runtimeCallPaths,
+      ...taskPaths.runtimeCallPaths,
+    },
+    summaries: [runtimePaths.summary, taskPaths.summary],
+  };
+}
+```
+
+**Example output**
+
+```json
+{
+  "runtimeCallPaths": {
+    "run-create": {
+      "entryPoint": "packages/sdk/src/cli/commands/runCreate.ts",
+      "tracedFiles": [
+        "packages/sdk/src/cli/commands/runCreate.ts",
+        "packages/sdk/src/runtime/createRun.ts",
+        "packages/sdk/src/storage/createRunDir.ts",
+        "packages/sdk/src/storage/appendEvent.ts",
+        "packages/sdk/src/storage/lock.ts"
+      ],
+      "deadCodeCandidates": [
+        "packages/sdk/src/storage/createRunDir.ts:ensureParentDir"
+      ],
+      "hotPath": "cli#runCreate → createRun() → createRunDir() → acquireRunLock() → appendEvent(RUN_CREATED)"
+    }
+  },
+  "summary": "The run-create path follows a strict layered architecture: CLI → runtime orchestration → storage primitives. The storage layer is consistently accessed through thin wrapper functions with no cross-cutting concerns. One unexported utility (ensureParentDir) appears to have no callers outside its declaration file."
+}
+```
+
+---
+
 ## API Reference
 
 | Export | Module | Type | Description |
@@ -813,5 +954,7 @@ For exploratory or diagnostic contexts where you want to *know* about errors wit
 | `tsCheckTask` | `ts-check` | `TaskDef` | Standalone shell `defineTask` that runs `tsc --noEmit` as a hard compilation gate |
 | `createTsCheck` | `ts-check` | `function` | Factory that returns a shell `checkTask` and an agent `reportTask` for TypeScript compilation checking |
 | `executeTsCheck` | `ts-check` | `async function` | Convenience wrapper that runs the compilation check and returns a structured result with parsed errors |
+| `traceRuntimeCallPathsTask` | `runtime-call-tracer` | `TaskDef` | Standalone agent `defineTask` that greps for handlers, follows imports, and maps call paths for a list of feature areas |
+| `createCallPathTracer` | `runtime-call-tracer` | `function` | Factory that returns a pre-configured `defineTask` descriptor with baked-in `projectDir`, `maxDepth`, and `timeout` defaults |
 
 All exports are available from `./index.js` (the preferred import path) or from the individual module files.

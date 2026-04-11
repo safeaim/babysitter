@@ -72,6 +72,11 @@ specified:
   - In case of a new project, plan the architecture, stack, parts, milestones
   - In case of an existing project, analyze the architecture, stack, relevant
     parts, milestones, and plan the changes
+  - In case of modifying existing code (brownfield), trace the runtime call path
+    from user-facing entry points through to final output before planning changes;
+    record traced paths as `runtimeCallPaths` in the planning output; only modify
+    files that are actually on the live execution path (see ADVANCED_PATTERNS.md
+    Pattern 9 for the full pattern)
   - Integrate/link the main pages (or entry points) with functionality created
     for every phase of the development process
   - Quality gated iterative and convergent development/refinement loops

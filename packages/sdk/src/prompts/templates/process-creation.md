@@ -66,3 +66,6 @@ After the process is created and before creating the run:
   breakpoints where appropriate
 - correct: pair shell verification gates with agent analysis tasks (shell runs
   the check, agent interprets failures and suggests fixes)
+- correct: for brownfield changes, trace the runtime call path from entry points
+  to final output first, record as `runtimeCallPaths`, and scope modifications
+  only to files on the live execution path (see ADVANCED_PATTERNS.md Pattern 9)

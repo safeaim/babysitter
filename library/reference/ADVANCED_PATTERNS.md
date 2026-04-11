@@ -7,12 +7,13 @@
 
 ## Summary
 
-Added four new advanced patterns to the babysitter skill documentation:
+Added five advanced patterns to the babysitter skill documentation:
 
 1. **Pattern 5:** Agent-based execution (LLM-powered tasks)
 2. **Pattern 6:** Skill-based execution (Claude Code skill invocation)
 3. **Pattern 7:** Complex iterative convergence with scoring
 4. **Pattern 8:** Smoke E2E verification gate (runtime reality check)
+5. **Pattern 9:** Runtime call-path tracing (confirm live paths before modifying code)
 
 These patterns demonstrate sophisticated orchestration capabilities beyond basic task execution.
 
@@ -749,13 +750,278 @@ Add one smoke test per new top-level route introduced by the process. The goal i
 
 ---
 
+## Pattern 9: Runtime Call-Path Tracing
+
+### Concept
+
+Planning agents frequently waste tokens — and worse, produce incorrect changes — by modifying code that is never actually reached at runtime. The underlying cause is a failure to trace the live call path before deciding which files to change.
+
+Type-safe monorepos are especially prone to this. A developer (or agent) sees a cleanly-typed `PdfRenderer` class, modifies it carefully, verifies the TypeScript compiles, and declares success. What they missed: the route handler that triggers the PDF export never imported `PdfRenderer`. It has its own inline HTML builder that it has been using since the original sprint. `PdfRenderer` is dead code. The typed layer is a ghost. The change did nothing.
+
+**The core problem:** static-analysis tools (grep, type-checker, file-existence checks) can tell you that a symbol *exists* and *could* be called. They cannot tell you what is *actually* called when a user clicks "Export PDF" at runtime.
+
+**The solution:** before deciding which files to modify, dispatch a `trace-call-path` planning subtask. The agent follows the live execution path from the user-facing entry point (route handler, CLI command, event listener) all the way to the final output-producing code. Every fork in the road is noted. Dead branches — including well-typed ones — are flagged explicitly. Only code on the confirmed live path is modified.
+
+### Motivation (from a real failure — see issue #127)
+
+A Next.js + Prisma process was asked to fix PDF rendering quality. The process spent six iterations improving `lib/pdf-renderer.ts`: added proper font embedding, fixed margin calculations, tightened the output schema. All TypeScript checks passed.
+
+The user's "Export PDF" button continued producing the same low-quality output. Root cause: `app/api/export/route.ts` had never imported `lib/pdf-renderer.ts`. It contained an inline `buildHtmlForPdf()` function that called `puppeteer` directly. Every change to `lib/pdf-renderer.ts` was irrelevant. The entire improvement loop was executed against dead code.
+
+A single call-path trace from `app/api/export/route.ts` → `buildHtmlForPdf()` would have surfaced this in under 30 seconds and redirected all effort to the live path.
+
+### TaskDef Structure
+
+```javascript
+import { defineTask } from '@a5c-ai/babysitter-sdk';
+
+export const traceCallPathTask = defineTask('trace-call-path', (args, taskCtx) => ({
+  kind: 'agent',
+  title: `Trace live call path: ${args.featureName}`,
+  agent: {
+    name: 'call-path-tracer',
+    prompt: {
+      role: 'Runtime Call-Path Analyst — you follow what ACTUALLY runs, not what looks like it should run',
+      task: `Trace the complete runtime execution path for the "${args.featureName}" feature from its user-facing entry point to final output. Identify every file on the live path and every file that exists but is NOT on the live path (dead code / unreachable typed layers).`,
+      context: {
+        projectDir: args.projectDir,
+        entryPoint: args.entryPoint,        // e.g. "app/api/export/route.ts POST handler"
+        featureName: args.featureName,       // e.g. "PDF export"
+        knownSymbols: args.knownSymbols ?? [], // hints: ["PdfRenderer", "buildHtmlForPdf"]
+        known_failure_modes: [
+          'A typed library class exists but the route handler uses a local inline function instead',
+          'An import exists in one file but a different import is used at the call site',
+          'Middleware rewrites the request before it reaches the handler you inspected',
+          'A feature flag short-circuits execution before reaching the typed layer',
+          'A cache layer returns early, bypassing the rendering function entirely'
+        ]
+      },
+      instructions: [
+        '1. Open the entry-point file and read the handler/function that is triggered by the user action.',
+        '2. For every function call and import in that handler, resolve the actual import source — do not assume the most obvious file is the one being used.',
+        '3. Follow each call transitively. At each level, note: file path, exported symbol, whether it is actually imported by the caller.',
+        '4. When you encounter a branch (feature flag, env check, early-return), record BOTH paths with a note on which is live under normal conditions.',
+        '5. Stop when you reach code that writes to the response / produces output (HTTP response, file write, return value to client).',
+        '6. Separately, list any symbols/files that LOOK related (similar name, same domain) but are NOT on the live call path — these are dead code candidates.',
+        '7. Return the structured result matching the output schema.',
+        '8. CRITICAL: Do not guess. If an import is ambiguous, read the actual import statement in the file. If you cannot determine whether a branch is live, say so explicitly in the `uncertainties` field.'
+      ],
+      outputFormat: 'JSON matching the runtimeCallPaths output schema'
+    },
+    outputSchema: {
+      type: 'object',
+      required: ['entryPoint', 'livePath', 'deadCodeCandidates', 'uncertainties', 'recommendedEditTargets'],
+      properties: {
+        entryPoint: {
+          type: 'string',
+          description: 'The file and symbol where tracing began'
+        },
+        livePath: {
+          type: 'array',
+          description: 'Ordered list of every file/symbol on the confirmed live call path',
+          items: {
+            type: 'object',
+            required: ['file', 'symbol', 'calledBy'],
+            properties: {
+              file: { type: 'string', description: 'Repo-relative file path' },
+              symbol: { type: 'string', description: 'Function or class name' },
+              calledBy: { type: 'string', description: 'The caller (file:symbol)' },
+              notes: { type: 'string', description: 'Optional: branch conditions, cache layers, etc.' }
+            }
+          }
+        },
+        deadCodeCandidates: {
+          type: 'array',
+          description: 'Files/symbols that exist and look related but are NOT on the live call path',
+          items: {
+            type: 'object',
+            required: ['file', 'symbol', 'reason'],
+            properties: {
+              file: { type: 'string' },
+              symbol: { type: 'string' },
+              reason: { type: 'string', description: 'Why this is not on the live path' }
+            }
+          }
+        },
+        uncertainties: {
+          type: 'array',
+          description: 'Branches or imports that could not be resolved with certainty',
+          items: {
+            type: 'object',
+            required: ['location', 'description'],
+            properties: {
+              location: { type: 'string' },
+              description: { type: 'string' }
+            }
+          }
+        },
+        recommendedEditTargets: {
+          type: 'array',
+          description: 'The specific files that should be modified to affect the feature — only files on the live path',
+          items: { type: 'string' }
+        }
+      }
+    }
+  },
+  io: {
+    inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+    outputJsonPath: `tasks/${taskCtx.effectId}/output.json`
+  },
+  labels: ['planning', 'call-path', 'static-analysis', 'dead-code']
+}));
+```
+
+### Usage in Process
+
+Dispatch the call-path tracer **before** any planning or implementation phases that touch a known feature path. Use its `recommendedEditTargets` output to constrain which files downstream tasks are allowed to modify.
+
+```javascript
+export async function process(inputs, ctx) {
+  // Phase 1: Trace the live call path BEFORE planning any changes
+  ctx.log('info', 'Phase 1: Tracing runtime call path to identify live code');
+
+  const callPathResult = await ctx.task(traceCallPathTask, {
+    projectDir: inputs.projectDir,
+    entryPoint: inputs.entryPoint,       // e.g. "app/api/export/route.ts → POST handler"
+    featureName: inputs.featureName,     // e.g. "PDF export"
+    knownSymbols: inputs.knownSymbols    // optional hints from the issue description
+  });
+
+  ctx.log('info', `Live path: ${callPathResult.livePath.length} nodes`);
+  ctx.log('info', `Dead code candidates: ${callPathResult.deadCodeCandidates.length}`);
+
+  if (callPathResult.deadCodeCandidates.length > 0) {
+    ctx.log('warn', 'Dead code detected — the following files will NOT be modified:');
+    for (const dead of callPathResult.deadCodeCandidates) {
+      ctx.log('warn', `  ${dead.file} (${dead.symbol}): ${dead.reason}`);
+    }
+  }
+
+  // Phase 2: Plan changes — constrained to recommendedEditTargets only
+  const plan = await ctx.task(planChangesTask, {
+    ...inputs,
+    editTargets: callPathResult.recommendedEditTargets,  // only touch live code
+    callPathSummary: callPathResult
+  });
+
+  // Phase 3: Implement using the constrained plan
+  const implementation = await ctx.task(implementTask, {
+    plan,
+    editTargets: callPathResult.recommendedEditTargets
+  });
+
+  return { callPathResult, plan, implementation };
+}
+```
+
+### Reusable Instruction Block for Planning Prompts
+
+Include the following block verbatim in planning agent prompts to prevent dead-code edits:
+
+```
+CALL-PATH CONSTRAINT — READ BEFORE PLANNING:
+You have been provided a runtimeCallPaths result. You MUST:
+1. Only propose modifications to files listed in `recommendedEditTargets`.
+2. Never modify files listed in `deadCodeCandidates` — they are not on the live execution path.
+3. If you believe a dead-code candidate must be modified anyway, stop and raise a breakpoint
+   explaining your reasoning. Do not silently edit dead code.
+4. If `uncertainties` is non-empty, resolve each uncertainty before modifying code in that area.
+
+Violating this constraint wastes tokens and produces changes that have zero runtime effect.
+```
+
+### `runtimeCallPaths` Output Schema (standalone reference)
+
+The `runtimeCallPaths` schema can be re-used anywhere a process needs to record or pass call-path information:
+
+```typescript
+interface RuntimeCallPathEntry {
+  file: string;          // repo-relative path, e.g. "app/api/export/route.ts"
+  symbol: string;        // function or class name, e.g. "POST"
+  calledBy: string;      // "app/api/export/route.ts:POST" or "entry"
+  notes?: string;        // optional: branch conditions, caching notes
+}
+
+interface DeadCodeCandidate {
+  file: string;
+  symbol: string;
+  reason: string;        // e.g. "never imported by route handler; inline function used instead"
+}
+
+interface CallPathUncertainty {
+  location: string;      // file:symbol where uncertainty was encountered
+  description: string;   // what could not be determined
+}
+
+interface RuntimeCallPaths {
+  entryPoint: string;
+  livePath: RuntimeCallPathEntry[];
+  deadCodeCandidates: DeadCodeCandidate[];
+  uncertainties: CallPathUncertainty[];
+  recommendedEditTargets: string[];   // de-duplicated list of files safe to modify
+}
+```
+
+### When to Use
+
+✅ **Good use cases:**
+- Any process that fixes a bug in a specific feature (e.g. "PDF quality is bad") — trace the call path first to confirm you are touching live code
+- Refactors that span multiple architectural layers (service → repository → handler) — confirm the layers are actually connected before restructuring
+- Performance optimizations — ensure the bottleneck you are optimizing is on the live path, not a superseded implementation
+- Processes working in large codebases where multiple implementations of the same concept exist (typed library + inline fallback, v1 + v2 handlers, legacy + modern API routes)
+- Processes handed an issue report that names a file or class — verify the named entity is actually live before accepting the reporter's diagnosis
+
+❌ **Avoid for:**
+- Pure infrastructure changes (dependency upgrades, CI config) where there is no live call path to trace
+- New feature development where no existing call path exists yet — use a different planning approach
+- Simple one-file fixes where the entry point IS the implementation file
+- Processes where the user has already provided a confirmed call-path trace (do not duplicate work)
+
+### Anti-Pattern: Modifying the Typed Layer Without Checking the Live Path
+
+The following is the canonical anti-pattern this pattern exists to prevent. Do not reproduce it.
+
+```javascript
+// ANTI-PATTERN — do not do this
+
+export const fixPdfQualityTask = defineTask('fix-pdf-quality', (args, taskCtx) => ({
+  kind: 'agent',
+  title: 'Fix PDF rendering quality',
+  agent: {
+    name: 'pdf-fixer',
+    prompt: {
+      role: 'PDF engineer',
+      task: 'Fix PDF quality issues',
+      context: { projectDir: args.projectDir },
+      instructions: [
+        // BUG: assumes the typed library is on the live path without verifying
+        '1. Open lib/pdf-renderer.ts',
+        '2. Find the font embedding code and fix it',
+        '3. Fix the margin calculation',
+        '4. Run TypeScript compiler to verify',
+        '5. Return success'
+      ],
+      outputFormat: 'JSON'
+    }
+  },
+  // ...
+}));
+```
+
+**Why this fails:** Step 1 assumes `lib/pdf-renderer.ts` is used at runtime. If the actual route handler at `app/api/export/route.ts` never imports it — because it has its own inline `buildHtmlForPdf()` function — then steps 1–4 execute against dead code, TypeScript passes, and the bug is unchanged.
+
+**Correct approach:** dispatch `traceCallPathTask` first, confirm `lib/pdf-renderer.ts` appears in `recommendedEditTargets`, then proceed with the fix. If it does not appear, the fix belongs in whatever file the tracer identifies as the live renderer.
+
+---
+
 ## Summary
 
-These four patterns extend babysitter's capabilities:
+These five patterns extend babysitter's capabilities:
 
 1. **Agent tasks** - LLM-powered work with structured I/O
 2. **Skill tasks** - Composable skill invocation
 3. **Iterative convergence** - Score-based improvement loops with safety mechanisms
 4. **Smoke E2E gate** - Runtime reality check that hard-fails on any failure
+5. **Runtime call-path tracing** - Confirm live execution paths before modifying any code
 
-All patterns use the same SDK API (`ctx.task()`), maintaining consistency while enabling sophisticated workflows. The Smoke E2E Gate pattern pairs especially well with Iterative Convergence when used as the quality-gate for UI-heavy refinement loops.
+All patterns use the same SDK API (`ctx.task()`), maintaining consistency while enabling sophisticated workflows. The Smoke E2E Gate pattern pairs especially well with Iterative Convergence when used as the quality-gate for UI-heavy refinement loops. Runtime Call-Path Tracing should be run as the first planning step in any process that targets a specific existing feature — it prevents all downstream phases from wasting iterations on dead code.

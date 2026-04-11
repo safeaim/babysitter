@@ -283,4 +283,36 @@ describe("storage primitives", () => {
       stderrSpy.mockRestore();
     }
   });
+
+  test("createRunDir auto-creates parent package.json with type:module", async () => {
+    const runsRoot = path.join(tmpRoot, "dot-a5c", "runs");
+    await createRunDir({
+      runsRoot,
+      runId: "run-pkg",
+      request: "pkg-test",
+    });
+    const pkgPath = path.join(tmpRoot, "dot-a5c", "package.json");
+    const content = JSON.parse(await fs.readFile(pkgPath, "utf8"));
+    expect(content).toEqual({ type: "module" });
+  });
+
+  test("createRunDir does not overwrite existing parent package.json", async () => {
+    const parentDir = path.join(tmpRoot, "existing-parent");
+    const runsRoot = path.join(parentDir, "runs");
+    await fs.mkdir(parentDir, { recursive: true });
+    await fs.writeFile(
+      path.join(parentDir, "package.json"),
+      JSON.stringify({ name: "my-project", type: "commonjs" }),
+    );
+    await createRunDir({
+      runsRoot,
+      runId: "run-existing-pkg",
+      request: "existing-pkg-test",
+    });
+    const content = JSON.parse(
+      await fs.readFile(path.join(parentDir, "package.json"), "utf8"),
+    );
+    expect(content.name).toBe("my-project");
+    expect(content.type).toBe("commonjs");
+  });
 });

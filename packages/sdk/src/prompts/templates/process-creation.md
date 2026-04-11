@@ -2,11 +2,11 @@
 
 After the interview phase, create the complete custom process files (js and
 jsons) for the run according to the Process Creation Guidelines and
-methodologies section. Also install the babysitter-sdk inside `.a5c/` if it is
-not already installed. **IMPORTANT**: When installing into `.a5c/`, use
-`{{sdkInstallCmd}}` or a subshell
-`{{sdkSubshellCmd}}` to avoid leaving CWD inside
-`.a5c/`, which causes doubled path resolution bugs.
+methodologies section. Place process files in `.a5c/processes/`.
+
+**Note:** The `run:create` command automatically ensures `.a5c/package.json`
+exists with `"type": "module"` for ESM support. You do **not** need to install
+the babysitter-sdk inside `.a5c/` or create a package.json manually.
 
 You must abide the syntax and structure of the process files from the process
 library.

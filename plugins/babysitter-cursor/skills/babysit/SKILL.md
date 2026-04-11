@@ -18,28 +18,21 @@ Read the SDK version from `versions.json` to ensure version compatibility:
 
 ```bash
 SDK_VERSION=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('${PLUGIN_ROOT}/versions.json','utf8')).sdkVersion||'latest')}catch{console.log('latest')}")
+CLI="npx -y @a5c-ai/babysitter-sdk@$SDK_VERSION"
 ```
 
-Then ensure the CLI is installed:
-
-```bash
-sudo npm i -g @a5c-ai/babysitter-sdk@$SDK_VERSION
-```
-
-Use the CLI alias: `CLI="babysitter"`
-
-**Alternatively:** `CLI="npx -y @a5c-ai/babysitter-sdk@$SDK_VERSION"`
+If `babysitter` is already installed globally at the correct version, you may use `CLI="babysitter"` instead.
 
 ### jq
 
-make sure you have jq installed and available in the path. if not, install it.
+Make sure `jq` is installed and available in the path. If not, install it.
 
 ## Instructions
 
 Run the following command to get full orchestration instructions:
 
 ```bash
-babysitter instructions:babysit-skill --harness cursor --json
+$CLI instructions:babysit-skill --harness cursor --json
 ```
 
 Follow the instructions returned by the command above to orchestrate the run.
@@ -53,9 +46,9 @@ automatically re-enter the orchestration loop.
 Therefore, you MUST use **in-turn iteration**: run the full orchestration loop
 within a single session turn. The pattern is:
 
-1. `babysitter run:iterate --json` -- get pending actions
+1. `$CLI run:iterate --json` -- get pending actions
 2. For each pending action: execute it (run tasks, post results via `task:post`)
-3. `babysitter run:iterate --json` -- check for more pending actions
+3. `$CLI run:iterate --json` -- check for more pending actions
 4. Repeat steps 2-3 until run completes or reaches a breakpoint requiring user input
 5. If a breakpoint requires user input, ask the user and post the response, then continue iterating
 
@@ -67,7 +60,7 @@ the orchestration loop. The agent drives the loop directly by calling
 
 ```bash
 # Initial iterate
-RESULT=$(babysitter run:iterate --run-id "$RUN_ID" --json)
+RESULT=$($CLI run:iterate --run-id "$RUN_ID" --json)
 STATUS=$(echo "$RESULT" | jq -r '.status')
 
 while [ "$STATUS" != "completed" ] && [ "$STATUS" != "failed" ]; do
@@ -75,7 +68,7 @@ while [ "$STATUS" != "completed" ] && [ "$STATUS" != "failed" ]; do
   # ... execute tasks, post results ...
 
   # Iterate again
-  RESULT=$(babysitter run:iterate --run-id "$RUN_ID" --json)
+  RESULT=$($CLI run:iterate --run-id "$RUN_ID" --json)
   STATUS=$(echo "$RESULT" | jq -r '.status')
 done
 ```

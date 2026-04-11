@@ -86,6 +86,40 @@ export {
   buildResumeContext,
 } from './persistence';
 
+// Continuity state (GAP-PERF-008)
+export type {
+  ContinuityPhase,
+  ContinuityDecision,
+  ContinuityWorkingContext,
+  ContinuityState,
+} from './continuityState';
+export {
+  CONTINUITY_STATE_SCHEMA_VERSION,
+  getContinuityStatePath,
+  getContinuityState,
+  setCurrentPhase,
+  upsertDecision,
+  updateWorkingContext,
+  buildContinuityResumePrompt,
+} from './continuityState';
+
+// Long-term memory extraction (GAP-STATE-001)
+export type {
+  MemoryCategory,
+  MemoryConfidence,
+  MemoryEntry,
+  LongTermMemoryStore,
+  MemoryExtractionInput,
+} from './memoryExtraction';
+export {
+  LONG_TERM_MEMORY_SCHEMA_VERSION,
+  extractMemoriesFromSession,
+  readLongTermMemory,
+  persistMemories,
+  queryMemories,
+  pruneMemories,
+} from './memoryExtraction';
+
 // Cost tracking (GAP-SESSION-004)
 export type {
   SessionBudget,

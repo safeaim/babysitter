@@ -40,6 +40,16 @@ export { hashInvocationKey } from "./invocation";
 export { EffectRequestedError, EffectPendingError, EffectCancelledError, ParallelPendingError, RunFailedError } from "./exceptions";
 export { replaySchemaVersion } from "./constants";
 export {
+  definePipeline,
+  buildStepInputs,
+  validatePipelineDefinition,
+  type PipelineStepDefinition,
+  type PipelineDefinition,
+  type PipelineStepResult,
+  type PipelineResult,
+  type PipelineValidationResult,
+} from "./processPipeline";
+export {
   applyStrategy,
   type ParallelStrategyName,
   type ParallelStrategyOptions,

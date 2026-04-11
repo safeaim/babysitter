@@ -36,3 +36,15 @@ export type {
   DelegationResponse,
 } from "./delegationTypes";
 export { DELEGATION_RULES_SCHEMA_VERSION, DEFAULT_DELEGATION_TIMEOUT_MS } from "./delegationTypes";
+export {
+  evaluateApprovalChain,
+  advanceChainStep,
+  initChainState,
+  resolveEscalationPath,
+  type ApprovalChainStep,
+  type ApprovalChainDefinition,
+  type QuorumConfig,
+  type ApprovalChainState,
+  type CompletedChainStep,
+  type ChainEvaluationResult,
+} from "./approvalChains";

@@ -26,13 +26,15 @@ import type { SearchBarState } from "../components/SearchBar.js";
 import { BreakpointPanel } from "../components/BreakpointPanel.js";
 import { EffectsPanel } from "../components/EffectsPanel.js";
 import {
-  parseStreamingLine,
+  createStreamingParser,
+  getHarnessStreamingFormat,
   findMatches,
   formatKeyboardHelp,
   TERMINAL_BELL,
   buildTabStatusSequence,
   mapRunStatusToTabPreset,
 } from "../helpers.js";
+import type { StreamingParser } from "../helpers.js";
 import { filterMessages } from "../components/MessagePane.js";
 import type { TuiMessage, VerbosityLevel } from "../types.js";
 
@@ -271,6 +273,7 @@ export function SessionView(): React.JSX.Element {
   const { state: sessionState, dispatch: sessionDispatch } = useSession();
   const chat = useChatContext();
   const pendingRef = useRef(false);
+  const parserRef = useRef<StreamingParser | null>(null);
   const [searchActive, setSearchActive] = useState(false);
   const [showEffects, setShowEffects] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -412,11 +415,16 @@ export function SessionView(): React.JSX.Element {
       let toolCallCounter = 0;
       const activeTools = new Map<string, { msgId: string; startedAt: number }>();
 
+      // Create a harness-aware stateful parser for this message
+      const format = getHarnessStreamingFormat(chat.harness);
+      const parser = createStreamingParser(format);
+      parserRef.current = parser;
+
       chat
         .sendMessage(text, {
           onLine: (line: string) => {
             // Try to parse structured events from the streaming line
-            const event = parseStreamingLine(line);
+            const event = parser.parse(line);
             if (event) {
               if (event.kind === "tool_start") {
                 toolCallCounter++;
@@ -496,6 +504,8 @@ export function SessionView(): React.JSX.Element {
             });
           },
           onComplete: (output: string) => {
+            // Reset parser state between messages
+            parserRef.current?.reset();
             // Final update with complete output, mark streaming done
             sessionDispatch({
               type: "UPDATE_MESSAGE",
@@ -514,6 +524,7 @@ export function SessionView(): React.JSX.Element {
             try { process.stderr.write(TERMINAL_BELL); } catch (_e) { /* ignore */ }
           },
           onError: (errText: string) => {
+            parserRef.current?.reset();
             sessionDispatch({
               type: "UPDATE_MESSAGE",
               id: assistantId,

@@ -145,6 +145,13 @@ export function RunListTable({
         { color: colors.muted },
         truncateProcess(run.processId),
       ),
+      run.harness
+        ? React.createElement(
+            Text as React.ComponentType<Record<string, unknown>>,
+            { color: colors.secondary },
+            run.harness,
+          )
+        : null,
       React.createElement(
         Text as React.ComponentType<Record<string, unknown>>,
         { color: colors.muted },

@@ -23,6 +23,7 @@ export interface RunSummary {
   readonly eventCount: number;
   readonly pendingCount: number;
   readonly prompt?: string;
+  readonly harness?: string;
 }
 
 export interface RunDetail {
@@ -35,6 +36,7 @@ export interface RunDetail {
   readonly pendingCount: number;
   readonly resolvedCount: number;
   readonly prompt?: string;
+  readonly harness?: string;
   readonly events: ReadonlyArray<{
     readonly type: string;
     readonly recordedAt: string;
@@ -114,6 +116,7 @@ export async function scanRuns(runsDir: string): Promise<RunSummary[]> {
         eventCount: journal.length,
         pendingCount,
         prompt: (metadata as Record<string, unknown>).prompt as string | undefined,
+        harness: (metadata as Record<string, unknown>).harness as string | undefined,
       });
     } catch {
       // Skip malformed runs
@@ -152,6 +155,7 @@ export async function getRunDetail(runDir: string): Promise<RunDetail> {
     pendingCount,
     resolvedCount,
     prompt: (metadata as Record<string, unknown>).prompt as string | undefined,
+    harness: (metadata as Record<string, unknown>).harness as string | undefined,
     events: journal.map((e) => ({
       type: e.type,
       recordedAt: e.recordedAt,

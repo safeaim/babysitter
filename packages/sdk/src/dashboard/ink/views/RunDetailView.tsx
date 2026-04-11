@@ -205,6 +205,13 @@ export function RunDetailView({ runsDir }: RunDetailViewProps): React.JSX.Elemen
         { color: colors.foreground },
         `Process: ${detail.processId}`,
       ),
+      detail.harness
+        ? React.createElement(
+            Text as React.ComponentType<Record<string, unknown>>,
+            { color: colors.secondary },
+            `Harness: ${detail.harness}`,
+          )
+        : null,
       React.createElement(
         Text as React.ComponentType<Record<string, unknown>>,
         { color: colors.muted },

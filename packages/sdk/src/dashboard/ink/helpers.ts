@@ -1498,6 +1498,15 @@ export function getHarnessRpcSupport(harness: string): boolean {
 }
 
 /**
+ * Format a harness name for display in run list and detail views.
+ * Returns "-" for undefined or empty harness names.
+ */
+export function formatHarnessBadge(harness: string | undefined): string {
+  if (!harness) return "-";
+  return harness;
+}
+
+/**
  * Format a streaming line with source annotation.
  *
  * Stderr lines are prefixed with [stderr] for visual distinction.

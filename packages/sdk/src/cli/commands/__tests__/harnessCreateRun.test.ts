@@ -12,10 +12,14 @@ import { RunFailedError } from "../../../runtime/exceptions";
 
 // ── Mocks ─────────────────────────────────────────────────────────────
 
-vi.mock("../../../harness/discovery", () => ({
-  discoverHarnesses: vi.fn(),
-  detectCallerHarness: vi.fn(() => null),
-}));
+vi.mock("../../../harness/discovery", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../harness/discovery")>();
+  return {
+    ...actual,
+    discoverHarnesses: vi.fn(),
+    detectCallerHarness: vi.fn(() => null),
+  };
+});
 
 vi.mock("../../../harness/invoker", () => ({
   invokeHarness: vi.fn(),

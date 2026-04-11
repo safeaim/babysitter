@@ -114,6 +114,37 @@ export interface PromptContext {
    * Typically `defaultSpec.referenceRoot` from the resolved library.
    */
   processLibraryReferenceRoot?: string;
+
+  /**
+   * GAP-PROMPT-005: Continuity context for resume overlays.
+   * When set, renderContinuityOverlay produces a structured resume context section.
+   * Undefined by default — only populated when resuming an existing run.
+   */
+  continuityContext?: ContinuityContext;
+}
+
+/**
+ * GAP-PROMPT-005: Summary of a single effect for continuity overlays.
+ */
+export interface ContinuityEffectSummary {
+  effectId: string;
+  kind: string;
+  title: string;
+  status: 'resolved' | 'pending';
+}
+
+/**
+ * GAP-PROMPT-005: Rich context extracted from run journal, tasks, and session
+ * for structured resume overlays.
+ */
+export interface ContinuityContext {
+  resolvedEffects: ContinuityEffectSummary[];
+  pendingEffects: ContinuityEffectSummary[];
+  stateTransitions: Array<{ event: string; recordedAt: string }>;
+  modifiedFiles: string[];
+  decisions: Array<{ description: string; timestamp: string }>;
+  iteration: number;
+  progressText: string;
 }
 
 /**
@@ -141,6 +172,28 @@ export interface StratumTaggedPart {
   stratum: PromptStratum;
   /** The render function */
   render: PromptPart;
+  /**
+   * GAP-PERF-005: Volatility score for cache-aware ordering within a stratum.
+   * 0 = most stable (rendered first, most cacheable), 100 = most volatile.
+   * Default: 50.
+   */
+  volatilityScore?: number;
+}
+
+/**
+ * GAP-PERF-005: Stratum checksums for cache-break detection.
+ * Only populated strata have checksums.
+ */
+export type StratumChecksums = Partial<Record<PromptStratum, string>>;
+
+/**
+ * GAP-PERF-005: Result of strata-aware composition with metadata.
+ */
+export interface ComposeByStrataWithMetaResult {
+  /** The composed prompt output */
+  output: string;
+  /** SHA256 checksum per stratum for cache-break detection */
+  stratumChecksums: StratumChecksums;
 }
 
 /**
@@ -151,4 +204,6 @@ export interface ComposeByStrataOptions {
   showStrata?: boolean;
   /** Custom separator between stratum groups (default: '\n\n---\n\n') */
   separator?: string;
+  /** GAP-PERF-005: Sort parts within each stratum by volatilityScore ascending. Default: true */
+  sortByVolatility?: boolean;
 }

@@ -32,3 +32,4 @@ export { renderCodingPhilosophy } from './codingPhilosophy';
 export { renderToolPreferences } from './toolPreferences';
 export { renderOutputEfficiency } from './outputEfficiency';
 export { renderGitSafety } from './gitSafety';
+export { renderContinuityOverlay } from './continuityOverlay';

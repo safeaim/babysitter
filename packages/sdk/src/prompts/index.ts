@@ -5,7 +5,17 @@
  */
 
 // Types
-export type { PromptContext, PromptPart, PromptStratum, StratumTaggedPart, ComposeByStrataOptions } from './types';
+export type {
+  PromptContext,
+  PromptPart,
+  PromptStratum,
+  StratumTaggedPart,
+  ComposeByStrataOptions,
+  StratumChecksums,
+  ComposeByStrataWithMetaResult,
+  ContinuityContext,
+  ContinuityEffectSummary,
+} from './types';
 
 // Context factories
 export {
@@ -36,14 +46,43 @@ export {
   joinNonEmpty,
 } from './compose';
 
-// Strata model (GAP-PROMPT-001)
+// Strata model (GAP-PROMPT-001, GAP-PERF-005)
 export {
   tagPart,
   PART_STRATA_MAP,
   STRATUM_ORDER,
   getPartsForStratum,
   composeByStrata,
+  composeByStrataWithMeta,
+  detectStratumChanges,
 } from './strata';
+
+// GAP-PROMPT-002: Capability collection
+export {
+  collectCapabilities,
+  mergeCapabilities,
+} from './capabilityCollector';
+export type {
+  CollectedCapabilities,
+  CapabilityCollectionOptions,
+} from './capabilityCollector';
+
+// GAP-PROMPT-002: Runtime context
+export {
+  createRuntimePromptContext,
+} from './runtimeContext';
+export type {
+  RuntimeContextOptions,
+} from './runtimeContext';
+
+// GAP-PROMPT-005: Continuity overlay
+export {
+  buildContinuityContext,
+  renderContinuityOverlay,
+} from './continuityOverlay';
+export type {
+  BuildContinuityContextOptions,
+} from './continuityOverlay';
 
 // Parts (individual render functions)
 export {

@@ -1,13 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { createClaudeCodeContext } from '../context';
+import { createClaudeCodeContext, createCodexContext } from '../context';
 import {
   tagPart,
   PART_STRATA_MAP,
   STRATUM_ORDER,
   getPartsForStratum,
   composeByStrata,
+  composeByStrataWithMeta,
+  detectStratumChanges,
 } from '../strata';
-import type { PromptStratum, StratumTaggedPart, ComposeByStrataOptions } from '../types';
+import type { PromptStratum, StratumTaggedPart, ComposeByStrataOptions, StratumChecksums } from '../types';
 
 const mockCtx = createClaudeCodeContext();
 
@@ -31,10 +33,20 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
       const part = tagPart('dynamic', 'runtime', render);
       expect(part.render(mockCtx)).toBe('harness: claude-code');
     });
+
+    it('stores explicit volatilityScore', () => {
+      const part = tagPart('scored', 'stable', () => '', 15);
+      expect(part.volatilityScore).toBe(15);
+    });
+
+    it('stores undefined volatilityScore when not provided', () => {
+      const part = tagPart('unscored', 'stable', () => '');
+      expect(part.volatilityScore).toBeUndefined();
+    });
   });
 
   describe('PART_STRATA_MAP', () => {
-    it('contains all 28 known parts', () => {
+    it('contains all 29 known parts', () => {
       const expectedParts = [
         'renderNonNegotiables', 'renderCriticalRules', 'renderTaskKinds',
         'renderTaskExamples', 'renderProcessGuidelines', 'renderSeeAlso',
@@ -47,6 +59,7 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
         'renderParallelDispatch',
         'renderInterview', 'renderUserProfile', 'renderProcessCreation',
         'renderIntentFidelityChecks', 'renderProjectInstructions',
+        'renderContinuityOverlay',
       ];
       for (const name of expectedParts) {
         expect(PART_STRATA_MAP).toHaveProperty(name);
@@ -82,6 +95,7 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
       const turnLocalNames = [
         'renderInterview', 'renderUserProfile', 'renderProcessCreation',
         'renderIntentFidelityChecks', 'renderProjectInstructions',
+        'renderContinuityOverlay',
       ];
       for (const name of turnLocalNames) {
         expect(PART_STRATA_MAP[name].stratum).toBe('turnLocal');
@@ -89,9 +103,24 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
     });
 
     it('every entry has a render function', () => {
-      for (const [name, part] of Object.entries(PART_STRATA_MAP)) {
+      for (const [_name, part] of Object.entries(PART_STRATA_MAP)) {
         expect(typeof part.render).toBe('function');
       }
+    });
+
+    it('every entry has a volatilityScore defined', () => {
+      for (const [_name, part] of Object.entries(PART_STRATA_MAP)) {
+        expect(typeof part.volatilityScore).toBe('number');
+      }
+    });
+
+    it('renderContinuityOverlay has volatilityScore 90', () => {
+      expect(PART_STRATA_MAP.renderContinuityOverlay.volatilityScore).toBe(90);
+    });
+
+    it('renderCriticalRules has lower volatilityScore than renderProjectInstructions', () => {
+      expect(PART_STRATA_MAP.renderCriticalRules.volatilityScore!)
+        .toBeLessThan(PART_STRATA_MAP.renderProjectInstructions.volatilityScore!);
     });
   });
 
@@ -110,7 +139,7 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
 
     it('returns only turnLocal parts when stratum is turnLocal', () => {
       const parts = getPartsForStratum('turnLocal');
-      expect(parts.length).toBe(5);
+      expect(parts.length).toBe(6);
       expect(parts.every(p => p.stratum === 'turnLocal')).toBe(true);
     });
   });
@@ -186,6 +215,56 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
       const result = composeByStrata(parts, mockCtx, { separator: '\n===\n' });
       expect(result).toContain('===');
     });
+
+    it('sorts parts within stratum by volatilityScore ascending', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('high', 'stable', () => 'HIGH', 80),
+        tagPart('low', 'stable', () => 'LOW', 5),
+        tagPart('mid', 'stable', () => 'MID', 50),
+      ];
+      const result = composeByStrata(parts, mockCtx);
+      const lowIdx = result.indexOf('LOW');
+      const midIdx = result.indexOf('MID');
+      const highIdx = result.indexOf('HIGH');
+      expect(lowIdx).toBeLessThan(midIdx);
+      expect(midIdx).toBeLessThan(highIdx);
+    });
+
+    it('preserves insertion order for equal volatilityScores (stable sort)', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('first', 'stable', () => 'FIRST', 50),
+        tagPart('second', 'stable', () => 'SECOND', 50),
+        tagPart('third', 'stable', () => 'THIRD', 50),
+      ];
+      const result = composeByStrata(parts, mockCtx);
+      const firstIdx = result.indexOf('FIRST');
+      const secondIdx = result.indexOf('SECOND');
+      const thirdIdx = result.indexOf('THIRD');
+      expect(firstIdx).toBeLessThan(secondIdx);
+      expect(secondIdx).toBeLessThan(thirdIdx);
+    });
+
+    it('does not reorder when sortByVolatility is false', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('high', 'stable', () => 'HIGH', 80),
+        tagPart('low', 'stable', () => 'LOW', 5),
+      ];
+      const result = composeByStrata(parts, mockCtx, { sortByVolatility: false });
+      const highIdx = result.indexOf('HIGH');
+      const lowIdx = result.indexOf('LOW');
+      expect(highIdx).toBeLessThan(lowIdx);
+    });
+
+    it('defaults volatilityScore to 50 for unsorted parts', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('unscored', 'stable', () => 'UNSCORED'),
+        tagPart('scored-low', 'stable', () => 'LOW', 10),
+      ];
+      const result = composeByStrata(parts, mockCtx);
+      const lowIdx = result.indexOf('LOW');
+      const unscoredIdx = result.indexOf('UNSCORED');
+      expect(lowIdx).toBeLessThan(unscoredIdx);
+    });
   });
 
   describe('showStrata mode', () => {
@@ -226,6 +305,14 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
       const result = composeByStrata(parts, mockCtx, { showStrata: true });
       expect(result).toContain('myPart');
     });
+
+    it('includes volatilityScore in showStrata annotations', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('myPart', 'stable', () => 'content', 15),
+      ];
+      const result = composeByStrata(parts, mockCtx, { showStrata: true });
+      expect(result).toContain('vol:15');
+    });
   });
 
   describe('backward compatibility', () => {
@@ -233,6 +320,103 @@ describe('GAP-PROMPT-001: Prompt Strata Model', () => {
       const allParts = Object.values(PART_STRATA_MAP);
       const result = composeByStrata(allParts, mockCtx);
       expect(result.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe('GAP-PERF-005: Cache-Aware Prompt Assembly', () => {
+  describe('composeByStrataWithMeta', () => {
+    it('returns same output as composeByStrata for identical inputs', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('s1', 'stable', () => 'STABLE', 10),
+        tagPart('r1', 'runtime', () => 'RUNTIME', 30),
+        tagPart('t1', 'turnLocal', () => 'TURN', 60),
+      ];
+      const plain = composeByStrata(parts, mockCtx);
+      const withMeta = composeByStrataWithMeta(parts, mockCtx);
+      expect(withMeta.output).toBe(plain);
+    });
+
+    it('returns stratum checksums as 64-char hex strings', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('s1', 'stable', () => 'STABLE', 10),
+      ];
+      const result = composeByStrataWithMeta(parts, mockCtx);
+      expect(result.stratumChecksums.stable).toBeDefined();
+      expect(result.stratumChecksums.stable).toMatch(/^[0-9a-f]{64}$/);
+    });
+
+    it('omits checksum for stratum with no rendered content', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('s1', 'stable', () => 'STABLE', 10),
+      ];
+      const result = composeByStrataWithMeta(parts, mockCtx);
+      expect(result.stratumChecksums.runtime).toBeUndefined();
+      expect(result.stratumChecksums.turnLocal).toBeUndefined();
+    });
+
+    it('produces deterministic checksums for same inputs', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('s1', 'stable', () => 'STABLE', 10),
+        tagPart('r1', 'runtime', () => 'RUNTIME', 30),
+      ];
+      const result1 = composeByStrataWithMeta(parts, mockCtx);
+      const result2 = composeByStrataWithMeta(parts, mockCtx);
+      expect(result1.stratumChecksums).toEqual(result2.stratumChecksums);
+    });
+
+    it('produces different checksums for different contexts', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('dynamic', 'runtime', (ctx) => `harness: ${ctx.harness}`, 30),
+      ];
+      const ccCtx = createClaudeCodeContext();
+      const codexCtx = createCodexContext();
+      const result1 = composeByStrataWithMeta(parts, ccCtx);
+      const result2 = composeByStrataWithMeta(parts, codexCtx);
+      expect(result1.stratumChecksums.runtime).not.toBe(result2.stratumChecksums.runtime);
+    });
+
+    it('includes volatilityScore in showStrata annotations', () => {
+      const parts: StratumTaggedPart[] = [
+        tagPart('scored', 'stable', () => 'content', 25),
+      ];
+      const result = composeByStrataWithMeta(parts, mockCtx, { showStrata: true });
+      expect(result.output).toContain('vol:25');
+    });
+  });
+
+  describe('detectStratumChanges', () => {
+    it('returns empty array when checksums are identical', () => {
+      const checksums: StratumChecksums = { stable: 'abc', runtime: 'def' };
+      expect(detectStratumChanges(checksums, checksums)).toEqual([]);
+    });
+
+    it('returns only changed strata', () => {
+      const prev: StratumChecksums = { stable: 'abc', runtime: 'def' };
+      const next: StratumChecksums = { stable: 'abc', runtime: 'xyz' };
+      expect(detectStratumChanges(prev, next)).toEqual(['runtime']);
+    });
+
+    it('returns all three strata when all differ', () => {
+      const prev: StratumChecksums = { stable: 'a', runtime: 'b', turnLocal: 'c' };
+      const next: StratumChecksums = { stable: 'x', runtime: 'y', turnLocal: 'z' };
+      expect(detectStratumChanges(prev, next)).toEqual(['stable', 'runtime', 'turnLocal']);
+    });
+
+    it('treats newly added stratum as changed', () => {
+      const prev: StratumChecksums = { stable: 'a' };
+      const next: StratumChecksums = { stable: 'a', runtime: 'new' };
+      expect(detectStratumChanges(prev, next)).toEqual(['runtime']);
+    });
+
+    it('treats removed stratum as changed', () => {
+      const prev: StratumChecksums = { stable: 'a', runtime: 'b' };
+      const next: StratumChecksums = { stable: 'a' };
+      expect(detectStratumChanges(prev, next)).toEqual(['runtime']);
+    });
+
+    it('handles both empty checksums as no changes', () => {
+      expect(detectStratumChanges({}, {})).toEqual([]);
     });
   });
 });

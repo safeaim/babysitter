@@ -3,6 +3,9 @@ export { createBabysitterMcpServer } from "./server";
 export { createWebSocketTransport, authenticateUpgrade, WebSocketSessionManager } from "./transport";
 export type { WebSocketServerTransport, WebSocketTransportOptions, WebSocketSession } from "./transport";
 
+// MCP Client (GAP-REMOTE-006, GAP-TOOLS-025)
+export * as mcpClient from "./client";
+
 /**
  * Start the MCP server on stdio transport.
  * This is the main entry point for running the babysitter MCP server.

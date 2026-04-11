@@ -14,6 +14,7 @@ import * as childProcess from "node:child_process";
 import { Type, type TObject } from "@sinclair/typebox";
 import { getConfig, DEFAULTS, CONFIG_ENV_VARS, type BabysitterConfig } from "../config/defaults";
 import { BackgroundProcessRegistry } from "./backgroundProcessRegistry";
+import { DeferredToolRegistry } from "./deferredToolRegistry";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -49,6 +50,8 @@ export interface AgenticToolOptions {
   onBackgroundComplete?: (event: unknown) => void;
   /** Maximum concurrent background processes (default 16). */
   maxBackgroundProcesses?: number;
+  /** Optional deferred tool registry for tool_search/tool_fetch (GAP-TOOLS-034). */
+  deferredToolRegistry?: DeferredToolRegistry;
 }
 
 /** Standard tool result shape. */
@@ -81,6 +84,8 @@ export const AGENTIC_TOOL_NAMES: string[] = [
   "config",
   "background_status",
   "background_list",
+  "tool_search",
+  "tool_fetch",
 ];
 
 const DEFAULT_BASH_TIMEOUT = 120_000;
@@ -1635,6 +1640,86 @@ export function createAgenticToolDefinitions(
         const registry = getBackgroundRegistry(options.maxBackgroundProcesses);
         const all = registry.list();
         return jsonResult({ tasks: all });
+      },
+    }),
+
+    // -----------------------------------------------------------------
+    // TOOL DISCOVERY (GAP-TOOLS-034)
+    // -----------------------------------------------------------------
+    wrap({
+      name: "tool_search",
+      label: "Search Tools",
+      description:
+        "Search available tools by name or description. Returns lightweight tier-1 entries (name, description, source). Use tool_fetch to get full schema for a specific tool.",
+      parameters: Type.Object({
+        query: Type.String({ description: "Search query (matched against tool names and descriptions)" }),
+        max_results: Type.Optional(Type.Number({ description: "Maximum results to return (default 20)" })),
+      }),
+      execute: (
+        _toolCallId: string,
+        params: Record<string, unknown>,
+      ): ToolResult => {
+        const registry = options.deferredToolRegistry;
+        if (!registry) {
+          return errorResult("Tool search is not available — no deferred tool registry configured.");
+        }
+        const query = String(params.query ?? "");
+        const maxResults = typeof params.max_results === "number" ? params.max_results : 20;
+        const results = registry.searchTools(query, maxResults);
+        return jsonResult({
+          query,
+          resultCount: results.length,
+          tools: results.map((t) => ({
+            name: t.name,
+            description: t.description,
+            source: t.source,
+            sourceQualifier: t.sourceQualifier,
+          })),
+        });
+      },
+    }),
+    wrap({
+      name: "tool_fetch",
+      label: "Fetch Tool Schema",
+      description:
+        "Fetch the full JSON Schema for a tool by name. Returns the complete input/output schema needed to invoke the tool.",
+      parameters: Type.Object({
+        name: Type.String({ description: "Tool name to fetch schema for" }),
+        source: Type.Optional(Type.String({ description: "Source filter: builtin, mcp, plugin, custom" })),
+        source_qualifier: Type.Optional(Type.String({ description: "Source qualifier (e.g. MCP server name)" })),
+      }),
+      execute: async (
+        _toolCallId: string,
+        params: Record<string, unknown>,
+      ): Promise<ToolResult> => {
+        const registry = options.deferredToolRegistry;
+        if (!registry) {
+          return errorResult("Tool fetch is not available — no deferred tool registry configured.");
+        }
+        const toolName = String(params.name ?? "");
+        const VALID_SOURCES = new Set(["builtin", "mcp", "plugin", "custom"]);
+        const rawSource = typeof params.source === "string" ? params.source : undefined;
+        if (rawSource && !VALID_SOURCES.has(rawSource)) {
+          return errorResult(`Invalid source "${rawSource}". Valid sources: builtin, mcp, plugin, custom.`);
+        }
+        const source = rawSource as "builtin" | "mcp" | "plugin" | "custom" | undefined;
+        const sourceQualifier = typeof params.source_qualifier === "string" ? params.source_qualifier : undefined;
+        const resolved = await registry.fetchSchema(
+          toolName,
+          source,
+          sourceQualifier,
+        );
+        if (!resolved) {
+          return errorResult(`Tool "${toolName}" not found or schema could not be loaded.`);
+        }
+        return jsonResult({
+          name: resolved.name,
+          description: resolved.description,
+          source: resolved.source,
+          sourceQualifier: resolved.sourceQualifier,
+          inputSchema: resolved.schema.inputSchema,
+          outputSchema: resolved.schema.outputSchema,
+        });
       },
     }),
   ];

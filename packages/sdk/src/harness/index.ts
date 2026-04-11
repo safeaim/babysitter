@@ -59,3 +59,12 @@ export {
   type BackgroundTaskRecord,
   type BackgroundCompletionEvent,
 } from "./backgroundProcessRegistry";
+
+export {
+  DeferredToolRegistry,
+  type DeferredToolEntry,
+  type ResolvedToolEntry,
+  type ToolSchema,
+  type SchemaLoader,
+  type ToolSource,
+} from "./deferredToolRegistry";

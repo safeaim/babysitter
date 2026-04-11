@@ -462,3 +462,110 @@ describe("GAP-TOOLS-036: Completion and cleanup", () => {
     expect(runningAfter.length).toBe(0);
   });
 });
+
+// ---------------------------------------------------------------------------
+// GAP-TOOLS-034: tool_search and tool_fetch agentic tools
+// ---------------------------------------------------------------------------
+
+describe("GAP-TOOLS-034: tool_search and tool_fetch agentic tools", () => {
+  it("includes tool_search and tool_fetch in AGENTIC_TOOL_NAMES", () => {
+    expect(AGENTIC_TOOL_NAMES).toContain("tool_search");
+    expect(AGENTIC_TOOL_NAMES).toContain("tool_fetch");
+  });
+
+  it("tool_search returns error when no registry configured", () => {
+    const tools = createAgenticToolDefinitions({
+      workspace: TEST_WORKSPACE,
+      interactive: false,
+    });
+    const searchTool = tools.find((t) => t.name === "tool_search");
+    expect(searchTool).toBeDefined();
+    const result = searchTool!.execute("tc1", { query: "read" }) as { content: Array<{ type: string; text: string }> };
+    expect(result.content[0].text).toContain("not available");
+  });
+
+  it("tool_search returns matching tools from registry", async () => {
+    const { DeferredToolRegistry } = await import("../deferredToolRegistry");
+    const registry = new DeferredToolRegistry();
+    registry.registerTools([
+      { name: "file_read", description: "Read a file", source: "builtin" },
+      { name: "file_write", description: "Write a file", source: "builtin" },
+      { name: "bash", description: "Run bash commands", source: "builtin" },
+    ]);
+
+    const tools = createAgenticToolDefinitions({
+      workspace: TEST_WORKSPACE,
+      interactive: false,
+      deferredToolRegistry: registry,
+    });
+    const searchTool = tools.find((t) => t.name === "tool_search")!;
+    const result = searchTool.execute("tc2", { query: "file" }) as { content: Array<{ type: string; text: string }> };
+    const parsed = JSON.parse(result.content[0].text) as { resultCount: number; tools: Array<{ name: string }> };
+    expect(parsed.resultCount).toBe(2);
+    expect(parsed.tools.map((t: { name: string }) => t.name)).toContain("file_read");
+    expect(parsed.tools.map((t: { name: string }) => t.name)).toContain("file_write");
+  });
+
+  it("tool_search respects max_results", async () => {
+    const { DeferredToolRegistry } = await import("../deferredToolRegistry");
+    const registry = new DeferredToolRegistry();
+    registry.registerTools(
+      Array.from({ length: 10 }, (_, i) => ({ name: `tool_${i}`, description: "A tool", source: "builtin" as const })),
+    );
+
+    const tools = createAgenticToolDefinitions({
+      workspace: TEST_WORKSPACE,
+      interactive: false,
+      deferredToolRegistry: registry,
+    });
+    const searchTool = tools.find((t) => t.name === "tool_search")!;
+    const result = searchTool.execute("tc3", { query: "tool", max_results: 3 }) as { content: Array<{ type: string; text: string }> };
+    const parsed = JSON.parse(result.content[0].text) as { resultCount: number };
+    expect(parsed.resultCount).toBe(3);
+  });
+
+  it("tool_fetch returns error when no registry configured", async () => {
+    const tools = createAgenticToolDefinitions({
+      workspace: TEST_WORKSPACE,
+      interactive: false,
+    });
+    const fetchTool = tools.find((t) => t.name === "tool_fetch");
+    expect(fetchTool).toBeDefined();
+    const result = await fetchTool!.execute("tc4", { name: "read" }) as { content: Array<{ type: string; text: string }> };
+    expect(result.content[0].text).toContain("not available");
+  });
+
+  it("tool_fetch validates source parameter", async () => {
+    const { DeferredToolRegistry } = await import("../deferredToolRegistry");
+    const registry = new DeferredToolRegistry();
+
+    const tools = createAgenticToolDefinitions({
+      workspace: TEST_WORKSPACE,
+      interactive: false,
+      deferredToolRegistry: registry,
+    });
+    const fetchTool = tools.find((t) => t.name === "tool_fetch")!;
+    const result = await fetchTool.execute("tc5", { name: "read", source: "invalid_source" }) as { content: Array<{ type: string; text: string }> };
+    expect(result.content[0].text).toContain("Invalid source");
+  });
+
+  it("tool_fetch returns schema for known tool", async () => {
+    const { DeferredToolRegistry } = await import("../deferredToolRegistry");
+    const registry = new DeferredToolRegistry();
+    registry.registerTools([{ name: "read", description: "Read file", source: "builtin" }]);
+    registry.registerLoader("builtin", async () => ({
+      inputSchema: { type: "object", properties: { path: { type: "string" } } },
+    }));
+
+    const tools = createAgenticToolDefinitions({
+      workspace: TEST_WORKSPACE,
+      interactive: false,
+      deferredToolRegistry: registry,
+    });
+    const fetchTool = tools.find((t) => t.name === "tool_fetch")!;
+    const result = await fetchTool.execute("tc6", { name: "read" }) as { content: Array<{ type: string; text: string }> };
+    const parsed = JSON.parse(result.content[0].text) as { name: string; inputSchema: Record<string, unknown> };
+    expect(parsed.name).toBe("read");
+    expect(parsed.inputSchema).toHaveProperty("properties");
+  });
+});

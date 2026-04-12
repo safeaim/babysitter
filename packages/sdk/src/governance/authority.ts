@@ -132,7 +132,10 @@ function isScopeSubsetOrEqual(parent: MandateScope, child: MandateScope): boolea
   const parentWildcard = parent.allowedEffectKinds.length === 1 && parent.allowedEffectKinds[0] === '*';
   if (!parentWildcard) {
     for (const kind of child.allowedEffectKinds) {
-      if (kind !== '*' && !parent.allowedEffectKinds.includes(kind)) {
+      if (kind === '*') {
+        return false; // wildcard child cannot escape non-wildcard parent
+      }
+      if (!parent.allowedEffectKinds.includes(kind)) {
         return false;
       }
     }

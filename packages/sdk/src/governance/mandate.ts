@@ -44,6 +44,8 @@ export interface ExecutionMandate {
   provenance: MandateProvenance;
   createdAt: string;
   activatedAt?: string;
+  /** High-resolution activation mark (performance.now()) for precise expiry checks. */
+  activatedMark?: number;
   revokedAt?: string;
   revokedBy?: string;
 }
@@ -112,8 +114,7 @@ export function activateMandate(mandate: ExecutionMandate): ExecutionMandate {
     lifecycle: 'active',
     activatedAt: new Date(now).toISOString(),
   };
-  // Store high-resolution activation mark for precise expiry checks
-  (result as unknown as Record<string, unknown>)['_perfMark'] = performance.now();
+  result.activatedMark = performance.now();
   return result;
 }
 
@@ -146,10 +147,13 @@ export function deriveMandate(parent: ExecutionMandate, options: DeriveMandateOp
   const parentKinds = parent.scope.allowedEffectKinds;
   const isParentWildcard = parentKinds.length === 1 && parentKinds[0] === '*';
 
+  const childKinds = options.scope.allowedEffectKinds;
   if (!isParentWildcard) {
-    const childKinds = options.scope.allowedEffectKinds;
     for (const kind of childKinds) {
-      if (kind !== '*' && !parentKinds.includes(kind)) {
+      if (kind === '*') {
+        throw new Error('Child scope expands beyond parent: wildcard child not allowed when parent has explicit effect kinds');
+      }
+      if (!parentKinds.includes(kind)) {
         throw new Error(`Child scope expands beyond parent: effect kind '${kind}' not in parent scope`);
       }
     }
@@ -196,19 +200,13 @@ export function validateMandateForContext(
 
   // Check expiration (activatedAt + timeoutMs)
   if (mandate.activatedAt) {
-    const perfMark = (mandate as unknown as Record<string, unknown>)['_perfMark'] as number | undefined;
     let elapsedMs: number;
-    if (perfMark != null) {
-      // Use high-resolution timer for sub-ms precision
-      elapsedMs = performance.now() - perfMark;
+    if (mandate.activatedMark != null) {
+      elapsedMs = performance.now() - mandate.activatedMark;
     } else {
-      // Fallback to ISO timestamp comparison
       elapsedMs = Date.now() - new Date(mandate.activatedAt).getTime();
     }
-    // Use strict > comparison with timeoutMs - 1 to handle edge cases where
-    // the timeout is very small (e.g. 1ms) and the mandate should expire
-    // within the same millisecond tick.
-    if (elapsedMs > mandate.scope.timeoutMs - 1) {
+    if (elapsedMs >= mandate.scope.timeoutMs) {
       return { valid: false, reason: 'Mandate has expired' };
     }
   }

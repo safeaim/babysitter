@@ -108,3 +108,25 @@ export {
   inheritSandboxPolicy,
   type SandboxEvent,
 } from './sandboxBridge';
+
+// Permission events
+export {
+  createPermissionEvent,
+  aggregateChainEvents,
+  filterEvents,
+  type PermissionEvent,
+  type PermissionEventSource,
+  type CreatePermissionEventOptions,
+  type FilterCriteria,
+} from './permissionEvents';
+
+// Permission propagation
+export {
+  formatPermissionForTui,
+  formatPermissionForJsonStream,
+  formatPermissionForCli,
+  createPropagationConfig,
+  shouldPropagate,
+  type PropagationTarget,
+  type PropagationConfig,
+} from './permissionPropagation';

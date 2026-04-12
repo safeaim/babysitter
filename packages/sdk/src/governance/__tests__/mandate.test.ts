@@ -166,13 +166,12 @@ describe('ExecutionMandate system', () => {
     });
 
     it('rejects expired mandate', () => {
-      const shortScope: MandateScope = { ...baseScope, timeoutMs: 1 };
+      const shortScope: MandateScope = { ...baseScope, timeoutMs: 0 };
       const m = activateMandate(createMandate({ scope: shortScope, grantedBy: 'user:alice' }));
 
-      // Wait for expiration (the mandate has a 1ms timeout)
       const ctx: PolicyEvaluationContext = { effectKind: 'node', processId: 'p1', runId: 'r1' };
 
-      // Force an artificial delay or rely on implementation checking activatedAt + timeoutMs < now
+      // With timeoutMs=0, any elapsed time >= 0 triggers expiration
       const result = validateMandateForContext(m, ctx);
       expect(result.valid).toBe(false);
       expect(result.reason).toContain('expired');

@@ -1102,3 +1102,113 @@ export async function process(inputs, ctx) {
 | `createPostCycleSurvivalCheck` | `cycle-aware-verification` | `function` | Factory that returns a shell `defineTask` for post-cycle survival checking with baked-in URL and cycle interval |
 
 All exports are available from `./index.js` (the preferred import path) or from the individual module files.
+
+---
+
+## Curated-Dataset + SQL-Tool Pattern
+
+Three composable processes that together implement the "do the curation once, then let an LLM compose SQL against a local SQLite database through Python stdlib scripts at query time" pattern. Generalized from `specializations/domains/business/travel/` -- works for any domain (science, finance, sports, civic data, ...).
+
+Hard constraints inherited from the source pattern (applies to all three):
+
+- Only `kind: 'agent'` tasks. No shell tasks, no MCP.
+- All DB creation/loading/indexing/querying happens via Python 3 scripts using ONLY the stdlib `sqlite3` module. No ORM, no sqlite3 CLI, no pandas, no requests.
+- DB is opened read-only (`file:{db}?mode=ro` URI) during exploration so the analyst cannot mutate the dataset.
+- Every finding carries the verbatim SQL that produced it as audit evidence.
+
+### `source-discovery`
+
+Discovers authoritative, licence-clean open data sources for a domain + scope and writes a reusable `sources.json` + `SOURCES.md` manifest.
+
+**Import**
+
+```js
+import { process as discoverSources, sourceDiscoveryTask } from './index.js';
+// or:
+import { process as discoverSources } from './source-discovery.js';
+```
+
+**Inputs** (see file header for full schema): `{ domain, scope, workDir, entityHints?, licencePolicy?, maxSources?, priorManifestPath? }`
+
+**Outputs**: `{ manifestPath, sources, coverageGaps, artifacts, duration, metadata }`
+
+**Phases**: scope-refinement → source-discovery → source-validation (reachability + licence re-check + sample persistence) → manifest-export.
+
+### `local-db-build`
+
+Turns a `sources.json` manifest into a populated, indexed, documented SQLite database.
+
+**Import**
+
+```js
+import { process as buildLocalDb } from './local-db-build.js';
+```
+
+**Inputs**: `{ manifestPath, workDir, dbFileName?, rebuild?, domain?, scopeNotes?, expectedRowCounts? }`
+
+**Outputs**: `{ dbPath, schemaDocPath, ingestReport, queryReadiness, artifacts, duration, metadata }`
+
+**Phases**: schema-design → python-etl-authoring (stdlib-only scripts) → ingest-execution (idempotent) → index-build (indexes + denormalized views + ANALYZE) → data-validation (foreign_key_check, integrity_check, row-count gates, representative queries) → schema-documentation (writes `SCHEMA.md` with tables, views, indexes, worked example queries).
+
+### `db-agent-explore`
+
+Points an analyst agent at a populated SQLite DB (typically from `local-db-build`) with a natural-language research question. The agent reads `SCHEMA.md`, decomposes the question into sub-questions, composes + executes Python `sqlite3` scripts in iterative rounds until the findings are sufficient, then emits a markdown report with verbatim SQL as evidence.
+
+**Import**
+
+```js
+import { process as exploreDb } from './db-agent-explore.js';
+```
+
+**Inputs**: `{ dbPath, schemaDocPath, workDir, question, hypotheses?, maxQueryRounds?, outputFormat?, persona? }`
+
+**Outputs**: `{ reportPath, findings, queryLog, artifacts, duration, metadata }`
+
+**Phases**: question-planning → sql-exploration (looped up to `maxQueryRounds`, with refinementNotes threading between rounds) → findings-synthesis (dedup + rank, no DB access) → report-export.
+
+### End-to-end usage
+
+```js
+import {
+  sourceDiscoveryProcess,
+  localDbBuildProcess,
+  dbAgentExploreProcess,
+} from '@a5c-ai/babysitter-library/processes/shared';
+
+export async function process(inputs, ctx) {
+  const workDir = inputs.workDir;
+
+  const sources = await sourceDiscoveryProcess({
+    domain: 'science/astronomy',
+    scope: { objects: ['exoplanets'], window: { from: '1995-01-01' } },
+    workDir,
+  }, ctx);
+
+  const db = await localDbBuildProcess({
+    manifestPath: sources.manifestPath,
+    workDir,
+    domain: 'science/astronomy',
+    scopeNotes: 'confirmed exoplanets discovered 1995-present',
+  }, ctx);
+
+  const report = await dbAgentExploreProcess({
+    dbPath: db.dbPath,
+    schemaDocPath: db.schemaDocPath,
+    workDir: `${workDir}/exploration`,
+    question: 'What is the mass/radius distribution of exoplanets discovered by transit vs radial velocity?',
+  }, ctx);
+
+  return { sources, db, report };
+}
+```
+
+### When to use which
+
+- Only need a source manifest (e.g. to hand to a non-Babysitter pipeline)? Run `source-discovery` alone.
+- Have sources already and want a queryable DB? Skip to `local-db-build` with a hand-written manifest.
+- Have a DB already and want an analyst pass? Run `db-agent-explore` standalone.
+- Want the full curated-dataset + SQL-tool experience? Chain all three, as shown above.
+
+### Inspired by
+
+Michael Lugassy's curated-dataset + direct-SQL-tool travel-agent pattern ([github.com/mluggy](https://github.com/mluggy)).

@@ -17,3 +17,8 @@ export { createPackageScaffold, executePackageScaffold, createLibraryPackage, cr
 export { traceRuntimeCallPathsTask, createCallPathTracer } from './runtime-call-tracer.js';
 export { cycleAwareVerificationTask, createCycleAwareVerification, createPreflightAnalysis, createPostCycleSurvivalCheck } from './cycle-aware-verification.js';
 
+// Curated-dataset + SQL-tool pattern (generalized from specializations/domains/business/travel):
+export { process as sourceDiscoveryProcess, scopeRefinementTask, sourceDiscoveryTask, sourceValidationTask, manifestExportTask } from './source-discovery.js';
+export { process as localDbBuildProcess, schemaDesignTask, pythonEtlAuthoringTask, ingestExecutionTask, indexBuildTask, dataValidationTask, schemaDocumentationTask } from './local-db-build.js';
+export { process as dbAgentExploreProcess, questionPlanningTask, sqlExplorationTask, findingsSynthesisTask, reportExportTask } from './db-agent-explore.js';
+

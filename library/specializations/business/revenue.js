@@ -1,69 +1,128 @@
 /**
  * @process specializations/business/revenue
- * @description Revenue persona (a5c revenue-agent). Designs pricing plans, analyzes costs,
- *   researches similar-project pricing, and optimizes revenue channels. Produces pricing
- *   structures (subscription / one-time / tiered), revenue-channel recommendations, and
- *   cost-vs-revenue projections; coordinates with researcher-base and content-writer.
- * @inputs { projectSummary: string, costs?: object, revenue?: object, horizonMonths?: number }
- * @outputs { success: boolean, strategyPath?: string, projectedRevenue?: object }
+ * @description Revenue-agent. Analyse current/projected project costs → market-compare
+ *   pricing strategies of similar projects → design tiered pricing + revenue channels →
+ *   produce cost-vs-revenue projections and monitoring guidance.
+ * @inputs { projectName?: string, costMetrics?: object, revenueData?: object, horizonMonths?: number }
+ * @outputs { success, phase, tiers, projections, monitoringGuidance }
  *
- * Source: a5c-ai/registry/prompts/business/revenue-agent.prompt.md
+ * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/business/revenue-agent.prompt.md
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';
 
-const researchTask = defineTask(
-  'revenue.benchmark-research',
-  async ({ projectSummary }, ctx) => {
+const costAnalysisTask = defineTask(
+  'revenue.cost-analysis',
+  async ({ projectName, costMetrics }, ctx) => {
     return ctx.agent({
-      title: 'Revenue: benchmark similar-project pricing',
+      title: `Revenue: cost analysis for ${projectName ?? 'project'}`,
       prompt: [
-        'You are the revenue-agent working with researcher-base-agent data.',
-        'Identify comparable projects/products and their pricing strategies, tiers, anchor prices, and channel mixes.',
-        `Project: ${projectSummary ?? '(unspecified)'}`,
-        'Return JSON: { benchmarks: Array<{ name, model, tiers, notes }>, insights: string[] }.',
+        'Analyse project costs. Identify cost drivers (infra, per-seat licenses, support, egress).',
+        'Recommend cost-optimisation opportunities. Return a unit-economics summary suitable for pricing design.',
+        `Project: ${projectName ?? '(unspecified)'}`,
+        `Cost metrics: ${JSON.stringify(costMetrics ?? {}, null, 2)}`,
+        'Return JSON: { drivers: object, unitEconomics: object, optimisations: string[] }.',
       ].join('\n'),
     });
   },
-  { kind: 'agent', title: 'Revenue benchmark research', labels: ['a5c', 'revenue'] },
+  { kind: 'agent', title: 'Revenue cost analysis', labels: ['a5c', 'revenue'] },
 );
 
-const strategyTask = defineTask(
-  'revenue.design-strategy',
-  async ({ projectSummary, costs, revenue, horizonMonths, benchmarks }, ctx) => {
+const marketCompareTask = defineTask(
+  'revenue.market-compare',
+  async ({ projectName }, ctx) => {
     return ctx.agent({
-      title: 'Revenue: design pricing + channel strategy',
+      title: 'Revenue: market-compare similar projects',
       prompt: [
-        'You are the revenue-agent.',
-        'Propose pricing structures (subscription, one-time, tiered) and revenue channels (ads, partnerships, premium features).',
-        'Present cost vs revenue projections across scenarios (conservative / base / optimistic).',
-        'Provide monitoring guidance: metrics to watch, adjustment triggers.',
-        `Project: ${projectSummary ?? '(unspecified)'}`,
-        `Costs: ${JSON.stringify(costs ?? {}, null, 2)}`,
-        `Current revenue: ${JSON.stringify(revenue ?? {}, null, 2)}`,
-        `Horizon: ${horizonMonths ?? 12} months`,
-        `Benchmarks: ${JSON.stringify(benchmarks ?? [], null, 2)}`,
-        'Coordinate with @content-writer-agent for pricing-page copy and @developer-agent for integration hooks.',
-        'Return JSON: { strategyPath, projectedRevenue: { conservative, base, optimistic } }.',
+        'Research pricing strategies of at least 3 analogous OSS/SaaS projects.',
+        'Collect: pricing model (flat/subscription/tiered/usage), price points, free-tier policy, premium gates.',
+        'Identify industry benchmarks relevant to this project.',
+        `Project: ${projectName ?? '(unspecified)'}`,
+        'Return JSON: { comparables: Array<{ name, model, pricePoints, notes }>, benchmarks: object }.',
       ].join('\n'),
     });
   },
-  { kind: 'agent', title: 'Revenue design strategy', labels: ['a5c', 'revenue'] },
+  { kind: 'agent', title: 'Revenue market compare', labels: ['a5c', 'revenue'] },
+);
+
+const tierDesignTask = defineTask(
+  'revenue.tier-design',
+  async ({ unitEconomics, comparables, benchmarks }, ctx) => {
+    return ctx.agent({
+      title: 'Revenue: design tiered pricing + channels',
+      prompt: [
+        'Design a tiered pricing plan (free / pro / team / enterprise) with feature gates aligned to cost drivers.',
+        'Propose additional revenue channels: partnerships, marketplace, managed hosting, premium support, ads (if appropriate).',
+        `Unit economics: ${JSON.stringify(unitEconomics ?? {}, null, 2)}`,
+        `Comparables: ${JSON.stringify(comparables ?? [], null, 2)}`,
+        `Benchmarks: ${JSON.stringify(benchmarks ?? {}, null, 2)}`,
+        'Return JSON: { tiers: Array<{ name, price, features, gate }>, channels: Array<{ name, rationale }> }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Revenue tier design', labels: ['a5c', 'revenue'] },
+);
+
+const projectionsTask = defineTask(
+  'revenue.projections',
+  async ({ tiers, channels, horizonMonths, revenueData }, ctx) => {
+    return ctx.agent({
+      title: `Revenue: project cost-vs-revenue over ${horizonMonths ?? 12} months`,
+      prompt: [
+        'Produce cost-vs-revenue projections for conservative/base/aggressive scenarios.',
+        'Assume mix-shift between tiers; call out key sensitivities.',
+        `Tiers: ${JSON.stringify(tiers, null, 2)}`,
+        `Channels: ${JSON.stringify(channels, null, 2)}`,
+        `Revenue data (if any): ${JSON.stringify(revenueData ?? {}, null, 2)}`,
+        `Horizon (months): ${horizonMonths ?? 12}`,
+        'Return JSON: { projections: { conservative, base, aggressive }, sensitivities: string[] }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Revenue projections', labels: ['a5c', 'revenue'] },
+);
+
+const monitoringGuidanceTask = defineTask(
+  'revenue.monitoring-guidance',
+  async ({ tiers, projections }, ctx) => {
+    return ctx.agent({
+      title: 'Revenue: monitoring + adjustment guidance',
+      prompt: [
+        'Define KPIs + dashboards + review cadence for ongoing pricing optimisation.',
+        'Suggest triggers for adjustments (e.g. gross-margin drift, churn spike, conversion miss).',
+        `Tiers: ${JSON.stringify(tiers, null, 2)}`,
+        `Projections: ${JSON.stringify(projections, null, 2)}`,
+        'Return JSON: { kpis: string[], cadence: string, triggers: Array<{ metric, threshold, action }> }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Revenue monitoring guidance', labels: ['a5c', 'revenue'] },
 );
 
 export async function process(inputs, ctx) {
-  const { projectSummary = '', costs, revenue, horizonMonths = 12 } = inputs ?? {};
-  const bench = await ctx.task(researchTask, { projectSummary });
-  const strategy = await ctx.task(strategyTask, {
-    projectSummary,
-    costs,
-    revenue,
-    horizonMonths,
-    benchmarks: Array.isArray(bench?.benchmarks) ? bench.benchmarks : [],
+  const { projectName, costMetrics, revenueData, horizonMonths = 12 } = inputs ?? {};
+  const [cost, market] = await ctx.parallel.all([
+    ctx.task(costAnalysisTask, { projectName, costMetrics }),
+    ctx.task(marketCompareTask, { projectName }),
+  ]);
+
+  const tiersRes = await ctx.task(tierDesignTask, {
+    unitEconomics: cost?.unitEconomics ?? {},
+    comparables: market?.comparables ?? [],
+    benchmarks: market?.benchmarks ?? {},
   });
+  const tiers = Array.isArray(tiersRes?.tiers) ? tiersRes.tiers : [];
+  const channels = Array.isArray(tiersRes?.channels) ? tiersRes.channels : [];
+
+  const proj = await ctx.task(projectionsTask, { tiers, channels, horizonMonths, revenueData });
+  const mon = await ctx.task(monitoringGuidanceTask, { tiers, projections: proj?.projections ?? {} });
+
   return {
     success: true,
-    strategyPath: strategy?.strategyPath,
-    projectedRevenue: strategy?.projectedRevenue,
+    phase: 'designed',
+    tiers,
+    channels,
+    projections: proj?.projections ?? {},
+    monitoringGuidance: mon ?? {},
   };
 }

@@ -1,31 +1,46 @@
 /**
  * @process specializations/communication/content-writer
- * @description Content-writer persona (a5c content-writer-agent). Translates technical
- *   information into clear, engaging copy for mixed or non-technical audiences across
- *   channels (blog, social, sales, docs-for-non-technical, email), preserving brand voice
- *   and business value while maintaining technical accuracy.
- * @inputs { brief: string, channel?: string, audience?: string, sources?: string[] }
- * @outputs { success: boolean, draftPath?: string, variants?: object }
+ * @description Content-writer persona. Brief (audience/purpose/channel/KPIs) → plan (structure,
+ *   narrative, headline) → draft (accessible language, examples, CTAs) → self-edit + SEO pass →
+ *   optional multi-channel variations.
+ * @inputs { topic: string, audience?: string, channel?: string, goal?: string, variations?: string[] }
+ * @outputs { success, brief, draftPath?, variationPaths }
  *
- * Source: a5c-ai/registry/prompts/communication/content-writer-agent.prompt.md
+ * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/communication/content-writer-agent.prompt.md
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';
 
+const briefTask = defineTask(
+  'content-writer.brief',
+  async ({ topic, audience, channel, goal }, ctx) => {
+    return ctx.agent({
+      title: 'Content-writer: build content brief',
+      prompt: [
+        'Produce a content brief: audience (technical level / needs / pain-points), purpose, channel, desired outcome, KPIs.',
+        'Extract the core value proposition in one sentence.',
+        `Topic: ${topic ?? '(unspecified)'}`,
+        `Audience: ${audience ?? '(unspecified)'}`,
+        `Channel: ${channel ?? 'blog'}`,
+        `Goal: ${goal ?? 'inform'}`,
+        'Return JSON: { audience, purpose, channel, kpis: string[], coreValue: string, tone: string }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Content-writer brief', labels: ['a5c', 'content-writer'] },
+);
+
 const planTask = defineTask(
   'content-writer.plan',
-  async ({ brief, channel, audience, sources }, ctx) => {
+  async ({ brief, topic }, ctx) => {
     return ctx.agent({
-      title: 'Content-writer: brief + structure',
+      title: 'Content-writer: plan structure + narrative',
       prompt: [
-        'You are the content-writer-agent.',
-        'Analyze requirements, audience, channel, desired outcome/KPIs. Gather technical info + industry context + audience pain points.',
-        'Produce a content brief: key messages, structure, narrative arc, headline strategy, intro hook.',
-        `Brief: ${brief ?? '(unspecified)'}`,
-        `Channel: ${channel ?? 'blog'}`,
-        `Audience: ${audience ?? 'mixed'}`,
-        `Sources: ${JSON.stringify(sources ?? [])}`,
-        'Return JSON: { keyMessages: string[], structure: object, headlineOptions: string[] }.',
+        'Plan the content structure: headline options, intro hook, logical section progression, key takeaways, CTA.',
+        'Use storytelling where appropriate. Tailor the hook to the channel.',
+        `Brief: ${JSON.stringify(brief, null, 2)}`,
+        `Topic: ${topic}`,
+        'Return JSON: { headlineOptions: string[], outline: Array<{ heading, bullets: string[] }>, cta: string }.',
       ].join('\n'),
     });
   },
@@ -34,35 +49,78 @@ const planTask = defineTask(
 
 const draftTask = defineTask(
   'content-writer.draft',
-  async ({ plan, channel, audience }, ctx) => {
+  async ({ brief, plan }, ctx) => {
     return ctx.agent({
-      title: 'Content-writer: draft + multi-channel variants',
+      title: 'Content-writer: write first draft',
       prompt: [
-        'You are the content-writer-agent. Produce the primary draft + channel variants.',
-        'Rules: audience-first; connect technical features to business benefits; quantify advantages; never sacrifice accuracy for simplicity.',
-        'Channel guidance:',
-        ' - Blog: conversational-professional, subheadings, examples, CTAs.',
-        ' - Social: concise, hooks, hashtags, suggested visuals.',
-        ' - Sales: clear value props, benefit language, proof points, CTAs.',
-        ' - Technical docs for non-technical users: step-by-step, visuals, acronym definitions.',
-        ' - Email: strong subject + preview, scannable, personalization, next steps.',
-        `Plan: ${JSON.stringify(plan ?? {}, null, 2)}`,
-        `Primary channel: ${channel ?? 'blog'}`,
-        `Audience: ${audience ?? 'mixed'}`,
-        'Return JSON: { draftPath, variants: { blog?, social?, sales?, email?, docs? } }.',
+        'Write the draft in clear, jargon-free language (unless the audience demands jargon).',
+        'Use analogies and real examples for complex concepts. Connect features to business benefits with quantified impact when possible.',
+        'Keep voice/tone aligned to the brief.',
+        `Brief: ${JSON.stringify(brief, null, 2)}`,
+        `Plan: ${JSON.stringify(plan, null, 2)}`,
+        'Return JSON: { title: string, draft: string }.',
       ].join('\n'),
     });
   },
   { kind: 'agent', title: 'Content-writer draft', labels: ['a5c', 'content-writer'] },
 );
 
+const selfEditTask = defineTask(
+  'content-writer.self-edit',
+  async ({ draft }, ctx) => {
+    return ctx.agent({
+      title: 'Content-writer: self-edit + SEO pass',
+      prompt: [
+        'Refine for clarity, engagement, and impact. Apply SEO basics (headline, keywords, scannable structure).',
+        'Verify technical accuracy while preserving accessibility. Flag anywhere a SME review is needed.',
+        `Draft:\n---\n${draft?.draft ?? ''}\n---`,
+        'Return JSON: { edited: string, smeQuestions: string[] }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Content-writer self-edit', labels: ['a5c', 'content-writer'] },
+);
+
+const variationTask = defineTask(
+  'content-writer.channel-variation',
+  async ({ edited, channel, brief }, ctx) => {
+    return ctx.agent({
+      title: `Content-writer: ${channel} variation`,
+      prompt: [
+        `Adapt the content for channel "${channel}" — adjust length/tone/format to the channel\'s conventions.`,
+        ' - blog: conversational-professional, subheadings, CTAs',
+        ' - social: concise, hook-first, hashtags/mentions, visual suggestions',
+        ' - email: engaging subject, scannable, personalised, clear next step',
+        ' - sales: benefit-driven, proof points, strong CTA',
+        ' - docs-for-non-technical: step-by-step, visuals, defined terms, anticipated FAQs',
+        `Brief: ${JSON.stringify(brief, null, 2)}`,
+        `Edited source:\n---\n${edited}\n---`,
+        'Return JSON: { channel, content }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Content-writer channel variation', labels: ['a5c', 'content-writer'] },
+);
+
 export async function process(inputs, ctx) {
-  const { brief = '', channel, audience, sources } = inputs ?? {};
-  const plan = await ctx.task(planTask, { brief, channel, audience, sources });
-  const draft = await ctx.task(draftTask, { plan, channel, audience });
+  const { topic = '', audience, channel, goal, variations = [] } = inputs ?? {};
+  const brief = await ctx.task(briefTask, { topic, audience, channel, goal });
+  const plan = await ctx.task(planTask, { brief, topic });
+  const draft = await ctx.task(draftTask, { brief, plan });
+  const edit = await ctx.task(selfEditTask, { draft });
+
+  let variationPaths = [];
+  if (variations.length > 0) {
+    const adaptations = await ctx.parallel.map(variations, (ch) =>
+      ctx.task(variationTask, { edited: edit?.edited ?? draft?.draft ?? '', channel: ch, brief }),
+    );
+    variationPaths = adaptations.map((a) => a?.channel).filter(Boolean);
+  }
+
   return {
     success: true,
-    draftPath: draft?.draftPath,
-    variants: draft?.variants,
+    brief,
+    draftPath: draft?.title ? `drafts/${String(draft.title).toLowerCase().replace(/\s+/g, '-')}.md` : undefined,
+    variationPaths,
   };
 }

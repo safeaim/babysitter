@@ -1,50 +1,104 @@
 /**
  * @process specializations/communication/content-validator
- * @description Content-validator persona (a5c content-validator-agent). Acts as devil's
- *   advocate: stress-tests text for clarity, jargon, ambiguity, audience-fit, metaphors,
- *   and consistency. Returns structured feedback with rewrite suggestions — never accepts
- *   the message at face value.
- * @inputs { content: string, audiences?: string[] }
- * @outputs { success: boolean, feedback: object }
+ * @description Content-validator persona. Scans text as devil's advocate → flags issues
+ *   across 5 independent axes in parallel (clarity, audience perspectives, ambiguity,
+ *   metaphors, consistency) → writes a structured feedback report with concrete rewrites.
+ * @inputs { content: string, audience?: string }
+ * @outputs { success, axesReviewed, issuesFound, reportPath? }
  *
- * Source: a5c-ai/registry/prompts/communication/content-validator-agent.prompt.md
+ * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/communication/content-validator-agent.prompt.md
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';
 
-const critiqueTask = defineTask(
-  'content-validator.critique',
-  async ({ content, audiences }, ctx) => {
+const AXES = [
+  { id: 'clarity', description: 'Clarity audit: highlight vague, overly complex, jargon-heavy passages. Ask: would a first-time visitor instantly understand?' },
+  { id: 'audience-flip', description: 'Audience perspective flip: review from technical, non-technical, investor, casual-user perspectives. Flag where one audience is lost.' },
+  { id: 'ambiguity', description: 'Ambiguity hunt: detect phrases or CTAs that could be misinterpreted.' },
+  { id: 'metaphors', description: 'Metaphor analyzer: test metaphors for clarity and accuracy; propose better alternatives; surface gaps where a metaphor would help.' },
+  { id: 'consistency', description: 'Consistency sweep + impact check: tone, terminology, key value props uniform; every heading/visual supports core message.' },
+];
+
+const scanAxisTask = defineTask(
+  'content-validator.scan-axis',
+  async ({ axis, content, audience }, ctx) => {
     return ctx.agent({
-      title: 'Content-validator: multi-lens critique',
+      title: `Content-validator: ${axis.id} axis`,
       prompt: [
-        'You are the content-validator-agent — a devil\'s advocate content critic.',
-        'Your goal is to stress-test the message, not accept it at face value.',
-        'Produce structured feedback in these categories (each with examples + rewrite suggestions):',
-        ' 1. Clarity audit — vague, complex, jargon-heavy passages.',
-        ' 2. Message challenge — would a first-time visitor instantly understand?',
-        ' 3. Ambiguity hunt — misinterpretable phrases or CTAs.',
-        ' 4. Audience perspective flip — technical / non-technical / investor / casual user views.',
-        ' 5. Alternative suggestions — sharper, simpler rewrites.',
-        ' 6. Impact check — does every headline/subheading/visual support the core message?',
-        ' 7. Consistency sweep — tone, terminology, value propositions.',
-        ' 8. Metaphor analyzer — accuracy, gaps, better alternatives.',
-        ' 9. Simplification opportunities.',
-        '10. Additional constructive feedback.',
-        `Audiences: ${JSON.stringify(audiences ?? ['technical', 'non-technical', 'investor', 'casual'])}`,
-        `Content:\n${(content ?? '').slice(0, 40000)}`,
-        'Return JSON: { clarity, messageChallenge, ambiguity, audiencePerspectives, alternatives, impact, consistency, metaphors, simplifications, other }.',
+        'You are the content-validator-agent reviewing ONE axis as devil\'s advocate.',
+        `Axis: ${axis.id}`,
+        `Scope: ${axis.description}`,
+        'For each issue, propose a concrete rewrite (before/after).',
+        `Audience (if specified): ${audience ?? '(unspecified)'}`,
+        `Content:\n---\n${(content ?? '').slice(0, 40000)}\n---`,
+        'Return JSON: { issues: Array<{ passage, problem, rewrite, severity }> }.',
       ].join('\n'),
     });
   },
-  { kind: 'agent', title: 'Content-validator critique', labels: ['a5c', 'content-validator'] },
+  { kind: 'agent', title: 'Content-validator scan axis', labels: ['a5c', 'content-validator'] },
+);
+
+const flagIssuesTask = defineTask(
+  'content-validator.flag-and-prioritise',
+  async ({ allIssues }, ctx) => {
+    return ctx.agent({
+      title: `Content-validator: flag + prioritise ${allIssues.length} issue(s)`,
+      prompt: [
+        'Deduplicate overlapping findings across axes. Rank by severity (blocker|major|minor).',
+        'Identify top simplification opportunities that would improve understanding most.',
+        `All issues: ${JSON.stringify(allIssues, null, 2)}`,
+        'Return JSON: { ranked: Array<same-shape + axis>, topSimplifications: string[] }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Content-validator flag', labels: ['a5c', 'content-validator'] },
+);
+
+const writeReportTask = defineTask(
+  'content-validator.write-report',
+  async ({ ranked, topSimplifications }, ctx) => {
+    return ctx.agent({
+      title: 'Content-validator: write structured feedback report',
+      prompt: [
+        'Produce a structured markdown report grouped by axis, each issue showing passage + problem + proposed rewrite.',
+        'End with a "Top Simplification Opportunities" section.',
+        `Ranked issues: ${JSON.stringify(ranked, null, 2)}`,
+        `Top simplifications: ${JSON.stringify(topSimplifications, null, 2)}`,
+        'Return JSON: { reportPath?: string, reportMarkdown: string }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Content-validator report', labels: ['a5c', 'content-validator'] },
 );
 
 export async function process(inputs, ctx) {
-  const { content = '', audiences } = inputs ?? {};
-  const feedback = await ctx.task(critiqueTask, { content, audiences });
+  const { content = '', audience } = inputs ?? {};
+  if (!content) {
+    return { success: true, axesReviewed: 0, issuesFound: 0 };
+  }
+
+  // Scan all axes in parallel.
+  const axisResults = await ctx.parallel.map(AXES, (axis) =>
+    ctx.task(scanAxisTask, { axis, content, audience }),
+  );
+  const allIssues = axisResults.flatMap((r, i) =>
+    (Array.isArray(r?.issues) ? r.issues : []).map((iss) => ({ ...iss, axis: AXES[i].id })),
+  );
+
+  if (allIssues.length === 0) {
+    return { success: true, axesReviewed: AXES.length, issuesFound: 0 };
+  }
+
+  const flagged = await ctx.task(flagIssuesTask, { allIssues });
+  const report = await ctx.task(writeReportTask, {
+    ranked: flagged?.ranked ?? allIssues,
+    topSimplifications: flagged?.topSimplifications ?? [],
+  });
+
   return {
     success: true,
-    feedback: feedback ?? {},
+    axesReviewed: AXES.length,
+    issuesFound: allIssues.length,
+    reportPath: report?.reportPath,
   };
 }

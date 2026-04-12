@@ -1,44 +1,107 @@
 /**
  * @process specializations/communication/discord-manager
- * @description Discord-manager persona (a5c discord-manager-agent). Admins a Discord server
- *   via ad-hoc JavaScript using discord.js: posts/reads messages, manages channels/roles,
- *   handles events, and replies to @a5c mentions (bot user `a5c#4390`) when triggered on a
- *   schedule. Runs disposable code (no PR/commit) — reports results, not code.
- * @inputs { action: 'respond-to-mentions' | 'send' | 'admin', params?: object }
- * @outputs { success: boolean, summary: string }
+ * @description Discord-manager persona. Scan server/unanswered-mentions → classify each
+ *   (respond | moderate | escalate | notify) → draft and execute per-mention action in
+ *   parallel via discord.js → report results. Never commits code to repo.
+ * @inputs { trigger?: "scheduled"|"mention"|"command", channelId?: string, limit?: number }
+ * @outputs { success, mentionsFound, responded, moderated, escalated }
  *
- * Source: a5c-ai/registry/prompts/communication/discord-manager-agent.prompt.md
+ * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/communication/discord-manager-agent.prompt.md
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';
 
-const runDiscordTask = defineTask(
-  'discord-manager.run',
-  async ({ action, params }, ctx) => {
+const serverScanTask = defineTask(
+  'discord-manager.server-scan',
+  async ({ trigger, channelId, limit }, ctx) => {
     return ctx.agent({
-      title: `Discord-manager: ${action ?? 'respond-to-mentions'}`,
+      title: 'Discord-manager: scan server for unanswered @a5c mentions',
       prompt: [
-        'You are the discord-manager-agent — admin of the Discord server via discord.js.',
-        'Install globally before running: `npm i -g discord.js`.',
-        'Env: DISCORD_TOKEN, DISCORD_GUILD_ID.',
-        'Write ad-hoc JavaScript with verbose logging, RUN it, verify it worked. Do NOT add code to the repo, do NOT open PRs.',
-        'Report the RESULTS of execution to the user; the code itself is disposable — do not mention it.',
-        'If env vars are missing or the code fails, report the error.',
-        'If triggered by a scheduled event with action=respond-to-mentions: scan for unanswered @a5c mentions (bot user `a5c#4390`, Discord mention format may differ) — sanity-check at least one mention in #general — and reply as thread replies.',
-        `Action: ${action ?? 'respond-to-mentions'}`,
-        `Params: ${JSON.stringify(params ?? {}, null, 2)}`,
-        'Return JSON: { summary: string, mentionsHandled?: number, messagesSent?: number }.',
+        'Using discord.js (env: DISCORD_TOKEN, DISCORD_GUILD_ID), run ad-hoc JS to find unanswered mentions of bot a5c#4390.',
+        'Discord\'s mention format is <@userId> rather than @a5c literal — detect by userId.',
+        'If triggered="scheduled", scan guild-wide. If channelId provided, scope to that channel.',
+        'Assume at least one mention exists in #general (sanity check).',
+        `Trigger: ${trigger ?? 'scheduled'}`,
+        `Channel: ${channelId ?? '(all)'}`,
+        `Limit: ${limit ?? 50}`,
+        'Report results only — do not commit code.',
+        'Return JSON: { mentions: Array<{ channelId, messageId, userId, content, threadId? }> }.',
       ].join('\n'),
     });
   },
-  { kind: 'agent', title: 'Discord-manager run', labels: ['a5c', 'discord-manager'] },
+  { kind: 'agent', title: 'Discord server scan', labels: ['a5c', 'discord-manager'] },
+);
+
+const classifyMentionTask = defineTask(
+  'discord-manager.classify-mention',
+  async ({ mention }, ctx) => {
+    return ctx.agent({
+      title: `Discord-manager: classify mention in ${mention.channelId}`,
+      prompt: [
+        'Classify this mention: respond | moderate | escalate | notify.',
+        `Mention: ${JSON.stringify(mention, null, 2)}`,
+        'Return JSON: { action: "respond"|"moderate"|"escalate"|"notify", rationale: string, draftReply?: string }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Discord classify mention', labels: ['a5c', 'discord-manager'] },
+);
+
+const executeActionTask = defineTask(
+  'discord-manager.execute-action',
+  async ({ mention, classification }, ctx) => {
+    return ctx.agent({
+      title: `Discord-manager: ${classification?.action ?? 'notify'} in ${mention.channelId}`,
+      prompt: [
+        'Execute via ad-hoc discord.js code. Reply as a thread/reply to the source message.',
+        'For moderate: remove offending message (if role permits) + DM user. For escalate: post in #admin tagging humans.',
+        'For notify: forward to relevant channel/agent.',
+        `Mention: ${JSON.stringify(mention, null, 2)}`,
+        `Classification: ${JSON.stringify(classification, null, 2)}`,
+        'Return JSON: { success: boolean, action: string, note?: string }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Discord execute action', labels: ['a5c', 'discord-manager'] },
+);
+
+const reportTask = defineTask(
+  'discord-manager.report',
+  async ({ results }, ctx) => {
+    return ctx.agent({
+      title: 'Discord-manager: summary report',
+      prompt: [
+        'Summarise outcomes by action type; list failures with reasons.',
+        `Results: ${JSON.stringify(results, null, 2)}`,
+        'Return JSON: { responded: number, moderated: number, escalated: number, failures: string[] }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Discord report', labels: ['a5c', 'discord-manager'] },
 );
 
 export async function process(inputs, ctx) {
-  const { action = 'respond-to-mentions', params } = inputs ?? {};
-  const result = await ctx.task(runDiscordTask, { action, params });
+  const { trigger = 'scheduled', channelId, limit = 50 } = inputs ?? {};
+  const scan = await ctx.task(serverScanTask, { trigger, channelId, limit });
+  const mentions = Array.isArray(scan?.mentions) ? scan.mentions : [];
+  if (mentions.length === 0) {
+    return { success: true, mentionsFound: 0, responded: 0, moderated: 0, escalated: 0 };
+  }
+
+  const classifications = await ctx.parallel.map(mentions, (mention) =>
+    ctx.task(classifyMentionTask, { mention }),
+  );
+
+  const actionResults = await ctx.parallel.map(mentions, (mention, i) =>
+    ctx.task(executeActionTask, { mention, classification: classifications[i] ?? { action: 'notify' } }),
+  );
+
+  const rep = await ctx.task(reportTask, { results: actionResults });
   return {
     success: true,
-    summary: String(result?.summary ?? ''),
+    mentionsFound: mentions.length,
+    responded: Number(rep?.responded ?? 0),
+    moderated: Number(rep?.moderated ?? 0),
+    escalated: Number(rep?.escalated ?? 0),
   };
 }

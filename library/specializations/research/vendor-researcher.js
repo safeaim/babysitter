@@ -1,66 +1,132 @@
 /**
  * @process specializations/research/vendor-researcher
- * @description Vendor-researcher persona (a5c vendor-researcher-agent). Performs on-demand
- *   vendor discovery and periodic vendor-list analysis. Produces comparison tables, vendor
- *   dossiers, and maintains a structured alternatives repository with clear scoring and
- *   regulatory/geographic annotations.
+ * @description Vendor-researcher persona. Discover candidate vendors → analyse each in
+ *   parallel against criteria (capabilities, compliance, pricing, reputation, service terms) →
+ *   assemble a comparison table → produce a recommendation report with regulatory/geographic
+ *   annotations. Updates the structured alternatives repository.
  * @inputs { objective: string, geography?: string, regulations?: string[], existingVendors?: string[] }
- * @outputs { success: boolean, reportPath?: string, comparisonTablePath?: string }
+ * @outputs { success, reportPath?, comparisonTablePath?, vendorCount }
  *
- * Source: a5c-ai/registry/prompts/research/vendor-researcher-agent.prompt.md
+ * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/research/vendor-researcher-agent.prompt.md
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';
 
-const discoveryTask = defineTask(
-  'vendor-researcher.discovery',
+const clarifyCriteriaTask = defineTask(
+  'vendor-researcher.clarify-criteria',
   async ({ objective, geography, regulations, existingVendors }, ctx) => {
     return ctx.agent({
-      title: 'Vendor-researcher: discovery + evaluation',
+      title: 'Vendor-researcher: clarify criteria',
       prompt: [
-        'You are the vendor-researcher-agent.',
-        'Step 1: Clarify objective, criteria, geography, regulations, deliverable format.',
-        'Step 2: Collect vendor info from public/reliable sources (docs, pricing pages, known databases).',
-        'Step 3: Evaluate vendors against criteria: capabilities, compliance, pricing, reputation, service terms.',
-        'Step 4: Score and rank. Highlight regulatory + geographic factors.',
+        'Formalise the evaluation criteria: capabilities, compliance, pricing model, reputation, service terms, SLAs.',
+        'Factor in geographic and regulatory constraints.',
         `Objective: ${objective ?? '(unspecified)'}`,
         `Geography: ${geography ?? '(any)'}`,
         `Regulations: ${JSON.stringify(regulations ?? [])}`,
         `Existing vendors: ${JSON.stringify(existingVendors ?? [])}`,
-        'Return JSON: { vendors: Array<{ name, url, score, strengths, weaknesses, pricing, compliance }>, criteria: object }.',
+        'Return JSON: { criteria: object, scoringRubric: object }.',
       ].join('\n'),
     });
   },
-  { kind: 'agent', title: 'Vendor-researcher discovery', labels: ['a5c', 'vendor-researcher'] },
+  { kind: 'agent', title: 'Clarify criteria', labels: ['a5c', 'vendor-researcher'] },
 );
 
-const reportTask = defineTask(
-  'vendor-researcher.report',
-  async ({ vendors, criteria }, ctx) => {
+const discoverCandidatesTask = defineTask(
+  'vendor-researcher.discover-candidates',
+  async ({ objective, criteria, existingVendors }, ctx) => {
     return ctx.agent({
-      title: 'Vendor-researcher: write comparison table + report',
+      title: 'Vendor-researcher: discover candidate vendors',
       prompt: [
-        'You are the vendor-researcher-agent. Produce TWO artifacts:',
-        ' 1. A markdown/YAML comparison table of vendor attributes and scores.',
-        ' 2. A structured research report (executive summary, methodology, findings, recommendations, next steps).',
-        'Update the vendor alternatives list in the designated repo location.',
-        `Vendors: ${JSON.stringify(vendors ?? [], null, 2)}`,
+        'Collect candidate vendors from public/reliable sources (docs, pricing pages, known databases).',
+        'Include existing vendors for incumbent comparison. Return a candidate shortlist (name + url + one-line pitch).',
+        `Objective: ${objective}`,
         `Criteria: ${JSON.stringify(criteria ?? {}, null, 2)}`,
-        'Return JSON: { reportPath, comparisonTablePath }.',
+        `Existing: ${JSON.stringify(existingVendors ?? [])}`,
+        'Return JSON: { candidates: Array<{ name, url, pitch }> }.',
       ].join('\n'),
     });
   },
-  { kind: 'agent', title: 'Vendor-researcher report', labels: ['a5c', 'vendor-researcher'] },
+  { kind: 'agent', title: 'Discover candidates', labels: ['a5c', 'vendor-researcher'] },
+);
+
+const analyseVendorTask = defineTask(
+  'vendor-researcher.analyse-vendor',
+  async ({ vendor, criteria, scoringRubric }, ctx) => {
+    return ctx.agent({
+      title: `Analyse vendor: ${vendor.name}`,
+      prompt: [
+        'Score this single vendor against every criterion.',
+        'Produce: strengths, weaknesses, pricing snapshot, compliance status, regulatory/geographic notes.',
+        `Vendor: ${JSON.stringify(vendor)}`,
+        `Criteria: ${JSON.stringify(criteria ?? {}, null, 2)}`,
+        `Scoring rubric: ${JSON.stringify(scoringRubric ?? {}, null, 2)}`,
+        'Return JSON: { name, url, score, strengths, weaknesses, pricing, compliance, regulatoryNotes }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Analyse vendor', labels: ['a5c', 'vendor-researcher'] },
+);
+
+const comparisonTableTask = defineTask(
+  'vendor-researcher.comparison-table',
+  async ({ vendors, criteria }, ctx) => {
+    return ctx.agent({
+      title: 'Vendor-researcher: assemble comparison table',
+      prompt: [
+        'Produce a markdown (or YAML) comparison table: one row per vendor, one column per criterion, final score column.',
+        'Commit it to the vendor alternatives repo location (e.g. docs/vendors/comparison.md).',
+        `Vendors: ${JSON.stringify(vendors, null, 2)}`,
+        `Criteria: ${JSON.stringify(criteria ?? {}, null, 2)}`,
+        'Return JSON: { comparisonTablePath: string }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Comparison table', labels: ['a5c', 'vendor-researcher'] },
+);
+
+const recommendationTask = defineTask(
+  'vendor-researcher.recommendation',
+  async ({ vendors, criteria }, ctx) => {
+    return ctx.agent({
+      title: 'Vendor-researcher: write recommendation report',
+      prompt: [
+        'Write a structured report: executive summary, methodology, findings, ranked recommendation, next steps (outreach/POC plan).',
+        'Highlight regulatory and geographic factors affecting selection.',
+        `Vendors (with scores): ${JSON.stringify(vendors, null, 2)}`,
+        `Criteria: ${JSON.stringify(criteria ?? {}, null, 2)}`,
+        'Commit at docs/vendors/<objective-slug>/report.md.',
+        'Return JSON: { reportPath: string, topChoice: string }.',
+      ].join('\n'),
+    });
+  },
+  { kind: 'agent', title: 'Recommendation report', labels: ['a5c', 'vendor-researcher'] },
 );
 
 export async function process(inputs, ctx) {
   const { objective = '', geography, regulations, existingVendors } = inputs ?? {};
-  const disc = await ctx.task(discoveryTask, { objective, geography, regulations, existingVendors });
-  const vendors = Array.isArray(disc?.vendors) ? disc.vendors : [];
-  const report = await ctx.task(reportTask, { vendors, criteria: disc?.criteria ?? {} });
+  const { criteria, scoringRubric } = await ctx.task(clarifyCriteriaTask, {
+    objective, geography, regulations, existingVendors,
+  });
+  const { candidates = [] } = await ctx.task(discoverCandidatesTask, { objective, criteria, existingVendors });
+
+  if (candidates.length === 0) {
+    return { success: true, vendorCount: 0 };
+  }
+
+  // Analyse each vendor in parallel — independent scoring.
+  const vendors = await ctx.parallel.map(candidates, (vendor) =>
+    ctx.task(analyseVendorTask, { vendor, criteria, scoringRubric }),
+  );
+
+  const [table, rec] = await ctx.parallel.all([
+    ctx.task(comparisonTableTask, { vendors, criteria }),
+    ctx.task(recommendationTask, { vendors, criteria }),
+  ]);
+
   return {
     success: true,
-    reportPath: report?.reportPath,
-    comparisonTablePath: report?.comparisonTablePath,
+    vendorCount: vendors.length,
+    reportPath: rec?.reportPath,
+    comparisonTablePath: table?.comparisonTablePath,
   };
 }

@@ -38,6 +38,14 @@ export type {
   DetectOptions,
 } from './contextDetect';
 
+// Capability → library process mapping (consumer side of the capability loop)
+export {
+  CAPABILITY_PROCESS_MAP,
+  processPathsForCapabilities,
+  renderCapabilityProcessGuide,
+} from './capabilityProcessMap';
+export type { CapabilityProcessMap } from './capabilityProcessMap';
+
 // Template renderer
 export {
   renderTemplate,

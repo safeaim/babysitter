@@ -20,6 +20,8 @@ import {
   composeByStrata,
   detectExecutionContext,
   deriveCapabilityFlags,
+  renderCapabilityProcessGuide,
+  processPathsForCapabilities,
 } from "../../prompts";
 import type { PromptContext, StratumTaggedPart } from "../../prompts";
 import {
@@ -283,6 +285,7 @@ export async function handleInstructionsCommand(
           hooksDetected: hooksActive,
           executionContext,
           capabilityFlags,
+          suggestedProcesses: processPathsForCapabilities(capabilityFlags),
           content,
           partsIncluded: composer.partsIncluded,
         },
@@ -316,7 +319,8 @@ export async function handleInstructionsCommand(
       '---',
       '',
     ].filter((l): l is string => l !== undefined).join('\n');
-    console.log(contextHeader + content);
+    const processGuide = renderCapabilityProcessGuide(capabilityFlags);
+    console.log(contextHeader + processGuide + content);
   }
 
   return 0;

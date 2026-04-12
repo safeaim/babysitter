@@ -37,6 +37,7 @@ const SCOPE_DIRS = [
   'specializations/media',
   'specializations/authoring',
   'specializations/observability',
+  'specializations/research',
   'specializations/ux-ui-design/design-language.js',
   'specializations/ux-ui-design/storybook-documentation.js',
   'methodologies/deep-research.js',

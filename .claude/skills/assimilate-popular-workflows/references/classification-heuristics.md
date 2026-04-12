@@ -89,6 +89,7 @@ When deciding if a skill's procedural content is transferable:
 - **Skill-management processes** (skill-routing, skill-discovery, skill-validation, metadata compliance) -- these are babysitter-internal concerns. Their *plugin ideas* may still be valid.
 - **Multi-model coordination** (multi-model review, heterogeneous AI team orchestration) -- babysitter's harness adapter system already handles this natively
 - **SDK-covered primitives** (human-in-the-loop review cycles = breakpoints, harness CLI invocation = harness adapters, effect dispatch = runtime)
+- **Memory systems** (tiered storage, decay, reflection, promotion) -- always plugins (Context & Memory category), never processes
 
 ## Implicit Procedural Knowledge Detection
 

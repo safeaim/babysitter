@@ -7,3 +7,6 @@
 - Avoid backwards-compatibility hacks like renaming unused _vars, re-exporting types, adding removed comments for removed code. If something is unused, delete it completely.
 - Prefer editing existing files over creating new ones. This prevents file bloat and builds on existing work.
 - Do not add feature flags or backwards-compatibility shims when you can just change the code.
+- Address root causes, not symptoms. If a fix only patches a surface effect, trace the underlying cause and fix there instead. A bug that resurfaces elsewhere was not fixed.
+- When a bug pattern is likely to recur, add a preventative guardrail: a test that would have caught it, a lint rule, or a hook. Do not add guardrails for scenarios that cannot recur.
+- When code changes deviate from existing documentation, update the docs in the same change. Do not leave docs referring to the old behavior.

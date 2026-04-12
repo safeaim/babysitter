@@ -34,6 +34,7 @@ import {
   isCodexPluginInstalled,
   runPackageBinaryViaNpx,
 } from "./installSupport";
+import { readSessionMarker, writeSessionMarker } from "./sessionMarker";
 
 function resolveCodexPluginRoot(
   args: { pluginRoot?: string } = {},
@@ -53,12 +54,26 @@ function resolveCodexStateDir(args: {
 function resolveCodexSessionId(parsed: { sessionId?: string }): string | undefined {
   if (parsed.sessionId) return parsed.sessionId;
 
-  // Cross-harness standard
-  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+  const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
 
-  // Codex-native env vars (auto-injected by Codex CLI into all hooks)
+  // Legacy escape hatch: env-var-first (pre-fix behavior).
+  if (trustEnv) {
+    if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+    if (process.env.CODEX_THREAD_ID) return process.env.CODEX_THREAD_ID;
+    if (process.env.CODEX_SESSION_ID) return process.env.CODEX_SESSION_ID;
+    return undefined;
+  }
+
+  // 1. PID-scoped marker (authoritative per live Codex ancestor PID)
+  const fromMarker = readSessionMarker("codex");
+  if (fromMarker) return fromMarker;
+
+  // 2. Codex-native env vars (auto-injected by Codex CLI into all hooks)
   if (process.env.CODEX_THREAD_ID) return process.env.CODEX_THREAD_ID;
   if (process.env.CODEX_SESSION_ID) return process.env.CODEX_SESSION_ID;
+
+  // 3. Cross-harness standard (potentially stale)
+  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
 
   return undefined;
 }
@@ -184,6 +199,13 @@ async function handleCodexSessionStartHookImpl(
   }
 
   // Codex auto-injects CODEX_THREAD_ID into all hooks — no env file write needed.
+  // Persist PID-scoped marker so descendant processes can resolve the session
+  // ID even in environments where CODEX_THREAD_ID isn't propagated.
+  try {
+    writeSessionMarker("codex", sessionId);
+  } catch {
+    // Non-fatal: marker is a best-effort mechanism
+  }
 
   const stateDir = resolveCodexStateDir({
     stateDir: args.stateDir,

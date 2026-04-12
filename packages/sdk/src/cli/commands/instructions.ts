@@ -170,10 +170,13 @@ async function tryResolveProcessLibraryRoot(): Promise<{
  * Detect whether the session-start hook has actually run by checking for the
  * session state file it creates (`<stateDir>/<sessionId>.md`).
  *
- * Some adapters can resolve a session ID from env vars alone (e.g.
- * GEMINI_SESSION_ID, CODEX_SESSION_ID) without the hook ever firing.
- * The definitive signal is the state file — the hook writes it as a
- * side effect of `babysitter hook:run --hook-type session-start`.
+ * The definitive signal is now the PID-scoped session marker written by the
+ * session-start hook; absence of the marker (even when env vars like
+ * GEMINI_SESSION_ID / CODEX_SESSION_ID / BABYSITTER_SESSION_ID are present)
+ * usually means hooks did not fire. Env-var-only resolution is a fallback
+ * path that may bind to stale IDs inherited from ancestor shells, so it
+ * cannot be trusted as proof that hooks are active. The hook writes the
+ * state file as a side effect of `babysitter hook:run --hook-type session-start`.
  */
 function detectHooksActive(harness: string): boolean {
   const adapter = getAdapterByName(harness);

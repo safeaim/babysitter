@@ -63,6 +63,7 @@ import { HarnessCapability } from "./types";
 import type { PromptContext } from "../prompts/types";
 import { createCursorContext } from "../prompts/context";
 import { getGlobalLogDir, getGlobalStateDir } from "../config";
+import { readSessionMarker, writeSessionMarker } from "./sessionMarker";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -661,6 +662,13 @@ async function handleSessionStartHookImpl(
   log.setContext("session", sessionId);
   log.info(`Session ID: ${sessionId}`);
 
+  // 2b. Persist PID-scoped marker so descendants can resolve session ID.
+  try {
+    writeSessionMarker("cursor", sessionId);
+  } catch {
+    // Non-fatal
+  }
+
   // 3. Resolve state directory and create baseline session file
   const stateDir = resolveStateDirInternal(args);
   log.info(`Resolved stateDir: ${stateDir}`);
@@ -891,7 +899,17 @@ export function createCursorAdapter(): HarnessAdapter {
     },
 
     resolveSessionId(parsed: { sessionId?: string }): string | undefined {
+      // stdin/conversation_id is the true per-request source, but it isn't
+      // available at env-resolution time — callers pass parsed.sessionId when
+      // they do have it. Honor that first.
       if (parsed.sessionId) return parsed.sessionId;
+      const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
+      if (trustEnv) {
+        if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+        return undefined;
+      }
+      const fromMarker = readSessionMarker("cursor");
+      if (fromMarker) return fromMarker;
       // Cursor has no env file mechanism, but BABYSITTER_SESSION_ID may be
       // set externally or by a wrapper script.
       if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;

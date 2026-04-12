@@ -26,8 +26,10 @@ the runs. Use the CLI to drive the orchestration loop directly.
 
 CRITICAL RULE: Never fallback to simpler execution if the user activated this
 skill. Persist in executing the orchestration itself -- you must create a valid
-process js file, create a run (with `--harness {{harness}}` to bind the session), then
-iterate the run until it is completed.
+process js file, create a run (with `--harness {{harness}}` to bind the session
+authoritatively via the PID-scoped session marker -- the run stays bound to the
+correct session even when shells inherit stale `BABYSITTER_SESSION_ID` env vars
+from ancestor processes), then iterate the run until it is completed.
 
 {{#hookDriven}}
 CRITICAL RULE: After run:create or run-session association and after each effect
@@ -53,5 +55,11 @@ when the user explicitly requested this skill. Do not execute the tasks yourself
 do not create helper scripts. Use the CLI to drive the orchestration loop.
 Not for simple tasks, and even if things get complicated.
 Persist in executing the orchestration itself.
+
+NOTE: CI pipelines and legacy workflows that deliberately export
+`BABYSITTER_SESSION_ID` to bind a run across a pre-launched shell can opt into
+the old env-var-first behavior by setting `BABYSITTER_TRUST_ENV_SESSION=1`. This
+is an escape hatch only -- interactive sessions should rely on the PID-scoped
+session marker written by the session-start hook.
 
 {{codexSessionIdRule}}

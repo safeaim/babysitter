@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- No unreleased changes.
+### Fixed
+- Inverted session-ID resolution precedence across all harness adapters to prefer the PID-scoped session marker (authoritative, tied to live ancestor Claude Code PID) over the inheritable `BABYSITTER_SESSION_ID` env var, which previously caused cross-session bleed when a parent shell had a stale export.
+- Fixed env-file stale-line hazard by using a last-match regex and strip-and-append atomic writes, so repeated session rebinds no longer leave shadowed earlier lines that could be picked up by naive first-match parsers.
+- Replaced legacy `wmic` with a PowerShell `Get-CimInstance` fallback cascade for Windows 11 24H2+, where `wmic` has been removed from the base image.
+- Added `session:whoami` and `session:cleanup` commands, plus four new `/babysitter:doctor` checks covering session-binding provenance and liveness.
+- Added `BABYSITTER_TRUST_ENV_SESSION=1` escape hatch to retain legacy env-first precedence for CI workflows that deliberately export `BABYSITTER_SESSION_ID`.
+- Closes #130; related to previously-fixed #100, #107, #75.
 
 
 ## [0.0.187] - 2026-04-04

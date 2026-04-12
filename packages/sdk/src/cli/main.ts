@@ -29,6 +29,8 @@ import {
   handleSessionLastMessage,
   handleSessionIterationMessage,
 } from "./commands/session";
+import { handleSessionWhoami } from "./commands/sessionWhoami";
+import { handleSessionCleanup } from "./commands/sessionCleanup";
 import { handleSessionHistory } from "./commands/sessionHistory";
 import { handleSkillDiscover, handleSkillFetchRemote, discoverSkillsInternal, discoverFromProcessFile } from "./commands/skill";
 import { handleMcpServe } from "./commands/mcpServe";
@@ -1462,11 +1464,30 @@ async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
     const compactAgents = discoveredAgents
       ? { count: discoveredAgents.length, names: discoveredAgents.map(a => a.name) }
       : undefined;
+
+    // Enrich session object with resolution provenance when the active
+    // harness is claude-code (only one that currently exposes it).
+    let sessionOut: unknown = sessionBound ?? undefined;
+    if (sessionBound && adapter?.name === "claude-code") {
+      try {
+        const { resolveSessionIdDetailed } = await import("../harness/claudeCode");
+        const details = resolveSessionIdDetailed(parsed.sessionId);
+        sessionOut = {
+          ...sessionBound,
+          resolvedFrom: details.resolvedFrom,
+          ancestorPid: details.ancestorPid,
+          ancestorAlive: details.ancestorAlive,
+        };
+      } catch {
+        // non-fatal — fall through to plain sessionBound
+      }
+    }
+
     console.log(JSON.stringify({
       runId: result.runId,
       runDir: result.runDir,
       entry: entrySpec,
-      session: sessionBound ?? undefined,
+      session: sessionOut,
       discoveredSkills: parsed.verbose ? discoveredSkills : compactSkills,
       discoveredAgents: parsed.verbose ? discoveredAgents : compactAgents,
     }, null, 2));
@@ -2491,6 +2512,8 @@ const VALID_COMMANDS = [
   "session:check-iteration",
   "session:last-message",
   "session:iteration-message",
+  "session:whoami",
+  "session:cleanup",
   "harness:create-run",
   "harness:call",
   "harness:yolo",
@@ -3006,6 +3029,20 @@ export function createBabysitterCli() {
             runId: parsed.runIdOverride,
             runsDir: parsed.runsDir,
             pluginRoot: parsed.pluginRoot,
+            json: parsed.json,
+          });
+        }
+        if (parsed.command === "session:whoami") {
+          return handleSessionWhoami({
+            harness: parsed.harness,
+            json: parsed.json,
+          });
+        }
+        if (parsed.command === "session:cleanup") {
+          return await handleSessionCleanup({
+            harness: parsed.harness,
+            dryRun: parsed.dryRun,
+            runsDir: parsed.runsDir,
             json: parsed.json,
           });
         }

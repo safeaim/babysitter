@@ -25,6 +25,7 @@ import {
   installCliViaNpm,
   runPackageBinaryViaNpx,
 } from "./installSupport";
+import { readSessionMarker, writeSessionMarker } from "./sessionMarker";
 
 function resolvePiPluginRoot(
   args: { pluginRoot?: string } = {},
@@ -43,8 +44,16 @@ function resolvePiStateDir(args: {
 
 function resolvePiSessionId(parsed: { sessionId?: string }): string | undefined {
   if (parsed.sessionId) return parsed.sessionId;
-  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+  const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
+  if (trustEnv) {
+    if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+    if (process.env.PI_SESSION_ID) return process.env.PI_SESSION_ID;
+    return undefined;
+  }
+  const fromMarker = readSessionMarker("pi");
+  if (fromMarker) return fromMarker;
   if (process.env.PI_SESSION_ID) return process.env.PI_SESSION_ID;
+  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
   return undefined;
 }
 
@@ -191,6 +200,17 @@ export function createPiAdapter(): HarnessAdapter {
     },
 
     handleSessionStartHook(_args: HookHandlerArgs): Promise<number> {
+      // Best-effort: persist PID-scoped marker so descendants can resolve the
+      // session ID independent of PI_SESSION_ID propagation.
+      const sessionId =
+        process.env.PI_SESSION_ID || process.env.BABYSITTER_SESSION_ID;
+      if (sessionId) {
+        try {
+          writeSessionMarker("pi", sessionId);
+        } catch {
+          // Non-fatal
+        }
+      }
       writeNoopHookResult();
       return Promise.resolve(0);
     },

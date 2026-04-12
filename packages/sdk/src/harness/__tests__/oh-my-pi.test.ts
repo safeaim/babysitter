@@ -87,18 +87,20 @@ describe("oh-my-pi Adapter", () => {
     expect(adapter.isActive()).toBe(false);
   });
 
-  it("resolves session IDs in explicit -> BABYSITTER -> OMP order", () => {
+  it("resolves session IDs in explicit -> OMP_SESSION_ID -> BABYSITTER_SESSION_ID order (marker-first, env-native before cross-harness)", () => {
     const adapter = createOhMyPiAdapter();
     process.env.BABYSITTER_SESSION_ID = "babysitter-session";
     process.env.OMP_SESSION_ID = "omp-session";
 
     expect(adapter.resolveSessionId({ sessionId: "explicit" })).toBe("explicit");
-    expect(adapter.resolveSessionId({})).toBe("babysitter-session");
-
-    delete process.env.BABYSITTER_SESSION_ID;
+    // Under marker-first precedence, OMP_SESSION_ID (harness-native) wins
+    // over stale-prone BABYSITTER_SESSION_ID.
     expect(adapter.resolveSessionId({})).toBe("omp-session");
 
     delete process.env.OMP_SESSION_ID;
+    expect(adapter.resolveSessionId({})).toBe("babysitter-session");
+
+    delete process.env.BABYSITTER_SESSION_ID;
     expect(adapter.resolveSessionId({})).toBeUndefined();
   });
 

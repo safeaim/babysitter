@@ -22,6 +22,7 @@ import {
 } from "../session";
 import type { SessionState } from "../session";
 import { installCliViaNpm, runPackageBinaryViaNpx } from "./installSupport";
+import { readSessionMarker, writeSessionMarker } from "./sessionMarker";
 
 function resolveOhMyPiPluginRoot(
   args: { pluginRoot?: string } = {},
@@ -40,8 +41,16 @@ function resolveOhMyPiStateDir(args: {
 
 function resolveOhMyPiSessionId(parsed: { sessionId?: string }): string | undefined {
   if (parsed.sessionId) return parsed.sessionId;
-  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+  const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
+  if (trustEnv) {
+    if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+    if (process.env.OMP_SESSION_ID) return process.env.OMP_SESSION_ID;
+    return undefined;
+  }
+  const fromMarker = readSessionMarker("oh-my-pi");
+  if (fromMarker) return fromMarker;
   if (process.env.OMP_SESSION_ID) return process.env.OMP_SESSION_ID;
+  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
   return undefined;
 }
 
@@ -176,6 +185,15 @@ export function createOhMyPiAdapter(): HarnessAdapter {
     },
 
     handleSessionStartHook(_args: HookHandlerArgs): Promise<number> {
+      const sessionId =
+        process.env.OMP_SESSION_ID || process.env.BABYSITTER_SESSION_ID;
+      if (sessionId) {
+        try {
+          writeSessionMarker("oh-my-pi", sessionId);
+        } catch {
+          // Non-fatal
+        }
+      }
       writeNoopHookResult();
       return Promise.resolve(0);
     },

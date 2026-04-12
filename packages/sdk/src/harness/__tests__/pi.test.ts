@@ -87,18 +87,20 @@ describe("Pi Coding Agent Adapter", () => {
     expect(adapter.isActive()).toBe(false);
   });
 
-  it("resolves session IDs in explicit -> BABYSITTER -> PI order", () => {
+  it("resolves session IDs in explicit -> PI_SESSION_ID -> BABYSITTER_SESSION_ID order (marker-first, env-native before cross-harness)", () => {
     const adapter = createPiAdapter();
     process.env.BABYSITTER_SESSION_ID = "babysitter-session";
     process.env.PI_SESSION_ID = "pi-session";
 
     expect(adapter.resolveSessionId({ sessionId: "explicit" })).toBe("explicit");
-    expect(adapter.resolveSessionId({})).toBe("babysitter-session");
-
-    delete process.env.BABYSITTER_SESSION_ID;
+    // PI_SESSION_ID wins over stale-prone BABYSITTER_SESSION_ID under the new
+    // marker-first precedence.
     expect(adapter.resolveSessionId({})).toBe("pi-session");
 
     delete process.env.PI_SESSION_ID;
+    expect(adapter.resolveSessionId({})).toBe("babysitter-session");
+
+    delete process.env.BABYSITTER_SESSION_ID;
     expect(adapter.resolveSessionId({})).toBeUndefined();
   });
 

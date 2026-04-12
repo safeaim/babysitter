@@ -64,6 +64,38 @@ import {
 import type { PromptContext } from "../prompts/types";
 import { createGeminiCliContext } from "../prompts/context";
 import { getGlobalLogDir, getGlobalStateDir } from "../config";
+import { readSessionMarker, writeSessionMarker } from "./sessionMarker";
+
+// ---------------------------------------------------------------------------
+// Session ID resolver (shared by all call sites)
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve the current Gemini CLI session ID without a hook payload.
+ *
+ * Precedence:
+ *   1. PID-scoped marker (authoritative; tied to live gemini ancestor PID)
+ *   2. GEMINI_SESSION_ID (auto-injected by Gemini CLI into all hooks)
+ *   3. BABYSITTER_SESSION_ID (cross-harness; potentially stale, last resort)
+ *
+ * Legacy escape hatch: BABYSITTER_TRUST_ENV_SESSION=1 restores the old
+ * env-var-first precedence.
+ */
+function resolveGeminiSessionIdFromEnv(): string | undefined {
+  const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
+  if (trustEnv) {
+    return (
+      process.env.BABYSITTER_SESSION_ID ||
+      process.env.GEMINI_SESSION_ID ||
+      undefined
+    );
+  }
+  const fromMarker = readSessionMarker("gemini-cli");
+  if (fromMarker) return fromMarker;
+  if (process.env.GEMINI_SESSION_ID) return process.env.GEMINI_SESSION_ID;
+  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+  return undefined;
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -299,12 +331,12 @@ async function handleAfterAgentHookImpl(
   const hookInput = parseHookInput(rawInput) as GeminiAfterAgentHookInput;
   log.info("Hook input received");
 
-  // 2. Resolve session ID from hook input or env var
-  //    Priority: stdin session_id → BABYSITTER_SESSION_ID → GEMINI_SESSION_ID
+  // 2. Resolve session ID from hook input or env via shared resolver
+  //    Precedence: stdin session_id → pid-marker → GEMINI_SESSION_ID →
+  //    BABYSITTER_SESSION_ID (legacy escape: BABYSITTER_TRUST_ENV_SESSION=1).
   const sessionId =
     safeStr(hookInput as Record<string, unknown>, "session_id") ||
-    process.env.BABYSITTER_SESSION_ID ||
-    process.env.GEMINI_SESSION_ID ||
+    resolveGeminiSessionIdFromEnv() ||
     "";
 
   if (!sessionId) {
@@ -680,13 +712,11 @@ async function handleSessionStartHookImpl(
 
   const hookInput = parseHookInput(rawInput) as GeminiSessionStartHookInput;
 
-  // 2. Resolve session ID
-  //    Gemini auto-injects GEMINI_SESSION_ID; BABYSITTER_SESSION_ID takes priority
-  //    if set (no env file mechanism — Gemini injects natively).
+  // 2. Resolve session ID via shared resolver (marker → GEMINI_SESSION_ID →
+  //    BABYSITTER_SESSION_ID), stdin always wins.
   const sessionId =
     safeStr(hookInput as Record<string, unknown>, "session_id") ||
-    process.env.BABYSITTER_SESSION_ID ||
-    process.env.GEMINI_SESSION_ID ||
+    resolveGeminiSessionIdFromEnv() ||
     "";
 
   if (!sessionId) {
@@ -697,6 +727,13 @@ async function handleSessionStartHookImpl(
 
   log.setContext("session", sessionId);
   log.info(`Session ID: ${sessionId}`);
+
+  // 2b. Persist PID-scoped marker so descendants can resolve session ID.
+  try {
+    writeSessionMarker("gemini-cli", sessionId);
+  } catch {
+    // Non-fatal: marker is a best-effort mechanism
+  }
 
   // 3. Resolve state directory and create baseline session file
   const stateDir = resolveStateDirInternal(args);
@@ -883,10 +920,7 @@ export function createGeminiCliAdapter(): HarnessAdapter {
 
     resolveSessionId(parsed: { sessionId?: string }): string | undefined {
       if (parsed.sessionId) return parsed.sessionId;
-      // Cross-harness standard first, then Gemini-native (auto-injected)
-      if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
-      if (process.env.GEMINI_SESSION_ID) return process.env.GEMINI_SESSION_ID;
-      return undefined;
+      return resolveGeminiSessionIdFromEnv();
     },
 
     resolveStateDir(args: {

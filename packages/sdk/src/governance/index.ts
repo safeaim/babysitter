@@ -40,3 +40,50 @@ export {
   type DecisionTrailSummary,
   type PolicyEvalRecord,
 } from './decisionTrail';
+
+// Mandate system
+export {
+  createMandate,
+  activateMandate,
+  revokeMandate,
+  deriveMandate,
+  validateMandateForContext,
+  mandateToPolicy,
+  type ExecutionMandate,
+  type MandateScope,
+  type MandateLifecycle,
+  type MandateProvenance,
+  type MandateValidationResult,
+} from './mandate';
+
+// Authority chain
+export {
+  createAuthorityChain,
+  validateAuthorityChain,
+  attenuateScope,
+  traceAuthorityToHuman,
+  type AuthorityPrincipal,
+  type AuthorityGrant,
+  type AuthorityChain,
+  type AuthorityChainLink,
+  type AuthorityTrace,
+  type AuthorityChainValidationResult,
+} from './authority';
+
+// Categorized policy engine
+export {
+  categorizePolicyRule,
+  createCategorizedEngine,
+  inferPolicyCategory,
+  type PolicyCategory,
+  type CategorizedPolicyRule,
+  type CategoryEnforcementBehavior,
+  type CategorizedPolicyDecision,
+  type CategorizedPolicyEngine,
+} from './categories';
+
+// Posture-to-policy bridge
+export {
+  postureToPolicyRules,
+  allPosturesToPolicies,
+} from './postureBridge';

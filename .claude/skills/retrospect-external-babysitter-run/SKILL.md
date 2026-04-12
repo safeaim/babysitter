@@ -110,6 +110,9 @@ Concrete, actionable suggestions in three buckets:
 
 - **For the run** (if still in progress): what to retry, rollback, or fix first.
 - **For the process** (always): specific edits to the process file -- split this task, add this breakpoint, move that side-effect inside a task, use stableKey here.
+
+Can it be generalized into a reusable pattern or library process in the processes library? If so, suggest that too. (also using `/babysitter:contrib library ...`)
+
 - **For babysitter upstream** (when the insight generalizes): missing primitives, confusing SDK behavior, documentation gaps worth filing via `/babysitter:contrib`.
 
 Every suggestion must cite evidence -- a journal event, a file path, a line range.

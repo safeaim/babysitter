@@ -4,6 +4,24 @@
   "url": "https://github.com/a5c-ai/babysitter.git",
   "owner": "a5c-ai",
   "plugins": {
+    "a11y": {
+      "name": "a11y",
+      "description": "Install accessibility feedback loops — lint rules (jsx-a11y/vue-a11y/angular-eslint/htmlhint/djlint), pre-commit hooks, GitHub Actions workflow, and runtime scanning via Axe/Playwright, Lighthouse CI, or pa11y. Per-stack recommendations for React, Vue, Angular, plain HTML, and Python templates.",
+      "latestVersion": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "packagePath": "plugins/a11y",
+      "tags": [
+        "accessibility",
+        "a11y",
+        "wcag",
+        "lint",
+        "ci",
+        "quality"
+      ],
+      "author": "a5c-ai"
+    },
     "basic-security": {
       "name": "basic-security",
       "description": "Install security processes, skills, agents and commands from the babysitter security-compliance library into your project. Includes post-install codebase security scan.",
@@ -110,6 +128,24 @@
         "workflows",
         "harness-agnostic",
         "multi-provider"
+      ],
+      "author": "a5c-ai"
+    },
+    "i18n": {
+      "name": "i18n",
+      "description": "Install internationalization feedback loops — lint rules for hardcoded strings (eslint-plugin-i18next/formatjs/vue-i18n/angular-localize/flake8-i18n), extraction and validation tooling (i18next-parser, FormatJS, gettext/Babel), pre-commit checks, and a GitHub Actions workflow that gates untranslated strings from merging. Per-stack for React, Vue, Angular, plain JS, and Python.",
+      "latestVersion": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "packagePath": "plugins/i18n",
+      "tags": [
+        "i18n",
+        "internationalization",
+        "translation",
+        "lint",
+        "ci",
+        "quality"
       ],
       "author": "a5c-ai"
     },

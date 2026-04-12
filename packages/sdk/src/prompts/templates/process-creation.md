@@ -69,3 +69,62 @@ After the process is created and before creating the run:
 - correct: for brownfield changes, trace the runtime call path from entry points
   to final output first, record as `runtimeCallPaths`, and scope modifications
   only to files on the live execution path (see ADVANCED_PATTERNS.md Pattern 9)
+
+### Drift-resistant prompt composition (issue #129)
+
+In multi-phase processes, your own attention is biased toward recently-built
+implementation artifacts when you compose later-phase agent prompts. This
+systematically rewrites spec acceptance criteria to match what got built --
+e.g. "integration test with ReplicatedTransform sync" silently becomes "unit
+test calling tick_projectile with MockWorld". All tests then pass (exit 0)
+while testing the wrong thing. The defense is to keep spec bytes out of your
+compose pass entirely.
+
+**Runtime-read pattern (mandatory for spec-bearing prompts).** Never paraphrase
+or inline spec text when authoring a prompt literal. Instead, read the spec
+file at run time via a `kind: 'shell'` task and interpolate its stdout into
+the downstream agent prompt verbatim:
+
+```javascript
+const spec = await ctx.task({
+  kind: 'shell',
+  command: `cat specs/projectile-sync.md`,
+  expectedExitCode: 0,
+});
+
+await ctx.task({
+  kind: 'agent',
+  prompt: [
+    'SPEC (verbatim, do not paraphrase):',
+    '---',
+    spec.stdout,
+    '---',
+    'Your task: author integration tests that exercise every acceptance',
+    'criterion above. Cite spec lines in test names.',
+  ].join('\n'),
+});
+```
+
+The `cat` runs at execution time, so the spec content bypasses the process-
+authoring compose pass where proximity bias operates. You only ever write the
+`cat` line; the runtime pulls the spec bytes fresh from disk. This works for
+any spec source (markdown, `bd show > /tmp/spec.md && cat /tmp/spec.md`,
+issue body dumps, etc.).
+
+**Recency-anchored verification prompts.** Verification/acceptance agent
+prompts must end with two freshly-interpolated blocks -- a `SPEC (verbatim)`
+block read via `cat`, followed by an `ARTIFACTS (verbatim)` block read via
+`cat`/`git show` on the produced files -- followed by one line: "Compare
+SPEC to ARTIFACTS directly. Ignore any narrative in your context about how
+ARTIFACTS were built." Do not summarize either block. Put the spec last so
+the verifier's own attention anchors on it.
+
+**Test-authoring phase must precede implementation.** In any multi-phase
+process with a verification/test gate, order the test-authoring phase before
+the first implementation phase. Its agent prompt must use the runtime-read
+pattern for the spec and must include: "Do not read files under
+implementation directories. Author tests strictly from the spec text above."
+The committed tests become frozen inputs to later implementation phases --
+implementation cannot retroactively redefine what "correct" means. If the
+spec is underspecified, this surfaces as "cannot author tests" at phase 1
+rather than hiding as "tests that test the wrong thing" at phase 5.

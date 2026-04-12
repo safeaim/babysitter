@@ -94,3 +94,13 @@ specified:
     - `.a5c/processes/` (project level processes)
     - `specializations/` under the active process-library root
     - `methodologies/` under the active process-library root
+  - **Drift-resistant prompt composition** (issue #129). In multi-phase
+    processes, never paraphrase spec text into agent-task prompt literals.
+    Read specs at run time via `kind: 'shell'` `cat` tasks and interpolate
+    stdout verbatim into downstream prompts -- this keeps spec bytes out of
+    the authoring compose pass where proximity bias rewrites criteria to
+    match recently-built implementation. Order test-authoring phases *before*
+    implementation phases so the tests become frozen inputs rather than a
+    post-hoc rationalization of what got built. See the "Drift-resistant
+    prompt composition" section of the process creation guidance for the
+    full pattern and examples.

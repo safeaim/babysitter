@@ -1,0 +1,26 @@
+{
+  "_attribution": {
+    "author": "https://github.com/mluggy",
+    "post": "https://www.linkedin.com/posts/mluggy_%D7%9B%D7%9E%D7%95-%D7%9E%D7%99%D7%9C%D7%99%D7%95%D7%A0%D7%99-%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D-%D7%92%D7%9D-%D7%90%D7%A0%D7%97%D7%A0%D7%95-%D7%9E%D7%AA%D7%9B%D7%A0%D7%A0%D7%99%D7%9D-%D7%97%D7%95%D7%A4%D7%A9%D7%95%D7%AA-ugcPost-7448843353275858944-b7d4",
+    "note": "Michael Lugassy (mluggy) — LinkedIn post describing SQL-over-MCP curated flight dataset agent."
+  },
+  "domain": "flights",
+  "dataSources": [
+    { "name": "openflights-airports", "url": "https://openflights.org/data.html", "notes": "3,888 airports baseline; IATA + ICAO codes, tz, country" },
+    { "name": "openflights-routes", "url": "https://openflights.org/data.html", "notes": "59,079 direct routes; carrier, src, dst, equipment" },
+    { "name": "kiwi-tequila-schedules", "notes": "July schedules expansion: ~1M+ relevant connection combinations" },
+    { "name": "manual-weather-band-table", "notes": "Curated weather-similarity band per IATA for 'same weather' predicate" }
+  ],
+  "schemaGoal": "A compact relational schema over airports, routes, schedules, and weather bands that answers questions like 'cheapest 2-3 day stopover in Madrid en route to OPO/FAO' via a single SQL query.",
+  "sampleQueries": [
+    "List direct routes from TLV to Portugal (OPO, FAO, LIS) in July under 2000 ILS.",
+    "Find 2-3 day stopover combinations via MAD that beat the cheapest direct TLV->OPO fare.",
+    "Compare Air Portugal vs El Al morning vs afternoon departures TLV->LIS.",
+    "Which aircraft type (Airbus NEO vs older Boeing) serves TLV->MAD most often?",
+    "Show the 14 cheapest European stopover cities for a Portugal trip matching TLV summer weather band.",
+    "Total trip cost (outbound + return) with a stopover on the return only.",
+    "Rank carriers by on-time reputation for TLV->BCN in July.",
+    "Find any stopover city where two-destination total cost < cheapest direct TLV->Portugal fare."
+  ],
+  "harnessName": "claude-code"
+}

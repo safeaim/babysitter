@@ -25,6 +25,19 @@ export {
   createPiContext,
 } from './context';
 
+// Execution-context autodetection for prompt gating
+export {
+  detectExecutionContext,
+  deriveCapabilityFlags,
+} from './contextDetect';
+export type {
+  ExecutionContext,
+  ContextCapabilityFlags,
+  CiKind,
+  TriggerKind,
+  DetectOptions,
+} from './contextDetect';
+
 // Template renderer
 export {
   renderTemplate,

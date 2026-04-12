@@ -121,6 +121,37 @@ export interface PromptContext {
    * Undefined by default — only populated when resuming an existing run.
    */
   continuityContext?: ContinuityContext;
+
+  // ── Context-gated part flags (auto-derived from detectExecutionContext) ──
+
+  /** Always-on additions (enabled by default). */
+  hasPriorityLadder?: boolean;
+  hasExecutionLifecycle?: boolean;
+  hasRootCauseGuardrail?: boolean;
+  hasProgressiveDocs?: boolean;
+
+  /** GitHub-context-gated. */
+  hasHandoffConventions?: boolean;
+  hasAgentMentionProtocol?: boolean;
+  hasPrPolicies?: boolean;
+  hasBranchPolicies?: boolean;
+  hasIssueLinking?: boolean;
+  hasDraftPrProhibition?: boolean;
+  hasLabelTaxonomy?: boolean;
+  hasSingleChannelRule?: boolean;
+  hasSourceQuoteCap?: boolean;
+
+  /** CI-context-gated. */
+  hasIdempotencyAndAbort?: boolean;
+  hasIssueOnlyNoDirectCommits?: boolean;
+
+  /** Trigger-context-gated. */
+  hasBuildFailureTaxonomy?: boolean;
+  hasConflictResolutionEtiquette?: boolean;
+  hasPrCommentFormat?: boolean;
+  hasSixDimensionReview?: boolean;
+  hasScheduledReportFormat?: boolean;
+  hasLocalDevRelax?: boolean;
 }
 
 /**

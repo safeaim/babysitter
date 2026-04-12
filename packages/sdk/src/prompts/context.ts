@@ -12,6 +12,30 @@ const COMMON_DEFAULTS: Partial<PromptContext> = {
   hasIntentFidelityChecks: false,
   hasNonNegotiables: false,
   sdkVersionExpr: '',
+  // Always-on additions — enabled by default across harnesses.
+  hasPriorityLadder: true,
+  hasRootCauseGuardrail: true,
+  hasProgressiveDocs: true,
+  // Opt-in per methodology/process (not always-on).
+  hasExecutionLifecycle: false,
+  // Context-gated flags — default off, auto-enabled via deriveCapabilityFlags.
+  hasHandoffConventions: false,
+  hasAgentMentionProtocol: false,
+  hasPrPolicies: false,
+  hasBranchPolicies: false,
+  hasIssueLinking: false,
+  hasDraftPrProhibition: false,
+  hasLabelTaxonomy: false,
+  hasSingleChannelRule: false,
+  hasSourceQuoteCap: false,
+  hasIdempotencyAndAbort: false,
+  hasIssueOnlyNoDirectCommits: false,
+  hasBuildFailureTaxonomy: false,
+  hasConflictResolutionEtiquette: false,
+  hasPrCommentFormat: false,
+  hasSixDimensionReview: false,
+  hasScheduledReportFormat: false,
+  hasLocalDevRelax: false,
 };
 
 /**

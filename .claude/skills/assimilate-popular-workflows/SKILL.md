@@ -256,6 +256,9 @@ Skipped (internal-maintenance): K
 - Never copy SKILL.md content wholesale. Extract the *procedural insight*, not the prose.
 - Respect source licenses. Include attribution in every extracted process file.
 - Skills that are purely prompt-engineering (just a system prompt with no procedure) have no extractable process value -- note them as `not-transferable` in the inventory.
+- **Skip skill-management processes** (skill-routing, skill-discovery pipelines, skill-validation, skill-metadata checks). These are babysitter-internal concerns, not transferable domain processes. Their associated *plugin ideas* (e.g., a skill-registry-browser plugin) may still be valid.
+- **Skip multi-model coordination processes** (multi-model review, heterogeneous AI team orchestration). Babysitter's harness adapter system already handles multi-model dispatch natively. These don't add value as library processes.
+- **Skip patterns already covered by the SDK**: human-in-the-loop review cycles (covered by breakpoints), harness CLI invocation/degradation (covered by harness adapters), effect dispatch coordination (covered by the runtime). Only extract processes that add *domain-specific* or *workflow-specific* value beyond what the SDK primitives provide.
 - The `internal-maintenance` archetype is the most common. Expect 60-70% of hits to be skipped.
 - Rate-limit awareness: `gh search code` is throttled at 30 req/min. Split searches by language qualifier if hitting caps.
 - When a repo has already been researched (directory exists under `docs/reference-repos/`), update in-place rather than recreating. Compare `pushedAt` dates to decide if re-investigation is needed.

@@ -86,6 +86,9 @@ When deciding if a skill's procedural content is transferable:
 - Entirely repo-specific paths and configuration
 - Duplicates functionality already in babysitter process library
 - Trivially simple (no multi-step procedure to codify)
+- **Skill-management processes** (skill-routing, skill-discovery, skill-validation, metadata compliance) -- these are babysitter-internal concerns. Their *plugin ideas* may still be valid.
+- **Multi-model coordination** (multi-model review, heterogeneous AI team orchestration) -- babysitter's harness adapter system already handles this natively
+- **SDK-covered primitives** (human-in-the-loop review cycles = breakpoints, harness CLI invocation = harness adapters, effect dispatch = runtime)
 
 ## Implicit Procedural Knowledge Detection
 
@@ -115,7 +118,7 @@ Is this a complete, generic development methodology (like agile, scrum, TDD, wat
 ├── No
 │   ├── Is this pattern reusable across multiple domains/specializations?
 │   │   └── Yes → specializations/shared/
-│   │       (e.g., audit-pipeline, expert-advisory, progressive-disclosure, skill-routing)
+│   │       (e.g., audit-pipeline, expert-advisory, progressive-disclosure, research-pipeline)
 │   │
 │   └── Is this domain-specific?
 │       └── Yes → specializations/<domain>/

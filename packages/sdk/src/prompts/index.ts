@@ -126,4 +126,6 @@ export {
   renderToolPreferences,
   renderOutputEfficiency,
   renderGitSafety,
+  renderPriorityLadder,
+  renderRootCauseGuardrail,
 } from './parts';

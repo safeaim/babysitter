@@ -65,6 +65,8 @@ export const PART_STRATA_MAP: Record<string, StratumTaggedPart> = {
   renderToolPreferences: tagPart('renderToolPreferences', 'stable', parts.renderToolPreferences, 20),
   renderOutputEfficiency: tagPart('renderOutputEfficiency', 'stable', parts.renderOutputEfficiency, 20),
   renderGitSafety: tagPart('renderGitSafety', 'stable', parts.renderGitSafety, 20),
+  renderPriorityLadder: tagPart('renderPriorityLadder', 'stable', parts.renderPriorityLadder, 22),
+  renderRootCauseGuardrail: tagPart('renderRootCauseGuardrail', 'stable', parts.renderRootCauseGuardrail, 22),
   renderSeeAlso: tagPart('renderSeeAlso', 'stable', parts.renderSeeAlso, 25),
 
   // ── Runtime stratum ──────────────────────────────────────────────────

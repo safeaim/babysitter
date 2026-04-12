@@ -74,8 +74,13 @@ export const PART_STRATA_MAP: Record<string, StratumTaggedPart> = {
   renderLabelTaxonomy: tagPart('renderLabelTaxonomy', 'stable', parts.renderLabelTaxonomy, 23),
   renderSingleChannelRule: tagPart('renderSingleChannelRule', 'stable', parts.renderSingleChannelRule, 24),
   renderSourceQuoteCap: tagPart('renderSourceQuoteCap', 'stable', parts.renderSourceQuoteCap, 24),
-  renderAgentMentionProtocol: tagPart('renderAgentMentionProtocol', 'stable', parts.renderAgentMentionProtocol, 24),
   renderHandoffConventions: tagPart('renderHandoffConventions', 'stable', parts.renderHandoffConventions, 24),
+  renderIdempotencyAndAbort: tagPart('renderIdempotencyAndAbort', 'stable', parts.renderIdempotencyAndAbort, 24),
+  renderIssueOnlyNoDirectCommits: tagPart('renderIssueOnlyNoDirectCommits', 'stable', parts.renderIssueOnlyNoDirectCommits, 24),
+  renderPrCommentFormat: tagPart('renderPrCommentFormat', 'stable', parts.renderPrCommentFormat, 24),
+  renderSixDimensionReview: tagPart('renderSixDimensionReview', 'stable', parts.renderSixDimensionReview, 24),
+  renderScheduledReportFormat: tagPart('renderScheduledReportFormat', 'stable', parts.renderScheduledReportFormat, 24),
+  renderLocalDevRelax: tagPart('renderLocalDevRelax', 'stable', parts.renderLocalDevRelax, 24),
   renderSeeAlso: tagPart('renderSeeAlso', 'stable', parts.renderSeeAlso, 25),
 
   // ── Runtime stratum ──────────────────────────────────────────────────

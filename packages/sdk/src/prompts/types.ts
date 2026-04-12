@@ -130,7 +130,6 @@ export interface PromptContext {
 
   /** GitHub-context-gated. */
   hasHandoffConventions?: boolean;
-  hasAgentMentionProtocol?: boolean;
   hasPrPolicies?: boolean;
   hasBranchPolicies?: boolean;
   hasIssueLinking?: boolean;
@@ -144,8 +143,6 @@ export interface PromptContext {
   hasIssueOnlyNoDirectCommits?: boolean;
 
   /** Trigger-context-gated. */
-  hasBuildFailureTaxonomy?: boolean;
-  hasConflictResolutionEtiquette?: boolean;
   hasPrCommentFormat?: boolean;
   hasSixDimensionReview?: boolean;
   hasScheduledReportFormat?: boolean;

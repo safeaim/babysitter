@@ -135,6 +135,11 @@ export {
   renderLabelTaxonomy,
   renderSingleChannelRule,
   renderSourceQuoteCap,
-  renderAgentMentionProtocol,
   renderHandoffConventions,
+  renderIdempotencyAndAbort,
+  renderIssueOnlyNoDirectCommits,
+  renderPrCommentFormat,
+  renderSixDimensionReview,
+  renderScheduledReportFormat,
+  renderLocalDevRelax,
 } from './parts';

@@ -17,7 +17,6 @@ const COMMON_DEFAULTS: Partial<PromptContext> = {
   hasRootCauseGuardrail: true,
   // Context-gated flags — default off, auto-enabled via deriveCapabilityFlags.
   hasHandoffConventions: false,
-  hasAgentMentionProtocol: false,
   hasPrPolicies: false,
   hasBranchPolicies: false,
   hasIssueLinking: false,
@@ -27,8 +26,6 @@ const COMMON_DEFAULTS: Partial<PromptContext> = {
   hasSourceQuoteCap: false,
   hasIdempotencyAndAbort: false,
   hasIssueOnlyNoDirectCommits: false,
-  hasBuildFailureTaxonomy: false,
-  hasConflictResolutionEtiquette: false,
   hasPrCommentFormat: false,
   hasSixDimensionReview: false,
   hasScheduledReportFormat: false,

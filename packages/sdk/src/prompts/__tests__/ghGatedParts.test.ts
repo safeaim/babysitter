@@ -14,7 +14,6 @@ const gatedParts: Array<{
   { render: parts.renderLabelTaxonomy, flag: 'hasLabelTaxonomy', match: /Label Taxonomy/ },
   { render: parts.renderSingleChannelRule, flag: 'hasSingleChannelRule', match: /Single-Channel/ },
   { render: parts.renderSourceQuoteCap, flag: 'hasSourceQuoteCap', match: /Source Quote Discipline/ },
-  { render: parts.renderAgentMentionProtocol, flag: 'hasAgentMentionProtocol', match: /Agent Mention Protocol/ },
   { render: parts.renderHandoffConventions, flag: 'hasHandoffConventions', match: /Handoff Conventions/ },
 ];
 

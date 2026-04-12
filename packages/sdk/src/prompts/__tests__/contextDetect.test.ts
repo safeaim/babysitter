@@ -121,20 +121,7 @@ describe('deriveCapabilityFlags', () => {
     expect(flags.hasPrPolicies).toBe(false);
   });
 
-  it('enables buildFailureTaxonomy only on build-failure trigger', () => {
-    const flags = deriveCapabilityFlags(
-      detectExecutionContext({
-        env: {
-          GITHUB_ACTIONS: 'true',
-          GITHUB_EVENT_NAME: 'workflow_run',
-          GITHUB_EVENT_CONCLUSION: 'failure',
-        },
-      }),
-    );
-    expect(flags.hasBuildFailureTaxonomy).toBe(true);
-  });
-
-  it('enables prCommentFormat and sixDimensionReview on pr-comment-mention', () => {
+it('enables prCommentFormat and sixDimensionReview on pr-comment-mention', () => {
     const flags = deriveCapabilityFlags(
       detectExecutionContext({
         env: {

@@ -158,12 +158,9 @@ export interface ContextCapabilityFlags {
   hasLabelTaxonomy: boolean;
   hasSingleChannelRule: boolean;
   hasSourceQuoteCap: boolean;
-  hasAgentMentionProtocol: boolean;
   hasHandoffConventions: boolean;
   hasIdempotencyAndAbort: boolean;
   hasIssueOnlyNoDirectCommits: boolean;
-  hasBuildFailureTaxonomy: boolean;
-  hasConflictResolutionEtiquette: boolean;
   hasPrCommentFormat: boolean;
   hasSixDimensionReview: boolean;
   hasScheduledReportFormat: boolean;
@@ -183,13 +180,9 @@ export function deriveCapabilityFlags(ctx: ExecutionContext): ContextCapabilityF
     hasLabelTaxonomy: inGha,
     hasSingleChannelRule: inGha,
     hasSourceQuoteCap: inGha,
-    hasAgentMentionProtocol: inGha,
     hasHandoffConventions: inGha,
     hasIdempotencyAndAbort: inCi,
     hasIssueOnlyNoDirectCommits: inCi,
-    hasBuildFailureTaxonomy: ctx.trigger === 'build-failure',
-    hasConflictResolutionEtiquette:
-      ctx.trigger === 'merge-conflict' || ctx.mergeableState === 'dirty',
     hasPrCommentFormat:
       ctx.trigger === 'pr-comment-mention' || ctx.trigger === 'issue-comment-mention',
     hasSixDimensionReview: ctx.trigger === 'pr-comment-mention',

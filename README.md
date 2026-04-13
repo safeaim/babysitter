@@ -1,17 +1,17 @@
 <div align="center">
 
 # Babysitter
-
-https://a5c.ai
-
----
+> **Enforce obedience on agentic workforces. Manage extremely complex workflows through deterministic, hallucination-free self-orchestration.**
 
 [![npm version](https://img.shields.io/npm/v/@a5c-ai/babysitter-sdk.svg)](https://www.npmjs.com/package/@a5c-ai/babysitter-sdk)
+[![CI](https://img.shields.io/github/actions/workflow/status/a5c-ai/babysitter/ci.yml?branch=staging)](https://github.com/a5c-ai/babysitter/actions/workflows/ci.yml)
+[![npm downloads](https://img.shields.io/npm/dm/@a5c-ai/babysitter-sdk?label=downloads)](https://www.npmjs.com/package/@a5c-ai/babysitter-sdk)
+[![Node.js](https://img.shields.io/node/v/@a5c-ai/babysitter-sdk)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub issues](https://img.shields.io/github/issues/a5c-ai/babysitter.svg)](https://github.com/a5c-ai/babysitter/issues)
 [![GitHub stars](https://img.shields.io/github/stars/a5c-ai/babysitter.svg)](https://github.com/a5c-ai/babysitter/stargazers)
 
-> **Enforce obedience to agentic workforces. Manage extremely complex workflows through deterministic, hallucination-free self-orchestration.**
+---
 
 [Getting Started](#installation) | [Documentation](#documentation) | [Community](#community-and-support)
 

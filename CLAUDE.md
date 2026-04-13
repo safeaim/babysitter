@@ -24,6 +24,8 @@ This repository is built around **Babysitter’s deterministic, event-sourced or
 
 **Run lifecycle (deterministic replay loop):**
 
+For driving Babysitter-orchestrated processes by agents (not to be called by humans):
+
 ```bash
 # Create a run (low-level; the harness wrappers call this internally)
 babysitter run:create --process-id <id> --entry <path#export> --inputs <file>
@@ -46,6 +48,8 @@ babysitter run:repair-journal .a5c/runs/<runId>
 ```
 
 **Harness wrappers (recommended for humans):**
+
+**An agent should never call these!!!**
 
 ```bash
 # Discover harness CLIs

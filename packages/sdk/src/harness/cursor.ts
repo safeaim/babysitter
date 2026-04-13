@@ -17,8 +17,13 @@
  *   - Output: JSON via stdout
  *   - Stop hook: return { followup_message: "..." } to auto-continue (loop_limit
  *     default 5, null for unlimited). Return {} to allow exit.
- *   - Hook types (in headless CLI): sessionStart, stop, postToolUse,
- *     afterFileEdit, afterShellExecution (work in CLI)
+ *   - Hook types (in headless CLI): sessionStart, stop, prompt, postToolUse,
+ *     afterFileEdit, afterShellExecution. Stop hook in CLI was officially
+ *     added in the Jan 16 2026 release, but community reports (forum
+ *     #148511, last verified Apr 2026) indicate intermittent firing
+ *     reliability — the orchestration loop may stall if Cursor skips a
+ *     stop callback. Verify hook activity via `~/.cursor/logs/` if loops
+ *     fail to advance.
  *   - NOT in headless: afterAgentResponse, afterAgentThought (IDE only)
  *
  * Session ID:

@@ -33,6 +33,37 @@ The `research-paper-writing` skill (also found in hermes-agent, attributed to Or
 ### Plugin idea: ai-research-skills
 The marketplace already has a `marketplace.json` with plugin structure. Could be assimilated as a babysitter marketplace plugin providing AI research domain skills. However, these are tool/framework-specific skills (vLLM, DeepSpeed, etc.), not babysitter processes — they'd need to be wrapped as process definitions.
 
+## Processes
+
+### 1. Autonomous AI Research Orchestration
+- **Source**: autoresearch SKILL.md two-loop architecture (inner experiment loop + outer synthesis loop)
+- **Placement**: `specializations/science/autonomous-ai-research.js`
+- **Description**: Complete research methodology: bootstrap (scope question, literature survey, form hypotheses) → inner loop (pick hypothesis, experiment, measure, record, learn) → outer loop (review results, find patterns, update findings, new hypotheses) → finalize (write paper, presentation, archive).
+
+### 2. ML Paper Writing Pipeline
+- **Source**: research-paper-writing skill 7-phase pipeline for ML conferences
+- **Placement**: `specializations/science/ml-paper-writing.js`
+- **Description**: End-to-end ML paper writing for NeurIPS/ICML/ICLR/ACL/AAAI/COLM: experiment design → monitoring → statistical analysis → iterative drafting → self-review → submission prep.
+
+## Plugin Ideas
+
+- **AI Research Skills Suite**: Babysitter marketplace plugin providing AI research domain skills with 87 skills across 22 categories covering full AI research lifecycle.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Autonomous AI Research Orchestration | NEW | Two-loop research methodology with experiment and synthesis cycles | - | specializations/science/autonomous-ai-research.js |
+| ML Paper Writing Pipeline | NEW | 7-phase ML paper writing process for major conferences with statistical analysis | - | specializations/science/ml-paper-writing.js |
+| Research Workspace Organization | NEW | Structured research workspace with research-state.yaml and experiment tracking | - | specializations/science/research-workspace-organization.js |
+| Agent Continuity Patterns | NEW | Maintaining research state and context across long-running autonomous research projects | - | specializations/shared/agent-continuity-patterns.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| AI Research Skills Suite | NEW | Comprehensive AI research domain skills across 22 categories with orchestration | - | plugins/a5c/marketplace/plugins/ai-research-skills-suite/ |
+
 ## Classification
 - **Archetype**: Domain skill library with orchestration layer
 - **Primary value**: Two processes extractable — autonomous research orchestration and ML paper writing pipeline

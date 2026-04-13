@@ -38,5 +38,30 @@ fixtures/                 # Test fixtures
 - The actual platform-specific API integrations (Reddit JSON, X API, YouTube transcripts) - tool-specific implementation details
 - ELI5 mode - presentation concern, not methodology
 
+## Processes
+
+### 1. Multi-Source Research Synthesis
+- **Source**: V3 research methodology with intelligent pre-research and engagement-weighted scoring
+- **Placement**: `specializations/shared/multi-source-research-synthesis.js`
+- **Description**: Research methodology pattern: entity resolution before search → parallel multi-source search → engagement-weighted scoring (upvotes > editorial SEO) → cross-source cluster merging → synthesis with source citations.
+
+## Plugin Ideas
+
+- **Last30Days Research Integration**: Babysitter marketplace plugin that wraps /last30days as a research task for pre-meeting research, competitive analysis, and trend monitoring.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Multi-Source Research Synthesis | NEW | Research methodology: entity resolution → parallel search → engagement scoring → cluster merging → citation synthesis | - | specializations/shared/multi-source-research-synthesis.js |
+| Engagement-Weighted Content Scoring | NEW | Content ranking algorithm using engagement metrics (upvotes, likes, real money) over editorial SEO | - | specializations/shared/engagement-weighted-content-scoring.js |
+| Cross-Source Content Clustering | NEW | Deduplication and clustering of same stories across multiple platforms and sources | - | specializations/shared/cross-source-content-clustering.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Last30Days Research Integration | NEW | Multi-platform research aggregation with engagement scoring and synthesis | - | plugins/a5c/marketplace/plugins/last30days-research-integration/ |
+
 ## Priority Assessment
 **LOW-MEDIUM** - The multi-source research synthesis methodology is conceptually interesting but the actual value is tightly coupled to the platform integrations (API keys, browser sessions). The methodology pattern (entity-resolve -> parallel-search -> engagement-score -> cluster-merge -> synthesize) could inform a generic research process, but it's thin without the platform access. Better as inspiration than a direct port.

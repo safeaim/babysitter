@@ -23,5 +23,17 @@ Same as blader/humanizer, adapted for Chinese language.
 ## Plugin Ideas
 None beyond what blader/humanizer covers.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| N/A | DERIVATIVE | Chinese localization of blader/humanizer - extraction should be done from original repository | specializations/shared/humanize-text-process.js | N/A |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| N/A | DERIVATIVE | No additional plugin ideas beyond blader/humanizer coverage | plugins/a5c/marketplace/plugins/writing-humanizer/ | N/A |
+
 ## Implicit Procedural Knowledge
 - Chinese-specific AI writing tells may differ from English patterns

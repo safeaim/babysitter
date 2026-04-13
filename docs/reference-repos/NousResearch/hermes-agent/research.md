@@ -43,6 +43,26 @@ The software-development skills (TDD, code review, debugging, plans, subagent-dr
 
 **Harness assimilation opportunity** — Create a plugin FOR hermes-agent that integrates babysitter orchestration into the hermes ecosystem. However, integration would require developing a custom mechanism to pause/resume hermes conversations since native stop hooks don't exist.
 
+## Processes
+
+None extractable. Software development skills overlap with existing babysitter methodologies, and research-paper-writing process is duplicate of Orchestra-Research content.
+
+## Plugin Ideas
+
+None suitable for babysitter marketplace. Primary value is harness assimilation opportunity (plugin FOR hermes-agent, not babysitter marketplace plugin).
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| N/A | N/A | No new processes identified - content overlaps with existing babysitter methodologies | methodologies/ | N/A |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| N/A | N/A | No babysitter marketplace plugins identified - primary value is harness integration | - | N/A |
+
 ## Classification
 - **Archetype**: Full agent framework with skills ecosystem
 - **Primary value**: Harness assimilation opportunity; research-paper-writing process (duplicate of Orchestra-Research)

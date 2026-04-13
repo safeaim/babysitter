@@ -36,5 +36,31 @@ Would map well to a babysitter process with:
 - Tool-routing logic as branching in the process
 - Output formatting as final stage
 
+## Processes
+
+### 1. Advanced Prompt Engineering Methodology
+- **Source**: SKILL.md 9-dimension intent extraction framework and tool-routing logic
+- **Placement**: `specializations/shared/advanced-prompt-engineering.js`
+- **Description**: Comprehensive prompt engineering process: extract intent across 9 dimensions (task, target tool, output format, constraints, input, context, audience, success criteria, examples) → apply tool-specific routing logic for 16+ AI models → enforce anti-fabrication rules → generate optimized prompt with target tool and optimization notes.
+
+## Plugin Ideas
+
+- **Prompt Engineering Suite**: Babysitter marketplace plugin that provides advanced prompt engineering capabilities with tool-routing logic and anti-pattern enforcement for optimal AI model communication.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Advanced Prompt Engineering Methodology | NEW | 9-dimension intent extraction with tool-specific routing for 16+ AI models | - | specializations/shared/advanced-prompt-engineering.js |
+| Tool-Specific Routing Logic | NEW | Detailed prompting guidance mapped to specific AI tools and models | - | specializations/shared/tool-specific-routing-logic.js |
+| Anti-Fabrication Pattern Enforcement | NEW | Hard rules against techniques that cause hallucination in single-prompt execution | - | specializations/shared/anti-fabrication-pattern-enforcement.js |
+| Model-Specific Constraint Systems | NEW | Model-specific prompting constraints (e.g., no CoT for reasoning models, over-engineering prevention) | - | specializations/shared/model-specific-constraint-systems.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Prompt Engineering Suite | NEW | Advanced prompt engineering with tool routing, anti-pattern enforcement, and optimization | - | plugins/a5c/marketplace/plugins/prompt-engineering-suite/ |
+
 ## Classification Rationale
 Cross-domain (works for any AI tool/model), so fits in `specializations/shared/`. The tool-routing logic and anti-fabrication rules are unique contributions not found in the current process library.

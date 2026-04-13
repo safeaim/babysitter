@@ -29,3 +29,19 @@ MEDIUM -- The skill-maker meta-pattern is the most extractable element. Domain w
 - Skill-maker pattern: meta-skill that generates domain skills from API documentation
 - Shared skill pattern (lark-shared): common auth, flags, security rules factored out
 - Whiteboard skills for visual collaboration in agent workflows
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Enterprise Meeting Workflow | NEW | Schedule → prepare → conduct → follow-up cycle | - | specializations/business/enterprise-meeting-workflow.js |
+| Approval Workflow | NEW | Request creation, routing, approval, notification | - | specializations/business/approval-workflow.js |
+| Skill Maker Meta-Process | NEW | Meta-skill for generating domain skills from API docs | - | specializations/shared/skill-maker-meta-process.js |
+| Shared Skill Pattern | NEW | Common auth/security rules factored out across skills | - | specializations/shared/shared-skill-pattern.js |
+| Visual Collaboration Integration | NEW | Whiteboard skills for visual agent workflows | - | specializations/business/visual-collaboration.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Lark Bridge | NEW | Lark/Feishu ecosystem integration | - | plugins/a5c/marketplace/plugins/lark-bridge/ |

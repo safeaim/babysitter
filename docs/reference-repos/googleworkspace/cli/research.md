@@ -36,3 +36,20 @@ HIGH -- Persona workflow patterns are directly extractable:
 - `--dry-run` pattern before write operations
 - OpenClaw metadata format for skill categorization and dependency declaration
 - Auto-discovery of CLI help as skill documentation
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Project Management Workflow | NEW | Weekly digest, task tracking, artifact sharing cycle | - | specializations/business/project-management-workflow.js |
+| Customer Support Triage | NEW | Email triage, categorization, response drafting workflow | - | specializations/business/customer-support-triage.js |
+| Content Creation Pipeline | NEW | Ideation, drafting, review, publish workflow | - | specializations/business/content-creation-pipeline.js |
+| IT Admin Audit | NEW | User audit, permission review, compliance checks | - | specializations/business/it-admin-audit.js |
+| Skill Composition Pattern | NEW | Three-tier skill architecture methodology | - | methodologies/skill-composition-pattern/ |
+| Three-Tier Skill Architecture | NEW | Service primitives → personas → recipes pattern | - | specializations/shared/three-tier-architecture.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Google Workspace Bridge | NEW | Google Workspace automation within orchestrated processes | - | plugins/a5c/marketplace/plugins/google-workspace-bridge/ |

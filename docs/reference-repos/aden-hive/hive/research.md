@@ -43,3 +43,18 @@ Provides production-ready multi-agent harness patterns with conversation quality
 ## Research Methodology Notes
 
 Framework discovered through multi-agent harness search. Repository demonstrates enterprise-grade multi-agent coordination patterns.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Multi-Agent Production Harness | UPGRADE | Enhanced multi-agent coordination for enterprise | library/specializations/ai-agents-conversational/ | specializations/shared/multi-agent-production-harness.js |
+| Conversation Quality Assessment | NEW | Intelligent conversation evaluation methodology | - | specializations/shared/conversation-quality-assessment.js |
+| Production Agent Deployment | NEW | Enterprise-ready agent deployment patterns | - | specializations/devops-sre-platform/production-agent-deployment.js |
+| Agent Coordination Architecture | UPGRADE | Enhanced agent communication and state management | library/specializations/ai-agents-conversational/ | specializations/shared/agent-coordination-architecture.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Hive Production Bridge | NEW | Enterprise multi-agent harness integration | - | plugins/a5c/marketplace/plugins/hive-production-bridge/ |

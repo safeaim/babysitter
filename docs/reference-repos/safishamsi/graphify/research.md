@@ -85,3 +85,22 @@ A babysitter plugin that generates interactive architecture visualizations from 
 A babysitter plugin that uses graphify's knowledge graph to provide intelligent code navigation hints. Before a task reads files, the plugin suggests which files are most architecturally relevant based on graph community structure and shortest-path analysis.
 
 **install.md**: Installs `pre-tool-use` hook on Read/Glob/Grep operations. When a task is about to search files, the plugin queries the knowledge graph for related nodes and suggests the most relevant files. Reduces unnecessary file reads and helps tasks find the right code faster.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Three-Pass Knowledge Extraction | NEW | Multi-modal content extraction methodology | - | specializations/shared/three-pass-extraction.js |
+| Graph-Based Codebase Analysis | NEW | Knowledge graph generation for code understanding | - | specializations/shared/graph-codebase-analysis.js |
+| Incremental Knowledge Building | NEW | SHA256-based caching for incremental processing | - | specializations/shared/incremental-knowledge-building.js |
+| Multi-Format Knowledge Export | NEW | Knowledge graph output in multiple formats | - | specializations/shared/multi-format-export.js |
+| Topology-Based Content Clustering | NEW | Leiden community detection for content organization | - | specializations/shared/topology-clustering.js |
+| Domain-Aware Transcription | NEW | Context-driven audio/video transcription | - | specializations/shared/domain-aware-transcription.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Knowledge Graph Builder | NEW | Codebase knowledge graph generation and querying | - | plugins/a5c/marketplace/plugins/knowledge-graph-builder/ |
+| Codebase Architecture Visualizer | NEW | Interactive architecture visualization from knowledge graph | - | plugins/a5c/marketplace/plugins/architecture-visualizer/ |
+| Graph-Aware Code Navigation | NEW | Intelligent code navigation using knowledge graph | - | plugins/a5c/marketplace/plugins/graph-aware-navigation/ |

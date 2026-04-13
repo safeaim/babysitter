@@ -53,3 +53,19 @@ HIGH VALUE for harness assimilation - modern terminal AI interface with sophisti
 ## Implicit Procedural Knowledge
 
 None - framework rather than process repository.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| TUI Design Patterns | NEW | Charmbracelet-style terminal interface patterns | - | specializations/developer-experience-ux/tui-design-patterns.js |
+| Multi-Session Management | NEW | Context isolation and session switching methodology | - | specializations/shared/multi-session-management.js |
+| MCP Transport Orchestration | NEW | Multi-transport MCP server management | - | specializations/devops-sre-platform/mcp-transport-orchestration.js |
+| Cross-Platform Terminal Adaptation | NEW | Terminal interface adaptation across platforms | - | specializations/shared/cross-platform-terminal.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Crush Harness Adapter | NEW | Charmbracelet Crush integration for babysitter | - | plugins/a5c/marketplace/plugins/crush-harness-adapter/ |
+| Glamorous TUI Enhancement | NEW | Charmbracelet-style TUI improvements for observer dashboard | - | plugins/a5c/marketplace/plugins/glamorous-tui-enhancement/ |

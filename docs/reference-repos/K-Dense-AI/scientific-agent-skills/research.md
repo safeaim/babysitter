@@ -107,4 +107,28 @@ Extremely high value for babysitter process library. The scientific workflows ar
 - **Multi-database query pattern**: The database-lookup skill demonstrates a unified interface for querying 78+ heterogeneous scientific databases with a common schema. This pattern (query normalization -> source routing -> result aggregation) is reusable.
 - **Computational pipeline orchestration**: Many skills encode multi-tool pipelines (e.g., scanpy -> scvelo -> visualization) that demonstrate effective task sequencing with intermediate validation checkpoints.
 - **Domain expert routing**: The consciousness-council skill implements a multi-perspective deliberation pattern where different "expert" viewpoints evaluate a problem -- potentially valuable for breakpoint routing strategies.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Scientific Literature Review & Synthesis | NEW | Systematic literature search and synthesis methodology | - | specializations/academic-research/literature-review-synthesis.js |
+| Hypothesis Generation & Experimental Design | NEW | Research hypothesis development and experimental planning | - | specializations/academic-research/hypothesis-experimental-design.js |
+| Drug Discovery Pipeline | NEW | Computational drug discovery workflow | - | specializations/science/drug-discovery-pipeline.js |
+| Single-Cell RNA-seq Analysis Pipeline | NEW | End-to-end single-cell genomics analysis | - | specializations/science/single-cell-rnaseq-analysis.js |
+| Scientific Paper Writing & Peer Review | NEW | Academic paper authoring and review process | - | specializations/academic-research/scientific-paper-authoring.js |
+| Statistical EDA & Reporting | NEW | Exploratory data analysis and statistical reporting | - | specializations/data-science-ml/statistical-eda-reporting.js |
+| Genomics & Variant Analysis Pipeline | NEW | Genomic sequence analysis workflow | - | specializations/science/genomics-variant-analysis.js |
+| Clinical Decision Support Workflow | NEW | Clinical data analysis and decision support | - | specializations/science/clinical-decision-support.js |
+| Multi-Database Query Pattern | NEW | Unified interface for heterogeneous database querying | - | specializations/shared/multi-database-query.js |
+| Computational Pipeline Orchestration | NEW | Multi-tool pipeline sequencing with validation | - | specializations/shared/computational-pipeline-orchestration.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Scientific Database Gateway | NEW | Unified access to 78+ scientific databases | - | plugins/a5c/marketplace/plugins/scientific-database-gateway/ |
+| Lab Notebook Integration | NEW | Electronic lab notebook integration | - | plugins/a5c/marketplace/plugins/lab-notebook-integration/ |
+| Scientific Visualization Theme | NEW | Publication-quality visualization presets | - | plugins/a5c/marketplace/plugins/scientific-visualization-theme/ |
+| Citation Manager | NEW | Zotero integration and bibliography management | - | plugins/a5c/marketplace/plugins/citation-manager/ |
 - **GPU optimization patterns**: The optimize-for-gpu skill encodes knowledge about when and how to offload computation, relevant to any resource-intensive process orchestration.

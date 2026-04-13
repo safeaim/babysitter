@@ -98,3 +98,21 @@ Official AI agent skills from the Expo team for building, deploying, and debuggi
 - Individual skill content is Expo-specific instruction text, not orchestratable
 - The Claude Code plugin marketplace format is already well-understood by babysitter
 - Native UI skills (SwiftUI, Jetpack Compose) are reference material, not processes
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Mobile App Deployment Process | NEW | Multi-platform mobile deployment with store submission workflow | - | specializations/business/mobile-app-deployment.js |
+| SDK/Framework Upgrade Process | NEW | Universal framework upgrade with breaking changes analysis | - | specializations/shared/framework-upgrade-process.js |
+| EAS CI/CD Integration Pattern | NEW | Expo Application Services CI/CD automation patterns | - | specializations/devops-sre-platform/eas-cicd-integration.js |
+| Native Module Development Workflow | NEW | Cross-platform native module development and integration | - | specializations/business/native-module-development.js |
+| Platform-Specific UI Integration | NEW | SwiftUI/Jetpack Compose integration patterns for cross-platform apps | - | specializations/business/platform-specific-ui-integration.js |
+| Mobile Build Configuration Management | NEW | Build configuration and signing credentials management workflow | - | specializations/devops-sre-platform/mobile-build-configuration.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Mobile Deployment | NEW | Multi-platform mobile build and store submission orchestration | - | plugins/a5c/marketplace/plugins/mobile-deployment/ |
+| Framework Upgrade Automation | NEW | SDK/framework upgrade with breaking changes analysis and incremental migration | - | plugins/a5c/marketplace/plugins/framework-upgrade-automation/ |

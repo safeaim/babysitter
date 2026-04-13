@@ -57,3 +57,24 @@ Architecture: Server orchestrates multiple AI agents (each running in their own 
 2. **Budget-Aware Orchestration Plugin**: Token/cost budget tracking per-run and per-process, with breakpoint gates when budget thresholds are approached. Inspired by Paperclip's budget governance.
 
 3. **Org-Chart Process Plugin**: Define process hierarchies where parent processes delegate to child processes with different harnesses, similar to Paperclip's CEO -> CTO -> Engineer delegation model.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Goal-to-Agent Decomposition | NEW | Business goal decomposition with role assignment and budget constraints | - | methodologies/goal-to-agent-decomposition/ |
+| Multi-Agent Role Assignment | NEW | Specialized role assignment patterns for technical/creative/analytical tasks | - | specializations/shared/multi-agent-role-assignment.js |
+| Budget-Aware Process Orchestration | NEW | Token/cost budget tracking with governance gates and threshold breakpoints | - | specializations/shared/budget-aware-orchestration.js |
+| Business Agent Coordination | NEW | Multi-agent team coordination for business goals and deliverables | - | specializations/business/business-agent-coordination.js |
+| Org-Chart Process Hierarchies | NEW | Hierarchical process delegation with role-based harness assignment | - | specializations/shared/org-chart-process-hierarchies.js |
+| Multi-Harness Adapter Orchestration | UPGRADE | Enhanced multi-harness coordination patterns for complex workflows | library/harness/ | specializations/shared/multi-harness-adapter-orchestration.js |
+| Agent Task Assignment Patterns | NEW | Task decomposition and agent assignment based on capabilities and roles | - | specializations/shared/agent-task-assignment-patterns.js |
+| Business Dashboard Integration | NEW | Business metrics dashboard integration for agent orchestration | - | specializations/business/business-dashboard-integration.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Paperclip Bridge | NEW | Integration with Paperclip business orchestration platform | - | plugins/a5c/marketplace/plugins/paperclip-bridge/ |
+| Budget-Aware Orchestration | NEW | Token/cost budget tracking with governance gates and spending limits | - | plugins/a5c/marketplace/plugins/budget-aware-orchestration/ |
+| Org-Chart Process | NEW | Hierarchical process delegation with role-based harness assignment | - | plugins/a5c/marketplace/plugins/org-chart-process/ |

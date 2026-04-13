@@ -43,3 +43,18 @@ Provides specialized conversational control patterns for customer-facing agent i
 ## Research Methodology Notes
 
 Framework discovered through conversational agent search. Repository demonstrates specialized customer interaction control patterns.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Conversational Control Layer | UPGRADE | Enhanced dialogue management for interactive processes | library/specializations/ai-agents-conversational/ | specializations/shared/conversational-control-layer.js |
+| Customer Interaction Control | NEW | Specialized customer-facing AI agent interaction patterns | - | specializations/business/customer-interaction-control.js |
+| Dialogue Flow Management | UPGRADE | Structured conversation flow control | library/specializations/ai-agents-conversational/ | specializations/shared/dialogue-flow-management.js |
+| Interaction State Persistence | NEW | Customer conversation state management | - | specializations/shared/interaction-state-persistence.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Parlant Conversation Bridge | NEW | Customer-facing dialogue management integration | - | plugins/a5c/marketplace/plugins/parlant-conversation-bridge/ |

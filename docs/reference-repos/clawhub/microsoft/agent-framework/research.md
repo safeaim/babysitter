@@ -49,3 +49,23 @@ The codebase is too large (1500+ files) for deep extraction but worth studying s
 1. **A2A Protocol Plugin**: Implement Agent-to-Agent protocol support in babysitter, enabling cross-framework agent communication (e.g., a babysitter-orchestrated agent talking to a Microsoft Agent Framework agent).
 
 2. **Declarative Process Plugin**: YAML/JSON-based process definition format (inspired by Microsoft's declarative package) as an alternative to JavaScript process files.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Graph-Based Orchestration Methodology | NEW | DAG-based agent workflow definition with typed edges and checkpointing | - | methodologies/graph-based-orchestration/ |
+| Declarative Agent Definition Patterns | NEW | YAML/JSON-based agent definition format and validation | - | specializations/shared/declarative-agent-patterns.js |
+| DurableTask Integration Patterns | UPGRADE | Durable workflow execution with checkpointing for agent systems | library/runtime/ | specializations/shared/durable-task-integration.js |
+| Multi-Provider Agent Communication | NEW | Cross-framework agent communication protocols and adapters | - | specializations/shared/multi-provider-agent-communication.js |
+| Agent Development UI Patterns | NEW | Interactive developer UI for agent debugging and workflow visualization | - | specializations/shared/agent-development-ui-patterns.js |
+| A2A Protocol Implementation | NEW | Agent-to-Agent communication standard for cross-framework integration | - | specializations/shared/a2a-protocol-implementation.js |
+| Reinforcement Learning Agent Training | NEW | RL patterns for agent optimization and benchmarking | - | specializations/ai-agents-conversational/rl-agent-training.js |
+| Human-in-the-Loop Orchestration | NEW | HITL patterns for workflow gating and approval processes | - | specializations/shared/human-in-loop-orchestration.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| A2A Protocol | NEW | Agent-to-Agent protocol support for cross-framework agent communication | - | plugins/a5c/marketplace/plugins/a2a-protocol/ |
+| Declarative Process | NEW | YAML/JSON-based process definition as alternative to JavaScript process files | - | plugins/a5c/marketplace/plugins/declarative-process/ |

@@ -70,3 +70,24 @@ None - these are all pure methodology content, not tool integrations.
 
 ## Priority Assessment
 **HIGH** - Multiple unique, well-structured methodologies from a credible engineering leader. The deprecation-and-migration and shipping-and-launch methodologies fill gaps in the current process library. The spec-driven and incremental approaches offer convergence value for existing processes.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Spec-Driven Development (4-phase gated) | UPGRADE | Enhanced spec-driven workflow with assumption-surfacing protocol | library/methodologies/spec-driven/ | methodologies/spec-driven/ |
+| Incremental Implementation | UPGRADE | Vertical-slice delivery methodology with explicit slicing strategies | library/methodologies/iterative-convergence/ | methodologies/iterative-convergence/ |
+| Deprecation and Migration | NEW | Full methodology for system sunsetting with decision framework | - | methodologies/deprecation-and-migration/ |
+| Shipping and Launch | NEW | Comprehensive pre-launch checklist covering all quality gates | - | methodologies/shipping-and-launch/ |
+| Code Review and Quality | NEW | Five-axis review methodology with code health improvement standard | - | specializations/shared/code-review-quality-gates.js |
+| Performance Optimization | NEW | Measurement-first optimization workflow with Core Web Vitals | - | specializations/shared/performance-optimization.js |
+| API and Interface Design | NEW | Production API design methodology from Chrome team lead | - | specializations/shared/api-interface-design.js |
+| Code Simplification | NEW | Systematic code simplification and complexity reduction process | - | specializations/shared/code-simplification.js |
+| Debugging and Error Recovery | UPGRADE | Production debugging methodology for complex systems | library/specializations/shared/debugging-strategies.js | specializations/shared/debugging-strategies.js |
+| Security and Hardening | NEW | Production security checklist and hardening methodology | - | specializations/security-compliance/production-security-hardening.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Production Engineering Checklist | NEW | Install comprehensive pre-launch checklists and quality gates | - | plugins/a5c/marketplace/plugins/production-engineering-checklist/ |

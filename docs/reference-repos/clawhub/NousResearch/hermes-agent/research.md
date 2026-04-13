@@ -79,3 +79,31 @@ NousResearch's Hermes Agent is a self-improving AI agent with a built-in learnin
 2. **Trajectory Compression Plugin**: Adapt Hermes Agent's trajectory_compressor.py for babysitter's run journal compression, reducing storage and improving replay performance.
 
 3. **Memory Backend Abstraction Plugin**: Abstract over multiple memory backends (mem0, honcho, etc.) for babysitter's state persistence, similar to Hermes Agent's plugin/memory architecture.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Research Paper Writing Pipeline | NEW | 8-phase ML research paper pipeline targeting top-tier conferences | - | specializations/academic-research/research-paper-writing.js |
+| Systematic Debugging Methodology | UPGRADE | 4-phase root cause investigation with "Iron Law: NO FIXES WITHOUT ROOT CAUSE" | library/methodologies/debugging/ | methodologies/systematic-debugging/ |
+| Creative Ideation Process | NEW | Constraint-driven project generation with rich constraint library | - | specializations/creative/creative-ideation-process.js |
+| Subagent-Driven Development | NEW | Multi-agent delegation patterns for parallel workstream execution | - | methodologies/subagent-driven-development/ |
+| Self-Improving Skill Creation | NEW | Meta-process for creating and improving skills from agent experience | - | methodologies/self-improving-skill-creation/ |
+| Test-Driven Development Workflow | UPGRADE | Complete TDD methodology with breakpoint gates and validation | library/methodologies/tdd/ | methodologies/tdd/ |
+| Code Review Request Process | NEW | Structured code review workflow with preparation and submission | - | specializations/shared/code-review-request-process.js |
+| ArXiv Paper Discovery and Analysis | NEW | Academic paper discovery, analysis, and integration workflow | - | specializations/academic-research/arxiv-paper-analysis.js |
+| Linear Issue Management | NEW | Linear project management integration and workflow automation | - | specializations/business/linear-issue-management.js |
+| Multi-Platform Messaging Gateway | NEW | Cross-platform agent communication via Telegram/Discord/Slack | - | specializations/shared/multi-platform-messaging-gateway.js |
+| Natural Language Cron Scheduling | NEW | Natural language scheduled automation with cross-platform delivery | - | specializations/shared/natural-language-cron-scheduling.js |
+| Agent Communication Protocol (ACP) | NEW | Registry and adapter for agent-to-agent communication | - | specializations/shared/agent-communication-protocol.js |
+| Trajectory Compression Patterns | UPGRADE | Token optimization for agent interaction compression | library/compression/ | specializations/shared/trajectory-compression-patterns.js |
+| Toolset Distribution Management | NEW | Configurable toolset combinations for different agent configurations | - | specializations/shared/toolset-distribution-management.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Hermes Gateway Bridge | NEW | Telegram/Discord/Slack integration for babysitter via Hermes Agent gateway | - | plugins/a5c/marketplace/plugins/hermes-gateway-bridge/ |
+| Trajectory Compression | NEW | Hermes-inspired trajectory compression for babysitter run journal optimization | - | plugins/a5c/marketplace/plugins/trajectory-compression/ |
+| Memory Backend Abstraction | NEW | Multi-backend memory persistence (mem0, honcho, etc.) for babysitter state | - | plugins/a5c/marketplace/plugins/memory-backend-abstraction/ |
+| Research Paper Assistant | NEW | Complete ML research paper pipeline with conference targeting and feedback loops | - | plugins/a5c/marketplace/plugins/research-paper-assistant/ |

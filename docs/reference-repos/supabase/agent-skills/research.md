@@ -65,3 +65,20 @@ None directly extractable. The skills are instruction sets (reference material f
 - The Supabase-specific skill content is too vendor-specific for babysitter processes
 - The MCP server configuration is Supabase-specific infrastructure
 - The Agent Skills format (agentskills.io) is a different ecosystem
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Database Performance Audit Framework | NEW | 8-category prioritized database performance audit methodology | - | specializations/data-science-ml/database-performance-audit.js |
+| Postgres Best Practices Decision Tree | NEW | Systematic Postgres optimization checklist and decision framework | - | specializations/data-science-ml/postgres-best-practices.js |
+| Auth Troubleshooting Workflow | NEW | Systematic authentication debugging process (login/logout/sessions/JWT) | - | specializations/security-compliance/auth-troubleshooting.js |
+| Schema Design Review Process | NEW | Database schema design review with RLS and security considerations | - | specializations/data-science-ml/schema-design-review.js |
+| Migration Review Workflow | NEW | Pre-commit migration review with performance and security checks | - | specializations/shared/migration-review-workflow.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Database Performance Audit | NEW | Database-agnostic performance audit with 8-category framework | - | plugins/a5c/marketplace/plugins/database-performance-audit/ |
+| Migration Review Automation | NEW | Pre-commit hooks and breakpoints for database migration review | - | plugins/a5c/marketplace/plugins/migration-review-automation/ |

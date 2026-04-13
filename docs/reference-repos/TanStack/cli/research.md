@@ -30,3 +30,19 @@ LOW-MEDIUM VALUE for process extraction. The skills are TanStack-ecosystem-speci
 - **Common mistakes documentation**: Dedicated section listing what NOT to do with specific examples. Negative examples are often more instructive than positive ones.
 - **Skill type taxonomy**: `type: core` distinguishes essential skills from optional ones within a collection. A simple but useful categorization.
 - **Non-interactive defaults**: `-y` flag pattern for CI/automation compatibility. Skills should prefer deterministic, non-interactive execution paths.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Deterministic CLI Scaffolding | NEW | Analyze intent → validate flag compatibility → construct non-interactive command | - | specializations/shared/deterministic-cli-scaffolding.js |
+| App Lifecycle Skills Suite | NEW | Complete app lifecycle pattern: create → integrate → addon → maintain → query | - | specializations/shared/app-lifecycle-skills-suite.js |
+| CLI Command Compatibility Validation | NEW | Flag compatibility matrix validation for CLI command construction | - | specializations/shared/cli-command-compatibility-validation.js |
+| Version-Pinned Skill Management | NEW | Skill versioning and compatibility management for external tools | - | specializations/shared/version-pinned-skill-management.js |
+| Framework Scaffolding Patterns | NEW | Generic framework project scaffolding with ecosystem integration | - | specializations/shared/framework-scaffolding-patterns.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| CLI Command Builder | NEW | Generic CLI wrapper with flag compatibility rules and deterministic command generation | - | plugins/a5c/marketplace/plugins/cli-command-builder/ |

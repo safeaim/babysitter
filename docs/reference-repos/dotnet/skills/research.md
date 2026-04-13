@@ -81,3 +81,25 @@ HIGH - Contains official .NET team processes that are directly transferable:
   - Placement: specializations/dotnet/
   - Why codify: Provides systematic approach to build performance that's reusable across .NET projects
   - Sketch: Build metrics collection -> Bottleneck identification -> Target analysis -> Optimization implementation -> Performance validation
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| .NET P/Invoke Debugging | NEW | Systematic P/Invoke and native interop debugging methodology | - | specializations/dotnet/pinvoke-debugging.js |
+| MSBuild Performance Optimization | NEW | Build performance investigation and optimization workflow | - | specializations/dotnet/msbuild-performance-optimization.js |
+| .NET Framework Upgrade | NEW | Structured .NET project framework migration process | - | specializations/dotnet/framework-upgrade.js |
+| Entity Framework Migration Workflow | NEW | EF Core migrations and data access pattern management | - | specializations/dotnet/ef-migration-workflow.js |
+| .NET Diagnostics Investigation | NEW | Performance and memory diagnostic procedures for .NET | - | specializations/dotnet/diagnostics-investigation.js |
+| NuGet Package Management | NEW | Package dependency analysis and optimization workflows | - | specializations/dotnet/nuget-package-management.js |
+| ASP.NET Core Development Process | NEW | ASP.NET Core application development and optimization patterns | - | specializations/dotnet/aspnet-core-development.js |
+| MAUI Cross-Platform Development | NEW | Multi-platform application development with .NET MAUI | - | specializations/dotnet/maui-development.js |
+| .NET AI/ML Integration | NEW | AI and ML integration patterns for .NET applications | - | specializations/dotnet/ai-ml-integration.js |
+| C# Scripting Automation | NEW | C# scripting and automation workflow patterns | - | specializations/dotnet/csharp-scripting-automation.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| .NET Development Suite | NEW | Comprehensive .NET development environment with 11 specialized skill categories | - | plugins/a5c/marketplace/plugins/dotnet-development-suite/ |
+| .NET Upgrade Assistant | NEW | Systematic .NET framework upgrade with compatibility analysis | - | plugins/a5c/marketplace/plugins/dotnet-upgrade-assistant/ |

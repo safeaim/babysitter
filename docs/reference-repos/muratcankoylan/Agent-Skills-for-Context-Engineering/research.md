@@ -46,3 +46,24 @@ HIGH -- Multiple skills map directly to babysitter process methodology areas:
 - Token-per-task as the correct optimization target (not tokens-per-request)
 - Warm sandbox pools and predictive warming for hosted agent infrastructure
 - Tool consolidation principle: prefer single comprehensive tools over multiple narrow ones
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Context Optimization Workflow | UPGRADE | Enhanced context window optimization strategies | library/specializations/shared/context-compression.js | specializations/shared/context-compression.js |
+| Agent Evaluation Framework | NEW | Multi-dimensional agent evaluation methodology | - | methodologies/agent-evaluation/ |
+| Multi-Agent Architecture Design | UPGRADE | Pattern selection for multi-agent coordination | library/specializations/shared/orchestration-patterns.js | specializations/shared/orchestration-patterns.js |
+| Memory System Design | NEW | Agent memory architecture selection and implementation | - | specializations/shared/memory-system-design.js |
+| Context Degradation Prevention | NEW | Lost-in-middle and context poisoning mitigation strategies | - | specializations/shared/context-degradation-prevention.js |
+| BDI Mental States Architecture | NEW | Belief-desire-intention architecture for agent systems | - | specializations/ai-agents-conversational/bdi-mental-states.js |
+| Filesystem-as-Memory Pattern | NEW | Structural query optimization using filesystem operations | - | specializations/shared/filesystem-as-memory.js |
+| Tool Design Optimization | NEW | Tool consolidation and efficiency principles | - | specializations/shared/tool-design-optimization.js |
+| Hosted Agents Infrastructure | NEW | Warm sandbox pools and predictive warming patterns | - | specializations/devops-sre-platform/hosted-agents-infrastructure.js |
+| Project Development Task-Model Fit | NEW | Task-model fit analysis for project development | - | specializations/shared/project-development-task-model-fit.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Context Engineering Advisor | NEW | Analyze process definitions for context anti-patterns and optimization | - | plugins/a5c/marketplace/plugins/context-engineering-advisor/ |

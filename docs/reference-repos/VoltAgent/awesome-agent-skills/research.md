@@ -30,3 +30,19 @@ This is primarily a link aggregator/directory rather than a skills source itself
 - Multi-harness compatibility matrix (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, Windsurf)
 - Vendor-grouped skill organization (official team skills vs community skills)
 - Companion list pattern: separate awesome-lists for subagents, OpenClaw skills, and research papers
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Skill Curation Methodology | NEW | Hand-picked skill evaluation and onboarding process | - | methodologies/skill-curation/ |
+| Multi-Harness Compatibility Assessment | NEW | Cross-platform agent skill compatibility evaluation | - | specializations/shared/multi-harness-compatibility.js |
+| Vendor-Based Skill Organization | NEW | Official vs community skill categorization patterns | - | specializations/shared/vendor-skill-organization.js |
+| Skills Directory Management | NEW | Curated skill catalog indexing and maintenance | - | specializations/shared/skills-directory-management.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Skills Directory Browser | NEW | Index and search awesome-agent-skills catalog | - | plugins/a5c/marketplace/plugins/skills-directory-browser/ |
+| Skills Onboarding Automation | NEW | Automated skill installation and validation from directory | - | plugins/a5c/marketplace/plugins/skills-onboarding-automation/ |

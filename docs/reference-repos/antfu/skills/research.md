@@ -51,3 +51,23 @@ Moderate extractable value. The Vue/Nuxt/Vite skills are ecosystem-specific. The
 - **Documentation-to-skill generation**: The meta.ts + scripts pipeline demonstrates a replicable pattern for converting any library's documentation into structured agent skills. This is a meta-capability worth codifying.
 - **Opinionated preference codification**: The hand-maintained "antfu" SKILL.md shows how individual developer preferences (ESLint config, package manager choice, testing framework) can be captured as a skill -- relevant for babysitter's profile system.
 - **Skill vendoring pattern**: Using git submodules to keep third-party skills in sync while allowing local customization. This informs how the babysitter process library could handle external skill imports.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Vue/Nuxt Application Quality Review | NEW | Vue 3 + TypeScript quality gate with Composition API and SSR checks | - | specializations/frontend/vue-nuxt-quality-review.js |
+| Documentation-to-Skill Generation Pipeline | NEW | Convert documentation into structured agent skills with sync mechanism | - | methodologies/doc-to-skill-generation/ |
+| Vue Best Practices Audit | NEW | Modern Vue 3 development pattern validation and code review | - | specializations/frontend/vue-best-practices-audit.js |
+| Nuxt Application Development Process | NEW | SSR/SSG application development with Nuxt framework patterns | - | specializations/frontend/nuxt-application-development.js |
+| Pinia State Management Review | NEW | Vue state management pattern validation and optimization | - | specializations/frontend/pinia-state-management-review.js |
+| Vite Build Optimization | NEW | Vite build configuration and performance optimization workflow | - | specializations/frontend/vite-build-optimization.js |
+| Vue Testing Strategy Implementation | NEW | Vue component testing with Vitest and Vue Testing Library patterns | - | specializations/frontend/vue-testing-strategy.js |
+| Skill Vendoring and Sync | NEW | Git submodule-based skill syncing and update management | - | specializations/shared/skill-vendoring-sync.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Skill Sync | NEW | Automatic syncing of vendored skills from upstream repos with validation | - | plugins/a5c/marketplace/plugins/skill-sync/ |
+| Vue Development Suite | NEW | Comprehensive Vue/Nuxt development environment with ecosystem tools | - | plugins/a5c/marketplace/plugins/vue-development-suite/ |

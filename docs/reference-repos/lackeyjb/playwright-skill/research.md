@@ -45,3 +45,15 @@ skills/
 - MIT license, very permissive
 - The progressive disclosure pattern (concise SKILL.md + lazy-loaded API reference) is a good practice to adopt in babysitter skill design
 - Hasn't been updated since Dec 2025 - may be stale
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| N/A | N/A | No multi-step processes identified - single-purpose tool, not a methodology | - | N/A |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Browser Automation Plugin | POTENTIAL OVERLAP | Model-invoked Playwright automation with progressive disclosure | plugins/a5c/marketplace/plugins/dev-browser/ | plugins/a5c/marketplace/plugins/browser-automation-plugin/ |

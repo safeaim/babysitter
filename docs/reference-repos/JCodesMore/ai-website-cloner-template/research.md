@@ -49,6 +49,32 @@ An exceptionally well-crafted skill definition (~400+ lines) with deep extractio
 1. **Parallel worktree builder pattern** -- The pattern of writing detailed spec files, then dispatching independent builder agents in git worktrees with those specs, then merging -- is a reusable methodology for any large parallel construction task. Generalizable beyond web cloning.
 2. **Spec-then-build decomposition** -- The "complexity budget rule" (>150 lines = split) and the principle of spec files as source-of-truth contracts between extraction and building phases.
 
+## Processes
+
+### 1. Website Reverse-Engineering Process
+- **Source**: Multi-phase pipeline (recon → foundation → spec → parallel-build → assembly+QA)
+- **Placement**: `specializations/frontend/website-reverse-engineering.js`
+- **Description**: Multi-phase website cloning: reconnaissance (screenshots, design tokens, interaction sweep) → foundation (fonts, colors, globals, asset downloads) → component specs → parallel build (dispatch builder agents in git worktrees) → assembly & QA (merge worktrees, visual diff).
+
+## Plugin Ideas
+
+- **Website Cloning Template**: Babysitter marketplace plugin for reverse-engineering websites into modern codebases using parallel agent dispatch and git worktree methodology.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Website Reverse-Engineering Process | NEW | Multi-phase website cloning with parallel agent dispatch in git worktrees | - | specializations/frontend/website-reverse-engineering.js |
+| Parallel Worktree Builder Pattern | NEW | Methodology for parallel construction using spec files and git worktree dispatch | - | methodologies/parallel-worktree-builder/ |
+| Spec-Then-Build Decomposition | NEW | Complexity budget rule (>150 lines = split) with spec-as-contract methodology | - | methodologies/spec-then-build-decomposition/ |
+| Multi-Agent Parallel Dispatch | NEW | Pattern for dispatching independent agents with detailed specs in isolated environments | - | specializations/shared/multi-agent-parallel-dispatch.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Website Cloning Template | NEW | Multi-agent website reverse-engineering with parallel git worktree builders | - | plugins/a5c/marketplace/plugins/website-cloning-template/ |
+
 ## Classification
 
 - **Archetype**: Multi-agent website cloning template with parallel execution

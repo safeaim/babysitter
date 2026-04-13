@@ -105,3 +105,21 @@ VERY HIGH - Contains official GitHub workflow orchestration patterns that are di
   - Placement: methodologies/agentic-workflows/
   - Why codify: Systematic approach to agent workflow design that's applicable beyond GitHub automation
   - Sketch: Requirement analysis -> Natural language workflow definition -> Safety constraint identification -> Execution environment setup -> Guardrail implementation -> Testing and validation
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Error Recovery Pipeline | NEW | Comprehensive error handling with circuit breakers and exponential backoff | - | specializations/shared/error-recovery-pipeline.js |
+| Agentic Workflow Orchestration | NEW | Natural language agent workflow design and execution with safety guardrails | - | methodologies/agentic-workflow-orchestration/ |
+| GitHub Automation Pipeline | NEW | Systematic GitHub repository automation with issue/PR query patterns | - | specializations/devops-sre-platform/github-automation-pipeline.js |
+| Error Classification and Recovery Strategy | NEW | Systematic error categorization (transient/non-transient) with appropriate recovery patterns | - | specializations/shared/error-classification-recovery.js |
+| Agentic Workflow Design Methodology | NEW | Translation of natural language requirements into executable agent workflows | - | methodologies/agentic-workflow-design/ |
+| Agent Session Management | NEW | Agent session lifecycle management with GitHub integration patterns | - | specializations/shared/agent-session-management.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Agentic GitHub Workflows | UPGRADE | Complete GitHub workflow automation beyond existing github-actions-cicd plugins | plugins/a5c/marketplace/plugins/github-actions-cicd-* | plugins/a5c/marketplace/plugins/agentic-github-workflows/ |
+| Error Recovery Suite | NEW | Robust error handling and recovery infrastructure with circuit breakers and monitoring | - | plugins/a5c/marketplace/plugins/error-recovery-suite/ |

@@ -23,5 +23,17 @@ None extractable. The entire skill is a persona/style instruction.
 ## Plugin Ideas
 None -- babysitter already has `compression/` with multi-layer token compression.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| N/A | N/A | No multi-step processes identified - entire skill is a persona/style instruction | - | N/A |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| N/A | N/A | No plugin ideas identified - babysitter already has compression system | babysitter compression/ | N/A |
+
 ## Implicit Procedural Knowledge
 The insight that output style dramatically affects token budget is valid but already well-understood.

@@ -84,6 +84,37 @@ This repository provides:
 
 The MCP specialization and enterprise security patterns represent valuable approaches to protocol-specific development frameworks.
 
+## Processes
+
+### 1. MCP Server Development with Security Hardening
+- **Source**: Enterprise Security Framework and FastMCP Integration patterns
+- **Placement**: `specializations/shared/mcp-server-development-hardened.js`
+- **Description**: End-to-end MCP server development with enterprise security: validate requirements → generate FastMCP template → implement security hooks → inject validation → audit for code injection vulnerabilities → deploy with monitoring.
+
+### 2. Multi-Agent MCP Development Workflow
+- **Source**: 8 specialized sub-agents and Dual-Mode Architecture
+- **Placement**: `specializations/shared/multi-agent-mcp-development.js`
+- **Description**: Coordinated development using specialized sub-agents: assign domain-specific agents → coordinate via hybrid markdown/programmatic approach → integrate outputs → validate protocol compliance → security review.
+
+## Plugin Ideas
+
+- **MCP Development Suite**: Enterprise-grade MCP server development environment with 8 specialized sub-agents, security validation, and FastMCP templates.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| MCP Server Development with Security Hardening | NEW | End-to-end MCP development with enterprise security hooks and validation | - | specializations/shared/mcp-server-development-hardened.js |
+| Multi-Agent MCP Development Workflow | NEW | Coordinated MCP development using 8 specialized domain-specific sub-agents | - | specializations/shared/multi-agent-mcp-development.js |
+| Enterprise Security Framework for Agent Tools | NEW | Code injection prevention and input validation for agent-generated code | - | specializations/shared/enterprise-security-framework.js |
+| Dual-Mode Agent Architecture | NEW | Hybrid markdown agent and programmatic SDK operation with fallback | - | specializations/shared/dual-mode-agent-architecture.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| MCP Development Suite | NEW | Enterprise-grade MCP development with specialized sub-agents and security validation | - | plugins/a5c/marketplace/plugins/mcp-development-suite/ |
+
 ## Research Methodology Notes
 
 Framework discovered through MCP ecosystem analysis. Repository demonstrates sophisticated approach to protocol-specific development with enterprise-grade security and multi-modal agent architectures.

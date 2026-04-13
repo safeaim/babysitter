@@ -24,6 +24,20 @@ LOW-MEDIUM -- The social media automation workflow pattern is extractable for sp
 ## Plugin Ideas
 - **social-media-bridge plugin**: Babysitter plugin pattern for CLI-based social media automation
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Social Media CLI Workflow | NEW | Authenticate → search/browse → interact (like/comment) → publish workflow pattern | - | specializations/business/social-media-cli-workflow.js |
+| Cookie-Based Auth Management | NEW | Auto-extract browser cookies with QR code login fallback strategy | - | specializations/shared/cookie-based-auth-management.js |
+| Anti-Detection Social Media Automation | NEW | Headless browser patterns for resilient social media platform interaction | - | specializations/shared/anti-detection-social-media-automation.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Social Media Bridge | NEW | CLI-based social media automation with anti-detection and multi-platform support | - | plugins/a5c/marketplace/plugins/social-media-bridge/ |
+
 ## Implicit Procedural Knowledge
 - Headless browser approach vs reverse-engineered API tradeoff
 - Anti-detection resilience patterns for social media automation

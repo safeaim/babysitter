@@ -1,82 +1,51 @@
-# MCP Agent Research
+# lastmile-ai/mcp-agent
 
-**Repository:** lastmile-ai/mcp-agent  
-**Stars:** 8,245  
-**License:** Apache-2.0  
-**Language:** Python  
-**Created:** 2024-12-18  
-**Last Updated:** 2026-04-13  
-**Default Branch:** main
+- **Archetype**: harness-framework
+- **Stars**: 8,251
+- **Last pushed**: 2026-01-25
+- **License**: Apache-2.0
+- **Discovered**: 2026-04-13
+- **Source**: gh-search
+- **Skills found**: 0 (Python framework, no SKILL.md files)
 
-## Archetype Classification: **MCP Agent Framework**
+## Summary
+Professional Python framework for building MCP (Model Context Protocol) agents using systematic patterns from Anthropic's "Building Effective Agents" guide. Implements composable workflow patterns including map-reduce, router, orchestrator, deep research, and swarm coordination with full MCP lifecycle management and Temporal-based durability for production agent deployment.
 
-Composable framework for building effective agents using Model Context Protocol with simple, robust patterns and durable workflow capabilities.
+## Assessment
+VERY HIGH VALUE. This represents the most sophisticated framework for systematic agent development found to date. Unlike skill collections, this provides actual implementation of proven agent architecture patterns with production-ready infrastructure. The systematic approach to agent patterns (parallel LLM, evaluator-optimizer, orchestrator, deep research) provides extractable processes for babysitter's orchestration capabilities. The MCP integration patterns and durable execution with Temporal offer valuable insights for babysitter's agent coordination and process persistence.
 
-## Repository Structure & Key Skills
+## Extraction Priority
+VERY HIGH - Contains production-ready agent architecture patterns directly applicable to babysitter:
+- Advanced agent orchestration patterns → babysitter process orchestration enhancements
+- MCP integration lifecycle management → babysitter MCP server coordination
+- Durable workflow execution patterns → babysitter process persistence and recovery
+- Agent composition and routing patterns → babysitter skill coordination
 
-### Framework Components
+## Processes
+- **mcp-agent-lifecycle-management**: Systematic process for managing MCP server connections and agent coordination throughout execution lifecycle
+  - Source: Core MCP lifecycle management and server aggregation patterns
+  - Placement: specializations/tools-integration/
+  - Inputs: MCP server configurations, agent specifications, connection requirements
+  - Outputs: Managed MCP connections, agent coordination, lifecycle monitoring
+  - Complexity: complex
 
-1. **Full MCP Implementation** - Complete Model Context Protocol support with lifecycle management
-2. **Effective Agent Patterns** - Anthropic's "Building Effective Agents" patterns implemented compositionally  
-3. **Durable Workflows** - Temporal.io integration for pause/resume/recovery capabilities
-4. **Examples & Documentation** - Comprehensive examples and pattern documentation
+- **parallel-agent-orchestration**: Process for coordinating multiple agents in map-reduce and parallel execution patterns
+  - Source: Parallel LLM and workflow orchestration patterns
+  - Placement: specializations/shared/
+  - Inputs: Task decomposition requirements, agent specifications, coordination strategy
+  - Outputs: Parallel execution plans, result aggregation, coordination monitoring
+  - Complexity: complex
 
-### Novel Patterns & Methodologies
+## Plugin Ideas
+- **mcp-agent-integration**: Plugin for integrating MCP agent framework patterns with babysitter orchestration
+  - What install.md would do: Install mcp-agent dependencies, configure agent patterns, set up MCP coordination, create workflow templates
+  - Processes it would copy: mcp-agent-lifecycle-management, parallel-agent-orchestration
+  - Configs/hooks it would create: MCP server configurations, agent pattern templates, coordination frameworks
+  - Source evidence: Comprehensive agent framework with proven patterns and production-ready infrastructure
 
-#### 1. **MCP-First Agent Architecture**
-Model Context Protocol as foundation:
-- **Full MCP Support**: Complete implementation with connection lifecycle management
-- **Tool Integration**: Native MCP tool discovery and execution
-- **Resource Management**: MCP resource access and state management
-- **Server Coordination**: Multi-MCP server connection handling
-
-#### 2. **Composable Agent Patterns**
-Anthropic's effective agent patterns as building blocks:
-- **Pattern Chaining**: Compositional pattern combination
-- **Workflow Orchestration**: Pattern-based agent workflow construction
-- **State Management**: Consistent state across pattern transitions
-- **Error Handling**: Robust error recovery across pattern boundaries
-
-#### 3. **Durable Agent Execution**
-Temporal.io-based durability:
-- **Workflow Persistence**: Agent state persistence across interruptions
-- **Resume Capability**: Seamless restart from previous state
-- **Failure Recovery**: Automatic recovery from transient failures
-- **Long-Running Workflows**: Support for extended agent operations
-
-## Technical Architecture
-
-- **Python-based** framework with MCP native integration
-- **Temporal.io** workflow engine for durability
-- **Apache-2.0** licensed for broad adoption
-- **Documentation-driven** development with comprehensive examples
-
-## Significance for Babysitter
-
-### High-Value Patterns
-
-1. **MCP Integration**: Native Model Context Protocol implementation
-2. **Durable Workflows**: Temporal.io-based agent persistence and recovery
-3. **Composable Patterns**: Modular agent behavior composition
-4. **Production Readiness**: Robust error handling and state management
-
-### Implementation Insights
-
-- MCP provides standardized tool and resource integration
-- Durable workflows enable long-running agent processes
-- Composable patterns reduce agent development complexity
-- Temporal.io integration provides enterprise-grade reliability
-
-## Repository Value: **High**
-
-This repository provides:
-- Complete MCP implementation with lifecycle management (8K+ stars)
-- Anthropic's effective agent patterns in composable form
-- Durable workflow capabilities via Temporal.io integration
-- Production-ready framework for MCP-based agent development
-
-The MCP-first architecture and durable workflow patterns represent significant innovations in agent framework design and reliability.
-
-## Research Methodology Notes
-
-Framework discovered through agent marketplace analysis. Repository represents cutting-edge approach to MCP-based agent development with enterprise-grade durability patterns.
+## Implicit Procedural Knowledge
+- **Agent Pattern Composition**: Methodology for systematically combining multiple agent patterns into coherent workflows
+  - Source: Framework's composable pattern architecture and workflow examples
+  - Placement: methodologies/agent-orchestration/
+  - Why codify: Provides systematic approach to building complex agent workflows from proven patterns
+  - Sketch: Pattern analysis → Composition strategy → Integration design → Coordination implementation → Quality validation

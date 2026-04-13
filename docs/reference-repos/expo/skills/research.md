@@ -48,7 +48,7 @@ Official AI agent skills from the Expo team for building, deploying, and debuggi
 
 ### 1. Mobile App Deployment Process
 
-- **Placement**: `specializations/domains/business/mobile-development/` (domain-specific)
+- **Placement**: `specializations/mobile/` (domain-specific)
 - **Description**: Multi-step mobile app deployment workflow extracted from the `expo-deployment` and `expo-cicd-workflows` skills. Generalizable beyond Expo to any React Native or mobile deployment pipeline.
 - **Steps**:
   1. Detect platform targets (iOS, Android, web)
@@ -103,11 +103,11 @@ Official AI agent skills from the Expo team for building, deploying, and debuggi
 
 | Extractable Process | Library Status | Action | Existing Path | Target Placement |
 |-------------------|----------------|--------|---------------|------------------|
-| Mobile App Deployment Process | NEW | Multi-platform mobile deployment with store submission workflow | - | specializations/business/mobile-app-deployment.js |
+| Mobile App Deployment Process | NEW | Multi-platform mobile deployment with store submission workflow | - | specializations/mobile/mobile-app-deployment.js |
 | SDK/Framework Upgrade Process | NEW | Universal framework upgrade with breaking changes analysis | - | specializations/shared/framework-upgrade-process.js |
 | EAS CI/CD Integration Pattern | NEW | Expo Application Services CI/CD automation patterns | - | specializations/devops-sre-platform/eas-cicd-integration.js |
-| Native Module Development Workflow | NEW | Cross-platform native module development and integration | - | specializations/business/native-module-development.js |
-| Platform-Specific UI Integration | NEW | SwiftUI/Jetpack Compose integration patterns for cross-platform apps | - | specializations/business/platform-specific-ui-integration.js |
+| Native Module Development Workflow | NEW | Cross-platform native module development and integration | - | specializations/mobile/native-module-development.js |
+| Platform-Specific UI Integration | NEW | SwiftUI/Jetpack Compose integration patterns for cross-platform apps | - | specializations/mobile/platform-specific-ui-integration.js |
 | Mobile Build Configuration Management | NEW | Build configuration and signing credentials management workflow | - | specializations/devops-sre-platform/mobile-build-configuration.js |
 
 ## Plugin Marketplace Mapping

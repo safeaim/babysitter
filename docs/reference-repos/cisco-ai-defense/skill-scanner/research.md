@@ -77,6 +77,19 @@ Both tools serve similar purposes. Key differences:
 - Snyk: simpler single-engine approach, requires Snyk API token, broader agent discovery (more harness support), toxic flow analysis
 - **Recommendation**: A unified `skill-security` babysitter plugin could wrap either/both, with a configurable backend. The threat taxonomies from both are complementary.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| N/A | N/A | No extractable processes - scanning is a standalone CLI tool, not multi-step orchestration | - | N/A |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Skill Security Scanner | UPGRADE | Enhanced security scanning with multi-engine detection and threat taxonomy | basic-security | plugins/a5c/marketplace/plugins/skill-security-scanner/ |
+| AI Threat Taxonomy Integration | NEW | Cisco AI Security Framework taxonomy for breakpoint auto-approval rules | - | plugins/a5c/marketplace/plugins/ai-threat-taxonomy/ |
+
 ## Skipped
 
 - The eval SKILL.md files are scanner test fixtures, not real skills

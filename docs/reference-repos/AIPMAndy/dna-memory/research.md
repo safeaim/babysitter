@@ -35,6 +35,18 @@ Repo-specific: Python implementation, OpenClaw-specific installation paths, Chin
   - Configs/hooks it would create: on-session-start hook to load relevant long-term memories; on-session-end hook to filter and persist working memory; periodic maintenance cron for decay/reflect/promote/dedupe cycle; memory type taxonomy config (fact/preference/skill/error/pattern/insight); `.a5c/commands/memory-evolve.md` slash command for manual maintenance.
   - Source evidence: SKILL.md three-tier architecture, scripts/evolve.py (reflect, decay, promote, dedupe commands), daemon section with configurable intervals. The weight-based promotion criteria (weight > threshold + stable over time + verified by reflection) and reflection-driven pattern extraction (gather recent high-weight items -> cluster -> synthesize -> store) are the core novel patterns.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| N/A | N/A | No extractable processes - memory systems belong in plugin territory, not process library | - | N/A |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Agent Memory System | UPGRADE | Enhance existing context/memory with three-tier architecture and decay patterns | claude-mem | plugins/a5c/marketplace/plugins/agent-memory-system/ |
+
 ## Implicit Procedural Knowledge
 
 (No extractable procedures -- all memory-related patterns belong in the plugin above.)

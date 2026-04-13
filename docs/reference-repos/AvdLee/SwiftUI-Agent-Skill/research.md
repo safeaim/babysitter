@@ -32,6 +32,20 @@ Moderate value. More sophisticated than the twostraws version due to the referen
 
 - **Living Reference File plugin**: Maintain auto-updating reference files (like latest-apis.md) that skills/processes consult at task start. Useful for any domain with rapidly changing APIs. Category: knowledge management.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| SwiftUI Code Quality Workflow | NEW | Three-mode quality process: review → improve → implement with API deprecation checking | - | specializations/mobile/swiftui-code-quality.js |
+| Living Reference Consultation Pattern | NEW | Auto-updating reference files that processes consult at task start for current APIs | - | specializations/shared/living-reference-consultation.js |
+| Three-Workflow Decomposition Pattern | NEW | Review/improve/implement task workflow structure for code quality | - | specializations/shared/three-workflow-decomposition.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Living Reference Manager | NEW | Auto-updating reference file system for rapidly changing APIs and knowledge | - | plugins/a5c/marketplace/plugins/living-reference-manager/ |
+
 ## Patterns
 
 - Reference-file architecture: skill consults `references/latest-apis.md` at start of every task

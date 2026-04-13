@@ -47,3 +47,18 @@ Provides multi-platform skill aggregation with quality curation focus.
 
 ## Research Methodology Notes
 Skill collection discovered through multi-tool ecosystem analysis. Repository demonstrates cross-platform approach to skill aggregation and curation.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Multi-Platform Skill Curation | NEW | Cross-tool skill collection methodology with quality curation | - | methodologies/multi-platform-skill-curation/ |
+| Resource Aggregation Patterns | NEW | Systematic tool and resource compilation for AI agent development | - | specializations/shared/resource-aggregation-patterns.js |
+| Cross-Platform Compatibility Framework | NEW | Multi-tool skill compatibility design and validation | - | specializations/shared/cross-platform-compatibility-framework.js |
+| Skill Quality Assessment | NEW | Curation criteria and quality evaluation for skill collections | - | specializations/shared/skill-quality-assessment.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Multi-Platform Skill Browser | NEW | Cross-tool skill discovery and compatibility assessment | - | plugins/a5c/marketplace/plugins/multi-platform-skill-browser/ |

@@ -34,3 +34,24 @@ HIGH VALUE for domain specialization. The react-native-best-practices skill demo
 - **Security notes in skill files**: Explicit security guidance for shell commands, third-party dependencies, and remote code loading within skill documentation. A responsible disclosure pattern.
 - **Vendored plugins**: plugins/vendored/ directory for internal/pre-release skills separate from public skills/. Clean separation of public and internal skill content.
 - **Meta-skill for validation**: A skill whose purpose is validating other skills in the collection. Self-referential quality assurance.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| React Native Performance Optimization | NEW | Priority-ordered performance optimization with impact ratings and measurement cycle | - | specializations/business/react-native-performance-optimization.js |
+| React Native Brownfield Migration | NEW | Incremental React Native integration into existing native apps | - | specializations/business/react-native-brownfield-migration.js |
+| React Native Upgrade Process | NEW | Version upgrade with dependency resolution and breaking change handling | - | specializations/business/react-native-upgrade-process.js |
+| Performance Triage Framework | NEW | Generic performance optimization with impact-rated categories and measurement cycle | - | specializations/shared/performance-triage-framework.js |
+| Hybrid Skill Format Design | NEW | Quick reference + deep dive skill structure pattern | - | specializations/shared/hybrid-skill-format-design.js |
+| Impact-Rated Priority Hierarchy | NEW | CRITICAL/HIGH/MEDIUM impact rating system for optimization tasks | - | specializations/shared/impact-rated-priority-hierarchy.js |
+| Measure-Optimize-Remeasure Cycle | NEW | Data-driven optimization workflow with before/after measurement | - | specializations/shared/measure-optimize-remeasure-cycle.js |
+| Skills Validation Meta-Process | NEW | Quality assurance for skill collection content and format | - | methodologies/skills-validation/ |
+| Mobile CI/CD with GitHub Actions | NEW | React Native CI/CD pipeline optimization and automation | - | specializations/business/mobile-cicd-github-actions.js |
+| Device Testing Automation | NEW | Automated testing across mobile device configurations | - | specializations/business/device-testing-automation.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| React Native Profiler Integration | NEW | Metro bundler analysis, Flipper integration, and performance monitoring tools | - | plugins/a5c/marketplace/plugins/react-native-profiler-integration/ |

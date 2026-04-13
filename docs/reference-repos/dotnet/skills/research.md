@@ -101,5 +101,4 @@ HIGH - Contains official .NET team processes that are directly transferable:
 
 | Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
 |-------------|-------------------|--------|-----------------|------------------|
-| .NET Development Suite | NEW | Comprehensive .NET development environment with 11 specialized skill categories | - | plugins/a5c/marketplace/plugins/dotnet-development-suite/ |
-| .NET Upgrade Assistant | NEW | Systematic .NET framework upgrade with compatibility analysis | - | plugins/a5c/marketplace/plugins/dotnet-upgrade-assistant/ |
+| N/A | N/A | No valid plugin ideas - processes cover the extractable value | - | N/A |

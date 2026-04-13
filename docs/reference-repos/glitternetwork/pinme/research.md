@@ -37,3 +37,21 @@ Moderate value. The deployment orchestration pattern (decision tree routing betw
 - Dual-path skill design (simple vs complex workflow branching)
 - No-login-required path for low-friction operations
 - Decision diamond routing based on project requirements analysis
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Frontend Deployment Decision Process | NEW | Generic deployment decision workflow with project analysis and strategy selection | - | specializations/shared/frontend-deployment-decision.js |
+| Dual-Path Workflow Design | NEW | Simple vs complex workflow branching pattern with decision diamond routing | - | specializations/shared/dual-path-workflow-design.js |
+| Project Type Analysis for Deployment | NEW | Analyze frontend projects to determine appropriate deployment strategy | - | specializations/frontend/project-type-analysis-deployment.js |
+| IPFS Deployment Workflow | NEW | Decentralized hosting deployment process via IPFS | - | specializations/devops-sre-platform/ipfs-deployment-workflow.js |
+| Full-Stack Project Deployment | NEW | Complete deployment for React + Cloudflare Worker + D1 database stacks | - | specializations/frontend/fullstack-project-deployment.js |
+| Workflow Visualization with Graphviz | NEW | Decision tree and workflow visualization using dot notation in documentation | - | specializations/shared/workflow-visualization-graphviz.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| IPFS Deployment Integration | NEW | IPFS CLI integration for decentralized hosting workflows | - | plugins/a5c/marketplace/plugins/ipfs-deployment-integration/ |
+| Multi-Platform Deployment Orchestrator | NEW | Deployment routing with Vercel, Cloudflare, IPFS integration based on project analysis | - | plugins/a5c/marketplace/plugins/multi-platform-deployment-orchestrator/ |

@@ -34,3 +34,24 @@ HIGH VALUE for novel domain. AEO/GEO is an emerging discipline at the intersecti
 - **Priority-ordered fixing**: Blockers (Priority 1) first, then progressively lower priorities. Ensures the most impactful fixes happen before lower-impact ones.
 - **Quantitative quality gate**: Target score (80+) as a concrete, measurable completion criterion. Removes subjectivity from "done" assessment.
 - **Novel domain encoding**: AEO/GEO is a new discipline being codified as structured agent skills. Demonstrates how emerging domains can be rapidly encoded into agent-consumable formats.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| AEO/GEO Website Audit Process | NEW | AI Engine Optimization audit with dual scoring model and framework-specific fixes | - | specializations/business/aeo-geo-audit.js |
+| Content Marketing Pipeline | NEW | Complete GTM engineering workflow from research to distribution | - | specializations/business/content-marketing-pipeline.js |
+| Reddit Opportunity Research | NEW | Social media research methodology for content opportunities | - | specializations/business/reddit-opportunity-research.js |
+| Framework-Specific SEO Optimization | NEW | Cross-framework SEO optimization with stack detection and targeted fixes | - | specializations/business/framework-specific-seo-optimization.js |
+| Dual Scoring Assessment Model | NEW | Combined deterministic and LLM-evaluated quality assessment framework | - | specializations/shared/dual-scoring-assessment-model.js |
+| Priority-Ordered Fix Implementation | NEW | Blocker-first fix ordering with quantitative completion criteria | - | specializations/shared/priority-ordered-fix-implementation.js |
+| Keyword Research and Analysis | NEW | SEO keyword research with AEO/GEO optimization considerations | - | specializations/business/keyword-research-analysis.js |
+| Content Planning and Strategy | NEW | GEO-optimized content planning with audience and platform targeting | - | specializations/business/content-planning-strategy.js |
+| Backlink Building Strategy | NEW | Strategic backlink acquisition and relationship building methodology | - | specializations/business/backlink-building-strategy.js |
+| Structured Data Generation | NEW | JSON-LD and schema markup generation for AI engine optimization | - | specializations/business/structured-data-generation.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| AEO/GEO Site Audit Integration | NEW | External audit tool integration with aeo-audit.sh and framework detection | - | plugins/a5c/marketplace/plugins/aeo-geo-audit-integration/ |

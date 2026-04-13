@@ -32,3 +32,23 @@ MEDIUM-HIGH VALUE. The parallel subagent pattern for large document processing m
 - **Incremental progress detection**: Glob for source chunks vs output chunks to determine remaining work. Supports idempotent re-execution.
 - **Binary dependency declaration**: openclaw metadata declaring required binaries (python3, pandoc, ebook-convert) with anyBins for alternatives (calibre OR ebook-convert). A dependency specification pattern for skills with external tool requirements.
 - **Preprocess -> parallel process -> reassemble**: The canonical pipeline for embarrassingly parallel document processing. Reusable across translation, summarization, analysis, and transformation tasks.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Parallel Document Translation Process | NEW | Complete book translation pipeline with chunking and parallel subagent processing | - | specializations/creative/parallel-document-translation.js |
+| Large Document Chunking Pipeline | NEW | Generic document chunking with manifest tracking for parallel processing | - | specializations/shared/large-document-chunking-pipeline.js |
+| Batch-Based Parallel Dispatch | UPGRADE | Enhanced parallel processing with rate limit management and batch coordination | library/specializations/shared/orchestration-patterns.js | specializations/shared/batch-based-parallel-dispatch.js |
+| Manifest-Based Progress Tracking | NEW | Progress tracking system for resumable parallel operations | - | specializations/shared/manifest-based-progress-tracking.js |
+| Fresh Context Per Chunk Pattern | NEW | 1 chunk = 1 subagent = 1 fresh context for quality large-document processing | - | specializations/shared/fresh-context-per-chunk.js |
+| Multi-Format Document Preprocessing | NEW | PDF/DOCX/EPUB conversion to processable formats via pandoc and calibre | - | specializations/shared/multi-format-document-preprocessing.js |
+| Incremental Processing Detection | NEW | Resume-from-failure by comparing source vs output chunks | - | specializations/shared/incremental-processing-detection.js |
+| Binary Dependency Management | NEW | External tool dependency declaration and validation patterns | - | specializations/shared/binary-dependency-management.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Pandoc Integration | NEW | Document format conversion via pandoc CLI tool | - | plugins/a5c/marketplace/plugins/pandoc-integration/ |
+| Calibre Integration | NEW | E-book format conversion and processing via calibre tools | - | plugins/a5c/marketplace/plugins/calibre-integration/ |

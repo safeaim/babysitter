@@ -30,3 +30,21 @@ Critical reference for understanding the agent skills specification that all oth
 - Client implementation pattern: discovery via filesystem walk, SKILL.md parsing, tool permission gating
 - Python reference implementation using standard packaging (pyproject.toml, uv.lock)
 - Mintlify-based documentation (docs.json, .mdx files) for the specification website at agentskills.io
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Skill Lifecycle Validation | NEW | Discover → load → validate → execute skill processing workflow | - | methodologies/skill-lifecycle-validation/ |
+| Agent Skills Specification Compliance | NEW | SKILL.md frontmatter and format validation against official spec | - | specializations/shared/agent-skills-spec-compliance.js |
+| Skill Discovery and Loading Patterns | NEW | Filesystem-based skill discovery with permission gating | - | specializations/shared/skill-discovery-loading-patterns.js |
+| Tool Permission Gating | NEW | Skill tool declaration validation and permission management | - | specializations/shared/tool-permission-gating.js |
+| SKILL.md Format Validation | NEW | YAML frontmatter and content validation for skill files | - | specializations/shared/skill-md-format-validation.js |
+| Client Implementation Guidelines | NEW | Harness client implementation patterns for skill integration | - | specializations/shared/client-implementation-guidelines.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Skill Validator | NEW | Validate SKILL.md files against official agentskills specification | - | plugins/a5c/marketplace/plugins/skill-validator/ |
+| Skill Conformance Checker | NEW | Audit installed skills for specification compliance and report deviations | - | plugins/a5c/marketplace/plugins/skill-conformance-checker/ |

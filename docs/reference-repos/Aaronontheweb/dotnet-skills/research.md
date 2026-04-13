@@ -24,14 +24,31 @@ HIGH VALUE for domain specialization. This is the most authoritative .NET skills
 - **C# Code Quality Process**: Apply coding standards -> analyze type design for performance -> implement concurrency patterns -> run CRAP analysis (Change Risk Anti-Pattern). A code quality methodology with quantitative metrics.
 - **CRAP Analysis**: Cyclomatic complexity + code coverage metric for identifying risky code. A quantitative quality assessment extractable as a shared methodology.
 
-## Plugin Ideas
-- **.NET Expert plugin**: Install.md-driven plugin with 34 .NET skills covering Akka.NET, Aspire, C# patterns, EF Core, and testing. Configurable for which sub-domains to activate based on project dependencies.
-- **Actor Model Patterns plugin**: Framework-agnostic actor model patterns plugin (applicable to Akka.NET, Akka/JVM, Orleans, Proto.Actor) with distribution/supervision/testing abstractions.
-- **CRAP Analysis plugin**: A code quality assessment plugin implementing the Change Risk Anti-Pattern metric. Install.md sets up coverage tooling and complexity analysis.
-
 ## Patterns
 - **Local vs distributed abstraction**: GenericChildPerEntityParent and IPubSubMediator abstractions that work identically in single-node and cluster modes. Enables testability without cluster infrastructure.
 - **Invocable: false metadata**: Skills marked `invocable: false` serve as reference documentation rather than interactive skills. A useful distinction for knowledge bases vs. workflows.
 - **Reference file architecture**: Per-skill reference files (work-distribution-patterns.md, cluster-local-abstractions.md, async-cancellation-patterns.md) linked from main SKILL.md. Modular knowledge organization.
 - **Critical mistake highlighting**: "BAD" code examples with explicit explanation of why they fail (e.g., EventStream is local-only, subscribers on server 2 won't receive events). Negative examples with distributed-systems failure modes.
 - **Framework creator authority**: Skills authored by the framework creator carry implicit authority. The Akka.NET skills can make definitive statements about intended usage patterns.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Akka.NET Actor Design Process | NEW | Multi-decision architecture for actor systems with supervision and distribution | - | specializations/dotnet/akka-net-actor-design.js |
+| .NET Testing Pipeline | NEW | Comprehensive test infrastructure with Testcontainers and Playwright | - | specializations/dotnet/dotnet-testing-pipeline.js |
+| Aspire Service Configuration | NEW | Aspire infrastructure setup with service defaults and integration | - | specializations/dotnet/aspire-service-configuration.js |
+| C# Code Quality Process | NEW | Code standards with type design performance and concurrency patterns | - | specializations/dotnet/csharp-code-quality.js |
+| CRAP Analysis | NEW | Cyclomatic complexity + coverage metric for identifying risky code | - | specializations/shared/crap-analysis.js |
+| Actor Model Distribution Patterns | NEW | EventStream vs DistributedPubSub decision framework for actor systems | - | specializations/dotnet/actor-model-distribution-patterns.js |
+| .NET Snapshot Testing | NEW | Verify-based snapshot testing for .NET applications | - | specializations/dotnet/dotnet-snapshot-testing.js |
+| Blazor Playwright Testing | NEW | E2E testing for Blazor applications using Playwright | - | specializations/dotnet/blazor-playwright-testing.js |
+| Testcontainers Infrastructure | NEW | Container-based integration testing setup for .NET | - | specializations/dotnet/testcontainers-infrastructure.js |
+| Actor Supervision Strategy Design | NEW | Fault tolerance and supervision patterns for actor systems | - | specializations/dotnet/actor-supervision-strategy.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| CRAP Analysis Integration | NEW | Code quality analysis setup with coverage tooling and complexity metrics | - | plugins/a5c/marketplace/plugins/crap-analysis-integration/ |
+| Testcontainers Setup | NEW | Container infrastructure setup for .NET integration testing | - | plugins/a5c/marketplace/plugins/testcontainers-setup/ |

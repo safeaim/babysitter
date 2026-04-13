@@ -32,3 +32,18 @@ None directly extractable. The categorization taxonomy could inform process libr
 - Multi-language README pattern for international reach
 - Awesome-list as skill discovery hub with companion website
 - Quality standards section defining what makes a good skill (useful reference for babysitter skill validation)
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Skill Categorization Taxonomy | NEW | Domain categorization system for agent skills and processes | - | specializations/shared/skill-categorization-taxonomy.js |
+| Quality Standards Assessment | NEW | Skill quality evaluation criteria and validation methodology | - | specializations/shared/quality-standards-assessment.js |
+| Multi-Platform Compatibility Matrix | NEW | Agent compatibility assessment and cross-platform validation | - | specializations/shared/multi-platform-compatibility-matrix.js |
+| Skill Discovery Feed Management | NEW | Automated discovery and curation of external skill repositories | - | specializations/shared/skill-discovery-feed-management.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Skill Discovery Feed | NEW | Automated scraping of awesome-list repos for new skill discovery | - | plugins/a5c/marketplace/plugins/skill-discovery-feed/ |

@@ -32,3 +32,16 @@ None. Babysitter's existing harness system (`createCodexAdapter`, `createGeminiC
 - Cross-model task delegation via skill installation
 - Python-based skill installer for non-JS ecosystems
 - Separate repos per skill for independent versioning (collaborating-with-codex, collaborating-with-gemini)
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Cross-Model Task Delegation | EXISTING | Already implemented via babysitter harness adapters | library/harness/ | N/A - Already covered |
+| Multi-Harness Skill Installation | EXISTING | Already implemented via babysitter harness system | library/harness/ | N/A - Already covered |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| N/A | N/A | No plugin ideas - functionality already covered by babysitter harness system | - | N/A |

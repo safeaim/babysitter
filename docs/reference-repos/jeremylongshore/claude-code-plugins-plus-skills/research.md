@@ -44,3 +44,21 @@ Ambitious scope but quality is uncertain given the backup-heavy repository struc
 - Firebase hosting for marketplace frontend
 - Multi-harness support (CLAUDE.md + AGENTS.md + Gemini)
 - Planned-skills backlog directory for roadmap tracking
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Plugin Enhancement Pipeline | NEW | Iterative plugin improvement with backup versioning and validation | - | specializations/shared/plugin-enhancement-pipeline.js |
+| Crypto/Finance Workflow | NEW | Market analysis, portfolio tracking, DeFi interaction, and financial reporting | - | specializations/business/crypto-finance-workflow.js |
+| Marketplace Management | NEW | Plugin categorization, quality filtering, and distribution management | - | specializations/shared/marketplace-management.js |
+| Multi-Harness Plugin Distribution | NEW | Cross-platform plugin compatibility and distribution patterns | - | specializations/shared/multi-harness-plugin-distribution.js |
+| Plugin Version Backup System | NEW | Timestamped backup snapshots for plugin version history | - | specializations/shared/plugin-version-backup-system.js |
+| Domain-Organized Plugin Classification | NEW | Business domain categorization for plugin organization | - | specializations/shared/domain-plugin-classification.js |
+| Bulk Quality Assessment | NEW | Quality filtering and validation for large-scale plugin collections | - | specializations/shared/bulk-quality-assessment.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| N/A | N/A | Repository focuses on plugin organization rather than external integrations | - | N/A |

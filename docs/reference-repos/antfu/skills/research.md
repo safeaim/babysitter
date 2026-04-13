@@ -69,5 +69,4 @@ Moderate extractable value. The Vue/Nuxt/Vite skills are ecosystem-specific. The
 
 | Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
 |-------------|-------------------|--------|-----------------|------------------|
-| Skill Sync | NEW | Automatic syncing of vendored skills from upstream repos with validation | - | plugins/a5c/marketplace/plugins/skill-sync/ |
-| Vue Development Suite | NEW | Comprehensive Vue/Nuxt development environment with ecosystem tools | - | plugins/a5c/marketplace/plugins/vue-development-suite/ |
+| Git Submodule Sync | NEW | Automatic syncing of vendored content from upstream repos via git submodules | - | plugins/a5c/marketplace/plugins/git-submodule-sync/ |

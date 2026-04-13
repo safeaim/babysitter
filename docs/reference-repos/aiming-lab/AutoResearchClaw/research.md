@@ -181,3 +181,28 @@ This repository represents a significant advancement in automated research metho
 - Academic standard compliance automation
 
 The 23-stage pipeline architecture and quality validation systems provide substantial value for complex workflow orchestration in babysitter processes.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| 23-Stage Research Pipeline | NEW | Complete autonomous research lifecycle from idea to conference-ready paper | - | specializations/academic-research/autonomous-research-pipeline.js |
+| Multi-Agent Consensus Building | UPGRADE | Collaborative validation with CodeAgent, BenchmarkAgent, FigureAgent patterns | library/specializations/ai-agents-conversational/ | specializations/shared/multi-agent-consensus-building.js |
+| Human-in-the-Loop Intervention System | NEW | 6 intervention modes with confidence-driven dynamic intervention | - | specializations/shared/human-in-loop-intervention-system.js |
+| Quality Assurance Framework | NEW | 7-dimension scoring with AI-slop detection and conference compliance | - | specializations/academic-research/research-quality-assurance.js |
+| Citation Verification Pipeline | NEW | Anti-fabrication system with real literature validation | - | specializations/academic-research/citation-verification-pipeline.js |
+| Literature Integration Workflow | NEW | Multi-source aggregation from OpenAlex, Semantic Scholar, arXiv | - | specializations/academic-research/literature-integration-workflow.js |
+| Experiment Automation Framework | NEW | Hardware-aware execution with statistical validation and reproducibility | - | specializations/academic-research/experiment-automation-framework.js |
+| Academic Paper Generation | NEW | LaTeX compilation with section-by-section writing and formatting | - | specializations/academic-research/academic-paper-generation.js |
+| Reproducibility Validation | NEW | Code and data validation for research reproducibility standards | - | specializations/academic-research/reproducibility-validation.js |
+| Statistical Analysis Automation | NEW | Automated statistical validation and analysis workflows | - | specializations/data-science-ml/statistical-analysis-automation.js |
+| Anti-Hallucination Verification | NEW | Claim validation and anti-fabrication safeguards | - | specializations/shared/anti-hallucination-verification.js |
+| Conference Standard Compliance | NEW | NeurIPS checklist validation and academic standard checking | - | specializations/academic-research/conference-standard-compliance.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| OpenAlex API Integration | NEW | Academic literature search and citation data via OpenAlex API | - | plugins/a5c/marketplace/plugins/openalex-api-integration/ |
+| Semantic Scholar Integration | NEW | Research paper discovery and analysis via Semantic Scholar API | - | plugins/a5c/marketplace/plugins/semantic-scholar-integration/ |
+| ArXiv Integration | NEW | Preprint repository access and paper retrieval via arXiv API | - | plugins/a5c/marketplace/plugins/arxiv-integration/ |

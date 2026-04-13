@@ -42,3 +42,22 @@ High conceptual value. The "skills as memory" paradigm aligns well with babysitt
 - Daily-log skill template: one file per day, append-only, ISO date naming
 - Third-person user references in logs ("The user requested X") for objectivity
 - Skill templates shipped with the platform as starting points
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Self-Evolving Process Template | NEW | Meta-process that wraps any process with learning loop and outcome-based adaptation | - | methodologies/self-evolving-process/ |
+| Context Accumulation Workflow | NEW | Structured context building with daily logging and fact extraction | - | specializations/shared/context-accumulation-workflow.js |
+| Daily Activity Logging Process | NEW | Structured daily logging with append-only entries and ISO date naming | - | specializations/shared/daily-activity-logging.js |
+| User Profile Building | NEW | Fact extraction and user context profile generation from activity logs | - | specializations/shared/user-profile-building.js |
+| Skills-as-Memory Pattern | NEW | Persistent skill-scoped memory accumulation across multiple runs | - | specializations/shared/skills-as-memory-pattern.js |
+| Skill Template Management | NEW | Template system for bootstrapping new skills with learning capabilities | - | specializations/shared/skill-template-management.js |
+| Process Heuristic Adaptation | NEW | Extract patterns from process outcomes to improve future executions | - | specializations/shared/process-heuristic-adaptation.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Memory Layer | NEW | Persistent skill-scoped memory that accumulates context across runs | claude-mem | plugins/a5c/marketplace/plugins/memory-layer/ |
+| Self-Evolving Skills Tracker | NEW | Track skill effectiveness and suggest refinements based on outcome patterns | - | plugins/a5c/marketplace/plugins/self-evolving-skills-tracker/ |

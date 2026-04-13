@@ -49,3 +49,24 @@ High value as a domain specialization exemplar. The pipeline architecture is the
 - Visual target -> implementation -> visual QA feedback loop
 - Pipeline stage table documenting when to read each sub-skill file
 - Asset budget planning as a separate pipeline stage
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Game Generation Pipeline | NEW | End-to-end Godot game creation from natural language requirements | - | specializations/creative/godot-game-generation.js |
+| Visual QA Verification Loop | NEW | Screenshot capture and comparison for visual regression testing | - | specializations/shared/visual-qa-verification.js |
+| Task DAG Decomposition | NEW | Break high-level goals into DAG of implementation tasks with dependencies | - | methodologies/task-dag-decomposition/ |
+| Lazy Sub-File Loading Pattern | NEW | Orchestrator pattern with on-demand loading of stage-specific instructions | - | specializations/shared/lazy-sub-file-loading.js |
+| Resume/Checkpoint Support | NEW | Process resumability via plan file detection and state recovery | - | specializations/shared/resume-checkpoint-support.js |
+| Asset Budget Planning | NEW | Resource planning and asset generation budgeting for creative projects | - | specializations/creative/asset-budget-planning.js |
+| Game Architecture Scaffolding | NEW | Godot project structure and scene hierarchy generation | - | specializations/creative/game-architecture-scaffolding.js |
+| Visual Target Implementation Loop | NEW | Visual reference → implementation → QA verification feedback cycle | - | specializations/shared/visual-target-implementation-loop.js |
+| Multi-Stage Pipeline Orchestration | NEW | Complex pipeline with stage documentation and execution ordering | - | specializations/shared/multi-stage-pipeline-orchestration.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Godot Integration | NEW | Godot CLI tools integration for project scaffolding and build automation | - | plugins/a5c/marketplace/plugins/godot-integration/ |
+| Screenshot QA Integration | NEW | Visual regression testing via screenshot capture and comparison tools | - | plugins/a5c/marketplace/plugins/screenshot-qa-integration/ |

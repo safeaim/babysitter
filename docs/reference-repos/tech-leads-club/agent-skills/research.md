@@ -66,3 +66,29 @@ Extremely high value -- the largest and most well-organized skill collection in 
 - Skill disambiguation in descriptions (e.g., "Do NOT use for X, use Y instead")
 - GTM skills applying engineering rigor to marketing/sales processes
 - Skill architect meta-skill for creating new skills
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Domain-Driven Architecture Analysis | UPGRADE | DDD strategic design with subdomain identification and bounded context mapping | library/specializations/architecture/ | specializations/architecture/domain-driven-analysis.js |
+| Technical Document Generation | NEW | Structured generation of ADRs, RFCs, and design docs based on scope/audience | - | specializations/shared/technical-document-generation.js |
+| Go-to-Market Execution | NEW | End-to-end GTM process for technical founders with metrics tracking | - | specializations/business/gtm-execution.js |
+| Web Performance Audit | UPGRADE | Core Web Vitals and Lighthouse-based performance optimization | library/specializations/frontend/ | specializations/frontend/web-performance-audit.js |
+| Security Threat Modeling | UPGRADE | Threat model creation with ownership mapping and remediation | library/specializations/security-compliance/ | specializations/security-compliance/threat-modeling.js |
+| Legacy Migration Planning | NEW | Phased legacy system migration with boundary analysis | - | specializations/architecture/legacy-migration-planning.js |
+| Cloud Deployment Orchestration | NEW | Multi-platform cloud deployment with AWS/Cloudflare/Vercel patterns | - | specializations/devops-sre-platform/cloud-deployment-orchestration.js |
+| Design System Implementation | NEW | Figma to code implementation with frontend blueprint generation | - | specializations/frontend/design-system-implementation.js |
+| GTM Content Pipeline | NEW | Content strategy and multi-platform publishing for technical products | - | specializations/business/gtm-content-pipeline.js |
+| Chrome DevTools Automation | NEW | Automated performance and debugging workflows with DevTools | - | specializations/frontend/chrome-devtools-automation.js |
+| Nx Monorepo Management | NEW | Nx workspace task orchestration and CI/CD optimization | - | specializations/devops-sre-platform/nx-monorepo-management.js |
+| Skill Architecture Meta-Process | NEW | Meta-skill for creating new domain-specific skills | - | methodologies/skill-architecture/ |
+| Sales Motion Design | NEW | Engineering-rigor approach to B2B sales process design | - | specializations/business/sales-motion-design.js |
+| React Native Development Process | NEW | Cross-platform mobile development with React Native patterns | - | specializations/business/react-native-development.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Jira/Confluence Integration | NEW | Bidirectional sync between babysitter runs and Atlassian tools via API | - | plugins/a5c/marketplace/plugins/jira-confluence-integration/ |
+| Figma Design Bridge | NEW | Figma API integration to import designs as implementation specifications | - | plugins/a5c/marketplace/plugins/figma-design-bridge/ |

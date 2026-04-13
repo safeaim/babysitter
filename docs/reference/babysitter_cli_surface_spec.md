@@ -43,7 +43,7 @@ Acceptance Criteria
 3. **Safe automation loops** – orchestration loops are owned by the caller (skill/hook/worker). The CLI provides deterministic primitives (`run:iterate`, `task:list`, `task:post`) and never embeds task-execution policy.
 4. **State repair tooling** – `run:rebuild-state` rebuilds derived state when `state/state.json` is missing or stale and reports the rebuild result in both human and JSON modes. Subsequent `run:status` reflects the rebuilt `stateVersion`.
 5. **Process integration** – CLI surfaces are thin wrappers over runtime APIs (`createRun`, `orchestrateIteration`, `commitEffectResult`, `rebuildStateCache`). Unit tests stub these APIs to ensure argument translation and error propagation are correct.
-6. **Documentation & help** – `babysitter --help` (or bare invocation) prints the usage block with all commands/flags. README/sdk.md tables stay in sync with the implementation.
+6. **Documentation & help** – `babysitter --help` (or bare invocation, or wrong-syntax error) prints the **agent-facing** usage block (commands intended for skill/hook automation). `babysitter --help-human` prints the **human-facing** usage block (commands intended for direct interactive use, e.g. `harness:*`, `session:init`, `mcp:serve`, `compress-output`). README/sdk.md tables stay in sync with both surfaces.
 
 Edge Cases
 ----------

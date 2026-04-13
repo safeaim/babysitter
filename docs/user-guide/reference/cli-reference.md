@@ -96,8 +96,11 @@ These options are available on all commands:
 | `--json` | Output in JSON format | `false` |
 | `--verbose` | Enable verbose logging (paths, resolved options) | `false` |
 | `--dry-run` | Preview changes without applying (where supported) | `false` |
-| `--help` | Show help for command | - |
-| `--version` | Show version number | - |
+| `--help`, `-h` | Show agent-facing help (default; covers commands intended for agent/automation use) | - |
+| `--help-human` | Show human-facing help (covers commands intended for interactive human use, e.g. `harness:*`, `session:init`, `mcp:serve`) | - |
+| `--version`, `-v` | Show version number | - |
+
+> The default `--help` (and the usage text printed on a wrong-syntax invocation or a bare command name) lists **agent-facing** commands only — the surface a babysitter skill or hook would call. Run `babysitter --help-human` to see the commands intended for direct human use.
 
 ### Path Handling
 

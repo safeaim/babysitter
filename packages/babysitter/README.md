@@ -19,7 +19,8 @@ npx @a5c-ai/babysitter --help
 Or if installed globally:
 
 ```bash
-babysitter --help
+babysitter --help          # agent-facing commands (default)
+babysitter --help-human    # human-facing commands (harness:*, session:init, mcp:serve, ...)
 ```
 
 ## What's Included

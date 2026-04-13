@@ -45,7 +45,7 @@ export interface CategorizedPolicyEngine {
 // Category behaviours
 // ---------------------------------------------------------------------------
 
-const CATEGORY_BEHAVIORS: Record<PolicyCategory, CategoryEnforcementBehavior> = {
+const _CATEGORY_BEHAVIORS: Record<PolicyCategory, CategoryEnforcementBehavior> = {
   A: { category: 'A', description: 'Immutable critical rules', immutable: true, requiresClassification: false, isFallback: false },
   B: { category: 'B', description: 'Advisory rules', immutable: false, requiresClassification: false, isFallback: false },
   C: { category: 'C', description: 'Classification-required rules', immutable: false, requiresClassification: true, isFallback: false },

@@ -308,7 +308,7 @@ export async function handleInstructionsCommand(
       '',
       `- CI: \`${executionContext.ci}\``,
       `- Trigger: \`${executionContext.trigger}\``,
-      executionContext.branch ? `- Branch: \`${executionContext.branch}\`` : undefined,
+      executionContext.branch.ref ? `- Branch: \`${executionContext.branch.ref}\`` : undefined,
       executionContext.repo ? `- Repo: \`${executionContext.repo.owner}/${executionContext.repo.name}\`` : undefined,
       executionContext.actor ? `- Actor: \`${executionContext.actor.login}\`${executionContext.actor.isBot ? ' (bot)' : ''}` : undefined,
       '',

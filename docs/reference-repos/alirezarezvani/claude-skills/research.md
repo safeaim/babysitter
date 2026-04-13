@@ -1,73 +1,95 @@
 # alirezarezvani/claude-skills
 
-- **Archetype:** mega-skill-pack
-- **Stars:** 10,670
-- **Last pushed:** 2026-04-12
-- **License:** MIT
-- **Discovered:** 2026-04-12
+- **Archetype**: domain-skill-pack
+- **Stars**: 10,787
+- **Last pushed**: 2026-04-13
+- **License**: MIT
+- **Discovered**: 2026-04-13
 - **Source**: gh-search
+- **Skills found**: 540
 
 ## Summary
-
-The largest open-source Claude Code skills collection (235 skills across 9 domains). Organized by domain: engineering, business-growth, c-level-advisor, marketing, product-team, project-management, ra-qm-team, finance, and documentation. Each skill is a SKILL.md + optional Python scripts (305 total, all stdlib-only) + reference docs. Includes a lightweight orchestration protocol (persona + skill + phase pattern) and multi-tool conversion scripts.
+Professional business-domain skill collection with 540 production-ready skills organized by business functions (engineering, marketing, product, C-level advisory, finance, compliance) rather than technical domains. Features sophisticated multi-harness support, 314 Python automation tools, comprehensive documentation infrastructure, and enterprise-grade organization patterns.
 
 ## Assessment
-
-The vast majority of skills are single-domain reference sheets / prompt engineering -- not multi-phase workflows. However, the **ra-qm-team** (Regulatory Affairs / Quality Management) domain contains genuine multi-phase audit and investigation workflows with Python tooling:
-
-- **CAPA Officer**: Full CAPA investigation workflow (trigger -> assess -> investigate -> RCA -> corrective action -> effectiveness verification) with `capa_tracker.py` and `root_cause_analyzer.py`
-- **FDA Consultant Specialist**: Regulatory submission workflows
-- Other RA/QM skills with compliance-oriented multi-phase pipelines
-
-The orchestration protocol is a prompt-engineering pattern (persona + skill + phase handoff), not a deterministic process -- no extractable process there.
-
-The Python scripts across domains (churn_risk_analyzer, pipeline_analyzer, burn_rate_calculator, etc.) represent potential plugin tooling.
+VERY HIGH VALUE. This represents the most professionally organized domain-skill-pack with clear business function separation and enterprise-ready workflows. Unlike mega-skill-packs that dump skills alphabetically, this repository organizes skills by business domains (C-level strategic leadership, marketing campaigns, product management, engineering teams, compliance frameworks). The quality is consistently high with systematic methodologies, Python automation tools, and production-ready processes. The multi-harness support and comprehensive documentation make this highly extractable for business process automation.
 
 ## Extraction Priority
-
-**Medium-Low.** Most content is prompt engineering. The RA/QM domain has genuine process value. The Python scripts are interesting as plugin building blocks but are standalone calculators, not orchestration-worthy.
-
----
+VERY HIGH - Contains sophisticated business domain processes directly transferable:
+- C-level strategic decision-making processes → specializations/business-strategy/
+- Marketing campaign and growth workflows → specializations/marketing-automation/
+- Product management and UX methodologies → specializations/product-management/
+- Engineering team processes and tools → specializations/software-engineering/
+- Compliance and regulatory frameworks → specializations/regulatory-compliance/
 
 ## Processes
+- **c-level-strategic-leadership**: Systematic processes for executive decision-making, strategic planning, and organizational leadership
+  - Source: c-level-advisor/ skills (34 skills covering CEO/CTO strategic frameworks)
+  - Placement: specializations/business-strategy/
+  - Inputs: Business context, strategic objectives, organizational constraints
+  - Outputs: Strategic decisions, implementation plans, organizational guidance
+  - Complexity: complex
+  - Notes: Covers CEO strategic thinking, CTO technology leadership, board-level decision frameworks
 
-### 1. CAPA Investigation Pipeline
+- **marketing-campaign-orchestration**: Comprehensive marketing automation workflows covering content, SEO, demand generation, and analytics
+  - Source: marketing-skill/ domain (44 skills across 7 marketing pods)
+  - Placement: specializations/marketing-automation/
+  - Inputs: Campaign objectives, target audiences, channel strategies
+  - Outputs: Campaign plans, content strategies, performance analytics
+  - Complexity: complex
+  - Notes: Includes Python tools for analytics, content optimization, and campaign tracking
 
-- **Source:** `ra-qm-team/capa-officer/SKILL.md`
-- **Placement:** `specializations/quality-management/capa-investigation.js`
-- **Description:** Systematic Corrective and Preventive Action investigation for quality management systems. Phases: (1) Document trigger event with evidence, (2) Assess severity and determine CAPA necessity using classification matrix, (3) Form investigation team per severity tier, (4) Collect evidence via structured checklist, (5) Select and apply RCA methodology (5-Why, Fishbone, Fault Tree), (6) Identify and validate root cause(s), (7) Develop corrective/preventive actions, (8) Implement with tracking, (9) Effectiveness verification with defined criteria and timeframes.
-- **Key inputs:** Trigger event description, severity classification, affected processes/products
-- **Key outputs:** CAPA report, root cause determination, action plan with owners/dates, effectiveness verification results
-- **Breakpoints:** CAPA necessity determination (human decides if CAPA is warranted), root cause validation (human confirms root cause before corrective actions), action plan approval (management review before implementation)
-- **Why it fits babysitter:** Clear phase gates, human approval points at severity classification and action approval, deterministic checklist execution, artifact generation at each phase.
+- **product-management-workflow**: Systematic product development processes covering RICE prioritization, OKRs, user stories, and UX research
+  - Source: product-team/ skills (16 skills with Apple HIG expertise)
+  - Placement: specializations/product-management/
+  - Inputs: Product requirements, user research, business objectives
+  - Outputs: Product roadmaps, feature specifications, UX guidelines
+  - Complexity: moderate
+  - Notes: Includes Apple Human Interface Guidelines expertise and product scaffolding tools
 
-### 2. Regulatory Compliance Audit Pipeline
+- **engineering-team-automation**: Professional engineering workflows with accessibility audits, security testing, and deployment automation
+  - Source: engineering-team/ and engineering/ skills (82 total engineering skills)
+  - Placement: specializations/software-engineering/
+  - Inputs: Engineering requirements, technical constraints, quality standards
+  - Outputs: Code implementations, automation tools, quality reports
+  - Complexity: complex
+  - Notes: Includes 39+ Python tools, WCAG 2.2 compliance, CI/CD integration patterns
 
-- **Source:** `ra-qm-team/` (multiple skills: FDA consultant, compliance tracker, quality system skills)
-- **Placement:** `specializations/quality-management/regulatory-audit.js`
-- **Description:** Multi-phase regulatory compliance audit workflow. Phases: (1) Scope definition and regulatory standard identification, (2) Document collection and gap analysis, (3) Finding classification (Major/Minor/Observation), (4) Risk assessment per finding, (5) Remediation planning with priority ordering, (6) Evidence package assembly.
-- **Key inputs:** Regulatory standard (FDA 21 CFR, ISO 13485, etc.), scope boundaries, existing documentation
-- **Key outputs:** Gap analysis matrix, findings report with severity classifications, remediation plan, evidence packages
-- **Breakpoints:** Scope approval, finding classification review, remediation plan sign-off
-- **Why it fits babysitter:** Structured audit phases, mandatory human review of findings before remediation, deterministic gap analysis checklist.
+- **regulatory-compliance-management**: Systematic compliance frameworks for ISO, FDA, GDPR, and other regulatory standards
+  - Source: ra-qm-team/ skills (14 compliance skills)
+  - Placement: specializations/regulatory-compliance/
+  - Inputs: Regulatory requirements, compliance scope, organizational structure
+  - Outputs: Compliance frameworks, audit procedures, documentation standards
+  - Complexity: complex
 
 ## Plugin Ideas
+- **business-domain-suite**: Plugin for installing complete business function skill sets with domain-specific automation
+  - What install.md would do: Interview user about business domain needs, install relevant skill packages, configure Python automation tools, set up documentation frameworks
+  - Processes it would copy: All domain-specific processes based on user selection
+  - Configs/hooks it would create: Business domain templates, automation scripts, documentation standards, reporting dashboards
+  - Source evidence: Comprehensive business domain organization with 540 skills across 9 professional domains
 
-### 1. Business Metrics Calculator Suite
-
-- **Name:** `business-metrics-calculators`
-- **install.md description:** Installs a collection of Python-based business metric calculators as CLI tools accessible via babysitter tasks. Includes: burn rate calculator (`cfo-advisor/scripts/burn_rate_calculator.py`), unit economics analyzer, pipeline analyzer, churn risk analyzer, health score calculator, forecast accuracy tracker, growth model simulator. All stdlib-only Python, zero dependencies. The install.md would copy scripts to a tools directory and register them as available task executors.
-- **Source scripts:** 20+ Python scripts across `c-level-advisor/`, `business-growth/`, `finance/` directories
-- **Value:** Gives babysitter processes access to quantitative business analysis without external API dependencies.
-
-### 2. Competitive Intelligence Toolkit
-
-- **Name:** `competitive-intel`
-- **install.md description:** Installs competitive analysis tools: competitive matrix builder (`sales-engineer/scripts/competitive_matrix_builder.py`), RFP response analyzer, POC planner. Provides structured frameworks for competitive teardown workflows.
-- **Source:** `business-growth/sales-engineer/scripts/`
+- **enterprise-automation-framework**: Plugin for business process automation with Python tools and professional workflows
+  - What install.md would do: Install Python automation environment, set up business process templates, configure reporting tools, create workflow orchestration
+  - Processes it would copy: marketing-campaign-orchestration, engineering-team-automation, product-management-workflow
+  - Configs/hooks it would create: Python tool configurations, workflow templates, automation scripts, analytics dashboards
+  - Source evidence: 314 Python automation tools with professional business integration patterns
 
 ## Implicit Procedural Knowledge
+- **Business Domain Organization**: Methodology for organizing procedural knowledge by business function rather than technical domain
+  - Source: Overall repository structure organized by business domains instead of technical categories
+  - Placement: methodologies/domain-organization/
+  - Why codify: Provides framework for organizing large procedural knowledge bases by business value rather than technical similarity
+  - Sketch: Business function analysis → Domain boundary identification → Skill categorization → Cross-domain dependency mapping → Integration pattern design
 
-- **Orchestration phase handoff pattern:** The orchestration protocol documents a clean pattern for context passing between phases: "Decisions made, Artifacts created, Open questions" as the handoff payload. This maps directly to babysitter process context passing between tasks.
-- **Severity-gated team composition:** The CAPA investigation uses severity level to determine required team members (Critical = 5 people, Major = 3, Minor = 2). This is a reusable pattern for breakpoint routing via expert fields.
-- **CAPA necessity determination matrix:** A decision table mapping trigger types (customer complaint, audit finding, nonconformance, trend) to CAPA-required/evaluate/recommended -- reusable as an auto-approval pattern for breakpoints.
+- **Multi-Harness Professional Deployment**: Process for deploying professional business skills across multiple AI coding platforms
+  - Source: .claude, .codex-plugin, .gemini directory structure with professional documentation
+  - Placement: methodologies/cross-platform-deployment/
+  - Why codify: Systematic approach to making business processes available across different AI platforms
+  - Sketch: Platform capability analysis → Skill adaptation → Deployment orchestration → Quality validation → Professional documentation
+
+- **Enterprise Skill Quality Management**: Framework for maintaining professional-grade skill quality across large collections
+  - Source: Quality standards, documentation infrastructure, version management, and professional organization
+  - Placement: methodologies/quality-management/
+  - Why codify: Systematic approach to maintaining consistent quality in large professional skill collections
+  - Sketch: Quality criteria definition → Assessment framework → Continuous improvement → Version management → Professional standards maintenance

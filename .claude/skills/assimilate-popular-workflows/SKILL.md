@@ -23,12 +23,25 @@ Extracted processes go into the babysitter process library (`plugins/babysitter/
 
 A babysitter plugin is a set of natural language instructions (markdown) or deterministic coded processes (JS) that an AI agent reads and executes to install a modular set of capabilities. A plugin contains at minimum `install.md` with instructions the AI agent follows to modify the user's project. See `docs/plugins.md` for the full specification.
 
-When identifying plugin ideas, think about what could be distributed as an installable package:
-- An `install.md` that interviews the user about their project, detects their stack, and installs relevant processes/configs/hooks
-- A `configure.md` for reconfiguration
-- Processes copied from the library into `.a5c/processes/`
-- ESLint rules, git hooks, CI/CD templates, tool configs
-- Migration files for version upgrades
+**CRITICAL DISTINCTION**: Plugin ideas should ONLY be things that modify project setup, install external integrations, or enforce workflows beyond just adding processes. Do NOT suggest plugins for:
+- **Skill pack collections**: If you mark processes for extraction, don't suggest a plugin that just bundles those processes
+- **Expert/Role plugins**: ".NET Expert", "React Native Expert", "Vue Development Suite", "Security Expert" - these are just skill packs
+- **Domain suites**: "Frontend Development Suite", "DevOps Toolkit", "Data Science Suite" - these bundle processes
+- **Orchestration patterns**: Multi-agent coordination, session continuity, workflow orchestration belong in babysitter core or as processes
+- **Process repackaging**: Any plugin that just wraps processes you already marked for extraction
+
+Valid plugin ideas change the project or setup (may not install skills at all):
+- **Project configuration changes**: Modify CLAUDE.md/AGENTS.md instructions, update settings, configure behaviors
+- **External service integrations**: GitHub API, Slack API, database connections, CLI tools, MCP servers
+- **Project enforcement mechanisms**: Git hooks, ESLint rules, pre-commit checks, CI/CD pipeline templates
+- **Infrastructure and deployment**: Docker configs, cloud provider setup, deployment templates, containerization
+- **Memory and persistence systems**: Context storage, session state, cross-run memory, caching layers
+- **Development environment changes**: IDE integrations, build tool configs, linting setups, editor extensions
+- **Workflow enforcement**: Harness hooks, commit policies, pipeline triggers, quality gates, approval workflows
+- **Project structure modifications**: Directory layouts, file templates, scaffolding, boilerplate generation
+- **Additional project functionality**: New capabilities, tool chains, automation layers, monitoring integration
+
+**Rule of thumb**: If it teaches babysitter how to do something → process. If it changes the project, adds external connections, or modifies behavior → plugin.
 
 **Valid plugin use case categories** (derived from the existing marketplace):
 

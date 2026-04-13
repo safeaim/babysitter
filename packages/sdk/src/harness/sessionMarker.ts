@@ -20,6 +20,9 @@ import {
   writeFileSync,
   renameSync,
   mkdirSync,
+  readdirSync,
+  unlinkSync,
+  statSync,
 } from "node:fs";
 import { getGlobalStateDir } from "../config";
 import { isProcessAlive } from "../utils/processLiveness";
@@ -258,7 +261,57 @@ export function writeSessionMarker(harness: string, sessionId: string): string |
   if (!info) return undefined;
   const target = getSessionMarkerPath(harness, info.pid);
   atomicWriteString(target, `${sessionId}\n`);
+  // Opportunistic GC — markers accumulate across ancestor lifetimes; sweep
+  // dead-PID markers on every write. Best-effort, never fatal.
+  try { cleanupDeadSessionMarkers(); } catch { /* ignore */ }
   return target;
+}
+
+const MARKER_FILENAME_RE = /^current-session-.+-pid-(\d+)$/;
+const MARKER_RECENCY_GRACE_MS = 60_000;
+
+/**
+ * Remove marker files whose keyed PID is no longer alive. Intended to be
+ * invoked opportunistically (e.g. from `writeSessionMarker`). Returns the
+ * number of files removed. Errors are swallowed per-entry so a transient
+ * filesystem problem does not abort the whole sweep.
+ *
+ * Markers modified within the last `MARKER_RECENCY_GRACE_MS` are retained
+ * regardless of PID liveness. This protects just-written markers on platforms
+ * or test harnesses where PID liveness checks cannot observe the owning
+ * process yet (e.g. synthesized test PIDs).
+ */
+export function cleanupDeadSessionMarkers(): number {
+  const dir = getGlobalStateDir();
+  let entries: string[];
+  try {
+    entries = readdirSync(dir);
+  } catch {
+    return 0;
+  }
+  const now = Date.now();
+  let removed = 0;
+  for (const entry of entries) {
+    const match = MARKER_FILENAME_RE.exec(entry);
+    if (!match) continue;
+    const pid = parseInt(match[1], 10);
+    if (!Number.isFinite(pid) || pid <= 0) continue;
+    const full = path.join(dir, entry);
+    try {
+      const st = statSync(full);
+      if (now - st.mtimeMs < MARKER_RECENCY_GRACE_MS) continue;
+    } catch {
+      continue;
+    }
+    if (isProcessAlive(pid)) continue;
+    try {
+      unlinkSync(full);
+      removed++;
+    } catch {
+      // best-effort
+    }
+  }
+  return removed;
 }
 
 /**
@@ -278,6 +331,44 @@ export function readSessionMarker(harness: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Shared session-id resolution following the standard adapter precedence:
+ *   1. Explicit `parsed.sessionId` (from hook stdin JSON).
+ *   2. If `BABYSITTER_TRUST_ENV_SESSION=1`: `BABYSITTER_SESSION_ID`, then
+ *      harness-native env vars — legacy escape hatch.
+ *   3. Otherwise: PID-scoped marker (survives env-var loss across descendants).
+ *   4. Harness-native env vars.
+ *   5. `BABYSITTER_SESSION_ID`.
+ *
+ * `harnessEnvVars` is the ordered list of harness-native env var names
+ * (e.g. `["CODEX_THREAD_ID"]`, `["GEMINI_SESSION_ID"]`). Adapters that do not
+ * use the marker system should not call this helper.
+ */
+export function resolveSessionIdWithMarker(
+  harness: string,
+  parsed: { sessionId?: string },
+  harnessEnvVars: readonly string[] = [],
+): string | undefined {
+  if (parsed.sessionId) return parsed.sessionId;
+  const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
+  if (trustEnv) {
+    if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+    for (const key of harnessEnvVars) {
+      const v = process.env[key];
+      if (v) return v;
+    }
+    return undefined;
+  }
+  const fromMarker = readSessionMarker(harness);
+  if (fromMarker) return fromMarker;
+  for (const key of harnessEnvVars) {
+    const v = process.env[key];
+    if (v) return v;
+  }
+  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
+  return undefined;
 }
 
 /**

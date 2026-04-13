@@ -25,7 +25,7 @@ import {
   installCliViaNpm,
   runPackageBinaryViaNpx,
 } from "./installSupport";
-import { readSessionMarker, writeSessionMarker } from "./sessionMarker";
+import { writeSessionMarker, resolveSessionIdWithMarker } from "./sessionMarker";
 
 function resolvePiPluginRoot(
   args: { pluginRoot?: string } = {},
@@ -43,18 +43,7 @@ function resolvePiStateDir(args: {
 }
 
 function resolvePiSessionId(parsed: { sessionId?: string }): string | undefined {
-  if (parsed.sessionId) return parsed.sessionId;
-  const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
-  if (trustEnv) {
-    if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
-    if (process.env.PI_SESSION_ID) return process.env.PI_SESSION_ID;
-    return undefined;
-  }
-  const fromMarker = readSessionMarker("pi");
-  if (fromMarker) return fromMarker;
-  if (process.env.PI_SESSION_ID) return process.env.PI_SESSION_ID;
-  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
-  return undefined;
+  return resolveSessionIdWithMarker("pi", parsed, ["PI_SESSION_ID"]);
 }
 
 async function bindPiSession(

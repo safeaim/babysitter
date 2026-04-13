@@ -22,7 +22,7 @@ import {
 } from "../session";
 import type { SessionState } from "../session";
 import { installCliViaNpm, runPackageBinaryViaNpx } from "./installSupport";
-import { readSessionMarker, writeSessionMarker } from "./sessionMarker";
+import { writeSessionMarker, resolveSessionIdWithMarker } from "./sessionMarker";
 
 function resolveOhMyPiPluginRoot(
   args: { pluginRoot?: string } = {},
@@ -40,18 +40,7 @@ function resolveOhMyPiStateDir(args: {
 }
 
 function resolveOhMyPiSessionId(parsed: { sessionId?: string }): string | undefined {
-  if (parsed.sessionId) return parsed.sessionId;
-  const trustEnv = process.env.BABYSITTER_TRUST_ENV_SESSION === "1";
-  if (trustEnv) {
-    if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
-    if (process.env.OMP_SESSION_ID) return process.env.OMP_SESSION_ID;
-    return undefined;
-  }
-  const fromMarker = readSessionMarker("oh-my-pi");
-  if (fromMarker) return fromMarker;
-  if (process.env.OMP_SESSION_ID) return process.env.OMP_SESSION_ID;
-  if (process.env.BABYSITTER_SESSION_ID) return process.env.BABYSITTER_SESSION_ID;
-  return undefined;
+  return resolveSessionIdWithMarker("oh-my-pi", parsed, ["OMP_SESSION_ID"]);
 }
 
 async function bindOhMyPiSession(

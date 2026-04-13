@@ -64,9 +64,27 @@ Superpowers is already installed as a plugin in the babysitter project (skills a
 ### Plugin Ideas
 - **Superpowers methodology bridge plugin:** Since superpowers is already installed as a plugin, the value is in converting its skill-based methodology into deterministic babysitter processes that can be replayed, journal-tracked, and state-cached. A marketplace plugin could provide `babysitter harness:call --process superpowers-tdd` etc.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| TDD Quality Convergence | UPGRADE | Enhance with Iron Law enforcement and anti-patterns | library/methodologies/superpowers/superpowers-workflow.js | methodologies/superpowers/ (enhancement) |
+| Systematic Debugging | UPGRADE | Enhance with 4-phase methodology and root-cause tracing | library/methodologies/superpowers/superpowers-workflow.js | methodologies/superpowers/ (enhancement) |
+| Plan-Execute-Review Pipeline | UPGRADE | Enhance with dedicated reviewer prompts and phase gates | library/methodologies/superpowers/superpowers-workflow.js | methodologies/superpowers/ (enhancement) |
+| Subagent Orchestration Pattern | UPGRADE | Enhance with dispatch-implement-review cycle | library/methodologies/superpowers/using-superpowers.js | methodologies/superpowers/ (enhancement) |
+| Parallel Agent Dispatch | UPGRADE | Enhance with independent task identification patterns | library/methodologies/superpowers/superpowers-workflow.js | methodologies/superpowers/ (enhancement) |
+| Code Review Cycle | VARIANT | Could be extracted as shared pattern | - | specializations/shared/bidirectional-review.js |
+| Branch Finalization | VARIANT | Could be extracted as shared workflow pattern | - | specializations/shared/branch-finalization.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Superpowers Methodology Bridge | NEW | Convert superpowers skills to deterministic processes | - | plugins/a5c/marketplace/plugins/superpowers-bridge/ |
+
 ### SKIP
 - using-superpowers meta-skill (skill-management)
-- writing-skills (skill-management)
+- writing-skills (skill-management)  
 - using-git-worktrees (utility, not a process methodology)
 - brainstorming (already lightweight enough as a skill, doesn't benefit from process orchestration)
 - The plugin infrastructure (hooks, commands, agents) -- babysitter has its own

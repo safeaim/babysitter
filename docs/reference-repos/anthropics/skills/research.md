@@ -35,3 +35,24 @@ This is the upstream source for the agent skills standard. The MCP builder skill
 - YAML frontmatter with `name`, `description`, `license`, optional `allowed-tools` and `metadata` fields
 - Template-driven skill creation via `template/SKILL.md` -- defines the canonical skill format
 - Skills are self-contained markdown with no external dependencies beyond specified tools
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| MCP Server Development | NEW | Multi-phase MCP server creation workflow | - | specializations/devops-sre-platform/mcp-server-development.js |
+| Document Generation | NEW | PDF/DOCX/XLSX/PPTX generation workflows | - | specializations/business/document-generation.js |
+| Frontend Design Review | NEW | Frontend design quality assessment | - | specializations/frontend/frontend-design-review.js |
+| Webapp Testing | NEW | End-to-end webapp testing workflow | - | specializations/frontend/webapp-testing.js |
+| Skill Scaffolding | UPGRADE | Meta-process for creating new skills | library/methodologies/superpowers/using-superpowers.js | specializations/shared/skill-scaffolding.js |
+| Phased Workflow Pattern | NEW | Discovery-Analysis-Implementation-Verification pattern | - | specializations/shared/phased-workflow.js |
+| Brand Guidelines Enforcement | NEW | UI validation against brand standards | - | specializations/frontend/brand-guidelines.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| DevX MCP Builder | NEW | MCP server scaffolding with test harness | - | plugins/a5c/marketplace/plugins/mcp-builder/ |
+| Document Factory | NEW | Unified document generation with templates | - | plugins/a5c/marketplace/plugins/document-factory/ |
+| Webapp Testing | NEW | Playwright-based visual and functional testing | - | plugins/a5c/marketplace/plugins/webapp-testing/ |
+| Brand Guidelines Enforcer | NEW | UI validation against brand standards | - | plugins/a5c/marketplace/plugins/brand-enforcer/ |

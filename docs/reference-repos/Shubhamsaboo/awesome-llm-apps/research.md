@@ -109,3 +109,24 @@ N/A - This is not a harness framework repository.
   - Placement: specializations/research/source-validation
   - Why codify: Ensures research quality and prevents misinformation propagation
   - Sketch: Identify sources → Cross-reference claims → Verify credentials → Rate reliability → Document provenance
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Systematic Debugging Process | NEW | Create 6-phase debugging workflow | - | specializations/shared/systematic-debugging.js |
+| Academic Research Methodology | NEW | Structured approach to academic research | - | specializations/research/academic-research.js |
+| Deep Research Pipeline | NEW | Multi-stage research with source verification | - | specializations/shared/deep-research.js |
+| Self-Improving Agent Framework | NEW | Automated skill optimization using ADK | - | methodologies/automated-optimization/ |
+| Project Planning Workflow | VARIANT | Could enhance existing planning processes | library/methodologies/agile.js | specializations/shared/project-planning.js |
+| Multi-Agent Optimization Pattern | NEW | Specialized agent roles for improvement | - | specializations/shared/multi-agent-optimization.js |
+| Debugging Strategy Selection | NEW | Systematic debugging technique selection | - | specializations/shared/debugging-strategy.js |
+| Research Source Validation | NEW | Information verification and cross-referencing | - | specializations/research/source-validation.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Agent Skill Optimizer | NEW | ADK integration for process optimization | - | plugins/a5c/marketplace/plugins/agent-skill-optimizer/ |
+| Development Toolkit | UPGRADE | Enhanced debugging and code review | basic-security, agentsh | plugins/a5c/marketplace/plugins/development-toolkit/ |
+| Research Suite | NEW | Academic and deep research capabilities | - | plugins/a5c/marketplace/plugins/research-suite/ |

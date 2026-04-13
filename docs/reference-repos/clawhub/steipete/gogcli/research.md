@@ -56,6 +56,22 @@ HIGH extractable value. Google Workspace integration is a universal developer ne
 - **Category**: Security
 - **install.md**: Extracts the allowlist pattern from gogcli (restricting which CLI subcommands an agent can invoke) and generalizes it as a babysitter plugin. Configures per-tool allowlists that the harness enforces. Useful for any CLI tool where the agent should only access a subset of commands.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Email Triage and Response Workflow | NEW | Agent-assisted email management with search, categorization, drafting, and tracking | - | specializations/shared/email-triage-workflow.js |
+| Calendar Conflict Resolution | NEW | Scheduling conflict detection and resolution with free/busy checking and alternative times | - | specializations/shared/calendar-conflict-resolution.js |
+| Google Docs Generation Pipeline | NEW | Document generation from Markdown to Google Docs with templating and export | - | specializations/shared/google-docs-generation-pipeline.js |
+| Multi-Account Credential Management | NEW | Multiple service account management with credential isolation via OS keyring | - | specializations/shared/multi-account-credential-management.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Google Workspace Integration | NEW | Comprehensive Google Workspace CLI with OAuth, multi-account, and command allowlists | - | plugins/a5c/marketplace/plugins/google-workspace-integration/ |
+| Agent Sandbox Command Allowlist | UPGRADE | Generalized command allowlist pattern beyond existing basic-security | plugins/a5c/marketplace/plugins/basic-security/ | plugins/a5c/marketplace/plugins/agent-sandbox-command-allowlist/ |
+
 ## Implicit Procedural Knowledge
 
 - **Agent-friendly CLI design pattern**: JSON-first output, command allowlists for sandboxed execution, credential isolation via OS keyring. This is a reference implementation for how CLI tools should be designed to work with AI agents.

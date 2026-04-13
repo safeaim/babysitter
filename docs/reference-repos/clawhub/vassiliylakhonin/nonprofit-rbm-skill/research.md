@@ -47,3 +47,18 @@ This is a good example of a "specialization" process that could live in babysitt
 ### Plugin Ideas
 
 None -- this is purely process content, no plugin architecture patterns.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Nonprofit Grant Package Generator | NEW | Full RBM-based grant writing with Theory of Change, logframe, MEAL, GESI, and compliance scoring | - | specializations/business/nonprofit-grant-package-generator.js |
+| Evidence-Graded Research Pattern | NEW | Confidence labeling pattern (HIGH/MEDIUM/UNVERIFIED) with source-limited fallback mode | - | specializations/shared/evidence-graded-research-pattern.js |
+| Results-Based Management Framework | NEW | RBM chain implementation with strategic context, program logic, and validation sprint | - | specializations/business/results-based-management-framework.js |
+| Compliance Scoring Methodology | NEW | Quantified readiness assessment with pass/warn/fail indicators and confidence reporting | - | specializations/shared/compliance-scoring-methodology.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| N/A | N/A | No plugin ideas identified - purely process content, no plugin architecture patterns | - | N/A |

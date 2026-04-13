@@ -50,3 +50,20 @@ Key patterns:
 ### Plugin Ideas
 
 1. **Workflow Catalog Plugin**: A babysitter marketplace plugin that provides a browseable catalog of pre-built workflow templates (inspired by this repo's structure) that users can instantiate as babysitter processes with one command.
+
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| CI Flake Doctor | NEW | Scan CI failures, cluster by test signature, identify flakes, create remediation tasks | - | specializations/devops-sre-platform/ci-flake-doctor.js |
+| Daily Operating Memo | NEW | Multi-source synthesis pattern for daily briefings (email, GitHub, task manager, weather) | - | specializations/shared/daily-operating-memo.js |
+| Renewal Risk Explainer | NEW | Account health monitoring and risk assessment with recommended actions | - | specializations/business/renewal-risk-explainer.js |
+| Competitive Intelligence Monitor | NEW | Recurring web search, synthesis, and task creation for competitive monitoring | - | specializations/business/competitive-intelligence-monitor.js |
+| Incident Postmortem Drafter | NEW | Template-driven postmortem generation from GitHub issues/PRs/CI data | - | specializations/devops-sre-platform/incident-postmortem-drafter.js |
+| Workflow Composition Patterns | NEW | Skill composition methodology (2-5 skills per workflow with coherent automation) | - | specializations/shared/workflow-composition-patterns.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Workflow Catalog Browser | NEW | Browseable catalog of pre-built workflow templates with one-command instantiation | - | plugins/a5c/marketplace/plugins/workflow-catalog-browser/ |

@@ -52,6 +52,22 @@ MEDIUM extractable value. The summarization itself is a common utility, but the 
 - **Category**: Tools Integration
 - **install.md**: Extracts the daemon-bridge pattern from summarize (local service with shared token, auto-started via launchd/systemd/Scheduled Task) as a reusable plugin pattern. Enables any babysitter plugin to expose a local HTTP service that browser extensions or other tools can call into.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Multi-Source Content Research Pipeline | NEW | Cross-source research with content type detection and synthesis | - | specializations/shared/multi-source-content-research.js |
+| Video Knowledge Extraction | NEW | Video slide extraction with screenshots, OCR, and transcript alignment | - | specializations/shared/video-knowledge-extraction.js |
+| Content-Type Detection Pipeline | NEW | Auto-detection and routing for webpage/video/audio/PDF/RSS content processing | - | specializations/shared/content-type-detection-pipeline.js |
+| Cost-Aware Model Selection | NEW | Tiered quality/cost tradeoffs with cost estimation and free model presets | - | specializations/shared/cost-aware-model-selection.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Content Summarization Engine | NEW | Multi-provider content summarization with CLI backend and cost-aware operation | - | plugins/a5c/marketplace/plugins/content-summarization-engine/ |
+| Local Daemon Bridge | NEW | Background service pattern for browser extension integration with token-based auth | - | plugins/a5c/marketplace/plugins/local-daemon-bridge/ |
+
 ## Implicit Procedural Knowledge
 
 - **Content-type detection pipeline**: Auto-detecting whether a URL points to a webpage, video, audio, PDF, or RSS feed, then routing to the appropriate extraction backend. This branching pattern is reusable for any multi-format content processing.

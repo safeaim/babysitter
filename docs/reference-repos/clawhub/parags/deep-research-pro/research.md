@@ -40,6 +40,21 @@ Low star count but high methodology quality. The DDG search dependency is ClawHu
 
 None directly. The DDG search dependency is ClawHub-specific infrastructure, not a babysitter plugin pattern.
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Deep Research Methodology | NEW | 6-step research workflow: clarify → plan sub-questions → multi-source search → deep-read → synthesize → deliver | - | specializations/shared/deep-research-methodology.js |
+| Sub-Question Decomposition | NEW | Breaking research topics into 3-5 orthogonal sub-questions for systematic coverage | - | specializations/shared/sub-question-decomposition.js |
+| Multi-Keyword Search Strategy | NEW | 2-3 keyword variations per sub-question with web/news source mixing | - | specializations/shared/multi-keyword-search-strategy.js |
+| Confidence-Scored Report Generation | NEW | Research report synthesis with High/Medium/Low confidence ratings based on source quality | - | specializations/shared/confidence-scored-report-generation.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| N/A | N/A | No plugin ideas identified - DDG search dependency is ClawHub-specific | - | N/A |
+
 ## Implicit Procedural Knowledge
 
 - **Sub-question decomposition pattern**: Breaking a research topic into 3-5 orthogonal sub-questions before searching is a reusable strategy for any information-gathering process.

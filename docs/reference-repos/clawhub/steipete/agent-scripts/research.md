@@ -75,6 +75,23 @@ MEDIUM extractable value. Many skills are Apple-ecosystem-specific (SwiftUI, Ins
 - **Category**: Tools Integration
 - **install.md**: Installs nano-banana-pro dependencies (uv, Python), configures GEMINI_API_KEY. Provides babysitter tasks for image generation (text-to-image) and image editing (image-to-image) at configurable resolutions. Useful for processes that need to generate visual assets (documentation, marketing, UI mockups).
 
+## Library Mapping
+
+| Extractable Process | Library Status | Action | Existing Path | Target Placement |
+|-------------------|----------------|--------|---------------|------------------|
+| Cross-Model Code Review | NEW | Second AI model review for code changes with disagreement surfacing and actionable notes | - | specializations/shared/cross-model-code-review.js |
+| AI Image Generation Pipeline | NEW | Multi-step image generation: draft → iterate → final with resolution progression | - | specializations/shared/ai-image-generation-pipeline.js |
+| Video Content Summarization | NEW | Video transcript extraction and summarization with key segments and action items | - | specializations/shared/video-content-summarization.js |
+| Draft-Iterate-Final Resolution Pattern | NEW | Low-resolution drafts for iteration, upscale only when locked (for expensive operations) | - | specializations/shared/draft-iterate-final-resolution.js |
+
+## Plugin Marketplace Mapping
+
+| Plugin Idea | Marketplace Status | Action | Existing Plugin | Target Placement |
+|-------------|-------------------|--------|-----------------|------------------|
+| Web Search Integration (Brave) | NEW | Brave Search API integration for web search and page content extraction | - | plugins/a5c/marketplace/plugins/web-search-integration/ |
+| Cross-Model Validation Oracle | NEW | Second model opinion as quality gate with adversarial review pattern | - | plugins/a5c/marketplace/plugins/cross-model-validation-oracle/ |
+| Image Asset Generation | NEW | Gemini-powered image generation and editing with configurable resolutions | - | plugins/a5c/marketplace/plugins/image-asset-generation/ |
+
 ## Implicit Procedural Knowledge
 
 - **Draft-iterate-final resolution pattern**: nano-banana-pro's workflow of starting at low resolution for fast iteration then upscaling only when prompt is locked. This pattern applies to any expensive generative operation -- do cheap drafts first.

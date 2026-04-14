@@ -36,7 +36,7 @@ function main() {
     console.log(`[babysitter]   process library state: ${active.stateFile}`);
     warnWindowsHooks();
     console.log('[babysitter] Installation complete!');
-    console.log('[babysitter] Restart Codex to pick up the installed plugin and config changes.');
+    console.log('[babysitter] Restart Codex to pick up the installed plugin and config changes, then run Codex and install Babysitter from `/plugins`.');
   } catch (err) {
     console.error(`[babysitter] Failed to install plugin: ${err.message}`);
     process.exitCode = 1;

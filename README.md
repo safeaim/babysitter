@@ -93,11 +93,14 @@ of this repo for that flow, or upload plugin ZIPs manually.
 
 After cloning this repo, From within the Codex CLI:
 
-```
+```bash
+npx -y @a5c-ai/babysitter-codex install --global
 codex
-> /plugins
 ```
 
+```
+/plugins
+```
 Navigate to the "babysitter" entry and select "Install".
 
 [Plugin README](plugins/babysitter-codex/README.md)

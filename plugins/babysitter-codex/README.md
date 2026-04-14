@@ -26,8 +26,8 @@ npm install -g @a5c-ai/babysitter-sdk
 clone the repo and install the plugin globally:
 
 ```bash
-git clone https://github.com/a5c-ai/babysitter.git
-cd babysitter
+npx -y @a5c-ai/babysitter-codex install --global
+
 codex
 
 > /plugins

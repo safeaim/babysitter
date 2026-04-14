@@ -11,6 +11,10 @@ const PLUGIN_NAME = 'babysitter-gemini';
 const EXTENSION_NAME = 'babysitter'; // matches gemini-extension.json "name"
 const EXTENSION_DIR_NAME = 'babysitter-gemini';
 
+const REPO_DIR = path.join(os.homedir(), '.a5c', 'babysitter-repo');
+const PLUGIN_RELATIVE_PATH = path.join('plugins', 'babysitter-gemini');
+const PLUGIN_SOURCE_PATH = path.join(REPO_DIR, PLUGIN_RELATIVE_PATH);
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -20,14 +24,14 @@ function printUsage() {
     `${PLUGIN_NAME} - Babysitter plugin for Gemini CLI`,
     '',
     'Usage:',
-    `  ${PLUGIN_NAME} install [--global]              Install via: gemini extensions install <package-root>`,
-    `  ${PLUGIN_NAME} install --link                   Link via: gemini extensions link <package-root> (dev mode)`,
-    `  ${PLUGIN_NAME} uninstall                        Uninstall via: gemini extensions uninstall ${EXTENSION_NAME}`,
-    `  ${PLUGIN_NAME} status                           Check installation status`,
-    `  ${PLUGIN_NAME} version                          Show version info`,
-    `  ${PLUGIN_NAME} help                             Show this message`,
+    `  ${PLUGIN_NAME} install                        Install (or update) via git clone/pull to ~/.a5c/babysitter-repo`,
+    `                                                and gemini extensions link.`,
+    `  ${PLUGIN_NAME} uninstall                      Uninstall via: gemini extensions uninstall ${EXTENSION_NAME}`,
+    `  ${PLUGIN_NAME} status                         Check installation status`,
+    `  ${PLUGIN_NAME} version                        Show version info`,
+    `  ${PLUGIN_NAME} help                           Show this message`,
     '',
-    'Installation delegates to `gemini extensions install/link/uninstall`.',
+    'Installation clones/pulls the repository and links it via `gemini extensions link`.',
     'The Gemini CLI must be installed for install/uninstall to work.',
     '',
     'The plugin provides:',
@@ -38,9 +42,24 @@ function printUsage() {
   ].join('\n'));
 }
 
+function getGitRemoteUrl() {
+  const result = spawnSync('git', ['remote', 'get-url', 'origin'], {
+    cwd: PACKAGE_ROOT,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    encoding: 'utf8',
+    shell: true,
+  });
+  if (result.status === 0) {
+    return result.stdout.trim();
+  }
+  return 'https://github.com/a5c-ai/babysitter.git';
+}
+
 function getVersions() {
   try {
-    const versionsPath = path.join(PACKAGE_ROOT, 'versions.json');
+    const versionsPath = fs.existsSync(PLUGIN_SOURCE_PATH)
+      ? path.join(PLUGIN_SOURCE_PATH, 'versions.json')
+      : path.join(PACKAGE_ROOT, 'versions.json');
     return JSON.parse(fs.readFileSync(versionsPath, 'utf8'));
   } catch {
     return { sdkVersion: 'unknown', extensionVersion: 'unknown' };
@@ -166,30 +185,57 @@ function getGlobalStateDir() {
 // Install
 // ---------------------------------------------------------------------------
 
-function install(useLink) {
-  if (isGeminiCliAvailable()) {
-    const subcommand = useLink ? 'link' : 'install';
-    console.log(`[babysitter] Running: gemini extensions ${subcommand} ${PACKAGE_ROOT}`);
+function install() {
+  const gitUrl = getGitRemoteUrl();
 
-    const result = spawnSync('gemini', ['extensions', subcommand, PACKAGE_ROOT], {
+  console.log(`[babysitter] Target repository directory: ${REPO_DIR}`);
+
+  if (fs.existsSync(REPO_DIR)) {
+    console.log(`[babysitter] Repository directory exists. Running git pull...`);
+    const pullResult = spawnSync('git', ['pull'], {
+      cwd: REPO_DIR,
+      stdio: 'inherit',
+      shell: true,
+    });
+    if (pullResult.status !== 0) {
+      console.error(`[babysitter] git pull failed (exit ${pullResult.status}).`);
+      process.exitCode = 1;
+      return;
+    }
+  } else {
+    console.log(`[babysitter] Repository directory does not exist. Running git clone ${gitUrl}...`);
+    fs.mkdirSync(path.dirname(REPO_DIR), { recursive: true });
+    const cloneResult = spawnSync('git', ['clone', gitUrl, REPO_DIR], {
+      stdio: 'inherit',
+      shell: true,
+    });
+    if (cloneResult.status !== 0) {
+      console.error(`[babysitter] git clone failed (exit ${cloneResult.status}).`);
+      process.exitCode = 1;
+      return;
+    }
+  }
+
+  if (isGeminiCliAvailable()) {
+    console.log(`[babysitter] Running: gemini extensions link ${PLUGIN_SOURCE_PATH}`);
+
+    const result = spawnSync('gemini', ['extensions', 'link', PLUGIN_SOURCE_PATH], {
       stdio: 'inherit',
       shell: true,
       timeout: 60000,
     });
 
     if (result.status !== 0) {
-      console.error(`[babysitter] gemini extensions ${subcommand} failed (exit ${result.status}).`);
+      console.error(`[babysitter] gemini extensions link failed (exit ${result.status}).`);
       process.exitCode = 1;
       return;
     }
 
-    if (useLink) {
-      console.log('[babysitter] Extension linked. Changes to the package are reflected immediately.');
-    } else {
-      console.log('[babysitter] Extension installed.');
-    }
+    console.log('[babysitter] Extension linked.');
   } else {
-    installWithoutGeminiCli(useLink);
+    console.error('[babysitter] Error: Gemini CLI is not installed or not in PATH.');
+    process.exitCode = 1;
+    return;
   }
 
   installSdk();
@@ -319,24 +365,6 @@ function status() {
 }
 
 // ---------------------------------------------------------------------------
-// Argument parsing
-// ---------------------------------------------------------------------------
-
-function parseInstallArgs(argv) {
-  let useLink = false;
-  for (const arg of argv) {
-    if (arg === '--link' || arg === '--symlink') {
-      useLink = true;
-    } else if (arg === '--global') {
-      // Accepted for backwards compat, no-op (global is the only target now)
-    } else {
-      throw new Error(`unknown argument: ${arg}`);
-    }
-  }
-  return { useLink };
-}
-
-// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
@@ -359,13 +387,7 @@ function main() {
   }
 
   if (command === 'install') {
-    try {
-      const parsed = parseInstallArgs(rest);
-      install(parsed.useLink);
-    } catch (err) {
-      console.error(`[babysitter] Error: ${err.message}`);
-      process.exitCode = 1;
-    }
+    install();
     return;
   }
 

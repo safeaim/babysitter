@@ -27,7 +27,7 @@ const config = {
       'classic',
       {
         docs: {
-          path: 'docs',
+          path: '../docs',
           routeBasePath: 'docs',
           exclude: [
             'retrospectives/hagaybar-budget-manager/banking-ux-polish.md',

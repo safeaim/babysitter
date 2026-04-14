@@ -13,7 +13,7 @@ import {
   __resetCacheForTests,
   __setAncestorResolverForTests,
   getSessionMarkerPath,
-} from "../../../harness/sessionMarker";
+} from "../../../utils/sessionMarker";
 
 // ── Mocks ─────────────────────────────────────────────────────────────
 

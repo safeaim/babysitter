@@ -64,7 +64,7 @@ import {
 import type { PromptContext } from "../prompts/types";
 import { createGeminiCliContext } from "../prompts/context";
 import { getGlobalLogDir, normalizeSessionStateDir } from "../config";
-import { readSessionMarker, writeSessionMarker } from "../utils/sessionMarker";
+import { writeSessionMarker } from "../utils/sessionMarker";
 import { resolveAmbientSessionId } from "../session/discovery";
 
 // ---------------------------------------------------------------------------

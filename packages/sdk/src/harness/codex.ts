@@ -34,7 +34,7 @@ import {
   isCodexPluginInstalled,
   runPackageBinaryViaNpx,
 } from "./installSupport";
-import { readSessionMarker, writeSessionMarker } from "../utils/sessionMarker";
+import { writeSessionMarker } from "../utils/sessionMarker";
 import { resolveAmbientSessionId } from "../session/discovery";
 
 function resolveCodexPluginRoot(

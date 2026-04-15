@@ -117,7 +117,7 @@ const EFFECT_RETRY_DELAYS_OVERRIDE = process.env.VITEST ? [0, 0, 0] : undefined;
  * Returns an unsubscribe function.  No-ops when verbose is disabled or json
  * mode is active (no stderr noise).
  */
-function subscribeVerbosePiEvents(
+export function subscribeVerbosePiEvents(
   session: PiSessionHandle,
   label: string,
   opts: { verbose: boolean; json: boolean; outputMode?: import("./harnessUtils").OutputMode },
@@ -132,6 +132,7 @@ function subscribeVerbosePiEvents(
   let lastTextFlush = 0;
   const TEXT_FLUSH_INTERVAL_MS = 2000; // Show a snippet every 2s during streaming
   const TEXT_SNIPPET_LENGTH = 120;
+  let lastStructuredMessage = "";
 
   try {
     return session.subscribe((event: PiSessionEvent) => {
@@ -145,16 +146,18 @@ function subscribeVerbosePiEvents(
           process.stderr.write(`    ${DIM}${snippet}${snippet.length < textBuffer.trim().length ? "..." : ""}${RESET}\n`);
           textBuffer = "";
         }
-        const name = (event as { name?: string }).name ?? (event as { toolName?: string }).toolName ?? "unknown";
+        const name = extractVerboseToolName(event);
         process.stderr.write(`    ${DIM}tool ${CYAN}${name}${RESET}${DIM}...${RESET}\n`);
-      } else if (t === "tool_execution_end") {
-        const result = (event as { result?: string; output?: string }).result
-          ?? (event as { result?: string; output?: string }).output;
-        if (result && typeof result === "string") {
-          const snippet = result.trim().slice(0, TEXT_SNIPPET_LENGTH);
-          if (snippet) {
-            process.stderr.write(`    ${DIM}  → ${snippet}${snippet.length < result.trim().length ? "..." : ""}${RESET}\n`);
+        if (opts.verbose) {
+          const argsSnippet = formatVerbosePayload(extractVerboseToolArgs(event), TEXT_SNIPPET_LENGTH);
+          if (argsSnippet) {
+            process.stderr.write(`    ${DIM}  args ${argsSnippet}${RESET}\n`);
           }
+        }
+      } else if (t === "tool_execution_end") {
+        const resultSnippet = formatVerbosePayload(extractVerboseToolResult(event), TEXT_SNIPPET_LENGTH);
+        if (resultSnippet) {
+          process.stderr.write(`    ${DIM}  → ${resultSnippet}${RESET}\n`);
         }
       } else if (t === "agent_start") {
         const agentName = (event as { name?: string }).name ?? (event as { agentName?: string }).agentName;
@@ -184,6 +187,17 @@ function subscribeVerbosePiEvents(
           }
         }
       } else if (t === "message_end" || t === "turn_end") {
+        const role = extractVerboseMessageRole(event);
+        const structuredMessage = formatVerbosePayload(extractVerboseMessagePayload(event), TEXT_SNIPPET_LENGTH * 2);
+        if (
+          structuredMessage &&
+          structuredMessage !== lastStructuredMessage &&
+          (!textBuffer.trim() || normalizeVerboseText(textBuffer) !== normalizeVerboseText(structuredMessage))
+        ) {
+          const prefix = role === "toolResult" ? "    " : "";
+          process.stderr.write(`${prefix}${structuredMessage}\n`);
+          lastStructuredMessage = structuredMessage;
+        }
         // Flush remaining text at message/turn boundaries
         if (textBuffer.trim().length > 20 && !opts.verbose) {
           const snippet = textBuffer.trim().slice(-TEXT_SNIPPET_LENGTH);
@@ -211,6 +225,157 @@ function subscribeVerbosePiEvents(
   } catch {
     // Session not yet initialized — caller should retry after initialize().
     return null;
+  }
+}
+
+function normalizeVerboseText(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function formatVerbosePayload(value: unknown, maxLength: number): string | undefined {
+  const text = extractVerboseText(value);
+  if (!text) {
+    return undefined;
+  }
+  const normalized = normalizeVerboseText(text);
+  if (!normalized) {
+    return undefined;
+  }
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 3)}...` : normalized;
+}
+
+function extractVerboseToolName(event: PiSessionEvent): string {
+  const record = event as Record<string, unknown>;
+  const directName = [
+    record.name,
+    record.toolName,
+    record.tool,
+    record.call,
+    record.invocation,
+  ].find((value) => typeof value === "string");
+  if (typeof directName === "string" && directName.trim()) {
+    return directName.trim();
+  }
+
+  const nestedNameCandidates = [
+    record.tool,
+    record.call,
+    record.invocation,
+    record.message,
+  ];
+  for (const candidate of nestedNameCandidates) {
+    if (!candidate || typeof candidate !== "object") {
+      continue;
+    }
+    const nested = candidate as Record<string, unknown>;
+    const name = [nested.name, nested.toolName, nested.id].find((value) => typeof value === "string");
+    if (typeof name === "string" && name.trim()) {
+      return name.trim();
+    }
+  }
+
+  return "unknown";
+}
+
+function extractVerboseToolArgs(event: PiSessionEvent): unknown {
+  const record = event as Record<string, unknown>;
+  return record.input
+    ?? record.args
+    ?? record.arguments
+    ?? record.parameters
+    ?? (record.tool && typeof record.tool === "object" ? (record.tool as Record<string, unknown>).input : undefined)
+    ?? (record.call && typeof record.call === "object" ? (record.call as Record<string, unknown>).input : undefined);
+}
+
+function extractVerboseToolResult(event: PiSessionEvent): unknown {
+  const record = event as Record<string, unknown>;
+  return record.result
+    ?? record.output
+    ?? record.details
+    ?? record.message
+    ?? record.content;
+}
+
+function extractVerboseMessageRole(event: PiSessionEvent): string | undefined {
+  const record = event as Record<string, unknown>;
+  if (typeof record.role === "string") {
+    return record.role;
+  }
+  const message = record.message;
+  if (message && typeof message === "object") {
+    const role = (message as Record<string, unknown>).role;
+    if (typeof role === "string") {
+      return role;
+    }
+  }
+  return undefined;
+}
+
+function extractVerboseMessagePayload(event: PiSessionEvent): unknown {
+  const record = event as Record<string, unknown>;
+  if (record.message !== undefined) {
+    return record.message;
+  }
+  if (record.content !== undefined) {
+    return record.content;
+  }
+  if (record.output !== undefined) {
+    return record.output;
+  }
+  return undefined;
+}
+
+function extractVerboseText(value: unknown, depth = 0): string | undefined {
+  if (depth > 4 || value === null || value === undefined) {
+    return undefined;
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    const parts = value
+      .map((entry) => extractVerboseText(entry, depth + 1))
+      .filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0);
+    return parts.length > 0 ? parts.join("\n") : undefined;
+  }
+  if (typeof value !== "object") {
+    return undefined;
+  }
+
+  const record = value as Record<string, unknown>;
+  const preferredKeys = [
+    "text",
+    "content",
+    "message",
+    "output",
+    "result",
+    "details",
+    "delta",
+    "summary",
+    "error",
+    "value",
+  ];
+  const parts: string[] = [];
+  for (const key of preferredKeys) {
+    if (!(key in record)) {
+      continue;
+    }
+    const extracted = extractVerboseText(record[key], depth + 1);
+    if (typeof extracted === "string" && extracted.trim()) {
+      parts.push(extracted);
+    }
+  }
+  if (parts.length > 0) {
+    return Array.from(new Set(parts)).join("\n");
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return undefined;
   }
 }
 

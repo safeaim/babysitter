@@ -1122,51 +1122,51 @@ export function createAgenticToolDefinitions(
     // -----------------------------------------------------------------
     // UTILITIES
     // -----------------------------------------------------------------
-    wrap({
-      name: "calc",
-      label: "Calculator",
-      description:
-        "Evaluate mathematical expressions. Has access to all Math.* functions.",
-      parameters: Type.Object({
-        calculations: Type.Array(
-          Type.Object({
-            expression: Type.String({ description: "Math expression to evaluate" }),
-            prefix: Type.Optional(Type.String({ description: "Label prefix" })),
-            suffix: Type.Optional(Type.String({ description: "Label suffix" })),
-          }),
-          { description: "Calculations to perform" },
-        ),
-      }),
-      execute: (
-        _toolCallId: string,
-        params: Record<string, unknown>,
-      ): ToolResult => {
-        const calculations = params.calculations as Array<{
-          expression: string;
-          prefix?: string;
-          suffix?: string;
-        }>;
-        const results = calculations.map((calc) => {
-          try {
-            // Build a safe math evaluator using Function constructor with Math.*
-            const mathFns = Object.getOwnPropertyNames(Math)
-              .map((name) => `const ${name} = Math.${name};`)
-              .join(" ");
-            // eslint-disable-next-line @typescript-eslint/no-implied-eval
-            const fn = new Function(
-              `${mathFns} return (${calc.expression});`,
-            );
-            const value = fn() as unknown;
-            const prefix = calc.prefix ? `${calc.prefix} ` : "";
-            const suffix = calc.suffix ? ` ${calc.suffix}` : "";
-            return `${prefix}${String(value)}${suffix}`;
-          } catch (err) {
-            return `Error evaluating "${calc.expression}": ${err instanceof Error ? err.message : String(err)}`;
-          }
-        });
-        return ok(results.join("\n"));
-      },
-    }),
+    // wrap({
+    //   name: "calc",
+    //   label: "Calculator",
+    //   description:
+    //     "Evaluate mathematical expressions. Has access to all Math.* functions.",
+    //   parameters: Type.Object({
+    //     calculations: Type.Array(
+    //       Type.Object({
+    //         expression: Type.String({ description: "Math expression to evaluate" }),
+    //         prefix: Type.Optional(Type.String({ description: "Label prefix" })),
+    //         suffix: Type.Optional(Type.String({ description: "Label suffix" })),
+    //       }),
+    //       { description: "Calculations to perform" },
+    //     ),
+    //   }),
+    //   execute: (
+    //     _toolCallId: string,
+    //     params: Record<string, unknown>,
+    //   ): ToolResult => {
+    //     const calculations = params.calculations as Array<{
+    //       expression: string;
+    //       prefix?: string;
+    //       suffix?: string;
+    //     }>;
+    //     const results = calculations.map((calc) => {
+    //       try {
+    //         // Build a safe math evaluator using Function constructor with Math.*
+    //         const mathFns = Object.getOwnPropertyNames(Math)
+    //           .map((name) => `const ${name} = Math.${name};`)
+    //           .join(" ");
+    //         // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    //         const fn = new Function(
+    //           `${mathFns} return (${calc.expression});`,
+    //         );
+    //         const value = fn() as unknown;
+    //         const prefix = calc.prefix ? `${calc.prefix} ` : "";
+    //         const suffix = calc.suffix ? ` ${calc.suffix}` : "";
+    //         return `${prefix}${String(value)}${suffix}`;
+    //       } catch (err) {
+    //         return `Error evaluating "${calc.expression}": ${err instanceof Error ? err.message : String(err)}`;
+    //       }
+    //     });
+    //     return ok(results.join("\n"));
+    //   },
+    // }),
 
     wrap({
       name: "ast_grep",

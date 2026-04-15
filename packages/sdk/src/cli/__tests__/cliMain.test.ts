@@ -79,6 +79,18 @@ describe("CLI main entry", () => {
 
     expect(helpText).toContain("Usage:");
     expect(helpText).toContain("babysitter run:create");
+    expect(helpText).not.toContain("babysitter session:init");
+    expect(helpText).toContain("--help-human");
+  });
+
+  it("exposes the human usage block separately", () => {
+    const cli = createBabysitterCli();
+    const helpText = cli.formatHumanHelp();
+
+    expect(helpText).toContain("Usage:");
+    expect(helpText).toContain("babysitter session:init");
+    expect(helpText).toContain("babysitter harness:create-run");
+    expect(helpText).not.toContain("babysitter run:create");
   });
 
   it("prints help and exits zero when invoked without args", async () => {
@@ -96,6 +108,15 @@ describe("CLI main entry", () => {
 
     expect(exitCode).toBe(0);
     expect(logSpy).toHaveBeenCalledWith(cli.formatHelp());
+    expect(readRunMetadataMock).not.toHaveBeenCalled();
+  });
+
+  it("prints human help when --help-human is requested", async () => {
+    const cli = createBabysitterCli();
+    const exitCode = await cli.run(["--help-human"]);
+
+    expect(exitCode).toBe(0);
+    expect(logSpy).toHaveBeenCalledWith(cli.formatHumanHelp());
     expect(readRunMetadataMock).not.toHaveBeenCalled();
   });
 

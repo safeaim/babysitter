@@ -92,9 +92,9 @@ import type { EffectNode } from "../dashboard/components/EffectTree";
 import { renderEventMessage } from "../dashboard/components/messages/EventMessage";
 import type { StatusType } from "../dashboard/components/StatusBadge";
 
-const USAGE = `Usage:
-Agent commands:
-  babysitter run:create --process-id <id> --entry <path#export> [--runs-dir <dir>] [--inputs <file>] [--run-id <id>] [--process-revision <rev>] [--request <id>] [--prompt <text>] [--harness <name>] [--session-id <id>] [--plugin-root <dir>] [--non-interactive] [--json] [--dry-run]
+type HelpSurface = "agent" | "human";
+
+const AGENT_COMMAND_USAGE = `  babysitter run:create --process-id <id> --entry <path#export> [--runs-dir <dir>] [--inputs <file>] [--run-id <id>] [--process-revision <rev>] [--request <id>] [--prompt <text>] [--harness <name>] [--session-id <id>] [--plugin-root <dir>] [--non-interactive] [--json] [--dry-run]
   babysitter run:status <runDir> [--runs-dir <dir>] [--json]
   babysitter run:events <runDir> [--runs-dir <dir>] [--json] [--limit <n>] [--reverse] [--filter-type <type>]
   babysitter run:rebuild-state <runDir> [--runs-dir <dir>] [--json] [--dry-run]
@@ -111,9 +111,9 @@ Agent commands:
   babysitter profile:write --user|--project --input <file> [--dir <dir>] [--json]
   babysitter profile:merge --user|--project --input <file> [--dir <dir>] [--json]
   babysitter profile:render --user|--project [--dir <dir>] [--json]
-  babysitter instructions:babysit-skill --harness <name> [--interactive|--no-interactive] [--json]
-Other commands (agents should never call these directly unless explicitly instructed):
-  babysitter session:init --session-id <id> --state-dir <dir> [--max-iterations <n>] [--run-id <id>] [--prompt <text>] [--json]
+  babysitter instructions:babysit-skill --harness <name> [--interactive|--no-interactive] [--json]`;
+
+const HUMAN_COMMAND_USAGE = `  babysitter session:init --session-id <id> --state-dir <dir> [--max-iterations <n>] [--run-id <id>] [--prompt <text>] [--json]
   babysitter session:associate --session-id <id> --state-dir <dir> --run-id <id> [--force] [--runs-dir <dir>] [--json]
   babysitter session:state --session-id <id> --state-dir <dir> [--json]
   babysitter session:update --session-id <id> --state-dir <dir> [--iteration <n>] [--last-iteration-at <iso8601>] [--iteration-times <csv>] [--delete] [--json]
@@ -178,16 +178,35 @@ Other commands (agents should never call these directly unless explicitly instru
   babysitter breakpoint:history [--breakpoint-id <id>] [--runs-dir <dir>] [--limit <n>] [--json]
   babysitter health [--json] [--verbose]
   babysitter configure [show|validate|paths] [--json] [--defaults-only]
-  babysitter version
+  babysitter version`;
 
-Global flags:
+const GLOBAL_FLAGS_USAGE = `Global flags:
   --runs-dir <dir>   Override the runs directory (defaults to .a5c/runs).
   --json             Emit JSON output when supported by the command.
   --dry-run          Describe planned mutations without changing on-disk state.
   --verbose          Log resolved paths and options to stderr for debugging.
   --show-config      Show current configuration before executing command.
-  --help, -h         Show this help text.
+  --help, -h         Show agent-facing help text.
+  --help-human       Show human-facing help text.
   --version, -v      Show CLI version.`;
+
+const AGENT_USAGE = `Usage:
+Agent commands:
+${AGENT_COMMAND_USAGE}
+
+${GLOBAL_FLAGS_USAGE}`;
+
+const HUMAN_USAGE = `Usage:
+Human commands:
+${HUMAN_COMMAND_USAGE}
+
+${GLOBAL_FLAGS_USAGE}`;
+
+const USAGE = AGENT_USAGE;
+
+function formatUsage(surface: HelpSurface): string {
+  return surface === "human" ? HUMAN_USAGE : AGENT_USAGE;
+}
 
 interface ParsedArgs {
   command?: string;
@@ -196,6 +215,7 @@ interface ParsedArgs {
   dryRun: boolean;
   verbose: boolean;
   helpRequested: boolean;
+  helpSurface: HelpSurface;
   pendingOnly: boolean;
   // compress-output command args
   compressOutputArgs?: string[];
@@ -372,6 +392,7 @@ function parseArgs(argv: string[]): ParsedArgs {
     dryRun: false,
     verbose: false,
     helpRequested: false,
+    helpSurface: "agent",
     pendingOnly: false,
     reverseOrder: false,
     showConfig: false,
@@ -384,6 +405,11 @@ function parseArgs(argv: string[]): ParsedArgs {
     parsed.command = undefined;
     parsed.helpRequested = true;
   }
+  if (parsed.command === "--help-human") {
+    parsed.command = undefined;
+    parsed.helpRequested = true;
+    parsed.helpSurface = "human";
+  }
   if (parsed.command === "--version" || parsed.command === "-v") {
     parsed.command = "version";
   }
@@ -392,6 +418,11 @@ function parseArgs(argv: string[]): ParsedArgs {
     const arg = rest[i];
     if (arg === "--help" || arg === "-h") {
       parsed.helpRequested = true;
+      continue;
+    }
+    if (arg === "--help-human") {
+      parsed.helpRequested = true;
+      parsed.helpSurface = "human";
       continue;
     }
     if (arg === "--version" || arg === "-v") {
@@ -2934,7 +2965,7 @@ export function createBabysitterCli() {
           return 0;
         }
         if (!parsed.command || parsed.helpRequested) {
-          console.log(USAGE);
+          console.log(formatUsage(parsed.helpSurface));
           return 0;
         }
 
@@ -3695,7 +3726,10 @@ export function createBabysitterCli() {
       }
     },
     formatHelp(): string {
-      return USAGE;
+      return formatUsage("agent");
+    },
+    formatHumanHelp(): string {
+      return formatUsage("human");
     },
   };
 }

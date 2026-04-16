@@ -26,12 +26,14 @@ describe('session commands', () => {
     runsDir = path.join(testDir, 'runs');
     await fs.mkdir(stateDir, { recursive: true });
     await fs.mkdir(runsDir, { recursive: true });
+    vi.stubEnv('BABYSITTER_STATE_DIR', stateDir);
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(async () => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
     try {
       await fs.rm(testDir, { recursive: true, force: true });
     } catch {
@@ -43,7 +45,6 @@ describe('session commands', () => {
     it('creates state file with correct content', async () => {
       const result = await handleSessionInit({
         sessionId,
-        stateDir,
         maxIterations: 100,
         prompt: 'Test prompt',
         json: true,
@@ -64,14 +65,12 @@ describe('session commands', () => {
       // Create first session
       await handleSessionInit({
         sessionId,
-        stateDir,
         json: true,
       });
 
       // Try to create duplicate
       const result = await handleSessionInit({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -80,28 +79,18 @@ describe('session commands', () => {
 
     it('returns error when session-id is missing', async () => {
       const result = await handleSessionInit({
-        stateDir,
         json: true,
       });
 
       expect(result).toBe(1);
     });
 
-    it('returns error when state-dir is missing', async () => {
-      const result = await handleSessionInit({
-        sessionId,
-        json: true,
-      });
-
-      expect(result).toBe(1);
-    });
   });
 
   describe('session:associate', () => {
     beforeEach(async () => {
       await handleSessionInit({
         sessionId,
-        stateDir,
         json: true,
       });
     });
@@ -110,7 +99,6 @@ describe('session commands', () => {
       const runId = 'run-456';
       const result = await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId,
         json: true,
       });
@@ -129,7 +117,6 @@ describe('session commands', () => {
       // Associate first time
       await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId,
         json: true,
       });
@@ -140,7 +127,6 @@ describe('session commands', () => {
 
       const result = await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId: 'different-run',
         json: true,
       });
@@ -155,7 +141,6 @@ describe('session commands', () => {
 
       await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId,
         json: true,
       });
@@ -163,7 +148,6 @@ describe('session commands', () => {
       // Force rebind without runsDir (trusts user intent)
       const result = await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId: 'run-789',
         force: true,
         json: true,
@@ -181,7 +165,6 @@ describe('session commands', () => {
 
       await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId: oldRunId,
         json: true,
       });
@@ -197,7 +180,6 @@ describe('session commands', () => {
 
       const result = await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId: 'run-new',
         force: true,
         runsDir,
@@ -212,7 +194,6 @@ describe('session commands', () => {
 
       await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId: oldRunId,
         json: true,
       });
@@ -228,7 +209,6 @@ describe('session commands', () => {
 
       const result = await handleSessionAssociate({
         sessionId,
-        stateDir,
         runId: 'run-new',
         force: true,
         runsDir,
@@ -243,7 +223,6 @@ describe('session commands', () => {
     beforeEach(async () => {
       await handleSessionInit({
         sessionId,
-        stateDir,
         maxIterations: 50,
         prompt: 'Test prompt content',
         json: true,
@@ -256,7 +235,6 @@ describe('session commands', () => {
 
       const result = await handleSessionState({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -277,7 +255,6 @@ describe('session commands', () => {
 
       const result = await handleSessionState({
         sessionId: 'non-existent-session',
-        stateDir,
         json: true,
       });
 
@@ -292,7 +269,6 @@ describe('session commands', () => {
     beforeEach(async () => {
       await handleSessionInit({
         sessionId,
-        stateDir,
         json: true,
       });
     });
@@ -300,7 +276,6 @@ describe('session commands', () => {
     it('updates iteration number', async () => {
       const result = await handleSessionUpdate({
         sessionId,
-        stateDir,
         iteration: 5,
         json: true,
       });
@@ -316,7 +291,6 @@ describe('session commands', () => {
     it('deletes state file when --delete is passed', async () => {
       const result = await handleSessionUpdate({
         sessionId,
-        stateDir,
         delete: true,
         json: true,
       });
@@ -332,7 +306,6 @@ describe('session commands', () => {
     it('returns error when run does not exist', async () => {
       const result = await handleSessionResume({
         sessionId,
-        stateDir,
         runId: 'non-existent-run',
         runsDir,
         json: true,
@@ -355,7 +328,6 @@ describe('session commands', () => {
 
       const result = await handleSessionResume({
         sessionId,
-        stateDir,
         runId,
         runsDir,
         json: true,
@@ -367,6 +339,40 @@ describe('session commands', () => {
       const content = await fs.readFile(stateFile, 'utf8');
 
       expect(content).toContain(`run_id: "${runId}"`);
+    });
+
+    it('normalizes a global-root configured state dir to the canonical state subdirectory', async () => {
+      const runId = 'existing-run-root-state-dir';
+      const runDir = path.join(runsDir, runId);
+      const globalStateRoot = path.join(testDir, 'global-state-root');
+      const canonicalStateDir = path.join(globalStateRoot, 'state');
+      await fs.mkdir(runDir, { recursive: true });
+      await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
+      await fs.mkdir(globalStateRoot, { recursive: true });
+      await fs.writeFile(
+        path.join(runDir, 'run.json'),
+        JSON.stringify({ processId: 'test-process' }),
+        'utf8'
+      );
+
+      vi.stubEnv('BABYSITTER_GLOBAL_STATE_DIR', globalStateRoot);
+      vi.stubEnv('BABYSITTER_STATE_DIR', globalStateRoot);
+
+      const result = await handleSessionResume({
+        sessionId,
+        runId,
+        runsDir,
+        json: true,
+      });
+
+      expect(result).toBe(0);
+
+      const canonicalStateFile = path.join(canonicalStateDir, `${sessionId}.md`);
+      const misplacedStateFile = path.join(globalStateRoot, `${sessionId}.md`);
+
+      const content = await fs.readFile(canonicalStateFile, 'utf8');
+      expect(content).toContain(`run_id: "${runId}"`);
+      await expect(fs.access(misplacedStateFile)).rejects.toThrow();
     });
   });
 });

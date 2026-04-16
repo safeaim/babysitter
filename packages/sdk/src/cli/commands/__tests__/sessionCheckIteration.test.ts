@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { handleSessionCheckIteration, handleSessionInit, handleSessionUpdate } from '../session';
+import { handleSessionCheckIteration } from '../session';
 import { writeSessionFile } from '../../../session/write';
 import { getSessionFilePath } from '../../../session/parse';
 import type { SessionState } from '../../../session/types';
@@ -21,12 +21,14 @@ describe('session:check-iteration', () => {
     testDir = path.join(os.tmpdir(), `session-check-iter-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
     stateDir = path.join(testDir, 'state');
     await fs.mkdir(stateDir, { recursive: true });
+    vi.stubEnv('BABYSITTER_STATE_DIR', stateDir);
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(async () => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
     try {
       await fs.rm(testDir, { recursive: true, force: true });
     } catch {
@@ -69,7 +71,6 @@ describe('session:check-iteration', () => {
     it('returns found=false, shouldContinue=false, reason=session_not_found, stopMessage', async () => {
       const exitCode = await handleSessionCheckIteration({
         sessionId: 'non-existent-session',
-        stateDir,
         json: true,
       });
 
@@ -85,7 +86,6 @@ describe('session:check-iteration', () => {
     it('includes iteration=0, maxIterations=0, runId="", prompt="" when not found', async () => {
       await handleSessionCheckIteration({
         sessionId: 'missing',
-        stateDir,
         json: true,
       });
 
@@ -99,7 +99,6 @@ describe('session:check-iteration', () => {
     it('returns exit code 0 even when session not found', async () => {
       const exitCode = await handleSessionCheckIteration({
         sessionId: 'ghost',
-        stateDir,
         json: true,
       });
 
@@ -118,7 +117,6 @@ describe('session:check-iteration', () => {
 
       const exitCode = await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -138,7 +136,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -155,7 +152,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -174,7 +170,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -195,7 +190,6 @@ describe('session:check-iteration', () => {
 
       const exitCode = await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -214,7 +208,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -230,7 +223,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -247,7 +239,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -266,7 +257,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -283,7 +273,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -298,7 +287,6 @@ describe('session:check-iteration', () => {
     it('session_not_found response includes found, iteration, maxIterations, runId, prompt', async () => {
       await handleSessionCheckIteration({
         sessionId: 'does-not-exist',
-        stateDir,
         json: true,
       });
 
@@ -318,7 +306,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -338,7 +325,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -368,7 +354,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -394,7 +379,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -416,7 +400,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -433,20 +416,19 @@ describe('session:check-iteration', () => {
   describe('missing arguments', () => {
     it('returns exit code 1 when sessionId is missing', async () => {
       const exitCode = await handleSessionCheckIteration({
-        stateDir,
         json: true,
       });
 
       expect(exitCode).toBe(1);
     });
 
-    it('returns exit code 1 when stateDir is missing', async () => {
+    it('uses the configured global state dir and returns exit code 0 when no session file exists', async () => {
       const exitCode = await handleSessionCheckIteration({
         sessionId,
         json: true,
       });
 
-      expect(exitCode).toBe(1);
+      expect(exitCode).toBe(0);
     });
 
     it('emits JSON error when both are missing', async () => {
@@ -471,7 +453,6 @@ describe('session:check-iteration', () => {
 
       const exitCode = await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: false,
       });
 
@@ -486,7 +467,6 @@ describe('session:check-iteration', () => {
     it('prints shouldContinue=false for not-found in text mode', async () => {
       await handleSessionCheckIteration({
         sessionId: 'ghost-session',
-        stateDir,
         json: false,
       });
 
@@ -504,7 +484,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: false,
       });
 
@@ -526,7 +505,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -543,7 +521,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -568,7 +545,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -593,7 +569,6 @@ describe('session:check-iteration', () => {
 
       await handleSessionCheckIteration({
         sessionId,
-        stateDir,
         json: true,
       });
 
@@ -602,3 +577,4 @@ describe('session:check-iteration', () => {
     });
   });
 });
+

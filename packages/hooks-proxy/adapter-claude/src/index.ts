@@ -1,1 +1,22 @@
 export { createAdapter } from './adapter';
+export { CLAUDE_PHASE_MAPPINGS, getClaudePhaseMapping, getSupportedPhases } from './mappings';
+export { normalizeClaude, parseStdin, buildExecutionContext, buildPayload } from './normalizer';
+export type {
+  ClaudeStdinBase,
+  ClaudeSessionStartPayload,
+  ClaudePreToolUsePayload,
+  ClaudePostToolUsePayload,
+  ClaudeStopPayload,
+  ClaudeUserPromptSubmitPayload,
+  ClaudeSubagentStopPayload,
+} from './normalizer';
+export { renderClaudeOutput, buildEnvFileLines } from './renderer';
+export type {
+  ClaudePreToolUseOutput,
+  ClaudePostToolUseOutput,
+  ClaudeStopOutput,
+  ClaudeSessionStartOutput,
+  ClaudeGenericOutput,
+} from './renderer';
+export { resolveSessionId } from './session-resolver';
+export type { SessionResolutionResult } from './session-resolver';

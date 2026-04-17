@@ -13,13 +13,14 @@ const ROOT = path.resolve(__dirname, "../..");
 const HOOK = `${CURSOR_PLUGIN_DIR}/hooks/stop-hook.sh`;
 // The stop hook resolves STATE_DIR from BABYSITTER_STATE_DIR or PWD/.a5c
 const STATE_DIR = "/tmp/cursor-hook-test-state";
+const TEST_RUNS_DIR = "/tmp/cursor-hook-test-runs";
 const LOG_DIR = "/tmp/cursor-hook-test-logs";
-const HOOK_ENV = `CURSOR_PLUGIN_ROOT=${CURSOR_PLUGIN_DIR} BABYSITTER_STATE_DIR=${STATE_DIR} BABYSITTER_LOG_DIR=${LOG_DIR} CLI=babysitter`;
+const HOOK_ENV = `CURSOR_PLUGIN_ROOT=${CURSOR_PLUGIN_DIR} BABYSITTER_STATE_DIR=${STATE_DIR} BABYSITTER_RUNS_DIR=${TEST_RUNS_DIR} BABYSITTER_LOG_DIR=${LOG_DIR} CLI=babysitter`;
 
 beforeAll(() => {
   buildCursorImage(ROOT);
   startCursorContainer();
-  dockerExec(`mkdir -p ${STATE_DIR} ${LOG_DIR}`);
+  dockerExec(`mkdir -p ${STATE_DIR} ${LOG_DIR} ${TEST_RUNS_DIR}`);
 }, 300_000);
 
 afterAll(() => {
@@ -28,7 +29,7 @@ afterAll(() => {
 
 afterEach(() => {
   dockerExec(
-    `rm -rf ${STATE_DIR}/* ${LOG_DIR}/* /tmp/cursor-hook-test-run-* /tmp/cursor-hook-input-* 2>/dev/null || true`,
+    `rm -rf ${STATE_DIR}/* ${LOG_DIR}/* ${TEST_RUNS_DIR}/* /tmp/cursor-hook-test-run-* /tmp/cursor-hook-input-* 2>/dev/null || true`,
   );
 });
 
@@ -108,13 +109,13 @@ function parseJsonBlock(
 
 /**
  * Create a mock run directory with journal events inside the container.
- * Returns the path to the run directory.
+ * Returns the run id.
  */
 function createMockRun(
   runId: string,
   events: Array<{ type: string; data: Record<string, unknown> }>,
 ): string {
-  const runDir = `/tmp/cursor-hook-test-run-${runId}-${Date.now()}`;
+  const runDir = `${TEST_RUNS_DIR}/${runId}`;
   dockerExec(`mkdir -p ${runDir}/journal ${runDir}/state ${runDir}/tasks`);
 
   const runJson = JSON.stringify({ runId, processId: "test-process" });
@@ -140,7 +141,7 @@ function createMockRun(
     );
   }
 
-  return runDir;
+  return runId;
 }
 
 /** Assert the hook allowed exit (exit 0, no followup_message). */
@@ -200,7 +201,7 @@ describe("Cursor stop hook core lifecycle", () => {
   test("blocks exit when active session with associated run", () => {
     const sid = "active-" + Date.now();
 
-    const runDir = createMockRun("active-run", [
+    const runId = createMockRun("active-run", [
       {
         type: "RUN_CREATED",
         data: { runId: "active-run", processId: "test" },
@@ -208,7 +209,7 @@ describe("Cursor stop hook core lifecycle", () => {
     ]);
 
     dockerExec(
-      `babysitter session:init --session-id ${sid} --state-dir ${STATE_DIR} --prompt "test orchestration" --run-id ${runDir} --json`,
+      `babysitter session:init --session-id ${sid} --state-dir ${STATE_DIR} --prompt "test orchestration" --run-id ${runId} --json`,
     );
 
     const { exitCode, stdout } = runHook(sid, "some assistant output here");
@@ -225,7 +226,7 @@ describe("Cursor stop hook core lifecycle", () => {
   test("increments iteration counter on each invocation", () => {
     const sid = "iter-" + Date.now();
 
-    const runDir = createMockRun("iter-run", [
+    const runId = createMockRun("iter-run", [
       {
         type: "RUN_CREATED",
         data: { runId: "iter-run", processId: "test" },
@@ -233,7 +234,7 @@ describe("Cursor stop hook core lifecycle", () => {
     ]);
 
     dockerExec(
-      `babysitter session:init --session-id ${sid} --state-dir ${STATE_DIR} --prompt "counting test" --run-id ${runDir} --json`,
+      `babysitter session:init --session-id ${sid} --state-dir ${STATE_DIR} --prompt "counting test" --run-id ${runId} --json`,
     );
 
     // First invocation — Cursor adapter uses followup_message containing iteration number
@@ -259,7 +260,8 @@ describe("Cursor stop hook core lifecycle", () => {
 
   test("detects completion proof tag and allows exit", () => {
     const sid = "complete-" + Date.now();
-    const runDir = `/tmp/cursor-hook-test-run-complete-${sid}`;
+    const runId = `complete-${sid}`;
+    const runDir = `${TEST_RUNS_DIR}/${runId}`;
 
     // sha256("test-run:babysitter-completion-secret-v1")
     const secret =
@@ -277,7 +279,7 @@ describe("Cursor stop hook core lifecycle", () => {
     );
 
     dockerExec(
-      `babysitter session:init --session-id ${sid} --state-dir ${STATE_DIR} --prompt "complete test" --run-id ${runDir} --json`,
+      `babysitter session:init --session-id ${sid} --state-dir ${STATE_DIR} --prompt "complete test" --run-id ${runId} --json`,
     );
 
     // Cursor adapter reads last_response from hook input (not transcript files)

@@ -65,6 +65,8 @@ vi.mock('@a5c/hooks-proxy-core', () => ({
     contextFilePath: undefined,
     tempEnvFilePath: undefined,
   })),
+  getDefaultSessionDir: vi.fn(() => '/mock-session-dir'),
+  getSessionFilePath: vi.fn((id: string) => `/mock-session-dir/${id}.json`),
 }));
 
 import { loadAdapter } from '../cli/adapter-loader';
@@ -428,15 +430,17 @@ describe('CLI Commands', () => {
         await (doctorCommand.handler as Function)({
           adapter: 'claude',
           json: true,
+          'session-dir': '/nonexistent-session-dir-for-test',
+          'stale-threshold': 24,
           _: [],
           $0: 'a5c-hooks-proxy',
         });
 
         const output = stdout.getOutput();
-        const parsed = JSON.parse(output) as Array<{ name: string; available: boolean }>;
-        expect(parsed).toHaveLength(1);
-        expect(parsed[0].name).toBe('claude');
-        expect(parsed[0].available).toBe(true);
+        const parsed = JSON.parse(output) as { adapters: Array<{ name: string; available: boolean }> };
+        expect(parsed.adapters).toHaveLength(1);
+        expect(parsed.adapters[0].name).toBe('claude');
+        expect(parsed.adapters[0].available).toBe(true);
       } finally {
         stdout.restore();
       }
@@ -454,14 +458,16 @@ describe('CLI Commands', () => {
         await (doctorCommand.handler as Function)({
           adapter: 'nonexistent',
           json: true,
+          'session-dir': '/nonexistent-session-dir-for-test',
+          'stale-threshold': 24,
           _: [],
           $0: 'a5c-hooks-proxy',
         });
 
         const output = stdout.getOutput();
-        const parsed = JSON.parse(output) as Array<{ name: string; available: boolean; error?: string }>;
-        expect(parsed[0].available).toBe(false);
-        expect(parsed[0].error).toContain('Module not found');
+        const parsed = JSON.parse(output) as { adapters: Array<{ name: string; available: boolean; error?: string }> };
+        expect(parsed.adapters[0].available).toBe(false);
+        expect(parsed.adapters[0].error).toContain('Module not found');
       } finally {
         stdout.restore();
       }
@@ -494,16 +500,204 @@ describe('CLI Commands', () => {
         await (doctorCommand.handler as Function)({
           adapter: 'limited',
           json: true,
+          'session-dir': '/nonexistent-session-dir-for-test',
+          'stale-threshold': 24,
           _: [],
           $0: 'a5c-hooks-proxy',
         });
 
         const output = stdout.getOutput();
-        const parsed = JSON.parse(output) as Array<{ warnings: string[] }>;
-        expect(parsed[0].warnings.length).toBeGreaterThan(0);
+        const parsed = JSON.parse(output) as { adapters: Array<{ warnings: string[] }> };
+        expect(parsed.adapters[0].warnings.length).toBeGreaterThan(0);
         // Should warn about blocking, env persistence, session ID, tool scope, and no mappings
-        expect(parsed[0].warnings.some((w: string) => w.includes('blocking'))).toBe(true);
-        expect(parsed[0].warnings.some((w: string) => w.includes('persistence'))).toBe(true);
+        expect(parsed.adapters[0].warnings.some((w: string) => w.includes('blocking'))).toBe(true);
+        expect(parsed.adapters[0].warnings.some((w: string) => w.includes('persistence'))).toBe(true);
+      } finally {
+        stdout.restore();
+      }
+    });
+
+    it('should include session health in report', async () => {
+      const { doctorCommand } = await import('../cli/commands/doctor');
+      const stdout = captureStdout();
+
+      try {
+        await (doctorCommand.handler as Function)({
+          adapter: 'claude',
+          json: true,
+          'session-dir': '/nonexistent-session-dir-for-test',
+          'stale-threshold': 24,
+          _: [],
+          $0: 'a5c-hooks-proxy',
+        });
+
+        const output = stdout.getOutput();
+        const parsed = JSON.parse(output) as { sessionHealth: { dirExists: boolean; sessionDir: string } };
+        expect(parsed.sessionHealth).toBeDefined();
+        expect(parsed.sessionHealth.dirExists).toBe(false);
+        expect(parsed.sessionHealth.sessionDir).toBe('/nonexistent-session-dir-for-test');
+      } finally {
+        stdout.restore();
+      }
+    });
+
+    it('should detect stale sessions', async () => {
+      const { doctorCommand } = await import('../cli/commands/doctor');
+      const stdout = captureStdout();
+
+      // Create a temp session dir with a stale session
+      const fs = await import('fs');
+      const path = await import('path');
+      const os = await import('os');
+      const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'hooks-doctor-'));
+
+      const staleDate = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(); // 48h ago
+      const sessionData = {
+        schemaVersion: 'a5c.hooks.session.v1',
+        session: {
+          version: 'a5c.hooks.session.v1',
+          sessionId: 'stale-sess',
+          adapter: 'claude',
+          createdAt: staleDate,
+          updatedAt: staleDate,
+          persistedEnv: {},
+          contextVars: {},
+          contextFragments: [],
+          metadata: {},
+        },
+      };
+      await fs.promises.writeFile(
+        path.join(tmpDir, 'stale-sess.json'),
+        JSON.stringify(sessionData),
+        'utf-8',
+      );
+
+      try {
+        await (doctorCommand.handler as Function)({
+          adapter: 'claude',
+          json: true,
+          'session-dir': tmpDir,
+          'stale-threshold': 24,
+          _: [],
+          $0: 'a5c-hooks-proxy',
+        });
+
+        const output = stdout.getOutput();
+        const parsed = JSON.parse(output) as {
+          sessionHealth: { staleSessions: Array<{ sessionId: string; ageHours: number }> };
+        };
+        expect(parsed.sessionHealth.staleSessions).toHaveLength(1);
+        expect(parsed.sessionHealth.staleSessions[0].sessionId).toBe('stale-sess');
+        expect(parsed.sessionHealth.staleSessions[0].ageHours).toBeGreaterThan(24);
+      } finally {
+        stdout.restore();
+        await fs.promises.rm(tmpDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should detect corrupt sessions', async () => {
+      const { doctorCommand } = await import('../cli/commands/doctor');
+      const stdout = captureStdout();
+
+      const fs = await import('fs');
+      const path = await import('path');
+      const os = await import('os');
+      const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'hooks-doctor-corrupt-'));
+
+      await fs.promises.writeFile(
+        path.join(tmpDir, 'bad-session.json'),
+        'not valid json {{{',
+        'utf-8',
+      );
+
+      try {
+        await (doctorCommand.handler as Function)({
+          adapter: 'claude',
+          json: true,
+          'session-dir': tmpDir,
+          'stale-threshold': 24,
+          _: [],
+          $0: 'a5c-hooks-proxy',
+        });
+
+        const output = stdout.getOutput();
+        const parsed = JSON.parse(output) as {
+          sessionHealth: { corruptSessions: string[] };
+        };
+        expect(parsed.sessionHealth.corruptSessions).toContain('bad-session.json');
+      } finally {
+        stdout.restore();
+        await fs.promises.rm(tmpDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should include capability profile for available adapters', async () => {
+      const { doctorCommand } = await import('../cli/commands/doctor');
+      const stdout = captureStdout();
+
+      mockLoadAdapter.mockReturnValue({
+        capabilities: {
+          name: 'claude',
+          family: 'shell-hook',
+          sessionIdQuality: 'native',
+          supportsOrderedFanout: true,
+          supportsNativeAdditionalContext: true,
+          supportsBlock: true,
+          supportsAsk: true,
+          supportsToolInputMutation: false,
+          supportsToolResultMutation: false,
+          supportsPersistedEnv: true,
+          envPersistenceMode: 'native_env_file',
+          toolInterceptionScope: 'all',
+        },
+        phaseMappings: [
+          {
+            canonicalPhase: 'session.start',
+            nativeHook: 'SessionStart',
+            supportLevel: 'native',
+            blockCapability: false,
+            mutationCapability: false,
+            scope: 'session',
+          },
+          {
+            canonicalPhase: 'tool.before',
+            nativeHook: 'PreToolUse',
+            supportLevel: 'native',
+            blockCapability: true,
+            mutationCapability: false,
+            scope: 'tool',
+          },
+        ],
+        module: {},
+      });
+
+      try {
+        await (doctorCommand.handler as Function)({
+          adapter: 'claude',
+          json: true,
+          'session-dir': '/nonexistent-session-dir-for-test',
+          'stale-threshold': 24,
+          _: [],
+          $0: 'a5c-hooks-proxy',
+        });
+
+        const output = stdout.getOutput();
+        const parsed = JSON.parse(output) as {
+          adapters: Array<{
+            capabilityProfile: {
+              supportedPhases: string[];
+              unsupportedPhases: string[];
+              blockablePhases: string[];
+            };
+            phaseMappings: Array<{ canonicalPhase: string; nativeHook: string }>;
+          }>;
+        };
+        const profile = parsed.adapters[0].capabilityProfile;
+        expect(profile.supportedPhases).toContain('session.start');
+        expect(profile.supportedPhases).toContain('tool.before');
+        expect(profile.blockablePhases).toContain('tool.before');
+        expect(profile.unsupportedPhases.length).toBeGreaterThan(0);
+        expect(parsed.adapters[0].phaseMappings).toHaveLength(2);
       } finally {
         stdout.restore();
       }

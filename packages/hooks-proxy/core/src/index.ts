@@ -69,6 +69,25 @@ export type {
   SessionStore,
 } from './propagation';
 
+// Diagnostics
+export {
+  DiagnosticLogger,
+  createDiagnosticLogger,
+  TraceWriter,
+  createTraceWriter,
+  generateTraceId,
+  buildTraceRecord,
+} from './diagnostics';
+export type {
+  DiagnosticEntry,
+  DiagnosticLoggerOptions,
+  MergeDecisionSummary,
+  SessionIdQuality,
+  TraceWriterOptions,
+  TraceRecord,
+  TraceHandlerRecord,
+} from './diagnostics';
+
 // API
 export {
   createAdapter,

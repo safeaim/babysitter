@@ -78,7 +78,6 @@ export const execCommand: CommandModule<object, ExecArgs> = {
     const child = spawn(cmd, cmdArgs, {
       env: childEnv,
       stdio: 'inherit',
-      shell: true,
     });
 
     child.on('error', (err) => {

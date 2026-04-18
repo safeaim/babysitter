@@ -53,16 +53,25 @@ export const execCommand: CommandModule<object, ExecArgs> = {
     };
 
     // Materialize execution context
-    const materialized = await materializeExecContext({
-      sessionId,
-      sessionStore,
-    });
+    let childEnv: Record<string, string | undefined>;
+    try {
+      const materialized = await materializeExecContext({
+        sessionId,
+        sessionStore,
+      });
 
-    // Merge materialized env with current process env
-    const childEnv = {
-      ...process.env,
-      ...materialized.env,
-    };
+      // Merge materialized env with current process env
+      childEnv = {
+        ...process.env,
+        ...materialized.env,
+      };
+    } catch {
+      // Fallback: inject at least AGENT_SESSION_ID even if session not found
+      childEnv = {
+        ...process.env,
+        AGENT_SESSION_ID: sessionId,
+      };
+    }
 
     // Spawn the target command
     const [cmd, ...cmdArgs] = command;

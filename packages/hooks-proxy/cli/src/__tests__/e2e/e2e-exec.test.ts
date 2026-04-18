@@ -64,7 +64,8 @@ describe('exec — context rehydration (e2e)', { timeout: 30000 }, () => {
       },
     );
 
-    expect(result.exitCode).toBe(0);
+    // Debug: capture stderr if test fails
+    expect(result.exitCode, `exec failed with stderr: ${result.stderr}`).toBe(0);
 
     const output = JSON.parse(result.stdout.trim());
     expect(output.sid).toBe(sessionId);
@@ -87,9 +88,9 @@ describe('exec — context rehydration (e2e)', { timeout: 30000 }, () => {
       },
     );
 
-    // materializeExecContext always injects AGENT_SESSION_ID even when
-    // no session file exists
-    expect(result.exitCode).toBe(0);
+    // materializeExecContext injects AGENT_SESSION_ID even when no session
+    // file exists on disk. The fallback in exec.ts ensures this works.
+    expect(result.exitCode, `exec failed with stderr: ${result.stderr}`).toBe(0);
     expect(result.stdout.trim()).toBe(sessionId);
   });
 
@@ -137,7 +138,7 @@ describe('exec — context rehydration (e2e)', { timeout: 30000 }, () => {
       },
     );
 
-    expect(result.exitCode).toBe(0);
+    expect(result.exitCode, `exec failed with stderr: ${result.stderr}`).toBe(0);
     expect(result.stdout.trim()).toBe('/some/project/dir');
   });
 });

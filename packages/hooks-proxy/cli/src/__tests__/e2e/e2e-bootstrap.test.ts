@@ -12,6 +12,7 @@ import {
   runCli,
   readSessionFile,
   writeHandlerScript,
+  cleanupLaunchers,
 } from './helpers';
 
 describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () => {
@@ -27,6 +28,7 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
   });
 
   afterEach(async () => {
+    await cleanupLaunchers(tmpRoot);
     await cleanup();
   });
 

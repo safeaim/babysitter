@@ -140,12 +140,22 @@ export async function writeSessionFile(
   await fs.promises.writeFile(filePath, JSON.stringify(envelope, null, 2), 'utf-8');
 }
 
+/** Counter to ensure unique launcher names within a process. */
+let launcherCounter = 0;
+
 /**
  * Write a handler script to a temp file and return the shell command to run it.
- * This avoids shell quoting issues with `node -e` on Windows.
  *
- * On Windows, child_process.exec() uses cmd.exe which can struggle with
- * backslash paths. We normalize to forward slashes for portability.
+ * On Windows, we face two issues:
+ * 1. child_process.exec() uses cmd.exe which struggles with certain path formats
+ * 2. The CLI's parseHandlerArgs splits on ':', breaking Windows drive paths like C:/...
+ *
+ * To avoid both, we write a small launcher script under the CLI package
+ * directory (no drive letter in relative path) that requires the real handler
+ * via an absolute path encoded in a way that avoids colon splitting.
+ *
+ * Each call to createTempSessionRoot should pass its tmpRoot here so launchers
+ * are scoped to a unique subdirectory, preventing cross-test interference.
  */
 export async function writeHandlerScript(
   tmpRoot: string,
@@ -154,7 +164,49 @@ export async function writeHandlerScript(
 ): Promise<string> {
   const scriptPath = path.join(tmpRoot, `${name}.js`);
   await fs.promises.writeFile(scriptPath, jsCode, 'utf-8');
-  // Use forward slashes so cmd.exe on Windows does not misinterpret backslashes
-  const normalizedPath = scriptPath.replace(/\\/g, '/');
-  return `node "${normalizedPath}"`;
+
+  // Create a launcher script in a unique subdirectory under CLI_PKG_DIR.
+  // The subdirectory is derived from the tmpRoot basename to isolate
+  // concurrent test runs.
+  const tmpBasename = path.basename(tmpRoot);
+  const launcherDir = path.join(CLI_PKG_DIR, '.e2e-tmp-handlers', tmpBasename);
+  await fs.promises.mkdir(launcherDir, { recursive: true });
+
+  const launcherName = `launcher-${name}-${process.pid}-${++launcherCounter}.js`;
+  const launcherPath = path.join(launcherDir, launcherName);
+
+  // The launcher requires the actual handler script using its absolute path
+  const scriptPathForward = scriptPath.replace(/\\/g, '/');
+  await fs.promises.writeFile(
+    launcherPath,
+    `require("${scriptPathForward}");`,
+    'utf-8',
+  );
+
+  // Return relative path from CLI_PKG_DIR (avoids drive letter colon)
+  const relativeLauncher = path.relative(CLI_PKG_DIR, launcherPath).replace(/\\/g, '/');
+  return `node ${relativeLauncher}`;
+}
+
+/**
+ * Clean up temporary launcher scripts for a specific tmpRoot.
+ */
+export async function cleanupLaunchers(tmpRoot: string): Promise<void> {
+  const tmpBasename = path.basename(tmpRoot);
+  const launcherDir = path.join(CLI_PKG_DIR, '.e2e-tmp-handlers', tmpBasename);
+  try {
+    await fs.promises.rm(launcherDir, { recursive: true, force: true });
+  } catch {
+    // ignore
+  }
+  // Also try to remove parent if empty
+  try {
+    const parentDir = path.join(CLI_PKG_DIR, '.e2e-tmp-handlers');
+    const entries = await fs.promises.readdir(parentDir);
+    if (entries.length === 0) {
+      await fs.promises.rmdir(parentDir);
+    }
+  } catch {
+    // ignore
+  }
 }

@@ -12,6 +12,7 @@ import {
   runCli,
   readSessionFile,
   writeHandlerScript,
+  cleanupLaunchers,
 } from './helpers';
 
 describe('invoke — full CLI pipeline (e2e)', { timeout: 30000 }, () => {
@@ -31,6 +32,7 @@ describe('invoke — full CLI pipeline (e2e)', { timeout: 30000 }, () => {
   });
 
   afterEach(async () => {
+    await cleanupLaunchers(tmpRoot);
     await cleanup();
   });
 

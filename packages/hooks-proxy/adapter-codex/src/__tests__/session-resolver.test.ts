@@ -5,7 +5,7 @@ describe('resolveSessionId', () => {
   it('returns AGENT_SESSION_ID from env with highest priority', () => {
     const result = resolveSessionId(
       { session_id: 'from-payload' },
-      { AGENT_SESSION_ID: 'from-env', CODEX_THREAD_ID: 'from-codex-thread', CODEX_SESSION_ID: 'from-codex-env' },
+      { AGENT_SESSION_ID: 'from-env', CODEX_THREAD_ID: 'from-codex-thread' },
     );
     expect(result).toBe('from-env');
   });
@@ -24,22 +24,6 @@ describe('resolveSessionId', () => {
       { CODEX_THREAD_ID: 'codex-thread-id' },
     );
     expect(result).toBe('codex-thread-id');
-  });
-
-  it('falls back to CODEX_SESSION_ID env var when CODEX_THREAD_ID is absent', () => {
-    const result = resolveSessionId(
-      {},
-      { CODEX_SESSION_ID: 'codex-env-id' },
-    );
-    expect(result).toBe('codex-env-id');
-  });
-
-  it('prefers CODEX_THREAD_ID over CODEX_SESSION_ID', () => {
-    const result = resolveSessionId(
-      {},
-      { CODEX_THREAD_ID: 'thread-id', CODEX_SESSION_ID: 'session-id' },
-    );
-    expect(result).toBe('thread-id');
   });
 
   it('returns null when no session ID is available', () => {

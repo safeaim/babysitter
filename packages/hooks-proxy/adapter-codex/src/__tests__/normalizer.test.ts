@@ -115,23 +115,23 @@ describe('normalizeCodexEvent', () => {
     });
   });
 
-  describe('tool.before', () => {
+  describe('PreToolUse', () => {
     it('normalizes to tool.before with lossy support', () => {
-      const event = normalizeCodexEvent('tool.before', TOOL_BEFORE_PAYLOAD, BASE_ENV);
+      const event = normalizeCodexEvent('PreToolUse', TOOL_BEFORE_PAYLOAD, BASE_ENV);
       expect(event.phase).toBe('tool.before');
       expect(event.supportLevel).toBe('lossy');
     });
 
     it('enriches env with tool name and call ID', () => {
-      const event = normalizeCodexEvent('tool.before', TOOL_BEFORE_PAYLOAD, BASE_ENV);
+      const event = normalizeCodexEvent('PreToolUse', TOOL_BEFORE_PAYLOAD, BASE_ENV);
       expect(event.execution.toolName).toBe('bash');
       expect(event.execution.toolCallId).toBe('tc-001');
     });
   });
 
-  describe('tool.after', () => {
+  describe('PostToolUse', () => {
     it('normalizes to tool.after with lossy support', () => {
-      const event = normalizeCodexEvent('tool.after', TOOL_AFTER_PAYLOAD, BASE_ENV);
+      const event = normalizeCodexEvent('PostToolUse', TOOL_AFTER_PAYLOAD, BASE_ENV);
       expect(event.phase).toBe('tool.after');
       expect(event.supportLevel).toBe('lossy');
     });

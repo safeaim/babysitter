@@ -67,8 +67,8 @@ export interface GeminiAfterAgentPayload extends GeminiStdinBase {
   reason?: string;
 }
 
-/** BeforeToolExecution-specific fields. */
-export interface GeminiBeforeToolExecutionPayload extends GeminiStdinBase {
+/** BeforeTool-specific fields. */
+export interface GeminiBeforeToolPayload extends GeminiStdinBase {
   /** Name of the tool being executed. */
   toolName?: string;
   /** Input arguments for the tool. */
@@ -77,8 +77,8 @@ export interface GeminiBeforeToolExecutionPayload extends GeminiStdinBase {
   toolCallId?: string;
 }
 
-/** AfterToolExecution-specific fields. */
-export interface GeminiAfterToolExecutionPayload extends GeminiStdinBase {
+/** AfterTool-specific fields. */
+export interface GeminiAfterToolPayload extends GeminiStdinBase {
   /** Name of the tool that was executed. */
   toolName?: string;
   /** Input arguments for the tool. */
@@ -199,13 +199,13 @@ export function buildPayload(
       if (stdinData.reason != null) payload.reason = stdinData.reason;
       break;
 
-    case 'BeforeToolExecution':
+    case 'BeforeTool':
       if (stdinData.toolName != null) payload.toolName = stdinData.toolName;
       if (stdinData.toolInput != null) payload.toolInput = stdinData.toolInput;
       if (stdinData.toolCallId != null) payload.toolCallId = stdinData.toolCallId;
       break;
 
-    case 'AfterToolExecution':
+    case 'AfterTool':
       if (stdinData.toolName != null) payload.toolName = stdinData.toolName;
       if (stdinData.toolInput != null) payload.toolInput = stdinData.toolInput;
       if (stdinData.toolResult != null) payload.toolResponse = stdinData.toolResult;

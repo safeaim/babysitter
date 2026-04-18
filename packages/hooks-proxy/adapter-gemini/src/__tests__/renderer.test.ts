@@ -59,7 +59,7 @@ describe('renderGeminiOutput', () => {
 
     it('does not emit selectedTools when toolMutation value is not an array', () => {
       // If toolMutation.value is an object (not an array), it should not
-      // appear as selectedTools — that format is for BeforeToolExecution, not
+      // appear as selectedTools — that format is for BeforeTool, not
       // BeforeToolSelection.
       const result: UnifiedHookResult = {
         toolMutation: {
@@ -156,20 +156,20 @@ describe('renderGeminiOutput', () => {
     });
   });
 
-  describe('BeforeToolExecution', () => {
+  describe('BeforeTool', () => {
     it('renders deny decision', () => {
       const result: UnifiedHookResult = {
         decision: 'deny',
         reason: 'Dangerous command',
       };
-      const output = renderGeminiOutput(result, 'BeforeToolExecution');
+      const output = renderGeminiOutput(result, 'BeforeTool');
       expect(output.decision).toBe('deny');
       expect(output.reason).toBe('Dangerous command');
     });
 
     it('renders allow decision', () => {
       const result: UnifiedHookResult = { decision: 'allow' };
-      const output = renderGeminiOutput(result, 'BeforeToolExecution');
+      const output = renderGeminiOutput(result, 'BeforeTool');
       expect(output.decision).toBe('allow');
     });
 
@@ -180,23 +180,23 @@ describe('renderGeminiOutput', () => {
           value: { path: 'safe/path.ts', content: 'sanitized' },
         },
       };
-      const output = renderGeminiOutput(result, 'BeforeToolExecution');
+      const output = renderGeminiOutput(result, 'BeforeTool');
       expect(output.toolInput).toEqual({ path: 'safe/path.ts', content: 'sanitized' });
     });
 
     it('does not set decision for noop', () => {
       const result: UnifiedHookResult = { decision: 'noop' };
-      const output = renderGeminiOutput(result, 'BeforeToolExecution');
+      const output = renderGeminiOutput(result, 'BeforeTool');
       expect(output.decision).toBeUndefined();
     });
   });
 
-  describe('AfterToolExecution', () => {
+  describe('AfterTool', () => {
     it('renders additionalContext', () => {
       const result: UnifiedHookResult = {
         additionalContext: 'Tool completed successfully',
       };
-      const output = renderGeminiOutput(result, 'AfterToolExecution');
+      const output = renderGeminiOutput(result, 'AfterTool');
       expect(output.additionalContext).toBe('Tool completed successfully');
     });
   });

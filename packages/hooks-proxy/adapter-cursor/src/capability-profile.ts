@@ -33,39 +33,36 @@ export interface CursorCapabilityProfile {
 }
 
 /**
- * The default profile: conservative assumptions based on the
- * documented/stable Cursor hook surface as of early 2026.
- * Only sessionStart and stop are considered reliable.
+ * The default profile: based on the documented/stable Cursor
+ * hook surface as of mid-2026. All listed events are now
+ * documented as native hooks per Cursor's official docs.
  */
 export const DEFAULT_PROFILE: CursorCapabilityProfile = {
-  name: 'default-conservative',
+  name: 'default',
   mode: 'unknown',
-  reliableEvents: ['sessionStart', 'stop'],
-  unreliableEvents: ['preToolUse', 'postToolUse'],
+  reliableEvents: ['sessionStart', 'sessionEnd', 'stop', 'preToolUse', 'postToolUse'],
+  unreliableEvents: [],
   stopCanContinue: true,
-  toolHooksAvailable: false,
+  toolHooksAvailable: true,
   notes: [
-    'Only sessionStart and stop are documented as stable',
-    'Tool hooks may exist in some Cursor versions but are not reliable',
-    'IDE and CLI may have different event surfaces',
+    'All hook events are documented and stable as of Cursor 3.0',
+    'IDE and CLI share the same event surface',
   ],
 };
 
 /**
- * A more permissive profile for Cursor CLI environments where
- * tool hooks have been observed to work.
+ * A CLI-specific profile with the same capabilities as default.
+ * Retained for backward compatibility.
  */
 export const CLI_PERMISSIVE_PROFILE: CursorCapabilityProfile = {
   name: 'cli-permissive',
   mode: 'cli',
-  reliableEvents: ['sessionStart', 'stop'],
-  unreliableEvents: ['preToolUse', 'postToolUse', 'sessionEnd'],
+  reliableEvents: ['sessionStart', 'sessionEnd', 'stop', 'preToolUse', 'postToolUse'],
+  unreliableEvents: [],
   stopCanContinue: true,
   toolHooksAvailable: true,
   notes: [
-    'Assumes CLI mode with tool hooks enabled',
-    'Tool hooks may not fire for all tool types',
-    'Behavior not guaranteed across Cursor versions',
+    'CLI mode with full hook support',
   ],
 };
 

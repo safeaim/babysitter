@@ -25,23 +25,23 @@ describe('CURSOR_PHASE_MAPPINGS', () => {
     expect(m!.mutationCapability).toBe(false);
   });
 
-  it('maps sessionEnd as lossy', () => {
+  it('maps sessionEnd as native', () => {
     const m = findMapping('sessionEnd');
     expect(m).toBeDefined();
-    expect(m!.supportLevel).toBe('lossy');
+    expect(m!.supportLevel).toBe('native');
   });
 
-  it('marks preToolUse as emulated (not stable)', () => {
+  it('marks preToolUse as native', () => {
     const m = findMapping('preToolUse');
     expect(m).toBeDefined();
-    expect(m!.supportLevel).toBe('emulated');
-    expect(m!.notes).toContain('Not documented as stable');
+    expect(m!.supportLevel).toBe('native');
+    expect(m!.blockCapability).toBe(true);
   });
 
-  it('marks postToolUse as emulated (not stable)', () => {
+  it('marks postToolUse as native', () => {
     const m = findMapping('postToolUse');
     expect(m).toBeDefined();
-    expect(m!.supportLevel).toBe('emulated');
+    expect(m!.supportLevel).toBe('native');
   });
 
   it('returns undefined for unknown events', () => {

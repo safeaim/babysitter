@@ -11,8 +11,8 @@ describe('GEMINI_PHASE_MAPPINGS', () => {
     expect(nativeHooks).toContain('AfterModel');
     expect(nativeHooks).toContain('BeforeAgent');
     expect(nativeHooks).toContain('AfterAgent');
-    expect(nativeHooks).toContain('BeforeToolExecution');
-    expect(nativeHooks).toContain('AfterToolExecution');
+    expect(nativeHooks).toContain('BeforeTool');
+    expect(nativeHooks).toContain('AfterTool');
   });
 
   it('has exactly 9 mapping entries covering all Gemini native events', () => {
@@ -25,8 +25,8 @@ describe('GEMINI_PHASE_MAPPINGS', () => {
       'AfterModel',
       'BeforeAgent',
       'AfterAgent',
-      'BeforeToolExecution',
-      'AfterToolExecution',
+      'BeforeTool',
+      'AfterTool',
     ] as const;
 
     // Verify count — no missing or duplicate entries
@@ -85,11 +85,11 @@ describe('GEMINI_PHASE_MAPPINGS', () => {
   });
 
   it('maps tool execution events', () => {
-    const before = getGeminiPhaseMapping('BeforeToolExecution');
+    const before = getGeminiPhaseMapping('BeforeTool');
     expect(before?.canonicalPhase).toBe('tool.before');
     expect(before?.mutationCapability).toBe(true);
 
-    const after = getGeminiPhaseMapping('AfterToolExecution');
+    const after = getGeminiPhaseMapping('AfterTool');
     expect(after?.canonicalPhase).toBe('tool.after');
     expect(after?.mutationCapability).toBe(false);
   });

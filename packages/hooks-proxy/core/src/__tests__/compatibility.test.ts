@@ -45,8 +45,8 @@ const CODEX_MAPPINGS: PhaseMapping[] = [
   { canonicalPhase: 'session.end', nativeHook: 'SessionEnd', supportLevel: 'lossy', blockCapability: false, mutationCapability: false, scope: 'session' },
   { canonicalPhase: 'turn.user_prompt_submitted', nativeHook: 'UserPromptSubmit', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
   { canonicalPhase: 'turn.stop', nativeHook: 'Stop', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'tool.before', nativeHook: 'tool.before', supportLevel: 'lossy', blockCapability: true, mutationCapability: false, scope: 'tool' },
-  { canonicalPhase: 'tool.after', nativeHook: 'tool.after', supportLevel: 'lossy', blockCapability: false, mutationCapability: false, scope: 'tool' },
+  { canonicalPhase: 'tool.before', nativeHook: 'PreToolUse', supportLevel: 'lossy', blockCapability: true, mutationCapability: false, scope: 'tool' },
+  { canonicalPhase: 'tool.after', nativeHook: 'PostToolUse', supportLevel: 'lossy', blockCapability: false, mutationCapability: false, scope: 'tool' },
 ];
 
 const GEMINI_MAPPINGS: PhaseMapping[] = [
@@ -57,8 +57,8 @@ const GEMINI_MAPPINGS: PhaseMapping[] = [
   { canonicalPhase: 'model.after_response', nativeHook: 'AfterModel', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'model' },
   { canonicalPhase: 'turn.before_agent', nativeHook: 'BeforeAgent', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
   { canonicalPhase: 'turn.after_agent', nativeHook: 'AfterAgent', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'tool.before', nativeHook: 'BeforeToolExecution', supportLevel: 'native', blockCapability: true, mutationCapability: true, scope: 'tool' },
-  { canonicalPhase: 'tool.after', nativeHook: 'AfterToolExecution', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'tool' },
+  { canonicalPhase: 'tool.before', nativeHook: 'BeforeTool', supportLevel: 'native', blockCapability: true, mutationCapability: true, scope: 'tool' },
+  { canonicalPhase: 'tool.after', nativeHook: 'AfterTool', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'tool' },
 ];
 
 const COPILOT_MAPPINGS: PhaseMapping[] = [
@@ -67,7 +67,7 @@ const COPILOT_MAPPINGS: PhaseMapping[] = [
   { canonicalPhase: 'turn.user_prompt_submitted', nativeHook: 'userPromptSubmitted', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'turn' },
   { canonicalPhase: 'tool.before', nativeHook: 'preToolUse', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'tool' },
   { canonicalPhase: 'tool.after', nativeHook: 'postToolUse', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'tool' },
-  { canonicalPhase: 'turn.error', nativeHook: 'error', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'turn' },
+  { canonicalPhase: 'turn.error', nativeHook: 'errorOccurred', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'turn' },
 ];
 
 const ADAPTER_MAPPINGS_MAP: Record<string, PhaseMapping[]> = {

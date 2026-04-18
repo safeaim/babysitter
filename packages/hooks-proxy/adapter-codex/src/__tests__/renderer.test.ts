@@ -76,22 +76,22 @@ describe('renderCodexOutput', () => {
     });
   });
 
-  describe('tool.before', () => {
+  describe('PreToolUse', () => {
     it('includes decision and reason', () => {
       const result = makeMergedResult({
         decision: 'deny',
         reason: 'dangerous command',
       });
-      const { output } = renderCodexOutput(result, 'tool.before');
+      const { output } = renderCodexOutput(result, 'PreToolUse');
       expect(output['decision']).toBe('deny');
       expect(output['reason']).toBe('dangerous command');
     });
   });
 
-  describe('tool.after', () => {
+  describe('PostToolUse', () => {
     it('includes suppressOutput', () => {
       const result = makeMergedResult({ suppressOutput: true });
-      const { output } = renderCodexOutput(result, 'tool.after');
+      const { output } = renderCodexOutput(result, 'PostToolUse');
       expect(output['suppressOutput']).toBe(true);
     });
   });

@@ -55,8 +55,8 @@ export interface GeminiAfterAgentOutput {
   reason?: string;
 }
 
-/** BeforeToolExecution hook output: permission and mutation. */
-export interface GeminiBeforeToolExecutionOutput {
+/** BeforeTool hook output: permission and mutation. */
+export interface GeminiBeforeToolOutput {
   /** Permission decision. */
   decision?: 'allow' | 'deny';
   /** Reason for the decision. */
@@ -67,8 +67,8 @@ export interface GeminiBeforeToolExecutionOutput {
   additionalContext?: string;
 }
 
-/** AfterToolExecution hook output. */
-export interface GeminiAfterToolExecutionOutput {
+/** AfterTool hook output. */
+export interface GeminiAfterToolOutput {
   /** Additional context to inject. */
   additionalContext?: string;
 }
@@ -104,10 +104,10 @@ export function renderGeminiOutput(
       return renderBeforeAgentOutput(result) as Record<string, unknown>;
     case 'AfterAgent':
       return renderAfterAgentOutput(result) as Record<string, unknown>;
-    case 'BeforeToolExecution':
-      return renderBeforeToolExecutionOutput(result) as Record<string, unknown>;
-    case 'AfterToolExecution':
-      return renderAfterToolExecutionOutput(result) as Record<string, unknown>;
+    case 'BeforeTool':
+      return renderBeforeToolOutput(result) as Record<string, unknown>;
+    case 'AfterTool':
+      return renderAfterToolOutput(result) as Record<string, unknown>;
     case 'SessionStart':
       return renderSessionStartOutput(result) as Record<string, unknown>;
     default:
@@ -204,10 +204,10 @@ function renderAfterAgentOutput(result: UnifiedHookResult): GeminiAfterAgentOutp
   return output;
 }
 
-function renderBeforeToolExecutionOutput(
+function renderBeforeToolOutput(
   result: UnifiedHookResult,
-): GeminiBeforeToolExecutionOutput {
-  const output: GeminiBeforeToolExecutionOutput = {};
+): GeminiBeforeToolOutput {
+  const output: GeminiBeforeToolOutput = {};
 
   if (result.decision === 'allow') {
     output.decision = 'allow';
@@ -232,8 +232,8 @@ function renderBeforeToolExecutionOutput(
   return output;
 }
 
-function renderAfterToolExecutionOutput(result: UnifiedHookResult): GeminiAfterToolExecutionOutput {
-  const output: GeminiAfterToolExecutionOutput = {};
+function renderAfterToolOutput(result: UnifiedHookResult): GeminiAfterToolOutput {
+  const output: GeminiAfterToolOutput = {};
 
   if (result.additionalContext != null) {
     output.additionalContext = result.additionalContext;

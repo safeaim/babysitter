@@ -61,7 +61,7 @@ export const POST_TOOL_USE: CopilotRawInput = {
  * Fixture: error event.
  */
 export const ERROR_EVENT: CopilotRawInput = {
-  event: 'error',
+  event: 'errorOccurred',
   cwd: '/home/user/project',
   workspace: '/home/user/project',
   error: 'Connection timeout to model endpoint',

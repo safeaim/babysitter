@@ -13,8 +13,8 @@ export type {
   GeminiAfterModelPayload,
   GeminiBeforeAgentPayload,
   GeminiAfterAgentPayload,
-  GeminiBeforeToolExecutionPayload,
-  GeminiAfterToolExecutionPayload,
+  GeminiBeforeToolPayload,
+  GeminiAfterToolPayload,
 } from './normalizer';
 
 export type {
@@ -23,7 +23,7 @@ export type {
   GeminiAfterModelOutput,
   GeminiBeforeAgentOutput,
   GeminiAfterAgentOutput,
-  GeminiBeforeToolExecutionOutput,
-  GeminiAfterToolExecutionOutput,
+  GeminiBeforeToolOutput,
+  GeminiAfterToolOutput,
   GeminiSessionStartOutput,
 } from './renderer';

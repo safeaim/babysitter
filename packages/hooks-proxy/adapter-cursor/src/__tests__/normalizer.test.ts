@@ -84,7 +84,7 @@ describe('normalizeCursorEvent', () => {
       expect(diagnostics).toBeDefined();
       expect(diagnostics['isReliable']).toBe(true);
       expect(diagnostics['isKnown']).toBe(true);
-      expect(diagnostics['profileName']).toBe('default-conservative');
+      expect(diagnostics['profileName']).toBe('default');
     });
   });
 
@@ -101,11 +101,11 @@ describe('normalizeCursorEvent', () => {
     });
   });
 
-  describe('preToolUse (emulated)', () => {
-    it('normalizes to tool.before with emulated support', () => {
+  describe('preToolUse (native)', () => {
+    it('normalizes to tool.before with native support', () => {
       const event = normalizeCursorEvent('preToolUse', PRE_TOOL_USE_PAYLOAD, BASE_ENV);
       expect(event.phase).toBe('tool.before');
-      expect(event.supportLevel).toBe('emulated');
+      expect(event.supportLevel).toBe('native');
     });
 
     it('enriches env with tool name and call ID', () => {
@@ -114,20 +114,19 @@ describe('normalizeCursorEvent', () => {
       expect(event.execution.toolCallId).toBe('tc-cursor-001');
     });
 
-    it('marks event as unreliable in diagnostics', () => {
+    it('marks event as reliable in diagnostics', () => {
       const event = normalizeCursorEvent('preToolUse', PRE_TOOL_USE_PAYLOAD, BASE_ENV);
       const diagnostics = event.execution.metadata['cursorDiagnostics'] as Record<string, unknown>;
-      expect(diagnostics['isReliable']).toBe(false);
+      expect(diagnostics['isReliable']).toBe(true);
       expect(diagnostics['isKnown']).toBe(true);
-      expect((diagnostics['warnings'] as string[]).length).toBeGreaterThan(0);
     });
   });
 
-  describe('postToolUse (emulated)', () => {
-    it('normalizes to tool.after with emulated support', () => {
+  describe('postToolUse (native)', () => {
+    it('normalizes to tool.after with native support', () => {
       const event = normalizeCursorEvent('postToolUse', POST_TOOL_USE_PAYLOAD, BASE_ENV);
       expect(event.phase).toBe('tool.after');
-      expect(event.supportLevel).toBe('emulated');
+      expect(event.supportLevel).toBe('native');
     });
   });
 

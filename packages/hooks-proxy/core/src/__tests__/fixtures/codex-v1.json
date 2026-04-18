@@ -50,7 +50,7 @@
       }
     },
     {
-      "nativeEventName": "tool.before",
+      "nativeEventName": "PreToolUse",
       "stdin": {
         "session_id": "codex-sess-abc123",
         "tool_name": "bash",

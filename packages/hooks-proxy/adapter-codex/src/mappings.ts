@@ -8,7 +8,7 @@ import type { PhaseMapping } from '@a5c/hooks-proxy-core';
  * cover Bash execution and are incomplete (spec section 17.2).
  *
  * Events documented in Codex hooks.json: SessionStart, UserPromptSubmit,
- * Stop, plus tool.before / tool.after for Bash commands only.
+ * Stop, PreToolUse, PostToolUse (Bash commands only).
  */
 export const CODEX_PHASE_MAPPINGS: PhaseMapping[] = [
   // --- Session lifecycle ---
@@ -52,7 +52,7 @@ export const CODEX_PHASE_MAPPINGS: PhaseMapping[] = [
   // --- Tool lifecycle (Bash-only, incomplete) ---
   {
     canonicalPhase: 'tool.before',
-    nativeHook: 'tool.before',
+    nativeHook: 'PreToolUse',
     supportLevel: 'lossy',
     blockCapability: true,
     mutationCapability: false,
@@ -61,7 +61,7 @@ export const CODEX_PHASE_MAPPINGS: PhaseMapping[] = [
   },
   {
     canonicalPhase: 'tool.after',
-    nativeHook: 'tool.after',
+    nativeHook: 'PostToolUse',
     supportLevel: 'lossy',
     blockCapability: false,
     mutationCapability: false,

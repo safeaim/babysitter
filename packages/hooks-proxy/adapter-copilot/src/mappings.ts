@@ -56,7 +56,7 @@ export const COPILOT_PHASE_MAPPINGS: PhaseMapping[] = [
   },
   {
     canonicalPhase: 'turn.error',
-    nativeHook: 'error',
+    nativeHook: 'errorOccurred',
     supportLevel: 'native',
     blockCapability: false,
     mutationCapability: false,

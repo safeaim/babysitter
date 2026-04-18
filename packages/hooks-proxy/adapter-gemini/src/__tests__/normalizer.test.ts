@@ -7,8 +7,8 @@ import {
   AFTER_MODEL_STDIN,
   BEFORE_AGENT_STDIN,
   AFTER_AGENT_STDIN,
-  BEFORE_TOOL_EXECUTION_STDIN,
-  AFTER_TOOL_EXECUTION_STDIN,
+  BEFORE_TOOL_STDIN,
+  AFTER_TOOL_STDIN,
   DEFAULT_ENV,
   ENV_WITH_EXPLICIT_SESSION,
   ENV_WITH_PERSISTED,
@@ -71,8 +71,8 @@ describe('buildExecutionContext', () => {
 
   it('extracts tool metadata', () => {
     const ctx = buildExecutionContext(
-      BEFORE_TOOL_EXECUTION_STDIN,
-      'BeforeToolExecution',
+      BEFORE_TOOL_STDIN,
+      'BeforeTool',
       DEFAULT_ENV,
     );
     expect(ctx.toolName).toBe('write_file');
@@ -139,15 +139,15 @@ describe('buildPayload', () => {
     expect(payload.reason).toBe('completed');
   });
 
-  it('extracts BeforeToolExecution fields', () => {
-    const payload = buildPayload('BeforeToolExecution', BEFORE_TOOL_EXECUTION_STDIN);
+  it('extracts BeforeTool fields', () => {
+    const payload = buildPayload('BeforeTool', BEFORE_TOOL_STDIN);
     expect(payload.toolName).toBe('write_file');
     expect(payload.toolInput).toEqual({ path: 'src/config.ts', content: 'export const config = {}' });
     expect(payload.toolCallId).toBe('tc_001');
   });
 
-  it('extracts AfterToolExecution fields', () => {
-    const payload = buildPayload('AfterToolExecution', AFTER_TOOL_EXECUTION_STDIN);
+  it('extracts AfterTool fields', () => {
+    const payload = buildPayload('AfterTool', AFTER_TOOL_STDIN);
     expect(payload.toolName).toBe('write_file');
     expect(payload.toolResponse).toEqual({ success: true, bytesWritten: 28 });
     expect(payload.toolCallId).toBe('tc_001');
@@ -192,8 +192,8 @@ describe('normalizeGemini', () => {
     expect(event.payload.reason).toBe('completed');
   });
 
-  it('normalizes a BeforeToolExecution event', () => {
-    const event = normalizeGemini('BeforeToolExecution', BEFORE_TOOL_EXECUTION_STDIN, DEFAULT_ENV);
+  it('normalizes a BeforeTool event', () => {
+    const event = normalizeGemini('BeforeTool', BEFORE_TOOL_STDIN, DEFAULT_ENV);
 
     expect(event.phase).toBe('tool.before');
     expect(event.execution.toolName).toBe('write_file');

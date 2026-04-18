@@ -21,13 +21,13 @@ const STOP_FIELDS = new Set([
   'reason',
 ]);
 
-/** Output fields supported on tool.before. */
+/** Output fields supported on PreToolUse. */
 const TOOL_BEFORE_FIELDS = new Set([
   'decision',
   'reason',
 ]);
 
-/** Output fields supported on tool.after. */
+/** Output fields supported on PostToolUse. */
 const TOOL_AFTER_FIELDS = new Set([
   'suppressOutput',
   'reason',
@@ -43,8 +43,8 @@ const SUPPORTED_FIELDS_BY_EVENT: Record<string, Set<string>> = {
   SessionStart: SESSION_START_FIELDS,
   UserPromptSubmit: USER_PROMPT_SUBMIT_FIELDS,
   Stop: STOP_FIELDS,
-  'tool.before': TOOL_BEFORE_FIELDS,
-  'tool.after': TOOL_AFTER_FIELDS,
+  PreToolUse: TOOL_BEFORE_FIELDS,
+  PostToolUse: TOOL_AFTER_FIELDS,
 };
 
 /**

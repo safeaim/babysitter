@@ -58,7 +58,7 @@ export const AFTER_AGENT_STDIN = {
   reason: 'completed',
 };
 
-export const BEFORE_TOOL_EXECUTION_STDIN = {
+export const BEFORE_TOOL_STDIN = {
   cwd: '/home/user/project',
   model: 'gemini-2.5-pro',
   toolName: 'write_file',
@@ -66,7 +66,7 @@ export const BEFORE_TOOL_EXECUTION_STDIN = {
   toolCallId: 'tc_001',
 };
 
-export const AFTER_TOOL_EXECUTION_STDIN = {
+export const AFTER_TOOL_STDIN = {
   cwd: '/home/user/project',
   model: 'gemini-2.5-pro',
   toolName: 'write_file',

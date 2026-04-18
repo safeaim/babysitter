@@ -30,26 +30,14 @@ describe('createAdapter', () => {
     expect(caps.envPersistenceMode).toBe('wrapper_only');
   });
 
-  it('has partial_shell_only tool interception scope', () => {
-    expect(caps.toolInterceptionScope).toBe('partial_shell_only');
+  it('has all tool interception scope', () => {
+    expect(caps.toolInterceptionScope).toBe('all');
   });
 
-  it('includes experimental note', () => {
-    expect(caps.notes).toContain('experimental');
-  });
-
-  it('documents hook surface variability', () => {
+  it('notes stable hook surface', () => {
     expect(caps.notes).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('varies between IDE and CLI'),
-      ]),
-    );
-  });
-
-  it('documents capability profile instability', () => {
-    expect(caps.notes).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('capability profile may change'),
+        expect.stringContaining('stable as of Cursor 3.0'),
       ]),
     );
   });

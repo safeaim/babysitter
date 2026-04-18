@@ -33,15 +33,15 @@ describe('CODEX_PHASE_MAPPINGS', () => {
     expect(m!.canonicalPhase).toBe('turn.stop');
   });
 
-  it('marks tool.before as lossy (bash-only)', () => {
-    const m = findMapping('tool.before');
+  it('marks PreToolUse as lossy (bash-only)', () => {
+    const m = findMapping('PreToolUse');
     expect(m).toBeDefined();
     expect(m!.supportLevel).toBe('lossy');
     expect(m!.notes).toContain('Bash-only');
   });
 
-  it('marks tool.after as lossy (bash-only)', () => {
-    const m = findMapping('tool.after');
+  it('marks PostToolUse as lossy (bash-only)', () => {
+    const m = findMapping('PostToolUse');
     expect(m).toBeDefined();
     expect(m!.supportLevel).toBe('lossy');
   });

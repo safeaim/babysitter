@@ -8,9 +8,8 @@
  *   1. Explicit --session-id CLI flag (handled upstream)
  *   2. Explicit AGENT_SESSION_ID env var
  *   3. Native session_id from stdin payload
- *   4. CODEX_THREAD_ID env var (Codex-specific, primary)
- *   5. CODEX_SESSION_ID env var (Codex-specific, legacy fallback)
- *   6. null (no session; caller decides fallback)
+ *   4. CODEX_THREAD_ID env var (Codex-specific)
+ *   5. null (no session; caller decides fallback)
  */
 
 /**
@@ -36,16 +35,10 @@ export function resolveSessionId(
     return native;
   }
 
-  // Priority 3: Codex-specific env var (primary)
+  // Priority 3: Codex-specific env var
   const codexThreadId = env['CODEX_THREAD_ID'];
   if (typeof codexThreadId === 'string' && codexThreadId.length > 0) {
     return codexThreadId;
-  }
-
-  // Priority 4: Codex-specific env var (legacy fallback)
-  const codexSessionId = env['CODEX_SESSION_ID'];
-  if (typeof codexSessionId === 'string' && codexSessionId.length > 0) {
-    return codexSessionId;
   }
 
   return null;

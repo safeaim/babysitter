@@ -3,12 +3,11 @@ import type { PhaseMapping } from '@a5c/hooks-proxy-core';
 /**
  * Cursor native event to canonical phase mapping table.
  *
- * Cursor's hook surface is EXPERIMENTAL and varies between IDE and CLI.
- * Only sessionStart and stop are documented as stable. Tool-level hooks
- * may exist in some versions but are marked as lossy/emulated.
+ * Cursor's hook surface is now documented and stable for both IDE and CLI.
+ * All listed events (sessionStart, sessionEnd, preToolUse, postToolUse, stop)
+ * are native hooks per Cursor's official docs.
  *
- * Spec section 17.5: "support only documented/stable subset per
- * configured capability profile."
+ * Spec section 17.5.
  */
 export const CURSOR_PHASE_MAPPINGS: PhaseMapping[] = [
   // --- Session lifecycle ---
@@ -24,11 +23,11 @@ export const CURSOR_PHASE_MAPPINGS: PhaseMapping[] = [
   {
     canonicalPhase: 'session.end',
     nativeHook: 'sessionEnd',
-    supportLevel: 'lossy',
+    supportLevel: 'native',
     blockCapability: false,
     mutationCapability: false,
     scope: 'session',
-    notes: 'May not fire reliably in all exit paths. Observer-only.',
+    notes: 'Fires on session end. Observer-only.',
   },
 
   // --- Turn lifecycle ---
@@ -42,24 +41,24 @@ export const CURSOR_PHASE_MAPPINGS: PhaseMapping[] = [
     notes: 'Documented and stable. Can continue session. Guard against recursion.',
   },
 
-  // --- Tool lifecycle (unreliable / emulated) ---
+  // --- Tool lifecycle ---
   {
     canonicalPhase: 'tool.before',
     nativeHook: 'preToolUse',
-    supportLevel: 'emulated',
+    supportLevel: 'native',
     blockCapability: true,
     mutationCapability: false,
     scope: 'tool',
-    notes: 'Not documented as stable. May not fire in IDE mode. Shell commands only when available.',
+    notes: 'Documented and stable. Fires before tool execution. Can block (deny).',
   },
   {
     canonicalPhase: 'tool.after',
     nativeHook: 'postToolUse',
-    supportLevel: 'emulated',
+    supportLevel: 'native',
     blockCapability: false,
     mutationCapability: false,
     scope: 'tool',
-    notes: 'Not documented as stable. May not fire in IDE mode. Observer-only when available.',
+    notes: 'Documented and stable. Observer-only post-tool hook.',
   },
 ];
 

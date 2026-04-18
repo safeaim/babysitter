@@ -22,7 +22,7 @@
       }
     },
     {
-      "nativeEventName": "BeforeToolExecution",
+      "nativeEventName": "BeforeTool",
       "stdin": {
         "cwd": "/home/user/project",
         "model": "gemini-2.5-pro",

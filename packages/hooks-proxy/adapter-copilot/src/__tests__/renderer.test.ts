@@ -90,7 +90,7 @@ describe('renderCopilotOutput', () => {
 
     it('should return noop output for error events', () => {
       const result = makeMergedResult();
-      const output = renderCopilotOutput(result, 'error');
+      const output = renderCopilotOutput(result, 'errorOccurred');
       expect(output).toEqual({ ok: true });
     });
   });

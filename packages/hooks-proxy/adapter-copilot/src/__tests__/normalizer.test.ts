@@ -64,7 +64,7 @@ describe('normalizeCopilotEvent', () => {
   });
 
   it('should normalize an error event', () => {
-    const event = normalizeCopilotEvent(ERROR_EVENT, 'error');
+    const event = normalizeCopilotEvent(ERROR_EVENT, 'errorOccurred');
 
     expect(event.phase).toBe('turn.error');
     expect(event.payload['error']).toBe('Connection timeout to model endpoint');

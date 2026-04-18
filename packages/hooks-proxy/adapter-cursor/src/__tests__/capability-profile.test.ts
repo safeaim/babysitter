@@ -15,26 +15,28 @@ beforeEach(() => {
 });
 
 describe('DEFAULT_PROFILE', () => {
-  it('is named default-conservative', () => {
-    expect(DEFAULT_PROFILE.name).toBe('default-conservative');
+  it('is named default', () => {
+    expect(DEFAULT_PROFILE.name).toBe('default');
   });
 
   it('has unknown mode', () => {
     expect(DEFAULT_PROFILE.mode).toBe('unknown');
   });
 
-  it('lists sessionStart and stop as reliable', () => {
+  it('lists all hook events as reliable', () => {
     expect(DEFAULT_PROFILE.reliableEvents).toContain('sessionStart');
+    expect(DEFAULT_PROFILE.reliableEvents).toContain('sessionEnd');
     expect(DEFAULT_PROFILE.reliableEvents).toContain('stop');
+    expect(DEFAULT_PROFILE.reliableEvents).toContain('preToolUse');
+    expect(DEFAULT_PROFILE.reliableEvents).toContain('postToolUse');
   });
 
-  it('lists tool hooks as unreliable', () => {
-    expect(DEFAULT_PROFILE.unreliableEvents).toContain('preToolUse');
-    expect(DEFAULT_PROFILE.unreliableEvents).toContain('postToolUse');
+  it('has no unreliable events', () => {
+    expect(DEFAULT_PROFILE.unreliableEvents).toHaveLength(0);
   });
 
-  it('has tool hooks disabled', () => {
-    expect(DEFAULT_PROFILE.toolHooksAvailable).toBe(false);
+  it('has tool hooks enabled', () => {
+    expect(DEFAULT_PROFILE.toolHooksAvailable).toBe(true);
   });
 });
 
@@ -55,7 +57,7 @@ describe('CLI_PERMISSIVE_PROFILE', () => {
 describe('getActiveProfile / setActiveProfile / resetProfile', () => {
   it('defaults to DEFAULT_PROFILE', () => {
     const profile = getActiveProfile();
-    expect(profile.name).toBe('default-conservative');
+    expect(profile.name).toBe('default');
   });
 
   it('allows overriding the active profile', () => {
@@ -66,7 +68,7 @@ describe('getActiveProfile / setActiveProfile / resetProfile', () => {
   it('resets to default', () => {
     setActiveProfile(CLI_PERMISSIVE_PROFILE);
     resetProfile();
-    expect(getActiveProfile().name).toBe('default-conservative');
+    expect(getActiveProfile().name).toBe('default');
   });
 
   it('makes a copy when setting (does not share reference)', () => {
@@ -78,13 +80,12 @@ describe('getActiveProfile / setActiveProfile / resetProfile', () => {
 });
 
 describe('isEventReliable', () => {
-  it('returns true for reliable events', () => {
+  it('returns true for all documented events', () => {
     expect(isEventReliable('sessionStart')).toBe(true);
+    expect(isEventReliable('sessionEnd')).toBe(true);
     expect(isEventReliable('stop')).toBe(true);
-  });
-
-  it('returns false for unreliable events', () => {
-    expect(isEventReliable('preToolUse')).toBe(false);
+    expect(isEventReliable('preToolUse')).toBe(true);
+    expect(isEventReliable('postToolUse')).toBe(true);
   });
 
   it('returns false for unknown events', () => {
@@ -93,12 +94,10 @@ describe('isEventReliable', () => {
 });
 
 describe('isEventKnown', () => {
-  it('returns true for reliable events', () => {
+  it('returns true for all documented events', () => {
     expect(isEventKnown('sessionStart')).toBe(true);
-  });
-
-  it('returns true for unreliable events', () => {
     expect(isEventKnown('preToolUse')).toBe(true);
+    expect(isEventKnown('postToolUse')).toBe(true);
   });
 
   it('returns false for completely unknown events', () => {
@@ -119,15 +118,13 @@ describe('getEventDiagnostics', () => {
     );
   });
 
-  it('warns about unreliable events', () => {
+  it('returns no unreliable warning for preToolUse', () => {
     const diag = getEventDiagnostics('preToolUse');
-    expect(diag.isReliable).toBe(false);
+    expect(diag.isReliable).toBe(true);
     expect(diag.isKnown).toBe(true);
-    expect(diag.warnings).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('unreliable'),
-      ]),
-    );
+    // Only mode-unknown warning expected
+    const unreliableWarnings = diag.warnings.filter((w) => w.includes('unreliable'));
+    expect(unreliableWarnings).toHaveLength(0);
   });
 
   it('warns about completely unknown events', () => {
@@ -143,7 +140,7 @@ describe('getEventDiagnostics', () => {
 
   it('includes profile name and mode', () => {
     const diag = getEventDiagnostics('sessionStart');
-    expect(diag.profileName).toBe('default-conservative');
+    expect(diag.profileName).toBe('default');
     expect(diag.mode).toBe('unknown');
   });
 

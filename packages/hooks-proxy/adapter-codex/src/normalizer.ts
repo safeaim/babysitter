@@ -37,7 +37,7 @@ export interface CodexStopPayload {
 }
 
 /**
- * Shape of a Codex tool.before / tool.after stdin payload.
+ * Shape of a Codex PreToolUse / PostToolUse stdin payload.
  */
 export interface CodexToolPayload {
   session_id?: string;
@@ -84,7 +84,7 @@ export function extractSessionId(payload: Record<string, unknown>): string | nul
 }
 
 /**
- * Extract tool metadata from a tool.before/tool.after payload.
+ * Extract tool metadata from a PreToolUse/PostToolUse payload.
  */
 function extractToolFields(payload: Record<string, unknown>): Record<string, string> {
   const fields: Record<string, string> = {};
@@ -132,7 +132,7 @@ export function normalizeCodexEvent(
   }
 
   // Tool-specific env enrichment
-  if (rawEventName === 'tool.before' || rawEventName === 'tool.after') {
+  if (rawEventName === 'PreToolUse' || rawEventName === 'PostToolUse') {
     const toolFields = extractToolFields(parsed);
     for (const [k, v] of Object.entries(toolFields)) {
       if (!enrichedEnv[k]) {

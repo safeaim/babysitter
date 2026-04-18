@@ -6,7 +6,7 @@ import type { PhaseMapping } from '@a5c/hooks-proxy-core';
  * Gemini CLI hook events cover a richer lifecycle than some other harnesses,
  * including planner, model, and agent-level events:
  *   SessionStart, SessionEnd, BeforeToolSelection, BeforeModel, AfterModel,
- *   BeforeAgent, AfterAgent, BeforeToolExecution, AfterToolExecution
+ *   BeforeAgent, AfterAgent, BeforeTool, AfterTool
  *
  * Spec section 8.2 / 17.3.
  */
@@ -89,7 +89,7 @@ export const GEMINI_PHASE_MAPPINGS: PhaseMapping[] = [
   // --- Tool lifecycle ---
   {
     canonicalPhase: 'tool.before',
-    nativeHook: 'BeforeToolExecution',
+    nativeHook: 'BeforeTool',
     supportLevel: 'native',
     blockCapability: true,
     mutationCapability: true,
@@ -98,7 +98,7 @@ export const GEMINI_PHASE_MAPPINGS: PhaseMapping[] = [
   },
   {
     canonicalPhase: 'tool.after',
-    nativeHook: 'AfterToolExecution',
+    nativeHook: 'AfterTool',
     supportLevel: 'native',
     blockCapability: false,
     mutationCapability: false,

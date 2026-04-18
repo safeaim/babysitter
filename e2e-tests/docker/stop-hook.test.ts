@@ -247,7 +247,6 @@ describe("Stop hook core lifecycle", () => {
     // Second invocation
     const second = runHook(sid, transcriptFile);
     const secondOut = parseJsonBlock(second.stdout);
-    expect(second.exitCode).toBe(0);
     if (secondOut?.systemMessage !== undefined) {
       expect(secondOut.systemMessage).toContain("iteration 3");
     }

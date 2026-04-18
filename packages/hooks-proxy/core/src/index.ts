@@ -107,6 +107,10 @@ export {
 } from './api';
 export type { AdapterImpl, RegisteredAdapter } from './api';
 
+// Discovery
+export { detectHarness } from './discovery';
+export type { DetectedHarness } from './discovery';
+
 // SDK interface
 export {
   parseHookResult,

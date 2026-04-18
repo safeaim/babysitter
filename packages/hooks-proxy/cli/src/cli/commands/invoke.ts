@@ -89,7 +89,7 @@ export const invokeCommand: CommandModule<object, InvokeArgs> = {
       .option('adapter', {
         type: 'string',
         demandOption: true,
-        describe: 'Adapter name (e.g. claude, codex, copilot)',
+        describe: 'Adapter name (e.g. claude, codex, copilot) or "auto" to detect from environment',
       })
       .option('handler', {
         type: 'array',

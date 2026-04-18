@@ -13,6 +13,7 @@
  */
 
 import type { AdapterCapabilities, PhaseMapping } from '@a5c/hooks-proxy-core';
+import { detectHarness } from '@a5c/hooks-proxy-core';
 
 export interface LoadedAdapter {
   capabilities: AdapterCapabilities;
@@ -29,6 +30,22 @@ export interface LoadedAdapter {
  * @throws If the adapter package cannot be found or loaded.
  */
 export function loadAdapter(adapterName: string): LoadedAdapter {
+  // Auto-detection: probe env vars to determine the adapter
+  if (adapterName === 'auto') {
+    const detected = detectHarness();
+    if (!detected) {
+      process.stderr.write(
+        '[hooks-proxy] auto-detection failed: no harness signals found in environment\n',
+      );
+      process.exit(1);
+    }
+    process.stderr.write(
+      `[hooks-proxy] auto-detected adapter="${detected.adapter}" ` +
+      `confidence=${detected.confidence} evidence=[${detected.evidence.join(', ')}]\n`,
+    );
+    adapterName = detected.adapter;
+  }
+
   const packageName = `@a5c/hooks-proxy-adapter-${adapterName}`;
 
   let mod: Record<string, unknown>;

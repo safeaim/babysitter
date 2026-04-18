@@ -29,7 +29,7 @@ export const bootstrapCommand: CommandModule<object, BootstrapArgs> = {
       .option('adapter', {
         type: 'string',
         demandOption: true,
-        describe: 'Adapter name (e.g. claude, codex, copilot)',
+        describe: 'Adapter name (e.g. claude, codex, copilot) or "auto" to detect from environment',
       })
       .option('session-id', {
         type: 'string',

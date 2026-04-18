@@ -32,19 +32,6 @@ export class HandlerTimeoutError extends HandlerError {
 }
 
 /**
- * Thrown when a handler module cannot be resolved or loaded.
- */
-export class HandlerLoadError extends HandlerError {
-  constructor(options: { source: string; handler: string; cause?: unknown }) {
-    super(
-      `Failed to load handler ${options.source}:${options.handler}`,
-      { source: options.source, handler: options.handler, code: 'HANDLER_LOAD', cause: options.cause },
-    );
-    this.name = 'HandlerLoadError';
-  }
-}
-
-/**
  * Thrown when event normalization fails (e.g. missing required fields).
  */
 export class NormalizationError extends Error {

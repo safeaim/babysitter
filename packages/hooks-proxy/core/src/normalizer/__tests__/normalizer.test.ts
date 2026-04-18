@@ -2,11 +2,10 @@ import { describe, it, expect } from 'vitest';
 import type { PhaseMapping } from '../../types/lifecycle';
 import type { HandlerRef } from '../../types/plan';
 import type { UnifiedHookEvent } from '../../types/event';
-import type { UnifiedHookResult } from '../../types/result';
 import { normalizeEvent, resolvePhaseMapping, splitEnv } from '../normalize';
 import { resolveHookPlan, sortHandlers } from '../plan-resolver';
 import { runHandler, runPlan } from '../runner';
-import { NormalizationError, HandlerLoadError } from '../errors';
+import { NormalizationError } from '../errors';
 
 // --- Adapter mappings fixture ---
 
@@ -18,18 +17,6 @@ const CLAUDE_MAPPINGS: PhaseMapping[] = [
   { canonicalPhase: 'turn.stop', nativeHook: 'Stop', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
   { canonicalPhase: 'notification', nativeHook: 'Notification', supportLevel: 'emulated', blockCapability: false, mutationCapability: false, scope: 'notification' },
 ];
-
-// --- Helper: create a mock module loader ---
-
-function createMockLoader(modules: Record<string, Record<string, unknown>>): (source: string) => Record<string, unknown> {
-  return (source: string) => {
-    const mod = modules[source];
-    if (!mod) {
-      throw new Error(`Cannot find module '${source}'`);
-    }
-    return mod;
-  };
-}
 
 // --- normalizeEvent ---
 
@@ -231,19 +218,18 @@ describe('resolveHookPlan', () => {
     expect(plan).toHaveLength(0);
   });
 
-  it('should merge handlers from multiple sources', () => {
+  it('should handle multiple explicit handlers sorted by priority', () => {
     const plan = resolveHookPlan({
       phase: 'tool.before',
       handlers: [
-        { source: 'cli-plugin', handler: 'check', priority: 10 },
+        { source: 'echo check', handler: 'check', priority: 100 },
+        { source: 'echo validate', handler: 'validate', priority: 10 },
       ],
-      handlerModules: ['./my-module.js#validate'],
     });
 
-    // cli-plugin (10), ./my-module.js (100)
     expect(plan).toHaveLength(2);
-    expect(plan[0].handler.source).toBe('cli-plugin');
-    expect(plan[1].handler.source).toBe('./my-module.js');
+    expect(plan[0].handler.source).toBe('echo validate');
+    expect(plan[1].handler.source).toBe('echo check');
   });
 });
 
@@ -320,58 +306,43 @@ describe('runHandler', () => {
     expect(result.reason).toBe('hello');
   });
 
-  it('should run a JS module handler via mock loader', async () => {
+  it('should receive normalized event JSON on stdin', async () => {
     const event = makeEvent();
 
-    const mockLoader = createMockLoader({
-      '/fake/test-handler.js': {
-        myHandler: (evt: UnifiedHookEvent): UnifiedHookResult => ({
-          decision: 'allow',
-          reason: 'from-module',
-          metadata: { phase: evt.phase },
-        }),
-      },
+    // Handler reads stdin and echoes back the adapter from the event
+    const result = await runHandler(event, {
+      source: 'node -e "let d=\'\';process.stdin.on(\'data\',c=>d+=c);process.stdin.on(\'end\',()=>{const e=JSON.parse(d);console.log(JSON.stringify({decision:\'allow\',reason:e.adapter}))})"',
+      handler: 'shell',
+      priority: 1,
     });
-
-    const result = await runHandler(
-      event,
-      { source: '/fake/test-handler.js', handler: 'myHandler', priority: 1 },
-      { loadModule: mockLoader },
-    );
 
     expect(result.decision).toBe('allow');
-    expect(result.reason).toBe('from-module');
-    expect(result.metadata?.phase).toBe('tool.before');
+    expect(result.reason).toBe('claude');
   });
 
-  it('should throw HandlerLoadError for missing module', async () => {
+  it('should throw HandlerError for failing shell command', async () => {
     const event = makeEvent();
-
-    const mockLoader = createMockLoader({});
 
     await expect(
-      runHandler(
-        event,
-        { source: '/nonexistent/module.js', handler: 'run', priority: 1 },
-        { loadModule: mockLoader },
-      ),
-    ).rejects.toThrow(HandlerLoadError);
+      runHandler(event, {
+        source: 'node -e "process.exit(1)"',
+        handler: 'shell',
+        priority: 1,
+      }),
+    ).rejects.toThrow();
   });
 
-  it('should throw HandlerLoadError for missing export', async () => {
+  it('should return noop for non-JSON stdout', async () => {
     const event = makeEvent();
 
-    const mockLoader = createMockLoader({
-      '/fake/no-export.js': {},
+    const result = await runHandler(event, {
+      source: 'node -e "console.log(\'just a message\')"',
+      handler: 'shell',
+      priority: 1,
     });
 
-    await expect(
-      runHandler(
-        event,
-        { source: '/fake/no-export.js', handler: 'nonexistent', priority: 1 },
-        { loadModule: mockLoader },
-      ),
-    ).rejects.toThrow(HandlerLoadError);
+    expect(result.decision).toBe('noop');
+    expect(result.reason).toBe('just a message');
   });
 });
 
@@ -387,15 +358,6 @@ describe('runPlan', () => {
     });
 
   it('should execute handlers in sequential order', async () => {
-    const mockLoader = createMockLoader({
-      '/fake/handler1.js': {
-        handler: (): UnifiedHookResult => ({ decision: 'noop', metadata: { order: 1 } }),
-      },
-      '/fake/handler2.js': {
-        handler: (): UnifiedHookResult => ({ decision: 'noop', metadata: { order: 2 } }),
-      },
-    });
-
     const event = makeEvent();
     const results = await runPlan(event, [
       {
@@ -403,16 +365,24 @@ describe('runPlan', () => {
         pluginId: 'plugin-1',
         phase: 'tool.before',
         priority: 1,
-        handler: { source: '/fake/handler1.js', handler: 'handler', priority: 1 },
+        handler: {
+          source: 'node -e "console.log(JSON.stringify({decision:\'noop\',metadata:{order:1}}))"',
+          handler: 'shell',
+          priority: 1,
+        },
       },
       {
         id: 'h2',
         pluginId: 'plugin-2',
         phase: 'tool.before',
         priority: 2,
-        handler: { source: '/fake/handler2.js', handler: 'handler', priority: 2 },
+        handler: {
+          source: 'node -e "console.log(JSON.stringify({decision:\'noop\',metadata:{order:2}}))"',
+          handler: 'shell',
+          priority: 2,
+        },
       },
-    ], { loadModule: mockLoader });
+    ]);
 
     expect(results).toHaveLength(2);
     expect(results[0].metadata?.order).toBe(1);
@@ -420,12 +390,6 @@ describe('runPlan', () => {
   });
 
   it('should swallow errors with fail-open policy', async () => {
-    const mockLoader = createMockLoader({
-      '/fake/bad-handler.js': {
-        handler: (): UnifiedHookResult => { throw new Error('boom'); },
-      },
-    });
-
     const event = makeEvent();
     const results = await runPlan(
       event,
@@ -435,24 +399,18 @@ describe('runPlan', () => {
           pluginId: 'plugin-1',
           phase: 'tool.before',
           priority: 1,
-          handler: { source: '/fake/bad-handler.js', handler: 'handler', priority: 1 },
+          handler: { source: 'node -e "process.exit(1)"', handler: 'shell', priority: 1 },
         },
       ],
-      { defaultPolicy: 'fail-open', loadModule: mockLoader },
+      { defaultPolicy: 'fail-open' },
     );
 
     expect(results).toHaveLength(1);
     expect(results[0].decision).toBe('noop');
-    expect(results[0].reason).toContain('boom');
+    expect(results[0].metadata?.error).toBe(true);
   });
 
   it('should propagate errors with fail-closed policy', async () => {
-    const mockLoader = createMockLoader({
-      '/fake/bad-handler.js': {
-        handler: (): UnifiedHookResult => { throw new Error('critical failure'); },
-      },
-    });
-
     const event = makeEvent();
 
     await expect(
@@ -464,21 +422,15 @@ describe('runPlan', () => {
             pluginId: 'plugin-1',
             phase: 'tool.before',
             priority: 1,
-            handler: { source: '/fake/bad-handler.js', handler: 'handler', priority: 1 },
+            handler: { source: 'node -e "process.exit(1)"', handler: 'shell', priority: 1 },
           },
         ],
-        { defaultPolicy: 'fail-closed', loadModule: mockLoader },
+        { defaultPolicy: 'fail-closed' },
       ),
-    ).rejects.toThrow('critical failure');
+    ).rejects.toThrow();
   });
 
   it('should use fail-open for session.start with fail-open-bootstrap-only policy', async () => {
-    const mockLoader = createMockLoader({
-      '/fake/bad-handler.js': {
-        handler: (): UnifiedHookResult => { throw new Error('session boom'); },
-      },
-    });
-
     const sessionEvent = normalizeEvent({
       adapter: 'claude',
       rawEventName: 'SessionStart',
@@ -493,23 +445,17 @@ describe('runPlan', () => {
           pluginId: 'plugin-1',
           phase: 'session.start',
           priority: 1,
-          handler: { source: '/fake/bad-handler.js', handler: 'handler', priority: 1 },
+          handler: { source: 'node -e "process.exit(1)"', handler: 'shell', priority: 1 },
         },
       ],
-      { defaultPolicy: 'fail-open-bootstrap-only', loadModule: mockLoader },
+      { defaultPolicy: 'fail-open-bootstrap-only' },
     );
 
     expect(results).toHaveLength(1);
-    expect(results[0].reason).toContain('session boom');
+    expect(results[0].metadata?.error).toBe(true);
   });
 
   it('should use fail-closed for non-bootstrap phases with fail-open-bootstrap-only policy', async () => {
-    const mockLoader = createMockLoader({
-      '/fake/bad-handler.js': {
-        handler: (): UnifiedHookResult => { throw new Error('tool boom'); },
-      },
-    });
-
     const event = makeEvent();
 
     await expect(
@@ -521,21 +467,15 @@ describe('runPlan', () => {
             pluginId: 'plugin-1',
             phase: 'tool.before',
             priority: 1,
-            handler: { source: '/fake/bad-handler.js', handler: 'handler', priority: 1 },
+            handler: { source: 'node -e "process.exit(1)"', handler: 'shell', priority: 1 },
           },
         ],
-        { defaultPolicy: 'fail-open-bootstrap-only', loadModule: mockLoader },
+        { defaultPolicy: 'fail-open-bootstrap-only' },
       ),
-    ).rejects.toThrow('tool boom');
+    ).rejects.toThrow();
   });
 
   it('should apply default phase policies when no explicit policy given', async () => {
-    const mockLoader = createMockLoader({
-      '/fake/bad-handler.js': {
-        handler: (): UnifiedHookResult => { throw new Error('default policy test'); },
-      },
-    });
-
     const event = makeEvent(); // tool.before phase
 
     // tool.before defaults to fail-open
@@ -545,11 +485,36 @@ describe('runPlan', () => {
         pluginId: 'plugin-1',
         phase: 'tool.before',
         priority: 1,
-        handler: { source: '/fake/bad-handler.js', handler: 'handler', priority: 1 },
+        handler: { source: 'node -e "process.exit(1)"', handler: 'shell', priority: 1 },
       },
-    ], { loadModule: mockLoader });
+    ]);
 
     expect(results).toHaveLength(1);
-    expect(results[0].reason).toBeDefined();
+    expect(results[0].metadata?.error).toBe(true);
+  });
+
+  it('should inject execution context env vars into handler subprocess', async () => {
+    const event = makeEvent();
+    event.execution.sessionId = 'test-sess-123';
+    event.execution.adapter = 'claude';
+
+    const results = await runPlan(event, [
+      {
+        id: 'h1',
+        pluginId: 'plugin-1',
+        phase: 'tool.before',
+        priority: 1,
+        handler: {
+          source: 'node -e "console.log(JSON.stringify({decision:\'allow\',metadata:{sid:process.env.AGENT_SESSION_ID,adapter:process.env.AGENT_ADAPTER}}))"',
+          handler: 'shell',
+          priority: 1,
+        },
+      },
+    ]);
+
+    expect(results).toHaveLength(1);
+    expect(results[0].decision).toBe('allow');
+    expect(results[0].metadata?.sid).toBe('test-sess-123');
+    expect(results[0].metadata?.adapter).toBe('claude');
   });
 });

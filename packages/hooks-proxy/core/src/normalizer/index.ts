@@ -11,4 +11,4 @@ export { runHandler, runPlan } from './runner';
 export type { ErrorPolicy, RunPlanOptions, HandlerFn } from './runner';
 
 // Errors
-export { HandlerError, HandlerTimeoutError, HandlerLoadError, NormalizationError } from './errors';
+export { HandlerError, HandlerTimeoutError, NormalizationError } from './errors';

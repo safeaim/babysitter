@@ -33,7 +33,6 @@ import { readStdin } from '../stdin';
 interface InvokeArgs {
   adapter: string;
   handler?: string[];
-  'handler-module'?: string[];
   'bootstrap-only'?: boolean;
   'session-id'?: string;
   json?: boolean;
@@ -95,12 +94,7 @@ export const invokeCommand: CommandModule<object, InvokeArgs> = {
       .option('handler', {
         type: 'array',
         string: true,
-        describe: 'Handler command(s) in source:handler format',
-      })
-      .option('handler-module', {
-        type: 'array',
-        string: true,
-        describe: 'Handler module path(s) in path#export format',
+        describe: 'Shell command handler(s) in command:label format',
       })
       .option('bootstrap-only', {
         type: 'boolean',
@@ -187,7 +181,6 @@ export const invokeCommand: CommandModule<object, InvokeArgs> = {
     const plan = resolveHookPlan({
       phase: event.phase,
       handlers,
-      handlerModules: args['handler-module'],
     });
 
     // 7. Run plan and merge

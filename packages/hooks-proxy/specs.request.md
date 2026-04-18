@@ -441,7 +441,6 @@ The proxy must be able to resolve multiple logical handlers for one native event
 Sources may include:
 
 * explicit CLI `--handler`
-* explicit CLI `--handler-module`
 * registry file
 * programmatic registration
 
@@ -811,7 +810,6 @@ Primary entrypoint for native hook commands.
 a5c-hooks-proxy invoke \
   --adapter <adapter> \
   [--handler <command...>] \
-  [--handler-module <path>] \
   [--registry <path>] \
   [--bootstrap-only] \
   [--session-id <id>] \

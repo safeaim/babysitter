@@ -17,7 +17,6 @@ export {
   runPlan,
   HandlerError,
   HandlerTimeoutError,
-  HandlerLoadError,
   NormalizationError,
 } from './normalizer';
 export type { NormalizeOptions, PlanResolverOptions, ErrorPolicy, RunPlanOptions } from './normalizer';

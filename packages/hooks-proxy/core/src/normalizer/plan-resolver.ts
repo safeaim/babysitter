@@ -8,36 +8,6 @@ export interface PlanResolverOptions {
   phase: string;
   /** Explicit handler refs passed via CLI --handler args. */
   handlers?: HandlerRef[];
-  /** Module paths passed via CLI --handler-module args. */
-  handlerModules?: string[];
-}
-
-/**
- * Convert --handler-module paths into HandlerRef objects.
- * Module format: "path/to/module#exportName" or just "path/to/module" (default export = "handler").
- */
-function modulesToHandlerRefs(modules: string[]): { ref: HandlerRef; pluginId: string }[] {
-  return modules.map((mod, index) => {
-    const hashIdx = mod.indexOf('#');
-    if (hashIdx >= 0) {
-      return {
-        ref: {
-          source: mod.slice(0, hashIdx),
-          handler: mod.slice(hashIdx + 1),
-          priority: 100 + index,
-        },
-        pluginId: mod.slice(0, hashIdx),
-      };
-    }
-    return {
-      ref: {
-        source: mod,
-        handler: 'handler',
-        priority: 100 + index,
-      },
-      pluginId: mod,
-    };
-  });
 }
 
 /**
@@ -71,19 +41,16 @@ export function sortHandlers(handlers: HandlerRef[]): HandlerRef[] {
 /**
  * Resolve a hook execution plan for the given phase.
  *
- * Merges handlers from:
- * 1. Explicit --handler args
- * 2. --handler-module paths (converted to HandlerRefs)
- *
+ * Merges handlers from explicit --handler args.
  * Produces one HookPlanEntry per handler, sorted by priority.
  */
 export function resolveHookPlan(options: PlanResolverOptions): HookPlanEntry[] {
-  const { phase, handlers = [], handlerModules = [] } = options;
+  const { phase, handlers = [] } = options;
 
   const entries: HookPlanEntry[] = [];
   let counter = 0;
 
-  // 1. Explicit handler refs
+  // Explicit handler refs
   for (const h of handlers) {
     entries.push({
       id: `explicit-${counter++}`,
@@ -92,20 +59,6 @@ export function resolveHookPlan(options: PlanResolverOptions): HookPlanEntry[] {
       priority: h.priority ?? 1000,
       handler: h,
     });
-  }
-
-  // 2. Module paths
-  if (handlerModules.length > 0) {
-    const moduleRefs = modulesToHandlerRefs(handlerModules);
-    for (const { ref, pluginId } of moduleRefs) {
-      entries.push({
-        id: `module-${counter++}`,
-        pluginId,
-        phase,
-        priority: ref.priority ?? 1000,
-        handler: ref,
-      });
-    }
   }
 
   if (entries.length === 0) {

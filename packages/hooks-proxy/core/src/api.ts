@@ -79,10 +79,7 @@ export async function runNormalized(
   const results: UnifiedHookResult[] = [];
 
   for (const entry of matchingEntries) {
-    // For programmatic use, the handler.source should be a module
-    // and handler.handler should be the export name.
-    // In the API context, we expect handlers to be registered as functions
-    // via the metadata. For now we call through the runner.
+    // Handler.source is the shell command to execute as a child process.
     const { runHandler } = await import('./normalizer/runner');
     try {
       const result = await runHandler(event, entry.handler);

@@ -82,8 +82,8 @@ normalizeEvent()
                        execution, payload, env, raw }
         │
         ▼
-resolveHookPlan({ phase, handlers, handlerModules })
-  merge: explicit --handler refs → --handler-module paths
+resolveHookPlan({ phase, handlers })
+  merge: explicit --handler refs
   sort: priority asc, then pluginId asc, then id asc (deterministic)
   → HookPlanEntry[]
         │
@@ -91,8 +91,8 @@ resolveHookPlan({ phase, handlers, handlerModules })
 runPlan(event, plan, options)
   for each HookPlanEntry (ordered):
     runHandler(event, handler)
-      shell command → exec(), HOOKS_PROXY_EVENT on env + stdin
-      JS module     → require(source)[handler](event)
+      shell command → exec(), event JSON on stdin + env vars (AGENT_SESSION_ID, AGENT_ADAPTER, etc.)
+      stdout parsed as JSON result
     on error → apply ErrorPolicy for this phase
   → UnifiedHookResult[]
         │

@@ -4,8 +4,6 @@ import { resolveHookPlan } from '../../normalizer/plan-resolver';
 import { runPlan } from '../../normalizer/runner';
 import { mergeResults } from '../../merge-engine/merge';
 import type { PhaseMapping } from '../../types/lifecycle';
-import type { UnifiedHookEvent } from '../../types/event';
-import type { UnifiedHookResult } from '../../types/result';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -22,18 +20,21 @@ const ADAPTER_MAPPINGS: PhaseMapping[] = [
   },
 ];
 
-/** Create a mock module that adds env vars to persistEnv. */
-function makeMockModule(
+/**
+ * Build a shell command handler that outputs a JSON result with persistEnv.
+ * Uses Base64 encoding to avoid shell quoting issues across platforms.
+ */
+function makeShellHandler(
   envVars: Record<string, string>,
-  extras: Partial<UnifiedHookResult> = {},
-): Record<string, unknown> {
-  return {
-    handler: (_event: UnifiedHookEvent): UnifiedHookResult => ({
-      decision: 'allow',
-      persistEnv: envVars,
-      ...extras,
-    }),
-  };
+  extras: Record<string, unknown> = {},
+): string {
+  const result = JSON.stringify({
+    decision: 'allow',
+    persistEnv: envVars,
+    ...extras,
+  });
+  const b64 = Buffer.from(result).toString('base64');
+  return `node -e "console.log(Buffer.from('${b64}','base64').toString())"`;
 }
 
 // ---------------------------------------------------------------------------
@@ -41,7 +42,7 @@ function makeMockModule(
 // ---------------------------------------------------------------------------
 
 describe('invoke-fanout integration: normalizeEvent -> resolveHookPlan -> runPlan -> mergeResults', () => {
-  it('wires the full pipeline with 3 mock handlers that each add env vars', async () => {
+  it('wires the full pipeline with 3 shell handlers that each add env vars', async () => {
     // Step 1: normalizeEvent
     const event = normalizeEvent({
       adapter: 'claude',
@@ -55,32 +56,24 @@ describe('invoke-fanout integration: normalizeEvent -> resolveHookPlan -> runPla
     expect(event.phase).toBe('tool.before');
     expect(event.adapter).toBe('claude');
 
-    // Step 2: resolveHookPlan with 3 module handlers
+    // Step 2: resolveHookPlan with 3 explicit handlers
+    const cmdA = makeShellHandler({ PLUGIN_A_KEY: 'val-a' });
+    const cmdB = makeShellHandler({ PLUGIN_B_KEY: 'val-b' }, { additionalContext: 'context from B' });
+    const cmdC = makeShellHandler({ PLUGIN_C_KEY: 'val-c' }, { reason: 'handler-c ok' });
+
     const plan = resolveHookPlan({
       phase: 'tool.before',
-      handlerModules: [
-        './handler-a.js#handler',
-        './handler-b.js#handler',
-        './handler-c.js#handler',
+      handlers: [
+        { source: cmdA, handler: 'shell', priority: 100 },
+        { source: cmdB, handler: 'shell', priority: 101 },
+        { source: cmdC, handler: 'shell', priority: 102 },
       ],
     });
 
     expect(plan).toHaveLength(3);
 
-    // Step 3: runPlan with mock module loader
-    const modules: Record<string, Record<string, unknown>> = {
-      './handler-a.js': makeMockModule({ PLUGIN_A_KEY: 'val-a' }),
-      './handler-b.js': makeMockModule({ PLUGIN_B_KEY: 'val-b' }, { additionalContext: 'context from B' }),
-      './handler-c.js': makeMockModule({ PLUGIN_C_KEY: 'val-c' }, { reason: 'handler-c ok' }),
-    };
-
-    const results = await runPlan(event, plan, {
-      loadModule: (source: string) => {
-        const mod = modules[source];
-        if (!mod) throw new Error(`Module not found: ${source}`);
-        return mod;
-      },
-    });
+    // Step 3: runPlan
+    const results = await runPlan(event, plan);
 
     expect(results).toHaveLength(3);
 
@@ -107,33 +100,25 @@ describe('invoke-fanout integration: normalizeEvent -> resolveHookPlan -> runPla
       adapterMappings: ADAPTER_MAPPINGS,
     });
 
+    const cmdFirst = makeShellHandler({ SHARED: 'first' });
+    const cmdMiddle = makeShellHandler({ SHARED: 'middle' });
+    const cmdLast = makeShellHandler({ SHARED: 'last' });
+
     const plan = resolveHookPlan({
       phase: 'tool.before',
       handlers: [
-        { source: './last.js', handler: 'handler', priority: 200 },
-        { source: './first.js', handler: 'handler', priority: 10 },
-        { source: './middle.js', handler: 'handler', priority: 100 },
+        { source: cmdLast, handler: 'shell', priority: 200 },
+        { source: cmdFirst, handler: 'shell', priority: 10 },
+        { source: cmdMiddle, handler: 'shell', priority: 100 },
       ],
     });
 
     // Plan should be sorted by priority
-    expect(plan[0].handler.source).toBe('./first.js');
-    expect(plan[1].handler.source).toBe('./middle.js');
-    expect(plan[2].handler.source).toBe('./last.js');
+    expect(plan[0].handler.priority).toBe(10);
+    expect(plan[1].handler.priority).toBe(100);
+    expect(plan[2].handler.priority).toBe(200);
 
-    const modules: Record<string, Record<string, unknown>> = {
-      './first.js': makeMockModule({ SHARED: 'first' }),
-      './middle.js': makeMockModule({ SHARED: 'middle' }),
-      './last.js': makeMockModule({ SHARED: 'last' }),
-    };
-
-    const results = await runPlan(event, plan, {
-      loadModule: (source: string) => {
-        const mod = modules[source];
-        if (!mod) throw new Error(`Module not found: ${source}`);
-        return mod;
-      },
-    });
+    const results = await runPlan(event, plan);
 
     // With default last-writer-wins, the last handler (highest priority number = last exec) wins
     const merged = mergeResults(results);

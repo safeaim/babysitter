@@ -1,10 +1,10 @@
 /**
- * Reference to a hook handler function.
+ * Reference to a hook handler shell command.
  */
 export interface HandlerRef {
-  /** Module or plugin that provides the handler. */
+  /** Shell command to execute as a child process. */
   source: string;
-  /** Export name or handler identifier within the source. */
+  /** Handler identifier (informational label for diagnostics). */
   handler: string;
   /** Optional priority (lower = earlier execution). */
   priority?: number;

@@ -3,7 +3,7 @@ import type { UnifiedHookEvent } from '../types/event';
 import type { UnifiedHookResult } from '../types/result';
 import type { HandlerRef, HookPlanEntry } from '../types/plan';
 import type { CanonicalPhase } from '../types/lifecycle';
-import { HandlerError, HandlerLoadError } from './errors';
+import { HandlerError } from './errors';
 
 /**
  * Error handling policy for handler failures.
@@ -31,8 +31,6 @@ export interface RunPlanOptions {
   phasePolicies?: Record<string, ErrorPolicy>;
   /** Timeout in milliseconds per handler. */
   handlerTimeoutMs?: number;
-  /** Module loader override (for testing). Defaults to require(). */
-  loadModule?: (source: string) => Record<string, unknown>;
 }
 
 /**
@@ -83,7 +81,38 @@ function errorResult(err: unknown): UnifiedHookResult {
 }
 
 /**
- * Execute a shell command handler.
+ * Build execution context environment variables from the unified event.
+ *
+ * These are injected into the child process environment so handlers
+ * can access session/execution context without parsing stdin.
+ */
+function buildExecContextEnv(event: UnifiedHookEvent): Record<string, string> {
+  const ctx: Record<string, string> = {};
+
+  if (event.execution.sessionId) ctx['AGENT_SESSION_ID'] = event.execution.sessionId;
+  if (event.execution.turnId) ctx['AGENT_TURN_ID'] = event.execution.turnId;
+  if (event.execution.adapter) ctx['AGENT_ADAPTER'] = event.execution.adapter;
+  if (event.execution.cwd) ctx['AGENT_WORKSPACE_ROOT'] = event.execution.cwd;
+  if (event.execution.transcriptPath) ctx['AGENT_TRANSCRIPT_PATH'] = event.execution.transcriptPath;
+
+  // Merge persisted env from the session store
+  if (event.execution.persistedEnv) {
+    Object.assign(ctx, event.execution.persistedEnv);
+  }
+
+  return ctx;
+}
+
+/**
+ * Execute a shell command handler as a child process.
+ *
+ * The handler receives:
+ * - The normalized event JSON on stdin
+ * - Execution context env vars injected into the subprocess environment
+ * - HOOKS_PROXY_EVENT env var with the full event JSON
+ *
+ * The handler's stdout is parsed as JSON (the result).
+ * stderr is captured for diagnostics/logging.
  */
 function runShellHandler(
   command: string,
@@ -91,10 +120,16 @@ function runShellHandler(
   timeoutMs?: number,
 ): Promise<UnifiedHookResult> {
   return new Promise((resolve, reject) => {
+    const execContextEnv = buildExecContextEnv(event);
+
     const child = exec(
       command,
       {
-        env: { ...process.env, HOOKS_PROXY_EVENT: JSON.stringify(event) },
+        env: {
+          ...process.env,
+          ...execContextEnv,
+          HOOKS_PROXY_EVENT: JSON.stringify(event),
+        },
         timeout: timeoutMs ?? 30000,
       },
       (error, stdout, _stderr) => {
@@ -133,76 +168,15 @@ function runShellHandler(
 }
 
 /**
- * Default module loader using require().
- */
-function defaultLoadModule(source: string): Record<string, unknown> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  return require(source) as Record<string, unknown>;
-}
-
-/**
- * Execute a JS module handler by loading it and calling the named export.
- */
-async function runModuleHandler(
-  source: string,
-  handlerName: string,
-  event: UnifiedHookEvent,
-  loadModule: (source: string) => Record<string, unknown> = defaultLoadModule,
-): Promise<UnifiedHookResult> {
-  let mod: Record<string, unknown>;
-  try {
-    mod = loadModule(source);
-  } catch (err) {
-    throw new HandlerLoadError({ source, handler: handlerName, cause: err });
-  }
-
-  const fn = mod[handlerName];
-  if (typeof fn !== 'function') {
-    throw new HandlerLoadError({
-      source,
-      handler: handlerName,
-      cause: new Error(`Export "${handlerName}" is not a function`),
-    });
-  }
-
-  const result = await (fn as HandlerFn)(event);
-
-  if (result && typeof result === 'object') {
-    return result;
-  }
-
-  return { decision: 'noop' };
-}
-
-/**
- * Determine if a handler ref points to a shell command or a JS module.
- */
-function isModuleHandler(ref: HandlerRef): boolean {
-  const s = ref.source;
-  return (
-    s.endsWith('.js') ||
-    s.endsWith('.ts') ||
-    s.endsWith('.cjs') ||
-    s.endsWith('.mjs') ||
-    s.startsWith('./') ||
-    s.startsWith('../') ||
-    s.startsWith('/') ||
-    /^[A-Za-z]:[\\/]/.test(s) ||
-    s.includes('node_modules')
-  );
-}
-
-/**
- * Execute a single handler (shell command or JS module) with the normalized event.
+ * Execute a single handler as a shell command child process.
+ *
+ * All handlers are spawned as child processes. The handler.source
+ * is the shell command to execute.
  */
 export async function runHandler(
   event: UnifiedHookEvent,
   handler: HandlerRef,
-  options?: { loadModule?: (source: string) => Record<string, unknown> },
 ): Promise<UnifiedHookResult> {
-  if (isModuleHandler(handler)) {
-    return runModuleHandler(handler.source, handler.handler, event, options?.loadModule);
-  }
   return runShellHandler(handler.source, event);
 }
 
@@ -224,7 +198,7 @@ export async function runPlan(
     const policy = getEffectivePolicy(entry.phase, options);
 
     try {
-      const result = await runHandler(event, entry.handler, { loadModule: options?.loadModule });
+      const result = await runHandler(event, entry.handler);
       results.push(result);
     } catch (err) {
       const shouldFailOpen = resolveFailOpen(policy, event.phase);

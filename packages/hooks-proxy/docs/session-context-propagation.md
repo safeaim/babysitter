@@ -59,7 +59,7 @@ A session is created on the first hook invocation that resolves a session ID. Th
 
 1. Resolves the session ID from (in precedence order):
    - Explicit `--session-id` CLI flag
-   - `A5C_SESSION_ID` environment variable
+   - `AGENT_SESSION_ID` environment variable
    - `session_id` field in stdin payload
    - Adapter-specific resolution (e.g., Claude provides native session IDs)
 2. Checks the session store for an existing session
@@ -113,7 +113,7 @@ No native env injection. The proxy wraps commands to inject environment.
 Use the `exec` command to wrap downstream commands:
 
 ```bash
-a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- npm test
+a5c-hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- npm test
 ```
 
 This loads the session state, materializes persisted env into the subprocess environment, and then executes the target command.
@@ -132,7 +132,7 @@ For harnesses without native env persistence, use `exec` to inject session conte
 
 ```bash
 # Basic usage
-a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- npm test
+a5c-hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- npm test
 
 # The proxy:
 # 1. Loads session state for the given session ID
@@ -173,7 +173,7 @@ Each file contains:
     "updatedAt": "2026-04-17T10:05:00.000Z",
     "cwd": "/home/user/project",
     "persistedEnv": {
-      "A5C_SESSION_ID": "abc-123",
+      "AGENT_SESSION_ID": "abc-123",
       "MY_PLUGIN_VAR": "value"
     },
     "contextVars": {
@@ -223,12 +223,12 @@ When multiple handlers execute during fan-out, their context outputs are merged:
 |--------|----------|
 | `last-writer-wins` | Later handler overwrites earlier (default) |
 | `fail-on-conflict` | Error if two handlers write different values to the same key |
-| `protected-prefixes` | Keys with protected prefixes (e.g., `A5C_`) cannot be overwritten |
+| `protected-prefixes` | Keys with protected prefixes (e.g., `AGENT_`) cannot be overwritten |
 | `namespace-required` | All keys must have a namespace prefix |
 
 ### Reserved Prefixes
 
-- `A5C_*` -- reserved for proxy internals
+- `AGENT_*` -- reserved for proxy internals
 - Plugin-specific keys should use a namespace: `PLUGIN_X_*`
 
 ---
@@ -245,7 +245,7 @@ The proxy emits structured diagnostics for every hook execution, including:
 Enable JSONL trace files for full execution traces:
 
 ```bash
-A5C_HOOKS_TRACE_FILE=./hooks-trace.jsonl a5c-hooks-proxy invoke --adapter claude
+AGENT_HOOKS_TRACE_FILE=./hooks-trace.jsonl a5c-hooks-proxy invoke --adapter claude
 ```
 
 ---
@@ -256,7 +256,7 @@ A5C_HOOKS_TRACE_FILE=./hooks-trace.jsonl a5c-hooks-proxy invoke --adapter claude
 
 1. Check the adapter's env persistence mode: `a5c-hooks-proxy doctor --adapter <name>`
 2. If mode is `wrapper_only` or `none`, use the `exec` wrapper for downstream commands
-3. Verify `A5C_SESSION_ID` is available in the environment
+3. Verify `AGENT_SESSION_ID` is available in the environment
 
 ### Stale sessions accumulating
 

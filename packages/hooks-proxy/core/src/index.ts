@@ -35,6 +35,13 @@ export {
   releaseLock,
   getDefaultSessionDir,
   getSessionFilePath,
+  SESSION_PID_MARKER_ENV_VAR,
+  isSessionPidMarkerEnabled,
+  findHarnessAncestorPid,
+  writeSessionMarker,
+  readSessionMarker,
+  cleanupSessionMarker,
+  getSessionMarkerPath,
 } from './session-store';
 
 // Merge engine

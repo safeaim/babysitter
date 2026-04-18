@@ -6,7 +6,7 @@
  *
  * Resolution precedence (spec section 9.2):
  *   1. Explicit override (e.g. from caller)
- *   2. Explicit env/extension-state A5C_SESSION_ID
+ *   2. Explicit env/extension-state AGENT_SESSION_ID
  *   3. Native sessionId from Pi event payload
  *   4. PI_SESSION_ID from extension-state
  *   5. Fallback: null
@@ -35,7 +35,7 @@ export function resolveSessionId(
   }
 
   // 2. Explicit env
-  const envSessionId = extensionState['A5C_SESSION_ID'];
+  const envSessionId = extensionState['AGENT_SESSION_ID'];
   if (envSessionId) {
     return { sessionId: envSessionId, source: 'explicit_env' };
   }

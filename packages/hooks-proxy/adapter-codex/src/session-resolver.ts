@@ -6,7 +6,7 @@
  *
  * Resolution precedence (per spec 9.2):
  *   1. Explicit --session-id CLI flag (handled upstream)
- *   2. Explicit A5C_SESSION_ID env var
+ *   2. Explicit AGENT_SESSION_ID env var
  *   3. Native session_id from stdin payload
  *   4. CODEX_SESSION_ID env var (Codex-specific)
  *   5. null (no session; caller decides fallback)
@@ -24,7 +24,7 @@ export function resolveSessionId(
   env: Record<string, string> = {},
 ): string | null {
   // Priority 1: explicit env override
-  const explicit = env['A5C_SESSION_ID'];
+  const explicit = env['AGENT_SESSION_ID'];
   if (typeof explicit === 'string' && explicit.length > 0) {
     return explicit;
   }

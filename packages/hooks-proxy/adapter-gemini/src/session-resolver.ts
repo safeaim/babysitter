@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
  * Gemini CLI does not provide a native session ID on stdin.
  * The session ID is derived from available signals:
  *
- *   1. Explicit env: A5C_SESSION_ID or HOOKS_PROXY_SESSION_ID
+ *   1. Explicit env: AGENT_SESSION_ID or HOOKS_PROXY_SESSION_ID
  *   2. Gemini-specific env: GEMINI_SESSION_ID
  *   3. Derived from workspace (cwd) + a date-bucket to avoid accidental
  *      cross-session merging while keeping the ID stable within a session window.
@@ -18,8 +18,8 @@ export function resolveSessionId(
   env: Record<string, string>,
 ): string | null {
   // 1. Explicit session ID from env (highest priority)
-  if (env['A5C_SESSION_ID']) {
-    return env['A5C_SESSION_ID'];
+  if (env['AGENT_SESSION_ID']) {
+    return env['AGENT_SESSION_ID'];
   }
   if (env['HOOKS_PROXY_SESSION_ID']) {
     return env['HOOKS_PROXY_SESSION_ID'];

@@ -7,7 +7,7 @@ Initialize session context without running any hook logic. Useful when you need 
 ## Use Case
 
 You want to:
-- Ensure `A5C_SESSION_ID` is available for downstream tools
+- Ensure `AGENT_SESSION_ID` is available for downstream tools
 - Initialize the session store for later hook invocations
 - Set up baseline context without custom hook logic
 - Prepare for plugins that will be added later
@@ -63,7 +63,7 @@ When bootstrap-only mode runs:
 1. The adapter resolves the session ID from the harness-native payload
 2. If no session exists, a new one is created with baseline state
 3. The session is persisted to the session store
-4. If the adapter supports env persistence, `A5C_SESSION_ID` is propagated
+4. If the adapter supports env persistence, `AGENT_SESSION_ID` is propagated
 5. A valid success result is returned to the harness
 6. No user-provided handlers are executed
 
@@ -75,7 +75,7 @@ After a bootstrap hook has run, verify with:
 
 ```bash
 # Check the session was created
-a5c-hooks-proxy show-session --session-id "$A5C_SESSION_ID"
+a5c-hooks-proxy show-session --session-id "$AGENT_SESSION_ID"
 
 # Run doctor to check session store health
 a5c-hooks-proxy doctor --json
@@ -93,7 +93,7 @@ Once bootstrap is working, add handlers by switching to a registry:
     "SessionStart": [
       {
         "type": "command",
-        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude --registry .a5c/hooks-registry.json"
+        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude"
       }
     ]
   }

@@ -2,9 +2,9 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { resolveSessionId, deriveSessionId } from '../session-resolver';
 
 describe('resolveSessionId', () => {
-  it('prefers A5C_SESSION_ID', () => {
+  it('prefers AGENT_SESSION_ID', () => {
     const id = resolveSessionId({}, {
-      A5C_SESSION_ID: 'explicit-123',
+      AGENT_SESSION_ID: 'explicit-123',
       GEMINI_SESSION_ID: 'gemini-456',
     });
     expect(id).toBe('explicit-123');

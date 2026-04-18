@@ -32,8 +32,8 @@ export const SHELL_ENV_EVENT = {
   sessionId: 'opencode-session-abc',
   cwd: '/home/user/project',
   env: {
-    A5C_SESSION_ID: 'opencode-session-abc',
-    A5C_WORKSPACE_ROOT: '/home/user/project',
+    AGENT_SESSION_ID: 'opencode-session-abc',
+    AGENT_WORKSPACE_ROOT: '/home/user/project',
     CUSTOM_VAR: 'hello',
   },
 };
@@ -49,7 +49,7 @@ export const ENV_WITH_NATIVE_SESSION: Record<string, string> = {
 
 export const ENV_WITH_EXPLICIT_SESSION: Record<string, string> = {
   ...DEFAULT_ENV,
-  A5C_SESSION_ID: 'explicit-session-456',
+  AGENT_SESSION_ID: 'explicit-session-456',
   OPENCODE_SESSION_ID: 'opencode-env-session-789',
 };
 

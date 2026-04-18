@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { resolveSessionId, isValidSessionId } from '../session-resolver';
 
 describe('resolveSessionId', () => {
-  it('returns A5C_SESSION_ID from env with highest priority', () => {
+  it('returns AGENT_SESSION_ID from env with highest priority', () => {
     const result = resolveSessionId(
       { session_id: 'from-payload' },
-      { A5C_SESSION_ID: 'from-env', CODEX_SESSION_ID: 'from-codex-env' },
+      { AGENT_SESSION_ID: 'from-env', CODEX_SESSION_ID: 'from-codex-env' },
     );
     expect(result).toBe('from-env');
   });
@@ -30,10 +30,10 @@ describe('resolveSessionId', () => {
     expect(resolveSessionId({}, {})).toBeNull();
   });
 
-  it('ignores empty string A5C_SESSION_ID', () => {
+  it('ignores empty string AGENT_SESSION_ID', () => {
     const result = resolveSessionId(
       { session_id: 'payload-id' },
-      { A5C_SESSION_ID: '' },
+      { AGENT_SESSION_ID: '' },
     );
     expect(result).toBe('payload-id');
   });

@@ -7,7 +7,7 @@ import { generateTempEnvFile } from './env-file';
 /**
  * Materialize execution context for a downstream process.
  *
- * Loads the session, injects standard A5C_ env vars, optionally rehydrates
+ * Loads the session, injects standard AGENT_ env vars, optionally rehydrates
  * persisted env keys from session (filtered by allowlist), writes
  * a context file and temp env file.
  */
@@ -21,35 +21,35 @@ export async function materializeExecContext(
   const env: Record<string, string> = {};
 
   // Always inject session ID
-  env['A5C_SESSION_ID'] = sessionId;
+  env['AGENT_SESSION_ID'] = sessionId;
 
   if (session) {
     // Inject adapter
     if (session.adapter) {
-      env['A5C_ADAPTER'] = session.adapter;
+      env['AGENT_ADAPTER'] = session.adapter;
     }
 
     // Inject turn ID from metadata if available
     const turnId = session.metadata?.['turnId'];
     if (typeof turnId === 'string') {
-      env['A5C_TURN_ID'] = turnId;
+      env['AGENT_TURN_ID'] = turnId;
     }
 
     // Inject workspace root from metadata or cwd
     const workspaceRoot = session.metadata?.['workspaceRoot'];
     if (typeof workspaceRoot === 'string') {
-      env['A5C_WORKSPACE_ROOT'] = workspaceRoot;
+      env['AGENT_WORKSPACE_ROOT'] = workspaceRoot;
     } else if (session.cwd) {
-      env['A5C_WORKSPACE_ROOT'] = session.cwd;
+      env['AGENT_WORKSPACE_ROOT'] = session.cwd;
     }
 
     // Inject transcript path from session or metadata
     if (session.transcriptPath) {
-      env['A5C_TRANSCRIPT_PATH'] = session.transcriptPath;
+      env['AGENT_TRANSCRIPT_PATH'] = session.transcriptPath;
     } else {
       const transcriptPath = session.metadata?.['transcriptPath'];
       if (typeof transcriptPath === 'string') {
-        env['A5C_TRANSCRIPT_PATH'] = transcriptPath;
+        env['AGENT_TRANSCRIPT_PATH'] = transcriptPath;
       }
     }
 
@@ -58,8 +58,8 @@ export async function materializeExecContext(
     if (persistedEnv) {
       for (const [key, value] of Object.entries(persistedEnv)) {
         if (typeof value !== 'string') continue;
-        // Skip A5C_ keys -- they're injected explicitly above
-        if (key.startsWith('A5C_')) continue;
+        // Skip AGENT_ keys -- they're injected explicitly above
+        if (key.startsWith('AGENT_')) continue;
         // Only rehydrate keys in the allowlist (if one is provided)
         if (envAllowlist && !envAllowlist.includes(key)) continue;
         env[key] = value;
@@ -84,7 +84,7 @@ export async function materializeExecContext(
     };
 
     await fs.promises.writeFile(contextFilePath, JSON.stringify(contextData, null, 2), 'utf-8');
-    env['A5C_CONTEXT_FILE'] = contextFilePath;
+    env['AGENT_CONTEXT_FILE'] = contextFilePath;
   }
 
   // Generate temp env file

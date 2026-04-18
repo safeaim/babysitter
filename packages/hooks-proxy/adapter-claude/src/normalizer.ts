@@ -105,7 +105,7 @@ export function buildExecutionContext(
 
   // Claude provides session_id natively
   const sessionId = (stdinData.session_id as string | undefined)
-    ?? env['A5C_SESSION_ID']
+    ?? env['AGENT_SESSION_ID']
     ?? null;
 
   return {

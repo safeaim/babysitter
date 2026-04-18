@@ -34,7 +34,6 @@ interface InvokeArgs {
   adapter: string;
   handler?: string[];
   'handler-module'?: string[];
-  registry?: string;
   'bootstrap-only'?: boolean;
   'session-id'?: string;
   json?: boolean;
@@ -62,7 +61,7 @@ function resolveSessionId(
   env: Record<string, string>,
 ): string | null {
   if (explicitSessionId) return explicitSessionId;
-  if (env['A5C_SESSION_ID']) return env['A5C_SESSION_ID'];
+  if (env['AGENT_SESSION_ID']) return env['AGENT_SESSION_ID'];
   if (stdinData && typeof stdinData['session_id'] === 'string') {
     return stdinData['session_id'] as string;
   }
@@ -102,10 +101,6 @@ export const invokeCommand: CommandModule<object, InvokeArgs> = {
         type: 'array',
         string: true,
         describe: 'Handler module path(s) in path#export format',
-      })
-      .option('registry', {
-        type: 'string',
-        describe: 'Path to a JSON handler registry file',
       })
       .option('bootstrap-only', {
         type: 'boolean',
@@ -191,7 +186,6 @@ export const invokeCommand: CommandModule<object, InvokeArgs> = {
     const handlers = args.handler ? parseHandlerArgs(args.handler) : [];
     const plan = resolveHookPlan({
       phase: event.phase,
-      registryPath: args.registry,
       handlers,
       handlerModules: args['handler-module'],
     });

@@ -77,7 +77,7 @@ export function buildExecutionContext(
   }
 
   const sessionId = (data.sessionId as string | undefined)
-    ?? extensionState['A5C_SESSION_ID']
+    ?? extensionState['AGENT_SESSION_ID']
     ?? null;
 
   return {

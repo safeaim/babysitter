@@ -10,7 +10,7 @@
  *
  * Resolution precedence (spec section 9.2):
  *   1. Explicit CLI flag --session-id
- *   2. Explicit env A5C_SESSION_ID
+ *   2. Explicit env AGENT_SESSION_ID
  *   3. Plugin sessionId from event data
  *   4. Gateway correlationId as fallback (tagged as 'derived')
  *   5. null
@@ -39,7 +39,7 @@ export function resolveSessionId(
   }
 
   // 2. Explicit env
-  const envSessionId = env['A5C_SESSION_ID'];
+  const envSessionId = env['AGENT_SESSION_ID'];
   if (envSessionId) {
     return { sessionId: envSessionId, source: 'explicit_env' };
   }

@@ -8,7 +8,7 @@ import { createHash } from 'crypto';
  * The session ID is derived from workspace/cwd as a stable hash.
  *
  * Resolution precedence (per spec 9.2):
- *   1. Explicit A5C_SESSION_ID env var
+ *   1. Explicit AGENT_SESSION_ID env var
  *   2. CURSOR_SESSION_ID env var (Cursor-specific, if ever provided)
  *   3. Derived from workspace or cwd via stable hash
  *   4. null (no session available)
@@ -32,7 +32,7 @@ export function resolveSessionId(
   env: Record<string, string> = {},
 ): SessionResolutionResult {
   // Priority 1: explicit env override
-  const explicit = env['A5C_SESSION_ID'];
+  const explicit = env['AGENT_SESSION_ID'];
   if (typeof explicit === 'string' && explicit.length > 0) {
     return { sessionId: explicit, source: 'explicit_env', isDerived: false };
   }

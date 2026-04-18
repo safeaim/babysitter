@@ -7,7 +7,7 @@
 Its responsibilities:
 
 - **Normalize** harness-native hook events into a single canonical `UnifiedHookEvent` (version `a5c.hooks.v1`).
-- **Resolve** an ordered handler execution plan from a registry, CLI flags, or module paths.
+- **Resolve** an ordered handler execution plan from CLI flags or module paths.
 - **Execute** the plan with per-phase error policies (fail-open / fail-closed / fail-open-bootstrap-only).
 - **Merge** results from all handlers into one `MergedExecutionResult` with deterministic conflict resolution.
 - **Propagate** persisted environment variables downstream via the backend appropriate for the adapter.
@@ -82,8 +82,8 @@ normalizeEvent()
                        execution, payload, env, raw }
         │
         ▼
-resolveHookPlan({ phase, registryPath, handlers, handlerModules })
-  merge: explicit --handler refs → --handler-module paths → registry JSON
+resolveHookPlan({ phase, handlers, handlerModules })
+  merge: explicit --handler refs → --handler-module paths
   sort: priority asc, then pluginId asc, then id asc (deterministic)
   → HookPlanEntry[]
         │
@@ -223,7 +223,7 @@ Most restrictive wins across all handler results.
 |---|---|
 | `last-writer-wins` (default) | Later handler overwrites; conflict recorded in diagnostics |
 | `fail-on-conflict` | Throws `MergeConflictError` on first key collision |
-| `protected-prefixes` | Keys matching `protectedPrefixes` (default: `['A5C_']`) cannot be overwritten; others use last-writer-wins |
+| `protected-prefixes` | Keys matching `protectedPrefixes` (default: `['AGENT_']`) cannot be overwritten; others use last-writer-wins |
 | `namespace-required` | Every key must have a namespace prefix (`SOMETHING_`); throws if not present |
 
 **Other field rules:**

@@ -301,7 +301,7 @@ interface UnifiedExecutionContext {
 Resolution precedence:
 
 1. explicit CLI flag `--session-id`
-2. explicit env `A5C_SESSION_ID`
+2. explicit env `AGENT_SESSION_ID`
 3. adapter-native session id from stdin/input context
 4. adapter-derived session key from stable native identifiers
 5. synthetic session id only if the adapter has no stable session id and the integration explicitly allows synthetic ids
@@ -513,7 +513,7 @@ The proxy must support conflict policies:
 
 Recommended default:
 
-* env keys under `A5C_*` reserved for proxy
+* env keys under `AGENT_*` reserved for proxy
 * plugin-specific keys should be namespaced, for example `PLUGIN_X_*`
 * protected keys cannot be overwritten unless explicitly allowed
 
@@ -553,7 +553,7 @@ This mode must:
 ### 13.3 Use cases
 
 * context needs to exist for later `tool.before` hooks
-* downstream wrapped commands need access to `A5C_SESSION_ID`
+* downstream wrapped commands need access to `AGENT_SESSION_ID`
 * session bootstrap is required but plugin logic will be added later
 * a project wants shared context/env without custom session-start scripts
 
@@ -607,12 +607,12 @@ Each adapter must declare one of:
 
 The proxy should always inject these into child processes when possible:
 
-* `A5C_SESSION_ID`
-* `A5C_TURN_ID` when available
-* `A5C_ADAPTER`
-* `A5C_WORKSPACE_ROOT` when available
-* `A5C_TRANSCRIPT_PATH` when available
-* `A5C_CONTEXT_FILE` when materialized
+* `AGENT_SESSION_ID`
+* `AGENT_TURN_ID` when available
+* `AGENT_ADAPTER`
+* `AGENT_WORKSPACE_ROOT` when available
+* `AGENT_TRANSCRIPT_PATH` when available
+* `AGENT_CONTEXT_FILE` when materialized
 
 ---
 
@@ -988,7 +988,7 @@ Harness config registers one command hook only.
 That command invokes:
 
 ```bash
-npx -y @a5c/hooks-proxy invoke --adapter claude --registry .a5c/hooks-registry.json
+npx -y @a5c/hooks-proxy invoke --adapter claude
 ```
 
 The registry contains multiple logical `session.start` handlers.
@@ -1023,7 +1023,7 @@ The proxy:
 A tool command can be wrapped as:
 
 ```bash
-npx -y @a5c/hooks-proxy exec --session-id "$A5C_SESSION_ID" -- npm test
+npx -y @a5c/hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- npm test
 ```
 
 This restores proxy-managed env/context even on harnesses without native persistent shell env.

@@ -54,7 +54,7 @@ describe('exec-rehydration integration', () => {
     await fs.promises.rm(tmpDir, { recursive: true, force: true });
   });
 
-  it('materializes A5C_SESSION_ID from session', async () => {
+  it('materializes AGENT_SESSION_ID from session', async () => {
     const session = makeSession({ sessionId: 'sess-42' });
     await saveSession(session, tmpDir);
 
@@ -65,10 +65,10 @@ describe('exec-rehydration integration', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_SESSION_ID']).toBe('sess-42');
+    expect(result.env['AGENT_SESSION_ID']).toBe('sess-42');
   });
 
-  it('materializes A5C_ADAPTER from session', async () => {
+  it('materializes AGENT_ADAPTER from session', async () => {
     const session = makeSession({
       sessionId: 'adapter-sess',
       adapter: 'codex',
@@ -82,16 +82,16 @@ describe('exec-rehydration integration', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_ADAPTER']).toBe('codex');
+    expect(result.env['AGENT_ADAPTER']).toBe('codex');
   });
 
-  it('rehydrates persisted env vars (non-A5C_ prefixed) into materialized env', async () => {
+  it('rehydrates persisted env vars (non-AGENT_ prefixed) into materialized env', async () => {
     const session = makeSession({
       sessionId: 'persist-env-sess',
       persistedEnv: {
         MY_PLUGIN_TOKEN: 'abc-123',
         HOOKS_PROXY_PERSIST_FOO: 'bar',
-        A5C_SHOULD_SKIP: 'this-is-skipped',
+        AGENT_SHOULD_SKIP: 'this-is-skipped',
       },
     });
     await saveSession(session, tmpDir);
@@ -103,15 +103,15 @@ describe('exec-rehydration integration', () => {
       tempDir: tmpDir,
     });
 
-    // Non-A5C_ keys should be rehydrated
+    // Non-AGENT_ keys should be rehydrated
     expect(result.env['MY_PLUGIN_TOKEN']).toBe('abc-123');
     expect(result.env['HOOKS_PROXY_PERSIST_FOO']).toBe('bar');
 
-    // A5C_ prefixed keys from persistedEnv should be skipped (injected explicitly)
-    expect(result.env['A5C_SHOULD_SKIP']).toBeUndefined();
+    // AGENT_ prefixed keys from persistedEnv should be skipped (injected explicitly)
+    expect(result.env['AGENT_SHOULD_SKIP']).toBeUndefined();
 
-    // Standard A5C_ keys should still be present
-    expect(result.env['A5C_SESSION_ID']).toBe('persist-env-sess');
+    // Standard AGENT_ keys should still be present
+    expect(result.env['AGENT_SESSION_ID']).toBe('persist-env-sess');
   });
 
   it('respects envAllowlist when rehydrating persisted env', async () => {
@@ -150,7 +150,7 @@ describe('exec-rehydration integration', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_WORKSPACE_ROOT']).toBe('/home/user/project');
+    expect(result.env['AGENT_WORKSPACE_ROOT']).toBe('/home/user/project');
   });
 
   it('generates temp env file path', async () => {
@@ -171,7 +171,7 @@ describe('exec-rehydration integration', () => {
 
     // And contain valid export lines
     const content = await fs.promises.readFile(result.tempEnvFilePath!, 'utf-8');
-    expect(content).toContain('A5C_SESSION_ID=');
+    expect(content).toContain('AGENT_SESSION_ID=');
   });
 
   it('returns empty env (only session ID) when session is missing', async () => {
@@ -182,8 +182,8 @@ describe('exec-rehydration integration', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_SESSION_ID']).toBe('nonexistent');
-    // No other A5C_ keys since session does not exist
-    expect(result.env['A5C_ADAPTER']).toBeUndefined();
+    expect(result.env['AGENT_SESSION_ID']).toBe('nonexistent');
+    // No other AGENT_ keys since session does not exist
+    expect(result.env['AGENT_ADAPTER']).toBeUndefined();
   });
 });

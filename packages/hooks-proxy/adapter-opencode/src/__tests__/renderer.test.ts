@@ -14,10 +14,10 @@ describe('renderOpenCodeOutput', () => {
 
     it('renders persistEnv', () => {
       const result: UnifiedHookResult = {
-        persistEnv: { A5C_RUN_ID: 'run-123' },
+        persistEnv: { AGENT_RUN_ID: 'run-123' },
       };
       const output = renderOpenCodeOutput(result, 'session.created');
-      expect(output.persistEnv).toEqual({ A5C_RUN_ID: 'run-123' });
+      expect(output.persistEnv).toEqual({ AGENT_RUN_ID: 'run-123' });
     });
 
     it('renders empty object for noop result', () => {
@@ -105,13 +105,13 @@ describe('renderOpenCodeOutput', () => {
     it('renders env from persistEnv', () => {
       const result: UnifiedHookResult = {
         persistEnv: {
-          A5C_SESSION_ID: 'session-abc',
+          AGENT_SESSION_ID: 'session-abc',
           CUSTOM_VAR: 'hello',
         },
       };
       const output = renderOpenCodeOutput(result, 'shell.env');
       expect(output.env).toEqual({
-        A5C_SESSION_ID: 'session-abc',
+        AGENT_SESSION_ID: 'session-abc',
         CUSTOM_VAR: 'hello',
       });
     });

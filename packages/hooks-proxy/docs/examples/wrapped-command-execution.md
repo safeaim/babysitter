@@ -20,13 +20,13 @@ This is especially relevant for:
 
 ```bash
 # Run npm test with session context restored
-a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- npm test
+a5c-hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- npm test
 
 # Run a custom script with session env
-a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- node scripts/deploy.js
+a5c-hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- node scripts/deploy.js
 
 # Run a shell command
-a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- bash -c "echo $MY_PLUGIN_VAR"
+a5c-hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- bash -c "echo $MY_PLUGIN_VAR"
 ```
 
 ---
@@ -41,7 +41,7 @@ a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- bash -c "echo $MY_PLUGIN_
 The command inherits:
 - All current process environment variables
 - All persisted env from the session store (overriding any same-named vars)
-- `A5C_SESSION_ID` set to the session ID
+- `AGENT_SESSION_ID` set to the session ID
 
 ---
 
@@ -54,7 +54,7 @@ In your Gemini extension config:
 ```json
 {
   "hooks": {
-    "onSessionStart": "npx -y @a5c/hooks-proxy invoke --adapter gemini --registry .a5c/hooks-registry.json"
+    "onSessionStart": "npx -y @a5c/hooks-proxy invoke --adapter gemini"
   }
 }
 ```
@@ -85,7 +85,7 @@ Since Gemini's env persistence is `wrapper_only`, downstream tool processes will
 npm run migrate
 
 # Use:
-a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- npm run migrate
+a5c-hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- npm run migrate
 ```
 
 ---
@@ -128,10 +128,10 @@ To verify that session context is being properly injected:
 
 ```bash
 # Check what env would be materialized
-a5c-hooks-proxy show-session --session-id "$A5C_SESSION_ID" --json
+a5c-hooks-proxy show-session --session-id "$AGENT_SESSION_ID" --json
 
 # Test exec with a simple env dump
-a5c-hooks-proxy exec --session-id "$A5C_SESSION_ID" -- env | grep MY_PLUGIN
+a5c-hooks-proxy exec --session-id "$AGENT_SESSION_ID" -- env | grep MY_PLUGIN
 ```
 
 ---

@@ -308,15 +308,15 @@ describe('mergeResults', () => {
   // -----------------------------------------------------------------------
 
   describe('conflict policy: protected-prefixes', () => {
-    it('protects A5C_ prefixed env keys', () => {
+    it('protects AGENT_ prefixed env keys', () => {
       const merged = mergeResults(
         [
-          result({ persistEnv: { A5C_TOKEN: 'original' } }),
-          result({ persistEnv: { A5C_TOKEN: 'overwrite' } }),
+          result({ persistEnv: { AGENT_TOKEN: 'original' } }),
+          result({ persistEnv: { AGENT_TOKEN: 'overwrite' } }),
         ],
         { conflictPolicy: 'protected-prefixes' },
       );
-      expect(merged.persistEnv.A5C_TOKEN).toBe('original');
+      expect(merged.persistEnv.AGENT_TOKEN).toBe('original');
       expect(merged.diagnostics.conflicts[0].resolution).toBe('protected');
     });
 

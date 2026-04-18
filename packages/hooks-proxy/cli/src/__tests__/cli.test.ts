@@ -61,7 +61,7 @@ vi.mock('@a5c/hooks-proxy-core', () => ({
   })),
   propagateEnv: vi.fn(async () => undefined),
   materializeExecContext: vi.fn(async () => ({
-    env: { A5C_SESSION_ID: 'test-session' },
+    env: { AGENT_SESSION_ID: 'test-session' },
     contextFilePath: undefined,
     tempEnvFilePath: undefined,
   })),

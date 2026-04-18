@@ -266,11 +266,11 @@ describe('renderPiOutput', () => {
 
     it('renders persist state from persistEnv', () => {
       const output = renderPiOutput(
-        { persistEnv: { A5C_SESSION_ID: 'sess_123', MY_KEY: 'val' } },
+        { persistEnv: { AGENT_SESSION_ID: 'sess_123', MY_KEY: 'val' } },
         'session_start',
       );
       expect(output).toEqual({
-        persistState: { A5C_SESSION_ID: 'sess_123', MY_KEY: 'val' },
+        persistState: { AGENT_SESSION_ID: 'sess_123', MY_KEY: 'val' },
       });
     });
 
@@ -319,12 +319,12 @@ describe('renderPiOutput', () => {
 describe('buildExtensionState', () => {
   it('copies env vars for extension-state persistence', () => {
     const state = buildExtensionState({
-      A5C_SESSION_ID: 'sess_123',
+      AGENT_SESSION_ID: 'sess_123',
       MY_VAR: 'hello world',
     });
 
     expect(state).toEqual({
-      A5C_SESSION_ID: 'sess_123',
+      AGENT_SESSION_ID: 'sess_123',
       MY_VAR: 'hello world',
     });
   });
@@ -342,16 +342,16 @@ describe('resolveSessionId', () => {
   it('prefers explicit override over everything', () => {
     const result = resolveSessionId(
       { sessionId: 'native_id' },
-      { A5C_SESSION_ID: 'env_id', PI_SESSION_ID: 'pi_id' },
+      { AGENT_SESSION_ID: 'env_id', PI_SESSION_ID: 'pi_id' },
       'override_id',
     );
     expect(result).toEqual({ sessionId: 'override_id', source: 'explicit_override' });
   });
 
-  it('prefers A5C_SESSION_ID env over native sessionId', () => {
+  it('prefers AGENT_SESSION_ID env over native sessionId', () => {
     const result = resolveSessionId(
       { sessionId: 'native_id' },
-      { A5C_SESSION_ID: 'env_id' },
+      { AGENT_SESSION_ID: 'env_id' },
     );
     expect(result).toEqual({ sessionId: 'env_id', source: 'explicit_env' });
   });

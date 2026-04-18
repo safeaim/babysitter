@@ -66,7 +66,7 @@ export function normalizeCopilotEvent(
 ): UnifiedHookEvent {
   // Derive session ID: check env overrides, then synthesize from cwd/workspace
   const sessionId =
-    env['A5C_SESSION_ID'] ??
+    env['AGENT_SESSION_ID'] ??
     env['HOOKS_PROXY_SESSION_ID'] ??
     resolveSyntheticSessionId(rawInput.cwd, rawInput.workspace);
 

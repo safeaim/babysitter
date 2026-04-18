@@ -72,7 +72,7 @@ describe('normalizeCopilotEvent', () => {
 
   it('should use env session ID when provided', () => {
     const event = normalizeCopilotEvent(SESSION_START, 'sessionStart', {
-      A5C_SESSION_ID: 'explicit-session-42',
+      AGENT_SESSION_ID: 'explicit-session-42',
     });
 
     expect(event.execution.sessionId).toBe('explicit-session-42');

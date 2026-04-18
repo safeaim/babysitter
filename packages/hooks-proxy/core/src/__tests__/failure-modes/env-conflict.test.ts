@@ -119,22 +119,22 @@ describe('env-conflict failure modes', () => {
   });
 
   describe('protected-prefixes policy', () => {
-    it('protects A5C_ prefixed keys from being overwritten', () => {
+    it('protects AGENT_ prefixed keys from being overwritten', () => {
       const merged = mergeResults(
         [
-          result({ persistEnv: { A5C_SECRET: 'original' } }),
-          result({ persistEnv: { A5C_SECRET: 'attacker-value' } }),
+          result({ persistEnv: { AGENT_SECRET: 'original' } }),
+          result({ persistEnv: { AGENT_SECRET: 'attacker-value' } }),
         ],
         { conflictPolicy: 'protected-prefixes' },
       );
-      expect(merged.persistEnv.A5C_SECRET).toBe('original');
+      expect(merged.persistEnv.AGENT_SECRET).toBe('original');
     });
 
     it('records protected resolution in diagnostics', () => {
       const merged = mergeResults(
         [
-          result({ persistEnv: { A5C_TOKEN: 'original' } }),
-          result({ persistEnv: { A5C_TOKEN: 'new-value' } }),
+          result({ persistEnv: { AGENT_TOKEN: 'original' } }),
+          result({ persistEnv: { AGENT_TOKEN: 'new-value' } }),
         ],
         { conflictPolicy: 'protected-prefixes' },
       );

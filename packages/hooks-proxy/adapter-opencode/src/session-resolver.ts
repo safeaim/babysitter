@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
  * OpenCode provides a native session ID in the event payload.
  * Resolution priority:
  *
- *   1. Explicit env: A5C_SESSION_ID or HOOKS_PROXY_SESSION_ID
+ *   1. Explicit env: AGENT_SESSION_ID or HOOKS_PROXY_SESSION_ID
  *   2. Native session ID from the event payload (`sessionId`)
  *   3. OpenCode-specific env: OPENCODE_SESSION_ID
  *   4. Derived from workspace (cwd) + a date-bucket fallback
@@ -18,8 +18,8 @@ export function resolveSessionId(
   env: Record<string, string>,
 ): string | null {
   // 1. Explicit session ID from env (highest priority)
-  if (env['A5C_SESSION_ID']) {
-    return env['A5C_SESSION_ID'];
+  if (env['AGENT_SESSION_ID']) {
+    return env['AGENT_SESSION_ID'];
   }
   if (env['HOOKS_PROXY_SESSION_ID']) {
     return env['HOOKS_PROXY_SESSION_ID'];

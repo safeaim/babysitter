@@ -103,7 +103,7 @@ export function buildExecutionContext(
   // Session ID: prefer plugin sessionId, fall back to gateway correlationId
   const sessionId =
     (eventData.sessionId as string | undefined) ??
-    env['A5C_SESSION_ID'] ??
+    env['AGENT_SESSION_ID'] ??
     (eventData.correlationId as string | undefined) ??
     null;
 

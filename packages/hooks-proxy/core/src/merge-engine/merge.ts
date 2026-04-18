@@ -255,7 +255,7 @@ export function mergeResults(
 ): MergedExecutionResult {
   const opts = {
     conflictPolicy: options?.conflictPolicy ?? 'last-writer-wins',
-    protectedPrefixes: options?.protectedPrefixes ?? ['A5C_'],
+    protectedPrefixes: options?.protectedPrefixes ?? ['AGENT_'],
     systemMessageStrategy: options?.systemMessageStrategy ?? 'concatenate',
   } as const;
 

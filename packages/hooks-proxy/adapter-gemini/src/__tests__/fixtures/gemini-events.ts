@@ -82,7 +82,7 @@ export const DEFAULT_ENV: Record<string, string> = {
 
 export const ENV_WITH_EXPLICIT_SESSION: Record<string, string> = {
   ...DEFAULT_ENV,
-  A5C_SESSION_ID: 'explicit-session-456',
+  AGENT_SESSION_ID: 'explicit-session-456',
 };
 
 export const ENV_WITH_PERSISTED: Record<string, string> = {

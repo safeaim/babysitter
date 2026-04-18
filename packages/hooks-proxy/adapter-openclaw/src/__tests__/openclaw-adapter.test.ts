@@ -491,7 +491,7 @@ describe('resolveSessionId', () => {
   it('prefers explicit flag over everything', () => {
     const result = resolveSessionId(
       { sessionId: 'plugin-id', correlationId: 'gw-id' },
-      { A5C_SESSION_ID: 'env-id' },
+      { AGENT_SESSION_ID: 'env-id' },
       'flag-id',
     );
     expect(result).toEqual({ sessionId: 'flag-id', source: 'explicit_flag' });
@@ -500,7 +500,7 @@ describe('resolveSessionId', () => {
   it('prefers env over plugin/gateway session IDs', () => {
     const result = resolveSessionId(
       { sessionId: 'plugin-id', correlationId: 'gw-id' },
-      { A5C_SESSION_ID: 'env-id' },
+      { AGENT_SESSION_ID: 'env-id' },
     );
     expect(result).toEqual({ sessionId: 'env-id', source: 'explicit_env' });
   });

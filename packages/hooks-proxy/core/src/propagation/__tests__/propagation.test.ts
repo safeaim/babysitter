@@ -101,7 +101,7 @@ afterEach(async () => {
 // ---------------------------------------------------------------------------
 
 describe('materializeExecContext', () => {
-  it('injects all required A5C_ env vars when session has full metadata', async () => {
+  it('injects all required AGENT_ env vars when session has full metadata', async () => {
     const session = createMockSession({
       metadata: {
         turnId: 'turn-42',
@@ -117,15 +117,15 @@ describe('materializeExecContext', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_SESSION_ID']).toBe('test-session-001');
-    expect(result.env['A5C_TURN_ID']).toBe('turn-42');
-    expect(result.env['A5C_ADAPTER']).toBe('claude');
-    expect(result.env['A5C_WORKSPACE_ROOT']).toBe('/workspace/root');
-    expect(result.env['A5C_TRANSCRIPT_PATH']).toBe('/tmp/transcript.jsonl');
-    expect(result.env['A5C_CONTEXT_FILE']).toBeDefined();
+    expect(result.env['AGENT_SESSION_ID']).toBe('test-session-001');
+    expect(result.env['AGENT_TURN_ID']).toBe('turn-42');
+    expect(result.env['AGENT_ADAPTER']).toBe('claude');
+    expect(result.env['AGENT_WORKSPACE_ROOT']).toBe('/workspace/root');
+    expect(result.env['AGENT_TRANSCRIPT_PATH']).toBe('/tmp/transcript.jsonl');
+    expect(result.env['AGENT_CONTEXT_FILE']).toBeDefined();
   });
 
-  it('uses cwd as A5C_WORKSPACE_ROOT when workspaceRoot metadata is absent', async () => {
+  it('uses cwd as AGENT_WORKSPACE_ROOT when workspaceRoot metadata is absent', async () => {
     const session = createMockSession({ cwd: '/fallback/dir' });
     const store = createMockSessionStore(session);
 
@@ -135,10 +135,10 @@ describe('materializeExecContext', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_WORKSPACE_ROOT']).toBe('/fallback/dir');
+    expect(result.env['AGENT_WORKSPACE_ROOT']).toBe('/fallback/dir');
   });
 
-  it('injects A5C_SESSION_ID even when session is not found', async () => {
+  it('injects AGENT_SESSION_ID even when session is not found', async () => {
     const store = createMockSessionStore(null);
 
     const result = await materializeExecContext({
@@ -147,7 +147,7 @@ describe('materializeExecContext', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_SESSION_ID']).toBe('missing-session');
+    expect(result.env['AGENT_SESSION_ID']).toBe('missing-session');
     expect(result.contextFilePath).toBeUndefined();
   });
 
@@ -192,10 +192,10 @@ describe('materializeExecContext', () => {
     expect(result.env['OTHER_VAR']).toBe('world');
   });
 
-  it('skips A5C_ prefixed keys from persisted env', async () => {
+  it('skips AGENT_ prefixed keys from persisted env', async () => {
     const session = createMockSession({
       persistedEnv: {
-        A5C_STALE_VAR: 'should-not-appear',
+        AGENT_STALE_VAR: 'should-not-appear',
         NORMAL_VAR: 'should-appear',
       },
     });
@@ -207,7 +207,7 @@ describe('materializeExecContext', () => {
       tempDir: tmpDir,
     });
 
-    expect(result.env['A5C_STALE_VAR']).toBeUndefined();
+    expect(result.env['AGENT_STALE_VAR']).toBeUndefined();
     expect(result.env['NORMAL_VAR']).toBe('should-appear');
   });
 

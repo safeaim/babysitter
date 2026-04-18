@@ -455,12 +455,12 @@ describe('renderClaudeOutput', () => {
 describe('buildEnvFileLines', () => {
   it('builds export lines for env vars', () => {
     const lines = buildEnvFileLines({
-      A5C_SESSION_ID: 'sess_123',
+      AGENT_SESSION_ID: 'sess_123',
       MY_VAR: 'hello world',
     });
 
     expect(lines).toHaveLength(2);
-    expect(lines[0]).toBe('export A5C_SESSION_ID="sess_123"');
+    expect(lines[0]).toBe('export AGENT_SESSION_ID="sess_123"');
     expect(lines[1]).toBe('export MY_VAR="hello world"');
   });
 
@@ -485,7 +485,7 @@ describe('resolveSessionId', () => {
   it('prefers explicit flag over everything', () => {
     const result = resolveSessionId(
       { session_id: 'native_id' },
-      { A5C_SESSION_ID: 'env_id' },
+      { AGENT_SESSION_ID: 'env_id' },
       'flag_id',
     );
     expect(result).toEqual({ sessionId: 'flag_id', source: 'explicit_flag' });
@@ -494,7 +494,7 @@ describe('resolveSessionId', () => {
   it('prefers env over native session_id', () => {
     const result = resolveSessionId(
       { session_id: 'native_id' },
-      { A5C_SESSION_ID: 'env_id' },
+      { AGENT_SESSION_ID: 'env_id' },
     );
     expect(result).toEqual({ sessionId: 'env_id', source: 'explicit_env' });
   });

@@ -9,7 +9,7 @@ import { createHash } from 'crypto';
  * or cwd is used as a fallback.
  *
  * Resolution precedence (per spec 9.2):
- *   1. Explicit A5C_SESSION_ID env var
+ *   1. Explicit AGENT_SESSION_ID env var
  *   2. Native sessionId from event context (Pi runtime)
  *   3. OH_MY_PI_SESSION_ID env var (harness-specific)
  *   4. Derived from workspace or cwd via stable hash
@@ -34,7 +34,7 @@ export function resolveSessionId(
   env: Record<string, string> = {},
 ): SessionResolutionResult {
   // Priority 1: explicit env override
-  const explicit = env['A5C_SESSION_ID'];
+  const explicit = env['AGENT_SESSION_ID'];
   if (typeof explicit === 'string' && explicit.length > 0) {
     return { sessionId: explicit, source: 'explicit_env', isDerived: false };
   }

@@ -33,25 +33,25 @@ Add to `.claude/settings.json`:
     "SessionStart": [
       {
         "type": "command",
-        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude --registry .a5c/hooks-registry.json"
+        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude"
       }
     ],
     "PreToolUse": [
       {
         "type": "command",
-        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude --registry .a5c/hooks-registry.json"
+        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude"
       }
     ],
     "PostToolUse": [
       {
         "type": "command",
-        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude --registry .a5c/hooks-registry.json"
+        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude"
       }
     ],
     "Stop": [
       {
         "type": "command",
-        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude --registry .a5c/hooks-registry.json"
+        "command": "npx -y @a5c/hooks-proxy invoke --adapter claude"
       }
     ]
   }
@@ -107,7 +107,7 @@ To initialize session context without running any hook logic:
 Configure in your Codex hooks configuration:
 
 ```bash
-npx -y @a5c/hooks-proxy invoke --adapter codex --registry .a5c/hooks-registry.json
+npx -y @a5c/hooks-proxy invoke --adapter codex
 ```
 
 ### Capabilities
@@ -138,8 +138,8 @@ Configure in your Gemini CLI extension:
 ```json
 {
   "hooks": {
-    "onSessionStart": "npx -y @a5c/hooks-proxy invoke --adapter gemini --registry .a5c/hooks-registry.json",
-    "onToolUse": "npx -y @a5c/hooks-proxy invoke --adapter gemini --registry .a5c/hooks-registry.json"
+    "onSessionStart": "npx -y @a5c/hooks-proxy invoke --adapter gemini",
+    "onToolUse": "npx -y @a5c/hooks-proxy invoke --adapter gemini"
   }
 }
 ```
@@ -175,7 +175,7 @@ Configure in your Gemini CLI extension:
 Configure in your Copilot agent hooks:
 
 ```bash
-npx -y @a5c/hooks-proxy invoke --adapter copilot --registry .a5c/hooks-registry.json
+npx -y @a5c/hooks-proxy invoke --adapter copilot
 ```
 
 ### Capabilities

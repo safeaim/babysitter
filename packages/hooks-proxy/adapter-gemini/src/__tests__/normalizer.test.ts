@@ -60,7 +60,7 @@ describe('buildExecutionContext', () => {
     expect(ctx.adapter).toBe('gemini');
   });
 
-  it('prefers A5C_SESSION_ID over GEMINI_SESSION_ID', () => {
+  it('prefers AGENT_SESSION_ID over GEMINI_SESSION_ID', () => {
     const ctx = buildExecutionContext(
       { cwd: '/project' },
       'SessionStart',

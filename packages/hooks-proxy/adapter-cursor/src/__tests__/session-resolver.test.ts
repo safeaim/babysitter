@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { resolveSessionId, deriveSessionId, isValidSessionId } from '../session-resolver';
 
 describe('resolveSessionId', () => {
-  it('returns A5C_SESSION_ID from env with highest priority', () => {
+  it('returns AGENT_SESSION_ID from env with highest priority', () => {
     const result = resolveSessionId(
       { cwd: '/project' },
-      { A5C_SESSION_ID: 'from-env', CURSOR_SESSION_ID: 'from-cursor-env' },
+      { AGENT_SESSION_ID: 'from-env', CURSOR_SESSION_ID: 'from-cursor-env' },
     );
     expect(result.sessionId).toBe('from-env');
     expect(result.source).toBe('explicit_env');
@@ -58,10 +58,10 @@ describe('resolveSessionId', () => {
     expect(result.isDerived).toBe(false);
   });
 
-  it('ignores empty string A5C_SESSION_ID', () => {
+  it('ignores empty string AGENT_SESSION_ID', () => {
     const result = resolveSessionId(
       { workspace: '/project' },
-      { A5C_SESSION_ID: '' },
+      { AGENT_SESSION_ID: '' },
     );
     expect(result.source).toBe('derived');
   });

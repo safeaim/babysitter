@@ -46,7 +46,7 @@ export const bootstrapCommand: CommandModule<object, BootstrapArgs> = {
 
     // Determine session ID
     const sessionId = args['session-id']
-      ?? env['A5C_SESSION_ID']
+      ?? env['AGENT_SESSION_ID']
       ?? `bootstrap-${Date.now()}`;
 
     // Normalize a synthetic session.start event for context extraction

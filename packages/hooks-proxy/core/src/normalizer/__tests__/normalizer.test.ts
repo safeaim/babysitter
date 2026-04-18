@@ -1,7 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as os from 'os';
+import { describe, it, expect } from 'vitest';
 import type { PhaseMapping } from '../../types/lifecycle';
 import type { HandlerRef } from '../../types/plan';
 import type { UnifiedHookEvent } from '../../types/event';
@@ -210,16 +207,6 @@ describe('splitEnv', () => {
 // --- resolveHookPlan ---
 
 describe('resolveHookPlan', () => {
-  let tmpDir: string;
-
-  beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hooks-proxy-test-'));
-  });
-
-  afterEach(() => {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  });
-
   it('should resolve handlers from explicit refs', () => {
     const plan = resolveHookPlan({
       phase: 'tool.before',
@@ -236,27 +223,6 @@ describe('resolveHookPlan', () => {
     expect(plan[0].phase).toBe('tool.before');
   });
 
-  it('should resolve handlers from registry file', () => {
-    const registryPath = path.join(tmpDir, 'registry.json');
-    const registry = {
-      'tool.before': [
-        { source: 'reg-plugin', handler: 'guard', priority: 1 },
-      ],
-      'session.start': [
-        { source: 'other-plugin', handler: 'init', priority: 1 },
-      ],
-    };
-    fs.writeFileSync(registryPath, JSON.stringify(registry));
-
-    const plan = resolveHookPlan({
-      phase: 'tool.before',
-      registryPath,
-    });
-
-    expect(plan).toHaveLength(1);
-    expect(plan[0].handler.source).toBe('reg-plugin');
-  });
-
   it('should return empty plan when no handlers match', () => {
     const plan = resolveHookPlan({
       phase: 'tool.before',
@@ -266,39 +232,18 @@ describe('resolveHookPlan', () => {
   });
 
   it('should merge handlers from multiple sources', () => {
-    const registryPath = path.join(tmpDir, 'registry.json');
-    fs.writeFileSync(registryPath, JSON.stringify({
-      'tool.before': [
-        { source: 'reg-plugin', handler: 'guard', priority: 50 },
-      ],
-    }));
-
     const plan = resolveHookPlan({
       phase: 'tool.before',
-      registryPath,
       handlers: [
         { source: 'cli-plugin', handler: 'check', priority: 10 },
       ],
       handlerModules: ['./my-module.js#validate'],
     });
 
-    // cli-plugin (10), reg-plugin (50), ./my-module.js (100)
-    expect(plan).toHaveLength(3);
+    // cli-plugin (10), ./my-module.js (100)
+    expect(plan).toHaveLength(2);
     expect(plan[0].handler.source).toBe('cli-plugin');
-    expect(plan[1].handler.source).toBe('reg-plugin');
-    expect(plan[2].handler.source).toBe('./my-module.js');
-  });
-
-  it('should handle missing registry file gracefully', () => {
-    const plan = resolveHookPlan({
-      phase: 'tool.before',
-      registryPath: '/nonexistent/registry.json',
-      handlers: [
-        { source: 'fallback', handler: 'run', priority: 1 },
-      ],
-    });
-
-    expect(plan).toHaveLength(1);
+    expect(plan[1].handler.source).toBe('./my-module.js');
   });
 });
 

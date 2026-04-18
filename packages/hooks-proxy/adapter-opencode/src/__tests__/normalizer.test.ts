@@ -61,7 +61,7 @@ describe('buildExecutionContext', () => {
     expect(ctx.adapter).toBe('opencode');
   });
 
-  it('prefers A5C_SESSION_ID over native sessionId', () => {
+  it('prefers AGENT_SESSION_ID over native sessionId', () => {
     const ctx = buildExecutionContext(
       SESSION_CREATED_EVENT,
       'session.created',
@@ -131,8 +131,8 @@ describe('buildPayload', () => {
   it('extracts shell.env fields', () => {
     const payload = buildPayload('shell.env', SHELL_ENV_EVENT);
     expect(payload.env).toEqual({
-      A5C_SESSION_ID: 'opencode-session-abc',
-      A5C_WORKSPACE_ROOT: '/home/user/project',
+      AGENT_SESSION_ID: 'opencode-session-abc',
+      AGENT_WORKSPACE_ROOT: '/home/user/project',
       CUSTOM_VAR: 'hello',
     });
   });

@@ -11,7 +11,7 @@ import { createHash } from 'crypto';
  * Resolution precedence (per spec 9.2):
  *   1. Explicit AGENT_SESSION_ID env var
  *   2. Native sessionId from event context (Pi runtime)
- *   3. OH_MY_PI_SESSION_ID env var (harness-specific)
+ *   3. OMP_SESSION_ID env var (harness-specific)
  *   4. Derived from workspace or cwd via stable hash
  *   5. null (no session available)
  */
@@ -46,7 +46,7 @@ export function resolveSessionId(
   }
 
   // Priority 3: harness-specific env var
-  const harnessEnv = env['OH_MY_PI_SESSION_ID'];
+  const harnessEnv = env['OMP_SESSION_ID'];
   if (typeof harnessEnv === 'string' && harnessEnv.length > 0) {
     return { sessionId: harnessEnv, source: 'harness_env', isDerived: false };
   }

@@ -86,8 +86,15 @@ describe('detectHarness', () => {
   });
 
   describe('GitHub Copilot', () => {
-    it('detects via GITHUB_COPILOT_PLUGIN_ROOT', () => {
-      const result = detectHarness(envWith({ GITHUB_COPILOT_PLUGIN_ROOT: '/copilot' }));
+    it('detects via COPILOT_HOME', () => {
+      const result = detectHarness(envWith({ COPILOT_HOME: '/copilot' }));
+      expect(result).not.toBeNull();
+      expect(result!.adapter).toBe('copilot');
+      expect(result!.confidence).toBe('high');
+    });
+
+    it('detects via COPILOT_GITHUB_TOKEN', () => {
+      const result = detectHarness(envWith({ COPILOT_GITHUB_TOKEN: 'ghu_test' }));
       expect(result).not.toBeNull();
       expect(result!.adapter).toBe('copilot');
       expect(result!.confidence).toBe('high');
@@ -95,8 +102,15 @@ describe('detectHarness', () => {
   });
 
   describe('Cursor', () => {
-    it('detects via CURSOR_PLUGIN_ROOT with medium confidence', () => {
-      const result = detectHarness(envWith({ CURSOR_PLUGIN_ROOT: '/cursor' }));
+    it('detects via CURSOR_PROJECT_DIR with medium confidence', () => {
+      const result = detectHarness(envWith({ CURSOR_PROJECT_DIR: '/cursor' }));
+      expect(result).not.toBeNull();
+      expect(result!.adapter).toBe('cursor');
+      expect(result!.confidence).toBe('medium');
+    });
+
+    it('detects via CURSOR_VERSION with medium confidence', () => {
+      const result = detectHarness(envWith({ CURSOR_VERSION: '0.50.0' }));
       expect(result).not.toBeNull();
       expect(result!.adapter).toBe('cursor');
       expect(result!.confidence).toBe('medium');
@@ -104,8 +118,8 @@ describe('detectHarness', () => {
   });
 
   describe('Pi', () => {
-    it('detects via PI_EXTENSION_DIR', () => {
-      const result = detectHarness(envWith({ PI_EXTENSION_DIR: '/pi' }));
+    it('detects via PI_PLUGIN_ROOT', () => {
+      const result = detectHarness(envWith({ PI_PLUGIN_ROOT: '/pi' }));
       expect(result).not.toBeNull();
       expect(result!.adapter).toBe('pi');
       expect(result!.confidence).toBe('high');
@@ -120,8 +134,8 @@ describe('detectHarness', () => {
   });
 
   describe('Oh-My-Pi', () => {
-    it('detects via OMP_EXTENSION_DIR', () => {
-      const result = detectHarness(envWith({ OMP_EXTENSION_DIR: '/omp' }));
+    it('detects via OMP_PLUGIN_ROOT', () => {
+      const result = detectHarness(envWith({ OMP_PLUGIN_ROOT: '/omp' }));
       expect(result).not.toBeNull();
       expect(result!.adapter).toBe('oh-my-pi');
       expect(result!.confidence).toBe('high');
@@ -136,8 +150,15 @@ describe('detectHarness', () => {
   });
 
   describe('OpenCode', () => {
-    it('detects via OPENCODE_PLUGIN_DIR', () => {
-      const result = detectHarness(envWith({ OPENCODE_PLUGIN_DIR: '/opencode' }));
+    it('detects via OPENCODE_CONFIG', () => {
+      const result = detectHarness(envWith({ OPENCODE_CONFIG: '/opencode/config' }));
+      expect(result).not.toBeNull();
+      expect(result!.adapter).toBe('opencode');
+      expect(result!.confidence).toBe('high');
+    });
+
+    it('detects via ACCOMPLISH_TASK_ID', () => {
+      const result = detectHarness(envWith({ ACCOMPLISH_TASK_ID: 'task-123' }));
       expect(result).not.toBeNull();
       expect(result!.adapter).toBe('opencode');
       expect(result!.confidence).toBe('high');
@@ -145,8 +166,15 @@ describe('detectHarness', () => {
   });
 
   describe('OpenClaw', () => {
-    it('detects via OPENCLAW_PLUGIN_DIR with medium confidence', () => {
-      const result = detectHarness(envWith({ OPENCLAW_PLUGIN_DIR: '/openclaw' }));
+    it('detects via OPENCLAW_SHELL with medium confidence', () => {
+      const result = detectHarness(envWith({ OPENCLAW_SHELL: '/openclaw/shell' }));
+      expect(result).not.toBeNull();
+      expect(result!.adapter).toBe('openclaw');
+      expect(result!.confidence).toBe('medium');
+    });
+
+    it('detects via OPENCLAW_HOME with medium confidence', () => {
+      const result = detectHarness(envWith({ OPENCLAW_HOME: '/openclaw/home' }));
       expect(result).not.toBeNull();
       expect(result!.adapter).toBe('openclaw');
       expect(result!.confidence).toBe('medium');
@@ -206,7 +234,7 @@ describe('detectHarness', () => {
       // Actually, Cursor is rule 5 and Pi is rule 6.
       // Since Cursor is medium, it becomes bestMatch. Then Pi is high, so Pi wins.
       const result = detectHarness(envWith({
-        CURSOR_PLUGIN_ROOT: '/cursor',
+        CURSOR_PROJECT_DIR: '/cursor',
         PI_SESSION_ID: 'sess-1',
       }));
       expect(result!.adapter).toBe('pi');
@@ -241,12 +269,12 @@ describe('detectHarness', () => {
     });
 
     it('Cursor detections are medium confidence', () => {
-      const result = detectHarness(envWith({ CURSOR_PLUGIN_ROOT: '/x' }));
+      const result = detectHarness(envWith({ CURSOR_PROJECT_DIR: '/x' }));
       expect(result!.confidence).toBe('medium');
     });
 
     it('OpenClaw detections are medium confidence', () => {
-      const result = detectHarness(envWith({ OPENCLAW_PLUGIN_DIR: '/x' }));
+      const result = detectHarness(envWith({ OPENCLAW_SHELL: '/x' }));
       expect(result!.confidence).toBe('medium');
     });
   });
@@ -257,8 +285,8 @@ describe('detectHarness', () => {
 
   describe('evidence', () => {
     it('includes the specific env var(s) that matched', () => {
-      const result = detectHarness(envWith({ PI_EXTENSION_DIR: '/pi', PI_SESSION_ID: 'sess' }));
-      expect(result!.evidence).toEqual(expect.arrayContaining(['PI_EXTENSION_DIR', 'PI_SESSION_ID']));
+      const result = detectHarness(envWith({ PI_PLUGIN_ROOT: '/pi', PI_SESSION_ID: 'sess' }));
+      expect(result!.evidence).toEqual(expect.arrayContaining(['PI_PLUGIN_ROOT', 'PI_SESSION_ID']));
       expect(result!.evidence).toHaveLength(2);
     });
 

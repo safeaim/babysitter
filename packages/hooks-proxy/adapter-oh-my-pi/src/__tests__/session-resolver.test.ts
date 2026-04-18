@@ -5,7 +5,7 @@ describe('resolveSessionId', () => {
   it('returns AGENT_SESSION_ID from env with highest priority', () => {
     const result = resolveSessionId(
       { sessionId: 'native-id', cwd: '/project' },
-      { AGENT_SESSION_ID: 'from-env', OH_MY_PI_SESSION_ID: 'from-omp-env' },
+      { AGENT_SESSION_ID: 'from-env', OMP_SESSION_ID: 'from-omp-env' },
     );
     expect(result.sessionId).toBe('from-env');
     expect(result.source).toBe('explicit_env');
@@ -22,10 +22,10 @@ describe('resolveSessionId', () => {
     expect(result.isDerived).toBe(false);
   });
 
-  it('returns OH_MY_PI_SESSION_ID from env when no native session ID', () => {
+  it('returns OMP_SESSION_ID from env when no native session ID', () => {
     const result = resolveSessionId(
       { cwd: '/project' },
-      { OH_MY_PI_SESSION_ID: 'omp-env-id' },
+      { OMP_SESSION_ID: 'omp-env-id' },
     );
     expect(result.sessionId).toBe('omp-env-id');
     expect(result.source).toBe('harness_env');
@@ -109,7 +109,7 @@ describe('resolveSessionId', () => {
   it('prefers native session ID over harness env var', () => {
     const result = resolveSessionId(
       { sessionId: 'native-session' },
-      { OH_MY_PI_SESSION_ID: 'env-session' },
+      { OMP_SESSION_ID: 'env-session' },
     );
     expect(result.sessionId).toBe('native-session');
     expect(result.source).toBe('native');

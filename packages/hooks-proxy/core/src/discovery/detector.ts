@@ -43,11 +43,11 @@ const DETECTION_RULES: DetectionRule[] = [
     confidence: 'high',
     signals: ['CLAUDE_PLUGIN_ROOT', 'CLAUDE_ENV_FILE'],
   },
-  // 2. Codex — high if CODEX_PLUGIN_ROOT is set
+  // 2. Codex — high if CODEX_PLUGIN_ROOT or CODEX_THREAD_ID is set
   {
     adapter: 'codex',
     confidence: 'high',
-    signals: ['CODEX_PLUGIN_ROOT'],
+    signals: ['CODEX_PLUGIN_ROOT', 'CODEX_THREAD_ID'],
   },
   // 2b. Codex — medium if OPENAI_API_KEY is set but no Claude signals
   {
@@ -67,37 +67,37 @@ const DETECTION_RULES: DetectionRule[] = [
   {
     adapter: 'copilot',
     confidence: 'high',
-    signals: ['GITHUB_COPILOT_PLUGIN_ROOT'],
+    signals: ['COPILOT_HOME', 'COPILOT_GITHUB_TOKEN'],
   },
   // 5. Cursor
   {
     adapter: 'cursor',
     confidence: 'medium',
-    signals: ['CURSOR_PLUGIN_ROOT'],
+    signals: ['CURSOR_PROJECT_DIR', 'CURSOR_VERSION'],
   },
   // 6. Pi
   {
     adapter: 'pi',
     confidence: 'high',
-    signals: ['PI_EXTENSION_DIR', 'PI_SESSION_ID'],
+    signals: ['PI_PLUGIN_ROOT', 'PI_SESSION_ID'],
   },
   // 7. Oh-My-Pi
   {
     adapter: 'oh-my-pi',
     confidence: 'high',
-    signals: ['OMP_EXTENSION_DIR', 'OMP_SESSION_ID'],
+    signals: ['OMP_PLUGIN_ROOT', 'OMP_SESSION_ID'],
   },
   // 8. OpenCode
   {
     adapter: 'opencode',
     confidence: 'high',
-    signals: ['OPENCODE_PLUGIN_DIR'],
+    signals: ['OPENCODE_CONFIG', 'ACCOMPLISH_TASK_ID'],
   },
   // 9. OpenClaw
   {
     adapter: 'openclaw',
     confidence: 'medium',
-    signals: ['OPENCLAW_PLUGIN_DIR'],
+    signals: ['OPENCLAW_SHELL', 'OPENCLAW_HOME'],
   },
 ];
 

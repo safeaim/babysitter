@@ -1,7 +1,13 @@
 import * as readline from "node:readline";
-import { statSync } from "node:fs";
+import {
+
+  isRetryableEffectError,
+  buildBreakpointResult,
+  invokePromptEffect,
+  invokeAgentHarness,
+} from "./effectsHelpers";
+export { readProcessFileFingerprint } from "./effectsHelpers";
 import { getAdapterByName } from "../../../";
-import { invokeHarness } from "../../../invoker";
 import type { StreamingOutputOptions } from "../../../types";
 import { orchestrateIteration } from "@a5c-ai/babysitter-sdk";
 import {
@@ -10,7 +16,6 @@ import {
   PI_WORKER_TIMEOUT_MS,
   PiSessionHandle,
   YELLOW,
-  compressInternalHarnessPrompt,
   createApprovalAskUserQuestion,
   createAskUserQuestionResponse,
   isInternalHarness,
@@ -45,7 +50,6 @@ export function resolveHarnessSessionIdForBinding(
     process.env.PI_SESSION_ID = process.env.PI_SESSION_ID || orchestrationSession.sessionId;
     process.env.OMP_SESSION_ID = process.env.OMP_SESSION_ID || orchestrationSession.sessionId;
   }
-
   const resolved = adapter.resolveSessionId({});
   if (resolved) {
     return resolved;
@@ -72,7 +76,6 @@ export async function resolveEffect(
   askUserQuestionHandler?: ((params: unknown) => Promise<unknown>) | null,
 ): Promise<ResolveEffectResult> {
   const kind = action.kind;
-
   if (kind === "node" || kind === "orchestrator_task") {
     const meta = action.taskDef?.metadata as Record<string, unknown> | undefined;
     const prompt = typeof meta?.prompt === "string"
@@ -86,7 +89,6 @@ export async function resolveEffect(
       piSession,
     );
   }
-
   if (kind === "shell") {
     const shellDef = action.taskDef?.shell as Record<string, unknown> | undefined;
     const shellMeta = action.taskDef?.metadata as Record<string, unknown> | undefined;
@@ -146,14 +148,12 @@ export async function resolveEffect(
       stderr: shellResult.stderr,
     };
   }
-
   if (kind === "breakpoint") {
     const question = (action.taskDef as Record<string, unknown>)?.question as string | undefined
       ?? action.taskDef?.title
       ?? "Breakpoint reached. Continue?";
     const approvalPrompt = createApprovalAskUserQuestion(question);
     const approvalKey = approvalPrompt.questions[0]?.header ?? "Decision";
-
     if (options.interactive && rl) {
       if (!json) {
         process.stderr.write(`\n${YELLOW}${BOLD}BREAKPOINT ${question}\n`);
@@ -162,18 +162,15 @@ export async function resolveEffect(
       const response = await promptAskUserQuestionWithReadline(rl, approvalPrompt);
       return buildBreakpointResult(response, approvalKey);
     }
-
     if (options.interactive && askUserQuestionHandler) {
       const response = await askUserQuestionHandler(approvalPrompt) as AskUserQuestionResponse;
       return buildBreakpointResult(response, approvalKey);
     }
-
     return buildBreakpointResult(
       createAskUserQuestionResponse(approvalPrompt, { [approvalKey]: "Approve" }),
       approvalKey,
     );
   }
-
   if (kind === "sleep") {
     const targetMs = action.taskDef?.sleep?.targetEpochMs;
     if (typeof targetMs === "number") {
@@ -184,7 +181,6 @@ export async function resolveEffect(
     }
     return { status: "ok", value: { sleptUntil: new Date().toISOString() } };
   }
-
   if (kind === "agent") {
     const prompt = buildAgentPrompt(action.taskDef as unknown as Record<string, unknown>);
     const taskHarness = discovered ? resolveTaskHarness(action, harnessName, discovered) : harnessName;
@@ -212,7 +208,6 @@ export async function resolveEffect(
     }
     return invokeAgentHarness(action, taskHarness, prompt, options);
   }
-
   const fallbackPrompt = action.taskDef?.title ?? `Handle effect ${action.effectId} (kind: ${kind})`;
   return invokePromptEffect(action, harnessName, fallbackPrompt, options, undefined);
 }
@@ -256,10 +251,8 @@ export async function resolveEffectWithRetry(
       askUserQuestionHandler,
     );
   }
-
   let lastResult: ResolveEffectResult | undefined;
   let currentPiSession = piSession;
-
   for (let attempt = 0; attempt <= config.maxRetries; attempt += 1) {
     try {
       lastResult = await resolveEffect(
@@ -298,7 +291,6 @@ export async function resolveEffectWithRetry(
         error: error instanceof Error ? error : new Error(String(error)),
       };
     }
-
     const baseDelay = EFFECT_RETRY_DELAYS_OVERRIDE
       ? (EFFECT_RETRY_DELAYS_OVERRIDE[attempt] ?? 0)
       : Math.min(
@@ -309,7 +301,6 @@ export async function resolveEffectWithRetry(
       ? 0
       : baseDelay * 0.2 * (Math.random() * 2 - 1);
     const delay = Math.max(0, Math.round(baseDelay + jitter));
-
     if (currentPiSession && piSessionFactory) {
       if (disposePiSession) {
         await disposePiSession(currentPiSession);
@@ -322,7 +313,6 @@ export async function resolveEffectWithRetry(
       await new Promise<void>((resolve) => setTimeout(resolve, delay));
     }
   }
-
   return lastResult!;
 }
 
@@ -371,117 +361,3 @@ export async function orchestrateIterationWithProcessLoadRetry(args: {
   }
 }
 
-export function readProcessFileFingerprint(processPath: string): string | undefined {
-  try {
-    const stat = statSync(processPath);
-    return `${stat.size}:${Math.trunc(stat.mtimeMs)}`;
-  } catch {
-    return undefined;
-  }
-}
-
-function isRetryableEffectError(error: unknown): boolean {
-  const message = typeof error === "string"
-    ? error
-    : error instanceof Error
-      ? error.message
-      : String(error);
-  const lower = message.toLowerCase();
-  return (
-    lower.includes("timeout") ||
-    lower.includes("timed out") ||
-    lower.includes("econnreset") ||
-    lower.includes("econnrefused") ||
-    lower.includes("epipe") ||
-    lower.includes("rate limit") ||
-    lower.includes("too many requests") ||
-    lower.includes("server had an error") ||
-    lower.includes("temporarily unavailable") ||
-    lower.includes("please retry") ||
-    lower.includes("killed") ||
-    lower.includes("signal") ||
-    lower.includes("already processing")
-  );
-}
-
-function buildBreakpointResult(
-  response: AskUserQuestionResponse,
-  approvalKey: string,
-): ResolveEffectResult {
-  const option = response.answers[approvalKey] ?? "Reject";
-  return {
-    status: "ok",
-    value: {
-      approved: option === "Approve",
-      option,
-      askUserQuestion: response,
-    },
-  };
-}
-
-async function invokePromptEffect(
-  action: EffectAction,
-  taskHarness: string,
-  prompt: string,
-  options: {
-    workspace?: string;
-    model?: string;
-    compressionConfig?: CompressionConfig | null;
-    streaming?: StreamingOutputOptions;
-  },
-  piSession?: PiSessionHandle | null,
-): Promise<ResolveEffectResult> {
-  if (isInternalHarness(taskHarness) && piSession) {
-    const piResult = await promptPiWithRetry({
-      session: piSession,
-      message: compressInternalHarnessPrompt(prompt, options.compressionConfig, "skill"),
-      timeout: PI_WORKER_TIMEOUT_MS,
-      label: `effect ${action.effectId}`,
-    });
-    return {
-      status: piResult.success ? "ok" : "error",
-      value: piResult.success ? piResult.output : undefined,
-      error: piResult.success ? undefined : new Error(piResult.output),
-      stdout: piResult.output,
-    };
-  }
-  const result = await invokeHarness(taskHarness, {
-    prompt: compressInternalHarnessPrompt(prompt, options.compressionConfig, "skill"),
-    workspace: options.workspace,
-    model: options.model,
-    streaming: options.streaming,
-  });
-  return {
-    status: result.success ? "ok" : "error",
-    value: result.success ? result.output : undefined,
-    error: result.success ? undefined : new Error(result.output),
-    stdout: result.output,
-  };
-}
-
-async function invokeAgentHarness(
-  action: EffectAction,
-  taskHarness: string,
-  prompt: string,
-  options: {
-    workspace?: string;
-    model?: string;
-  },
-): Promise<ResolveEffectResult> {
-  const result = await invokeHarness(taskHarness, {
-    prompt: compressInternalHarnessPrompt(prompt, null, "agent"),
-    workspace: options.workspace,
-    model: options.model,
-  });
-  return {
-    status: result.success ? "ok" : "error",
-    value: result.success
-      ? coerceAgentResultValue(
-        action.taskDef as unknown as Record<string, unknown>,
-        result.output,
-      )
-      : undefined,
-    error: result.success ? undefined : new Error(result.output),
-    stdout: result.output,
-  };
-}

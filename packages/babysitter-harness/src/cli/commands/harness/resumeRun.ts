@@ -1,14 +1,7 @@
 /**
  * resume-run command handler.
- *
  * Uses an agentic Pi session to discover existing runs, present them to the
- * user, assess state, and resume orchestration by delegating to
- * handleHarnessCreateRun.
- *
- * The Pi agent has access to three domain-specific tools
- * (babysitter_list_runs, babysitter_assess_run, babysitter_resume_run) plus
- * the full agentic tool set (read/write/edit/grep/bash/etc.) for ad-hoc
- * inspection of run directories.
+ * user, assess state, and resume orchestration via handleHarnessCreateRun.
  */
 
 import * as path from "node:path";

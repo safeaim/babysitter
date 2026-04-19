@@ -85,7 +85,7 @@ export function parseHookEvent(json: string): UnifiedHookEvent {
     );
   }
 
-  return parsed as UnifiedHookEvent;
+  return parsed;
 }
 
 /**

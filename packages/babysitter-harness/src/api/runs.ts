@@ -13,7 +13,6 @@ import {
   loadJournal,
   orchestrateIteration,
   readRunMetadata,
-  RunFailedError,
   type EffectAction,
   type IterationResult,
   type JournalEvent,

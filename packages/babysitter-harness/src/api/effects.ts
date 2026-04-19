@@ -17,93 +17,18 @@ import { ok, fail, pathExists, buildBaseEffectMap } from "./utils";
 import type { ApiResult } from "./runs";
 import type { JournalEvent, JsonRecord } from "@a5c-ai/babysitter-sdk";
 import type { BaseEffectInfo } from "./utils";
+import type {
+  EffectStatusFilter, EffectStatusOutput, ListEffectsInput, ListEffectsOutput,
+  ShowEffectInput, ShowEffectOutput, CancelEffectInput, CancelEffectOutput,
+  BatchCommitEffectsInput, BatchCommitEffectResult, BatchCommitEffectsOutput,
+} from "./effectsTypes";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-
-type EffectStatusFilter = "requested" | "resolved" | "cancelled";
-type EffectStatusOutput = "requested" | "resolved_ok" | "resolved_error" | "cancelled";
-
-export interface ListEffectsInput {
-  runDir: string;
-  filter?: {
-    kind?: string | string[];
-    status?: EffectStatusFilter;
-  };
-}
-
-export interface EffectSummary {
-  effectId: string;
-  kind?: string;
-  status: EffectStatusOutput;
-  taskId?: string;
-  labels?: string[];
-  requestedAt?: string;
-  resolvedAt?: string;
-}
-
-export interface ListEffectsOutput {
-  effects: EffectSummary[];
-}
-
-export interface ShowEffectInput {
-  runDir: string;
-  effectId: string;
-}
-
-export interface ShowEffectOutput {
-  effectId: string;
-  kind?: string;
-  status: EffectStatusOutput;
-  taskId?: string;
-  labels?: string[];
-  requestedAt?: string;
-  resolvedAt?: string;
-  taskDefinition?: JsonRecord;
-  result?: unknown;
-  autoApproval?: unknown;
-}
-
-export interface CancelEffectInput {
-  runDir: string;
-  effectId: string;
-  reason?: string;
-}
-
-export interface CancelEffectOutput {
-  resultRef: string;
-}
-
-export interface BatchCommitEffectEntry {
-  effectId: string;
-  result: {
-    status: "ok" | "error";
-    value?: unknown;
-    error?: string;
-    stdout?: string;
-    stderr?: string;
-    stdoutRef?: string;
-    stderrRef?: string;
-    startedAt?: string;
-    finishedAt?: string;
-    metadata?: JsonRecord;
-  };
-}
-
-export interface BatchCommitEffectsInput {
-  runDir: string;
-  effects: BatchCommitEffectEntry[];
-}
-
-export interface BatchCommitEffectResult {
-  effectId: string;
-  ok: boolean;
-  resultRef?: string;
-  error?: string;
-}
-
-export interface BatchCommitEffectsOutput {
-  results: BatchCommitEffectResult[];
-}
+// Re-export types for backward compatibility
+export type {
+  EffectStatusFilter, EffectStatusOutput, ListEffectsInput, ListEffectsOutput,
+  ShowEffectInput, ShowEffectOutput, CancelEffectInput, CancelEffectOutput,
+  BatchCommitEffectsInput, BatchCommitEffectResult, BatchCommitEffectsOutput,
+} from "./effectsTypes";
 
 // ── Internal: derive effect status from journal events ─────────────────────
 
@@ -151,15 +76,12 @@ export async function apiListEffects(
     if (!input.runDir) {
       return fail("INVALID_INPUT", "runDir must be a non-empty string");
     }
-
     if (!(await pathExists(input.runDir))) {
       return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
     }
-
     const events = await loadJournal(input.runDir);
     const effectMap = buildEffectInfoMap(events);
     let effects = Array.from(effectMap.values());
-
     // Apply filters
     if (input.filter) {
       if (input.filter.kind !== undefined) {
@@ -180,10 +102,8 @@ export async function apiListEffects(
         });
       }
     }
-
     // Sort by effectId ascending
     effects.sort((a, b) => a.effectId.localeCompare(b.effectId));
-
     return ok({
       effects: effects.map((e) => ({
         effectId: e.effectId,
@@ -211,19 +131,15 @@ export async function apiShowEffect(
     if (!input.effectId) {
       return fail("INVALID_INPUT", "effectId must be a non-empty string");
     }
-
     if (!(await pathExists(input.runDir))) {
       return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
     }
-
     const events = await loadJournal(input.runDir);
     const effectMap = buildEffectInfoMap(events);
     const info = effectMap.get(input.effectId);
-
     if (!info) {
       return fail("EFFECT_NOT_FOUND", `Effect not found: ${input.effectId}`);
     }
-
     // Read task definition (may be missing if the task dir hasn't been created yet)
     let taskDef: JsonRecord | undefined = undefined;
     try {
@@ -231,14 +147,12 @@ export async function apiShowEffect(
     } catch {
       // task.json may not exist yet for freshly-requested effects
     }
-
     // Read result if resolved
     let resultData: unknown = null;
     if (info.status === "resolved_ok" || info.status === "resolved_error") {
       const storedResult = await readTaskResult(input.runDir, input.effectId);
       resultData = storedResult ?? null;
     }
-
     const output: ShowEffectOutput = {
       effectId: info.effectId,
       kind: info.kind,
@@ -250,7 +164,6 @@ export async function apiShowEffect(
       taskDefinition: taskDef,
       result: resultData === null ? undefined : resultData,
     };
-
     // Include autoApproval for breakpoint effects
     if (info.kind === "breakpoint" || info.taskId === "__sdk.breakpoint") {
       if (taskDef && typeof taskDef === "object") {
@@ -260,7 +173,6 @@ export async function apiShowEffect(
         }
       }
     }
-
     return ok(output);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
@@ -278,24 +190,19 @@ export async function apiCancelEffect(
     if (!input.effectId) {
       return fail("INVALID_INPUT", "effectId must be a non-empty string");
     }
-
     if (!(await pathExists(input.runDir))) {
       return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
     }
-
     return await withRunLock(input.runDir, "api:cancelEffect", async () => {
       const events = await loadJournal(input.runDir);
       const effectMap = buildEffectInfoMap(events);
       const info = effectMap.get(input.effectId);
-
       if (!info) {
         return fail<CancelEffectOutput>("EFFECT_NOT_FOUND", `Effect not found: ${input.effectId}`);
       }
-
       if (info.status !== "requested") {
         return fail<CancelEffectOutput>("EFFECT_NOT_PENDING", `Effect ${input.effectId} is not pending (status=${info.status})`);
       }
-
       // Extract taskId and invocationKey from the EFFECT_REQUESTED event
       const requestedEvent = events.find(
         (e) => e.type === "EFFECT_REQUESTED" && (e.data as Record<string, unknown>).effectId === input.effectId,
@@ -303,7 +210,6 @@ export async function apiCancelEffect(
       const eventData = requestedEvent?.data as Record<string, unknown> | undefined;
       const taskId = (eventData?.taskId as string) ?? `task-${input.effectId}`;
       const invocationKey = (eventData?.invocationKey as string) ?? `key-${input.effectId}`;
-
       const { resultRef } = await serializeAndWriteTaskResult({
         runDir: input.runDir,
         effectId: input.effectId,
@@ -316,7 +222,6 @@ export async function apiCancelEffect(
           metadata: { cancelled: true, reason: input.reason },
         },
       });
-
       await appendEvent({
         runDir: input.runDir,
         eventType: "EFFECT_CANCELLED",
@@ -325,7 +230,6 @@ export async function apiCancelEffect(
           reason: input.reason,
         },
       });
-
       return ok({ resultRef });
     });
   } catch (error) {
@@ -347,31 +251,25 @@ export async function apiBatchCommitEffects(
     if (input.effects.length === 0) {
       return fail("INVALID_INPUT", "effects array must not be empty");
     }
-
     if (!(await pathExists(input.runDir))) {
       return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
     }
-
     // Acquire lock once for the entire batch to ensure atomicity
     return await withRunLock(input.runDir, "api:batchCommitEffects", async () => {
       // Load journal once for the entire batch
       let events = await loadJournal(input.runDir);
       const results: BatchCommitEffectResult[] = [];
-
       for (const entry of input.effects) {
         try {
           const requestedEvent = events.find(
             (e) => e.type === "EFFECT_REQUESTED" && (e.data as Record<string, unknown>).effectId === entry.effectId,
           );
-
           if (!requestedEvent) {
             throw new Error(`Unknown effectId ${entry.effectId}`);
           }
-
           const eventData = requestedEvent.data as Record<string, unknown>;
           const taskId = (eventData.taskId as string) ?? `task-${entry.effectId}`;
           const invocationKey = (eventData.invocationKey as string) ?? `key-${entry.effectId}`;
-
           // Check if already resolved
           const alreadyResolved = events.some(
             (e) =>
@@ -381,7 +279,6 @@ export async function apiBatchCommitEffects(
           if (alreadyResolved) {
             throw new Error(`Effect ${entry.effectId} is already resolved`);
           }
-
           const resultPayload = entry.result.status === "ok"
             ? {
                 status: "ok" as const,
@@ -405,7 +302,6 @@ export async function apiBatchCommitEffects(
                 finishedAt: entry.result.finishedAt,
                 metadata: entry.result.metadata,
               };
-
           const { resultRef, stdoutRef, stderrRef } = await serializeAndWriteTaskResult({
             runDir: input.runDir,
             effectId: entry.effectId,
@@ -413,7 +309,6 @@ export async function apiBatchCommitEffects(
             invocationKey,
             payload: resultPayload,
           });
-
           await appendEvent({
             runDir: input.runDir,
             eventType: "EFFECT_RESOLVED",
@@ -427,10 +322,8 @@ export async function apiBatchCommitEffects(
               finishedAt: resultPayload.finishedAt,
             },
           });
-
           // Reload journal so subsequent effects in the batch see this resolution
           events = await loadJournal(input.runDir);
-
           results.push({
             effectId: entry.effectId,
             ok: true,
@@ -445,7 +338,6 @@ export async function apiBatchCommitEffects(
           });
         }
       }
-
       return ok({ results });
     });
   } catch (error) {

@@ -1,5 +1,4 @@
 import * as path from "node:path";
-import * as readline from "node:readline";
 import { buildProcessDefinitionSystemPrompt, buildProcessDefinitionUserPrompt } from "../prompts";
 import {
   DIM,
@@ -10,9 +9,6 @@ import {
   emitProgress,
   writeVerboseBlock,
   writeVerboseLine,
-  type CompressionConfig,
-  type HarnessPromptContext as SessionCreatePromptContext,
-  type OutputMode,
   type PiSessionEvent,
   type PiSessionHandle,
   type PiSessionOptions,
@@ -39,63 +35,26 @@ import {
 } from "./understandIntent";
 import { validateProcessExport } from "./validation";
 
-export async function runPlanProcessPhase(args: {
-  prompt: string;
-  outputDir: string;
-  workspace?: string;
-  model?: string;
-  runsDir: string;
-  maxIterations: number;
-  createRunOnReport?: boolean;
-  interactive: boolean;
-  rl: readline.Interface | null;
-  json: boolean;
-  verbose: boolean;
-  compressionConfig: CompressionConfig | null;
-  promptContext: SessionCreatePromptContext;
-  selectedHarnessName: string;
-  outputMode?: OutputMode;
-}): Promise<ProcessDefinitionReport> {
+export type { RunPlanProcessPhaseArgs } from "./phaseTypes";
+
+export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanProcessPhaseArgs): Promise<ProcessDefinitionReport> {
   const state: { report?: ProcessDefinitionReport } = {};
   const phaseOutputs: string[] = [];
   const sessionRef: { current: PiSessionHandle | null } = { current: null };
   const interactiveUiContext = args.interactive && args.rl
     ? createReadlineAskUserQuestionUiContext(args.rl)
     : undefined;
-  const writeVerbose = (message: string): void => {
-    writeVerboseLine(args.verbose, args.json, message, args.outputMode);
-  };
-  const writeVerboseData = (label: string, value: unknown, maxChars?: number): void => {
-    writeVerboseBlock(args.verbose, args.json, label, value, maxChars, args.outputMode);
-  };
-
+  const writeVerbose = (message: string): void => writeVerboseLine(args.verbose, args.json, message, args.outputMode);
+  const writeVerboseData = (label: string, value: unknown, maxChars?: number): void => writeVerboseBlock(args.verbose, args.json, label, value, maxChars, args.outputMode);
   const mergedCustomTools = createPlanProcessTools({
-    prompt: args.prompt,
-    outputDir: args.outputDir,
-    workspace: args.workspace,
-    model: args.model,
-    runsDir: args.runsDir,
-    maxIterations: args.maxIterations,
-    createRunOnReport: args.createRunOnReport,
-    interactive: args.interactive,
-    rl: args.rl,
-    json: args.json,
-    verbose: args.verbose,
-    outputMode: args.outputMode,
-    selectedHarnessName: args.selectedHarnessName,
-    state,
-    phaseOutputs,
-    sessionRef,
-    writeVerboseData,
+    ...args, state, phaseOutputs, sessionRef, writeVerboseData,
   });
-
   emitProgress(
     { phase: "1", status: "started", harness: "internal (agentic)" },
     args.json,
     args.verbose,
     args.outputMode,
   );
-
   writeVerbose(
     `[phasePlanProcess setup] workspace=${path.resolve(args.workspace ?? process.cwd())} model=${args.model ?? "(default)"} outputDir=${path.resolve(args.outputDir)}`,
   );
@@ -108,7 +67,6 @@ export async function runPlanProcessPhase(args: {
   );
   const workspaceAssessment = await assessWorkspaceForExternalAuthoring(args.workspace);
   writeVerboseData("phasePlanProcess workspace assessment", workspaceAssessment);
-
   const processDefinitionSystemPrompt = await buildProcessDefinitionSystemPrompt(
     args.outputDir,
     args.promptContext,
@@ -134,7 +92,6 @@ export async function runPlanProcessPhase(args: {
     workspaceAssessment.kind === "empty"
       ? "default"
       : "coding";
-
   sessionRef.current = createPiSession({
     workspace: args.workspace,
     model: args.model,
@@ -146,7 +103,6 @@ export async function runPlanProcessPhase(args: {
     isolated: true,
     ephemeral: true,
   });
-
   try {
     await sessionRef.current.initialize();
     let unsubscribe: (() => void) | null = null;
@@ -161,7 +117,6 @@ export async function runPlanProcessPhase(args: {
         }
       });
     }
-
     emitProgress(
       { phase: "1", status: "intent", answer: "Analyzing the user request and relevant workspace context." },
       args.json,
@@ -178,13 +133,11 @@ export async function runPlanProcessPhase(args: {
     phaseOutputs.push(intentResult.output);
     writeVerboseData("phaseUnderstandIntent output", intentResult.output);
     writeVerboseData("phaseUnderstandIntent handoff", intentResult.handoffSummary);
-
     const planProcessPrompt = appendIntentHandoffToPlanPrompt(
       basePlanProcessPrompt,
       intentResult.output,
     );
     writeVerboseData("phasePlanProcess prompt", planProcessPrompt);
-
     emitProgress(
       { phase: "1", status: "planning", answer: "Authoring the process definition and preparing the run." },
       args.json,
@@ -194,7 +147,6 @@ export async function runPlanProcessPhase(args: {
     if (!args.json && args.outputMode !== "tui") {
       process.stderr.write(`${DIM}PhasePlanProcess agent is authoring the process...${RESET}\n`);
     }
-
     const result = await promptPhaseSession({
       session: sessionRef.current,
       message: planProcessPrompt,
@@ -204,14 +156,12 @@ export async function runPlanProcessPhase(args: {
       writeVerboseData,
     });
     phaseOutputs.push(result.output);
-
     if (unsubscribe) {
       unsubscribe();
     }
     if (!args.json && args.outputMode !== "tui") {
       process.stderr.write("\n");
     }
-
     if (!result.success) {
       writeVerboseData("phasePlanProcess agent failure output", result.output);
       const recovered = await recoverReportedProcessDefinition({
@@ -233,7 +183,6 @@ export async function runPlanProcessPhase(args: {
     } else {
       writeVerboseData("phasePlanProcess agent output", result.output);
     }
-
     if (!state.report?.processPath) {
       writeVerboseProcessDefinitionRecovery(args.json);
       const recoveryPrompt = [
@@ -274,7 +223,6 @@ export async function runPlanProcessPhase(args: {
         writeVerboseData("phasePlanProcess recovery output", recovery.output);
       }
     }
-
     if (!state.report?.processPath) {
       writeVerbose("[phasePlanProcess recovery] attempting host-side recovery from agent outputs");
       await recoverReportedProcessDefinition({
@@ -286,7 +234,6 @@ export async function runPlanProcessPhase(args: {
         json: args.json,
       });
     }
-
     if (!state.report?.processPath) {
       const finalRecoveryPrompt = [
         "Final recovery step:",
@@ -336,7 +283,6 @@ export async function runPlanProcessPhase(args: {
         json: args.json,
       });
     }
-
     if (!state.report?.processPath) {
       writeVerboseData("phasePlanProcess unrecoverable outputs", phaseOutputs);
       throw new BabysitterRuntimeError(
@@ -345,7 +291,6 @@ export async function runPlanProcessPhase(args: {
         { category: ErrorCategory.Runtime },
       );
     }
-
     await waitForProcessFile(state.report.processPath);
     writeVerbose(`[phasePlanProcess validate] validating process export from ${path.resolve(state.report.processPath)}`);
     for (let repairAttempt = 0; repairAttempt < 3; repairAttempt += 1) {
@@ -386,7 +331,6 @@ export async function runPlanProcessPhase(args: {
         await waitForProcessFile(state.report.processPath);
       }
     }
-
     if (args.createRunOnReport !== false && (!state.report.runId || !state.report.runDir)) {
       const runState = await createRunAndMaybeBindFromProcessDefinition({
         processPath: state.report.processPath,
@@ -405,14 +349,12 @@ export async function runPlanProcessPhase(args: {
         conversationSummary: buildPhaseConversationSummary(phaseOutputs),
       };
     }
-
     if (state.report) {
       state.report = {
         ...state.report,
         conversationSummary: buildPhaseConversationSummary(phaseOutputs),
       };
     }
-
     emitProgress(
       {
         phase: "1",
@@ -424,7 +366,6 @@ export async function runPlanProcessPhase(args: {
       args.verbose,
       args.outputMode,
     );
-
     return state.report;
   } catch (error: unknown) {
     writeVerboseData(

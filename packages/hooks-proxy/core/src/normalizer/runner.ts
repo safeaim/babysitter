@@ -60,7 +60,7 @@ function getEffectivePolicy(
   }
   // Explicit override
   if (options?.errorPolicies?.[phase] != null) {
-    return options.errorPolicies[phase]!;
+    return options.errorPolicies[phase];
   }
   // Default policy option
   if (options?.defaultPolicy != null) {

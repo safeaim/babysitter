@@ -9,10 +9,6 @@
  * Last verified: 2026-04-05
  */
 
-// ============================================================================
-// Event-level types
-// ============================================================================
-
 /**
  * Token/cost data for a single API interaction (assistant message).
  *
@@ -60,10 +56,6 @@ export interface CostEventData {
   timestamp?: string;
 }
 
-// ============================================================================
-// Aggregation types
-// ============================================================================
-
 /** Per-model cost aggregation within a run. */
 export interface ModelCostStats {
   model: string;
@@ -109,10 +101,6 @@ export interface AggregateCostStats {
   overallCostUsd: number;
   runs: RunCostStats[];
 }
-
-// ============================================================================
-// Pricing model
-// ============================================================================
 
 /** Per-million-token pricing for a single model. All values in USD. */
 export interface ModelPricing {
@@ -291,10 +279,6 @@ export const MODEL_PRICING_EXTENDED: Record<string, ModelPricingExtended> = {
   },
 };
 
-// ============================================================================
-// Cost calculation
-// ============================================================================
-
 /**
  * Resolve pricing for a model identifier.
  *
@@ -385,10 +369,6 @@ export function calculateCostUsdExtended(
 
   return Math.round(cost * 1_000_000) / 1_000_000;
 }
-
-// ============================================================================
-// CLI options
-// ============================================================================
 
 /** Options for the cost:stats CLI command. */
 export interface CostStatsOptions {

@@ -24,7 +24,7 @@ import * as readline from "node:readline";
  */
 export interface AmuxInteractionEvent {
   /** Event type discriminator. */
-  type: "approval_response" | "input_response" | string;
+  type: string;
   /** Interaction ID this response corresponds to. */
   id: string;
   /** The response payload (varies by type). */
@@ -71,8 +71,8 @@ export function createAmuxStdinReader(): AsyncIterable<AmuxInteractionEvent> {
       }
 
       yield {
-        type: parsed["type"] as string,
-        id: parsed["id"] as string,
+        type: parsed["type"],
+        id: parsed["id"],
         response: parsed["response"],
         approved: typeof parsed["approved"] === "boolean" ? parsed["approved"] : undefined,
       };

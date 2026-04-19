@@ -49,11 +49,9 @@ export class PiSessionHandle {
   private session: PiAgentSession | null = null;
   private initPromise: Promise<void> | null = null;
   private readonly cleanupTasks: Array<() => Promise<void> | void> = [];
-
   constructor(options: PiSessionOptions = {}) {
     this.options = options;
   }
-
   /**
    * Initialize the underlying AgentSession.
    *
@@ -66,14 +64,12 @@ export class PiSessionHandle {
       await this.initPromise;
       return;
     }
-
     this.initPromise = this.doInitialize().catch((err: unknown) => {
       this.initPromise = null;
       throw err;
     });
     await this.initPromise;
   }
-
   /**
    * Send a prompt to the Pi agent and wait for completion.
    *
@@ -85,14 +81,12 @@ export class PiSessionHandle {
     const session = this.requireSession();
     const effectiveTimeout = timeout ?? this.options.timeout ?? DEFAULT_TIMEOUT_MS;
     const start = Date.now();
-
     return new Promise<PiPromptResult>((resolve, reject) => {
       let settled = false;
       let timer: ReturnType<typeof setTimeout> | undefined;
       let agentEndGraceTimer: ReturnType<typeof setTimeout> | undefined;
       let agentEndResult: PiPromptResult | null = null;
       let promptSettled = false;
-
       const finishWithResult = (result: PiPromptResult): void => {
         if (settled) return;
         settled = true;
@@ -100,7 +94,6 @@ export class PiSessionHandle {
         if (agentEndGraceTimer) clearTimeout(agentEndGraceTimer);
         resolve(result);
       };
-
       const finishWithPromptError = (err: unknown): void => {
         if (settled) return;
         settled = true;
@@ -114,7 +107,6 @@ export class PiSessionHandle {
           success: false,
         });
       };
-
       // Set up timeout
       if (effectiveTimeout > 0) {
         timer = setTimeout(() => {
@@ -131,17 +123,14 @@ export class PiSessionHandle {
           );
         }, effectiveTimeout);
       }
-
       // Subscribe to events to detect completion
       const unsubscribe = session.subscribe((event: PiSessionEvent) => {
         if (settled) return;
-
         if (event.type === "agent_end") {
           const messages = Array.isArray((event as { messages?: unknown[] }).messages)
             ? (event as { messages?: unknown[] }).messages
             : undefined;
           unsubscribe();
-
           const assistantFailure = extractAssistantFailure(messages);
           const assistantText = session.getLastAssistantText();
           const output = assistantText && assistantText.trim().length > 0
@@ -164,7 +153,6 @@ export class PiSessionHandle {
           }, AGENT_END_PROMPT_SETTLE_GRACE_MS);
         }
       });
-
       // Fire the prompt — errors are caught and resolved as failures
       session.prompt(text)
         .then(() => {
@@ -184,7 +172,6 @@ export class PiSessionHandle {
         });
     });
   }
-
   /**
    * Steer the running agent with an instruction.
    *
@@ -195,15 +182,11 @@ export class PiSessionHandle {
     const session = this.requireSession();
     await session.steer(text);
   }
-
-  /**
-   * Queue a follow-up message for after the current turn completes.
-   */
+  /** Queue a follow-up message for after the current turn completes. */
   async followUp(text: string): Promise<void> {
     const session = this.requireSession();
     await session.followUp(text);
   }
-
   /**
    * Subscribe to session events.
    *
@@ -213,10 +196,7 @@ export class PiSessionHandle {
     const session = this.requireSession();
     return session.subscribe(listener);
   }
-
-  /**
-   * Execute a bash command through the agent's sandbox.
-   */
+  /** Execute a bash command through the agent's sandbox. */
   async executeBash(
     command: string,
     onChunk?: (chunk: string) => void,
@@ -230,19 +210,13 @@ export class PiSessionHandle {
       cancelled: result.cancelled,
     };
   }
-
-  /**
-   * Abort the current prompt execution.
-   */
+  /** Abort the current prompt execution. */
   async abort(): Promise<void> {
     if (this.session) {
       await this.session.abort();
     }
   }
-
-  /**
-   * Dispose of the session and release resources.
-   */
+  /** Dispose of the session and release resources. */
   dispose(): void {
     if (this.session) {
       const session = this.session;
@@ -260,36 +234,29 @@ export class PiSessionHandle {
       }
     }
   }
-
   /** The underlying pi session ID, if initialized. */
   get sessionId(): string | undefined {
     return this.session?.sessionId;
   }
-
   /** Whether the session is currently streaming a response. */
   get isStreaming(): boolean {
     return this.session?.isStreaming ?? false;
   }
-
   /** Whether the session has been initialized. */
   get isInitialized(): boolean {
     return this.session !== null;
   }
-
   // ---------------------------------------------------------------------------
   // Internal helpers
   // ---------------------------------------------------------------------------
-
   private async doInitialize(): Promise<void> {
     const mod = await loadPiModule();
-
     // Bridge common Azure env var aliases that pi-coding-agent doesn't know
     // about.  Pi expects AZURE_OPENAI_RESOURCE_NAME; the user's profile may
     // set AZURE_OPENAI_PROJECT_NAME instead.
     configureAzureOpenAiEnvDefaults(
       typeof this.options.model === "string" ? this.options.model : undefined,
     );
-
     const createOpts: Record<string, unknown> = {};
     const cwd = this.options.workspace ?? process.cwd();
     const compressionConfig = loadCompressionConfigSafe(cwd);
@@ -303,7 +270,6 @@ export class PiSessionHandle {
     if (this.options.ephemeral) {
       createOpts.sessionManager = mod.SessionManager.inMemory();
     }
-
     const secureBashBackend = this.options.toolsMode === "coding" || this.options.toolsMode === "readonly"
       ? await createSecureBashBackend({
         workspace: cwd,
@@ -320,7 +286,6 @@ export class PiSessionHandle {
         },
       }
       : undefined;
-
     if (this.options.toolsMode === "coding") {
       createOpts.tools = mod.createCodingTools
         ? mod.createCodingTools(cwd, toolOptions)
@@ -330,13 +295,11 @@ export class PiSessionHandle {
         ? mod.createReadOnlyTools(cwd, toolOptions)
         : mod.readOnlyTools;
     }
-
     const appendedSystemPrompt = [
       ...discoverRepoInstructionPrompts(cwd),
       ...(this.options.appendSystemPrompt ?? []),
       ...(secureBashBackend ? [secureBashBackend.promptNote] : []),
     ];
-
     if (
       this.options.systemPrompt ||
       appendedSystemPrompt.length > 0 ||
@@ -376,7 +339,6 @@ export class PiSessionHandle {
         createOpts.resourceLoader = resourceLoader;
       }
     }
-
     // Resolve model string to a model object from pi's ModelRegistry.
     // The `createAgentSession` API expects a model object (with provider,
     // api, baseUrl, etc.), not a plain string.  We accept formats:
@@ -389,7 +351,6 @@ export class PiSessionHandle {
       }
       // If not resolved, let createAgentSession handle default model selection
     }
-
     try {
       const { session } = await mod.createAgentSession(createOpts);
       if (this.options.uiContext && typeof session.bindExtensions === "function") {
@@ -406,7 +367,6 @@ export class PiSessionHandle {
       throw error;
     }
   }
-
   private requireSession(): PiAgentSession {
     if (!this.session) {
       throw new BabysitterRuntimeError(

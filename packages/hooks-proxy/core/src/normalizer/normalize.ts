@@ -1,4 +1,4 @@
-import type { CanonicalPhase, PhaseMapping, SupportLevel } from '../types/lifecycle';
+import type { CanonicalPhase, PhaseMapping } from '../types/lifecycle';
 import type { UnifiedHookEvent, UnifiedExecutionContext } from '../types/event';
 import { NormalizationError } from './errors';
 

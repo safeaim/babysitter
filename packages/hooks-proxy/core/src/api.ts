@@ -7,7 +7,7 @@
 import type { UnifiedHookEvent } from './types/event';
 import type { UnifiedHookResult } from './types/result';
 import type { AdapterCapabilities } from './types/adapter';
-import type { HookPlanEntry, HandlerRef } from './types/plan';
+import type { HookPlanEntry } from './types/plan';
 import { mergeResults, type MergedExecutionResult } from './merge-engine';
 
 /**

@@ -1,5 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { createAgenticToolDefinitions } from "../../../agenticTools";
+import { buildBreakpointEffectResult } from "./internalToolsHelpers";
 import {
   commitEffectResult,
   createPiContext,
@@ -9,8 +10,6 @@ import {
   BabysitterRuntimeError,
   ErrorCategory,
   askUserQuestionViaTool,
-  createApprovalAskUserQuestion,
-  createAskUserQuestionResponse,
   formatToolResult,
   type AskUserQuestionRequest,
   type OrchestrationState,
@@ -19,7 +18,7 @@ import {
 import { assessRun } from "../resumeState";
 import { runDelegatedHarnessTask } from "../planProcess";
 import { orchestrateIterationWithProcessLoadRetry } from "./effects";
-import { applyExplicitEffectResult, coerceStatus, type PendingEffectResult } from "./taskResult";
+import { applyExplicitEffectResult, coerceStatus } from "./taskResult";
 import type {
   OrchestrationWriteVerbose,
   OrchestrationWriteVerboseData,
@@ -61,7 +60,6 @@ export function createOrchestrationTools(args: {
     createTaskPostResultTool(args),
     createFinishOrchestrationTool(args),
   ];
-
   const orchestrationAgenticTools = createAgenticToolDefinitions({
     workspace: args.phaseArgs.workspace ?? process.cwd(),
     interactive: args.phaseArgs.interactive ?? false,
@@ -108,14 +106,12 @@ export function createOrchestrationTools(args: {
       return delegated;
     },
   });
-
   const mergedTools = wrapToolExecute(
     [...customTools, ...orchestrationAgenticTools],
     args.writeVerbose,
   );
   const tools = mergedTools as OrchestrationNamedTool[];
   const finishTool = tools.find((tool) => tool.name === "babysitter_finish_orchestration");
-
   return {
     mergedTools,
     finishTool,
@@ -169,7 +165,6 @@ function createRunIterateTool(args: {
         };
         return formatToolResult(args.state.lastIterationResult, "Iteration limit reached.");
       }
-
       args.state.iteration += 1;
       args.state.pendingActions.clear();
       args.state.pendingEffectResults.clear();
@@ -184,7 +179,6 @@ function createRunIterateTool(args: {
           args.state.pendingActions.set(action.effectId, action);
         }
       }
-
       let processErrorExtra: Record<string, unknown> = {};
       if (result.status === "process-error") {
         args.state.iteration -= 1;
@@ -196,7 +190,6 @@ function createRunIterateTool(args: {
           ),
         };
       }
-
       return formatToolResult(
         { iteration: args.state.iteration, ...result, ...processErrorExtra },
         result.status === "process-error"
@@ -246,7 +239,6 @@ function createTaskPostResultTool(args: {
           { category: ErrorCategory.Validation },
         );
       }
-
       const startedAt = new Date().toISOString();
       let effectResult = args.state.pendingEffectResults.get(effectId);
       const status = coerceStatus(params.status);
@@ -268,7 +260,6 @@ function createTaskPostResultTool(args: {
           { category: ErrorCategory.Runtime },
         );
       }
-
       const finishedAt = new Date().toISOString();
       await commitEffectResult({
         runDir: args.state.runDir,
@@ -289,7 +280,6 @@ function createTaskPostResultTool(args: {
       if (action.kind === "breakpoint") {
         args.state.lastAskUserQuestionResponse = undefined;
       }
-
       return formatToolResult({ effectId, status: effectResult.status }, "Task result posted.");
     },
   };
@@ -336,7 +326,6 @@ function createFinishOrchestrationTool(args: {
           "The run has not been created yet.",
         );
       }
-
       const assessed = await assessRun(args.state.runDir);
       if (assessed.run.status !== "completed" && assessed.run.status !== "failed") {
         const lastStatus = args.state.lastIterationResult?.status;
@@ -358,7 +347,6 @@ function createFinishOrchestrationTool(args: {
           "The active run is not terminal yet.",
         );
       }
-
       args.state.finished = {
         summary: typeof params.summary === "string" ? params.summary : undefined,
       };
@@ -395,35 +383,4 @@ function wrapToolExecute(
   });
 }
 
-function buildBreakpointEffectResult(
-  args: {
-    phaseArgs: RunOrchestrationPhaseArgs;
-    state: OrchestrationState;
-  },
-  action: OrchestrationState["pendingActions"] extends Map<string, infer T> ? T : never,
-): PendingEffectResult {
-  if (args.phaseArgs.interactive && !args.state.lastAskUserQuestionResponse) {
-    throw new BabysitterRuntimeError(
-      "InteractiveBreakpointDecisionMissing",
-      "Interactive breakpoint results require AskUserQuestion before babysitter_task_post_result.",
-      { category: ErrorCategory.Runtime },
-    );
-  }
-  const question = (action.taskDef as Record<string, unknown>)?.question as string | undefined
-    ?? action.taskDef?.title
-    ?? "Breakpoint reached. Continue?";
-  const askResponse = args.state.lastAskUserQuestionResponse
-    ?? createAskUserQuestionResponse(
-      createApprovalAskUserQuestion(question),
-      { Decision: "Approve" },
-    );
-  const option = askResponse.answers.Decision ?? "Approve";
-  return {
-    status: "ok" as const,
-    value: {
-      approved: option === "Approve",
-      option,
-      askUserQuestion: askResponse,
-    },
-  };
-}
+// buildBreakpointEffectResult extracted to internalToolsHelpers.ts

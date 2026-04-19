@@ -110,19 +110,15 @@ export async function apiListBreakpoints(
     if (!input.runDir) {
       return fail("INVALID_INPUT", "runDir must be a non-empty string");
     }
-
     if (!(await pathExists(input.runDir))) {
       return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
     }
-
     const events = await loadJournal(input.runDir);
     const effectMap = buildBaseEffectMap(events);
-
     const breakpoints: BreakpointSummary[] = [];
     for (const info of effectMap.values()) {
       if (!isBreakpointEffect(info)) continue;
       if (info.lifecycle !== "requested") continue;
-
       // Read task definition to extract breakpoint-specific fields
       let taskDef: JsonRecord | undefined;
       try {
@@ -130,7 +126,6 @@ export async function apiListBreakpoints(
       } catch {
         // task.json may not exist
       }
-
       const td = taskDef as Record<string, unknown> | undefined;
       breakpoints.push({
         effectId: info.effectId,
@@ -143,7 +138,6 @@ export async function apiListBreakpoints(
         requestedAt: info.requestedAt,
       });
     }
-
     return ok({ breakpoints });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
@@ -161,23 +155,18 @@ export async function apiShowBreakpoint(
     if (!input.effectId) {
       return fail("INVALID_INPUT", "effectId must be a non-empty string");
     }
-
     if (!(await pathExists(input.runDir))) {
       return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
     }
-
     const events = await loadJournal(input.runDir);
     const effectMap = buildBaseEffectMap(events);
     const info = effectMap.get(input.effectId);
-
     if (!info) {
       return fail("EFFECT_NOT_FOUND", `Effect not found: ${input.effectId}`);
     }
-
     if (!isBreakpointEffect(info)) {
       return fail("EFFECT_NOT_BREAKPOINT", `Effect ${input.effectId} is not a breakpoint (kind=${info.kind})`);
     }
-
     // Read task definition
     let taskDef: JsonRecord | undefined;
     try {
@@ -185,7 +174,6 @@ export async function apiShowBreakpoint(
     } catch {
       // task.json may not exist
     }
-
     // Read result if resolved
     let resultData: unknown = undefined;
     if (info.lifecycle === "resolved") {
@@ -196,9 +184,7 @@ export async function apiShowBreakpoint(
         // result.json may be missing/corrupt
       }
     }
-
     const td = taskDef as Record<string, unknown> | undefined;
-
     const output: ShowBreakpointOutput = {
       effectId: info.effectId,
       status: info.lifecycle,
@@ -216,7 +202,6 @@ export async function apiShowBreakpoint(
       requestedAt: info.requestedAt,
       resolvedAt: info.resolvedAt,
     };
-
     return ok(output);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
@@ -238,31 +223,24 @@ export async function apiRespondToBreakpoint(
     if (input.approved === false && (!input.feedback || input.feedback.trim() === "")) {
       return fail("INVALID_INPUT", "feedback is required when rejecting a breakpoint (approved=false)");
     }
-
     if (!(await pathExists(input.runDir))) {
       return fail("RUN_NOT_FOUND", `Run directory not found: ${input.runDir}`);
     }
-
     return await withRunLock(input.runDir, "api:respondToBreakpoint", async () => {
       const events = await loadJournal(input.runDir);
       const effectMap = buildBaseEffectMap(events);
       const info = effectMap.get(input.effectId);
-
       if (!info) {
         return fail<{ resultRef: string }>("EFFECT_NOT_FOUND", `Effect not found: ${input.effectId}`);
       }
-
       if (!isBreakpointEffect(info)) {
         return fail<{ resultRef: string }>("EFFECT_NOT_BREAKPOINT", `Effect ${input.effectId} is not a breakpoint (kind=${info.kind})`);
       }
-
       if (info.lifecycle !== "requested") {
         return fail<{ resultRef: string }>("EFFECT_NOT_PENDING", `Breakpoint ${input.effectId} is not pending (status=${info.lifecycle})`);
       }
-
       const taskId = info.taskId ?? `task-${input.effectId}`;
       const invocationKey = info.invocationKey ?? `key-${input.effectId}`;
-
       // Build breakpoint result value
       const breakpointResult: Record<string, unknown> = {
         approved: input.approved,
@@ -271,7 +249,6 @@ export async function apiRespondToBreakpoint(
       if (input.feedback !== undefined) breakpointResult.feedback = input.feedback;
       if (input.option !== undefined) breakpointResult.option = input.option;
       if (input.respondedBy !== undefined) breakpointResult.respondedBy = input.respondedBy;
-
       const { resultRef } = await serializeAndWriteTaskResult({
         runDir: input.runDir,
         effectId: input.effectId,
@@ -282,7 +259,6 @@ export async function apiRespondToBreakpoint(
           result: breakpointResult,
         },
       });
-
       await appendEvent({
         runDir: input.runDir,
         eventType: "EFFECT_RESOLVED",
@@ -292,7 +268,6 @@ export async function apiRespondToBreakpoint(
           resultRef,
         },
       });
-
       // GAP-SEC-003: Fire on-permission-denied hook when breakpoint is denied
       if (!input.approved) {
         const td = await readTaskDefinition(input.runDir, input.effectId).catch(() => undefined);
@@ -314,7 +289,6 @@ export async function apiRespondToBreakpoint(
           cwd: input.runDir,
         }).catch(() => { /* fire-and-forget */ });
       }
-
       return ok({ resultRef });
     });
   } catch (error) {
@@ -349,7 +323,6 @@ export async function apiAddAutoApprovalRule(
     if (!input.createdBy) {
       return fail("INVALID_INPUT", "createdBy must be a non-empty string");
     }
-
     const rule: BreakpointRule = {
       id: input.id ?? crypto.randomUUID(),
       pattern: input.pattern,
@@ -359,7 +332,6 @@ export async function apiAddAutoApprovalRule(
       source: input.source,
       note: input.note,
     };
-
     const rules = await addRule(rule, input.rulesPath);
     return ok({ rule, rules });
   } catch (error) {
@@ -375,14 +347,12 @@ export async function apiRemoveAutoApprovalRule(
     if (!input.ruleId) {
       return fail("INVALID_INPUT", "ruleId must be a non-empty string");
     }
-
     // Check if rule exists before removing
     const existingRules = await readRules(input.rulesPath);
     const ruleExists = existingRules.some((r) => r.id === input.ruleId);
     if (!ruleExists) {
       return fail("RULE_NOT_FOUND", `Rule not found: ${input.ruleId}`);
     }
-
     const rules = await removeRule(input.ruleId, input.rulesPath);
     return ok({ rules });
   } catch (error) {
@@ -398,9 +368,7 @@ export async function apiEvaluateAutoApproval(
     if (!input.breakpointId) {
       return fail("INVALID_INPUT", "breakpointId must be a non-empty string");
     }
-
     const rules = await readRules(input.rulesPath);
-
     const result = evaluateAutoApprovalCore({
       breakpointId: input.breakpointId,
       tags: input.tags,
@@ -410,7 +378,6 @@ export async function apiEvaluateAutoApproval(
       consecutiveApprovals: input.consecutiveApprovals,
       autoApproveAfterN: input.autoApproveAfterN,
     });
-
     return ok(result);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

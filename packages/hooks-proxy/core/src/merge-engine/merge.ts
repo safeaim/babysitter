@@ -11,7 +11,6 @@ import {
   type MergeDiagnostics,
   createDiagnostics,
   recordConflict,
-  recordDegradedField,
 } from './diagnostics';
 
 // ---------------------------------------------------------------------------
@@ -19,60 +18,27 @@ import {
 // ---------------------------------------------------------------------------
 
 export interface MergeOptions {
-  conflictPolicy?:
-    | 'last-writer-wins'
-    | 'fail-on-conflict'
-    | 'protected-prefixes'
-    | 'namespace-required';
+  conflictPolicy?: 'last-writer-wins' | 'fail-on-conflict' | 'protected-prefixes' | 'namespace-required';
   protectedPrefixes?: string[];
   systemMessageStrategy?: 'concatenate' | 'keep-first';
 }
 
-/** Decision values ordered from most to least restrictive. */
 export type DecisionVerb = 'deny' | 'ask' | 'allow' | 'continue' | 'noop';
 
-/**
- * The merged output produced by {@link mergeResults}.
- *
- * Fields follow the merge rules documented in the spec:
- * - persistEnv / contextVars: key-wise merge respecting conflict policy
- * - unsetEnv: union
- * - additionalContext / reason: concatenate
- * - systemMessage: concatenate or keep-first
- * - decision: most restrictive wins
- * - toolMutation: single mutating writer only
- * - continueSession: false dominates
- * - stopReason: first non-empty if stopping, else concatenate
- * - metadata: deep merge
- */
 export interface MergedExecutionResult {
-  /** Merged decision verb. */
   decision: DecisionVerb;
-  /** Merged reason string (concatenated). */
   reason: string;
-  /** Environment variables to persist. */
   persistEnv: Record<string, string>;
-  /** Environment variables to unset (union). */
   unsetEnv: string[];
-  /** Merged context variables. */
   contextVars: Record<string, string>;
-  /** Concatenated additional context. */
   additionalContext: string;
-  /** System message (concatenated or first). */
   systemMessage: string;
-  /** Merged tool mutation (only one writer allowed). */
   toolMutation?: { mode: 'replace' | 'patch'; value: unknown };
-  /** Whether to continue the session (false dominates). */
   continueSession: boolean;
-  /** Stop reason string. */
   stopReason: string;
-  /** Whether to suppress output. */
   suppressOutput: boolean;
-  /** Follow-up message. */
   followUpMessage: string;
-  /** Deep-merged metadata. */
   metadata: Record<string, unknown>;
-  /** Merge diagnostics. */
   diagnostics: MergeDiagnostics;
 }
 

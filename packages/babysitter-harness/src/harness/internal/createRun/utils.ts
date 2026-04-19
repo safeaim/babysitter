@@ -6,10 +6,6 @@
 import { Type } from "@sinclair/typebox";
 import {
   detectCallerHarness,
-  discoverHarnesses,
-  BabysitterRuntimeError,
-  ErrorCategory,
-  type CompressionConfig,
   type EffectAction,
   type IterationResult,
 } from "@a5c-ai/babysitter-sdk";

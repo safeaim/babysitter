@@ -38,7 +38,7 @@ export async function loadSession(
   }
 
   try {
-    const envelope: SessionEnvelope = JSON.parse(raw);
+    const envelope = JSON.parse(raw) as SessionEnvelope;
     return envelope.session;
   } catch {
     // Corruption detected -- back up and return null

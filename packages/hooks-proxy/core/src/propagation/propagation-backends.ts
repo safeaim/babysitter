@@ -32,7 +32,7 @@ export async function propagateEnv(
       break;
     default: {
       const _exhaustive: never = backend;
-      throw new Error(`Unknown propagation backend: ${_exhaustive}`);
+      throw new Error(`Unknown propagation backend: ${String(_exhaustive)}`);
     }
   }
 }

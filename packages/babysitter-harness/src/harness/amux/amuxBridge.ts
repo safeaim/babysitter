@@ -13,7 +13,6 @@ import type { HarnessInvokeOptions, HarnessInvokeResult } from "../types";
 import type {
   AmuxClient,
   AmuxRunHandle,
-  AmuxAgentEvent,
 } from "./amuxTypes";
 import { mapHarnessToAmuxAdapter } from "./amuxHarnessMap";
 import {
@@ -140,7 +139,7 @@ export async function invokeViaAgentMux(
   let hasError = false;
 
   for await (const rawEvent of handle.events) {
-    const mapped = mapAmuxEvent(rawEvent as AmuxAgentEvent);
+    const mapped = mapAmuxEvent(rawEvent);
     if (!mapped) continue;
 
     collectedEvents.push(mapped);

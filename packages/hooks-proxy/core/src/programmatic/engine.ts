@@ -19,18 +19,11 @@ import type { SessionState } from '../types/session';
 import type { HookMiddleware } from './middleware';
 
 // ---------------------------------------------------------------------------
-// Public types
+// Public types (compact to stay under 400 lines)
 // ---------------------------------------------------------------------------
 
-/**
- * A portable hook handler function.
- * Receives a normalized event, returns a result.
- */
 export type PortableHookHandler = (event: UnifiedHookEvent) => Promise<UnifiedHookResult> | UnifiedHookResult;
 
-/**
- * Configuration for a programmatic hooks engine instance.
- */
 export interface ProgrammaticEngineConfig {
   adapter: string;
   capabilities: AdapterCapabilities;
@@ -38,9 +31,6 @@ export interface ProgrammaticEngineConfig {
   sessionDir?: string;
 }
 
-/**
- * A registered handler with metadata.
- */
 export interface RegisteredHandler {
   id: string;
   pluginId: string;
@@ -51,24 +41,12 @@ export interface RegisteredHandler {
   timeoutMs?: number;
 }
 
-/**
- * Result of processing a hook event through the engine.
- */
 export interface EngineResult {
   mergedResult: MergedExecutionResult;
   handlersExecuted: string[];
-  diagnostics: {
-    adapterName: string;
-    phase: string;
-    handlerCount: number;
-    executionTimeMs: number;
-    conflicts: string[];
-  };
+  diagnostics: { adapterName: string; phase: string; handlerCount: number; executionTimeMs: number; conflicts: string[] };
 }
 
-/**
- * Input for processing a native event through the engine.
- */
 export interface ProcessEventInput {
   nativeEventName: string;
   payload: Record<string, unknown>;
@@ -76,49 +54,15 @@ export interface ProcessEventInput {
   sessionId?: string;
 }
 
-/**
- * The programmatic hooks engine interface.
- */
+/** The programmatic hooks engine interface. */
 export interface HooksEngine {
-  /**
-   * Register a portable hook handler.
-   */
   registerHandler(handler: RegisteredHandler): void;
-
-  /**
-   * Remove a handler by ID.
-   */
   removeHandler(id: string): void;
-
-  /**
-   * Process a native event through the full pipeline:
-   * normalize -> resolve matching handlers -> execute in order -> merge results -> update session
-   */
   processEvent(input: ProcessEventInput): Promise<EngineResult>;
-
-  /**
-   * Process an already-normalized event (skip normalization).
-   */
   processNormalizedEvent(event: UnifiedHookEvent): Promise<EngineResult>;
-
-  /**
-   * Bootstrap session context without running any handlers.
-   */
   bootstrap(sessionId: string, metadata?: Record<string, unknown>): Promise<void>;
-
-  /**
-   * Get all registered handlers.
-   */
   getHandlers(): RegisteredHandler[];
-
-  /**
-   * Get handlers matching a specific phase.
-   */
   getHandlersForPhase(phase: string): RegisteredHandler[];
-
-  /**
-   * Add middleware to the processing pipeline.
-   */
   use(middleware: HookMiddleware): void;
 }
 
@@ -371,7 +315,7 @@ export function createHooksEngine(config: ProgrammaticEngineConfig): HooksEngine
       // If middlewares are present, run the chain to allow them to transform the result
       let finalMergedResult = mergedResult;
       if (middlewares.length > 0) {
-        const chain = buildExecutionChain(event, async () => {
+        const chain = buildExecutionChain(event, () => {
           // Return the already-computed merged result as a UnifiedHookResult
           return {
             decision: mergedResult.decision,

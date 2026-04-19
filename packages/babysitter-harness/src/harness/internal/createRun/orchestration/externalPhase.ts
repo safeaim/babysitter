@@ -1,8 +1,6 @@
 import * as path from "node:path";
 import {
   commitEffectResult,
-  createPiContext,
-  composeProcessCreatePrompt,
 } from "@a5c-ai/babysitter-sdk";
 import {
   BabysitterRuntimeError,
@@ -12,8 +10,6 @@ import {
   createStreamingProgressCallbacks,
   emitProgress,
   isInternalHarness,
-  PI_WORKER_TIMEOUT_MS,
-  promptPiWithRetry,
   resolveOutputMode,
   resolveTaskHarness,
   shouldUseExternalHarness,
@@ -27,12 +23,12 @@ import { orchestrateIterationWithProcessLoadRetry, resolveEffectWithRetry } from
 import { ensureRunAndMaybeBindFromProcessDefinition } from "../planProcess/runState";
 import { subscribeVerbosePiEvents } from "./verbose";
 import type { RunOrchestrationPhaseArgs } from "./types";
+import { extractErrorMessage, extractErrorStack, recoverExternalProcessError } from "./externalPhaseHelpers";
 
 export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseArgs): Promise<number | undefined> {
   if (!shouldUseExternalHarness(args.selectedHarnessName)) {
     return undefined;
   }
-
   const state: OrchestrationState = {
     runId: args.existingRunId,
     runDir: args.existingRunDir,
@@ -126,7 +122,6 @@ export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseA
         { category: ErrorCategory.Runtime },
       );
     }
-
     let consecutiveProcessErrors = 0;
     const runStartTime = Date.now();
     while (state.iteration < args.maxIterations) {
@@ -148,7 +143,6 @@ export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseA
         writeVerboseData,
       });
       state.lastIterationResult = result;
-
       if (result.status === "waiting") {
         consecutiveProcessErrors = 0;
         emitProgress(
@@ -187,7 +181,6 @@ export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseA
         );
         continue;
       }
-
       if (result.status === "completed") {
         emitProgress(
           { phase: "2", status: "completed", iteration: state.iteration, runStatus: "completed" },
@@ -197,7 +190,6 @@ export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseA
         );
         return 0;
       }
-
       if (result.status === "process-error") {
         consecutiveProcessErrors += 1;
         const errorMessage = extractErrorMessage(result.error);
@@ -240,7 +232,6 @@ export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseA
         state.iteration -= 1;
         continue;
       }
-
       emitProgress(
         {
           phase: "2",
@@ -255,7 +246,6 @@ export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseA
       );
       return 1;
     }
-
     emitProgress(
       {
         phase: "2",
@@ -334,7 +324,6 @@ async function resolveExternalAction(args: {
       return nextSession;
     }
     : undefined;
-
   try {
     const effectStartTime = Date.now();
     const streamingCallbacks = createStreamingProgressCallbacks(
@@ -400,69 +389,4 @@ async function resolveExternalAction(args: {
   }
 }
 
-async function recoverExternalProcessError(args: {
-  args: RunOrchestrationPhaseArgs;
-  errorMessage: string;
-  errorStack?: string;
-  registerPiSession: (session: ReturnType<typeof createPiSession>) => ReturnType<typeof createPiSession>;
-  shutdownPiSession: (
-    session: ReturnType<typeof createPiSession> | null | undefined,
-  ) => Promise<void>;
-}): Promise<void> {
-  const recoverySession = args.registerPiSession(createPiSession(buildPiWorkerSessionOptions({
-    action: {
-      effectId: "process-error-recovery",
-      invocationKey: "",
-      kind: "node",
-      taskDef: { title: "Fix process error" },
-    } as EffectAction,
-    workspace: args.args.workspace,
-    model: args.args.model,
-  })));
-  const recoveryUnsub = subscribeVerbosePiEvents(recoverySession, "recovery", args.args);
-  try {
-    const guidelines = composeProcessCreatePrompt(createPiContext({ interactive: false }));
-    const recoveryPrompt = [
-      `The babysitter process at ${path.resolve(args.args.processPath)} threw an error during execution:`,
-      "",
-      `Error: ${args.errorMessage}`,
-      args.errorStack ? `\nStack trace:\n${args.errorStack}` : "",
-      "",
-      "This is a bug in the process code, not in the babysitter runtime.",
-      "Read the process file, understand the error, and fix the code so the next iteration succeeds.",
-      "",
-      "--- Process Authoring Reference ---",
-      "",
-      guidelines,
-      "",
-      "--- End Reference ---",
-      "",
-      "Fix the process file and save it. The orchestrator will retry automatically.",
-    ].join("\n");
-    await promptPiWithRetry({
-      session: recoverySession,
-      message: recoveryPrompt,
-      timeout: PI_WORKER_TIMEOUT_MS,
-      label: "process-error-recovery",
-    });
-  } catch {
-    return;
-  } finally {
-    recoveryUnsub?.();
-    await args.shutdownPiSession(recoverySession);
-  }
-}
-
-function extractErrorMessage(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : typeof error === "object" && error !== null && "message" in error
-      ? String((error as Record<string, unknown>).message)
-      : String(error);
-}
-
-function extractErrorStack(error: unknown): string | undefined {
-  return typeof error === "object" && error !== null && "stack" in error
-    ? String((error as Record<string, unknown>).stack)
-    : undefined;
-}
+// Extracted to externalPhaseHelpers.ts

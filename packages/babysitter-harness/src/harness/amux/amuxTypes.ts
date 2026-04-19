@@ -21,13 +21,6 @@ import type {
   BaseEvent as MuxBaseEvent,
   AgentName as MuxAgentName,
 } from "@a5c-ai/agent-mux";
-import type {
-  InteractionChannel as MuxInteractionChannel,
-} from "@a5c-ai/agent-mux";
-import type {
-  AdapterRegistry as MuxAdapterRegistry,
-  AuthManager as MuxAuthManager,
-} from "@a5c-ai/agent-mux";
 
 // Re-export canonical types directly
 export type { MuxRunOptions, MuxRunHandle, MuxClient, MuxClientOptions, MuxBaseEvent, MuxAgentName };

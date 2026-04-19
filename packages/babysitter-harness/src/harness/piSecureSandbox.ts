@@ -6,72 +6,14 @@ const DEFAULT_SANDBOX_IMAGE = process.env.BABYSITTER_PI_SANDBOX_IMAGE || "node:2
 const DEFAULT_INSTALL_STRATEGY = process.env.BABYSITTER_PI_SANDBOX_INSTALL_STRATEGY || "download";
 const CONTAINER_WORKSPACE = "/workspace";
 
-export interface PiBashOperations {
-  exec: (
-    command: string,
-    cwd: string,
-    options: {
-      onData: (data: Buffer) => void;
-      signal?: AbortSignal;
-      timeout?: number;
-      env?: NodeJS.ProcessEnv;
-    },
-  ) => Promise<{ exitCode: number | null }>;
-}
-
-interface ExecResult {
-  stdout: string;
-  stderr: string;
-  exitCode: number;
-}
-
-interface SandboxAdapterLike {
-  exec(
-    cmd: string,
-    args?: string[],
-    opts?: {
-      cwd?: string;
-      sudo?: boolean;
-      detached?: boolean;
-      env?: Record<string, string>;
-    },
-  ): Promise<ExecResult>;
-  writeFile(path: string, content: string | Buffer, opts?: { sudo?: boolean }): Promise<void>;
-  readFile(path: string): Promise<string>;
-  stop?(): Promise<void>;
-  fileExists?(path: string): Promise<boolean>;
-}
-
-interface SecuredSandboxLike {
-  exec(
-    command: string,
-    opts?: {
-      cwd?: string;
-      timeout?: number;
-    },
-  ): Promise<ExecResult>;
-  stop(): Promise<void>;
-  readonly sessionId: string;
-  readonly securityMode: string;
-}
-
-interface AgentSHModule {
-  secureSandbox(
-    adapter: SandboxAdapterLike,
-    config?: Record<string, unknown>,
-  ): Promise<SecuredSandboxLike>;
-}
-
-export interface SecureBashBackend {
-  operations: PiBashOperations;
-  dispose(): Promise<void>;
-  promptNote: string;
-}
+import type { PiBashOperations, ExecResult, SandboxAdapterLike, SecuredSandboxLike, AgentSHModule, SecureBashBackend } from "./piSecureSandboxTypes";
+export type { PiBashOperations, SecureBashBackend } from "./piSecureSandboxTypes";
 
 const dynamicImportAgentSH: (specifier: string) => Promise<unknown> = (() => {
   if (process.env.VITEST) {
     return (specifier: string) => import(specifier);
   }
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
   return new Function("id", "return import(id)") as (id: string) => Promise<unknown>;
 })();
 
@@ -157,19 +99,16 @@ function runCommand(
       stdio: ["pipe", "pipe", "pipe"],
       windowsHide: true,
     });
-
     const stdout: Buffer[] = [];
     const stderr: Buffer[] = [];
     let timedOut = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-
     if (options?.timeout && options.timeout > 0) {
       timer = setTimeout(() => {
         timedOut = true;
         child.kill("SIGTERM");
       }, options.timeout);
     }
-
     child.stdout.on("data", (chunk: Buffer) => stdout.push(chunk));
     child.stderr.on("data", (chunk: Buffer) => stderr.push(chunk));
     child.stdin.on("error", (error: NodeJS.ErrnoException) => {
@@ -199,7 +138,6 @@ function runCommand(
         exitCode: code ?? 1,
       });
     });
-
     if (options?.input !== undefined) {
       try {
         child.stdin.write(options.input);
@@ -221,7 +159,6 @@ class DockerSandboxAdapter implements SandboxAdapterLike {
     private readonly containerName: string,
     private readonly workspaceHost: string,
   ) {}
-
   async exec(
     cmd: string,
     args?: string[],
@@ -242,14 +179,12 @@ class DockerSandboxAdapter implements SandboxAdapterLike {
       cmd,
       ...(args ?? []),
     ];
-
     const result = await runCommand("docker", dockerArgs);
     if (opts?.detached) {
       return { stdout: "", stderr: "", exitCode: result.exitCode };
     }
     return result;
   }
-
   async writeFile(filePath: string, content: string | Buffer, opts?: { sudo?: boolean }): Promise<void> {
     const result = await runCommand("docker", [
       ...toDockerExecArgs(this.containerName, {
@@ -262,12 +197,10 @@ class DockerSandboxAdapter implements SandboxAdapterLike {
       "--",
       filePath,
     ], { input: content });
-
     if (result.exitCode !== 0) {
       throw new Error(result.stderr || result.stdout || `writeFile failed for ${filePath}`);
     }
   }
-
   async readFile(filePath: string): Promise<string> {
     const result = await runCommand("docker", [
       ...toDockerExecArgs(this.containerName, { cwd: CONTAINER_WORKSPACE }),
@@ -282,7 +215,6 @@ class DockerSandboxAdapter implements SandboxAdapterLike {
     }
     return result.stdout;
   }
-
   async fileExists(filePath: string): Promise<boolean> {
     const result = await runCommand("docker", [
       ...toDockerExecArgs(this.containerName, { cwd: CONTAINER_WORKSPACE }),
@@ -294,7 +226,6 @@ class DockerSandboxAdapter implements SandboxAdapterLike {
     ]);
     return result.exitCode === 0;
   }
-
   async stop(): Promise<void> {
     await runCommand("docker", ["rm", "-f", this.containerName]).catch(() => undefined);
   }
@@ -305,14 +236,12 @@ class DockerSecureBashBackend implements SecureBashBackend {
   private readonly adapter: DockerSandboxAdapter;
   private securedSandbox: SecuredSandboxLike | null = null;
   private containerStarted = false;
-
   constructor(
     private readonly workspaceHost: string,
     private readonly image: string,
   ) {
     this.adapter = new DockerSandboxAdapter(this.containerName, this.workspaceHost);
   }
-
   get promptNote(): string {
     return [
       "The bash tool runs inside a secure Docker sandbox protected by AgentSH.",
@@ -320,17 +249,14 @@ class DockerSecureBashBackend implements SecureBashBackend {
       "Filesystem tools operate on the host mirror of the same workspace files.",
     ].join(" ");
   }
-
   get operations(): PiBashOperations {
     return {
       exec: async (command, cwd, options) => {
         if (options.signal?.aborted) {
           return { exitCode: null };
         }
-
         const sandbox = await this.initialize();
         const sandboxCommand = `${buildEnvPrefix(options.env)}${command}`;
-
         try {
           const result = await sandbox.exec(sandboxCommand, {
             cwd: mapHostPathToContainer(this.workspaceHost, cwd),
@@ -351,7 +277,6 @@ class DockerSecureBashBackend implements SecureBashBackend {
       },
     };
   }
-
   async dispose(): Promise<void> {
     if (this.securedSandbox) {
       await this.securedSandbox.stop().catch(() => undefined);
@@ -364,14 +289,11 @@ class DockerSecureBashBackend implements SecureBashBackend {
       this.containerStarted = false;
     }
   }
-
   async ensureReady(): Promise<void> {
     await this.initialize();
   }
-
   private async initialize(): Promise<SecuredSandboxLike> {
     if (this.securedSandbox) return this.securedSandbox;
-
     await this.startContainer();
     try {
       const mod = await loadAgentSHModule();
@@ -386,10 +308,8 @@ class DockerSecureBashBackend implements SecureBashBackend {
       throw error;
     }
   }
-
   private async startContainer(): Promise<void> {
     if (this.containerStarted) return;
-
     const result = await runCommand("docker", [
       "run",
       "-d",
@@ -420,12 +340,10 @@ export async function createSecureBashBackend(options: {
   if (options.mode === "local") {
     return null;
   }
-
   const backend = new DockerSecureBashBackend(
     path.resolve(options.workspace),
     options.image || DEFAULT_SANDBOX_IMAGE,
   );
-
   try {
     await backend.ensureReady();
   } catch (error: unknown) {
@@ -435,6 +353,5 @@ export async function createSecureBashBackend(options: {
     }
     throw error;
   }
-
   return backend;
 }

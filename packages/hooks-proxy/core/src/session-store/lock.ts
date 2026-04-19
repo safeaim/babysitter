@@ -19,7 +19,7 @@ export async function acquireLock(filePath: string, timeoutMs: number = DEFAULT_
 
   const deadline = Date.now() + timeoutMs;
 
-  while (true) {
+  for (;;) {
     try {
       // wx = create exclusively; fails if file already exists
       await fs.promises.writeFile(lp, String(process.pid), { flag: 'wx' });

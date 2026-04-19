@@ -311,5 +311,6 @@ async function runHarnessCreateRun(
     verbose: parsed.verbose,
     interactive: overrides.interactive ?? parsed.interactive,
     planOnly: overrides.planOnly,
+    outputMode: parsed.outputFormat === "amux-events" ? "amux-events" : undefined,
   });
 }

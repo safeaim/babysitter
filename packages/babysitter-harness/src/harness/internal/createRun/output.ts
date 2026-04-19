@@ -37,6 +37,13 @@ export function resolveOutputMode(json: boolean, outputMode?: OutputMode): Outpu
   return json ? "json" : "cli";
 }
 
+/**
+ * Check whether the given output mode is the amux-events JSONL protocol.
+ */
+export function isAmuxEventsMode(outputMode?: OutputMode): boolean {
+  return outputMode === "amux-events";
+}
+
 export function truncateForVerboseLog(text: string, maxChars: number = VERBOSE_LOG_LIMIT): string {
   const normalized = text.replace(/\r\n/g, "\n");
   if (normalized.length <= maxChars) {
@@ -86,6 +93,12 @@ export function emitProgress(
 ): void {
   const mode = resolveOutputMode(json, outputMode);
   if (mode === "tui") return;
+
+  // amux-events mode: translate progress payloads to agent-mux JSONL events
+  if (mode === "amux-events") {
+    emitProgressAsAmuxEvent(payload);
+    return;
+  }
 
   if (mode === "json") {
     console.log(JSON.stringify(payload, null, 2));
@@ -271,4 +284,114 @@ export function selectHarness(
   }
 
   return undefined;
+}
+
+// ---------------------------------------------------------------------------
+// amux-events progress translation
+// ---------------------------------------------------------------------------
+
+/**
+ * Translate an internal ProgressPayload to an agent-mux compatible JSONL
+ * event and write it to stdout.
+ *
+ * This function maps the babysitter-harness internal progress structure to
+ * the event types that the agent-mux babysitter adapter's `parseEvent()`
+ * understands: `session_start`, `turn_start`, `turn_end`, `tool_call_start`,
+ * `tool_result`, `text_delta`, `error`, `session_end`.
+ */
+function emitProgressAsAmuxEvent(payload: ProgressPayload): void {
+  const now = new Date().toISOString();
+  const runId = (payload as unknown as Record<string, unknown>)["runId"] as string | undefined ?? "";
+  const agent = "babysitter";
+
+  const writeEvent = (event: Record<string, unknown>): void => {
+    process.stdout.write(JSON.stringify({
+      runId,
+      agent,
+      timestamp: now,
+      ...event,
+    }) + "\n");
+  };
+
+  if (payload.phase === "2") {
+    switch (payload.status) {
+      case "started":
+        writeEvent({ type: "session_start", sessionId: runId, harness: payload.harness });
+        break;
+      case "run-created":
+        writeEvent({ type: "session_start", sessionId: payload.runId ?? runId, resumed: false });
+        break;
+      case "resuming":
+        writeEvent({ type: "session_start", sessionId: payload.runId ?? runId, resumed: true });
+        break;
+      case "iteration-start":
+        writeEvent({ type: "turn_start", turnIndex: payload.iteration ?? 0, iteration: payload.iteration });
+        break;
+      case "effect-start":
+        writeEvent({
+          type: "tool_call_start",
+          toolCallId: payload.effectId ?? "",
+          toolName: payload.effectKind ?? "unknown",
+          input: { title: payload.effectTitle, harness: payload.effectHarness },
+        });
+        break;
+      case "effect":
+        writeEvent({
+          type: "tool_result",
+          toolCallId: payload.effectId ?? "",
+          toolName: payload.effectKind ?? "unknown",
+          output: payload.output ?? "",
+          status: payload.effectStatus,
+        });
+        break;
+      case "iteration-summary":
+        writeEvent({
+          type: "turn_end",
+          turnIndex: payload.iteration ?? 0,
+          iteration: payload.iteration,
+          effectsResolved: payload.effectsResolved,
+          elapsedMs: payload.elapsedMs,
+        });
+        break;
+      case "completed":
+        writeEvent({
+          type: "session_end",
+          sessionId: payload.runId ?? runId,
+          exitReason: "completed",
+          turnCount: payload.iteration ?? 0,
+        });
+        break;
+      case "failed":
+        writeEvent({ type: "error", message: payload.error ?? "Run failed", code: "RUN_FAILED" });
+        writeEvent({
+          type: "session_end",
+          sessionId: payload.runId ?? runId,
+          exitReason: "failed",
+          turnCount: payload.iteration ?? 0,
+        });
+        break;
+      case "process-error-recovery":
+        writeEvent({
+          type: "error",
+          message: payload.error ?? "Process error",
+          code: "PROCESS_ERROR",
+          recoverable: true,
+          attempt: payload.attempt,
+          maxAttempts: payload.maxAttempts,
+        });
+        break;
+      // bound, iteration, skipped-plan-only -- no direct amux equivalent
+      default:
+        break;
+    }
+  } else if (payload.phase === "1") {
+    // Phase 1 (planning) events: emit as text_delta so the adapter sees progress
+    if (payload.status === "started") {
+      writeEvent({ type: "text_delta", text: `[planning] Process planning started via ${payload.harness ?? "unknown"}\n` });
+    } else if (payload.status === "completed") {
+      writeEvent({ type: "text_delta", text: `[planning] Process created: ${payload.processPath ?? "unknown"}\n` });
+    } else if (payload.status === "failed") {
+      writeEvent({ type: "error", message: payload.error ?? "Planning failed", code: "PLANNING_FAILED" });
+    }
+  }
 }

@@ -22,7 +22,7 @@ import type {
   AskUserQuestionResponse,
 } from "../../../interaction";
 
-export type OutputMode = "cli" | "json" | "tui";
+export type OutputMode = "cli" | "json" | "tui" | "amux-events";
 
 export interface HarnessCreateRunArgs {
   prompt?: string;
@@ -218,6 +218,7 @@ export function shellQuoteArg(value: string): string {
 
 export {
   resolveOutputMode,
+  isAmuxEventsMode,
   DIM,
   RESET,
   BOLD,

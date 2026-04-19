@@ -60,8 +60,8 @@ export async function handleHarnessCreateRun(
 
   const mode: OutputMode = resolveOutputMode(json, parsed.outputMode);
   const interactive = parsed.interactive ?? (mode === "cli" && process.stdin.isTTY === true);
-  // TUI mode: never create a readline interface — TUI owns the terminal
-  const rl = (interactive && mode !== "tui") ? createReadlineInterface() : null;
+  // TUI and amux-events modes: never create a readline interface
+  const rl = (interactive && mode !== "tui" && mode !== "amux-events") ? createReadlineInterface() : null;
 
   try {
     let prompt = initialPrompt;

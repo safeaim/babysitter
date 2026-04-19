@@ -49,3 +49,11 @@ export {
   isAmuxAvailable,
   _resetAmuxClientCache,
 } from "./amuxClientFactory";
+
+export { AmuxEventEmitter } from "./amuxEventEmitter";
+
+export {
+  createAmuxStdinReader,
+  waitForInteractionResponse,
+  type AmuxInteractionEvent,
+} from "./amuxStdinReader";

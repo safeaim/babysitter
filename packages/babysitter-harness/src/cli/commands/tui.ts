@@ -1,12 +1,11 @@
 /**
- * tui command -- Unified Ink-based terminal dashboard for babysitter.
+ * tui command -- stub redirecting to agent-mux TUI with babysitter plugins.
  *
- * `babysitter tui` opens the dashboard (run browser, details, actions).
- * `babysitter tui --run-id <id>` opens directly into the session view.
- * `babysitter tui --json` outputs a JSON listing (non-interactive fallback).
+ * The babysitter-harness dashboard has been removed. Use the agent-mux TUI
+ * with babysitter-tui-plugins instead (packages/babysitter-tui-plugins/).
  *
- * This replaces the old readline-based interactive menu.  The Ink-based
- * dashboard (dashboard/ink/) is the unified TUI entry point.
+ * `babysitter tui --json` still works as a non-interactive JSON fallback
+ * for run listing / detail inspection.
  */
 
 import * as path from "node:path";
@@ -17,8 +16,6 @@ import {
   getRunDir,
   buildEffectIndex,
 } from "@a5c-ai/babysitter-sdk";
-import { isTTY } from "../../dashboard/render";
-import type { ViewName, VerbosityLevel } from "../../dashboard/ink/types.js";
 
 interface TuiArgs {
   runsDir: string;
@@ -29,11 +26,11 @@ interface TuiArgs {
   workspace?: string;
   prompt?: string;
   runId?: string;
-  verbosity?: VerbosityLevel;
+  verbosity?: string;
 }
 
 // ---------------------------------------------------------------------------
-// JSON mode (non-interactive fallback)
+// JSON mode (non-interactive fallback -- retained)
 // ---------------------------------------------------------------------------
 
 interface RunSummary {
@@ -175,25 +172,18 @@ async function handleJsonMode(args: TuiArgs): Promise<number> {
 // ---------------------------------------------------------------------------
 
 export async function handleTui(args: TuiArgs): Promise<number> {
-  // JSON mode: non-interactive listing
-  if (args.json || !isTTY()) {
+  // JSON mode: non-interactive listing (retained for backward compat)
+  if (args.json) {
     return handleJsonMode(args);
   }
 
-  // Determine initial view: if a run ID is provided, go straight to session
-  const initialView: ViewName = args.runId ? "session" : "dashboard";
-
-  // Launch unified Ink-based dashboard
-  const { createTuiSession } = await import("../../dashboard/ink/render.js");
-  const session = await createTuiSession({
-    runId: args.runId,
-    verbosity: args.verbosity ?? "normal",
-    initialView,
-    runsDir: args.runsDir,
-    harness: args.harness ?? "internal",
-    workspace: args.workspace ?? process.cwd(),
-  });
-
-  await session.waitUntilExit();
-  return 0;
+  // Interactive TUI: redirect to agent-mux TUI
+  console.error(
+    "The babysitter-harness TUI has been removed.\n" +
+    "Use agent-mux TUI with babysitter plugins instead:\n" +
+    "  npx agent-mux tui --workspace .\n" +
+    "\n" +
+    "For non-interactive run listing, use: babysitter-harness tui --json"
+  );
+  return 1;
 }

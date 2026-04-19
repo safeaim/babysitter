@@ -50,9 +50,6 @@ export function resolveHarnessSessionIdForBinding(
   if (resolved) {
     return resolved;
   }
-  if (args.selectedHarnessName === "codex") {
-    return process.env.CODEX_THREAD_ID || process.env.CODEX_SESSION_ID;
-  }
   return isInternalHarness(args.selectedHarnessName)
     ? orchestrationSession?.sessionId
     : undefined;

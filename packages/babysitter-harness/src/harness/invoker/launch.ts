@@ -12,34 +12,18 @@ export interface LaunchSpec {
   shell: boolean;
 }
 
-function quotePowerShellArg(value: string): string {
-  return `'${value.replace(/'/g, "''")}'`;
-}
-
+/**
+ * Build a LaunchSpec for spawning a harness CLI.
+ *
+ * Only Pi uses direct CLI invocation. External harnesses are routed
+ * through agent-mux and never reach this function.
+ */
 export function buildLaunchSpec(
-  name: string,
+  _name: string,
   spec: HarnessCliSpec,
   cliPath: string | undefined,
   args: string[],
-  promptFilePath?: string,
 ): LaunchSpec {
-  if (process.platform === "win32" && name === "codex") {
-    const commandLine = [
-      "Get-Content -Raw",
-      quotePowerShellArg(promptFilePath ?? ""),
-      "|",
-      "&",
-      quotePowerShellArg(spec.cli),
-      ...args.map(quotePowerShellArg),
-    ].join(" ");
-
-    return {
-      command: "powershell.exe",
-      args: ["-NoProfile", "-Command", commandLine],
-      shell: false,
-    };
-  }
-
   if (process.platform === "win32") {
     return {
       command: spec.cli,

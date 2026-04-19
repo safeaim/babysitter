@@ -6,7 +6,6 @@ export * from "./daemon";
 export * from "./interaction";
 export * as anycli from "./anycli";
 export * as cost from "./cost";
-export * as dashboard from "./dashboard";
 export * as governance from "./governance";
 export * from "./observability";
 export * as session from "./session";

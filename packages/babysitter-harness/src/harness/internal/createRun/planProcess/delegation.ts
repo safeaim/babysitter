@@ -34,7 +34,6 @@ function resolveSkillFileCandidates(workspace: string, skillRef: string): string
   } else {
     add(path.join(trimmed, "SKILL.md"));
     add(path.join(".a5c", "skills", trimmed, "SKILL.md"));
-    add(path.join(".codex", "skills", trimmed, "SKILL.md"));
     const parts = trimmed.split(":").filter(Boolean);
     if (parts.length >= 2) {
       const [pluginName, ...skillParts] = parts;

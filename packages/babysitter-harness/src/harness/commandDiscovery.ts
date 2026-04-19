@@ -57,7 +57,7 @@ const COMMANDS: CommandInfo[] = [
   { name: "session-history", description: "Browse persisted session history", category: "session", tags: ["session", "history", "browse"] },
   // Harness commands
   { name: "discover", description: "Discover available harness CLIs", category: "harness", tags: ["discover", "list", "harness"], example: "babysitter-harness discover --json" },
-  { name: "call", description: "Create and run a programmatic session", category: "harness", tags: ["call", "create", "run", "harness"], example: "babysitter-harness call --harness claude-code --process ./process.js#process" },
+  { name: "call", description: "Create and run a programmatic session", category: "harness", tags: ["call", "create", "run", "harness"], example: "babysitter-harness call --process ./process.js#process" },
   { name: "resume", description: "Resume an existing run", category: "harness", tags: ["resume", "continue", "harness"], example: "babysitter-harness resume --run-id <runId>" },
   { name: "observe", description: "Launch live observer dashboard", category: "harness", tags: ["observe", "dashboard", "live", "ui"] },
   // Plugin commands

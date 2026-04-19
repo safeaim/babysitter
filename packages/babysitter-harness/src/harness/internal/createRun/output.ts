@@ -22,14 +22,14 @@ export const VERBOSE_LOG_LIMIT = 4_000;
 export const PROCESS_LIBRARY_READ_MAX_CHARS = 24_000;
 export const PROCESS_LIBRARY_SEARCH_DEFAULT_LIMIT = 12;
 
+/**
+ * Harness selection priority. Pi / internal harnesses are preferred;
+ * external harnesses are discovered dynamically via agent-mux.
+ */
 const HARNESS_PRIORITY: readonly string[] = [
   "internal",
   "oh-my-pi",
   "pi",
-  "claude-code",
-  "codex",
-  "gemini-cli",
-  "opencode",
 ] as const;
 
 export function resolveOutputMode(json: boolean, outputMode?: OutputMode): OutputMode {

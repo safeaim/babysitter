@@ -291,80 +291,49 @@ function getProcessWriteTool(
 // ── Tests ─────────────────────────────────────────────────────────────
 
 describe("selectHarness", () => {
-  const originalCodexThreadId = process.env.CODEX_THREAD_ID;
-  const originalCodexSessionId = process.env.CODEX_SESSION_ID;
   const harnesses: HarnessDiscoveryResult[] = [
-    makeDiscoveryResult({ name: "claude-code" }),
-    makeDiscoveryResult({ name: "codex" }),
-    makeDiscoveryResult({ name: "gemini-cli" }),
-    makeDiscoveryResult({ name: "opencode" }),
+    makeDiscoveryResult({ name: "internal" }),
+    makeDiscoveryResult({ name: "oh-my-pi" }),
     makeDiscoveryResult({ name: "pi" }),
   ];
 
   beforeEach(() => {
-    delete process.env.CODEX_THREAD_ID;
-    delete process.env.CODEX_SESSION_ID;
     detectCallerHarnessMock.mockReturnValue(null);
   });
 
-  afterEach(() => {
-    if (originalCodexThreadId === undefined) {
-      delete process.env.CODEX_THREAD_ID;
-    } else {
-      process.env.CODEX_THREAD_ID = originalCodexThreadId;
-    }
-    if (originalCodexSessionId === undefined) {
-      delete process.env.CODEX_SESSION_ID;
-    } else {
-      process.env.CODEX_SESSION_ID = originalCodexSessionId;
-    }
-  });
-
-  it("selects pi as highest priority when all are available", () => {
+  it("selects internal as highest priority when all are available", () => {
     const selected = selectHarness(harnesses);
-    expect(selected?.name).toBe("pi");
+    expect(selected?.name).toBe("internal");
   });
 
-  it("respects priority order: pi > claude-code > codex > gemini-cli > opencode", () => {
-    // Remove pi
-    const withoutPi = harnesses.filter((h) => h.name !== "pi");
-    expect(selectHarness(withoutPi)?.name).toBe("claude-code");
+  it("respects priority order: internal > oh-my-pi > pi", () => {
+    // Remove internal
+    const withoutInternal = harnesses.filter((h) => h.name !== "internal");
+    expect(selectHarness(withoutInternal)?.name).toBe("oh-my-pi");
 
-    // Remove pi + claude-code
-    const withoutPiClaude = withoutPi.filter((h) => h.name !== "claude-code");
-    expect(selectHarness(withoutPiClaude)?.name).toBe("codex");
-
-    // Remove pi + claude-code + codex
-    const withoutPiClaudeCodex = withoutPiClaude.filter(
-      (h) => h.name !== "codex",
-    );
-    expect(selectHarness(withoutPiClaudeCodex)?.name).toBe("gemini-cli");
-
-    // Only opencode left
-    const onlyOpencode = withoutPiClaudeCodex.filter(
-      (h) => h.name !== "gemini-cli",
-    );
-    expect(selectHarness(onlyOpencode)?.name).toBe("opencode");
+    // Remove internal + oh-my-pi
+    const onlyPi = withoutInternal.filter((h) => h.name !== "oh-my-pi");
+    expect(selectHarness(onlyPi)?.name).toBe("pi");
   });
 
   it("selects preferred harness when specified and installed", () => {
-    const selected = selectHarness(harnesses, "codex");
-    expect(selected?.name).toBe("codex");
+    const selected = selectHarness(harnesses, "pi");
+    expect(selected?.name).toBe("pi");
   });
 
   it("prefers the active caller harness when no explicit preference is provided", () => {
     detectCallerHarnessMock.mockReturnValue({
-      name: "codex",
-      matchedEnvVars: ["CODEX_THREAD_ID"],
+      name: "pi",
+      matchedEnvVars: ["PI_SESSION_ID"],
       capabilities: [],
     });
     const selected = selectHarness(harnesses);
-    expect(selected?.name).toBe("codex");
+    expect(selected?.name).toBe("pi");
   });
 
   it("falls back to priority when preferred harness is not installed", () => {
     const selected = selectHarness(harnesses, "cursor");
-    expect(selected?.name).toBe("pi");
+    expect(selected?.name).toBe("internal");
   });
 
   it("returns undefined when no harness is installed", () => {
@@ -377,11 +346,11 @@ describe("selectHarness", () => {
   });
 
   it("skips uninstalled harnesses even if they are high priority", () => {
-    const piUninstalled = harnesses.map((h) =>
-      h.name === "pi" ? { ...h, installed: false } : h,
+    const internalUninstalled = harnesses.map((h) =>
+      h.name === "internal" ? { ...h, installed: false } : h,
     );
-    const selected = selectHarness(piUninstalled);
-    expect(selected?.name).toBe("claude-code");
+    const selected = selectHarness(internalUninstalled);
+    expect(selected?.name).toBe("oh-my-pi");
   });
 });
 
@@ -537,12 +506,12 @@ describe("handleHarnessCreateRun", () => {
       );
 
       (discoverHarnesses as Mock).mockResolvedValue([
-        makeDiscoveryResult({ name: "codex" }),
-        makeDiscoveryResult({ name: "claude-code" }),
+        makeDiscoveryResult({ name: "pi" }),
+        makeDiscoveryResult({ name: "oh-my-pi" }),
       ]);
       detectCallerHarnessMock.mockReturnValue({
-        name: "codex",
-        matchedEnvVars: ["CODEX_THREAD_ID"],
+        name: "pi",
+        matchedEnvVars: ["PI_SESSION_ID"],
         capabilities: [],
       });
       vi.mocked(createPiSession).mockImplementationOnce((options?: { customTools?: Array<Record<string, unknown>> }) => {

@@ -114,13 +114,6 @@ describe("createUnifiedAdapter", () => {
     expect(adapter.resolveSessionId({})).toBeUndefined();
   });
 
-  it("resolveSessionId() prefers AGENT_SESSION_ID over AGENT_SESSION_ID", () => {
-    process.env.AGENT_SESSION_ID = "agent-wins";
-    process.env.AGENT_SESSION_ID = "bab-loses";
-    const adapter = createUnifiedAdapter();
-    expect(adapter.resolveSessionId({})).toBe("agent-wins");
-  });
-
   // ── autoResolvesSessionId ─────────────────────────────────────────
 
   it("autoResolvesSessionId() returns true when AGENT_SESSION_ID is set", () => {

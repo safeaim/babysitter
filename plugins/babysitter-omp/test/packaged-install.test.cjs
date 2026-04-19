@@ -86,8 +86,6 @@ try {
 
   [
     'extensions/babysitter',
-    'hooks',
-    'hooks.json',
     'skills/babysitter',
     'commands/babysitter-call.md',
     'test',

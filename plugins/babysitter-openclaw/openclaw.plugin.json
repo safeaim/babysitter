@@ -1,6 +1,6 @@
 {
   "name": "babysitter",
-  "version": "0.1.0",
+  "version": "5.0.0",
   "description": "Babysitter orchestration plugin for OpenClaw — event-sourced workflows, multi-step process management, and human-in-the-loop approval",
   "entrypoint": "extensions/index.ts",
   "hooks": {

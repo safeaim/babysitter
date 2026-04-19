@@ -1,6 +1,6 @@
 {
   "name": "@a5c-ai/babysitter-paperclip",
-  "version": "0.0.1",
+  "version": "5.0.0",
   "description": "Babysitter orchestration plugin for Paperclip AI",
   "type": "module",
   "main": "dist/worker.js",
@@ -15,7 +15,7 @@
     "@paperclipai/plugin-sdk": ">=0.1.0"
   },
   "dependencies": {
-    "@a5c-ai/babysitter-sdk": "workspace:*"
+    "@a5c-ai/babysitter-sdk": "5.0.0"
   },
   "devDependencies": {
     "@paperclipai/plugin-sdk": "latest",

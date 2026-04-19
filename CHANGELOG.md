@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- No unreleased changes.
+
+
+## [5.0.0] - 2026-04-18
+- No notable changes.
+
+
+
 ### Fixed
 - Restored the automatic stop-hook drive of `babysitter run:iterate` inside Claude Code and GitHub Copilot sessions. Two regressions had broken the chain: (a) `setBabysitterSessionIdInEnvFile` (and its Copilot twin) rewrote `CLAUDE_ENV_FILE`/`COPILOT_ENV_FILE` via `writeFileSync(tmp)+renameSync`, breaking the harness env-sourcing contract that relies on append-only writes to a stable inode; (b) the session-start PID-marker writer emitted `current-session-pid-<pid>` while the reader expected the slugged `current-session-claude-code-pid-<pid>`, causing the marker rail to always miss. The writer now goes through `getSessionMarkerPath()` so writer and reader agree, and the env-file helpers are append-only. The resolver's last-match regex already tolerates accumulated exports from repeated session rotation, so append-only is safe.
 - Inverted session-ID resolution precedence across all harness adapters to prefer the PID-scoped session marker (authoritative, tied to live ancestor Claude Code PID) over the inheritable `BABYSITTER_SESSION_ID` env var, which previously caused cross-session bleed when a parent shell had a stale export.

@@ -1,6 +1,6 @@
 {
   "name": "babysitter",
-  "version": "0.0.187",
+  "version": "5.0.0",
   "private": true,
   "workspaces": [
     "packages/*",

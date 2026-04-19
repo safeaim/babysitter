@@ -6,7 +6,7 @@
  *
  * @example
  * ```ts
- * import { DEFAULTS, getConfig, validateConfig } from "@a5c/babysitter-sdk/config";
+ * import { DEFAULTS, getConfig, validateConfig } from "@a5c-ai/babysitter-sdk/config";
  *
  * // Use defaults directly
  * console.log(DEFAULTS.runsDir); // ".a5c/runs"

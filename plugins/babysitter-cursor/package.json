@@ -1,6 +1,6 @@
 {
   "name": "@a5c-ai/babysitter-cursor",
-  "version": "0.1.4",
+  "version": "5.0.0",
   "description": "Babysitter orchestration plugin for Cursor IDE with SDK-managed process-library bootstrapping and in-turn iteration model",
   "scripts": {
     "test": "node scripts/sync-command-surfaces.js --check",
@@ -44,6 +44,6 @@
   },
   "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-cursor#readme",
   "dependencies": {
-    "@a5c-ai/babysitter-sdk": "^0.0.183"
+    "@a5c-ai/babysitter-sdk": "5.0.0"
   }
 }

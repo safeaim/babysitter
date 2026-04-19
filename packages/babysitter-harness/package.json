@@ -1,6 +1,6 @@
 {
   "name": "@a5c-ai/babysitter-harness",
-  "version": "0.0.187",
+  "version": "5.0.0",
   "description": "Optional harness runtime CLI for Babysitter orchestration and TUI workflows.",
   "license": "UNLICENSED",
   "type": "commonjs",
@@ -19,7 +19,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@a5c-ai/babysitter-sdk": "0.0.187",
+    "@a5c-ai/babysitter-sdk": "5.0.0",
     "@agentsh/secure-sandbox": "^0.1.7",
     "@mariozechner/pi-coding-agent": "*",
     "@modelcontextprotocol/sdk": "^1.12.1",

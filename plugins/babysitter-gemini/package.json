@@ -1,6 +1,6 @@
 {
   "name": "@a5c-ai/babysitter-gemini",
-  "version": "4.0.156",
+  "version": "5.0.0",
   "description": "Babysitter plugin for Gemini CLI — event-sourced orchestration with AfterAgent continuation hooks, session binding, and human-in-the-loop approval gates",
   "scripts": {
     "test": "node test/integration.test.js",
@@ -45,6 +45,6 @@
   },
   "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-gemini#readme",
   "dependencies": {
-    "@a5c-ai/babysitter-sdk": "^0.0.184"
+    "@a5c-ai/babysitter-sdk": "5.0.0"
   }
 }

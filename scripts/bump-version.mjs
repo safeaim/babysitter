@@ -20,297 +20,111 @@ const bumpVersion = (version, level) => {
   return `${major}.${minor}.${patch + 1}`;
 };
 
-const packageManifests = [
-  { path: "package.json" },
-  { path: "packages/sdk/package.json" },
-  { path: "packages/babysitter/package.json" },
-  { path: "packages/babysitter-harness/package.json" },
-  { path: "packages/hooks-proxy/core/package.json" },
-  { path: "packages/hooks-proxy/cli/package.json" },
-  { path: "packages/hooks-proxy/adapter-claude/package.json" },
-  { path: "packages/hooks-proxy/adapter-codex/package.json" },
-  { path: "packages/hooks-proxy/adapter-gemini/package.json" },
-  { path: "packages/hooks-proxy/adapter-copilot/package.json" },
-  { path: "packages/hooks-proxy/adapter-cursor/package.json" },
-  { path: "packages/hooks-proxy/adapter-pi/package.json" },
-  { path: "packages/hooks-proxy/adapter-oh-my-pi/package.json" },
-  { path: "packages/hooks-proxy/adapter-opencode/package.json" },
-  { path: "packages/hooks-proxy/adapter-openclaw/package.json" },
+const isValidSemver = (version) => /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version);
+
+const parseExplicitVersion = (argv) => {
+  for (let index = 0; index < argv.length; index += 1) {
+    const value = argv[index];
+    if (value === "--version") {
+      return argv[index + 1] ?? null;
+    }
+    if (value.startsWith("--version=")) {
+      return value.slice("--version=".length);
+    }
+    if (!value.startsWith("--")) {
+      return value;
+    }
+  }
+  return null;
+};
+
+const writeJson = (path, data) => {
+  writeFileSync(path, `${JSON.stringify(data, null, 2)}\n`);
+};
+
+const updateVersionField = (path, version) => {
+  if (!existsSync(path)) {
+    return;
+  }
+  const data = JSON.parse(readFileSync(path, "utf8"));
+  data.version = version;
+  writeJson(path, data);
+};
+
+const syncDependencyVersion = (path, packageName, version) => {
+  if (!existsSync(path)) {
+    return;
+  }
+  const data = JSON.parse(readFileSync(path, "utf8"));
+  let changed = false;
+  for (const field of ["dependencies", "peerDependencies", "optionalDependencies", "devDependencies"]) {
+    if (data[field]?.[packageName]) {
+      data[field][packageName] = version;
+      changed = true;
+    }
+  }
+  if (changed) {
+    writeJson(path, data);
+  }
+};
+
+const updateLockVersion = (path, version) => {
+  if (!existsSync(path)) {
+    return;
+  }
+  const data = JSON.parse(readFileSync(path, "utf8"));
+  if (data.version) {
+    data.version = version;
+  }
+  if (data.packages && data.packages[""]) {
+    data.packages[""].version = version;
+  }
+  writeJson(path, data);
+};
+
+const workspaceManifestPaths = [
+  "package.json",
+  "packages/sdk/package.json",
+  "packages/babysitter/package.json",
+  "packages/babysitter-harness/package.json",
+  "packages/hooks-proxy/core/package.json",
+  "packages/hooks-proxy/cli/package.json",
+  "packages/hooks-proxy/adapter-claude/package.json",
+  "packages/hooks-proxy/adapter-codex/package.json",
+  "packages/hooks-proxy/adapter-gemini/package.json",
+  "packages/hooks-proxy/adapter-copilot/package.json",
+  "packages/hooks-proxy/adapter-cursor/package.json",
+  "packages/hooks-proxy/adapter-pi/package.json",
+  "packages/hooks-proxy/adapter-oh-my-pi/package.json",
+  "packages/hooks-proxy/adapter-opencode/package.json",
+  "packages/hooks-proxy/adapter-openclaw/package.json",
 ];
 
-const pluginManifests = [
-  { path: "plugins/babysitter/.claude-plugin/plugin.json" },
-  { path: "plugins/babysitter/plugin.json" },
+const pluginPackageManifestPaths = [
+  "plugins/babysitter-codex/package.json",
+  "plugins/babysitter-github/package.json",
+  "plugins/babysitter-cursor/package.json",
+  "plugins/babysitter-gemini/package.json",
+  "plugins/babysitter-pi/package.json",
+  "plugins/babysitter-omp/package.json",
+  "plugins/babysitter-opencode/package.json",
+  "plugins/babysitter-openclaw/package.json",
+  "plugins/babysitter-paperclip/package.json",
 ];
-const codexPackageManifestPath = "plugins/babysitter-codex/package.json";
-const codexPackageLockPath = "plugins/babysitter-codex/package-lock.json";
-const geminiPackageManifestPath = "plugins/babysitter-gemini/package.json";
-const geminiPluginManifestPath = "plugins/babysitter-gemini/plugin.json";
-const geminiExtensionManifestPath = "plugins/babysitter-gemini/gemini-extension.json";
-const geminiVersionsPath = "plugins/babysitter-gemini/versions.json";
-const githubPackageManifestPath = "plugins/babysitter-github/package.json";
-const cursorPackageManifestPath = "plugins/babysitter-cursor/package.json";
-const piPackageManifestPath = "plugins/babysitter-pi/package.json";
-const piPackageLockPath = "plugins/babysitter-pi/package-lock.json";
-const ompPackageManifestPath = "plugins/babysitter-omp/package.json";
-const ompPackageLockPath = "plugins/babysitter-omp/package-lock.json";
-const opencodePackageManifestPath = "plugins/babysitter-opencode/package.json";
-const openclawPackageManifestPath = "plugins/babysitter-openclaw/package.json";
-const paperclipPackageManifestPath = "plugins/babysitter-paperclip/package.json";
 
-const manifests = packageManifests.map(({ path }) => ({
-  path,
-  data: JSON.parse(readFileSync(path, "utf8")),
-}));
+const pluginManifestPaths = [
+  "plugins/babysitter/.claude-plugin/plugin.json",
+  "plugins/babysitter/plugin.json",
+  "plugins/babysitter-gemini/plugin.json",
+  "plugins/babysitter-gemini/gemini-extension.json",
+  "plugins/babysitter-github/plugin.json",
+  "plugins/babysitter-cursor/plugin.json",
+  "plugins/babysitter-opencode/plugin.json",
+  "plugins/babysitter-openclaw/plugin.json",
+  "plugins/babysitter-openclaw/openclaw.plugin.json",
+];
 
-const pluginManifestData = pluginManifests.map(({ path }) => ({
-  path,
-  data: JSON.parse(readFileSync(path, "utf8")),
-}));
-const codexPackageManifest = existsSync(codexPackageManifestPath)
-  ? {
-      path: codexPackageManifestPath,
-      data: JSON.parse(readFileSync(codexPackageManifestPath, "utf8")),
-    }
-  : null;
-const geminiPackageManifest = existsSync(geminiPackageManifestPath)
-  ? {
-      path: geminiPackageManifestPath,
-      data: JSON.parse(readFileSync(geminiPackageManifestPath, "utf8")),
-    }
-  : null;
-const geminiPluginManifest = existsSync(geminiPluginManifestPath)
-  ? {
-      path: geminiPluginManifestPath,
-      data: JSON.parse(readFileSync(geminiPluginManifestPath, "utf8")),
-    }
-  : null;
-const geminiExtensionManifest = existsSync(geminiExtensionManifestPath)
-  ? {
-      path: geminiExtensionManifestPath,
-      data: JSON.parse(readFileSync(geminiExtensionManifestPath, "utf8")),
-    }
-  : null;
-const githubPackageManifest = existsSync(githubPackageManifestPath)
-  ? {
-      path: githubPackageManifestPath,
-      data: JSON.parse(readFileSync(githubPackageManifestPath, "utf8")),
-    }
-  : null;
-const cursorPackageManifest = existsSync(cursorPackageManifestPath)
-  ? {
-      path: cursorPackageManifestPath,
-      data: JSON.parse(readFileSync(cursorPackageManifestPath, "utf8")),
-    }
-  : null;
-const piPackageManifest = existsSync(piPackageManifestPath)
-  ? {
-      path: piPackageManifestPath,
-      data: JSON.parse(readFileSync(piPackageManifestPath, "utf8")),
-    }
-  : null;
-const ompPackageManifest = existsSync(ompPackageManifestPath)
-  ? {
-      path: ompPackageManifestPath,
-      data: JSON.parse(readFileSync(ompPackageManifestPath, "utf8")),
-    }
-  : null;
-const opencodePackageManifest = existsSync(opencodePackageManifestPath)
-  ? {
-      path: opencodePackageManifestPath,
-      data: JSON.parse(readFileSync(opencodePackageManifestPath, "utf8")),
-    }
-  : null;
-const openclawPackageManifest = existsSync(openclawPackageManifestPath)
-  ? {
-      path: openclawPackageManifestPath,
-      data: JSON.parse(readFileSync(openclawPackageManifestPath, "utf8")),
-    }
-  : null;
-const paperclipPackageManifest = existsSync(paperclipPackageManifestPath)
-  ? {
-      path: paperclipPackageManifestPath,
-      data: JSON.parse(readFileSync(paperclipPackageManifestPath, "utf8")),
-    }
-  : null;
-
-const rootManifest = manifests[0].data;
-const currentVersion = rootManifest.version;
-
-const lastTag = run("git describe --tags --abbrev=0");
-const logRange = lastTag ? `${lastTag}..HEAD` : "";
-const logCmd = lastTag
-  ? `git log ${logRange} --pretty=%s`
-  : "git log -n 50 --pretty=%s";
-const commits = run(logCmd, "");
-
-let bumpTarget = "patch";
-if (/#major\b/i.test(commits)) {
-  bumpTarget = "major";
-} else if (/#minor\b/i.test(commits)) {
-  bumpTarget = "minor";
-}
-
-const newVersion = bumpVersion(currentVersion, bumpTarget);
-
-for (const manifest of manifests) {
-  manifest.data.version = newVersion;
-  writeFileSync(manifest.path, `${JSON.stringify(manifest.data, null, 2)}\n`);
-}
-
-// Update plugin manifests - bump from their current version
-for (const pluginManifest of pluginManifestData) {
-  const currentPluginVersion = pluginManifest.data.version;
-  const newPluginVersion = bumpVersion(currentPluginVersion, bumpTarget);
-  pluginManifest.data.version = newPluginVersion;
-  writeFileSync(pluginManifest.path, `${JSON.stringify(pluginManifest.data, null, 2)}\n`);
-}
-
-// Update Codex package manifest - keep its own version stream, bumped by policy.
-if (codexPackageManifest) {
-  const currentCodexVersion = codexPackageManifest.data.version;
-  const newCodexVersion = bumpVersion(currentCodexVersion, bumpTarget);
-  codexPackageManifest.data.version = newCodexVersion;
-  writeFileSync(
-    codexPackageManifest.path,
-    `${JSON.stringify(codexPackageManifest.data, null, 2)}\n`,
-  );
-
-  if (existsSync(codexPackageLockPath)) {
-    const codexLock = JSON.parse(readFileSync(codexPackageLockPath, "utf8"));
-    codexLock.version = newCodexVersion;
-    if (codexLock.packages && codexLock.packages[""]) {
-      codexLock.packages[""].version = newCodexVersion;
-    }
-    writeFileSync(codexPackageLockPath, `${JSON.stringify(codexLock, null, 2)}\n`);
-  }
-}
-
-if (geminiPackageManifest) {
-  const currentGeminiVersion = geminiPackageManifest.data.version;
-  const newGeminiVersion = bumpVersion(currentGeminiVersion, bumpTarget);
-  geminiPackageManifest.data.version = newGeminiVersion;
-  writeFileSync(
-    geminiPackageManifest.path,
-    `${JSON.stringify(geminiPackageManifest.data, null, 2)}\n`,
-  );
-
-  if (geminiPluginManifest) {
-    geminiPluginManifest.data.version = newGeminiVersion;
-    writeFileSync(
-      geminiPluginManifest.path,
-      `${JSON.stringify(geminiPluginManifest.data, null, 2)}\n`,
-    );
-  }
-
-  if (geminiExtensionManifest) {
-    geminiExtensionManifest.data.version = newGeminiVersion;
-    writeFileSync(
-      geminiExtensionManifest.path,
-      `${JSON.stringify(geminiExtensionManifest.data, null, 2)}\n`,
-    );
-  }
-
-  if (existsSync(geminiVersionsPath)) {
-    const geminiVersions = JSON.parse(readFileSync(geminiVersionsPath, "utf8"));
-    geminiVersions.extensionVersion = newGeminiVersion;
-    writeFileSync(geminiVersionsPath, `${JSON.stringify(geminiVersions, null, 2)}\n`);
-  }
-}
-
-// Update GitHub package manifest - keep its own version stream, bumped by policy.
-if (githubPackageManifest) {
-  const currentGithubVersion = githubPackageManifest.data.version;
-  const newGithubVersion = bumpVersion(currentGithubVersion, bumpTarget);
-  githubPackageManifest.data.version = newGithubVersion;
-  writeFileSync(
-    githubPackageManifest.path,
-    `${JSON.stringify(githubPackageManifest.data, null, 2)}\n`,
-  );
-}
-
-// Update Cursor package manifest - keep its own version stream, bumped by policy.
-if (cursorPackageManifest) {
-  const currentCursorVersion = cursorPackageManifest.data.version;
-  const newCursorVersion = bumpVersion(currentCursorVersion, bumpTarget);
-  cursorPackageManifest.data.version = newCursorVersion;
-  writeFileSync(
-    cursorPackageManifest.path,
-    `${JSON.stringify(cursorPackageManifest.data, null, 2)}\n`,
-  );
-}
-
-if (piPackageManifest) {
-  const currentPiVersion = piPackageManifest.data.version;
-  const newPiVersion = bumpVersion(currentPiVersion, bumpTarget);
-  piPackageManifest.data.version = newPiVersion;
-  writeFileSync(
-    piPackageManifest.path,
-    `${JSON.stringify(piPackageManifest.data, null, 2)}\n`,
-  );
-
-  if (existsSync(piPackageLockPath)) {
-    const piLock = JSON.parse(readFileSync(piPackageLockPath, "utf8"));
-    piLock.version = newPiVersion;
-    if (piLock.packages && piLock.packages[""]) {
-      piLock.packages[""].version = newPiVersion;
-    }
-    writeFileSync(piPackageLockPath, `${JSON.stringify(piLock, null, 2)}\n`);
-  }
-}
-
-if (ompPackageManifest) {
-  const currentOmpVersion = ompPackageManifest.data.version;
-  const newOmpVersion = bumpVersion(currentOmpVersion, bumpTarget);
-  ompPackageManifest.data.version = newOmpVersion;
-  writeFileSync(
-    ompPackageManifest.path,
-    `${JSON.stringify(ompPackageManifest.data, null, 2)}\n`,
-  );
-
-  if (existsSync(ompPackageLockPath)) {
-    const ompLock = JSON.parse(readFileSync(ompPackageLockPath, "utf8"));
-    ompLock.version = newOmpVersion;
-    if (ompLock.packages && ompLock.packages[""]) {
-      ompLock.packages[""].version = newOmpVersion;
-    }
-    writeFileSync(ompPackageLockPath, `${JSON.stringify(ompLock, null, 2)}\n`);
-  }
-}
-
-if (opencodePackageManifest) {
-  const currentOpencodeVersion = opencodePackageManifest.data.version;
-  const newOpencodeVersion = bumpVersion(currentOpencodeVersion, bumpTarget);
-  opencodePackageManifest.data.version = newOpencodeVersion;
-  writeFileSync(
-    opencodePackageManifest.path,
-    `${JSON.stringify(opencodePackageManifest.data, null, 2)}\n`,
-  );
-}
-
-if (openclawPackageManifest) {
-  const currentOpenclawVersion = openclawPackageManifest.data.version;
-  const newOpenclawVersion = bumpVersion(currentOpenclawVersion, bumpTarget);
-  openclawPackageManifest.data.version = newOpenclawVersion;
-  writeFileSync(
-    openclawPackageManifest.path,
-    `${JSON.stringify(openclawPackageManifest.data, null, 2)}\n`,
-  );
-}
-
-if (paperclipPackageManifest) {
-  const currentPaperclipVersion = paperclipPackageManifest.data.version;
-  const newPaperclipVersion = bumpVersion(currentPaperclipVersion, bumpTarget);
-  paperclipPackageManifest.data.version = newPaperclipVersion;
-  writeFileSync(
-    paperclipPackageManifest.path,
-    `${JSON.stringify(paperclipPackageManifest.data, null, 2)}\n`,
-  );
-}
-
-// Write sdkVersion to versions.json (separate from plugin.json to avoid
-// Claude Code's plugin validator rejecting unrecognized keys)
-for (const versionsPath of [
+const versionsJsonPaths = [
   "plugins/babysitter/versions.json",
   "plugins/babysitter-codex/versions.json",
   "plugins/babysitter-gemini/versions.json",
@@ -321,98 +135,95 @@ for (const versionsPath of [
   "plugins/babysitter-cursor/versions.json",
   "plugins/babysitter-openclaw/versions.json",
   "plugins/babysitter-paperclip/versions.json",
-]) {
-  const versionsData = existsSync(versionsPath)
-    ? JSON.parse(readFileSync(versionsPath, "utf8"))
-    : {};
-  versionsData.sdkVersion = newVersion;
-  writeFileSync(versionsPath, `${JSON.stringify(versionsData, null, 2)}\n`);
+];
+
+const lockPaths = ["package-lock.json"];
+
+const rootManifest = JSON.parse(readFileSync("package.json", "utf8"));
+const currentVersion = rootManifest.version;
+const explicitVersion = parseExplicitVersion(process.argv.slice(2));
+
+if (explicitVersion && !isValidSemver(explicitVersion)) {
+  throw new Error(`Invalid version argument: ${explicitVersion}`);
 }
 
-// Update marketplace.json plugin entry - bump from its current version
+let newVersion = explicitVersion;
+if (!newVersion) {
+  const lastTag = run("git describe --tags --abbrev=0");
+  const logRange = lastTag ? `${lastTag}..HEAD` : "";
+  const logCmd = lastTag
+    ? `git log ${logRange} --pretty=%s`
+    : "git log -n 50 --pretty=%s";
+  const commits = run(logCmd, "");
+
+  let bumpTarget = "patch";
+  if (/#major\b/i.test(commits)) {
+    bumpTarget = "major";
+  } else if (/#minor\b/i.test(commits)) {
+    bumpTarget = "minor";
+  }
+
+  newVersion = bumpVersion(currentVersion, bumpTarget);
+}
+
+for (const path of [...workspaceManifestPaths, ...pluginPackageManifestPaths, ...pluginManifestPaths]) {
+  updateVersionField(path, newVersion);
+}
+
+for (const path of [
+  "packages/babysitter/package.json",
+  "packages/babysitter-harness/package.json",
+  "plugins/babysitter-codex/package.json",
+  "plugins/babysitter-github/package.json",
+  "plugins/babysitter-cursor/package.json",
+  "plugins/babysitter-gemini/package.json",
+  "plugins/babysitter-pi/package.json",
+  "plugins/babysitter-omp/package.json",
+  "plugins/babysitter-opencode/package.json",
+  "plugins/babysitter-openclaw/package.json",
+  "plugins/babysitter-paperclip/package.json",
+]) {
+  syncDependencyVersion(path, "@a5c-ai/babysitter-sdk", newVersion);
+}
+
+for (const path of [
+  "packages/hooks-proxy/cli/package.json",
+  "packages/hooks-proxy/adapter-claude/package.json",
+  "packages/hooks-proxy/adapter-codex/package.json",
+  "packages/hooks-proxy/adapter-gemini/package.json",
+  "packages/hooks-proxy/adapter-copilot/package.json",
+  "packages/hooks-proxy/adapter-cursor/package.json",
+  "packages/hooks-proxy/adapter-pi/package.json",
+  "packages/hooks-proxy/adapter-oh-my-pi/package.json",
+  "packages/hooks-proxy/adapter-opencode/package.json",
+  "packages/hooks-proxy/adapter-openclaw/package.json",
+]) {
+  syncDependencyVersion(path, "@a5c-ai/hooks-proxy-core", newVersion);
+}
+
+for (const path of versionsJsonPaths) {
+  const data = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
+  data.sdkVersion = newVersion;
+  if (path === "plugins/babysitter-gemini/versions.json" && "extensionVersion" in data) {
+    data.extensionVersion = newVersion;
+  }
+  writeJson(path, data);
+}
+
 const marketplacePath = ".claude-plugin/marketplace.json";
 if (existsSync(marketplacePath)) {
   const marketplaceData = JSON.parse(readFileSync(marketplacePath, "utf8"));
-  if (marketplaceData.plugins) {
-    const babysitterPlugin = marketplaceData.plugins.find(
-      (plugin) => plugin.name === "babysitter"
-    );
+  if (Array.isArray(marketplaceData.plugins)) {
+    const babysitterPlugin = marketplaceData.plugins.find((plugin) => plugin.name === "babysitter");
     if (babysitterPlugin) {
-      const currentMarketplaceVersion = babysitterPlugin.version;
-      const newMarketplaceVersion = bumpVersion(currentMarketplaceVersion, bumpTarget);
-      babysitterPlugin.version = newMarketplaceVersion;
-      writeFileSync(marketplacePath, `${JSON.stringify(marketplaceData, null, 2)}\n`);
+      babysitterPlugin.version = newVersion;
     }
   }
+  writeJson(marketplacePath, marketplaceData);
 }
 
-const lockPath = "package-lock.json";
-if (existsSync(lockPath)) {
-  const lock = JSON.parse(readFileSync(lockPath, "utf8"));
-  if (lock.version) lock.version = newVersion;
-  if (lock.packages && lock.packages[""]) {
-    lock.packages[""].version = newVersion;
-  }
-  const sdkWorkspaceKey = "packages/sdk";
-  if (lock.packages && lock.packages[sdkWorkspaceKey]) {
-    lock.packages[sdkWorkspaceKey].version = newVersion;
-  }
-  const babysitterWorkspaceKey = "packages/babysitter";
-  if (lock.packages && lock.packages[babysitterWorkspaceKey]) {
-    lock.packages[babysitterWorkspaceKey].version = newVersion;
-  }
-  const harnessWorkspaceKey = "packages/babysitter-harness";
-  if (lock.packages && lock.packages[harnessWorkspaceKey]) {
-    lock.packages[harnessWorkspaceKey].version = newVersion;
-  }
-  for (const hpSubdir of [
-    "packages/hooks-proxy/core",
-    "packages/hooks-proxy/cli",
-    "packages/hooks-proxy/adapter-claude",
-    "packages/hooks-proxy/adapter-codex",
-    "packages/hooks-proxy/adapter-gemini",
-    "packages/hooks-proxy/adapter-copilot",
-    "packages/hooks-proxy/adapter-cursor",
-    "packages/hooks-proxy/adapter-pi",
-    "packages/hooks-proxy/adapter-oh-my-pi",
-    "packages/hooks-proxy/adapter-opencode",
-    "packages/hooks-proxy/adapter-openclaw",
-  ]) {
-    if (lock.packages && lock.packages[hpSubdir]) {
-      lock.packages[hpSubdir].version = newVersion;
-    }
-  }
-  const sdkManifest = manifests.find(
-    (manifest) => manifest.path === "packages/sdk/package.json",
-  );
-  const sdkName = sdkManifest?.data?.name;
-  if (sdkName) {
-    const sdkNodeModulesKey = `node_modules/${sdkName}`;
-    if (lock.packages && lock.packages[sdkNodeModulesKey]) {
-      lock.packages[sdkNodeModulesKey].version = newVersion;
-    }
-  }
-  const babysitterManifest = manifests.find(
-    (manifest) => manifest.path === "packages/babysitter/package.json",
-  );
-  const babysitterName = babysitterManifest?.data?.name;
-  if (babysitterName) {
-    const babysitterNodeModulesKey = `node_modules/${babysitterName}`;
-    if (lock.packages && lock.packages[babysitterNodeModulesKey]) {
-      lock.packages[babysitterNodeModulesKey].version = newVersion;
-    }
-  }
-  const harnessManifest = manifests.find(
-    (manifest) => manifest.path === "packages/babysitter-harness/package.json",
-  );
-  const harnessName = harnessManifest?.data?.name;
-  if (harnessName) {
-    const harnessNodeModulesKey = `node_modules/${harnessName}`;
-    if (lock.packages && lock.packages[harnessNodeModulesKey]) {
-      lock.packages[harnessNodeModulesKey].version = newVersion;
-    }
-  }
-  writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
+for (const path of lockPaths) {
+  updateLockVersion(path, newVersion);
 }
 
 const changelogPath = "CHANGELOG.md";

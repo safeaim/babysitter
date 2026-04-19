@@ -271,6 +271,23 @@ cd packages/catalog && npm run reindex:force   # Force full reindex
 cd packages/catalog && npm run reindex:reset   # Reset and reindex with stats
 ```
 
+### Hooks Proxy (`packages/hooks-proxy/`)
+
+```bash
+# Build all hooks-proxy packages
+npm run build:hooks-proxy
+
+# Test all hooks-proxy packages
+npm run test:hooks-proxy
+
+# Lint hooks-proxy (core + cli)
+npm run lint:hooks-proxy
+
+# Individual package commands
+cd packages/hooks-proxy/core && npx tsc --noEmit    # Type check
+cd packages/hooks-proxy/core && npx vitest run       # Tests
+```
+
 ### E2E Tests (`e2e-tests/docker/`)
 
 ```bash
@@ -286,6 +303,9 @@ Config: `testTimeout: 30000`, `hookTimeout: 300000`, `fileParallelism: false`, J
 | `packages/sdk` | `@a5c-ai/babysitter-sdk` | Core: runtime, storage, tasks, CLI, hooks, testing, config. CJS. |
 | `packages/babysitter` | `@a5c-ai/babysitter` | Metapackage re-exporting SDK. Provides `babysitter` CLI. |
 | `packages/catalog` | `process-library-catalog` | Next.js 16 app (React 19, SQLite, Radix UI, Tailwind). |
+| `packages/hooks-proxy/core` | `@a5c-ai/hooks-proxy-core` | Hook normalization, session store, merge engine, propagation, SDK interface. |
+| `packages/hooks-proxy/cli` | `@a5c-ai/hooks-proxy-cli` | CLI entrypoint (`a5c-hooks-proxy`): invoke, exec, bootstrap, doctor. |
+| `packages/hooks-proxy/adapter-*` | `@a5c-ai/hooks-proxy-adapter-*` | 9 harness adapters (claude, codex, gemini, copilot, cursor, pi, oh-my-pi, opencode, openclaw). |
 
 ## Harness Plugin Packages (`plugins/`)
 
@@ -304,6 +324,8 @@ Harness-specific plugin packages that provide hooks, commands, skills, and integ
 | `plugins/a5c/` | -- | Marketplace configuration (`marketplace/marketplace.json`, plugin registry) |
 
 All harness plugins share the unified plugin name `babysitter` in their `plugin.json` manifests (previously named `babysitter-codex`, `babysitter-cursor`, etc. -- unified in a recent refactor).
+
+The SDK also provides a unified adapter at `packages/sdk/src/harness/unified/` that delegates to hooks-proxy via subprocess, reading `AGENT_CAPABILITIES_JSON` from env for capability derivation. Used as fallback when no harness-specific adapter is detected.
 
 ## SDK Architecture (`packages/sdk/src/`)
 
@@ -324,9 +346,36 @@ All harness plugins share the unified plugin name `babysitter` in their `plugin.
 - **`mcp/`** — MCP server: `createBabysitterMcpServer`, tool handlers (runs, tasks, sessions, discovery), stdio transport.
 - **`hooks/`** — 13 hook types: `on-run-start`, `on-run-complete`, `on-run-fail`, `on-task-start`, `on-task-complete`, `on-step-dispatch`, `on-iteration-start`, `on-iteration-end`, `on-breakpoint`, `pre-commit`, `pre-branch`, `post-planning`, `on-score`. Dispatcher: `callHook(hookType, payload, options)`.
 - **`harness/`** — Harness adapter abstraction and enrichment APIs. **types** (`HarnessAdapter`, `HarnessCapability` enum: Programmatic/SessionBinding/StopHook/Mcp/HeadlessPrompt, `HarnessDiscoveryResult`, `HarnessInvokeOptions`, `HarnessInvokeResult`, `PiSessionOptions`, `PiPromptResult`, `PiSessionEvent`, `SessionBindOptions`, `SessionBindResult`, `HookHandlerArgs`), **discovery** (`discoverHarnesses` — parallel CLI detection via `Promise.allSettled`, `checkCliAvailable` — single CLI probe via `which`/`where` + `--version`, `KNOWN_HARNESSES` — specs for claude-code, codex, cursor, gemini-cli, github-copilot, opencode, oh-my-pi, pi), **invoker** (`invokeHarness` — spawn harness CLI as child process with timeout/model/workspace flags, `buildHarnessArgs` — pure arg builder, `HARNESS_CLI_MAP` — flag mapping per harness), **piWrapper** (`createPiSession` — factory for `PiSessionHandle`, `PiSessionHandle` class with `.prompt()`, `.steer()`, `.followUp()`, `.subscribe()`, `.executeBash()`, `.abort()`, `.dispose()`, lazy initialization, `PiEventListener` type), **registry** (`detectAdapter`, `getAdapterByName`, `listSupportedHarnesses`, `getAdapter`, `setAdapter`, `resetAdapter`), **adapters** (`createClaudeCodeAdapter`, `createCodexAdapter`, `createCursorAdapter`, `createGeminiCliAdapter`, `createGithubCopilotAdapter`, `createOhMyPiAdapter`, `createPiAdapter`, `createCustomAdapter`, `createNullAdapter`), **support modules** (`piSecureSandbox` — secure sandbox for Pi execution, `agenticTools` — agentic tool integration, `installSupport` — harness installation helpers).
+- **`harness/unified/`** — Unified harness adapter that delegates to hooks-proxy via subprocess. Reads `AGENT_CAPABILITIES_JSON` from env to derive capabilities and prompt context. Fallback adapter when no harness-specific adapter detected.
 - **`testing/`** — `runHarness` for deterministic execution with snapshots.
 - **`config/`** — Environment variable resolution with defaults.
 - **`index.ts`** — Public API re-exports: `runtime`, `runtime/types`, `storage`, `storage/types`, `tasks`, `cli/main`, `testing`, `hooks`, `harness`, `config`, `profiles`, `plugins`, `interaction`, `prompts`, `logging`, `breakpoints`.
+
+## Hooks Proxy Architecture (`packages/hooks-proxy/`)
+
+Hook normalization and context-propagation runtime. Sits between harness-native hooks and portable hook implementations.
+
+- **`core/`** — Canonical types (lifecycle, event, result, adapter, session), session store (atomic writes, file locking, corruption recovery), merge engine (deterministic multi-hook fan-out), normalizer (event normalization, plan resolution, handler execution), propagation (env materialization, 4 backends), diagnostics (structured logging, JSONL trace), SDK interface (parser, builder, context-reader, serializer), programmatic engine (for in-process adapters), discovery (harness auto-detection).
+- **`cli/`** — CLI entrypoint (`a5c-hooks-proxy`): `invoke` (primary hook proxy), `exec` (context-enriched command execution), `bootstrap` (no-op session init), `show-session`, `clear-session`, `doctor`.
+- **`adapter-*/`** — 9 harness adapters in 2 families:
+  - Shell-hook: `claude`, `codex`, `gemini`, `copilot`, `cursor`
+  - Programmatic: `pi`, `oh-my-pi`, `opencode`, `openclaw`
+
+Each adapter provides: capability declaration, event-to-canonical-phase mapping, stdin normalization, native output rendering, session ID resolution.
+
+### Environment Variables (hooks-proxy)
+
+| Variable | Description |
+|----------|-------------|
+| `AGENT_SESSION_ID` | Session ID (set by hooks-proxy, read by handlers) |
+| `AGENT_TURN_ID` | Turn ID when available |
+| `AGENT_ADAPTER` | Adapter name (claude, codex, etc.) |
+| `AGENT_WORKSPACE_ROOT` | Workspace root directory |
+| `AGENT_TRANSCRIPT_PATH` | Transcript file path |
+| `AGENT_CONTEXT_FILE` | Materialized context file path |
+| `AGENT_CAPABILITIES_JSON` | Serialized adapter capabilities (JSON) |
+| `AGENT_HOOKS_PROXY_ENABLE_PID_MARKERS` | Enable PID session markers (default: off) |
+| `AGENT_UNIFIED_ADAPTER` | Enable SDK unified adapter (set to `1`) |
 
 ## Orchestration Flow (cross-file pattern)
 

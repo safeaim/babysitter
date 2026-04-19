@@ -158,13 +158,6 @@ export async function invokeHarness(
   }
 
   const amuxClient = await getAmuxClient();
-  if (!amuxClient) {
-    throw new BabysitterRuntimeError(
-      "@agent-mux/core is required for external harness invocation. Install it: npm i @agent-mux/core",
-      ErrorCategory.Configuration,
-    );
-  }
-
   return invokeViaAgentMux(amuxClient, name, options);
 }
 

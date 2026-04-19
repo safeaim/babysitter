@@ -68,4 +68,12 @@ export const FLAG_PARSERS: Record<string, FlagParser> = {
     parsed.wsMaxMps = parseIntegerFlag(expectFlagValue(args, index + 1, "--ws-max-mps"));
     return index + 1;
   },
+  "--output-format": (parsed, args, index) => {
+    const value = expectFlagValue(args, index + 1, "--output-format");
+    if (value !== "json" && value !== "text" && value !== "amux-events") {
+      throw new Error(`--output-format must be one of: json, text, amux-events (got "${value}")`);
+    }
+    parsed.outputFormat = value;
+    return index + 1;
+  },
 };

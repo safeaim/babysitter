@@ -11,6 +11,7 @@ import { detectCallerHarness, discoverHarnesses } from "../harness";
 import { handleDaemonRun, handleDaemonStart, handleDaemonStatus, handleDaemonStop } from "./commands/daemon";
 import { handleMcpServe } from "./commands/mcpServe";
 import { handleSessionHistory } from "./commands/session/history";
+import { formatResultAsAmuxEvents } from "./amuxEventsFormatter";
 
 type HarnessRunPromptKind =
   | "forever"
@@ -239,7 +240,17 @@ async function handleHarnessInvoke(parsed: HarnessParsedArgs): Promise<number> {
     model: parsed.model,
     timeout: parsed.timeout ? Number(parsed.timeout) : undefined,
   });
-  if (parsed.json) {
+
+  // amux-events output format: JSONL compatible with agent-mux event stream
+  if (parsed.outputFormat === "amux-events") {
+    const lines = formatResultAsAmuxEvents(harnessName, result);
+    for (const line of lines) {
+      console.log(line);
+    }
+    return result.success ? 0 : 1;
+  }
+
+  if (parsed.json || parsed.outputFormat === "json") {
     console.log(JSON.stringify(result, null, 2));
   } else if (result.success) {
     console.log(result.output);

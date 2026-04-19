@@ -34,3 +34,4 @@ export { createAgenticToolDefinitions, type AgenticToolOptions, type CustomToolD
 export { invokeHarness, buildHarnessArgs, buildLaunchSpec, HARNESS_CLI_MAP } from "./invoker";
 export { createPiSession, PiSessionHandle, type PiEventListener } from "./piWrapper";
 export { OutputStreamCollector, invokeHarnessStreaming } from "./streamingCapture";
+export * as amux from "./amux";

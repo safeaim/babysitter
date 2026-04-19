@@ -7,6 +7,7 @@ import { transform } from './transform.js';
 import { emit } from './emit.js';
 import { verify } from './verify.js';
 import { getAllTargets } from './targets/index.js';
+import { generateOrUpdateMarketplace } from './marketplaceGenerator.js';
 
 export interface CompileOptions {
   source: string;
@@ -14,10 +15,11 @@ export interface CompileOptions {
   output: string;
   dryRun?: boolean;
   verifyOutput?: boolean;
+  marketplacePath?: string;
 }
 
 export function compile(options: CompileOptions): CompilationResult {
-  const { source, target, output, dryRun = false, verifyOutput = false } = options;
+  const { source, target, output, dryRun = false, verifyOutput = false, marketplacePath } = options;
 
   // Stage 1: VALIDATE
   const validateResult = validate(source);
@@ -93,6 +95,15 @@ export function compile(options: CompileOptions): CompilationResult {
     };
   }
 
+  // Update marketplace if requested
+  if (marketplacePath && !dryRun) {
+    generateOrUpdateMarketplace(
+      resolveResult.effectiveManifest,
+      output,
+      marketplacePath
+    );
+  }
+
   // Stage 5: VERIFY (optional)
   let verificationChecklist: string[] = [];
   if (verifyOutput && !dryRun) {
@@ -118,7 +129,7 @@ export function compile(options: CompileOptions): CompilationResult {
 export function compileAll(
   source: string,
   outputBaseDir: string,
-  options: { dryRun?: boolean; verifyOutput?: boolean } = {}
+  options: { dryRun?: boolean; verifyOutput?: boolean; marketplacePath?: string } = {}
 ): CompilationResult[] {
   const targets = getAllTargets();
   const results: CompilationResult[] = [];

@@ -1,0 +1,110 @@
+name: Generate Plugins
+
+# Disabled by default — enable by uncommenting the trigger
+# on:
+#   push:
+#     branches: [main, staging]
+#     paths:
+#       - 'plugins/babysitter-unified/**'
+#       - 'packages/unified-plugins/**'
+#   workflow_dispatch:
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_results:
+        description: 'Commit generated plugins back to the branch'
+        type: boolean
+        default: false
+
+concurrency:
+  group: generate-plugins-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    name: Generate Target Plugins
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build unified-plugins compiler
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/unified-plugins
+
+      - name: Generate all target plugins
+        run: |
+          set -euo pipefail
+          node scripts/generate-plugins.mjs \
+            --output generated-plugins
+
+      - name: Compare with existing plugins
+        run: |
+          set -euo pipefail
+          node scripts/generate-plugins.mjs \
+            --output generated-plugins \
+            --compare . || true
+
+      - name: Upload generated plugins
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-plugins
+          path: generated-plugins/
+          if-no-files-found: error
+
+      - name: Commit generated plugins
+        if: ${{ github.event.inputs.commit_results == 'true' }}
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Copy generated output over existing plugin dirs
+          for target_dir in generated-plugins/*/; do
+            target=$(basename "$target_dir")
+            case "$target" in
+              claude-code) dest="plugins/babysitter" ;;
+              codex) dest="plugins/babysitter-codex" ;;
+              cursor) dest="plugins/babysitter-cursor" ;;
+              gemini) dest="plugins/babysitter-gemini" ;;
+              github-copilot) dest="plugins/babysitter-github" ;;
+              pi) dest="plugins/babysitter-pi" ;;
+              oh-my-pi) dest="plugins/babysitter-omp" ;;
+              opencode) dest="plugins/babysitter-opencode" ;;
+              openclaw) dest="plugins/babysitter-openclaw" ;;
+              *) continue ;;
+            esac
+
+            echo "Syncing $target -> $dest"
+            # Only copy files that the compiler generates (don't delete hand-maintained extras)
+            cp -r "$target_dir"* "$dest/" 2>/dev/null || true
+          done
+
+          git add plugins/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: regenerate target plugins from unified source [skip staging]"
+            git push origin HEAD:$BRANCH_NAME
+          fi

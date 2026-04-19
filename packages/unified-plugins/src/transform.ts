@@ -670,6 +670,25 @@ function generateExtraFiles(
     content: generateInstallInstructions(manifest, targetProfile),
   });
 
+  // Emit target-override extraFiles
+  const targetOverride = manifest.targets?.[targetProfile.name];
+  if (targetOverride?.extraFiles) {
+    for (const [outputPath, value] of Object.entries(targetOverride.extraFiles)) {
+      if (value.startsWith('file:')) {
+        const srcPath = value.slice(5);
+        const fullPath = path.join(sourceDir, srcPath);
+        if (fs.existsSync(fullPath)) {
+          files.push({
+            path: outputPath,
+            content: fs.readFileSync(fullPath, 'utf-8'),
+          });
+        }
+      } else {
+        files.push({ path: outputPath, content: value });
+      }
+    }
+  }
+
   // Generate OpenCode accomplish-skills
   if (targetProfile.name === 'opencode') {
     const accomplishSkill = generateOpenCodeAccomplishSkill(manifest);

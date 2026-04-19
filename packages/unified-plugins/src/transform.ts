@@ -81,8 +81,8 @@ export function transform(
   const contextFiles = copyContextFiles(sourceDir, manifest, targetProfile, diagnostics);
   files.push(...contextFiles);
 
-  // Copy included files (versions.json, assets, etc.)
-  const includedFiles = copyIncludedFiles(sourceDir, manifest);
+  // Copy included files (versions.json, assets, etc.) — skip hooks/ since transformHooks handles those
+  const includedFiles = copyIncludedFiles(sourceDir, manifest, ['hooks/', 'hooks']);
   files.push(...includedFiles);
 
   // Generate extra files (Pi/oh-my-pi extensions, etc.)
@@ -237,7 +237,7 @@ function getCommandPaths(
 }
 
 function transformHooks(
-  _sourceDir: string,
+  sourceDir: string,
   manifest: A5cPluginManifest,
   targetProfile: TargetProfile,
   diagnostics: Diagnostic[]
@@ -249,6 +249,12 @@ function transformHooks(
   }
 
   const isProgrammatic = targetProfile.adapterFamily === 'programmatic';
+  const override = manifest.targets?.[targetProfile.name];
+  const hookFilePattern = typeof override?.hookFilePattern === 'string'
+    ? override.hookFilePattern : undefined;
+  const slugify = (s: string) => s
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
   for (const [canonicalHook, handlerValue] of Object.entries(manifest.hooks)) {
     if (handlerValue === null) continue;
@@ -256,14 +262,47 @@ function transformHooks(
     const nativeHook = targetProfile.supportedHooks.get(canonicalHook);
     if (!nativeHook) continue;
 
-    // For programmatic targets with string handler scripts, generate a thin
-    // JS bridge that calls the shell script via execSync with the right env vars
-    if (isProgrammatic && typeof handlerValue === 'string' && handlerValue !== 'proxy') {
-      const slugName = handlerValue.replace(/^hooks\//, '').replace(/\.sh$/, '');
-      const jsContent = generateJsBridge(slugName, handlerValue, targetProfile);
+    if (typeof handlerValue !== 'string' || handlerValue === 'proxy') continue;
+
+    const hookSlug = slugify(canonicalHook);
+    const sourceScript = path.join(sourceDir, handlerValue);
+    if (!fs.existsSync(sourceScript)) continue;
+
+    const content = fs.readFileSync(sourceScript, 'utf-8');
+
+    // Determine output filename
+    let outName: string;
+    if (hookFilePattern) {
+      outName = hookFilePattern
+        .replace(/\{\{name\}\}/g, manifest.name)
+        .replace(/\{\{slug\}\}/g, hookSlug);
+    } else {
+      outName = path.basename(handlerValue);
+    }
+
+    // Copy bash script with renamed filename
+    files.push({
+      path: `hooks/${outName}`,
+      content,
+      executable: true,
+    });
+
+    // Generate PowerShell variant for targets that use powershell
+    if (targetProfile.scriptVariants.includes('powershell')) {
+      const ps1Name = outName.replace(/\.sh$/, '.ps1');
       files.push({
-        path: `hooks/${slugName}.js`,
-        content: jsContent,
+        path: `hooks/${ps1Name}`,
+        content: generatePs1Wrapper(hookSlug, targetProfile.adapterName, handlerValue),
+        executable: false,
+      });
+    }
+
+    // Generate JS bridge for programmatic targets
+    if (isProgrammatic) {
+      const jsName = outName.replace(/\.sh$/, '.js');
+      files.push({
+        path: `hooks/${jsName}`,
+        content: generateJsBridge(jsName.replace(/\.js$/, ''), handlerValue, targetProfile),
         executable: true,
       });
     }
@@ -282,6 +321,26 @@ function transformHooks(
   }
 
   return files;
+}
+
+function generatePs1Wrapper(
+  hookSlug: string,
+  adapterName: string,
+  _sourceScript: string
+): string {
+  return `# PowerShell hook wrapper — sets env vars and delegates to bash
+$env:HOOK_TYPE = '${hookSlug}'
+$env:ADAPTER_NAME = '${adapterName}'
+$env:PLUGIN_ROOT = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+
+$input_data = [Console]::In.ReadToEnd()
+$result = $input_data | & bash "$PSScriptRoot/../$($MyInvocation.MyCommand.Name -replace '\\.ps1$','.sh')" 2>$null
+if ($LASTEXITCODE -eq 0 -and $result) {
+  Write-Output $result
+} else {
+  Write-Output '{}'
+}
+`;
 }
 
 function generateJsBridge(
@@ -343,8 +402,26 @@ function generateHarnessManifest(
 
 function generateInstallShared(
   manifest: A5cPluginManifest,
-  _targetProfile: TargetProfile
+  targetProfile: TargetProfile
 ): string {
+  // Determine target-specific paths
+  let globalPluginDir: string;
+  let marketplaceRelPath: string;
+  switch (targetProfile.name) {
+    case 'codex':
+      globalPluginDir = `path.join(os.homedir(), '.agents', 'plugins', PLUGIN_NAME)`;
+      marketplaceRelPath = `path.join(os.homedir(), '.agents', 'plugins', 'marketplace.json')`;
+      break;
+    case 'cursor':
+      globalPluginDir = `path.join(os.homedir(), '.cursor', 'plugins', PLUGIN_NAME)`;
+      marketplaceRelPath = `path.join(os.homedir(), '.cursor', 'plugins', 'marketplace.json')`;
+      break;
+    default:
+      globalPluginDir = `path.join(os.homedir(), '.a5c', 'plugins', PLUGIN_NAME)`;
+      marketplaceRelPath = `path.join(os.homedir(), '.a5c', 'plugins', 'marketplace.json')`;
+      break;
+  }
+
   return `#!/usr/bin/env node
 'use strict';
 
@@ -356,7 +433,11 @@ var PLUGIN_NAME = ${JSON.stringify(manifest.name)};
 
 function getPluginHome(scope) {
   if (scope === 'workspace') return path.join(process.cwd(), '.a5c', 'plugins', PLUGIN_NAME);
-  return path.join(os.homedir(), '.a5c', 'plugins', PLUGIN_NAME);
+  return ${globalPluginDir};
+}
+
+function getMarketplacePath() {
+  return ${marketplaceRelPath};
 }
 
 function copyDir(src, dest) {
@@ -371,6 +452,22 @@ function copyDir(src, dest) {
   }
 }
 
+function ensureMarketplaceEntry(marketplacePath, pluginRoot) {
+  var marketplace;
+  if (fs.existsSync(marketplacePath)) {
+    marketplace = JSON.parse(fs.readFileSync(marketplacePath, 'utf8'));
+  } else {
+    marketplace = { name: ${JSON.stringify(typeof manifest.author === 'string' ? manifest.author : manifest.author.name)}, plugins: [] };
+  }
+  if (!Array.isArray(marketplace.plugins)) marketplace.plugins = [];
+  var idx = marketplace.plugins.findIndex(function(p) { return p.name === PLUGIN_NAME; });
+  var entry = { name: PLUGIN_NAME, source: pluginRoot, description: ${JSON.stringify(manifest.description)}, version: ${JSON.stringify(manifest.version)} };
+  if (idx >= 0) marketplace.plugins[idx] = entry;
+  else marketplace.plugins.push(entry);
+  fs.mkdirSync(path.dirname(marketplacePath), { recursive: true });
+  fs.writeFileSync(marketplacePath, JSON.stringify(marketplace, null, 2) + '\\n');
+}
+
 function runPostInstall(pluginRoot) {
   var postInstall = path.join(pluginRoot, 'scripts', 'post-install.js');
   if (fs.existsSync(postInstall)) {
@@ -381,7 +478,7 @@ function runPostInstall(pluginRoot) {
   }
 }
 
-module.exports = { PLUGIN_NAME, getPluginHome, copyDir, runPostInstall };
+module.exports = { PLUGIN_NAME, getPluginHome, getMarketplacePath, copyDir, ensureMarketplaceEntry, runPostInstall };
 `;
 }
 
@@ -475,6 +572,7 @@ function generateManifests(
       const codexPkg = generateCodexManifest(manifest);
       files.push({ path: 'package.json', content: codexPkg });
       files.push({ path: '.codex-plugin/plugin.json', content: generateHarnessManifest(manifest, targetProfile) });
+      files.push({ path: '.app.json', content: JSON.stringify({ apps: {} }, null, 2) });
       break;
     }
     case 'cursor': {
@@ -608,7 +706,8 @@ function copyContextFiles(
 
 function copyIncludedFiles(
   sourceDir: string,
-  manifest: A5cPluginManifest
+  manifest: A5cPluginManifest,
+  excludePatterns: string[] = []
 ): TransformedFile[] {
   const files: TransformedFile[] = [];
 
@@ -617,7 +716,8 @@ function copyIncludedFiles(
   }
 
   for (const pattern of manifest.include) {
-    // Simple glob: if pattern has no wildcard, treat as literal path
+    if (excludePatterns.some(ex => pattern === ex || pattern.startsWith(ex))) continue;
+
     if (!pattern.includes('*')) {
       const fullPath = path.join(sourceDir, pattern);
       if (fs.existsSync(fullPath)) {

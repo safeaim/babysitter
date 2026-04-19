@@ -148,11 +148,13 @@ function isIgnoredFile(f) {
     f.startsWith('node_modules/') ||
     f.startsWith('dist/') ||
     f.startsWith('test/') ||
-    f.startsWith('scripts/') ||
-    f.startsWith('.claude-plugin/') ||
     f === 'package-lock.json' ||
-    f === '.app.json' ||
     f === 'plugin.lock.json' ||
-    f === '.npmrc'
+    f === '.npmrc' ||
+    f === '.cursorrules' ||
+    f === 'CHANGELOG.md' ||
+    f.endsWith('.legacy') ||
+    f.endsWith('.legacy.ts') ||
+    f.includes('sync-command')
   );
 }

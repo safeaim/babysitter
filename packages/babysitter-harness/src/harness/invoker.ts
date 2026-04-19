@@ -129,8 +129,9 @@ export async function invokeHarness(
   // External harnesses go through agent-mux
   if (!hasAmuxAdapter(name)) {
     throw new BabysitterRuntimeError(
-      `No agent-mux adapter for harness "${name}"`,
-      ErrorCategory.Configuration,
+      "UnknownHarnessError",
+      `No agent-mux adapter for harness "${name}". External harnesses must have an agent-mux mapping.`,
+      { category: ErrorCategory.Configuration },
     );
   }
 
@@ -139,19 +140,11 @@ export async function invokeHarness(
 }
 
 /**
- * Direct child-process invocation of a harness CLI.
+ * Direct child-process invocation for Pi and internal harnesses.
  *
- * This is the original invokeHarness implementation, preserved as the
- * fallback path when agent-mux is not available.
- *
- * Steps:
- *   1. Validate that `name` is a known harness.
- *   2. Check that the CLI binary is installed via `checkCliAvailable`.
- *   3. Build args via `buildHarnessArgs`.
- *   4. Spawn via `child_process.execFile`. On Windows, enable shell mode so
- *      PATH-resolved `.cmd` shims (for example npm-installed CLIs) can launch.
- *   5. Capture stdout + stderr, measure wall-clock duration.
- *   6. Return a `HarnessInvokeResult`.
+ * "internal" uses piWrapper (in-process). Pi uses CLI subprocess via
+ * `child_process.execFile`. External harnesses should never reach this
+ * function -- they are routed through agent-mux in {@link invokeHarness}.
  *
  * @throws {BabysitterRuntimeError} if the harness is unknown or the CLI is
  *   not installed.
@@ -209,33 +202,14 @@ export async function invokeHarnessDirect(
 
   const args = buildHarnessArgs(name, options);
   const timeoutMs = options.timeout ?? DEFAULT_TIMEOUT_MS;
-  let promptTempDir: string | undefined;
-  let promptFilePath: string | undefined;
-  if (process.platform === "win32" && name === "codex") {
-    promptTempDir = await fs.mkdtemp(path.join(os.tmpdir(), "babysitter-codex-"));
-    promptFilePath = path.join(promptTempDir, "prompt.txt");
-    await fs.writeFile(promptFilePath, options.prompt, "utf8");
-  }
-  const launch = buildLaunchSpec(name, spec, cliCheck.path, args, promptFilePath);
-  const childCwd = name === "codex" ? process.cwd() : options.workspace;
+  const launch = buildLaunchSpec(name, spec, cliCheck.path, args);
 
   const startTime = Date.now();
-
-  // GAP-PERF-004: Use streaming path when callbacks are provided
-  if (options.streaming && (options.streaming.onStdout || options.streaming.onStderr || options.streaming.onLine)) {
-    return invokeHarnessStreaming(name, options, launch, childCwd, timeoutMs, startTime, options.streaming, promptTempDir);
-  }
 
   return new Promise<HarnessInvokeResult>((resolve, reject) => {
     const childEnv = options.env
       ? { ...process.env, ...options.env }
       : process.env;
-    const cleanupPromptFile = async (): Promise<void> => {
-      if (!promptTempDir) {
-        return;
-      }
-      await fs.rm(promptTempDir, { recursive: true, force: true }).catch(() => {});
-    };
 
     let trackedPid: number | undefined;
     try {
@@ -243,7 +217,7 @@ export async function invokeHarnessDirect(
         launch.command,
         launch.args,
         {
-          cwd: childCwd,
+          cwd: options.workspace,
           timeout: timeoutMs,
           windowsHide: true,
           maxBuffer: 50 * 1024 * 1024, // 50 MiB
@@ -252,7 +226,6 @@ export async function invokeHarnessDirect(
         },
         (error: Error | null, stdout: string | Buffer, stderr: string | Buffer) => {
           untrackChild(trackedPid);
-          void cleanupPromptFile();
           const duration = Date.now() - startTime;
           const stderrStr = String(stderr);
           const output = stderrStr.length > 0
@@ -287,179 +260,11 @@ export async function invokeHarnessDirect(
       );
       trackedPid = child.pid;
       trackChild(child);
-      if (name === "codex" && process.platform !== "win32" && child.stdin) {
-        child.stdin.end(options.prompt);
-      }
     } catch (err: unknown) {
-      void cleanupPromptFile();
       reject(
         new BabysitterRuntimeError(
           "HarnessSpawnError",
           `Failed to spawn ${spec.cli}: ${err instanceof Error ? err.message : String(err)}`,
-          { category: ErrorCategory.External },
-        ),
-      );
-    }
-  });
-}
-
-// ---------------------------------------------------------------------------
-// GAP-PERF-004: Streaming invoker
-// ---------------------------------------------------------------------------
-
-/**
- * Invoke a harness CLI using spawn for real-time streaming output.
- * Collects full output while forwarding chunks to streaming callbacks.
- * @internal
- */
-function invokeHarnessStreaming(
-  name: string,
-  options: HarnessInvokeOptions,
-  launch: LaunchSpec,
-  childCwd: string | undefined,
-  timeoutMs: number,
-  startTime: number,
-  streaming: StreamingOutputOptions,
-  promptTempDir: string | undefined,
-): Promise<HarnessInvokeResult> {
-  return new Promise<HarnessInvokeResult>((resolve, reject) => {
-    const childEnv = options.env
-      ? { ...process.env, ...options.env }
-      : process.env;
-
-    const cleanupPromptFile = async (): Promise<void> => {
-      if (!promptTempDir) return;
-      await fs.rm(promptTempDir, { recursive: true, force: true }).catch(() => {});
-    };
-
-    let trackedPid: number | undefined;
-    try {
-      const child = spawn(launch.command, launch.args, {
-        cwd: childCwd,
-        windowsHide: true,
-        env: childEnv,
-        shell: launch.shell,
-        stdio: ["pipe", "pipe", "pipe"],
-      });
-
-      trackedPid = child.pid;
-      trackChild(child);
-
-      let streamChunkCount = 0;
-      const stdoutBuf: string[] = [];
-      const stderrBuf: string[] = [];
-      let stdoutLineBuf = "";
-      let stderrLineBuf = "";
-
-      // Timeout handling
-      const timer = setTimeout(() => {
-        child.kill("SIGTERM");
-        setTimeout(() => {
-          try { child.kill("SIGKILL"); } catch { /* already exited */ }
-        }, 5000);
-      }, timeoutMs);
-
-      // AbortSignal support
-      if (options.signal) {
-        if (options.signal.aborted) {
-          child.kill("SIGTERM");
-        } else {
-          options.signal.addEventListener("abort", () => {
-            child.kill("SIGTERM");
-            setTimeout(() => {
-              try { child.kill("SIGKILL"); } catch { /* already exited */ }
-            }, 5000);
-          }, { once: true });
-        }
-      }
-
-      child.stdout?.on("data", (chunk: Buffer) => {
-        const text = chunk.toString();
-        stdoutBuf.push(text);
-        streamChunkCount++;
-        if (streaming.onStdout) streaming.onStdout(text);
-
-        if (streaming.onLine) {
-          stdoutLineBuf += text;
-          const lines = stdoutLineBuf.split("\n");
-          stdoutLineBuf = lines.pop() ?? "";
-          for (const line of lines) {
-            streaming.onLine(line, "stdout");
-          }
-        }
-      });
-
-      child.stderr?.on("data", (chunk: Buffer) => {
-        const text = chunk.toString();
-        stderrBuf.push(text);
-        streamChunkCount++;
-        if (streaming.onStderr) streaming.onStderr(text);
-
-        if (streaming.onLine) {
-          stderrLineBuf += text;
-          const lines = stderrLineBuf.split("\n");
-          stderrLineBuf = lines.pop() ?? "";
-          for (const line of lines) {
-            streaming.onLine(line, "stderr");
-          }
-        }
-      });
-
-      child.on("close", (code, signal) => {
-        clearTimeout(timer);
-        untrackChild(trackedPid);
-        void cleanupPromptFile();
-
-        // Flush remaining line buffers
-        if (streaming.onLine && stdoutLineBuf) streaming.onLine(stdoutLineBuf, "stdout");
-        if (streaming.onLine && stderrLineBuf) streaming.onLine(stderrLineBuf, "stderr");
-
-        const duration = Date.now() - startTime;
-        const stdoutStr = stdoutBuf.join("");
-        const stderrStr = stderrBuf.join("");
-        const output = stderrStr.length > 0
-          ? `${stdoutStr}\n${stderrStr}`.trim()
-          : stdoutStr.trim();
-
-        const killed = signal === "SIGTERM" || signal === "SIGKILL";
-        const exitCode = code ?? (killed ? 1 : 0);
-
-        resolve({
-          success: exitCode === 0 && !killed,
-          output: killed
-            ? `Process timed out after ${timeoutMs}ms\n${output}`.trim()
-            : output,
-          exitCode,
-          duration,
-          harness: name,
-          streamed: true,
-          streamChunkCount,
-        });
-      });
-
-      child.on("error", (err: Error) => {
-        clearTimeout(timer);
-        untrackChild(trackedPid);
-        void cleanupPromptFile();
-        reject(
-          new BabysitterRuntimeError(
-            "HarnessSpawnError",
-            `Failed to spawn ${name}: ${err.message}`,
-            { category: ErrorCategory.External },
-          ),
-        );
-      });
-
-      // Feed prompt via stdin for codex on non-Windows
-      if (name === "codex" && process.platform !== "win32" && child.stdin) {
-        child.stdin.end(options.prompt);
-      }
-    } catch (err: unknown) {
-      void cleanupPromptFile();
-      reject(
-        new BabysitterRuntimeError(
-          "HarnessSpawnError",
-          `Failed to spawn ${name}: ${err instanceof Error ? err.message : String(err)}`,
           { category: ErrorCategory.External },
         ),
       );

@@ -18,8 +18,75 @@ import {
   ErrorCategory,
 } from "@a5c-ai/babysitter-sdk";
 import type { HarnessInvokeOptions, HarnessInvokeResult } from "./types";
-import { buildHarnessArgs, buildLaunchSpec, HARNESS_CLI_MAP } from "./invoker";
+import {
+  buildLaunchSpec,
+  type HarnessCliSpec,
+} from "./invoker/launch";
 import { createPiSession } from "./piWrapper";
+
+// ---------------------------------------------------------------------------
+// CLI mapping for streaming invocations (full map for TUI / dashboard use)
+// ---------------------------------------------------------------------------
+
+/**
+ * CLI mapping used exclusively by the streaming invoker. This is the full
+ * set of harness CLI specs, retained here because the TUI/dashboard streams
+ * output from harnesses directly via spawn() rather than through agent-mux.
+ */
+const STREAMING_CLI_MAP: Readonly<Record<string, HarnessCliSpec>> = {
+  "claude-code": { cli: "claude", supportsModel: true, promptStyle: "flag" },
+  codex: {
+    cli: "codex",
+    workspaceFlag: "-C",
+    supportsModel: true,
+    promptStyle: "positional",
+    baseArgs: ["exec", "--dangerously-bypass-approvals-and-sandbox", "--skip-git-repo-check"],
+  },
+  pi: { cli: "pi", workspaceFlag: "--workspace", supportsModel: true, promptStyle: "flag" },
+  "oh-my-pi": { cli: "omp", workspaceFlag: "--workspace", supportsModel: true, promptStyle: "flag" },
+  "gemini-cli": { cli: "gemini", supportsModel: true, promptStyle: "flag" },
+  "github-copilot": { cli: "copilot", supportsModel: true, promptStyle: "flag" },
+  cursor: { cli: "cursor", supportsModel: true, promptStyle: "positional", baseArgs: ["agent"], workspaceFlag: "--workspace" },
+  openclaw: { cli: "openclaw", workspaceFlag: undefined, supportsModel: false, promptStyle: "flag", baseArgs: [] },
+  opencode: { cli: "opencode", supportsModel: true, promptStyle: "positional", baseArgs: ["run"] },
+} as const;
+
+/**
+ * Builds CLI argument array for streaming harness invocations.
+ * @internal
+ */
+function buildStreamingArgs(
+  name: string,
+  options: HarnessInvokeOptions,
+  spec: HarnessCliSpec,
+): string[] {
+  const args: string[] = [...(spec.baseArgs ?? [])];
+
+  if ((spec.promptStyle ?? "flag") === "positional") {
+    args.push(name === "codex" ? "-" : options.prompt);
+  } else {
+    args.push("--prompt", options.prompt);
+  }
+
+  if (options.model && spec.supportsModel) {
+    args.push("--model", options.model);
+  }
+
+  if (options.workspace && spec.workspaceFlag) {
+    args.push(spec.workspaceFlag, options.workspace);
+  }
+
+  // Structured JSON output mode (rpc) — only for harnesses that support it
+  if (options.rpc) {
+    if (name === "claude-code") {
+      args.push("--output-format", "streaming-json");
+    }
+    // codex already uses JSON events natively — no flag needed
+    // other harnesses: rpc flag silently ignored
+  }
+
+  return args;
+}
 
 // ---------------------------------------------------------------------------
 // OutputStreamCollector
@@ -117,11 +184,11 @@ export async function invokeHarnessStreaming(
     }
   }
 
-  const spec = HARNESS_CLI_MAP[name];
+  const spec = STREAMING_CLI_MAP[name];
   if (!spec) {
     throw new BabysitterRuntimeError(
       "UnknownHarnessError",
-      `Unknown harness: "${name}". Supported: ${Object.keys(HARNESS_CLI_MAP).join(", ")}`,
+      `Unknown harness: "${name}". Supported: ${Object.keys(STREAMING_CLI_MAP).join(", ")}`,
       { category: ErrorCategory.Validation },
     );
   }
@@ -135,7 +202,7 @@ export async function invokeHarnessStreaming(
     );
   }
 
-  const args = buildHarnessArgs(name, options);
+  const args = buildStreamingArgs(name, options, spec);
 
   // Windows codex special-case: write prompt to temp file for stdin piping
   let promptTempDir: string | undefined;

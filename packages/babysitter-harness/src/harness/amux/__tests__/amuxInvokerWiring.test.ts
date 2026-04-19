@@ -1,8 +1,8 @@
 /**
  * Tests for the wiring between invokeHarness and the amux bridge.
  *
- * Verifies that invokeHarness tries agent-mux first and falls back
- * to direct invocation when amux is unavailable.
+ * External harnesses are routed through agent-mux exclusively.
+ * Pi / internal harnesses always use piWrapper / direct invocation.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { AmuxClient, AmuxRunHandle, AmuxAgentEvent, AmuxInteractionChannel } from "../amuxTypes";
@@ -27,7 +27,7 @@ vi.mock("@a5c-ai/babysitter-sdk", async (importOriginal) => {
   const actual = await importOriginal() as Record<string, unknown>;
   return {
     ...actual,
-    checkCliAvailable: vi.fn().mockResolvedValue({ available: true, path: "/usr/bin/claude" }),
+    checkCliAvailable: vi.fn().mockResolvedValue({ available: true, path: "/usr/bin/pi" }),
   };
 });
 
@@ -63,7 +63,7 @@ vi.mock("../../invoker/processControl", () => ({
 // Mock launch
 vi.mock("../../invoker/launch", () => ({
   buildLaunchSpec: vi.fn().mockReturnValue({
-    command: "claude",
+    command: "pi",
     args: ["--prompt", "test"],
     shell: false,
   }),
@@ -115,21 +115,7 @@ afterEach(() => {
 });
 
 describe("invokeHarness amux wiring", () => {
-  it("falls back to direct invocation when amux client is null", async () => {
-    vi.mocked(getAmuxClient).mockResolvedValue(null);
-
-    const result = await invokeHarness("claude-code", {
-      prompt: "test prompt",
-    });
-
-    expect(getAmuxClient).toHaveBeenCalledOnce();
-    expect(invokeViaAgentMux).not.toHaveBeenCalled();
-    // Direct path returns "direct-output" from mocked execFile
-    expect(result.output).toBe("direct-output");
-    expect(result.harness).toBe("claude-code");
-  });
-
-  it("uses amux when client is available and harness has adapter", async () => {
+  it("routes external harnesses through amux exclusively", async () => {
     const mockClient = createMockAmuxClient();
     vi.mocked(getAmuxClient).mockResolvedValue(mockClient);
     vi.mocked(invokeViaAgentMux).mockResolvedValue({
@@ -156,6 +142,15 @@ describe("invokeHarness amux wiring", () => {
       expect.objectContaining({ prompt: "test prompt" }),
     );
     expect(result.output).toBe("amux-result");
+  });
+
+  it("throws for unknown harness without amux adapter", async () => {
+    await expect(
+      invokeHarness("unknown-harness", { prompt: "test" }),
+    ).rejects.toThrow(/No agent-mux adapter/);
+
+    expect(getAmuxClient).not.toHaveBeenCalled();
+    expect(invokeViaAgentMux).not.toHaveBeenCalled();
   });
 
   it("uses direct invocation for pi harness even when amux is available", async () => {
@@ -186,15 +181,9 @@ describe("invokeHarness amux wiring", () => {
     expect(result.harness).toBe("internal");
   });
 
-  it("falls back to direct when amux client exists but harness has no adapter", async () => {
+  it("routes codex through amux", async () => {
     const mockClient = createMockAmuxClient();
     vi.mocked(getAmuxClient).mockResolvedValue(mockClient);
-
-    // "internal" is not in HARNESS_TO_AMUX_ADAPTER, but it's caught earlier.
-    // We need a harness that's in HARNESS_CLI_MAP but not in HARNESS_TO_AMUX_ADAPTER.
-    // Currently all CLI harnesses are mapped, so we test a hypothetical one
-    // by checking the actual behavior for a known harness.
-    // Instead, let's verify that codex routes through amux when available.
     vi.mocked(invokeViaAgentMux).mockResolvedValue({
       success: true,
       output: "amux-codex",

@@ -13,7 +13,7 @@ export const GITHUB_COPILOT_PROFILE: TargetProfile = {
     ['UserPromptSubmit', 'userPromptSubmitted'],
   ]),
   commandFormat: 'markdown',
-  skillHandling: 'native',
+  skillHandling: 'derived-from-commands',
   manifestFormat: 'plugin.json',
   hookRegistrationFormat: 'github-copilot',
   scriptVariants: ['bash', 'powershell'],

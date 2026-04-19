@@ -12,7 +12,7 @@ export const CURSOR_PROFILE: TargetProfile = {
     ['Stop', 'stop'],
   ]),
   commandFormat: 'markdown',
-  skillHandling: 'native',
+  skillHandling: 'derived-from-commands',
   manifestFormat: 'plugin.json',
   hookRegistrationFormat: 'cursor',
   scriptVariants: ['bash', 'powershell'],

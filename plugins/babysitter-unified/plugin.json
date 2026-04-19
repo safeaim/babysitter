@@ -34,11 +34,12 @@
   ],
   "include": [
     "versions.json",
-    "hooks/"
+    "hooks/",
+    "scripts/"
   ],
   "targets": {
     "claude-code": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}-hook.sh",
+      "hookFilePattern": "{{name}}-{{slug}}-hook.sh",
       "hookConfig": {
         "matchers": {
           "PreToolUse": "Bash"
@@ -47,7 +48,7 @@
     },
     "codex": {
       "npmPackageName": "@a5c-ai/babysitter-codex",
-      "hookFilePattern": "{{name}}-proxied-{{slug}}.sh",
+      "hookFilePattern": "{{name}}-{{slug}}.sh",
       "harnessManifest": {
         "skills": "./skills/",
         "hooks": "./hooks.json",
@@ -71,10 +72,15 @@
           "composerIcon": "./assets/icon.svg",
           "logo": "./assets/logo.png"
         }
+      },
+      "extraFiles": {
+        "assets/icon.svg": "file:per-harness/codex/assets/icon.svg",
+        "assets/logo.png": "file:per-harness/codex/assets/logo.png",
+        "assets/logo.svg": "file:per-harness/codex/assets/logo.svg"
       }
     },
     "cursor": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}-hook.sh",
+      "hookFilePattern": "{{name}}-{{slug}}-hook.sh",
       "harnessManifest": {
         "skills": "skills/",
         "commands": "commands/",
@@ -82,13 +88,13 @@
       }
     },
     "gemini": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}-hook.sh",
+      "hookFilePattern": "{{name}}-{{slug}}-hook.sh",
       "extraFiles": {
         "GEMINI.md": "file:per-harness/gemini/GEMINI.md"
       }
     },
     "github-copilot": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}-hook.sh",
+      "hookFilePattern": "{{name}}-{{slug}}-hook.sh",
       "extraFiles": {
         "AGENTS.md": "file:per-harness/github/AGENTS.md"
       }

@@ -153,6 +153,9 @@ function isIgnoredFile(f) {
     f === '.npmrc' ||
     f === '.cursorrules' ||
     f === 'CHANGELOG.md' ||
+    f === 'hooks/proxied-hooks.json' ||
+    f === 'hooks/hooks.json' ||
+    f === 'proxied-hooks.json' ||
     f.endsWith('.legacy') ||
     f.endsWith('.legacy.ts') ||
     f.includes('sync-command')

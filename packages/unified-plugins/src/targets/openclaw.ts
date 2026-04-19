@@ -14,7 +14,7 @@ export const OPENCLAW_PROFILE: TargetProfile = {
     ['BeforePromptBuild', 'before_prompt_build'],
   ]),
   commandFormat: 'markdown',
-  skillHandling: 'native',
+  skillHandling: 'derived-from-commands',
   manifestFormat: 'multiple', // plugin.json + openclaw.plugin.json
   hookRegistrationFormat: 'openclaw',
   scriptVariants: ['bash', 'typescript'],

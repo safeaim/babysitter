@@ -317,6 +317,77 @@ try {
 `;
 }
 
+function generateInstallShared(
+  manifest: A5cPluginManifest,
+  _targetProfile: TargetProfile
+): string {
+  return `#!/usr/bin/env node
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
+var os = require('os');
+
+var PLUGIN_NAME = ${JSON.stringify(manifest.name)};
+
+function getPluginHome(scope) {
+  if (scope === 'workspace') return path.join(process.cwd(), '.a5c', 'plugins', PLUGIN_NAME);
+  return path.join(os.homedir(), '.a5c', 'plugins', PLUGIN_NAME);
+}
+
+function copyDir(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  var entries = fs.readdirSync(src, { withFileTypes: true });
+  for (var entry of entries) {
+    if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === 'test') continue;
+    var srcPath = path.join(src, entry.name);
+    var destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) copyDir(srcPath, destPath);
+    else fs.copyFileSync(srcPath, destPath);
+  }
+}
+
+function runPostInstall(pluginRoot) {
+  var postInstall = path.join(pluginRoot, 'scripts', 'post-install.js');
+  if (fs.existsSync(postInstall)) {
+    require('child_process').spawnSync(process.execPath, [postInstall], {
+      cwd: pluginRoot, stdio: 'inherit',
+      env: Object.assign({}, process.env, { PLUGIN_ROOT: pluginRoot })
+    });
+  }
+}
+
+module.exports = { PLUGIN_NAME, getPluginHome, copyDir, runPostInstall };
+`;
+}
+
+function generateTeamInstall(
+  manifest: A5cPluginManifest,
+  _targetProfile: TargetProfile
+): string {
+  return `#!/usr/bin/env node
+'use strict';
+
+var path = require('path');
+var shared = require('../bin/install-shared');
+
+var workspace = process.cwd();
+for (var i = 0; i < process.argv.length; i++) {
+  if (process.argv[i] === '--workspace' && process.argv[i + 1]) {
+    workspace = path.resolve(process.argv[i + 1]);
+  }
+}
+
+var dest = shared.getPluginHome('workspace');
+console.log('[${manifest.name}] Team install to ' + dest);
+
+var src = process.env.PLUGIN_PACKAGE_ROOT || path.resolve(__dirname, '..');
+shared.copyDir(src, dest);
+shared.runPostInstall(dest);
+console.log('[${manifest.name}] Team install complete.');
+`;
+}
+
 function generateHookRegistrationFile(
   manifest: A5cPluginManifest,
   targetProfile: TargetProfile,
@@ -370,24 +441,24 @@ function generateManifests(
   const files: TransformedFile[] = [];
 
   switch (targetProfile.name) {
-    case 'claude-code':
-      files.push({
-        path: 'plugin.json',
-        content: generateClaudeCodeManifest(manifest),
-      });
+    case 'claude-code': {
+      const ccManifest = generateClaudeCodeManifest(manifest);
+      files.push({ path: 'plugin.json', content: ccManifest });
+      files.push({ path: '.claude-plugin/plugin.json', content: ccManifest });
       break;
-    case 'codex':
-      files.push({
-        path: 'package.json',
-        content: generateCodexManifest(manifest),
-      });
+    }
+    case 'codex': {
+      const codexPkg = generateCodexManifest(manifest);
+      files.push({ path: 'package.json', content: codexPkg });
+      files.push({ path: '.codex-plugin/plugin.json', content: generateClaudeCodeManifest(manifest) });
       break;
-    case 'cursor':
-      files.push({
-        path: 'plugin.json',
-        content: generateCursorManifest(manifest),
-      });
+    }
+    case 'cursor': {
+      const cursorManifest = generateCursorManifest(manifest);
+      files.push({ path: 'plugin.json', content: cursorManifest });
+      files.push({ path: '.cursor-plugin/plugin.json', content: cursorManifest });
       break;
+    }
     case 'gemini':
       files.push({
         path: 'plugin.json',
@@ -625,6 +696,25 @@ function generateExtraFiles(
     content: generateInstallInstructions(manifest, targetProfile, sourceDir),
   });
 
+  // .gitignore
+  files.push({
+    path: '.gitignore',
+    content: 'node_modules/\ndist/\n*.log\n.DS_Store\n',
+  });
+
+  // Install infrastructure for npm-publishable targets
+  if (targetProfile.distribution === 'npm-cli' || targetProfile.distribution === 'both') {
+    files.push({
+      path: 'bin/install-shared.js',
+      content: generateInstallShared(manifest, targetProfile),
+    });
+    files.push({
+      path: 'scripts/team-install.js',
+      content: generateTeamInstall(manifest, targetProfile),
+      executable: true,
+    });
+  }
+
   // Emit target-override extraFiles
   const targetOverride = manifest.targets?.[targetProfile.name];
   if (targetOverride?.extraFiles) {
@@ -641,6 +731,18 @@ function generateExtraFiles(
       } else {
         files.push({ path: outputPath, content: value });
       }
+    }
+  }
+
+  // Copy postInstall script if defined
+  if (manifest.postInstall) {
+    const postInstallPath = path.join(sourceDir, manifest.postInstall);
+    if (fs.existsSync(postInstallPath)) {
+      files.push({
+        path: 'scripts/post-install.js',
+        content: fs.readFileSync(postInstallPath, 'utf-8'),
+        executable: true,
+      });
     }
   }
 

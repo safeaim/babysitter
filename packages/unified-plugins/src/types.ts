@@ -38,6 +38,9 @@ export interface A5cPluginManifest {
   // Extra files to include in output (glob patterns relative to source dir)
   include?: string[];
 
+  // Lifecycle scripts (relative to source dir, copied to output and called by generated installer)
+  postInstall?: string;
+
   // Hook Configuration
   hookConfig?: {
     proxyAdapter?: boolean;

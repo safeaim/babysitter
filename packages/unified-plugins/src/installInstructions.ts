@@ -1,8 +1,128 @@
 // Unified installation instructions generator for all targets
 
+import * as fs from 'fs';
+import * as path from 'path';
 import type { A5cPluginManifest, TargetProfile } from './types.js';
 
 export function generateInstallInstructions(
+  manifest: A5cPluginManifest,
+  targetProfile: TargetProfile,
+  sourceDir?: string
+): string {
+  // If a README.template.md exists in the source dir, use it
+  if (sourceDir) {
+    const templatePath = path.join(sourceDir, 'README.template.md');
+    if (fs.existsSync(templatePath)) {
+      return renderTemplate(
+        fs.readFileSync(templatePath, 'utf-8'),
+        manifest,
+        targetProfile
+      );
+    }
+  }
+
+  return renderDefault(manifest, targetProfile);
+}
+
+function renderTemplate(
+  template: string,
+  manifest: A5cPluginManifest,
+  targetProfile: TargetProfile
+): string {
+  const npmPkg = targetProfile.npmPackageName || `@a5c-ai/${manifest.name}-${targetProfile.name}`;
+  const cliName = `${manifest.name}-${targetProfile.name}`;
+
+  const skillNames = manifest.skills
+    ? manifest.skills.map(s => s.name).join(', ')
+    : 'none';
+
+  const hookNames = manifest.hooks
+    ? Object.keys(manifest.hooks)
+        .filter(h => {
+          const val = manifest.hooks![h];
+          if (val === null) return false;
+          return targetProfile.supportedHooks.has(h);
+        })
+        .join(', ')
+    : 'none';
+
+  const commandList = getCommandNames(manifest).join(', ') || 'none';
+
+  const hasBinScripts = targetProfile.distribution === 'npm-cli' || targetProfile.distribution === 'both';
+  const hasExtension = targetProfile.adapterFamily === 'programmatic';
+
+  let installInstructions: string;
+  switch (targetProfile.distribution) {
+    case 'marketplace':
+      installInstructions = generateMarketplaceBlock(targetProfile);
+      break;
+    case 'npm-cli':
+      installInstructions = generateNpmCliBlock(targetProfile, npmPkg, cliName);
+      break;
+    case 'both':
+      installInstructions = `### Option 1: Marketplace (Recommended)\n\n${generateMarketplaceBlock(targetProfile)}\n\n### Option 2: npm Install\n\n${generateNpmCliBlock(targetProfile, npmPkg, cliName)}`;
+      break;
+  }
+
+  let verifyCommands = '';
+  if (targetProfile.npmPublishable) {
+    verifyCommands += `npm ls -g ${npmPkg} --depth=0\n`;
+  }
+  verifyCommands += `babysitter harness:discover --json | grep ${targetProfile.adapterName}`;
+
+  let result = template;
+  result = result.replace(/\{\{name\}\}/g, manifest.name);
+  result = result.replace(/\{\{description\}\}/g, manifest.description);
+  result = result.replace(/\{\{targetDisplayName\}\}/g, targetProfile.displayName);
+  result = result.replace(/\{\{installInstructions\}\}/g, installInstructions);
+  result = result.replace(/\{\{skillNames\}\}/g, skillNames);
+  result = result.replace(/\{\{hookNames\}\}/g, hookNames);
+  result = result.replace(/\{\{commandList\}\}/g, commandList);
+  result = result.replace(/\{\{verifyCommands\}\}/g, verifyCommands);
+
+  // Conditional blocks: {{#if flag}}...{{/if}}
+  result = replaceConditional(result, 'hasBinScripts', hasBinScripts);
+  result = replaceConditional(result, 'hasExtension', hasExtension);
+
+  return result;
+}
+
+function replaceConditional(text: string, flag: string, value: boolean): string {
+  const pattern = new RegExp(`\\{\\{#if ${flag}\\}\\}([\\s\\S]*?)\\{\\{/if\\}\\}`, 'g');
+  return text.replace(pattern, value ? '$1' : '');
+}
+
+function getCommandNames(manifest: A5cPluginManifest): string[] {
+  if (!manifest.commands) return [];
+  if (typeof manifest.commands === 'string') return ['(directory)'];
+  return manifest.commands.map(c => c.replace(/\.md$/, ''));
+}
+
+function generateMarketplaceBlock(targetProfile: TargetProfile): string {
+  return `\`\`\`bash\nbabysitter harness:install-plugin ${targetProfile.name}\n\`\`\``;
+}
+
+function generateNpmCliBlock(
+  targetProfile: TargetProfile,
+  npmPkg: string,
+  cliName: string
+): string {
+  const lines = [
+    '```bash',
+    `npm install -g ${npmPkg}`,
+    `${cliName} install --global`,
+    '```',
+    '',
+  ];
+  if (targetProfile.name === 'codex') {
+    lines.push('Then open Codex and navigate to `/plugins` to activate the plugin.');
+  } else {
+    lines.push(`Restart ${targetProfile.displayName} to pick up the installed plugin.`);
+  }
+  return lines.join('\n');
+}
+
+function renderDefault(
   manifest: A5cPluginManifest,
   targetProfile: TargetProfile
 ): string {
@@ -14,8 +134,6 @@ export function generateInstallInstructions(
   sections.push('');
   sections.push(manifest.description);
   sections.push('');
-
-  // Prerequisites
   sections.push('## Prerequisites');
   sections.push('');
   sections.push('Install the Babysitter SDK CLI:');
@@ -24,32 +142,28 @@ export function generateInstallInstructions(
   sections.push('npm install -g @a5c-ai/babysitter-sdk');
   sections.push('```');
   sections.push('');
-
-  // Installation
   sections.push('## Installation');
   sections.push('');
 
   switch (targetProfile.distribution) {
     case 'marketplace':
-      sections.push(generateMarketplaceInstructions(manifest, targetProfile));
+      sections.push(generateMarketplaceBlock(targetProfile));
       break;
     case 'npm-cli':
-      sections.push(generateNpmCliInstructions(manifest, targetProfile, npmPkg, cliName));
+      sections.push(generateNpmCliBlock(targetProfile, npmPkg, cliName));
       break;
     case 'both':
       sections.push('### Option 1: Marketplace (Recommended)');
       sections.push('');
-      sections.push(generateMarketplaceInstructions(manifest, targetProfile));
+      sections.push(generateMarketplaceBlock(targetProfile));
       sections.push('');
       sections.push('### Option 2: npm Install');
       sections.push('');
-      sections.push(generateNpmCliInstructions(manifest, targetProfile, npmPkg, cliName));
+      sections.push(generateNpmCliBlock(targetProfile, npmPkg, cliName));
       break;
   }
 
   sections.push('');
-
-  // Workspace install
   if (targetProfile.npmPublishable) {
     sections.push('### Workspace Install');
     sections.push('');
@@ -59,118 +173,14 @@ export function generateInstallInstructions(
     sections.push('');
   }
 
-  // What's included
-  sections.push('## What\'s Included');
-  sections.push('');
-  sections.push(generateIncludedSection(manifest, targetProfile));
-  sections.push('');
-
-  // Verification
   sections.push('## Verification');
   sections.push('');
-  sections.push(generateVerificationSection(manifest, targetProfile, npmPkg));
+  sections.push('```bash');
+  if (targetProfile.npmPublishable) {
+    sections.push(`npm ls -g ${npmPkg} --depth=0`);
+  }
+  sections.push(`babysitter harness:discover --json | grep ${targetProfile.adapterName}`);
+  sections.push('```');
 
   return sections.join('\n');
-}
-
-function generateMarketplaceInstructions(
-  manifest: A5cPluginManifest,
-  targetProfile: TargetProfile
-): string {
-  const lines: string[] = [];
-
-  switch (targetProfile.name) {
-    case 'claude-code':
-      lines.push('```bash');
-      lines.push(`babysitter harness:install-plugin claude-code`);
-      lines.push('```');
-      break;
-    case 'cursor':
-      lines.push('```bash');
-      lines.push(`babysitter harness:install-plugin cursor`);
-      lines.push('```');
-      break;
-    case 'github-copilot':
-      lines.push('```bash');
-      lines.push(`babysitter harness:install-plugin github-copilot`);
-      lines.push('```');
-      break;
-    default:
-      lines.push(`Install via ${targetProfile.displayName}'s plugin marketplace.`);
-      break;
-  }
-
-  return lines.join('\n');
-}
-
-function generateNpmCliInstructions(
-  _manifest: A5cPluginManifest,
-  targetProfile: TargetProfile,
-  npmPkg: string,
-  cliName: string
-): string {
-  const lines: string[] = [];
-
-  lines.push('```bash');
-  lines.push(`npm install -g ${npmPkg}`);
-  lines.push(`${cliName} install --global`);
-  lines.push('```');
-  lines.push('');
-
-  if (targetProfile.name === 'codex') {
-    lines.push('Then open Codex and navigate to `/plugins` to activate the plugin.');
-  } else {
-    lines.push(`Restart ${targetProfile.displayName} to pick up the installed plugin.`);
-  }
-
-  return lines.join('\n');
-}
-
-function generateIncludedSection(
-  manifest: A5cPluginManifest,
-  targetProfile: TargetProfile
-): string {
-  const items: string[] = [];
-
-  if (manifest.skills && manifest.skills.length > 0) {
-    items.push(`- **Skills**: ${manifest.skills.map(s => s.name).join(', ')}`);
-  }
-
-  if (manifest.hooks && Object.keys(manifest.hooks).length > 0) {
-    const hookNames = Object.keys(manifest.hooks).filter(h => manifest.hooks![h] !== null);
-    items.push(`- **Hooks**: ${hookNames.join(', ')}`);
-  }
-
-  if (manifest.commands) {
-    items.push('- **Commands**: Slash commands for plugin operations');
-  }
-
-  if (targetProfile.adapterFamily === 'programmatic') {
-    items.push(`- **Extension**: Programmatic ${targetProfile.displayName} extension with shell-hook adapter bridge`);
-  }
-
-  if (targetProfile.distribution === 'npm-cli' || targetProfile.distribution === 'both') {
-    items.push('- **CLI**: Install/uninstall scripts for global and workspace setup');
-  }
-
-  return items.join('\n');
-}
-
-function generateVerificationSection(
-  manifest: A5cPluginManifest,
-  targetProfile: TargetProfile,
-  npmPkg: string
-): string {
-  const lines: string[] = [];
-
-  lines.push('```bash');
-
-  if (targetProfile.npmPublishable) {
-    lines.push(`npm ls -g ${npmPkg} --depth=0`);
-  }
-
-  lines.push(`babysitter harness:discover --json | grep ${targetProfile.adapterName}`);
-  lines.push('```');
-
-  return lines.join('\n');
 }

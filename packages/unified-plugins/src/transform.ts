@@ -622,7 +622,7 @@ function generateExtraFiles(
   // Generate installation instructions for all targets
   files.push({
     path: 'README.md',
-    content: generateInstallInstructions(manifest, targetProfile),
+    content: generateInstallInstructions(manifest, targetProfile, sourceDir),
   });
 
   // Emit target-override extraFiles

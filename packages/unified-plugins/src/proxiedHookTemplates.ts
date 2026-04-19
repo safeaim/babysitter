@@ -220,7 +220,7 @@ export function generateProxiedHooksJson(
 }
 
 export function generateProgrammaticExtension(
-  manifest: { name: string; skills?: Array<{ name: string }>; commands?: string[] | string },
+  manifest: { name: string; skills?: Array<{ name: string }>; commands?: string[] | string; hooks?: Record<string, string | boolean | null> },
   targetProfile: TargetProfile,
   commandPaths?: string[]
 ): string {
@@ -259,18 +259,15 @@ export function generateProgrammaticExtension(
 
   const commandNames = Array.from(commandNameSet).sort();
 
-  const hookEntries: string[] = [];
-  for (const [canonical, native] of targetProfile.supportedHooks) {
-    const hookType = slugify(canonical);
-    hookEntries.push(
-      `  // ${native} → ${manifest.name}-proxied-${hookType}.js`
-    );
+  // Find the session-start hook script name for the activate() call
+  let sessionStartCall = '';
+  if (manifest.hooks) {
+    const ssHandler = manifest.hooks.SessionStart;
+    if (typeof ssHandler === 'string' && ssHandler !== 'proxy') {
+      const jsBridge = ssHandler.replace(/^hooks\//, '').replace(/\.sh$/, '.js');
+      sessionStartCall = `\n  runProxiedHook("${jsBridge}", {\n    event: "session_start",\n    cwd: process.cwd(),\n  });`;
+    }
   }
-
-  const sessionStartNative = targetProfile.supportedHooks.get('SessionStart');
-  const sessionStartCall = sessionStartNative
-    ? `\n  runProxiedHook("${manifest.name}-proxied-session-start.js", {\n    event: "session_start",\n    cwd: process.cwd(),\n  });`
-    : '';
 
   if (!piPackage) {
     return `// Programmatic extension for ${targetProfile.displayName}
@@ -309,9 +306,7 @@ function toSkillPrompt(name: string, args: string): string {
 
 ${generateRunProxiedHookFunction(pluginRootEnvVar)}
 
-export default function activate(pi: ExtensionAPI): void {
-${hookEntries.join('\n')}
-${sessionStartCall}
+export default function activate(pi: ExtensionAPI): void {${sessionStartCall}
 
   const forwardPrimary = async (args: unknown) => {
     pi.sendUserMessage(toSkillPrompt("${primaryName}", String(args ?? "").trim()));

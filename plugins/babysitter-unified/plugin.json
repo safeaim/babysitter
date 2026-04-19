@@ -36,6 +36,9 @@
     "versions.json",
     "hooks/"
   ],
+  "hookConfig": {
+    "proxyAdapter": true
+  },
   "targets": {
     "codex": {
       "npmPackageName": "@a5c-ai/babysitter-codex"

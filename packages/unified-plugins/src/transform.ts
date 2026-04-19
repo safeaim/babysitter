@@ -248,17 +248,25 @@ function transformHooks(
     return files;
   }
 
+  const isProgrammatic = targetProfile.adapterFamily === 'programmatic';
+
   for (const [canonicalHook, handlerValue] of Object.entries(manifest.hooks)) {
     if (handlerValue === null) continue;
 
     const nativeHook = targetProfile.supportedHooks.get(canonicalHook);
-    if (!nativeHook) {
-      continue;
-    }
+    if (!nativeHook) continue;
 
-    // String handler = source script (copied via include, referenced in registration)
-    // Boolean true = no source script; registration alone is sufficient
-    // The hook registration generator handles env-var parameterization
+    // For programmatic targets with string handler scripts, generate a thin
+    // JS bridge that calls the shell script via execSync with the right env vars
+    if (isProgrammatic && typeof handlerValue === 'string' && handlerValue !== 'proxy') {
+      const slugName = handlerValue.replace(/^hooks\//, '').replace(/\.sh$/, '');
+      const jsContent = generateJsBridge(slugName, handlerValue, targetProfile);
+      files.push({
+        path: `hooks/${slugName}.js`,
+        content: jsContent,
+        executable: true,
+      });
+    }
   }
 
   // Generate hook registration file for shell-hook targets
@@ -274,6 +282,39 @@ function transformHooks(
   }
 
   return files;
+}
+
+function generateJsBridge(
+  _name: string,
+  shellScript: string,
+  targetProfile: TargetProfile
+): string {
+  const pluginRootEnvVar = targetProfile.pluginRootEnvVarForExtension || 'PLUGIN_ROOT';
+  return `#!/usr/bin/env node
+"use strict";
+var execSync = require("child_process").execSync;
+var path = require("path");
+var readFileSync = require("fs").readFileSync;
+
+var PLUGIN_ROOT = process.env.${pluginRootEnvVar} || process.env.PLUGIN_ROOT || path.resolve(__dirname, "..");
+var stdin = "";
+try { stdin = readFileSync(0, "utf8"); } catch {}
+try {
+  var result = execSync("bash " + JSON.stringify(path.join(PLUGIN_ROOT, "${shellScript}")), {
+    input: stdin,
+    stdio: ["pipe", "pipe", "pipe"],
+    timeout: 30000,
+    env: Object.assign({}, process.env, {
+      HOOK_TYPE: process.env.HOOK_TYPE || "",
+      ADAPTER_NAME: process.env.ADAPTER_NAME || "${targetProfile.adapterName}",
+      PLUGIN_ROOT: PLUGIN_ROOT
+    })
+  });
+  process.stdout.write(result);
+} catch (e) {
+  process.stdout.write("{}\\n");
+}
+`;
 }
 
 function generateHookRegistrationFile(

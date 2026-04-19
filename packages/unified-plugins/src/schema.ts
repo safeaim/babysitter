@@ -1,11 +1,11 @@
-// JSON Schema for a5c-plugin.json validation
+// JSON Schema for plugin.json validation
 // Manual validation implementation to avoid external dependencies
 
 import type { Diagnostic } from './types.js';
 
 export const A5C_PLUGIN_SCHEMA = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
-  $id: 'https://a5c.ai/schemas/a5c-plugin.json',
+  $id: 'https://a5c.ai/schemas/plugin.json',
   title: 'Unified Plugin Format Manifest',
   type: 'object',
   required: ['name', 'version', 'description', 'author', 'license'],
@@ -85,6 +85,11 @@ export const A5C_PLUGIN_SCHEMA = {
         },
         additionalProperties: true,
       },
+    },
+    include: {
+      type: 'array',
+      items: { type: 'string' },
+      description: 'Extra files to copy to output (glob patterns relative to source dir)',
     },
     hookConfig: {
       type: 'object',

@@ -92,14 +92,9 @@ export function transform(
   const contextFiles = copyContextFiles(sourceDir, manifest, targetProfile, diagnostics);
   files.push(...contextFiles);
 
-  // Copy versions.json
-  const versionsPath = path.join(sourceDir, 'versions.json');
-  if (fs.existsSync(versionsPath)) {
-    files.push({
-      path: 'versions.json',
-      content: fs.readFileSync(versionsPath, 'utf-8'),
-    });
-  }
+  // Copy included files (versions.json, assets, etc.)
+  const includedFiles = copyIncludedFiles(sourceDir, manifest);
+  files.push(...includedFiles);
 
   // Generate extra files (Pi/oh-my-pi extensions, etc.)
   const extraFiles = generateExtraFiles(sourceDir, manifest, targetProfile, diagnostics);
@@ -559,6 +554,77 @@ function copyContextFiles(
   }
 
   return files;
+}
+
+function copyIncludedFiles(
+  sourceDir: string,
+  manifest: A5cPluginManifest
+): TransformedFile[] {
+  const files: TransformedFile[] = [];
+
+  if (!manifest.include || manifest.include.length === 0) {
+    return files;
+  }
+
+  for (const pattern of manifest.include) {
+    // Simple glob: if pattern has no wildcard, treat as literal path
+    if (!pattern.includes('*')) {
+      const fullPath = path.join(sourceDir, pattern);
+      if (fs.existsSync(fullPath)) {
+        const stat = fs.statSync(fullPath);
+        if (stat.isFile()) {
+          files.push({
+            path: pattern,
+            content: fs.readFileSync(fullPath, 'utf-8'),
+          });
+        } else if (stat.isDirectory()) {
+          collectDir(sourceDir, pattern, files);
+        }
+      }
+      continue;
+    }
+
+    // Simple *.ext glob in a directory
+    const dir = path.dirname(pattern);
+    const ext = path.extname(pattern);
+    const fullDir = path.join(sourceDir, dir);
+    if (fs.existsSync(fullDir) && fs.statSync(fullDir).isDirectory()) {
+      for (const entry of fs.readdirSync(fullDir)) {
+        if (ext && !entry.endsWith(ext)) continue;
+        const entryPath = path.join(dir, entry);
+        const fullEntry = path.join(sourceDir, entryPath);
+        if (fs.statSync(fullEntry).isFile()) {
+          files.push({
+            path: entryPath,
+            content: fs.readFileSync(fullEntry, 'utf-8'),
+          });
+        }
+      }
+    }
+  }
+
+  return files;
+}
+
+function collectDir(
+  sourceDir: string,
+  relDir: string,
+  files: TransformedFile[]
+): void {
+  const fullDir = path.join(sourceDir, relDir);
+  for (const entry of fs.readdirSync(fullDir)) {
+    const relPath = path.join(relDir, entry);
+    const fullPath = path.join(sourceDir, relPath);
+    const stat = fs.statSync(fullPath);
+    if (stat.isFile()) {
+      files.push({
+        path: relPath,
+        content: fs.readFileSync(fullPath, 'utf-8'),
+      });
+    } else if (stat.isDirectory()) {
+      collectDir(sourceDir, relPath, files);
+    }
+  }
 }
 
 function generateExtraFiles(

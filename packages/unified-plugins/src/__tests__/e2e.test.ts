@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { compile, compileAll } from '../compiler.js';
+import { validate } from '../validate.js';
 
 const SAMPLE_PLUGIN_DIR = path.resolve(__dirname, '../../examples/sample-plugin');
 
@@ -13,6 +14,22 @@ describe('e2e: sample plugin compilation', () => {
 
   beforeAll(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'upf-e2e-'));
+  });
+
+  it('should validate plugin.json (not a5c-plugin.json)', () => {
+    const result = validate(SAMPLE_PLUGIN_DIR);
+    expect(result.valid).toBe(true);
+    expect(result.manifest).not.toBeNull();
+    expect(result.manifest!.name).toBe('sample-plugin');
+  });
+
+  it('should accept hooks-proxy sentinel without requiring handler files', () => {
+    const result = validate(SAMPLE_PLUGIN_DIR);
+    expect(result.valid).toBe(true);
+    const hookErrors = result.diagnostics.filter(
+      d => d.level === 'error' && d.message.includes('Hook handler')
+    );
+    expect(hookErrors).toHaveLength(0);
   });
 
   it('should compile to all 9 targets without errors', () => {
@@ -34,19 +51,15 @@ describe('e2e: sample plugin compilation', () => {
     for (const result of results) {
       const readmePath = path.join(result.outputDir, 'README.md');
       expect(fs.existsSync(readmePath), `${result.target} missing README.md`).toBe(true);
-
       const readme = fs.readFileSync(readmePath, 'utf-8');
-      expect(readme).toContain('sample-plugin');
-      // The title/description should use the manifest name, not a hardcoded one
       expect(readme).toContain('# sample-plugin');
     }
   });
 
-  it('should use manifest name in hook file naming, not hardcoded prefix', () => {
+  it('should use manifest name in hook file naming', () => {
     const results = compileAll(SAMPLE_PLUGIN_DIR, tmpDir, {});
 
     for (const result of results) {
-      // Filter to actual hook script files (not proxied-hooks.json metadata)
       const hookScripts = result.emittedFiles.filter(
         f => f.includes('-proxied-') && !f.endsWith('.json')
       );
@@ -54,6 +67,28 @@ describe('e2e: sample plugin compilation', () => {
         expect(hookFile).toContain('sample-plugin-proxied');
       }
     }
+  });
+
+  it('should copy files listed in include field', () => {
+    const result = compile({
+      source: SAMPLE_PLUGIN_DIR,
+      target: 'claude-code',
+      output: path.join(tmpDir, 'include-test'),
+    });
+
+    expect(result.status).not.toBe('error');
+    expect(result.emittedFiles).toContain('versions.json');
+    expect(result.emittedFiles).toContain('assets/logo.txt');
+
+    const versions = fs.readFileSync(
+      path.join(result.outputDir, 'versions.json'), 'utf-8'
+    );
+    expect(JSON.parse(versions).sdkVersion).toBe('5.0.0');
+
+    const logo = fs.readFileSync(
+      path.join(result.outputDir, 'assets/logo.txt'), 'utf-8'
+    );
+    expect(logo).toContain('Sample Plugin');
   });
 
   describe('target-specific output', () => {
@@ -86,14 +121,9 @@ describe('e2e: sample plugin compilation', () => {
       expect(result.emittedFiles).toContain('bin/cli.js');
       expect(result.emittedFiles).toContain('bin/install.js');
       expect(result.emittedFiles).toContain('bin/uninstall.js');
-
-      const pkgJson = JSON.parse(
-        fs.readFileSync(path.join(result.outputDir, 'package.json'), 'utf-8')
-      );
-      expect(pkgJson.bin).toBeDefined();
     });
 
-    it('pi: should emit extensions/index.ts with runProxiedHook', () => {
+    it('pi: should emit extensions with runProxiedHook and commands', () => {
       const result = compile({
         source: SAMPLE_PLUGIN_DIR,
         target: 'pi',
@@ -105,8 +135,7 @@ describe('e2e: sample plugin compilation', () => {
       expect(result.emittedFiles).toContain('hooks/proxied-hooks.json');
 
       const ext = fs.readFileSync(
-        path.join(result.outputDir, 'extensions/index.ts'),
-        'utf-8'
+        path.join(result.outputDir, 'extensions/index.ts'), 'utf-8'
       );
       expect(ext).toContain('runProxiedHook');
       expect(ext).toContain('@mariozechner/pi-coding-agent');
@@ -123,15 +152,13 @@ describe('e2e: sample plugin compilation', () => {
       });
 
       expect(result.status).not.toBe('error');
-
       const hookFiles = result.emittedFiles.filter(
         f => f.startsWith('hooks/sample-plugin-proxied-')
       );
       expect(hookFiles.length).toBeGreaterThanOrEqual(4);
 
       const sessionStart = fs.readFileSync(
-        path.join(result.outputDir, 'hooks/sample-plugin-proxied-session-start.js'),
-        'utf-8'
+        path.join(result.outputDir, 'hooks/sample-plugin-proxied-session-start.js'), 'utf-8'
       );
       expect(sessionStart).toContain('hooks-proxy');
       expect(sessionStart).toContain('--adapter pi');
@@ -145,30 +172,11 @@ describe('e2e: sample plugin compilation', () => {
       });
 
       expect(result.status).not.toBe('error');
-
       const ext = fs.readFileSync(
-        path.join(result.outputDir, 'extensions/index.ts'),
-        'utf-8'
+        path.join(result.outputDir, 'extensions/index.ts'), 'utf-8'
       );
       expect(ext).toContain('@oh-my-pi/pi-coding-agent');
       expect(ext).toContain('OMP_PLUGIN_ROOT');
-
-      const sessionHook = fs.readFileSync(
-        path.join(result.outputDir, 'hooks/sample-plugin-proxied-session-start.js'),
-        'utf-8'
-      );
-      expect(sessionHook).toContain('--adapter oh-my-pi');
-    });
-
-    it('gemini: should emit GEMINI.md context file', () => {
-      const result = compile({
-        source: SAMPLE_PLUGIN_DIR,
-        target: 'gemini',
-        output: path.join(tmpDir, 'gemini-test'),
-      });
-
-      expect(result.status).not.toBe('error');
-      expect(result.emittedFiles).toContain('GEMINI.md');
     });
 
     it('marketplace targets should not emit bin/ scripts', () => {

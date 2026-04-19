@@ -31,6 +31,9 @@ export interface A5cPluginManifest {
   // Target-Specific Overrides
   targets?: Record<string, TargetOverride>;
 
+  // Extra files to include in output (glob patterns relative to source dir)
+  include?: string[];
+
   // Hook Configuration
   hookConfig?: {
     proxyAdapter?: boolean;

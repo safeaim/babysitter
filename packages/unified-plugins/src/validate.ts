@@ -18,13 +18,13 @@ export function validate(sourceDir: string): ValidateResult {
     return { valid: false, manifest: null, diagnostics };
   }
 
-  // Load a5c-plugin.json
-  const manifestPath = path.join(sourceDir, 'a5c-plugin.json');
+  // Load plugin.json
+  const manifestPath = path.join(sourceDir, 'plugin.json');
   if (!fs.existsSync(manifestPath)) {
     diagnostics.push({
       level: 'error',
       category: 'validation',
-      message: 'Missing required file: a5c-plugin.json',
+      message: 'Missing required file: plugin.json',
       source: manifestPath,
     });
     return { valid: false, manifest: null, diagnostics };
@@ -38,7 +38,7 @@ export function validate(sourceDir: string): ValidateResult {
     diagnostics.push({
       level: 'error',
       category: 'validation',
-      message: `Failed to parse a5c-plugin.json: ${(error as Error).message}`,
+      message: `Failed to parse plugin.json: ${(error as Error).message}`,
       source: manifestPath,
     });
     return { valid: false, manifest: null, diagnostics };
@@ -56,6 +56,8 @@ export function validate(sourceDir: string): ValidateResult {
   if (manifest.hooks) {
     for (const [hookName, handlerPath] of Object.entries(manifest.hooks)) {
       if (handlerPath === null) continue;
+      // "hooks-proxy" is a sentinel: compiler generates the hook script
+      if (handlerPath === 'hooks-proxy') continue;
 
       const fullPath = path.join(sourceDir, handlerPath);
       if (!fs.existsSync(fullPath)) {

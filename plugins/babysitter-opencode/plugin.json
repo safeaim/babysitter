@@ -18,8 +18,8 @@
     "automation",
     "event-sourced",
     "hooks",
-    "opencode",
     "agent",
-    "LLM"
+    "LLM",
+    "opencode"
   ]
 }

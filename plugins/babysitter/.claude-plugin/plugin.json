@@ -1,9 +1,6 @@
 {
   "name": "babysitter",
   "version": "5.0.0",
-  "description": "Implementation of the babysitter technique - continuous orchestration loops for deterministic development. Run Claude in a loop with orchestration steps based on the babysitter-sdk and technique.",
-  "author": {
-    "name": "Tal Muskal",
-    "email": "tal@a5c.ai"
-  }
+  "description": "Orchestrate complex, multi-step workflows with event-sourced state management, hook-based extensibility, and human-in-the-loop approval",
+  "author": "a5c.ai"
 }

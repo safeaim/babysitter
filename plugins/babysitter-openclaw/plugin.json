@@ -20,6 +20,7 @@
     "TDD",
     "quality-convergence",
     "agent",
-    "LLM"
+    "LLM",
+    "openclaw"
   ]
 }

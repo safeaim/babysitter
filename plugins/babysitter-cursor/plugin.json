@@ -17,8 +17,8 @@
     "automation",
     "event-sourced",
     "hooks",
-    "cursor",
     "agent",
-    "LLM"
+    "LLM",
+    "cursor"
   ]
 }

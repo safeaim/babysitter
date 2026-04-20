@@ -56,12 +56,13 @@ export function generateManifests(
     }
     filteredManifest.hooks = filtered;
   }
-  // Add target name to keywords
+  // Add target name to end of keywords if not already present
   if (filteredManifest.keywords) {
-    const targetKw = targetProfile.name;
-    if (!filteredManifest.keywords.includes(targetKw)) {
-      filteredManifest.keywords = [...filteredManifest.keywords, targetKw];
+    const kw = [...filteredManifest.keywords];
+    if (!kw.includes(targetProfile.name)) {
+      kw.push(targetProfile.name);
     }
+    filteredManifest.keywords = kw;
   }
 
   switch (targetProfile.name) {

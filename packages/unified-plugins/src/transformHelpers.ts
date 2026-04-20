@@ -76,7 +76,7 @@ export function generateHarnessManifest(
     Object.assign(base, override.harnessManifest);
   }
 
-  return JSON.stringify(base, null, 2);
+  return JSON.stringify(base, null, 2) + '\n';
 }
 
 export function generateInstallShared(

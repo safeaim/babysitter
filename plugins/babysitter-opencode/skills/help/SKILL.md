@@ -231,9 +231,9 @@ SECONDARY COMMANDS
   effect status in your browser. Useful when running /yolo or /forever to watch
   progress without interrupting the run.
 
-  How it works: Runs npx @yoavmayer/babysitter-observer-dashboard@latest which watches
-  the .a5c/runs/ directory (or a parent directory containing multiple projects) and
-  serves a live dashboard. The process is blocking -- it runs until you stop it.
+  How it works: Runs babysitter-harness observe --workspace <dir>, which launches
+  the observer from the local babysitter workspace when available, or from an
+  installed observer binary. The process is blocking -- it runs until you stop it.
 
   Example: /babysitter:observe
   (opens browser showing all runs with live-updating task

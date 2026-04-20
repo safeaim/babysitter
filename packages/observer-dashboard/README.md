@@ -50,57 +50,35 @@ Babysitter Observer Dashboard is a real-time browser-based monitoring UI for [ba
 
 ## Quick Start
 
-### Option 1: Run directly with npx
+### Option 1: Launch through the harness CLI
 
 ```bash
-npx -y @a5c-ai/babysitter-observer-dashboard@latest
+babysitter-harness observe --workspace .
 ```
 
-### Option 2: Install globally
+If the harness CLI is not installed globally:
 
 ```bash
-npm install -g @a5c-ai/babysitter-observer-dashboard@latest
-babysitter-observer-dashboard
+npx -y @a5c-ai/babysitter-harness@latest observe --workspace .
 ```
 
-### Option 3: Add as a dev dependency
+### Option 2: Run the observer workspace from a Babysitter repo checkout
 
 ```bash
-npm install --save-dev @a5c-ai/babysitter-observer-dashboard
+npm run dev:cli --workspace=@a5c-ai/babysitter-observer-dashboard -- --dev --watch-dir .
 ```
 
-Then add a script to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "observe": "babysitter-observer-dashboard --watch-dir ."
-  }
-}
-```
-
-Or run it directly with npx without adding a script:
+### Option 3: Use an existing observer binary on your PATH
 
 ```bash
-npx babysitter-observer-dashboard --watch-dir .
+babysitter-observer-dashboard --watch-dir .
 ```
 
 The dashboard opens at [http://localhost:4800](http://localhost:4800) by default.
 
 ### Updating
 
-The CLI checks for newer versions on startup and shows a notice when an update is available:
-
-```
-  Update available: 0.10.1 → 0.11.0
-  Run: npm i -g @a5c-ai/babysitter-observer-dashboard@latest
-```
-
-To update, run the command shown in the notice. If you use `npx`, pass `@latest` to ensure you always get the newest version:
-
-```bash
-npx -y @a5c-ai/babysitter-observer-dashboard@latest
-```
+The observer currently ships through the Babysitter repo and harness CLI flow rather than a standalone published npm package. Update by pulling the latest repository changes or by updating `@a5c-ai/babysitter-harness`.
 
 ## CLI Reference
 
@@ -389,35 +367,13 @@ If you see `Error: listen EADDRINUSE :::4800`, another process is using the defa
 babysitter-observer-dashboard --port 4801
 ```
 
-### Permission errors on global install
+### Observer binary not found
 
-On macOS/Linux, global npm installs may require elevated permissions. If you see `EACCES` or permission-denied errors, try one of these approaches:
+If `babysitter-observer-dashboard` is not on your PATH, use one of the supported entrypoints above instead:
 
-**Recommended: use npx instead (no global install needed):**
-
-```bash
-npx -y @a5c-ai/babysitter-observer-dashboard@latest
-```
-
-**Alternative: configure npm to use a user-writable directory:**
-
-```bash
-mkdir -p ~/.npm-global
-npm config set prefix "~/.npm-global"
-export PATH=~/.npm-global/bin:$PATH
-```
-
-Then retry the global install:
-
-```bash
-npm install -g @a5c-ai/babysitter-observer-dashboard@latest
-```
-
-**Alternative: use sudo (not recommended):**
-
-```bash
-sudo npm install -g @a5c-ai/babysitter-observer-dashboard@latest
-```
+- `babysitter-harness observe --workspace .`
+- `npx -y @a5c-ai/babysitter-harness@latest observe --workspace .`
+- `npm run dev:cli --workspace=@a5c-ai/babysitter-observer-dashboard -- --dev --watch-dir .`
 
 ### No runs appearing in the dashboard
 
@@ -455,30 +411,9 @@ The observer reads and writes `~/.a5c/observer.json`. If this file or directory 
 mkdir -p ~/.a5c
 ```
 
-### Safe Chain blocks newly published versions
+### Standalone npm package unavailable
 
-If you have [Aikido Safe Chain](https://www.aikido.dev/) installed, you may see the following error when running `npx -y @a5c-ai/babysitter-observer-dashboard@latest`:
-
-```
-npm error code ENOVERSIONS
-npm error No versions available for @a5c-ai/babysitter-observer-dashboard
-```
-
-Along with a message like:
-
-```
-Safe-chain: Some package versions were suppressed due to minimum age requirement.
-```
-
-This happens because Safe Chain suppresses npm package versions that were published less than 24 hours ago as a supply-chain security measure. If a new version of the dashboard was released recently, Safe Chain will block it until it passes the minimum age threshold.
-
-**Workaround:** Add the `--safe-chain-skip-minimum-package-age` flag to bypass the age check:
-
-```bash
-npx -y @a5c-ai/babysitter-observer-dashboard@latest --safe-chain-skip-minimum-package-age
-```
-
-This only affects recently published versions. After 24 hours from publication, the package version will pass Safe Chain's age requirement and the standard command will work without the extra flag.
+The standalone `@a5c-ai/babysitter-observer-dashboard` npm package is not currently published. If you see `E404` or `ENOVERSIONS` from npm, switch to one of the supported flows in Quick Start instead of retrying the direct package install.
 
 ## Known Limitations
 

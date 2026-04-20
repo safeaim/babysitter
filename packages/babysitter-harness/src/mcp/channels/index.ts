@@ -1,5 +1,11 @@
 /**
- * GAP-MCPC-001/002/003/004: MCP Channels barrel exports.
+ * MCP Channels — interactive messaging and approval routing.
+ * Moved from @a5c-ai/babysitter-sdk.
+ *
+ * Status: NOT INTEGRATED YET — these modules are implemented but not wired
+ * into the harness's interaction/governance layer.
+ *
+ * GAP-MCPC-001/002/003/004
  */
 
 // Types

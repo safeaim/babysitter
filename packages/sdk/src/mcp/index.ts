@@ -5,8 +5,7 @@ export type { WebSocketServerTransport, WebSocketTransportOptions, WebSocketSess
 // MCP Client (GAP-REMOTE-006, GAP-TOOLS-025)
 export * as mcpClient from "./client";
 
-// MCP Channels (GAP-MCPC-001, GAP-MCPC-002, GAP-MCPC-003)
-export * as channels from "./channels";
+// MCP Channels moved to @a5c-ai/babysitter-harness (interactive feature)
 
 /**
  * Start the MCP server on stdio transport.

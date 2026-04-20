@@ -1,50 +1,45 @@
 {
   "name": "@a5c-ai/babysitter-gemini",
   "version": "5.0.0",
-  "description": "Babysitter plugin for Gemini CLI — event-sourced orchestration with AfterAgent continuation hooks, session binding, and human-in-the-loop approval gates",
+  "description": "Orchestrate complex, multi-step workflows with event-sourced state management, hook-based extensibility, and human-in-the-loop approval",
   "scripts": {
-    "test": "node test/integration.test.js",
+    "deploy": "npm publish --access public",
+    "deploy:staging": "npm publish --access public --tag staging",
     "postinstall": "node bin/postinstall.js",
     "preuninstall": "node bin/preuninstall.js",
-    "deploy": "npm publish --access public",
-    "deploy:staging": "npm publish --access public --tag staging"
+    "team:install": "node scripts/team-install.js"
   },
   "bin": {
     "babysitter-gemini": "bin/cli.js"
   },
   "files": [
-    "GEMINI.md",
-    "README.md",
-    "commands/",
+    "bin/",
+    "hooks/",
     "hooks/",
     "skills/",
+    "commands/",
     "scripts/",
-    "gemini-extension.json",
     "plugin.json",
+    "README.md",
     "versions.json",
-    "bin/"
+    "package.json"
   ],
   "keywords": [
     "babysitter",
     "gemini",
-    "gemini-cli",
-    "gemini-cli-extension",
-    "orchestration",
-    "extension",
-    "ai-agent",
-    "event-sourced"
+    "orchestration"
   ],
   "author": "a5c.ai",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@a5c-ai/babysitter-sdk": "5.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/a5c-ai/babysitter"
   },
-  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-gemini#readme",
-  "dependencies": {
-    "@a5c-ai/babysitter-sdk": "5.0.0"
-  }
+  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-gemini#readme"
 }

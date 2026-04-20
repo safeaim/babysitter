@@ -2,36 +2,27 @@
   "name": "@a5c-ai/babysitter-omp",
   "version": "5.0.0",
   "type": "module",
-  "description": "Babysitter package for oh-my-pi",
+  "description": "Orchestrate complex, multi-step workflows with event-sourced state management, hook-based extensibility, and human-in-the-loop approval — oh-my-pi",
   "keywords": [
     "oh-my-pi",
-    "omp",
     "babysitter",
-    "orchestration",
-    "ai-agent"
+    "orchestration"
   ],
   "omp": {
     "extensions": [
       "./extensions"
     ],
-    "hooks": "./hooks/hooks.json",
     "skills": [
       "./skills"
     ]
-  },
-  "dependencies": {
-    "@a5c-ai/babysitter-sdk": "5.0.0"
   },
   "peerDependencies": {
     "@oh-my-pi/pi-coding-agent": "*"
   },
   "scripts": {
     "test": "node --test test/integration.test.js && node test/packaged-install.test.cjs",
-    "test:integration": "node --test test/integration.test.js",
-    "test:packaged-install": "node test/packaged-install.test.cjs",
     "sync:commands": "node scripts/sync-command-docs.cjs",
-    "deploy": "npm publish --access public",
-    "deploy:staging": "npm publish --access public --tag staging"
+    "deploy": "npm publish --access public"
   },
   "bin": {
     "babysitter-omp": "bin/cli.cjs"
@@ -43,7 +34,6 @@
     "README.md",
     "AGENTS.md",
     "extensions/",
-    "hooks/",
     "skills/",
     "commands/",
     "scripts/"
@@ -56,6 +46,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/a5c-ai/babysitter"
-  },
-  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-omp#readme"
+  }
 }

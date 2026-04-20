@@ -1,14 +1,10 @@
 {
   "name": "@a5c-ai/babysitter-codex",
   "version": "5.0.0",
-  "description": "Babysitter Codex skill bundle and integration package for OpenAI Codex CLI with SDK-managed process-library bootstrapping, 15 orchestration modes, and BOM-safe SKILL installation",
+  "description": "Orchestrate complex, multi-step workflows with event-sourced state management, hook-based extensibility, and human-in-the-loop approval",
   "scripts": {
     "test": "node test/integration.test.js && node test/packaged-install.test.js",
-    "test:integration": "node test/integration.test.js",
     "sync:commands": "node scripts/sync-command-skills.js",
-    "sync:skills": "node scripts/sync-command-skills.js",
-    "team:install": "node scripts/team-install.js",
-    "lint": "node -e \"const fs=require('fs'); const path=require('path'); const cp=require('child_process'); const walk=(dir)=>{for(const entry of fs.readdirSync(dir)){const file=path.join(dir, entry); const stat=fs.statSync(file); if(stat.isDirectory()) walk(file); else if(file.endsWith('.js')) cp.execFileSync(process.execPath,['--check',file],{stdio:'inherit'});}}; ['skills','bin','scripts','test'].forEach((dir)=>{if(fs.existsSync(dir)) walk(dir);});\"",
     "deploy": "npm publish --access public",
     "deploy:staging": "npm publish --access public --tag staging"
   },
@@ -30,10 +26,7 @@
   "keywords": [
     "babysitter",
     "codex",
-    "orchestration",
-    "ai-agent",
-    "sdk-integration",
-    "codex-skill"
+    "orchestration"
   ],
   "author": "a5c.ai",
   "license": "MIT",
@@ -43,9 +36,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/a5c-ai/babysitter"
-  },
-  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-codex#readme",
-  "dependencies": {
-    "@a5c-ai/babysitter-sdk": "5.0.0"
   }
 }

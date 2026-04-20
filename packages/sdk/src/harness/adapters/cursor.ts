@@ -1,8 +1,8 @@
 /**
  * Cursor harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config. Extends BaseHarnessAdapter with Cursor-specific behavior:
+ * Derives metadata from @a5c-ai/agent-mux. Extends BaseHarnessAdapter with
+ * Cursor-specific behavior:
  * - Custom bindSession (inline, not shared helper)
  * - Hook dispatcher path resolution
  * - Supported hook types enumeration
@@ -44,35 +44,11 @@ export function resolveCursorStateDir(args: {
 }
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "cursor",
-  displayName: "Cursor",
-  activationEnvVars: ["CURSOR_PROJECT_DIR", "CURSOR_VERSION"],
-  capabilities: [Cap.HeadlessPrompt, Cap.StopHook, Cap.SessionBinding, Cap.Mcp],
-  loopControlTerm: "stop-hook",
-  autoResolvesSession: false,
-  pluginRootEnvVars: ["CURSOR_PLUGIN_ROOT"],
-  sessionIdEnvVars: ["AGENT_SESSION_ID"],
-  promptCapabilities: ["hooks", "stop-hook", "mcp", "task-tool", "breakpoint-routing"],
-  pluginRootVar: "${CURSOR_PLUGIN_ROOT}",
-  hookDriven: true,
-  interactiveToolName: "AskUserQuestion tool",
-  sessionEnvVars: "conversation_id from hook stdin (authoritative per-request); PID-scoped session marker; AGENT_SESSION_ID fallback",
-  hasIntentFidelityChecks: false,
-  hasNonNegotiables: false,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("cursor");
-  if (!metadata) return FALLBACK_CONFIG;
-
   const config = deriveAdapterConfig(metadata, {
     name: "cursor",
     displayName: "Cursor",

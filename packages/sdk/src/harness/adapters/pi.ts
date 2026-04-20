@@ -1,8 +1,7 @@
 /**
  * Pi harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config.
+ * Derives metadata from @a5c-ai/agent-mux.
  */
 
 import { HarnessCapability as Cap } from "../types";
@@ -31,35 +30,11 @@ import { getAmuxAdapterMetadata } from "../amuxMetadata";
 import { deriveAdapterConfig } from "../derivePromptContext";
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "pi",
-  displayName: "Pi Coding Agent",
-  activationEnvVars: ["AGENT_SESSION_ID", "PI_SESSION_ID", "PI_PLUGIN_ROOT"],
-  capabilities: [Cap.Programmatic, Cap.SessionBinding, Cap.HeadlessPrompt],
-  loopControlTerm: "skill-driven",
-  autoResolvesSession: true,
-  pluginRootEnvVars: ["PI_PLUGIN_ROOT"],
-  sessionIdEnvVars: ["PI_SESSION_ID", "AGENT_SESSION_ID"],
-  promptCapabilities: ["skills", "slash-commands", "task-tool", "harness-routing", "programmatic-session"],
-  pluginRootVar: "${PI_PLUGIN_ROOT}",
-  hookDriven: false,
-  interactiveToolName: "AskUserQuestion",
-  sessionEnvVars: "PID-scoped session marker (authoritative); PI_SESSION_ID and AGENT_SESSION_ID are fallbacks",
-  hasIntentFidelityChecks: false,
-  hasNonNegotiables: false,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("pi");
-  if (!metadata) return FALLBACK_CONFIG;
-
   return deriveAdapterConfig(metadata, {
     name: "pi",
     displayName: "Pi Coding Agent",

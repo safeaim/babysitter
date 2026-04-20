@@ -1,8 +1,8 @@
 /**
  * Claude Code harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config. Extends BaseHarnessAdapter with Claude-Code-specific:
+ * Derives metadata from @a5c-ai/agent-mux. Extends BaseHarnessAdapter with
+ * Claude-Code-specific behavior:
  * - Session binding with auto-release of stale runs
  * - Rich stop-hook continuation with skill discovery + compression
  * - Session-start hook with compression pre-warming
@@ -87,35 +87,11 @@ export function setBabysitterSessionIdInEnvFile(
 }
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "claude-code",
-  displayName: "Claude Code",
-  activationEnvVars: ["AGENT_SESSION_ID", "CLAUDE_ENV_FILE"],
-  capabilities: [Cap.SessionBinding, Cap.StopHook, Cap.Mcp, Cap.HeadlessPrompt],
-  loopControlTerm: "stop-hook",
-  autoResolvesSession: true,
-  pluginRootEnvVars: ["CLAUDE_PLUGIN_ROOT"],
-  sessionIdEnvVars: ["AGENT_SESSION_ID"],
-  promptCapabilities: ["hooks", "stop-hook", "ask-user-question", "task-tool", "breakpoint-routing"],
-  pluginRootVar: "${CLAUDE_PLUGIN_ROOT}",
-  hookDriven: true,
-  interactiveToolName: "AskUserQuestion tool",
-  sessionEnvVars: "PID-scoped session marker (authoritative); CLAUDE_ENV_FILE and AGENT_SESSION_ID are fallbacks",
-  hasIntentFidelityChecks: false,
-  hasNonNegotiables: false,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("claude-code");
-  if (!metadata) return FALLBACK_CONFIG;
-
   return deriveAdapterConfig(metadata, {
     name: "claude-code",
     displayName: "Claude Code",

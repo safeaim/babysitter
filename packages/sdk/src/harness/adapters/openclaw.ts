@@ -1,8 +1,7 @@
 /**
  * OpenClaw harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config.
+ * Derives metadata from @a5c-ai/agent-mux.
  */
 
 import { HarnessCapability as Cap } from "../types";
@@ -25,35 +24,11 @@ import { getAmuxAdapterMetadata } from "../amuxMetadata";
 import { deriveAdapterConfig } from "../derivePromptContext";
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "openclaw",
-  displayName: "OpenClaw",
-  activationEnvVars: ["OPENCLAW_SHELL", "OPENCLAW_HOME"],
-  capabilities: [Cap.SessionBinding, Cap.Mcp, Cap.HeadlessPrompt],
-  loopControlTerm: "agent_end",
-  autoResolvesSession: true,
-  pluginRootEnvVars: [],
-  sessionIdEnvVars: ["AGENT_SESSION_ID", "OPENCLAW_SHELL"],
-  promptCapabilities: ["session-binding", "mcp", "headless-prompt", "task-tool", "breakpoint-routing"],
-  pluginRootVar: "",
-  hookDriven: false,
-  interactiveToolName: "AskUserQuestion tool",
-  sessionEnvVars: "PID-scoped session marker (authoritative); OPENCLAW_SHELL gateway injection and AGENT_SESSION_ID are fallbacks",
-  hasIntentFidelityChecks: false,
-  hasNonNegotiables: false,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("openclaw");
-  if (!metadata) return FALLBACK_CONFIG;
-
   return deriveAdapterConfig(metadata, {
     name: "openclaw",
     displayName: "OpenClaw",

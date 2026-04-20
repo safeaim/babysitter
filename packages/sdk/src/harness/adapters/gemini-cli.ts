@@ -1,8 +1,7 @@
 /**
  * Gemini CLI harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config.
+ * Derives metadata from @a5c-ai/agent-mux.
  */
 
 import * as path from "node:path";
@@ -32,35 +31,11 @@ export function resolveGeminiCliStateDir(args: {
 }
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "gemini-cli",
-  displayName: "Gemini CLI",
-  activationEnvVars: ["AGENT_SESSION_ID", "GEMINI_CLI", "GEMINI_SESSION_ID", "GEMINI_PROJECT_DIR", "GEMINI_CWD"],
-  capabilities: [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt],
-  loopControlTerm: "stop-hook",
-  autoResolvesSession: true,
-  pluginRootEnvVars: ["GEMINI_EXTENSION_PATH", "BABYSITTER_EXTENSION_PATH"],
-  sessionIdEnvVars: ["GEMINI_SESSION_ID", "AGENT_SESSION_ID"],
-  promptCapabilities: ["hooks", "stop-hook", "task-tool", "breakpoint-routing"],
-  pluginRootVar: "${GEMINI_EXTENSION_PATH}",
-  hookDriven: true,
-  interactiveToolName: "AskUserQuestion tool",
-  sessionEnvVars: "PID-scoped session marker (authoritative); GEMINI_SESSION_ID and AGENT_SESSION_ID are fallbacks",
-  hasIntentFidelityChecks: false,
-  hasNonNegotiables: false,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("gemini-cli");
-  if (!metadata) return FALLBACK_CONFIG;
-
   return deriveAdapterConfig(metadata, {
     name: "gemini-cli",
     displayName: "Gemini CLI",

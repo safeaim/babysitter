@@ -1,8 +1,7 @@
 /**
  * OpenCode harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config.
+ * Derives metadata from @a5c-ai/agent-mux.
  */
 
 import * as path from "node:path";
@@ -79,35 +78,11 @@ function getAccomplishDataDirs(): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "opencode",
-  displayName: "OpenCode",
-  activationEnvVars: ["AGENT_SESSION_ID", "OPENCODE_CONFIG", "ACCOMPLISH_TASK_ID"],
-  capabilities: [Cap.HeadlessPrompt],
-  loopControlTerm: "in-turn",
-  autoResolvesSession: false,
-  pluginRootEnvVars: ["OPENCODE_PLUGIN_ROOT"],
-  sessionIdEnvVars: ["AGENT_SESSION_ID"],
-  promptCapabilities: ["task-tool", "breakpoint-routing"],
-  pluginRootVar: "",
-  hookDriven: false,
-  interactiveToolName: "",
-  sessionEnvVars: "PID-scoped session marker (authoritative); shell.env-injected session ID and AGENT_SESSION_ID are fallbacks",
-  hasIntentFidelityChecks: false,
-  hasNonNegotiables: false,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("opencode");
-  if (!metadata) return FALLBACK_CONFIG;
-
   const config = deriveAdapterConfig(metadata, {
     name: "opencode",
     displayName: "OpenCode",

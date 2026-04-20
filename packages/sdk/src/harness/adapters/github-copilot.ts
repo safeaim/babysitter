@@ -1,8 +1,7 @@
 /**
  * GitHub Copilot harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config.
+ * Derives metadata from @a5c-ai/agent-mux.
  */
 
 import * as path from "node:path";
@@ -102,35 +101,11 @@ export function resolveGithubCopilotSessionId(parsed: {
 }
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "github-copilot",
-  displayName: "GitHub Copilot CLI",
-  activationEnvVars: ["AGENT_SESSION_ID", "COPILOT_HOME", "COPILOT_GITHUB_TOKEN"],
-  capabilities: [Cap.HeadlessPrompt, Cap.SessionBinding, Cap.Mcp],
-  loopControlTerm: "in-turn",
-  autoResolvesSession: false,
-  pluginRootEnvVars: ["CLAUDE_PLUGIN_DATA", "COPILOT_PLUGIN_ROOT"],
-  sessionIdEnvVars: ["AGENT_SESSION_ID"],
-  promptCapabilities: ["hooks", "mcp", "task-tool", "breakpoint-routing"],
-  pluginRootVar: "${COPILOT_PLUGIN_ROOT}",
-  hookDriven: false,
-  interactiveToolName: "AskUserQuestion tool",
-  sessionEnvVars: "PID-scoped session marker (authoritative); COPILOT_ENV_FILE / COPILOT_SESSION_ID and AGENT_SESSION_ID are fallbacks",
-  hasIntentFidelityChecks: false,
-  hasNonNegotiables: false,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("github-copilot");
-  if (!metadata) return FALLBACK_CONFIG;
-
   const config = deriveAdapterConfig(metadata, {
     name: "github-copilot",
     displayName: "GitHub Copilot CLI",

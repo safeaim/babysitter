@@ -1,8 +1,8 @@
 /**
  * Codex harness adapter.
  *
- * Derives metadata from @a5c-ai/agent-mux when available, falling back to
- * hardcoded config. Extends BaseHarnessAdapter with Codex-specific behavior:
+ * Derives metadata from @a5c-ai/agent-mux. Extends BaseHarnessAdapter with
+ * Codex-specific behavior:
  * - Codex-specific session/plugin root resolution
  * - Session binding with auto-release
  */
@@ -54,35 +54,11 @@ export function resolveCodexSessionId(parsed: {
 }
 
 // ---------------------------------------------------------------------------
-// Fallback config (used when agent-mux is unavailable)
-// ---------------------------------------------------------------------------
-
-const FALLBACK_CONFIG: AdapterConfig = {
-  name: "codex",
-  displayName: "Codex",
-  activationEnvVars: ["AGENT_SESSION_ID", "CODEX_THREAD_ID", "CODEX_SESSION_ID", "CODEX_PLUGIN_ROOT"],
-  capabilities: [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt],
-  loopControlTerm: "stop-hook",
-  autoResolvesSession: true,
-  pluginRootEnvVars: ["CODEX_PLUGIN_ROOT", "AGENT_PLUGIN_ROOT"],
-  sessionIdEnvVars: ["CODEX_THREAD_ID", "CODEX_SESSION_ID", "AGENT_SESSION_ID"],
-  promptCapabilities: ["hooks", "stop-hook", "ask-user-question", "task-tool", "breakpoint-routing"],
-  pluginRootVar: "${CODEX_PLUGIN_ROOT}",
-  hookDriven: true,
-  interactiveToolName: "AskUserQuestion tool",
-  sessionEnvVars: "PID-scoped session marker (authoritative); CODEX_THREAD_ID/CODEX_SESSION_ID and AGENT_SESSION_ID are fallbacks",
-  hasIntentFidelityChecks: true,
-  hasNonNegotiables: true,
-};
-
-// ---------------------------------------------------------------------------
 // Config derivation from agent-mux
 // ---------------------------------------------------------------------------
 
 function buildConfig(): AdapterConfig {
   const metadata = getAmuxAdapterMetadata("codex");
-  if (!metadata) return FALLBACK_CONFIG;
-
   return deriveAdapterConfig(metadata, {
     name: "codex",
     displayName: "Codex",

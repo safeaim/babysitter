@@ -1,46 +1,23 @@
 {
-  "description": "babysitter plugin hooks for OpenClaw",
   "hooks": {
-    "session_start": [
+    "SessionStart": [
       {
         "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "HOOK_TYPE=session-start ADAPTER_NAME=openclaw PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-session-start.sh"
+            "command": "./hooks/babysitter-proxied-session-start.sh"
           }
         ]
       }
     ],
-    "agent_end": [
+    "Stop": [
       {
         "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "HOOK_TYPE=after-agent ADAPTER_NAME=openclaw PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-agent-end.sh"
-          }
-        ]
-      }
-    ],
-    "session_end": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "HOOK_TYPE=session-end ADAPTER_NAME=openclaw PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-session-end.sh"
-          }
-        ]
-      }
-    ],
-    "before_prompt_build": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "HOOK_TYPE=before-prompt-build ADAPTER_NAME=openclaw PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-before-prompt-build.sh"
+            "command": "./hooks/babysitter-proxied-stop-hook.sh"
           }
         ]
       }

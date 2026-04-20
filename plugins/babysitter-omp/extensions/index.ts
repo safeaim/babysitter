@@ -5,13 +5,31 @@ import * as path from "path";
 const PLUGIN_ROOT = path.resolve(__dirname, "..");
 
 const COMMANDS = [
-  "assimilate", "babysit", "call", "cleanup", "contrib", "doctor", "forever", "help", "observe", "plan", "plugins", "project-install", "resume", "retrospect", "user-install", "yolo"
+  "assimilate",
+  "call",
+  "cleanup",
+  "contrib",
+  "doctor",
+  "forever",
+  "help",
+  "observe",
+  "plan",
+  "plugins",
+  "project-install",
+  "resume",
+  "retrospect",
+  "user-install",
+  "yolo",
 ] as const;
 
 function toSkillPrompt(name: string, args: string): string {
   return `/skill:${name}${args ? ` ${args}` : ""}`;
 }
 
+/**
+ * Run a proxied hook script and return parsed JSON result.
+ * Returns empty object on failure (hooks are best-effort).
+ */
 function runProxiedHook(
   scriptName: string,
   inputData?: Record<string, unknown>
@@ -29,23 +47,35 @@ function runProxiedHook(
     });
     return JSON.parse(result.toString("utf8").trim());
   } catch {
+    // Hooks are best-effort -- never break the extension
     return {};
   }
 }
 
 export default function activate(pi: ExtensionAPI): void {
-  runProxiedHook("session-start.js", {
+  // ---------------------------------------------------------------------------
+  // Trigger session-start hook on activation
+  // ---------------------------------------------------------------------------
+  runProxiedHook("babysitter-proxied-session-start.js", {
     event: "session_start",
     cwd: process.cwd(),
   });
 
-  const forwardPrimary = async (args: unknown) => {
-    pi.sendUserMessage(toSkillPrompt("babysitter", String(args ?? "").trim()));
+  // ---------------------------------------------------------------------------
+  // Register slash commands (unchanged from legacy)
+  // ---------------------------------------------------------------------------
+  const forwardBabysit = async (args: unknown) => {
+    pi.sendUserMessage(toSkillPrompt("babysit", String(args ?? "").trim()));
   };
 
+  pi.registerCommand("babysit", {
+    description: "Load the Babysitter orchestration skill",
+    handler: forwardBabysit,
+  });
+
   pi.registerCommand("babysitter", {
-    description: "Load the babysitter skill",
-    handler: forwardPrimary,
+    description: "Alias for /babysit",
+    handler: forwardBabysit,
   });
 
   for (const name of COMMANDS) {
@@ -54,7 +84,7 @@ export default function activate(pi: ExtensionAPI): void {
     };
 
     pi.registerCommand(name, {
-      description: `Open the ${name} skill`,
+      description: `Open the Babysitter ${name} skill`,
       handler: forward,
     });
 

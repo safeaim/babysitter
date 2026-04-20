@@ -6,18 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "HOOK_TYPE=session-start ADAPTER_NAME=codex PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-session-start.sh"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "HOOK_TYPE=stop ADAPTER_NAME=codex PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-stop.sh"
+            "command": "./hooks/babysitter-proxied-session-start.sh"
           }
         ]
       }
@@ -28,7 +17,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "HOOK_TYPE=user-prompt-submit ADAPTER_NAME=codex PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-user-prompt-submit.sh"
+            "command": "./hooks/babysitter-proxied-user-prompt-submit.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./hooks/babysitter-proxied-stop.sh"
           }
         ]
       }

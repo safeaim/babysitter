@@ -138,7 +138,8 @@ export function generateManifests(
     (targetProfile.distribution === 'npm-cli' || targetProfile.distribution === 'both') &&
     !files.some(f => f.path === 'package.json')
   ) {
-    const npmPkg = targetProfile.npmPackageName || `@a5c-ai/${manifest.name}-${targetProfile.name}`;
+    const overrideNpmPkg = manifest.targets?.[targetProfile.name]?.npmPackageName;
+    const npmPkg = (typeof overrideNpmPkg === 'string' ? overrideNpmPkg : null) || targetProfile.npmPackageName || `@a5c-ai/${manifest.name}-${targetProfile.name}`;
     const isEsm = targetProfile.name === 'pi' || targetProfile.name === 'oh-my-pi' || targetProfile.name === 'openclaw';
     const ext = isEsm ? '.cjs' : '.js';
     const scripts: Record<string, string> = {

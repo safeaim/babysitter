@@ -95,6 +95,7 @@
       }
     },
     "github-copilot": {
+      "npmPackageName": "@a5c-ai/babysitter-github",
       "extraFiles": {
         "AGENTS.md": "file:per-harness/github/AGENTS.md",
         "skills/babysit/SKILL.md": "file:per-harness/github/babysit-SKILL.md"

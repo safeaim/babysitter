@@ -96,7 +96,7 @@ export class BabysitterRuntimeError extends Error {
     const message = templates.interpolateTemplate(template.pattern, context);
     return new BabysitterRuntimeError(name, message, {
       category: additionalOptions?.category ?? template.category,
-      suggestions: additionalOptions?.suggestions ?? template.defaultSuggestions ?? [],
+      suggestions: additionalOptions?.suggestions ?? (template as Record<string, unknown>).defaultSuggestions as string[] ?? [],
       nextSteps: additionalOptions?.nextSteps ?? template.defaultNextSteps ?? [],
       details: { ...context, ...(additionalOptions?.details ?? {}) },
       cause: additionalOptions?.cause,

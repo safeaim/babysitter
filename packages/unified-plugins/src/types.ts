@@ -60,7 +60,10 @@ export interface TargetOverride {
   };
   extraFiles?: Record<string, string>;
   // Pattern for hook output filenames: {{name}}-proxied-{{slug}}-hook.sh
+  // Supports {{name}}, {{slug}} (canonical), {{native}} (target-native hook name)
   hookFilePattern?: string;
+  // Pattern for JS bridge filenames (programmatic targets): {{name}}-proxied-{{native}}.js
+  hookJsPattern?: string;
   // Rich harness-specific manifest (e.g. codex interface metadata)
   harnessManifest?: Record<string, unknown>;
   [key: string]: unknown;

@@ -233,61 +233,55 @@ function transformHooks(
 
   const isProgrammatic = targetProfile.adapterFamily === 'programmatic';
   const override = manifest.targets?.[targetProfile.name];
-  const hookFilePattern = typeof override?.hookFilePattern === 'string'
-    ? override.hookFilePattern : undefined;
-  const slugify = (s: string) => s
+  const hookFilePattern = typeof override?.hookFilePattern === 'string' ? override.hookFilePattern : undefined;
+  const hookJsPattern = typeof override?.hookJsPattern === 'string' ? override.hookJsPattern : undefined;
+  const toSlug = (s: string) => s
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const toNativeSlug = (s: string) => s.replace(/[._]/g, '-').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 
   for (const [canonicalHook, handlerValue] of Object.entries(manifest.hooks)) {
     if (handlerValue === null) continue;
-
     const nativeHook = targetProfile.supportedHooks.get(canonicalHook);
     if (!nativeHook) continue;
-
     if (typeof handlerValue !== 'string' || handlerValue === 'proxy') continue;
 
-    const hookSlug = slugify(canonicalHook);
+    const hookSlug = toSlug(canonicalHook);
+    const nativeSlug = toNativeSlug(nativeHook);
     const sourceScript = path.join(sourceDir, handlerValue);
     if (!fs.existsSync(sourceScript)) continue;
-
     const content = fs.readFileSync(sourceScript, 'utf-8');
 
-    // Determine output filename
+    // Determine bash output filename via hookFilePattern
     let outName: string;
     if (hookFilePattern) {
       outName = hookFilePattern
         .replace(/\{\{name\}\}/g, manifest.name)
-        .replace(/\{\{slug\}\}/g, hookSlug);
+        .replace(/\{\{slug\}\}/g, hookSlug)
+        .replace(/\{\{native\}\}/g, nativeSlug);
     } else {
       outName = path.basename(handlerValue);
     }
 
-    // Copy bash script with renamed filename
-    files.push({
-      path: `hooks/${outName}`,
-      content,
-      executable: true,
-    });
+    files.push({ path: `hooks/${outName}`, content, executable: true });
 
-    // Generate PowerShell variant for targets that use powershell
     if (targetProfile.scriptVariants.includes('powershell')) {
       const ps1Name = outName.replace(/\.sh$/, '.ps1');
-      files.push({
-        path: `hooks/${ps1Name}`,
-        content: generatePs1Wrapper(hookSlug, targetProfile.adapterName, handlerValue),
-        executable: false,
-      });
+      files.push({ path: `hooks/${ps1Name}`, content: generatePs1Wrapper(hookSlug, targetProfile.adapterName, handlerValue) });
     }
 
-    // Generate JS bridge for programmatic targets
+    // JS bridge for programmatic targets — uses hookJsPattern if available
     if (isProgrammatic) {
-      const jsName = outName.replace(/\.sh$/, '.js');
-      files.push({
-        path: `hooks/${jsName}`,
-        content: generateJsBridge(jsName.replace(/\.js$/, ''), handlerValue, targetProfile),
-        executable: true,
-      });
+      let jsName: string;
+      if (hookJsPattern) {
+        jsName = hookJsPattern
+          .replace(/\{\{name\}\}/g, manifest.name)
+          .replace(/\{\{slug\}\}/g, hookSlug)
+          .replace(/\{\{native\}\}/g, nativeSlug);
+      } else {
+        jsName = outName.replace(/\.sh$/, '.js');
+      }
+      files.push({ path: `hooks/${jsName}`, content: generateJsBridge(jsName.replace(/\.js$/, ''), handlerValue, targetProfile), executable: true });
     }
   }
 

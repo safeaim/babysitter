@@ -1,1 +1,1 @@
-export { createPiAdapter, installPiPlugin } from "./adapter";
+export { createPiAdapter } from "./adapter";

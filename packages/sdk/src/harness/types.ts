@@ -206,10 +206,18 @@ export interface HarnessAdapter {
   /** List capabilities supported by this harness adapter. */
   getCapabilities?(): HarnessCapability[];
 
-  /** Install the harness CLI itself. */
+  /**
+   * Install the harness CLI itself.
+   * @deprecated Harness installation is now delegated to agent-mux. Use
+   *   `installHarnessViaAmux()` from `./install.ts` instead.
+   */
   installHarness?(options: HarnessInstallOptions): Promise<HarnessInstallResult>;
 
-  /** Install or materialize the Babysitter plugin/extension integration for this harness. */
+  /**
+   * Install or materialize the Babysitter plugin/extension integration for this harness.
+   * @deprecated Plugin installation is being migrated. This method will be
+   *   removed in a future release.
+   */
   installPlugin?(options: HarnessInstallOptions): Promise<HarnessInstallResult>;
 
   /**

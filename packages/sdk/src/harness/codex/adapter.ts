@@ -1,20 +1,18 @@
 import { createClaudeCodeAdapter } from "../claudeCode";
 import type {
   HarnessAdapter,
-  HarnessInstallOptions,
-  HarnessInstallResult,
   SessionBindOptions,
   SessionBindResult,
 } from "../types";
 import type { PromptContext } from "../../prompts/types";
 import { createCodexContext } from "./promptContext";
 import { handleCodexSessionStartHook, handleCodexStopHook } from "./hooks";
-import { installCodexHarness, installCodexPlugin } from "./install";
 import {
   resolveCodexPluginRoot,
   resolveCodexSessionId,
   resolveCodexStateDir,
 } from "./shared";
+import { bindSession } from "../hooks/sessionBinding";
 
 export function createCodexAdapter(): HarnessAdapter {
   const claude = createClaudeCodeAdapter();
@@ -67,14 +65,12 @@ export function createCodexAdapter(): HarnessAdapter {
         stateDir: opts.stateDir,
         pluginRoot: opts.pluginRoot,
       });
-      const result = await claude.bindSession({
-        ...opts,
-        stateDir,
-      });
-      return {
-        ...result,
+      return bindSession({
         harness: "codex",
-      };
+        stateDir,
+        opts,
+        autoReleaseStale: true,
+      });
     },
 
     handleStopHook(args) {
@@ -87,14 +83,6 @@ export function createCodexAdapter(): HarnessAdapter {
 
     findHookDispatcherPath(_startCwd: string): string | null {
       return null;
-    },
-
-    installHarness(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installCodexHarness(options);
-    },
-
-    installPlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installCodexPlugin(options);
     },
 
     getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {

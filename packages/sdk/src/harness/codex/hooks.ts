@@ -1,12 +1,10 @@
 import type { HarnessAdapter, HookHandlerArgs } from "../types";
 import {
-  getFirstCodexString,
-  normalizeCodexHookInput,
   readStdin,
   resolveCodexPluginRoot,
   resolveCodexStateDir,
 } from "./shared";
-import { initializeSessionState } from "../hooks/utils";
+import { initializeSessionState, parseHookInput, safeStr } from "../hooks/utils";
 import { writeSessionMarker } from "../../utils/sessionMarker";
 
 export async function handleCodexStopHook(
@@ -19,10 +17,9 @@ export async function handleCodexStopHook(
   } catch {
     rawInput = "";
   }
-  const normalized = normalizeCodexHookInput(rawInput);
 
-  // Pipe the normalized payload directly via stdinPayload rather than
-  // monkey-patching process.stdin.
+  // hooks-proxy now handles all input normalization.
+  // Pass the raw input directly to the stop hook handler.
   return claude.handleStopHook({
     ...args,
     pluginRoot: resolveCodexPluginRoot({ pluginRoot: args.pluginRoot }),
@@ -30,7 +27,7 @@ export async function handleCodexStopHook(
       stateDir: args.stateDir,
       pluginRoot: args.pluginRoot,
     }),
-    stdinPayload: JSON.stringify(normalized),
+    stdinPayload: rawInput,
   });
 }
 
@@ -51,8 +48,9 @@ export async function handleCodexSessionStartHook(
     }
   }
 
-  const normalized = normalizeCodexHookInput(rawInput);
-  const sessionId = getFirstCodexString(normalized, ["session_id"]);
+  // hooks-proxy now handles all input normalization.
+  const parsed = parseHookInput(rawInput);
+  const sessionId = safeStr(parsed, "session_id");
   if (!sessionId) {
     process.stdout.write("{}\n");
     return 0;

@@ -1,14 +1,3 @@
-import {
-  getSessionFilePath,
-  readSessionFile,
-  sessionFileExists,
-} from "../../session/parse";
-import type { SessionState } from "../../session/types";
-import {
-  getCurrentTimestamp,
-  updateSessionState,
-  writeSessionFile,
-} from "../../session/write";
 import type {
   HarnessAdapter,
   SessionBindOptions,
@@ -24,6 +13,7 @@ import { normalizeSessionStateDir } from "../../config";
 import { checkCliAvailable } from "../discovery";
 import { installCliViaNpm } from "../installSupport";
 import { createHookLogger, initializeSessionState } from "../hooks/utils";
+import { bindSession } from "../hooks/sessionBinding";
 
 const HARNESS_NAME = "openclaw";
 
@@ -76,74 +66,6 @@ async function handleSessionStartHookImpl(
 
   process.stdout.write("{}\n");
   return 0;
-}
-
-async function bindSessionImpl(
-  opts: SessionBindOptions,
-): Promise<SessionBindResult> {
-  const { sessionId, runId, maxIterations = 256, prompt, verbose } = opts;
-  const stateDir = resolveStateDirInternal({
-    stateDir: opts.stateDir,
-    pluginRoot: opts.pluginRoot,
-  });
-  const filePath = getSessionFilePath(stateDir, sessionId);
-
-  if (await sessionFileExists(filePath)) {
-    try {
-      const existing = await readSessionFile(filePath);
-      if (existing.state.runId && existing.state.runId !== runId) {
-        return {
-          harness: HARNESS_NAME,
-          sessionId,
-          stateFile: filePath,
-          error: `Session already associated with run: ${existing.state.runId}`,
-        };
-      }
-      await updateSessionState(
-        filePath,
-        { runId, active: true },
-        { state: existing.state, prompt: existing.prompt },
-      );
-      if (verbose) {
-        process.stderr.write(
-          `[run:create] Updated existing session ${sessionId} with run ${runId}\n`,
-        );
-      }
-      return { harness: HARNESS_NAME, sessionId, stateFile: filePath };
-    } catch {
-      // Corrupted state file — overwrite
-    }
-  }
-
-  const nowTs = getCurrentTimestamp();
-  const state: SessionState = {
-    active: true,
-    iteration: 1,
-    maxIterations,
-    runId,
-    runIds: [],
-    startedAt: nowTs,
-    lastIterationAt: nowTs,
-    iterationTimes: [],
-  };
-
-  try {
-    await writeSessionFile(filePath, state, prompt);
-  } catch (e) {
-    return {
-      harness: HARNESS_NAME,
-      sessionId,
-      error: `Failed to write session state: ${e instanceof Error ? e.message : String(e)}`,
-    };
-  }
-
-  if (verbose) {
-    process.stderr.write(
-      `[run:create] Session ${sessionId} initialized and bound to run ${runId}\n`,
-    );
-  }
-
-  return { harness: HARNESS_NAME, sessionId, stateFile: filePath };
 }
 
 export function createOpenClawAdapter(): HarnessAdapter {
@@ -203,8 +125,16 @@ export function createOpenClawAdapter(): HarnessAdapter {
       return undefined;
     },
 
-    bindSession(opts: SessionBindOptions): Promise<SessionBindResult> {
-      return bindSessionImpl(opts);
+    async bindSession(opts: SessionBindOptions): Promise<SessionBindResult> {
+      const stateDir = resolveStateDirInternal({
+        stateDir: opts.stateDir,
+        pluginRoot: opts.pluginRoot,
+      });
+      return bindSession({
+        harness: HARNESS_NAME,
+        stateDir,
+        opts,
+      });
     },
 
     handleStopHook(_args: HookHandlerArgs): Promise<number> {

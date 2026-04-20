@@ -1,16 +1,4 @@
 import * as path from "node:path";
-import { existsSync } from "node:fs";
-import {
-  getSessionFilePath,
-  readSessionFile,
-  sessionFileExists,
-} from "../../session/parse";
-import type { SessionState } from "../../session/types";
-import {
-  getCurrentTimestamp,
-  updateSessionState,
-  writeSessionFile,
-} from "../../session/write";
 import type {
   HarnessAdapter,
   SessionBindOptions,
@@ -29,6 +17,7 @@ import {
   resolveGithubCopilotSessionId,
   resolveGithubCopilotStateDir,
 } from "./hooks";
+import { bindSession } from "../hooks/sessionBinding";
 export { setBabysitterSessionIdInCopilotEnvFile } from "./hooks";
 
 const HARNESS_NAME = "github-copilot";
@@ -43,125 +32,6 @@ function resolvePluginRootInternal(args: { pluginRoot?: string }): string | unde
 }
 
 const resolveSessionIdInternal = resolveGithubCopilotSessionId;
-
-async function bindSessionImpl(
-  opts: SessionBindOptions,
-): Promise<SessionBindResult> {
-  const { sessionId, runId, maxIterations = 256, prompt, verbose } = opts;
-  const stateDir = resolveStateDirInternal({
-    stateDir: opts.stateDir,
-    pluginRoot: opts.pluginRoot,
-  });
-  const filePath = getSessionFilePath(stateDir, sessionId);
-
-  if (await sessionFileExists(filePath)) {
-    try {
-      const existing = await readSessionFile(filePath);
-      if (existing.state.runId && existing.state.runId !== runId) {
-        return {
-          harness: HARNESS_NAME,
-          sessionId,
-          stateFile: filePath,
-          error: `Session already associated with run: ${existing.state.runId}`,
-        };
-      }
-      await updateSessionState(
-        filePath,
-        { runId, active: true },
-        { state: existing.state, prompt: existing.prompt },
-      );
-      if (verbose) {
-        process.stderr.write(
-          `[run:create] Updated existing session ${sessionId} with run ${runId}\n`,
-        );
-      }
-      return { harness: HARNESS_NAME, sessionId, stateFile: filePath };
-    } catch {
-      // Corrupted state file — overwrite
-    }
-  }
-
-  const nowTs = getCurrentTimestamp();
-  const state: SessionState = {
-    active: true,
-    iteration: 1,
-    maxIterations,
-    runId,
-    runIds: [],
-    startedAt: nowTs,
-    lastIterationAt: nowTs,
-    iterationTimes: [],
-  };
-
-  try {
-    await writeSessionFile(filePath, state, prompt);
-  } catch (e) {
-    return {
-      harness: HARNESS_NAME,
-      sessionId,
-      error: `Failed to write session state: ${e instanceof Error ? e.message : String(e)}`,
-    };
-  }
-
-  if (verbose) {
-    process.stderr.write(
-      `[run:create] Session ${sessionId} initialized and bound to run ${runId}\n`,
-    );
-  }
-
-  return { harness: HARNESS_NAME, sessionId, stateFile: filePath };
-}
-
-function findHookDispatcherPathImpl(startCwd: string): string | null {
-  const pluginRoot = resolvePluginRootInternal({});
-  if (pluginRoot) {
-    const candidate = path.join(
-      path.resolve(pluginRoot),
-      "hooks.json",
-    );
-    if (existsSync(candidate)) return candidate;
-  }
-
-  let current = path.resolve(startCwd);
-  const root = path.parse(current).root;
-
-  while (current !== root) {
-    const candidate = path.join(current, ".github", "copilot", "hooks.json");
-    if (existsSync(candidate)) return candidate;
-
-    const copilotCandidate = path.join(current, ".copilot", "hooks.json");
-    if (existsSync(copilotCandidate)) return copilotCandidate;
-
-    const a5cCandidate = path.join(current, ".a5c", "hooks.json");
-    if (existsSync(a5cCandidate)) return a5cCandidate;
-
-    current = path.dirname(current);
-  }
-
-  return null;
-}
-
-async function installCopilotHarness(
-  options: HarnessInstallOptions,
-): Promise<HarnessInstallResult> {
-  return installCliViaNpm({
-    harness: HARNESS_NAME,
-    cliCommand: "copilot",
-    packageName: "@github/copilot",
-    summary: "Install the GitHub Copilot CLI globally via npm.",
-    options,
-  });
-}
-
-function installCopilotPlugin(
-  _options: HarnessInstallOptions,
-): HarnessInstallResult {
-  return {
-    harness: HARNESS_NAME,
-    summary: "GitHub Copilot CLI plugin installation is not yet automated. " +
-      "Configure hooks in .github/copilot/ or ~/.copilot/ manually.",
-  };
-}
 
 export function createGithubCopilotAdapter(): HarnessAdapter {
   return {
@@ -221,8 +91,16 @@ export function createGithubCopilotAdapter(): HarnessAdapter {
       return resolvePluginRootInternal(args);
     },
 
-    bindSession(opts: SessionBindOptions): Promise<SessionBindResult> {
-      return bindSessionImpl(opts);
+    async bindSession(opts: SessionBindOptions): Promise<SessionBindResult> {
+      const stateDir = resolveStateDirInternal({
+        stateDir: opts.stateDir,
+        pluginRoot: opts.pluginRoot,
+      });
+      return bindSession({
+        harness: HARNESS_NAME,
+        stateDir,
+        opts,
+      });
     },
 
     handleStopHook(args: HookHandlerArgs): Promise<number> {
@@ -233,16 +111,8 @@ export function createGithubCopilotAdapter(): HarnessAdapter {
       return handleGithubCopilotSessionStartHook(args);
     },
 
-    findHookDispatcherPath(startCwd: string): string | null {
-      return findHookDispatcherPathImpl(startCwd);
-    },
-
-    installHarness(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installCopilotHarness(options);
-    },
-
-    installPlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return Promise.resolve(installCopilotPlugin(options));
+    findHookDispatcherPath(_startCwd: string): string | null {
+      return null;
     },
 
     getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {

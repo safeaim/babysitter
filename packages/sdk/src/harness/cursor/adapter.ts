@@ -100,40 +100,6 @@ async function bindSessionImpl(
   return { harness: HARNESS_NAME, sessionId, stateFile: filePath };
 }
 
-function installCursorHarness(
-  options: HarnessInstallOptions,
-): Promise<HarnessInstallResult> {
-  if (options.dryRun) {
-    return Promise.resolve({
-      harness: HARNESS_NAME,
-      dryRun: true,
-      summary: "Cursor CLI is bundled with the Cursor IDE. Download and install Cursor from https://cursor.com/",
-    });
-  }
-
-  return Promise.resolve({
-    harness: HARNESS_NAME,
-    summary: "Cursor CLI is bundled with the Cursor IDE. Ensure Cursor is installed and the `cursor` command is available on PATH. Download from https://cursor.com/ if needed.",
-  });
-}
-
-function installCursorPlugin(
-  options: HarnessInstallOptions,
-): Promise<HarnessInstallResult> {
-  if (options.dryRun) {
-    return Promise.resolve({
-      harness: HARNESS_NAME,
-      dryRun: true,
-      summary: "Install the Babysitter Cursor plugin from the Cursor Marketplace or copy to ~/.cursor/plugins/local/ for local testing.",
-    });
-  }
-
-  return Promise.resolve({
-    harness: HARNESS_NAME,
-    summary: "To install the Babysitter Cursor plugin: use the Cursor Marketplace (Settings > Plugins) or copy the plugin directory to ~/.cursor/plugins/local/ for local development.",
-  });
-}
-
 export function createCursorAdapter(): HarnessAdapter {
   return {
     name: HARNESS_NAME,
@@ -250,14 +216,6 @@ export function createCursorAdapter(): HarnessAdapter {
         if (existsSync(candidate)) return candidate;
       }
       return null;
-    },
-
-    installHarness(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installCursorHarness(options);
-    },
-
-    installPlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installCursorPlugin(options);
     },
 
     getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {

@@ -1,17 +1,6 @@
 import * as path from "node:path";
 import * as os from "node:os";
 import { existsSync } from "node:fs";
-import {
-  getSessionFilePath,
-  readSessionFile,
-  sessionFileExists,
-} from "../../session/parse";
-import type { SessionState } from "../../session/types";
-import {
-  getCurrentTimestamp,
-  updateSessionState,
-  writeSessionFile,
-} from "../../session/write";
 import type {
   HarnessAdapter,
   SessionBindOptions,
@@ -29,80 +18,11 @@ import {
   resolveOpenCodeSessionId,
   resolveOpenCodeStateDir,
 } from "./hooks";
+import { bindSession } from "../hooks/sessionBinding";
 
 const HARNESS_NAME = "opencode";
 const resolveStateDirInternal = resolveOpenCodeStateDir;
 const resolveSessionIdInternal = resolveOpenCodeSessionId;
-
-async function bindSessionImpl(
-  opts: SessionBindOptions,
-): Promise<SessionBindResult> {
-  const { sessionId, runId, maxIterations = 256, prompt, verbose } = opts;
-  const stateDir = resolveStateDirInternal({
-    stateDir: opts.stateDir,
-    pluginRoot: opts.pluginRoot,
-  });
-  const filePath = getSessionFilePath(stateDir, sessionId);
-
-  if (await sessionFileExists(filePath)) {
-    try {
-      const existing = await readSessionFile(filePath);
-      if (existing.state.runId && existing.state.runId !== runId) {
-        return {
-          harness: HARNESS_NAME,
-          sessionId,
-          stateFile: filePath,
-          error: `Session already associated with run: ${existing.state.runId}`,
-        };
-      }
-      await updateSessionState(
-        filePath,
-        { runId, active: true },
-        { state: existing.state, prompt: existing.prompt },
-      );
-      if (verbose) {
-        process.stderr.write(
-          `[run:create] Updated existing session ${sessionId} with run ${runId}\n`,
-        );
-      }
-      return { harness: HARNESS_NAME, sessionId, stateFile: filePath };
-    } catch {
-      // Corrupted state file — overwrite
-    }
-  }
-
-  const nowTs = getCurrentTimestamp();
-  const accomplishTaskId = process.env.ACCOMPLISH_TASK_ID;
-  const state: SessionState = {
-    active: true,
-    iteration: 1,
-    maxIterations,
-    runId,
-    runIds: [],
-    startedAt: nowTs,
-    lastIterationAt: nowTs,
-    iterationTimes: [],
-    ...(accomplishTaskId ? { metadata: { accomplishTaskId } } : {}),
-  };
-
-  try {
-    await writeSessionFile(filePath, state, prompt);
-  } catch (e) {
-    return {
-      harness: HARNESS_NAME,
-      sessionId,
-      error: `Failed to write session state: ${e instanceof Error ? e.message : String(e)}`,
-    };
-  }
-
-  if (verbose) {
-    process.stderr.write(
-      `[run:create] Session ${sessionId} initialized and bound to run ${runId}\n`,
-    );
-  }
-
-  return { harness: HARNESS_NAME, sessionId, stateFile: filePath };
-}
 
 function installOpenCodePlugin(
   _options: HarnessInstallOptions,
@@ -220,8 +140,18 @@ export function createOpenCodeAdapter(): HarnessAdapter {
       return undefined;
     },
 
-    bindSession(opts: SessionBindOptions): Promise<SessionBindResult> {
-      return bindSessionImpl(opts);
+    async bindSession(opts: SessionBindOptions): Promise<SessionBindResult> {
+      const stateDir = resolveStateDirInternal({
+        stateDir: opts.stateDir,
+        pluginRoot: opts.pluginRoot,
+      });
+      const accomplishTaskId = process.env.ACCOMPLISH_TASK_ID;
+      return bindSession({
+        harness: HARNESS_NAME,
+        stateDir,
+        opts,
+        extraState: accomplishTaskId ? { metadata: { accomplishTaskId } } : undefined,
+      });
     },
 
     handleStopHook(args: HookHandlerArgs): Promise<number> {
@@ -232,26 +162,7 @@ export function createOpenCodeAdapter(): HarnessAdapter {
       return handleOpenCodeSessionStartHook(args);
     },
 
-    findHookDispatcherPath(startCwd: string): string | null {
-      let current = path.resolve(startCwd);
-      const root = path.parse(current).root;
-
-      while (current !== root) {
-        const candidate = path.join(current, ".opencode", "plugins", "babysitter", "index.js");
-        if (existsSync(candidate)) return candidate;
-
-        const tsCandidate = path.join(current, ".opencode", "plugins", "babysitter", "index.ts");
-        if (existsSync(tsCandidate)) return tsCandidate;
-
-        current = path.dirname(current);
-      }
-
-      const accomplishDirs = getAccomplishDataDirs();
-      for (const dataDir of accomplishDirs) {
-        const candidate = path.join(dataDir, "opencode", "plugins", "babysitter", "index.js");
-        if (existsSync(candidate)) return candidate;
-      }
-
+    findHookDispatcherPath(_startCwd: string): string | null {
       return null;
     },
 

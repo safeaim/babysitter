@@ -24,6 +24,7 @@ import type {
   HarnessSpec,
 } from "./types";
 import { getHarnessDiscoverySpec, KNOWN_HARNESSES } from "./registry";
+import { discoverHarnessesViaAmux } from "./install";
 
 export { KNOWN_HARNESSES } from "./registry";
 
@@ -110,6 +111,21 @@ export async function checkCliAvailable(
  * @returns An array of discovery results sorted alphabetically by harness name.
  */
 export async function discoverHarnesses(): Promise<HarnessDiscoveryResult[]> {
+  // Try agent-mux first -- it has richer detection and caching.
+  try {
+    return await discoverHarnessesViaAmux();
+  } catch {
+    // Fall back to legacy direct probing.
+  }
+
+  return discoverHarnessesLegacy();
+}
+
+/**
+ * Legacy discovery: probes each known harness CLI via `which`/`where` in
+ * parallel.  Used as fallback when agent-mux is unavailable.
+ */
+async function discoverHarnessesLegacy(): Promise<HarnessDiscoveryResult[]> {
   const settled = await Promise.allSettled(
     KNOWN_HARNESSES.map((spec) => probeHarness(spec)),
   );

@@ -23,7 +23,7 @@ import {
   updateSessionState,
   writeSessionFile,
 } from "../../session/write";
-import { installCliViaNpm, runPackageBinaryViaNpx } from "../installSupport";
+// installSupport removed — harness installation delegated to agent-mux
 import { writeSessionMarker, resolveSessionIdWithMarker } from "../../utils/sessionMarker";
 
 function resolveOhMyPiPluginRoot(
@@ -102,28 +102,6 @@ function writeNoopHookResult(): void {
   process.stdout.write("{}\n");
 }
 
-async function installOhMyPiPlugin(
-  options: HarnessInstallOptions,
-): Promise<HarnessInstallResult> {
-  const packageArgs = ["install"];
-  if (options.workspace) {
-    packageArgs.push("--workspace", path.resolve(options.workspace));
-  } else {
-    packageArgs.push("--global");
-  }
-
-  return runPackageBinaryViaNpx({
-    harness: "oh-my-pi",
-    packageName: "@a5c-ai/babysitter-omp",
-    packageArgs,
-    summary: options.workspace
-      ? "Install the published Babysitter oh-my-pi package for the target workspace."
-      : "Install the published Babysitter oh-my-pi package into the user profile.",
-    options,
-    env: process.env,
-  });
-}
-
 export function createOhMyPiAdapter(): HarnessAdapter {
   return {
     name: "oh-my-pi",
@@ -192,20 +170,6 @@ export function createOhMyPiAdapter(): HarnessAdapter {
 
     findHookDispatcherPath(_startCwd: string): string | null {
       return null;
-    },
-
-    installHarness(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installCliViaNpm({
-        harness: "oh-my-pi",
-        cliCommand: "omp",
-        packageName: "@oh-my-pi/pi-coding-agent",
-        summary: "Install the oh-my-pi CLI globally via npm.",
-        options,
-      });
-    },
-
-    installPlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installOhMyPiPlugin(options);
     },
 
     getCapabilities(): HarnessCapability[] {

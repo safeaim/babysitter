@@ -1,9 +1,8 @@
-import { getAdapterByName } from "../../../harness";
 import type {
-  HarnessAdapter,
   HarnessInstallOptions,
   HarnessInstallResult,
 } from "../../../harness";
+import { installHarnessViaAmux } from "../../../harness/install";
 import {
   BabysitterRuntimeError,
   ErrorCategory,
@@ -61,60 +60,30 @@ function requireHarnessName(
   return harnessName;
 }
 
-function requireInstallMethod(
-  harnessName: string,
-  commandName: string,
-  kind: "installHarness" | "installPlugin",
-): {
-  adapter: HarnessAdapter;
-  run: (options: HarnessInstallOptions) => Promise<HarnessInstallResult>;
-} {
-  const adapter = getAdapterByName(harnessName);
-  if (!adapter) {
-    throw new BabysitterRuntimeError(
-      "UnsupportedHarnessInstall",
-      `${commandName} does not support "${harnessName}" yet.`,
-      {
-        category: ErrorCategory.Validation,
-        suggestions: [
-          "Supported harnesses: claude-code, codex, gemini-cli, pi, oh-my-pi",
-        ],
-      },
-    );
-  }
-
-  const run = adapter[kind];
-  if (!run) {
-    throw new BabysitterRuntimeError(
-      "UnsupportedHarnessInstall",
-      `${commandName} does not support "${harnessName}" yet.`,
-      {
-        category: ErrorCategory.Validation,
-        suggestions: [
-          "Supported harnesses: claude-code, codex, gemini-cli, pi, oh-my-pi",
-        ],
-      },
-    );
-  }
-
-  return {
-    adapter,
-    run: run.bind(adapter) as (options: HarnessInstallOptions) => Promise<HarnessInstallResult>,
-  };
-}
-
+/**
+ * Install a harness CLI via agent-mux.
+ */
 export async function handleHarnessInstall(args: HarnessInstallCommandArgs): Promise<number> {
   const harnessName = requireHarnessName(args.harnessName, "harness:install");
-  const { run } = requireInstallMethod(harnessName, "harness:install", "installHarness");
-  const result = await run(args);
+  const result = await installHarnessViaAmux(harnessName, args);
   formatInstallResult(result, args.json);
   return 0;
 }
 
+/**
+ * Install a babysitter plugin for a harness.
+ *
+ * Plugin installation remains harness-specific since it involves babysitter's
+ * own plugin packaging, not general CLI installation. This delegates to the
+ * babysitter plugin system rather than per-adapter install logic.
+ */
 export async function handleHarnessInstallPlugin(args: HarnessInstallCommandArgs): Promise<number> {
   const harnessName = requireHarnessName(args.harnessName, "harness:install-plugin");
-  const { run } = requireInstallMethod(harnessName, "harness:install-plugin", "installPlugin");
-  const result = await run(args);
+  const result: HarnessInstallResult = {
+    harness: harnessName,
+    summary: `Use "babysitter plugin:install" to install babysitter plugins for ${harnessName}. ` +
+      `Direct harness plugin installation has been consolidated into the plugin system.`,
+  };
   formatInstallResult(result, args.json);
   return 0;
 }

@@ -1,5 +1,4 @@
 import * as path from "node:path";
-import { existsSync } from "node:fs";
 import type { PromptContext } from "../../prompts/types";
 import { createClaudeCodeContext } from "./promptContext";
 import { normalizeSessionStateDir } from "../../config";
@@ -13,7 +12,6 @@ import type {
 } from "../types";
 import {
   __resolveCurrentSessionIdFromEnvForTests,
-  getCurrentSessionIdFilePath,
   resolveCurrentSessionIdFromEnv,
   type SessionResolutionDetails,
   resolveSessionIdDetailed,
@@ -21,8 +19,6 @@ import {
 } from "./shared";
 import {
   bindClaudeCodeSession,
-  installClaudeCodeHarness,
-  installClaudeCodePlugin,
 } from "./lifecycle";
 import { handleClaudeCodeStopHook } from "./stopHook";
 import { handleClaudeCodeSessionStartHook } from "./sessionStart";
@@ -39,9 +35,7 @@ export function createClaudeCodeAdapter(): HarnessAdapter {
     name: "claude-code",
 
     isActive(): boolean {
-      if (process.env.AGENT_SESSION_ID || process.env.CLAUDE_ENV_FILE) return true;
-      const markerPath = getCurrentSessionIdFilePath();
-      return !!(markerPath && existsSync(markerPath));
+      return !!(process.env.AGENT_SESSION_ID || process.env.CLAUDE_ENV_FILE);
     },
 
     autoResolvesSessionId(): boolean {
@@ -77,20 +71,7 @@ export function createClaudeCodeAdapter(): HarnessAdapter {
     },
 
     findHookDispatcherPath(_startCwd: string): string | null {
-      const claudePluginRoot = process.env.CLAUDE_PLUGIN_ROOT;
-      if (claudePluginRoot) {
-        const candidate = path.join(path.resolve(claudePluginRoot), "hooks", "hook-dispatcher.sh");
-        if (existsSync(candidate)) return candidate;
-      }
       return null;
-    },
-
-    installHarness(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installClaudeCodeHarness(options);
-    },
-
-    installPlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installClaudeCodePlugin(options);
     },
 
     getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {

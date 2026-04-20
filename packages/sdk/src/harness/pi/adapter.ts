@@ -105,40 +105,6 @@ function writeNoopHookResult(): void {
   process.stdout.write("{}\n");
 }
 
-async function installPiFamilyPlugin(args: {
-  harness: "pi" | "oh-my-pi";
-  packageName: string;
-  options: HarnessInstallOptions;
-}): Promise<HarnessInstallResult> {
-  const packageArgs = ["install"];
-  if (args.options.workspace) {
-    packageArgs.push("--workspace", path.resolve(args.options.workspace));
-  } else {
-    packageArgs.push("--global");
-  }
-
-  return runPackageBinaryViaNpx({
-    harness: args.harness,
-    packageName: args.packageName,
-    packageArgs,
-    summary: args.options.workspace
-      ? `Install the published Babysitter ${args.harness} package for the target workspace.`
-      : `Install the published Babysitter ${args.harness} package into the user profile.`,
-    options: args.options,
-    env: process.env,
-  });
-}
-
-export async function installPiPlugin(
-  options: HarnessInstallOptions,
-): Promise<HarnessInstallResult> {
-  return installPiFamilyPlugin({
-    harness: "pi",
-    packageName: "@a5c-ai/babysitter-pi",
-    options,
-  });
-}
-
 export function createPiAdapter(): HarnessAdapter {
   return {
     name: "pi",
@@ -207,20 +173,6 @@ export function createPiAdapter(): HarnessAdapter {
 
     findHookDispatcherPath(_startCwd: string): string | null {
       return null;
-    },
-
-    installHarness(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installCliViaNpm({
-        harness: "pi",
-        cliCommand: "pi",
-        packageName: "@mariozechner/pi-coding-agent",
-        summary: "Install the Pi Coding Agent CLI globally via npm.",
-        options,
-      });
-    },
-
-    installPlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
-      return installPiPlugin(options);
     },
 
     getCapabilities(): HarnessCapability[] {

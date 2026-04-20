@@ -37,3 +37,4 @@ export {
 } from "./registry";
 
 export { discoverHarnesses, detectCallerHarness, checkCliAvailable, KNOWN_HARNESSES } from "./discovery";
+export { installHarnessViaAmux, discoverHarnessesViaAmux } from "./install";

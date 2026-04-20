@@ -1,5 +1,4 @@
 import * as path from "node:path";
-import { mkdirSync, writeFileSync } from "node:fs";
 import { getSessionFilePath, sessionFileExists } from "../../session/parse";
 import type { SessionState } from "../../session/types";
 import { getCurrentTimestamp, writeSessionFile } from "../../session/write";
@@ -12,7 +11,6 @@ import {
 import { getActiveProcessLibraryPath } from "../../processLibrary/active";
 import type { HookHandlerArgs } from "../types";
 import {
-  getCurrentSessionIdFilePath,
   parseHookInput,
   readStdin,
   safeStr,
@@ -51,19 +49,7 @@ export async function handleClaudeCodeSessionStartHook(
     return 0;
   }
 
-  let markerPersisted = false;
   let envFilePersisted = false;
-  const sessionIdFile = getCurrentSessionIdFilePath();
-  if (sessionIdFile) {
-    try {
-      mkdirSync(path.dirname(sessionIdFile), { recursive: true });
-      writeFileSync(sessionIdFile, sessionId + "\n");
-      markerPersisted = true;
-    } catch {
-      process.stderr.write("[hook:run session-start] Failed to write session ID marker file\n");
-    }
-  }
-
   const envFile = process.env.CLAUDE_ENV_FILE;
   if (envFile) {
     try {
@@ -136,9 +122,9 @@ export async function handleClaudeCodeSessionStartHook(
   if (verbose) {
     process.stderr.write(`Babysitter session started: ${sessionId}\n`);
   }
-  if (!markerPersisted && !envFilePersisted && !stateFilePersisted) {
+  if (!envFilePersisted && !stateFilePersisted) {
     process.stderr.write(
-      "[hook:run session-start] Session persistence failed — no marker, env file, or state file was written\n",
+      "[hook:run session-start] Session persistence failed — no env file or state file was written\n",
     );
     process.stdout.write("{}\n");
     return 1;

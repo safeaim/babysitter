@@ -20,8 +20,8 @@ import {
   handleOpenCodeStopHook,
   resolveOpenCodeSessionId,
   resolveOpenCodeStateDir,
-} from "../opencode/hooks";
-import { createOpenCodeContext } from "../opencode/promptContext";
+} from "../hooks/opencodeHooks";
+import { createOpenCodeContext } from "../hooks/promptContexts";
 import { bindSession } from "../hooks/sessionBinding";
 
 function getAccomplishDataDirs(): string[] {

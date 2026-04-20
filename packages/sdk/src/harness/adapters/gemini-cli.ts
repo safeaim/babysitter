@@ -16,8 +16,8 @@ import {
   handleGeminiSessionStartHook,
   resolveGeminiCliStateDir,
   resolveGeminiSessionIdFromEnv,
-} from "../geminiCli/hooks";
-import { createGeminiCliContext } from "../geminiCli/promptContext";
+} from "../hooks/geminiCliHooks";
+import { createGeminiCliContext } from "../hooks/promptContexts";
 import { bindSession } from "../hooks/sessionBinding";
 
 class GeminiCliAdapter extends BaseHarnessAdapter {

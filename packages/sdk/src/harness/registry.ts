@@ -9,15 +9,13 @@ import type { PromptContext } from "../prompts/types";
 import type { HarnessAdapter, HarnessSpec } from "./types";
 import { HarnessCapability as Cap } from "./types";
 import { createClaudeCodeAdapter } from "./adapters/claude-code";
-import { CLAUDE_CODE_DISCOVERY_SPEC } from "./claudeCode/discovery";
 import {
   resolveSessionIdDetailed as resolveClaudeCodeSessionDetails,
   type SessionResolutionDetails,
-} from "./claudeCode/shared";
+} from "./hooks/claudeCodeHooks";
 import { createCodexAdapter } from "./adapters/codex";
 import { createGeminiCliAdapter } from "./adapters/gemini-cli";
 import { createPiAdapter } from "./adapters/pi";
-import { PI_DISCOVERY_SPEC } from "./pi/discovery";
 import { createOhMyPiAdapter } from "./adapters/oh-my-pi";
 import { createCursorAdapter } from "./adapters/cursor";
 import { createGithubCopilotAdapter } from "./adapters/github-copilot";
@@ -30,6 +28,22 @@ import { createCustomAdapter } from "./customAdapter";
 // ---------------------------------------------------------------------------
 // Inline discovery specs (previously in per-adapter discovery.ts files)
 // ---------------------------------------------------------------------------
+
+export const CLAUDE_CODE_DISCOVERY_SPEC: HarnessSpec = {
+  name: "claude-code",
+  cli: "claude",
+  callerEnvVars: ["CLAUDE_ENV_FILE"],
+  capabilities: [Cap.SessionBinding, Cap.StopHook, Cap.Mcp, Cap.HeadlessPrompt],
+  configPaths: [".claude"],
+};
+
+export const PI_DISCOVERY_SPEC: HarnessSpec = {
+  name: "pi",
+  cli: "pi",
+  callerEnvVars: ["PI_SESSION_ID"],
+  capabilities: [Cap.Programmatic, Cap.SessionBinding, Cap.HeadlessPrompt],
+  configPaths: [".pi"],
+};
 
 export const CODEX_DISCOVERY_SPEC: HarnessSpec = {
   name: "codex",
@@ -87,7 +101,7 @@ export const OPENCLAW_DISCOVERY_SPEC: HarnessSpec = {
   configPaths: [".openclaw"],
 };
 
-export type { SessionResolutionDetails } from "./claudeCode/shared";
+export type { SessionResolutionDetails } from "./hooks/claudeCodeHooks";
 
 interface HarnessRegistryEntry {
   name: string;

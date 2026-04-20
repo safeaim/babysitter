@@ -16,14 +16,9 @@ import type {
 import type { PromptContext } from "../../prompts/types";
 import { BaseHarnessAdapter } from "../BaseAdapter";
 import { createClaudeCodeAdapter } from "./claude-code";
-import { handleCodexStopHook, handleCodexSessionStartHook } from "../codex/hooks";
-import {
-  resolveCodexPluginRoot,
-  resolveCodexSessionId,
-  resolveCodexStateDir,
-} from "../codex/shared";
+import { handleCodexStopHook, handleCodexSessionStartHook, resolveCodexPluginRoot, resolveCodexSessionId, resolveCodexStateDir } from "../hooks/codexHooks";
 import { bindSession } from "../hooks/sessionBinding";
-import { createCodexContext } from "../codex/promptContext";
+import { createCodexContext } from "../hooks/promptContexts";
 
 class CodexAdapter extends BaseHarnessAdapter {
   constructor() {

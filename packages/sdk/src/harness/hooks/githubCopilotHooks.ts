@@ -1,3 +1,8 @@
+/**
+ * GitHub Copilot hook handlers.
+ * Extracted from githubCopilot/hooks.ts.
+ */
+
 import * as path from "node:path";
 import { appendFileSync, readFileSync } from "node:fs";
 import { appendEvent } from "../../storage/journal";
@@ -15,7 +20,7 @@ import {
   parseHookInput,
   readStdin,
   safeStr,
-} from "../hooks/utils";
+} from "./utils";
 import { readSessionMarker, writeSessionMarker } from "../../utils/sessionMarker";
 
 const HARNESS_NAME = "github-copilot";

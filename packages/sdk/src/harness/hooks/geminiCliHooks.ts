@@ -1,3 +1,8 @@
+/**
+ * Gemini CLI hook handlers.
+ * Extracted from geminiCli/hooks.ts and geminiCli/sessionStartHook.ts.
+ */
+
 import * as path from "node:path";
 import { existsSync, readFileSync } from "node:fs";
 import {
@@ -19,12 +24,13 @@ import {
   appendStopHookEvent as appendStopHookEventShared,
   cleanupSession,
   createHookLogger,
+  initializeSessionState,
   parseHookInput,
   readStdin,
   safeStr,
-} from "../hooks/utils";
-import { resolveHookRunState } from "../hooks/runState";
-import { resolveSessionIdWithMarker } from "../../utils/sessionMarker";
+} from "./utils";
+import { resolveHookRunState } from "./runState";
+import { resolveSessionIdWithMarker, writeSessionMarker } from "../../utils/sessionMarker";
 
 const HARNESS_NAME = "gemini-cli";
 
@@ -34,6 +40,13 @@ interface GeminiAfterAgentHookInput {
   prompt_response?: string;
   stop_hook_active?: boolean;
   transcript_path?: string;
+  cwd?: string;
+  hook_event_name?: string;
+  timestamp?: string;
+}
+
+interface GeminiSessionStartHookInput {
+  session_id?: string;
   cwd?: string;
   hook_event_name?: string;
   timestamp?: string;
@@ -226,5 +239,51 @@ export async function handleGeminiAfterAgentHook(args: HookHandlerArgs): Promise
   return 0;
 }
 
-// Re-export the session-start hook from its extracted module
-export { handleGeminiSessionStartHook } from "./sessionStartHook";
+export async function handleGeminiSessionStartHook(
+  args: HookHandlerArgs,
+): Promise<number> {
+  const { verbose } = args;
+  const log = createHookLogger("babysitter-session-start-hook");
+  log.info("handleSessionStartHook started (gemini-cli)");
+
+  let rawInput: string;
+  try {
+    rawInput = await readStdin();
+  } catch {
+    process.stdout.write("{}\n");
+    return 0;
+  } finally {
+    if (typeof process.stdin.unref === "function") {
+      process.stdin.unref();
+    }
+  }
+
+  const hookInput = parseHookInput(rawInput) as GeminiSessionStartHookInput;
+  const sessionId =
+    safeStr(hookInput as Record<string, unknown>, "session_id") ||
+    resolveGeminiSessionIdFromEnv() ||
+    "";
+
+  if (!sessionId) {
+    log.info("No session ID in hook input — skipping state file creation");
+    process.stdout.write("{}\n");
+    return 0;
+  }
+
+  log.setContext("session", sessionId);
+  log.info(`Session ID: ${sessionId}`);
+
+  try {
+    writeSessionMarker(HARNESS_NAME, sessionId);
+  } catch {
+    // Non-fatal: marker is a best-effort mechanism
+  }
+
+  const stateDir = resolveGeminiCliStateDir(args);
+  log.info(`Resolved stateDir: ${stateDir}`);
+
+  await initializeSessionState(sessionId, stateDir, { verbose, log });
+
+  process.stdout.write("{}\n");
+  return 0;
+}

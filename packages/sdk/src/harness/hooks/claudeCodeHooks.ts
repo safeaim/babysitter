@@ -1,3 +1,8 @@
+/**
+ * Claude Code hook handlers.
+ * Extracted from claudeCode/stopHook.ts and claudeCode/sessionStart.ts.
+ */
+
 import * as path from "node:path";
 import { existsSync } from "node:fs";
 import {
@@ -13,6 +18,12 @@ import {
   writeSessionFile,
 } from "../../session/write";
 import { normalizeSessionStateDir } from "../../config";
+import { loadCompressionConfig } from "../../compression/config-loader";
+import {
+  findLibraryFiles,
+  getOrCompressFile,
+} from "../../compression/library-cache";
+import { getActiveProcessLibraryPath } from "../../processLibrary/active";
 import type { HookHandlerArgs } from "../types";
 import {
   appendStopHookEvent,
@@ -20,16 +31,111 @@ import {
   createHookLogger,
   parseHookInput,
   readStdin,
-  resolveCurrentSessionIdFromEnv,
   safeStr,
-  type ClaudeCodeStopHookInput,
-} from "./shared";
+} from "./utils";
 import {
   buildStopHookContinuation,
   parseAssistantStopState,
   resolveStopHookRunState,
-} from "./stopHookState";
+} from "./stopHookContinuation";
 import { collapseDoubledA5cRuns } from "../../cli/resolveInputPath";
+
+// ---------------------------------------------------------------------------
+// Shared Claude Code types and utilities
+// ---------------------------------------------------------------------------
+
+export interface ClaudeCodeStopHookInput {
+  session_id?: string;
+  transcript_path?: string;
+  last_assistant_message?: string;
+}
+
+export interface ClaudeCodeSessionStartHookInput {
+  session_id?: string;
+}
+
+/**
+ * Resolve the current session ID from environment.
+ * hooks-proxy handles session ID propagation via AGENT_SESSION_ID.
+ */
+export function resolveCurrentSessionIdFromEnv(): string | undefined {
+  return process.env.AGENT_SESSION_ID;
+}
+
+export interface SessionResolutionDetails {
+  sessionId?: string;
+  resolvedFrom: "env-var" | "explicit" | "none";
+  /** @deprecated PID-marker logic removed. Always null. */
+  ancestorPid: number | null;
+  /** @deprecated PID-marker logic removed. Always null. */
+  ancestorAlive: boolean | null;
+}
+
+/**
+ * Resolve session ID with detailed provenance.
+ */
+export function resolveSessionIdDetailed(explicit?: string): SessionResolutionDetails {
+  if (explicit) {
+    return {
+      sessionId: explicit,
+      resolvedFrom: "explicit",
+      ancestorPid: null,
+      ancestorAlive: null,
+    };
+  }
+
+  const agentSessionId = process.env.AGENT_SESSION_ID;
+  if (agentSessionId) {
+    return {
+      sessionId: agentSessionId,
+      resolvedFrom: "env-var",
+      ancestorPid: null,
+      ancestorAlive: null,
+    };
+  }
+
+  return {
+    sessionId: undefined,
+    resolvedFrom: "none",
+    ancestorPid: null,
+    ancestorAlive: null,
+  };
+}
+
+export const __resolveCurrentSessionIdFromEnvForTests = resolveCurrentSessionIdFromEnv;
+
+import { appendFileSync } from "node:fs";
+
+export function setBabysitterSessionIdInEnvFile(
+  envFile: string,
+  sessionId: string,
+): void {
+  appendFileSync(envFile, `export AGENT_SESSION_ID="${sessionId}"\n`);
+}
+
+// ---------------------------------------------------------------------------
+// Lifecycle (session binding)
+// ---------------------------------------------------------------------------
+
+import { bindSession } from "./sessionBinding";
+
+export async function bindClaudeCodeSession(
+  opts: import("../types").SessionBindOptions,
+): Promise<import("../types").SessionBindResult> {
+  const stateDir = normalizeSessionStateDir(
+    opts.stateDir ?? process.env.BABYSITTER_STATE_DIR,
+  );
+  return bindSession({
+    harness: "claude-code",
+    stateDir,
+    opts,
+    autoReleaseStale: true,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Stop hook handler
+// ---------------------------------------------------------------------------
 
 export async function handleClaudeCodeStopHook(args: HookHandlerArgs): Promise<number> {
   const { verbose } = args;
@@ -335,5 +441,133 @@ export async function handleClaudeCodeStopHook(args: HookHandlerArgs): Promise<n
     log.warn(`Resolved run directory missing during stop hook: ${runDir}`);
   }
 
+  return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Session start hook handler
+// ---------------------------------------------------------------------------
+
+export async function handleClaudeCodeSessionStartHook(
+  args: HookHandlerArgs,
+): Promise<number> {
+  const { verbose } = args;
+
+  if (args.pluginRoot && !process.env.CLAUDE_PLUGIN_ROOT) {
+    process.env.CLAUDE_PLUGIN_ROOT = path.resolve(args.pluginRoot);
+  }
+  if (args.stateDir && !process.env.BABYSITTER_STATE_DIR) {
+    process.env.BABYSITTER_STATE_DIR = normalizeSessionStateDir(args.stateDir);
+  }
+
+  let rawInput: string;
+  try {
+    rawInput = await readStdin();
+  } catch {
+    process.stdout.write("{}\n");
+    return 0;
+  } finally {
+    if (typeof process.stdin.unref === "function") {
+      process.stdin.unref();
+    }
+  }
+
+  const hookInput = parseHookInput(rawInput) as ClaudeCodeSessionStartHookInput;
+  const sessionId = safeStr(hookInput as Record<string, unknown>, "session_id");
+  if (!sessionId) {
+    process.stdout.write("{}\n");
+    return 0;
+  }
+
+  // hooks-proxy handles CLAUDE_ENV_FILE writes via native_env_file propagation backend
+  const envFilePersisted = !!process.env.CLAUDE_ENV_FILE;
+
+  const stateDir = normalizeSessionStateDir(
+    args.stateDir ?? process.env.BABYSITTER_STATE_DIR,
+  );
+
+  let stateFilePersisted = false;
+  if (stateDir) {
+    const filePath = getSessionFilePath(stateDir, sessionId);
+    try {
+      if (!(await sessionFileExists(filePath))) {
+        const nowTs = getCurrentTimestamp();
+        const state: SessionState = {
+          active: true,
+          iteration: 1,
+          maxIterations: 256,
+          runId: "",
+          runIds: [],
+          startedAt: nowTs,
+          lastIterationAt: nowTs,
+          iterationTimes: [],
+        };
+        await writeSessionFile(filePath, state, "");
+        stateFilePersisted = true;
+        if (verbose) {
+          process.stderr.write(`[hook:run session-start] Created session state: ${filePath}\n`);
+        }
+      } else {
+        stateFilePersisted = true;
+      }
+    } catch {
+      process.stderr.write(`[hook:run session-start] Failed to create session state in ${stateDir}\n`);
+    }
+  } else {
+    process.stderr.write(
+      "[hook:run session-start] Cannot resolve state directory — session state will not be persisted\n",
+    );
+  }
+
+  try {
+    const compressionCfg = loadCompressionConfig(process.cwd());
+    const cacheLayer = compressionCfg.layers.processLibraryCache;
+    if (compressionCfg.enabled && cacheLayer.enabled) {
+      const libraryRoot = await getActiveProcessLibraryPath();
+      if (libraryRoot) {
+        const cacheDir = path.join(process.cwd(), ".a5c", "cache", "compression");
+        const libraryFiles = findLibraryFiles(libraryRoot);
+        for (const file of libraryFiles) {
+          getOrCompressFile(file, cacheLayer.targetReduction, cacheLayer.ttlHours, cacheDir);
+        }
+        if (verbose) {
+          process.stderr.write(
+            `[hook:run session-start] Pre-warmed processLibraryCache for ${libraryFiles.length} file(s)\n`,
+          );
+        }
+      }
+    }
+  } catch {
+    // Best-effort
+  }
+
+  if (verbose) {
+    process.stderr.write(`Babysitter session started: ${sessionId}\n`);
+  }
+  if (!envFilePersisted && !stateFilePersisted) {
+    process.stderr.write(
+      "[hook:run session-start] Session persistence failed — no env file or state file was written\n",
+    );
+    process.stdout.write("{}\n");
+    return 1;
+  }
+
+  try {
+    const { runSessionCleanup } = await import("../../session/cleanup");
+    void runSessionCleanup({ harness: "claude-code", dryRun: false }).catch(() => {
+      // non-fatal
+    });
+  } catch {
+    // non-fatal
+  }
+
+  process.stdout.write(
+    JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: "SessionStart",
+        additionalContext: `Your Claude Code session ID is: ${sessionId}`,
+      },
+    }) + "\n",
+  );
   return 0;
 }

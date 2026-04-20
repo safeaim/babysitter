@@ -23,7 +23,7 @@ import {
   writeSessionFile,
 } from "../../session/write";
 import { writeSessionMarker, resolveSessionIdWithMarker } from "../../utils/sessionMarker";
-import { createOhMyPiContext } from "../ohMyPi/promptContext";
+import { createOhMyPiContext } from "../hooks/promptContexts";
 
 class OhMyPiAdapter extends BaseHarnessAdapter {
   constructor() {

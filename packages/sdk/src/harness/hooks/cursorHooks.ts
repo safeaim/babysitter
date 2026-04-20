@@ -1,3 +1,8 @@
+/**
+ * Cursor hook handlers.
+ * Extracted from cursor/hooks.ts.
+ */
+
 import * as path from "node:path";
 import {
   getSessionFilePath,
@@ -23,8 +28,8 @@ import {
   parseHookInput,
   readStdin,
   safeStr,
-} from "../hooks/utils";
-import { resolveHookRunState } from "../hooks/runState";
+} from "./utils";
+import { resolveHookRunState } from "./runState";
 import { writeSessionMarker } from "../../utils/sessionMarker";
 
 interface CursorStopHookInput {

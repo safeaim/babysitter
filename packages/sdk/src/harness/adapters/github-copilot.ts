@@ -16,11 +16,12 @@ import {
   handleGithubCopilotSessionStartHook,
   resolveGithubCopilotSessionId,
   resolveGithubCopilotStateDir,
-} from "../githubCopilot/hooks";
-import { createGithubCopilotContext } from "../githubCopilot/promptContext";
+  setBabysitterSessionIdInCopilotEnvFile,
+} from "../hooks/githubCopilotHooks";
+import { createGithubCopilotContext } from "../hooks/promptContexts";
 import { bindSession } from "../hooks/sessionBinding";
 
-export { setBabysitterSessionIdInCopilotEnvFile } from "../githubCopilot/hooks";
+export { setBabysitterSessionIdInCopilotEnvFile };
 
 class GithubCopilotAdapter extends BaseHarnessAdapter {
   constructor() {

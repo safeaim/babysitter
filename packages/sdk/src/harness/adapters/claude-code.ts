@@ -19,15 +19,15 @@ import {
   createPromptContext,
 } from "../../prompts/contextShared";
 import { BaseHarnessAdapter } from "../BaseAdapter";
-import { handleClaudeCodeStopHook } from "../claudeCode/stopHook";
-import { handleClaudeCodeSessionStartHook } from "../claudeCode/sessionStart";
-import { bindClaudeCodeSession } from "../claudeCode/lifecycle";
+import { handleClaudeCodeStopHook } from "../hooks/claudeCodeHooks";
+import { handleClaudeCodeSessionStartHook } from "../hooks/claudeCodeHooks";
+import { bindClaudeCodeSession } from "../hooks/claudeCodeHooks";
 import {
   resolveCurrentSessionIdFromEnv,
   type SessionResolutionDetails,
   resolveSessionIdDetailed,
   __resolveCurrentSessionIdFromEnvForTests,
-} from "../claudeCode/shared";
+} from "../hooks/claudeCodeHooks";
 
 export {
   __resolveCurrentSessionIdFromEnvForTests,

@@ -17,7 +17,7 @@ import { checkCliAvailable } from "../discovery";
 import { installCliViaNpm } from "../installSupport";
 import { createHookLogger, initializeSessionState } from "../hooks/utils";
 import { bindSession } from "../hooks/sessionBinding";
-import { createOpenClawContext } from "../openclaw/promptContext";
+import { createOpenClawContext } from "../hooks/promptContexts";
 
 class OpenClawAdapter extends BaseHarnessAdapter {
   constructor() {

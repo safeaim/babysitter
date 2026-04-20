@@ -23,8 +23,8 @@ import {
   handleCursorStopHook,
   handleCursorSessionStartHook,
   resolveCursorStateDir,
-} from "../cursor/hooks";
-import { createCursorContext } from "../cursor/promptContext";
+} from "../hooks/cursorHooks";
+import { createCursorContext } from "../hooks/promptContexts";
 import { readSessionMarker } from "../../utils/sessionMarker";
 import {
   getSessionFilePath,

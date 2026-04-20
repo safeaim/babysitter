@@ -3,4 +3,5 @@ export {
   __resolveCurrentSessionIdFromEnvForTests,
   type SessionResolutionDetails,
   resolveSessionIdDetailed,
-} from "../adapters/claude-code";
+  setBabysitterSessionIdInEnvFile,
+} from "../hooks/claudeCodeHooks";

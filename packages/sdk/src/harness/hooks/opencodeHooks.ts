@@ -1,3 +1,8 @@
+/**
+ * OpenCode hook handlers.
+ * Extracted from opencode/hooks.ts.
+ */
+
 import {
   getSessionFilePath,
   readSessionFile,
@@ -17,8 +22,8 @@ import {
   parseHookInput,
   readStdin,
   safeStr,
-} from "../hooks/utils";
-import { resolveHookRunState } from "../hooks/runState";
+} from "./utils";
+import { resolveHookRunState } from "./runState";
 
 export function resolveOpenCodeStateDir(args: {
   stateDir?: string;

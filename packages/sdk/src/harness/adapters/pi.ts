@@ -23,7 +23,7 @@ import {
   writeSessionFile,
 } from "../../session/write";
 import { writeSessionMarker, resolveSessionIdWithMarker } from "../../utils/sessionMarker";
-import { createPiContext } from "../pi/promptContext";
+import { createPiContext } from "../hooks/promptContexts";
 
 class PiAdapter extends BaseHarnessAdapter {
   constructor() {

@@ -29,22 +29,52 @@ export function generateManifests(
   const files: TransformedFile[] = [];
 
   // Filter manifest hooks to only those supported by this target
+  // and resolve handler paths through hookFilePattern
   const filteredManifest = { ...manifest };
   if (manifest.hooks) {
+    const hookFilePattern = manifest.targets?.[targetProfile.name]?.hookFilePattern
+      ?? manifest.hookFilePattern;
+    const pat = typeof hookFilePattern === 'string' ? hookFilePattern : undefined;
+    const toSlug = (s: string) => s
+      .replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const toNativeSlug = (s: string) => s.replace(/[._]/g, '-').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+
     const filtered: Record<string, string | boolean | null> = {};
     for (const [canonical, handler] of Object.entries(manifest.hooks)) {
-      if (handler !== null && targetProfile.supportedHooks.has(canonical)) {
+      if (handler === null || !targetProfile.supportedHooks.has(canonical)) continue;
+      if (typeof handler === 'string' && handler !== 'proxy' && pat) {
+        const native = targetProfile.supportedHooks.get(canonical) || canonical;
+        const resolved = 'hooks/' + pat
+          .replace(/\{\{name\}\}/g, manifest.name)
+          .replace(/\{\{slug\}\}/g, toSlug(canonical))
+          .replace(/\{\{native\}\}/g, toNativeSlug(native));
+        filtered[canonical] = resolved;
+      } else {
         filtered[canonical] = handler;
       }
     }
     filteredManifest.hooks = filtered;
+  }
+  // Add target name to keywords
+  if (filteredManifest.keywords) {
+    const targetKw = targetProfile.name;
+    if (!filteredManifest.keywords.includes(targetKw)) {
+      filteredManifest.keywords = [...filteredManifest.keywords, targetKw];
+    }
   }
 
   switch (targetProfile.name) {
     case 'claude-code': {
       const ccManifest = generateClaudeCodeManifest(filteredManifest);
       files.push({ path: 'plugin.json', content: ccManifest });
-      files.push({ path: '.claude-plugin/plugin.json', content: ccManifest });
+      const authorStr = typeof manifest.author === 'string' ? manifest.author : manifest.author.name;
+      files.push({ path: '.claude-plugin/plugin.json', content: JSON.stringify({
+        name: manifest.name,
+        version: manifest.version,
+        description: manifest.description,
+        author: authorStr,
+      }, null, 2) + '\n' });
       break;
     }
     case 'codex': {

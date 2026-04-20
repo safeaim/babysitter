@@ -24,16 +24,16 @@ export {
 export type {
   ListEffectsInput,
   ListEffectsOutput,
-  EffectSummary,
   ShowEffectInput,
   ShowEffectOutput,
   CancelEffectInput,
   CancelEffectOutput,
-  BatchCommitEffectEntry,
   BatchCommitEffectsInput,
   BatchCommitEffectResult,
   BatchCommitEffectsOutput,
 } from "./effects";
+
+export type { EffectSummary, BatchCommitEffectEntry } from "./effectsTypes";
 
 export {
   apiListBreakpoints,

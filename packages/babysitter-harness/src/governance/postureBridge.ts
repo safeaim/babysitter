@@ -6,7 +6,7 @@
  */
 
 import type { ActionCategory, ApprovalPosture } from "@a5c-ai/babysitter-sdk";
-import { DEFAULT_POSTURES } from "@a5c-ai/babysitter-sdk";
+import { DEFAULT_POSTURES } from "../breakpoints/postures";
 import type { PolicyRule } from './types';
 
 // ---------------------------------------------------------------------------

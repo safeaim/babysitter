@@ -1,6 +1,6 @@
 export { createClaudeCodeAdapter } from "./claude-code";
 export type { SessionResolutionDetails } from "./claude-code";
-export { resolveSessionIdDetailed, __resolveCurrentSessionIdFromEnvForTests } from "./claude-code";
+export { resolveSessionIdDetailed, __resolveCurrentSessionIdFromEnvForTests, setBabysitterSessionIdInEnvFile } from "./claude-code";
 export { createCodexAdapter } from "./codex";
 export { createCursorAdapter } from "./cursor";
 export { createGeminiCliAdapter } from "./gemini-cli";

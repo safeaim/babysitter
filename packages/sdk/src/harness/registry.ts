@@ -11,8 +11,8 @@ import { HarnessCapability as Cap } from "./types";
 import {
   createClaudeCodeAdapter,
   resolveSessionIdDetailed as resolveClaudeCodeSessionDetails,
-  type SessionResolutionDetails,
 } from "./adapters/claude-code";
+import type { SessionResolutionDetails } from "./adapters/claude-code";
 import { createCodexAdapter } from "./adapters/codex";
 import { createGeminiCliAdapter } from "./adapters/gemini-cli";
 import { createPiAdapter } from "./adapters/pi";

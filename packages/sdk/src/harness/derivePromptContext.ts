@@ -113,6 +113,8 @@ export interface DeriveConfigOptions {
   extraActivationEnvVars?: string[];
   /** Plugin root env vars. */
   pluginRootEnvVars?: string[];
+  /** If true, resolvePluginRoot always returns undefined. */
+  noPluginRoot?: boolean;
   /** Session ID env vars (in priority order). */
   sessionIdEnvVars?: string[];
   /** Plugin root variable expression for shell interpolation. */
@@ -133,6 +135,18 @@ export interface DeriveConfigOptions {
   capabilities?: Cap[];
   /** Override prompt capabilities list. */
   promptCapabilities?: string[];
+  /** Supported hook types (if limited). */
+  supportedHookTypes?: string[];
+  /** If true, adapter does not support any hooks. */
+  noHookSupport?: boolean;
+  /** Whether bindSession should auto-release stale sessions. */
+  autoReleaseStale?: boolean;
+  /** Custom missing session ID hint. */
+  missingSessionIdHint?: string;
+  /** Lower-priority fallback env vars (checked after AGENT_SESSION_ID and PID marker). */
+  fallbackSessionIdEnvVars?: string[];
+  /** Custom messages for specific unsupported hook types. */
+  unsupportedHookMessages?: Record<string, string>;
 }
 
 /**
@@ -159,7 +173,14 @@ export function deriveAdapterConfig(
     loopControlTerm,
     autoResolvesSession: true,
     pluginRootEnvVars: opts.pluginRootEnvVars ?? [],
+    noPluginRoot: opts.noPluginRoot,
     sessionIdEnvVars: opts.sessionIdEnvVars ?? ["AGENT_SESSION_ID"],
+    supportedHookTypes: opts.supportedHookTypes,
+    noHookSupport: opts.noHookSupport,
+    autoReleaseStale: opts.autoReleaseStale,
+    missingSessionIdHint: opts.missingSessionIdHint,
+    fallbackSessionIdEnvVars: opts.fallbackSessionIdEnvVars,
+    unsupportedHookMessages: opts.unsupportedHookMessages,
     promptCapabilities: opts.promptCapabilities ?? derivePromptCapabilities(metadata),
     pluginRootVar: opts.pluginRootVar ?? "",
     hookDriven,

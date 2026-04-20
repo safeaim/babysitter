@@ -24,6 +24,7 @@ import { bindSession } from "./hooks/sessionBinding";
 import { handleStopHookCommon } from "./hooks/stopHookHandler";
 import { buildStopHookContinuation } from "./hooks/stopHookContinuation";
 import { initializeSessionState, readStdin, parseHookInput, safeStr } from "./hooks/utils";
+import { resolveSessionIdWithMarker } from "../utils/sessionMarker";
 
 // ---------------------------------------------------------------------------
 // Adapter configuration interface
@@ -44,8 +45,33 @@ export interface AdapterConfig {
   autoResolvesSession: boolean;
   /** Env vars to check for plugin root. */
   pluginRootEnvVars: string[];
-  /** Env vars to check for session ID (in priority order). */
+  /** If true, resolvePluginRoot always returns undefined (no plugin root concept). */
+  noPluginRoot?: boolean;
+  /** Env vars to check for session ID (in priority order). These are "native" harness vars that beat AGENT_SESSION_ID. */
   sessionIdEnvVars: string[];
+  /** Env vars checked AFTER AGENT_SESSION_ID and PID marker (lower priority fallbacks). */
+  fallbackSessionIdEnvVars?: string[];
+
+  // ── Hook behavior fields ──
+  /**
+   * If set, only these hook types are supported. `supportsHookType()` returns
+   * true only for types in this set. If undefined, all hook types are supported.
+   */
+  supportedHookTypes?: string[];
+  /**
+   * If true, the adapter does not support any hooks (supportsHookType always
+   * returns false and handleStopHook/handleSessionStartHook are no-ops).
+   */
+  noHookSupport?: boolean;
+  /**
+   * Whether bindSession should auto-release sessions from terminal runs.
+   * Default: false.
+   */
+  autoReleaseStale?: boolean;
+  /** Custom hint for missing session ID. If undefined, uses generic hint. */
+  missingSessionIdHint?: string;
+  /** Custom messages for specific unsupported hook types. */
+  unsupportedHookMessages?: Record<string, string>;
 
   // ── Prompt context fields ──
   /** Capabilities list for prompt context. */
@@ -84,9 +110,20 @@ export abstract class BaseHarnessAdapter implements HarnessAdapter {
   }
 
   resolveSessionId(parsed: { sessionId?: string }): string | undefined {
-    if (parsed.sessionId) return parsed.sessionId;
-    for (const envVar of this.config.sessionIdEnvVars) {
-      if (process.env[envVar]) return process.env[envVar];
+    // Harness-native env vars are everything in sessionIdEnvVars except AGENT_SESSION_ID
+    // (resolveSessionIdWithMarker handles AGENT_SESSION_ID separately with correct precedence)
+    const harnessEnvVars = this.config.sessionIdEnvVars.filter(
+      (v) => v !== "AGENT_SESSION_ID",
+    );
+    const result = resolveSessionIdWithMarker(this.config.name, parsed, harnessEnvVars);
+    if (result) return result;
+
+    // Check lower-priority fallback env vars (these lose to AGENT_SESSION_ID and markers)
+    if (this.config.fallbackSessionIdEnvVars) {
+      for (const envVar of this.config.fallbackSessionIdEnvVars) {
+        const val = process.env[envVar];
+        if (val) return val;
+      }
     }
     return undefined;
   }
@@ -101,6 +138,7 @@ export abstract class BaseHarnessAdapter implements HarnessAdapter {
   }
 
   resolvePluginRoot(args: { pluginRoot?: string }): string | undefined {
+    if (this.config.noPluginRoot) return undefined;
     if (args.pluginRoot) return path.resolve(args.pluginRoot);
     for (const envVar of this.config.pluginRootEnvVars) {
       const val = process.env[envVar];
@@ -144,10 +182,15 @@ export abstract class BaseHarnessAdapter implements HarnessAdapter {
       harness: this.config.name,
       stateDir: stateDir ?? "",
       opts,
+      autoReleaseStale: this.config.autoReleaseStale ?? false,
     });
   }
 
   async handleStopHook(args: HookHandlerArgs): Promise<number> {
+    if (this.config.noHookSupport || !this.supportsHookType("stop")) {
+      process.stdout.write("{}\n");
+      return 0;
+    }
     const common = await handleStopHookCommon(args, {
       harness: this.config.name,
       sessionIdFields: ["session_id", "conversation_id"],
@@ -180,24 +223,42 @@ export abstract class BaseHarnessAdapter implements HarnessAdapter {
   }
 
   async handleSessionStartHook(args: HookHandlerArgs): Promise<number> {
-    let rawInput: string;
-    try {
-      rawInput = await readStdin();
-    } catch {
+    if (this.config.noHookSupport) {
       process.stdout.write("{}\n");
       return 0;
-    } finally {
-      if (typeof process.stdin.unref === "function") {
-        process.stdin.unref();
+    }
+
+    let rawInput = "";
+    if (args.stdinPayload !== undefined) {
+      rawInput = args.stdinPayload;
+    } else if (this.config.hookDriven) {
+      // Only read stdin for hook-driven adapters (they pipe JSON via harness hooks)
+      try {
+        rawInput = await readStdin();
+      } catch {
+        // stdin unavailable — fall through to env-based resolution
+      } finally {
+        if (typeof process.stdin.unref === "function") {
+          process.stdin.unref();
+        }
       }
     }
 
     const hookInput = parseHookInput(rawInput);
-    const sessionId =
+    let sessionId =
       safeStr(hookInput, "session_id") ||
       safeStr(hookInput, "conversation_id") ||
       process.env.AGENT_SESSION_ID ||
       "";
+    if (!sessionId) {
+      // Check harness-native and fallback session env vars
+      for (const envVar of [...this.config.sessionIdEnvVars, ...(this.config.fallbackSessionIdEnvVars ?? [])]) {
+        if (envVar !== "AGENT_SESSION_ID" && process.env[envVar]) {
+          sessionId = process.env[envVar]!;
+          break;
+        }
+      }
+    }
 
     if (!sessionId) {
       process.stdout.write("{}\n");
@@ -222,14 +283,21 @@ export abstract class BaseHarnessAdapter implements HarnessAdapter {
   }
 
   getMissingSessionIdHint(): string {
-    return `Pass --session-id explicitly or ensure the ${this.config.name} hook context provides one.`;
+    return this.config.missingSessionIdHint ??
+      `Pass --session-id explicitly or ensure the ${this.config.name} hook context provides one.`;
   }
 
-  supportsHookType(_hookType: string): boolean {
+  supportsHookType(hookType: string): boolean {
+    if (this.config.noHookSupport) return false;
+    if (this.config.supportedHookTypes) {
+      return this.config.supportedHookTypes.includes(hookType);
+    }
     return true;
   }
 
   getUnsupportedHookMessage(hookType: string): string {
+    const custom = this.config.unsupportedHookMessages?.[hookType];
+    if (custom) return custom;
     return `Hook type "${hookType}" is not supported by the ${this.config.name} adapter.`;
   }
 }

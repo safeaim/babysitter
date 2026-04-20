@@ -496,33 +496,21 @@ describe("handleHookRun stop", () => {
 });
 
 describe("handleHookRun session-start", () => {
-  it("writes session ID to CLAUDE_ENV_FILE", async () => {
-    const envFile = path.join(tmpDir, "env.sh");
-    await fs.writeFile(envFile, "");
-    const origEnvFile = process.env.CLAUDE_ENV_FILE;
-    process.env.CLAUDE_ENV_FILE = envFile;
-
-    try {
-      const code = await callWithStdin(
-        JSON.stringify({ session_id: "my-session-42" }),
-        {
-          hookType: "session-start",
-          harness: "claude-code",
-          stateDir,
-          json: true,
-        },
-      );
-      expect(code).toBe(0);
-      const content = await fs.readFile(envFile, "utf8");
-      expect(content).toContain('export AGENT_SESSION_ID="my-session-42"');
-      expect(content).toContain('export AGENT_SESSION_ID="my-session-42"');
-    } finally {
-      if (origEnvFile !== undefined) {
-        process.env.CLAUDE_ENV_FILE = origEnvFile;
-      } else {
-        delete process.env.CLAUDE_ENV_FILE;
-      }
-    }
+  it("initializes session state from stdin session_id (env file writing moved to hooks-proxy)", async () => {
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: "my-session-42" }),
+      {
+        hookType: "session-start",
+        harness: "claude-code",
+        stateDir,
+        json: true,
+      },
+    );
+    expect(code).toBe(0);
+    // Session state file should be created (env file writing is now handled by hooks-proxy)
+    const sessionPath = getSessionFilePath(stateDir, "my-session-42");
+    const stat = await fs.stat(sessionPath).catch(() => null);
+    expect(stat).not.toBeNull();
   });
 
   it("creates baseline session state file when stateDir is provided", async () => {

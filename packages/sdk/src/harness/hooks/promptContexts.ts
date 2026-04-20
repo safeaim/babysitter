@@ -1,6 +1,10 @@
 /**
  * Harness-specific prompt context factories.
- * Extracted from individual adapter promptContext.ts files.
+ *
+ * @deprecated Adapters now derive their config from @a5c-ai/agent-mux metadata
+ * via amuxMetadata.ts and derivePromptContext.ts. These factory functions are
+ * retained for backward compatibility with prompts/context.ts re-exports.
+ * New code should use createPromptContext() directly.
  */
 
 import type { PromptContext } from "../../prompts/types";

@@ -1,5 +1,8 @@
 /**
  * GitHub Copilot harness adapter.
+ *
+ * Derives metadata from @a5c-ai/agent-mux when available, falling back to
+ * hardcoded config.
  */
 
 import * as path from "node:path";
@@ -11,10 +14,12 @@ import type {
 } from "../types";
 import type { PromptContext } from "../../prompts/types";
 import { normalizeSessionStateDir } from "../../config";
-import { BaseHarnessAdapter } from "../BaseAdapter";
-import { createGithubCopilotContext } from "../hooks/promptContexts";
+import { BaseHarnessAdapter, type AdapterConfig } from "../BaseAdapter";
+import { createDefaultCliSetupSnippet, createPromptContext } from "../../prompts/contextShared";
 import { bindSession } from "../hooks/sessionBinding";
 import { readSessionMarker } from "../../utils/sessionMarker";
+import { getAmuxAdapterMetadata } from "../amuxMetadata";
+import { deriveAdapterConfig } from "../derivePromptContext";
 
 // ---------------------------------------------------------------------------
 // Utilities (previously in githubCopilotHooks.ts)
@@ -97,28 +102,63 @@ export function resolveGithubCopilotSessionId(parsed: {
 }
 
 // ---------------------------------------------------------------------------
+// Fallback config (used when agent-mux is unavailable)
+// ---------------------------------------------------------------------------
+
+const FALLBACK_CONFIG: AdapterConfig = {
+  name: "github-copilot",
+  displayName: "GitHub Copilot CLI",
+  activationEnvVars: ["AGENT_SESSION_ID", "COPILOT_HOME", "COPILOT_GITHUB_TOKEN"],
+  capabilities: [Cap.HeadlessPrompt, Cap.SessionBinding, Cap.Mcp],
+  loopControlTerm: "in-turn",
+  autoResolvesSession: false,
+  pluginRootEnvVars: ["CLAUDE_PLUGIN_DATA", "COPILOT_PLUGIN_ROOT"],
+  sessionIdEnvVars: ["AGENT_SESSION_ID"],
+  promptCapabilities: ["hooks", "mcp", "task-tool", "breakpoint-routing"],
+  pluginRootVar: "${COPILOT_PLUGIN_ROOT}",
+  hookDriven: false,
+  interactiveToolName: "AskUserQuestion tool",
+  sessionEnvVars: "PID-scoped session marker (authoritative); COPILOT_ENV_FILE / COPILOT_SESSION_ID and AGENT_SESSION_ID are fallbacks",
+  hasIntentFidelityChecks: false,
+  hasNonNegotiables: false,
+};
+
+// ---------------------------------------------------------------------------
+// Config derivation from agent-mux
+// ---------------------------------------------------------------------------
+
+function buildConfig(): AdapterConfig {
+  const metadata = getAmuxAdapterMetadata("github-copilot");
+  if (!metadata) return FALLBACK_CONFIG;
+
+  const config = deriveAdapterConfig(metadata, {
+    name: "github-copilot",
+    displayName: "GitHub Copilot CLI",
+    extraActivationEnvVars: ["COPILOT_HOME", "COPILOT_GITHUB_TOKEN"],
+    pluginRootEnvVars: ["CLAUDE_PLUGIN_DATA", "COPILOT_PLUGIN_ROOT"],
+    sessionIdEnvVars: ["AGENT_SESSION_ID"],
+    pluginRootVar: "${COPILOT_PLUGIN_ROOT}",
+    interactiveToolName: "AskUserQuestion tool",
+    sessionEnvVars: "PID-scoped session marker (authoritative); COPILOT_ENV_FILE / COPILOT_SESSION_ID and AGENT_SESSION_ID are fallbacks",
+    hasIntentFidelityChecks: false,
+    hasNonNegotiables: false,
+    capabilities: [Cap.HeadlessPrompt, Cap.SessionBinding, Cap.Mcp],
+    promptCapabilities: ["hooks", "mcp", "task-tool", "breakpoint-routing"],
+    loopControlTerm: "in-turn",
+    hookDriven: false,
+  });
+  // Copilot does not auto-resolve sessions
+  config.autoResolvesSession = false;
+  return config;
+}
+
+// ---------------------------------------------------------------------------
 // Adapter class
 // ---------------------------------------------------------------------------
 
 class GithubCopilotAdapter extends BaseHarnessAdapter {
   constructor() {
-    super({
-      name: "github-copilot",
-      displayName: "GitHub Copilot CLI",
-      activationEnvVars: ["AGENT_SESSION_ID", "COPILOT_HOME", "COPILOT_GITHUB_TOKEN"],
-      capabilities: [Cap.HeadlessPrompt, Cap.SessionBinding, Cap.Mcp],
-      loopControlTerm: "in-turn",
-      autoResolvesSession: false,
-      pluginRootEnvVars: ["CLAUDE_PLUGIN_DATA", "COPILOT_PLUGIN_ROOT"],
-      sessionIdEnvVars: ["AGENT_SESSION_ID"],
-      promptCapabilities: ["hooks", "mcp", "task-tool", "breakpoint-routing"],
-      pluginRootVar: "${COPILOT_PLUGIN_ROOT}",
-      hookDriven: false,
-      interactiveToolName: "AskUserQuestion tool",
-      sessionEnvVars: "PID-scoped session marker (authoritative); COPILOT_ENV_FILE / COPILOT_SESSION_ID and AGENT_SESSION_ID are fallbacks",
-      hasIntentFidelityChecks: false,
-      hasNonNegotiables: false,
-    });
+    super(buildConfig());
   }
 
   override getMissingSessionIdHint(): string {
@@ -166,7 +206,22 @@ class GithubCopilotAdapter extends BaseHarnessAdapter {
   }
 
   override getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {
-    return createGithubCopilotContext(opts);
+    return createPromptContext({
+      harness: "github-copilot",
+      harnessLabel: "GitHub Copilot CLI",
+      capabilities: ["hooks", "mcp", "task-tool", "breakpoint-routing"],
+      pluginRootVar: "${COPILOT_PLUGIN_ROOT}",
+      loopControlTerm: "in-turn",
+      sessionBindingFlags: "",
+      hookDriven: false,
+      interactiveToolName: "AskUserQuestion tool",
+      sessionEnvVars: "PID-scoped session marker (authoritative); COPILOT_ENV_FILE / COPILOT_SESSION_ID and AGENT_SESSION_ID are fallbacks",
+      resumeFlags: "",
+      cliSetupSnippet: createDefaultCliSetupSnippet(),
+      iterateFlags: "",
+      hasIntentFidelityChecks: false,
+      hasNonNegotiables: false,
+    }, opts);
   }
 
   // handleStopHook and handleSessionStartHook use BaseAdapter defaults

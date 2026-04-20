@@ -1,7 +1,8 @@
 /**
  * Cursor harness adapter.
  *
- * Extends BaseHarnessAdapter with Cursor-specific behavior:
+ * Derives metadata from @a5c-ai/agent-mux when available, falling back to
+ * hardcoded config. Extends BaseHarnessAdapter with Cursor-specific behavior:
  * - Custom bindSession (inline, not shared helper)
  * - Hook dispatcher path resolution
  * - Supported hook types enumeration
@@ -16,8 +17,8 @@ import type {
 } from "../types";
 import type { PromptContext } from "../../prompts/types";
 import { normalizeSessionStateDir } from "../../config";
-import { BaseHarnessAdapter } from "../BaseAdapter";
-import { createCursorContext } from "../hooks/promptContexts";
+import { BaseHarnessAdapter, type AdapterConfig } from "../BaseAdapter";
+import { createDefaultCliSetupSnippet, createPromptContext } from "../../prompts/contextShared";
 import { readSessionMarker } from "../../utils/sessionMarker";
 import {
   getSessionFilePath,
@@ -30,6 +31,8 @@ import {
   updateSessionState,
   writeSessionFile,
 } from "../../session/write";
+import { getAmuxAdapterMetadata } from "../amuxMetadata";
+import { deriveAdapterConfig } from "../derivePromptContext";
 
 export function resolveCursorStateDir(args: {
   stateDir?: string;
@@ -40,25 +43,62 @@ export function resolveCursorStateDir(args: {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Fallback config (used when agent-mux is unavailable)
+// ---------------------------------------------------------------------------
+
+const FALLBACK_CONFIG: AdapterConfig = {
+  name: "cursor",
+  displayName: "Cursor",
+  activationEnvVars: ["CURSOR_PROJECT_DIR", "CURSOR_VERSION"],
+  capabilities: [Cap.HeadlessPrompt, Cap.StopHook, Cap.SessionBinding, Cap.Mcp],
+  loopControlTerm: "stop-hook",
+  autoResolvesSession: false,
+  pluginRootEnvVars: ["CURSOR_PLUGIN_ROOT"],
+  sessionIdEnvVars: ["AGENT_SESSION_ID"],
+  promptCapabilities: ["hooks", "stop-hook", "mcp", "task-tool", "breakpoint-routing"],
+  pluginRootVar: "${CURSOR_PLUGIN_ROOT}",
+  hookDriven: true,
+  interactiveToolName: "AskUserQuestion tool",
+  sessionEnvVars: "conversation_id from hook stdin (authoritative per-request); PID-scoped session marker; AGENT_SESSION_ID fallback",
+  hasIntentFidelityChecks: false,
+  hasNonNegotiables: false,
+};
+
+// ---------------------------------------------------------------------------
+// Config derivation from agent-mux
+// ---------------------------------------------------------------------------
+
+function buildConfig(): AdapterConfig {
+  const metadata = getAmuxAdapterMetadata("cursor");
+  if (!metadata) return FALLBACK_CONFIG;
+
+  const config = deriveAdapterConfig(metadata, {
+    name: "cursor",
+    displayName: "Cursor",
+    extraActivationEnvVars: ["CURSOR_PROJECT_DIR", "CURSOR_VERSION"],
+    pluginRootEnvVars: ["CURSOR_PLUGIN_ROOT"],
+    sessionIdEnvVars: ["AGENT_SESSION_ID"],
+    pluginRootVar: "${CURSOR_PLUGIN_ROOT}",
+    interactiveToolName: "AskUserQuestion tool",
+    sessionEnvVars: "conversation_id from hook stdin (authoritative per-request); PID-scoped session marker; AGENT_SESSION_ID fallback",
+    hasIntentFidelityChecks: false,
+    hasNonNegotiables: false,
+    capabilities: [Cap.HeadlessPrompt, Cap.StopHook, Cap.SessionBinding, Cap.Mcp],
+    promptCapabilities: ["hooks", "stop-hook", "mcp", "task-tool", "breakpoint-routing"],
+  });
+  // Cursor does not auto-resolve sessions
+  config.autoResolvesSession = false;
+  return config;
+}
+
+// ---------------------------------------------------------------------------
+// Adapter class
+// ---------------------------------------------------------------------------
+
 class CursorAdapter extends BaseHarnessAdapter {
   constructor() {
-    super({
-      name: "cursor",
-      displayName: "Cursor",
-      activationEnvVars: ["CURSOR_PROJECT_DIR", "CURSOR_VERSION"],
-      capabilities: [Cap.HeadlessPrompt, Cap.StopHook, Cap.SessionBinding, Cap.Mcp],
-      loopControlTerm: "stop-hook",
-      autoResolvesSession: false,
-      pluginRootEnvVars: ["CURSOR_PLUGIN_ROOT"],
-      sessionIdEnvVars: ["AGENT_SESSION_ID"],
-      promptCapabilities: ["hooks", "stop-hook", "mcp", "task-tool", "breakpoint-routing"],
-      pluginRootVar: "${CURSOR_PLUGIN_ROOT}",
-      hookDriven: true,
-      interactiveToolName: "AskUserQuestion tool",
-      sessionEnvVars: "conversation_id from hook stdin (authoritative per-request); PID-scoped session marker; AGENT_SESSION_ID fallback",
-      hasIntentFidelityChecks: false,
-      hasNonNegotiables: false,
-    });
+    super(buildConfig());
   }
 
   override getMissingSessionIdHint(): string {
@@ -188,7 +228,22 @@ class CursorAdapter extends BaseHarnessAdapter {
   }
 
   override getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {
-    return createCursorContext(opts);
+    return createPromptContext({
+      harness: "cursor",
+      harnessLabel: "Cursor",
+      capabilities: ["hooks", "stop-hook", "mcp", "task-tool", "breakpoint-routing"],
+      pluginRootVar: "${CURSOR_PLUGIN_ROOT}",
+      loopControlTerm: "stop-hook",
+      sessionBindingFlags: "",
+      hookDriven: true,
+      interactiveToolName: "AskUserQuestion tool",
+      sessionEnvVars: "conversation_id from hook stdin (authoritative per-request); PID-scoped session marker; AGENT_SESSION_ID fallback",
+      resumeFlags: "",
+      cliSetupSnippet: createDefaultCliSetupSnippet(),
+      iterateFlags: "",
+      hasIntentFidelityChecks: false,
+      hasNonNegotiables: false,
+    }, opts);
   }
 
   // handleStopHook and handleSessionStartHook use BaseAdapter defaults

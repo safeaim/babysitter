@@ -1,5 +1,8 @@
 /**
  * OpenCode harness adapter.
+ *
+ * Derives metadata from @a5c-ai/agent-mux when available, falling back to
+ * hardcoded config.
  */
 
 import * as path from "node:path";
@@ -14,9 +17,11 @@ import type {
 } from "../types";
 import type { PromptContext } from "../../prompts/types";
 import { normalizeSessionStateDir } from "../../config";
-import { BaseHarnessAdapter } from "../BaseAdapter";
-import { createOpenCodeContext } from "../hooks/promptContexts";
+import { BaseHarnessAdapter, type AdapterConfig } from "../BaseAdapter";
+import { createDefaultCliSetupSnippet, createPromptContext } from "../../prompts/contextShared";
 import { bindSession } from "../hooks/sessionBinding";
+import { getAmuxAdapterMetadata } from "../amuxMetadata";
+import { deriveAdapterConfig } from "../derivePromptContext";
 
 // ---------------------------------------------------------------------------
 // Utilities (previously in opencodeHooks.ts)
@@ -74,28 +79,62 @@ function getAccomplishDataDirs(): string[] {
 }
 
 // ---------------------------------------------------------------------------
+// Fallback config (used when agent-mux is unavailable)
+// ---------------------------------------------------------------------------
+
+const FALLBACK_CONFIG: AdapterConfig = {
+  name: "opencode",
+  displayName: "OpenCode",
+  activationEnvVars: ["AGENT_SESSION_ID", "OPENCODE_CONFIG", "ACCOMPLISH_TASK_ID"],
+  capabilities: [Cap.HeadlessPrompt],
+  loopControlTerm: "in-turn",
+  autoResolvesSession: false,
+  pluginRootEnvVars: ["OPENCODE_PLUGIN_ROOT"],
+  sessionIdEnvVars: ["AGENT_SESSION_ID"],
+  promptCapabilities: ["task-tool", "breakpoint-routing"],
+  pluginRootVar: "",
+  hookDriven: false,
+  interactiveToolName: "",
+  sessionEnvVars: "PID-scoped session marker (authoritative); shell.env-injected session ID and AGENT_SESSION_ID are fallbacks",
+  hasIntentFidelityChecks: false,
+  hasNonNegotiables: false,
+};
+
+// ---------------------------------------------------------------------------
+// Config derivation from agent-mux
+// ---------------------------------------------------------------------------
+
+function buildConfig(): AdapterConfig {
+  const metadata = getAmuxAdapterMetadata("opencode");
+  if (!metadata) return FALLBACK_CONFIG;
+
+  const config = deriveAdapterConfig(metadata, {
+    name: "opencode",
+    displayName: "OpenCode",
+    extraActivationEnvVars: ["OPENCODE_CONFIG", "ACCOMPLISH_TASK_ID"],
+    pluginRootEnvVars: ["OPENCODE_PLUGIN_ROOT"],
+    sessionIdEnvVars: ["AGENT_SESSION_ID"],
+    pluginRootVar: "",
+    interactiveToolName: "",
+    sessionEnvVars: "PID-scoped session marker (authoritative); shell.env-injected session ID and AGENT_SESSION_ID are fallbacks",
+    hasIntentFidelityChecks: false,
+    hasNonNegotiables: false,
+    capabilities: [Cap.HeadlessPrompt],
+    promptCapabilities: ["task-tool", "breakpoint-routing"],
+    loopControlTerm: "in-turn",
+    hookDriven: false,
+  });
+  config.autoResolvesSession = false;
+  return config;
+}
+
+// ---------------------------------------------------------------------------
 // Adapter class
 // ---------------------------------------------------------------------------
 
 class OpenCodeAdapter extends BaseHarnessAdapter {
   constructor() {
-    super({
-      name: "opencode",
-      displayName: "OpenCode",
-      activationEnvVars: ["AGENT_SESSION_ID", "OPENCODE_CONFIG", "ACCOMPLISH_TASK_ID"],
-      capabilities: [Cap.HeadlessPrompt],
-      loopControlTerm: "in-turn",
-      autoResolvesSession: false,
-      pluginRootEnvVars: ["OPENCODE_PLUGIN_ROOT"],
-      sessionIdEnvVars: ["AGENT_SESSION_ID"],
-      promptCapabilities: ["task-tool", "breakpoint-routing"],
-      pluginRootVar: "",
-      hookDriven: false,
-      interactiveToolName: "",
-      sessionEnvVars: "PID-scoped session marker (authoritative); shell.env-injected session ID and AGENT_SESSION_ID are fallbacks",
-      hasIntentFidelityChecks: false,
-      hasNonNegotiables: false,
-    });
+    super(buildConfig());
   }
 
   override getMissingSessionIdHint(): string {
@@ -170,7 +209,22 @@ class OpenCodeAdapter extends BaseHarnessAdapter {
   }
 
   override getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {
-    return createOpenCodeContext(opts);
+    return createPromptContext({
+      harness: "opencode",
+      harnessLabel: "OpenCode",
+      capabilities: ["task-tool", "breakpoint-routing"],
+      pluginRootVar: "",
+      loopControlTerm: "in-turn",
+      sessionBindingFlags: "",
+      hookDriven: false,
+      interactiveToolName: "",
+      sessionEnvVars: "PID-scoped session marker (authoritative); shell.env-injected session ID and AGENT_SESSION_ID are fallbacks",
+      resumeFlags: "",
+      cliSetupSnippet: createDefaultCliSetupSnippet(),
+      iterateFlags: "",
+      hasIntentFidelityChecks: false,
+      hasNonNegotiables: false,
+    }, opts);
   }
 
   // handleStopHook and handleSessionStartHook use BaseAdapter defaults

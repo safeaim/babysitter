@@ -1,5 +1,8 @@
 /**
  * oh-my-pi harness adapter.
+ *
+ * Derives metadata from @a5c-ai/agent-mux when available, falling back to
+ * hardcoded config.
  */
 
 import { HarnessCapability as Cap } from "../types";
@@ -9,7 +12,7 @@ import type {
   SessionBindResult,
 } from "../types";
 import type { PromptContext } from "../../prompts/types";
-import { BaseHarnessAdapter } from "../BaseAdapter";
+import { BaseHarnessAdapter, type AdapterConfig } from "../BaseAdapter";
 import { normalizeSessionStateDir } from "../../config";
 import {
   getSessionFilePath,
@@ -23,27 +26,65 @@ import {
   writeSessionFile,
 } from "../../session/write";
 import { writeSessionMarker, resolveSessionIdWithMarker } from "../../utils/sessionMarker";
-import { createOhMyPiContext } from "../hooks/promptContexts";
+import { createDefaultCliSetupSnippet, createPromptContext } from "../../prompts/contextShared";
+import { getAmuxAdapterMetadata } from "../amuxMetadata";
+import { deriveAdapterConfig } from "../derivePromptContext";
+
+// ---------------------------------------------------------------------------
+// Fallback config (used when agent-mux is unavailable)
+// ---------------------------------------------------------------------------
+
+const FALLBACK_CONFIG: AdapterConfig = {
+  name: "oh-my-pi",
+  displayName: "oh-my-pi",
+  activationEnvVars: ["AGENT_SESSION_ID", "OMP_SESSION_ID", "OMP_PLUGIN_ROOT"],
+  capabilities: [Cap.Programmatic, Cap.SessionBinding, Cap.HeadlessPrompt, Cap.Mcp],
+  loopControlTerm: "skill-driven",
+  autoResolvesSession: true,
+  pluginRootEnvVars: ["OMP_PLUGIN_ROOT"],
+  sessionIdEnvVars: ["OMP_SESSION_ID", "AGENT_SESSION_ID"],
+  promptCapabilities: ["skills", "slash-commands", "task-tool", "harness-routing", "programmatic-session", "mcp"],
+  pluginRootVar: "${OMP_PLUGIN_ROOT}",
+  hookDriven: false,
+  interactiveToolName: "AskUserQuestion",
+  sessionEnvVars: "PID-scoped session marker (authoritative); OMP_SESSION_ID and AGENT_SESSION_ID are fallbacks",
+  hasIntentFidelityChecks: false,
+  hasNonNegotiables: false,
+};
+
+// ---------------------------------------------------------------------------
+// Config derivation from agent-mux
+// ---------------------------------------------------------------------------
+
+function buildConfig(): AdapterConfig {
+  const metadata = getAmuxAdapterMetadata("oh-my-pi");
+  if (!metadata) return FALLBACK_CONFIG;
+
+  return deriveAdapterConfig(metadata, {
+    name: "oh-my-pi",
+    displayName: "oh-my-pi",
+    extraActivationEnvVars: ["OMP_SESSION_ID", "OMP_PLUGIN_ROOT"],
+    pluginRootEnvVars: ["OMP_PLUGIN_ROOT"],
+    sessionIdEnvVars: ["OMP_SESSION_ID", "AGENT_SESSION_ID"],
+    pluginRootVar: "${OMP_PLUGIN_ROOT}",
+    interactiveToolName: "AskUserQuestion",
+    sessionEnvVars: "PID-scoped session marker (authoritative); OMP_SESSION_ID and AGENT_SESSION_ID are fallbacks",
+    hasIntentFidelityChecks: false,
+    hasNonNegotiables: false,
+    capabilities: [Cap.Programmatic, Cap.SessionBinding, Cap.HeadlessPrompt, Cap.Mcp],
+    promptCapabilities: ["skills", "slash-commands", "task-tool", "harness-routing", "programmatic-session", "mcp"],
+    loopControlTerm: "skill-driven",
+    hookDriven: false,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Adapter class
+// ---------------------------------------------------------------------------
 
 class OhMyPiAdapter extends BaseHarnessAdapter {
   constructor() {
-    super({
-      name: "oh-my-pi",
-      displayName: "oh-my-pi",
-      activationEnvVars: ["AGENT_SESSION_ID", "OMP_SESSION_ID", "OMP_PLUGIN_ROOT"],
-      capabilities: [Cap.Programmatic, Cap.SessionBinding, Cap.HeadlessPrompt, Cap.Mcp],
-      loopControlTerm: "skill-driven",
-      autoResolvesSession: true,
-      pluginRootEnvVars: ["OMP_PLUGIN_ROOT"],
-      sessionIdEnvVars: ["OMP_SESSION_ID", "AGENT_SESSION_ID"],
-      promptCapabilities: ["skills", "slash-commands", "task-tool", "harness-routing", "programmatic-session", "mcp"],
-      pluginRootVar: "${OMP_PLUGIN_ROOT}",
-      hookDriven: false,
-      interactiveToolName: "AskUserQuestion",
-      sessionEnvVars: "PID-scoped session marker (authoritative); OMP_SESSION_ID and AGENT_SESSION_ID are fallbacks",
-      hasIntentFidelityChecks: false,
-      hasNonNegotiables: false,
-    });
+    super(buildConfig());
   }
 
   override getMissingSessionIdHint(): string {
@@ -122,7 +163,22 @@ class OhMyPiAdapter extends BaseHarnessAdapter {
   }
 
   override getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {
-    return createOhMyPiContext(opts);
+    return createPromptContext({
+      harness: "oh-my-pi",
+      harnessLabel: "oh-my-pi",
+      capabilities: ["skills", "slash-commands", "task-tool", "harness-routing", "programmatic-session", "mcp"],
+      pluginRootVar: "${OMP_PLUGIN_ROOT}",
+      loopControlTerm: "skill-driven",
+      sessionBindingFlags: "",
+      hookDriven: false,
+      interactiveToolName: "AskUserQuestion",
+      sessionEnvVars: "PID-scoped session marker (authoritative); OMP_SESSION_ID and AGENT_SESSION_ID are fallbacks",
+      resumeFlags: "",
+      cliSetupSnippet: createDefaultCliSetupSnippet(),
+      iterateFlags: "",
+      hasIntentFidelityChecks: false,
+      hasNonNegotiables: false,
+    }, opts);
   }
 }
 

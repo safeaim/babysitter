@@ -1,5 +1,8 @@
 /**
  * OpenClaw harness adapter.
+ *
+ * Derives metadata from @a5c-ai/agent-mux when available, falling back to
+ * hardcoded config.
  */
 
 import { HarnessCapability as Cap } from "../types";
@@ -11,33 +14,71 @@ import type {
   SessionBindResult,
 } from "../types";
 import type { PromptContext } from "../../prompts/types";
-import { BaseHarnessAdapter } from "../BaseAdapter";
+import { BaseHarnessAdapter, type AdapterConfig } from "../BaseAdapter";
 import { normalizeSessionStateDir } from "../../config";
 import { checkCliAvailable } from "../discovery";
 import { installCliViaNpm } from "../installSupport";
 import { createHookLogger, initializeSessionState } from "../hooks/utils";
 import { bindSession } from "../hooks/sessionBinding";
-import { createOpenClawContext } from "../hooks/promptContexts";
+import { createDefaultCliSetupSnippet, createPromptContext } from "../../prompts/contextShared";
+import { getAmuxAdapterMetadata } from "../amuxMetadata";
+import { deriveAdapterConfig } from "../derivePromptContext";
+
+// ---------------------------------------------------------------------------
+// Fallback config (used when agent-mux is unavailable)
+// ---------------------------------------------------------------------------
+
+const FALLBACK_CONFIG: AdapterConfig = {
+  name: "openclaw",
+  displayName: "OpenClaw",
+  activationEnvVars: ["OPENCLAW_SHELL", "OPENCLAW_HOME"],
+  capabilities: [Cap.SessionBinding, Cap.Mcp, Cap.HeadlessPrompt],
+  loopControlTerm: "agent_end",
+  autoResolvesSession: true,
+  pluginRootEnvVars: [],
+  sessionIdEnvVars: ["AGENT_SESSION_ID", "OPENCLAW_SHELL"],
+  promptCapabilities: ["session-binding", "mcp", "headless-prompt", "task-tool", "breakpoint-routing"],
+  pluginRootVar: "",
+  hookDriven: false,
+  interactiveToolName: "AskUserQuestion tool",
+  sessionEnvVars: "PID-scoped session marker (authoritative); OPENCLAW_SHELL gateway injection and AGENT_SESSION_ID are fallbacks",
+  hasIntentFidelityChecks: false,
+  hasNonNegotiables: false,
+};
+
+// ---------------------------------------------------------------------------
+// Config derivation from agent-mux
+// ---------------------------------------------------------------------------
+
+function buildConfig(): AdapterConfig {
+  const metadata = getAmuxAdapterMetadata("openclaw");
+  if (!metadata) return FALLBACK_CONFIG;
+
+  return deriveAdapterConfig(metadata, {
+    name: "openclaw",
+    displayName: "OpenClaw",
+    extraActivationEnvVars: ["OPENCLAW_SHELL", "OPENCLAW_HOME"],
+    pluginRootEnvVars: [],
+    sessionIdEnvVars: ["AGENT_SESSION_ID", "OPENCLAW_SHELL"],
+    pluginRootVar: "",
+    interactiveToolName: "AskUserQuestion tool",
+    sessionEnvVars: "PID-scoped session marker (authoritative); OPENCLAW_SHELL gateway injection and AGENT_SESSION_ID are fallbacks",
+    hasIntentFidelityChecks: false,
+    hasNonNegotiables: false,
+    capabilities: [Cap.SessionBinding, Cap.Mcp, Cap.HeadlessPrompt],
+    promptCapabilities: ["session-binding", "mcp", "headless-prompt", "task-tool", "breakpoint-routing"],
+    loopControlTerm: "agent_end",
+    hookDriven: false,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Adapter class
+// ---------------------------------------------------------------------------
 
 class OpenClawAdapter extends BaseHarnessAdapter {
   constructor() {
-    super({
-      name: "openclaw",
-      displayName: "OpenClaw",
-      activationEnvVars: ["OPENCLAW_SHELL", "OPENCLAW_HOME"],
-      capabilities: [Cap.SessionBinding, Cap.Mcp, Cap.HeadlessPrompt],
-      loopControlTerm: "agent_end",
-      autoResolvesSession: true,
-      pluginRootEnvVars: [],
-      sessionIdEnvVars: ["AGENT_SESSION_ID", "OPENCLAW_SHELL"],
-      promptCapabilities: ["session-binding", "mcp", "headless-prompt", "task-tool", "breakpoint-routing"],
-      pluginRootVar: "",
-      hookDriven: false,
-      interactiveToolName: "AskUserQuestion tool",
-      sessionEnvVars: "PID-scoped session marker (authoritative); OPENCLAW_SHELL gateway injection and AGENT_SESSION_ID are fallbacks",
-      hasIntentFidelityChecks: false,
-      hasNonNegotiables: false,
-    });
+    super(buildConfig());
   }
 
   override getMissingSessionIdHint(): string {
@@ -146,7 +187,22 @@ class OpenClawAdapter extends BaseHarnessAdapter {
   }
 
   override getPromptContext(opts?: { interactive?: boolean | undefined }): PromptContext {
-    return createOpenClawContext(opts);
+    return createPromptContext({
+      harness: "openclaw",
+      harnessLabel: "OpenClaw",
+      capabilities: ["session-binding", "mcp", "headless-prompt", "task-tool", "breakpoint-routing"],
+      pluginRootVar: "",
+      loopControlTerm: "agent_end",
+      sessionBindingFlags: "",
+      hookDriven: false,
+      interactiveToolName: "AskUserQuestion tool",
+      sessionEnvVars: "PID-scoped session marker (authoritative); OPENCLAW_SHELL gateway injection and AGENT_SESSION_ID are fallbacks",
+      resumeFlags: "",
+      cliSetupSnippet: createDefaultCliSetupSnippet(),
+      iterateFlags: "",
+      hasIntentFidelityChecks: false,
+      hasNonNegotiables: false,
+    }, opts);
   }
 }
 

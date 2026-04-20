@@ -4,16 +4,17 @@
     "sessionStart": [
       {
         "type": "command",
-        "bash": "bash \"./hooks/babysitter-proxied-session-start.sh\"",
-        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File \"./hooks/babysitter-proxied-session-start.ps1\"",
+        "bash": "HOOK_TYPE=session-start ADAPTER_NAME=cursor PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-session-start.sh",
+        "powershell": "$env:HOOK_TYPE='session-start'; $env:ADAPTER_NAME='cursor'; & \"./hooks/babysitter-proxied-session-start.ps1\"",
         "timeoutSec": 30
       }
     ],
     "stop": [
       {
         "type": "command",
-        "bash": "bash \"./hooks/babysitter-proxied-stop.sh\"",
-        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File \"./hooks/babysitter-proxied-stop.ps1\"",
+        "bash": "HOOK_TYPE=stop ADAPTER_NAME=cursor PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-stop.sh",
+        "powershell": "$env:HOOK_TYPE='stop'; $env:ADAPTER_NAME='cursor'; & \"./hooks/babysitter-proxied-stop.ps1\"",
+        "timeoutSec": 30,
         "loop_limit": null
       }
     ]

@@ -1,12 +1,12 @@
 {
-  "description": "Babysitter plugin hooks for continuous orchestration loops and token compression (proxied)",
+  "description": "babysitter plugin hooks",
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-session-start.sh"
+            "command": "HOOK_TYPE=session-start ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-session-start.sh"
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-stop.sh"
+            "command": "HOOK_TYPE=stop ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-stop.sh"
           }
         ]
       }
@@ -26,18 +26,58 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-user-prompt-submit.sh"
+            "command": "HOOK_TYPE=user-prompt-submit ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-user-prompt-submit.sh"
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-pre-tool-use.sh"
+            "command": "HOOK_TYPE=pre-tool-use ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-pre-tool-use.sh"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_TYPE=post-tool-use ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-post-tool-use.sh"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_TYPE=subagent-stop ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-subagent-stop.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_TYPE=notification ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-notification.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_TYPE=pre-compact ADAPTER_NAME=claude PLUGIN_ROOT=${CLAUDE_PLUGIN_ROOT} bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-pre-compact.sh"
           }
         ]
       }

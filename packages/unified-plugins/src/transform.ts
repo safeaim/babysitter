@@ -255,7 +255,11 @@ function transformHooks(
     const nativeSlug = toNativeSlug(nativeHook);
     const sourceScript = path.join(sourceDir, handlerValue);
     if (!fs.existsSync(sourceScript)) continue;
-    const content = fs.readFileSync(sourceScript, 'utf-8');
+    const rawContent = fs.readFileSync(sourceScript, 'utf-8');
+    const content = rawContent.replace(
+      /ADAPTER_NAME="\$\{ADAPTER_NAME:\?[^}]*\}"/,
+      `ADAPTER_NAME="\${ADAPTER_NAME:-${targetProfile.adapterName}}"`
+    );
 
     // Determine bash output filename via hookFilePattern
     let outName: string;

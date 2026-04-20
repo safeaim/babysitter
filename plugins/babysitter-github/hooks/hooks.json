@@ -4,25 +4,25 @@
     "sessionStart": [
       {
         "type": "command",
-        "bash": "bash \"./hooks/babysitter-proxied-session-start.sh\"",
-        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File \"./hooks/babysitter-proxied-session-start.ps1\"",
-        "timeoutSec": 30
-      }
-    ],
-    "sessionEnd": [
-      {
-        "type": "command",
-        "bash": "bash \"./hooks/babysitter-proxied-session-end.sh\"",
-        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File \"./hooks/babysitter-proxied-session-end.ps1\"",
+        "bash": "HOOK_TYPE=session-start ADAPTER_NAME=copilot PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-session-start.sh",
+        "powershell": "$env:HOOK_TYPE='session-start'; $env:ADAPTER_NAME='copilot'; & \"./hooks/babysitter-proxied-session-start.ps1\"",
         "timeoutSec": 30
       }
     ],
     "userPromptSubmitted": [
       {
         "type": "command",
-        "bash": "bash \"./hooks/babysitter-proxied-user-prompt-submitted.sh\"",
-        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File \"./hooks/babysitter-proxied-user-prompt-submitted.ps1\"",
-        "timeoutSec": 15
+        "bash": "HOOK_TYPE=user-prompt-submit ADAPTER_NAME=copilot PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-user-prompt-submitted.sh",
+        "powershell": "$env:HOOK_TYPE='user-prompt-submit'; $env:ADAPTER_NAME='copilot'; & \"./hooks/babysitter-proxied-user-prompt-submitted.ps1\"",
+        "timeoutSec": 30
+      }
+    ],
+    "sessionEnd": [
+      {
+        "type": "command",
+        "bash": "HOOK_TYPE=session-end ADAPTER_NAME=copilot PLUGIN_ROOT=. bash ./hooks/babysitter-proxied-session-end.sh",
+        "powershell": "$env:HOOK_TYPE='session-end'; $env:ADAPTER_NAME='copilot'; & \"./hooks/babysitter-proxied-session-end.ps1\"",
+        "timeoutSec": 30
       }
     ]
   }

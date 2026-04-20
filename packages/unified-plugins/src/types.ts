@@ -35,6 +35,10 @@ export interface A5cPluginManifest {
   // Target-Specific Overrides
   targets?: Record<string, TargetOverride>;
 
+  // Global hook file naming pattern — applies to all targets unless overridden
+  // Supports {{name}}, {{slug}} (canonical), {{native}} (target-native name)
+  hookFilePattern?: string;
+
   // Extra files to include in output (glob patterns relative to source dir)
   include?: string[];
 

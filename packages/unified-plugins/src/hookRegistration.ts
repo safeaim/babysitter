@@ -66,13 +66,18 @@ function resolvePsCmd(
 }
 
 function getPattern(manifest: A5cPluginManifest, targetName: string): string | undefined {
-  const val = manifest.targets?.[targetName]?.hookFilePattern;
-  return typeof val === 'string' ? val : undefined;
+  const override = manifest.targets?.[targetName]?.hookFilePattern;
+  if (typeof override === 'string') return override;
+  if (typeof manifest.hookFilePattern === 'string') return manifest.hookFilePattern;
+  return undefined;
 }
 
 function getJsPattern(manifest: A5cPluginManifest, targetName: string): string | undefined {
-  const val = manifest.targets?.[targetName]?.hookJsPattern;
-  return typeof val === 'string' ? val : undefined;
+  const override = manifest.targets?.[targetName]?.hookJsPattern;
+  if (typeof override === 'string') return override;
+  // Derive JS pattern from global hookFilePattern by swapping extension
+  if (typeof manifest.hookFilePattern === 'string') return manifest.hookFilePattern.replace(/\.sh$/, '.js');
+  return undefined;
 }
 
 function iterateHooks(

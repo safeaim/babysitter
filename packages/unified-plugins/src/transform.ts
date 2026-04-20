@@ -233,8 +233,12 @@ function transformHooks(
 
   const isProgrammatic = targetProfile.adapterFamily === 'programmatic';
   const override = manifest.targets?.[targetProfile.name];
-  const hookFilePattern = typeof override?.hookFilePattern === 'string' ? override.hookFilePattern : undefined;
-  const hookJsPattern = typeof override?.hookJsPattern === 'string' ? override.hookJsPattern : undefined;
+  const hookFilePattern = typeof override?.hookFilePattern === 'string'
+    ? override.hookFilePattern
+    : typeof manifest.hookFilePattern === 'string' ? manifest.hookFilePattern : undefined;
+  const hookJsPattern = typeof override?.hookJsPattern === 'string'
+    ? override.hookJsPattern
+    : hookFilePattern ? hookFilePattern.replace(/\.sh$/, '.js') : undefined;
   const toSlug = (s: string) => s
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-session-start-hook.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-session-start.sh"
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-stop-hook.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-stop.sh"
           }
         ]
       }
@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-user-prompt-submit-hook.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-user-prompt-submit.sh"
           }
         ]
       }
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-pre-tool-use-hook.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-pre-tool-use.sh"
           }
         ]
       }

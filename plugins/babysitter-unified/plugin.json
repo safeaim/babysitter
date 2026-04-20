@@ -28,6 +28,7 @@
     "BeforePromptBuild": "hooks/before-prompt-build.sh",
     "BeforeProviderRequest": "hooks/before-provider-request.sh"
   },
+  "hookFilePattern": "{{name}}-proxied-{{native}}.sh",
   "commands": "commands",
   "skills": [
     { "name": "babysit", "file": "skills/babysit/SKILL.md" }
@@ -39,7 +40,6 @@
   ],
   "targets": {
     "claude-code": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}-hook.sh",
       "hookConfig": {
         "matchers": {
           "PreToolUse": "Bash"
@@ -48,7 +48,6 @@
     },
     "codex": {
       "npmPackageName": "@a5c-ai/babysitter-codex",
-      "hookFilePattern": "{{name}}-proxied-{{slug}}.sh",
       "harnessManifest": {
         "skills": "./skills/",
         "hooks": "./hooks.json",
@@ -80,7 +79,6 @@
       }
     },
     "cursor": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}-hook.sh",
       "harnessManifest": {
         "skills": "skills/",
         "commands": "commands/",
@@ -88,37 +86,26 @@
       }
     },
     "gemini": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}.sh",
       "extraFiles": {
         "GEMINI.md": "file:per-harness/gemini/GEMINI.md"
       }
     },
     "github-copilot": {
-      "hookFilePattern": "{{name}}-proxied-{{native}}.sh",
       "extraFiles": {
         "AGENTS.md": "file:per-harness/github/AGENTS.md"
       }
     },
     "pi": {
       "npmPackageName": "@a5c-ai/babysitter-pi",
-      "hookJsPattern": "{{name}}-proxied-{{native}}.js",
       "extraFiles": {
         "AGENTS.md": "file:per-harness/pi/AGENTS.md"
       }
     },
     "oh-my-pi": {
       "npmPackageName": "@a5c-ai/babysitter-omp",
-      "hookJsPattern": "{{name}}-proxied-{{native}}.js",
       "extraFiles": {
         "AGENTS.md": "file:per-harness/omp/AGENTS.md"
       }
-    },
-    "opencode": {
-      "hookJsPattern": "{{name}}-proxied-{{native}}.js"
-    },
-    "openclaw": {
-      "hookFilePattern": "{{name}}-proxied-{{slug}}.sh",
-      "hookJsPattern": "{{name}}-proxied-{{native}}.js"
     }
   }
 }

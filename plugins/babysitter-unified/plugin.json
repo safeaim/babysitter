@@ -53,6 +53,9 @@
         "matchers": {
           "PreToolUse": "Bash"
         }
+      },
+      "extraFiles": {
+        "README.md": "file:per-harness/claude-code/README.md"
       }
     },
     "codex": {
@@ -96,7 +99,8 @@
         "assets/icon.svg": "file:per-harness/codex/assets/icon.svg",
         "assets/logo.png": "file:per-harness/codex/assets/logo.png",
         "assets/logo.svg": "file:per-harness/codex/assets/logo.svg",
-        "bin/install-shared.js": "file:per-harness/codex/bin/install-shared.js"
+        "bin/install-shared.js": "file:per-harness/codex/bin/install-shared.js",
+        "README.md": "file:per-harness/codex/README.md"
       }
     },
     "cursor": {
@@ -113,7 +117,8 @@
       },
       "extraFiles": {
         "skills/babysit/SKILL.md": "file:per-harness/cursor/babysit-SKILL.md",
-        "bin/install-shared.js": "file:per-harness/cursor/bin/install-shared.js"
+        "bin/install-shared.js": "file:per-harness/cursor/bin/install-shared.js",
+        "README.md": "file:per-harness/cursor/README.md"
       }
     },
     "gemini": {
@@ -122,7 +127,8 @@
         "skills/babysit/SKILL.md": "file:per-harness/gemini/babysit-SKILL.md",
         "bin/cli.js": "file:per-harness/gemini/bin/cli.js",
         "bin/postinstall.js": "file:per-harness/gemini/bin/postinstall.js",
-        "bin/preuninstall.js": "file:per-harness/gemini/bin/preuninstall.js"
+        "bin/preuninstall.js": "file:per-harness/gemini/bin/preuninstall.js",
+        "README.md": "file:per-harness/gemini/README.md"
       }
     },
     "github-copilot": {
@@ -130,7 +136,8 @@
       "extraFiles": {
         "AGENTS.md": "file:per-harness/github/AGENTS.md",
         "skills/babysit/SKILL.md": "file:per-harness/github/babysit-SKILL.md",
-        "bin/install-shared.js": "file:per-harness/github/bin/install-shared.js"
+        "bin/install-shared.js": "file:per-harness/github/bin/install-shared.js",
+        "README.md": "file:per-harness/github/README.md"
       }
     },
     "pi": {
@@ -138,7 +145,8 @@
       "extraFiles": {
         "AGENTS.md": "file:per-harness/pi/AGENTS.md",
         "skills/babysit/SKILL.md": "file:per-harness/pi/babysit-SKILL.md",
-        "extensions/index.ts": "file:per-harness/pi/extensions-index.ts"
+        "extensions/index.ts": "file:per-harness/pi/extensions-index.ts",
+        "README.md": "file:per-harness/pi/README.md"
       }
     },
     "oh-my-pi": {
@@ -146,7 +154,8 @@
       "extraFiles": {
         "AGENTS.md": "file:per-harness/omp/AGENTS.md",
         "skills/babysit/SKILL.md": "file:per-harness/omp/babysit-SKILL.md",
-        "extensions/index.ts": "file:per-harness/omp/extensions-index.ts"
+        "extensions/index.ts": "file:per-harness/omp/extensions-index.ts",
+        "README.md": "file:per-harness/omp/README.md"
       }
     },
     "opencode": {
@@ -154,14 +163,16 @@
         "skills/babysit/SKILL.md": "file:per-harness/opencode/babysit-SKILL.md",
         "commands/status.md": "file:per-harness/opencode/status-command.md",
         "skills/accomplish-status/SKILL.md": "file:per-harness/opencode/accomplish-status-skill/SKILL.md",
-        "bin/install-shared.js": "file:per-harness/opencode/bin/install-shared.js"
+        "bin/install-shared.js": "file:per-harness/opencode/bin/install-shared.js",
+        "README.md": "file:per-harness/opencode/README.md"
       }
     },
     "openclaw": {
       "extraFiles": {
         "skills/babysit/SKILL.md": "file:per-harness/openclaw/babysit-SKILL.md",
         "commands/babysit.md": "file:per-harness/openclaw/babysit-command.md",
-        "extensions/index.ts": "file:per-harness/openclaw/extensions-index.ts"
+        "extensions/index.ts": "file:per-harness/openclaw/extensions-index.ts",
+        "README.md": "file:per-harness/openclaw/README.md"
       }
     }
   }

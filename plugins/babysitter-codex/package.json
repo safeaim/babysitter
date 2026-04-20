@@ -6,7 +6,8 @@
     "test": "node test/integration.test.js && node test/packaged-install.test.js",
     "sync:commands": "node scripts/sync-command-skills.js",
     "deploy": "npm publish --access public",
-    "deploy:staging": "npm publish --access public --tag staging"
+    "deploy:staging": "npm publish --access public --tag staging",
+    "sync:skills": "node scripts/sync-command-skills.js"
   },
   "bin": {
     "babysitter-codex": "bin/cli.js"

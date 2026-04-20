@@ -7,7 +7,8 @@
     "deploy:staging": "npm publish --access public --tag staging",
     "postinstall": "node bin/install.cjs",
     "preuninstall": "node bin/uninstall.cjs",
-    "team:install": "node scripts/team-install.cjs"
+    "team:install": "node scripts/team-install.cjs",
+    "sync:commands": "node scripts/sync-command-docs.cjs"
   },
   "bin": {
     "babysitter-openclaw": "bin/cli.cjs"

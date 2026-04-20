@@ -36,7 +36,6 @@ Run the verification script to check all dependencies at once:
 
 ```bash
 # From your project directory containing the plugin
-bash plugins/babysitter/scripts/verify-install.sh
 ```
 
 **Expected output when all checks pass:**
@@ -62,7 +61,6 @@ Babysitter Plugin Installation Verification
 All checks passed! The babysitter plugin is ready to use.
 ```
 
-> **Tip:** Run `bash plugins/babysitter/scripts/verify-install.sh --json` for machine-readable output.
 
 ### Install Missing Dependencies
 
@@ -339,7 +337,6 @@ chmod +x plugins/babysitter/scripts/*.sh
 Run the health check script to diagnose issues:
 
 ```bash
-bash plugins/babysitter/scripts/health-check.sh --verbose
 ```
 
 **Health status meanings:**
@@ -392,8 +389,6 @@ See [PROCESS_SELECTION.md](./PROCESS_SELECTION.md) for a guide on choosing the r
 
 ### Utility Scripts
 
-- **[verify-install.sh](./scripts/verify-install.sh)** - Validate installation
-- **[health-check.sh](./scripts/health-check.sh)** - Runtime diagnostics
 
 ---
 

@@ -108,9 +108,6 @@ describe("Plugin installation", () => {
     expect(enabled).toBe("true");
   });
 
-  test("error-codes.sh is sourceable", () => {
-    dockerExec(`bash -n ${PLUGIN_DIR}/scripts/error-codes.sh`);
-  });
 });
 
 describe("Entrypoint validation", () => {

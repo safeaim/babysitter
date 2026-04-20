@@ -28,10 +28,8 @@ Run these commands first to get an overview of your setup:
 
 ```bash
 # Check installation status
-bash plugins/babysitter/scripts/verify-install.sh
 
 # Check runtime health
-bash plugins/babysitter/scripts/health-check.sh --verbose
 
 # Check SDK CLI version
 npx -y @a5c-ai/babysitter-sdk@latest --version
@@ -490,7 +488,6 @@ Then start fresh with `/babysitter:babysit`.
 
 ### Symptoms
 
-- `verify-install.sh` reports failures
 - "Command not found" errors for babysitter CLI
 - Missing dependencies (Node.js, npm, jq)
 - Plugin structure errors
@@ -500,7 +497,6 @@ Then start fresh with `/babysitter:babysit`.
 **Step 1: Run verification script**
 
 ```bash
-bash plugins/babysitter/scripts/verify-install.sh --json
 ```
 
 **Step 2: Check individual dependencies**
@@ -601,7 +597,6 @@ npx -y @a5c-ai/babysitter-sdk@latest --version
 
 - Use a Node.js version manager (nvm, fnm)
 - Pin SDK version in your project (optional)
-- Run `verify-install.sh` after updates
 - Keep the plugin updated with git pull
 
 ---
@@ -730,7 +725,6 @@ git update-index --chmod=+x plugins/babysitter/hooks/**/*.sh
 
 A: Run the verification script:
 ```bash
-bash plugins/babysitter/scripts/verify-install.sh
 ```
 
 **Q: What Node.js version is required?**
@@ -830,7 +824,6 @@ A: The state file remains. When you restart, the loop will not resume automatica
 
 A: The health check provides a comprehensive overview:
 ```bash
-bash plugins/babysitter/scripts/health-check.sh --verbose
 ```
 
 **Q: How do I get verbose output from the CLI?**
@@ -872,12 +865,10 @@ When reporting issues, collect:
 
 1. **System info:**
    ```bash
-   bash plugins/babysitter/scripts/verify-install.sh --json
    ```
 
 2. **Health check:**
    ```bash
-   bash plugins/babysitter/scripts/health-check.sh --json
    ```
 
 3. **Run status (if applicable):**

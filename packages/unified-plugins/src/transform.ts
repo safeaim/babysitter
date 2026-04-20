@@ -27,6 +27,7 @@ import {
 import {
   generatePs1Wrapper,
   generateJsBridge,
+  generateTsHookStub,
 } from './transformHelpers.js';
 
 import {
@@ -286,6 +287,15 @@ function transformHooks(
         jsName = outName.replace(/\.sh$/, '.js');
       }
       files.push({ path: `hooks/${jsName}`, content: generateJsBridge(jsName.replace(/\.js$/, ''), handlerValue, targetProfile), executable: true });
+    }
+
+    // TS hook stubs for targets with typescript variant (openclaw)
+    if (targetProfile.scriptVariants.includes('typescript')) {
+      const tsName = `${nativeSlug}.ts`;
+      files.push({
+        path: `extensions/hooks/${tsName}`,
+        content: generateTsHookStub(nativeHook, nativeSlug, outName, targetProfile),
+      });
     }
   }
 

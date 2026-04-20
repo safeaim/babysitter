@@ -105,6 +105,17 @@
       "extraFiles": {
         "AGENTS.md": "file:per-harness/omp/AGENTS.md"
       }
+    },
+    "opencode": {
+      "extraFiles": {
+        "commands/status.md": "file:per-harness/opencode/status-command.md",
+        "skills/accomplish-status/SKILL.md": "file:per-harness/opencode/accomplish-status-skill/SKILL.md"
+      }
+    },
+    "openclaw": {
+      "extraFiles": {
+        "commands/babysit.md": "file:per-harness/openclaw/babysit-command.md"
+      }
     }
   }
 }

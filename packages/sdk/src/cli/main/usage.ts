@@ -2,7 +2,7 @@ import type { HelpSurface } from "./types";
 import { CORE_PROGRAM, type CliProgram } from "./program";
 
 function coreAgentUsage(commandName: string): string {
-  return `  ${commandName} run:create --process-id <id> --entry <path#export> [--runs-dir <dir>] [--inputs <file>] [--run-id <id>] [--process-revision <rev>] [--request <id>] [--prompt <text>] [--harness <name>] [--session-id <id>] [--plugin-root <dir>] [--non-interactive] [--json] [--dry-run]
+  return `  ${commandName} run:create --process-id <id> --entry <path#export> [--runs-dir <dir>] [--inputs <file>] [--run-id <id>] [--process-revision <rev>] [--request <id>] [--prompt <text>] [--harness <name>] [--session-id <id>] [--non-interactive] [--json] [--dry-run]
   ${commandName} run:status <runDir> [--runs-dir <dir>] [--json]
   ${commandName} run:events <runDir> [--runs-dir <dir>] [--json] [--limit <n>] [--reverse] [--filter-type <type>]
   ${commandName} run:rebuild-state <runDir> [--runs-dir <dir>] [--json] [--dry-run]
@@ -11,7 +11,7 @@ function coreAgentUsage(commandName: string): string {
   ${commandName} task:post <runDir> <effectId> --status <ok|error> [--runs-dir <dir>] [--json] [--dry-run] [--value <file>] [--value-inline <json>] [--error <file>] [--stdout-ref <ref>] [--stderr-ref <ref>] [--stdout-file <file>] [--stderr-file <file>] [--started-at <iso8601>] [--finished-at <iso8601>] [--metadata <file>] [--invocation-key <key>]
   ${commandName} task:list <runDir> [--runs-dir <dir>] [--pending] [--kind <kind>] [--json]
   ${commandName} task:show <runDir> <effectId> [--runs-dir <dir>] [--json]
-  ${commandName} skill:discover --plugin-root <dir> [--run-id <id>] [--cache-ttl <seconds>] [--runs-dir <dir>] [--include-remote] [--summary-only] [--process-path <path>] [--json]
+  ${commandName} skill:discover [--run-id <id>] [--cache-ttl <seconds>] [--runs-dir <dir>] [--include-remote] [--summary-only] [--process-path <path>] [--json]
   ${commandName} session:init --session-id <id> --state-dir <dir> [--max-iterations <n>] [--run-id <id>] [--prompt <text>] [--json]
   ${commandName} session:associate --session-id <id> --state-dir <dir> --run-id <id> [--force] [--runs-dir <dir>] [--json]
   ${commandName} session:resume --session-id <id> [--state-dir <dir>] --run-id <id> [--max-iterations <n>] [--runs-dir <dir>] [--json]
@@ -19,7 +19,7 @@ function coreAgentUsage(commandName: string): string {
   ${commandName} session:update --session-id <id> --state-dir <dir> [--iteration <n>] [--last-iteration-at <iso8601>] [--iteration-times <csv>] [--delete] [--json]
   ${commandName} session:check-iteration --session-id <id> --state-dir <dir> [--json]
   ${commandName} session:last-message --transcript-path <file> [--json]
-  ${commandName} session:iteration-message --iteration <n> [--run-id <id>] [--runs-dir <dir>] [--plugin-root <dir>] [--json]
+  ${commandName} session:iteration-message --iteration <n> [--run-id <id>] [--runs-dir <dir>] [--json]
   ${commandName} session:whoami [--harness <name>] [--json]
   ${commandName} session:cleanup [--harness <name>] [--dry-run] [--runs-dir <dir>] [--json]
   ${commandName} process-library:active [--run-id <id>] [--session-id <id>] [--state-dir <dir>] [--json]
@@ -44,7 +44,7 @@ function coreHumanUsage(commandName: string): string {
   ${commandName} session:update --session-id <id> --state-dir <dir> [--iteration <n>] [--last-iteration-at <iso8601>] [--iteration-times <csv>] [--delete] [--json]
   ${commandName} session:check-iteration --session-id <id> --state-dir <dir> [--json]
   ${commandName} session:last-message --transcript-path <file> [--json]
-  ${commandName} session:iteration-message --iteration <n> [--run-id <id>] [--runs-dir <dir>] [--plugin-root <dir>] [--json]
+  ${commandName} session:iteration-message --iteration <n> [--run-id <id>] [--runs-dir <dir>] [--json]
   ${commandName} session:whoami [--harness <name>] [--json]
   ${commandName} session:cleanup [--harness <name>] [--dry-run] [--runs-dir <dir>] [--json]
   ${commandName} compress-output <command and args...>

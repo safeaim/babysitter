@@ -36,12 +36,13 @@ describe('skill commands', () => {
   });
 
   describe('skill:discover', () => {
-    it('returns error when plugin-root is missing', async () => {
+    it('succeeds without explicit plugin-root (resolves from env)', async () => {
       const result = await handleSkillDiscover({
         json: true,
+        cacheTtl: 0,
       });
 
-      expect(result).toBe(1);
+      expect(result).toBe(0);
     });
 
     it('returns empty results when no skills found', async () => {

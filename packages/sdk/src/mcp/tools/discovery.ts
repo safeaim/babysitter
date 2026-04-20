@@ -15,7 +15,8 @@ export function registerDiscoveryTools(server: McpServer): void {
     {
       pluginRoot: z
         .string()
-        .describe("Plugin root directory to scan for skills"),
+        .optional()
+        .describe("Plugin root directory to scan for skills (resolved from env vars if omitted)"),
       runId: z
         .string()
         .optional()
@@ -32,7 +33,7 @@ export function registerDiscoveryTools(server: McpServer): void {
     },
     async (args) => {
       try {
-        const pluginRoot = path.resolve(args.pluginRoot);
+        const pluginRoot = args.pluginRoot ? path.resolve(args.pluginRoot) : undefined;
         const libraryPath = await getActiveProcessLibraryPath();
 
         const result = await discoverSkillsInternal({

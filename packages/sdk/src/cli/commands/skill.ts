@@ -52,7 +52,7 @@ export {
 } from './skill/processMarkers';
 
 export async function discoverSkillsInternal(options: {
-  pluginRoot: string;
+  pluginRoot?: string;
   libraryPath?: string;
   runId?: string;
   cacheTtl?: number;
@@ -62,7 +62,7 @@ export async function discoverSkillsInternal(options: {
   includeProcesses?: boolean;
 }): Promise<DiscoverSkillsResult> {
   const {
-    pluginRoot,
+    pluginRoot: explicitPluginRoot,
     libraryPath,
     runId = '',
     cacheTtl = DEFAULT_CACHE_TTL,
@@ -71,6 +71,17 @@ export async function discoverSkillsInternal(options: {
     processPath,
     includeProcesses = false,
   } = options;
+
+  // Resolve pluginRoot from explicit arg or environment variables
+  const pluginRoot = explicitPluginRoot
+    || process.env.CLAUDE_PLUGIN_ROOT
+    || process.env.CODEX_PLUGIN_ROOT
+    || process.env.CURSOR_PLUGIN_ROOT
+    || process.env.GEMINI_EXTENSION_PATH
+    || process.env.COPILOT_PLUGIN_ROOT
+    || process.env.PI_PLUGIN_ROOT
+    || process.env.OMP_PLUGIN_ROOT
+    || '';
 
   if (!processPath) {
     const cached = await readCache(runId, cacheTtl);
@@ -251,19 +262,9 @@ export async function handleSkillDiscover(args: SkillCommandArgs): Promise<numbe
     processPath,
   } = args;
 
-  if (!pluginRoot) {
-    const error = { error: 'MISSING_PLUGIN_ROOT', message: '--plugin-root is required' };
-    if (json) {
-      console.error(JSON.stringify(error, null, 2));
-    } else {
-      console.error('Error: --plugin-root is required');
-    }
-    return 1;
-  }
-
   const libraryPath = await getActiveProcessLibraryPath();
   const result = await discoverSkillsInternal({
-    pluginRoot,
+    pluginRoot: pluginRoot || undefined,
     libraryPath: libraryPath || undefined,
     runId,
     cacheTtl,

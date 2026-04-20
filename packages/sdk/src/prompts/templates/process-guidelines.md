@@ -46,7 +46,7 @@ available skills.
 ```
 
 **Steps during process creation:**
-1. Use `babysitter skill:discover --plugin-root {{pluginRootVar}} --process-path <path> --json` to find
+1. Use `babysitter skill:discover --process-path <path> --json` to find
    relevant skills/agents in the specialization directory
 2. Select the ones actually needed by the process tasks
 3. Add them as `@skill`/`@agent` markers in the JSDoc header

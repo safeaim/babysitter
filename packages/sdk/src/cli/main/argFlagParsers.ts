@@ -239,10 +239,6 @@ export const FLAG_PARSERS: Record<string, FlagParser> = {
     parsed.logFile = expectFlagValue(args, index + 1, "--log-file");
     return index + 1;
   },
-  "--plugin-root": (parsed, args, index) => {
-    parsed.pluginRoot = expectFlagValue(args, index + 1, "--plugin-root");
-    return index + 1;
-  },
   "--cache-ttl": (parsed, args, index) => {
     parsed.cacheTtl = parsePositiveInteger(expectFlagValue(args, index + 1, "--cache-ttl"), "--cache-ttl");
     return index + 1;

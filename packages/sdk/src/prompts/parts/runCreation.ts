@@ -20,17 +20,6 @@ export function renderRunCreation(ctx: PromptContext): string {
     `  auto-resolved from ${ctx.sessionEnvVars}.`,
   ];
 
-  if (ctx.sessionBindingFlags) {
-    const flagParts = ctx.sessionBindingFlags.split(/\s+--/).filter(Boolean);
-    for (const part of flagParts) {
-      const flagName = part.startsWith('--') ? part : `--${part}`;
-      const nameOnly = flagName.split(/\s/)[0];
-      if (nameOnly === '--plugin-root') {
-        requiredFlagsLines.push(`- \`--plugin-root "${ctx.pluginRootVar}"\` -- plugin root for state resolution`);
-      }
-    }
-  }
-
   const sessionIdNote = ctx.harness === 'codex'
     ? `Do **not** pass \`--session-id\` explicitly inside a real ${ctx.harnessLabel} session. The\nsession ID auto-resolves from the **PID-scoped session marker** written by the\nsession-start hook (authoritative), with the harness env file and\n\`AGENT_SESSION_ID\` env var used only as last-resort fallbacks. Orchestrators\ncan verify the binding at any time via \`babysitter session:whoami --json\`. Only\npass \`--session-id\` in out-of-band recovery flows.\n`
     : `The session ID auto-resolves from the **PID-scoped session marker** written by\nthe session-start hook (authoritative), with the harness env file and\n\`AGENT_SESSION_ID\` env var used only as last-resort fallbacks. Orchestrators\ncan verify the binding at any time via \`babysitter session:whoami --json\`.\n`;

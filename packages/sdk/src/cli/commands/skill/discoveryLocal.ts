@@ -373,7 +373,7 @@ export function resolveStaticProcessRoot(options: {
 }
 
 export async function resolveDiscoveryProcessRoot(options: {
-  pluginRoot: string;
+  pluginRoot?: string;
   libraryPath?: string;
   runId?: string;
 }): Promise<string> {

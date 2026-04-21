@@ -15,3 +15,8 @@ export { parsePattern, matchPattern } from "./patterns";
 export { readRules, writeRules, addRule, removeRule, listRules } from "./rules";
 export { evaluateAutoApproval } from "./evaluator";
 export type { EvaluateAutoApprovalOptions } from "./evaluator";
+export { verifyBreakpointResult, hasSignatureFields } from "./proven-verification";
+export type {
+  BreakpointVerificationConfig,
+  BreakpointVerificationResult,
+} from "./proven-verification";

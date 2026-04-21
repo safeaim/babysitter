@@ -1,0 +1,50 @@
+{
+  "name": "@a5c-ai/breakpoints-mux",
+  "version": "5.0.0",
+  "description": "Serverless breakpoint multiplexing system with pluggable backends and cryptographic signing.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./backends": {
+      "types": "./dist/backends/index.d.ts",
+      "default": "./dist/backends/index.js"
+    },
+    "./proven": {
+      "types": "./dist/proven/index.d.ts",
+      "default": "./dist/proven/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/index.d.ts",
+      "default": "./dist/mcp/index.js"
+    },
+    "./harness": {
+      "types": "./dist/harness/index.d.ts",
+      "default": "./dist/harness/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "author": "a5c.ai",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

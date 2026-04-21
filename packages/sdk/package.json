@@ -38,6 +38,14 @@
     "@vscode/ripgrep": "^1.15.9",
     "puppeteer": "^24.0.0"
   },
+  "peerDependencies": {
+    "@a5c-ai/breakpoints-mux": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@a5c-ai/breakpoints-mux": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.11.30",

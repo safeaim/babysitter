@@ -103,6 +103,9 @@ export type { BackendFactory } from "./backends/index.js";
 export { GitNativeBackend } from "./backends/git-native.js";
 export type { GitNativeBackendOptions } from "./backends/git-native.js";
 
+// ── GitHub Issues Backend ──────────────────────────────────────────
+export { GitHubIssuesBackend, getGitHubToken, parseAnswerFromComment } from "./backends/github-issues.js";
+
 // ── Proven Breakpoints ──────────────────────────────────────────────
 export {
   generateKeyPair,

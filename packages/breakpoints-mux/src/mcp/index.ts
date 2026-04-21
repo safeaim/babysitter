@@ -29,3 +29,30 @@ export {
   verifyBreakpointAnswerDescription,
   verifyBreakpointAnswerParams,
 } from "./tools/verify-answer.js";
+
+export {
+  handleListResponders,
+  listRespondersDescription,
+  listRespondersParams,
+} from "./tools/list-responders.js";
+
+export {
+  handleClaimBreakpoint,
+  claimBreakpointDescription,
+  claimBreakpointParams,
+} from "./tools/claim-breakpoint.js";
+
+export {
+  handlePollBreakpoints,
+  pollBreakpointsDescription,
+  pollBreakpointsParams,
+} from "./tools/poll-breakpoints.js";
+
+export {
+  resolveBreakpointBackend,
+} from "./backend-resolver.js";
+
+export type {
+  BackendResolveContext,
+  ResolvedBackend,
+} from "./backend-resolver.js";

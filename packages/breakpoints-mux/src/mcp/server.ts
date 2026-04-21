@@ -26,30 +26,57 @@ import {
   verifyBreakpointAnswerParams,
   handleVerifyBreakpointAnswer,
 } from "./tools/verify-answer.js";
+import {
+  listRespondersDescription,
+  listRespondersParams,
+  handleListResponders,
+} from "./tools/list-responders.js";
+import {
+  claimBreakpointDescription,
+  claimBreakpointParams,
+  handleClaimBreakpoint,
+} from "./tools/claim-breakpoint.js";
+import {
+  pollBreakpointsDescription,
+  pollBreakpointsParams,
+  handlePollBreakpoints,
+} from "./tools/poll-breakpoints.js";
+import { resolveBreakpointBackend } from "./backend-resolver.js";
 import { createDefaultBackend } from "../backends/index.js";
 import type { BreakpointBackend } from "../backend.js";
 
 /**
  * Resolve the backend for an MCP tool call.
- * Uses the explicit backend param, environment variable, or defaults to git-native.
+ * Uses the backend-resolver (env var, routing config) or defaults to git-native.
  */
 function resolveToolBackend(params?: {
   backend?: string;
   breakpointsDir?: string;
+  domain?: string;
+  tags?: string[];
 }): BreakpointBackend {
-  return createDefaultBackend(
-    params?.breakpointsDir ? { breakpointsDir: params.breakpointsDir } : undefined,
-  );
+  // If an explicit breakpointsDir is provided, use git-native directly
+  if (params?.breakpointsDir) {
+    return createDefaultBackend({ breakpointsDir: params.breakpointsDir });
+  }
+
+  const { backend } = resolveBreakpointBackend({
+    domain: params?.domain,
+    tags: params?.tags,
+  });
+  return backend;
 }
 
 /**
- * Create a breakpoints-mux MCP server with all 5 tools registered.
+ * Create a breakpoints-mux MCP server with all 8 tools registered.
  */
 export function createBreakpointMcpServer(): McpServer {
   const server = new McpServer({
     name: "breakpoints-mux",
     version: "0.1.0",
   });
+
+  // ── Submitter-side tools ──────────────────────────────────────────────
 
   server.tool(
     "ask_breakpoint",
@@ -110,6 +137,47 @@ export function createBreakpointMcpServer(): McpServer {
     async (args) => {
       const backend = resolveToolBackend(args);
       const result = await handleVerifyBreakpointAnswer(args as Parameters<typeof handleVerifyBreakpointAnswer>[0], backend);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  // ── Responder-side tools ──────────────────────────────────────────────
+
+  server.tool(
+    "list_responders",
+    listRespondersDescription,
+    listRespondersParams,
+    async (args) => {
+      const backend = resolveToolBackend(args);
+      const result = await handleListResponders(args as Parameters<typeof handleListResponders>[0], backend);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  server.tool(
+    "claim_breakpoint",
+    claimBreakpointDescription,
+    claimBreakpointParams,
+    async (args) => {
+      const backend = resolveToolBackend(args);
+      const result = await handleClaimBreakpoint(args as Parameters<typeof handleClaimBreakpoint>[0], backend);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  server.tool(
+    "poll_breakpoints",
+    pollBreakpointsDescription,
+    pollBreakpointsParams,
+    async (args) => {
+      const backend = resolveToolBackend(args);
+      const result = await handlePollBreakpoints(args as Parameters<typeof handlePollBreakpoints>[0], backend);
       return {
         content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
       };

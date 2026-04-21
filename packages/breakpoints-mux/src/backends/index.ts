@@ -1,7 +1,8 @@
 import type { BreakpointBackend } from "../backend.js";
-import type { BreakpointContext, BackendConfig, RoutingConfig } from "../types.js";
+import type { BreakpointContext, BackendConfig, RoutingConfig, GitHubIssuesBackendConfig } from "../types.js";
 import { GitNativeBackend } from "./git-native.js";
 import type { GitNativeBackendOptions } from "./git-native.js";
+import { GitHubIssuesBackend } from "./github-issues.js";
 
 /**
  * Factory function type for creating backends from config.
@@ -16,6 +17,11 @@ const backendFactories = new Map<string, BackendFactory>();
 // Register the built-in git-native backend
 backendFactories.set("git-native", (config) => {
   return new GitNativeBackend(config as GitNativeBackendOptions);
+});
+
+// Register the GitHub Issues backend
+backendFactories.set("github-issues", (config) => {
+  return new GitHubIssuesBackend(config as GitHubIssuesBackendConfig);
 });
 
 /**

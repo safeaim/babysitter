@@ -171,22 +171,22 @@ describe("Harness Integration", () => {
     it("can be constructed with multiple backends and routing config", async () => {
       const { BreakpointMuxInteractionProvider } = await importInteractionProvider();
       const defaultBackend = createMockBackend("git-native");
-      const serverBackend = createMockBackend("aeq-server");
+      const serverBackend = createMockBackend("bmux-server");
 
       const routingConfig: RoutingConfig = {
         defaultBackend: "git-native",
         routes: [
           {
             domains: ["security"],
-            backend: "aeq-server",
-            backendConfig: { type: "server", url: "https://aeq.a5c.ai" },
+            backend: "bmux-server",
+            backendConfig: { type: "server", url: "https://bmux.a5c.ai" },
           },
         ],
       };
 
       const provider = new BreakpointMuxInteractionProvider({
         defaultBackend,
-        backends: { "aeq-server": serverBackend },
+        backends: { "bmux-server": serverBackend },
         routingConfig,
       });
 
@@ -633,22 +633,22 @@ describe("Harness Integration", () => {
     it("routes to domain-specific backend when routing config matches domain", async () => {
       const { BreakpointMuxInteractionProvider } = await importInteractionProvider();
       const defaultBackend = createMockBackend("git-native");
-      const securityBackend = createMockBackend("aeq-server");
+      const securityBackend = createMockBackend("bmux-server");
 
       const routingConfig: RoutingConfig = {
         defaultBackend: "git-native",
         routes: [
           {
             domains: ["security", "auth"],
-            backend: "aeq-server",
-            backendConfig: { type: "server", url: "https://aeq.a5c.ai" },
+            backend: "bmux-server",
+            backendConfig: { type: "server", url: "https://bmux.a5c.ai" },
           },
         ],
       };
 
       const provider = new BreakpointMuxInteractionProvider({
         defaultBackend,
-        backends: { "aeq-server": securityBackend },
+        backends: { "bmux-server": securityBackend },
         routingConfig,
       });
 
@@ -664,14 +664,14 @@ describe("Harness Integration", () => {
     it("routes to default backend when domain does not match any rule", async () => {
       const { BreakpointMuxInteractionProvider } = await importInteractionProvider();
       const defaultBackend = createMockBackend("git-native");
-      const securityBackend = createMockBackend("aeq-server");
+      const securityBackend = createMockBackend("bmux-server");
 
       const routingConfig: RoutingConfig = {
         defaultBackend: "git-native",
         routes: [
           {
             domains: ["security"],
-            backend: "aeq-server",
+            backend: "bmux-server",
             backendConfig: { type: "server" },
           },
         ],
@@ -679,7 +679,7 @@ describe("Harness Integration", () => {
 
       const provider = new BreakpointMuxInteractionProvider({
         defaultBackend,
-        backends: { "aeq-server": securityBackend },
+        backends: { "bmux-server": securityBackend },
         routingConfig,
       });
 
@@ -695,14 +695,14 @@ describe("Harness Integration", () => {
     it("matches second domain in domains array", async () => {
       const { BreakpointMuxInteractionProvider } = await importInteractionProvider();
       const defaultBackend = createMockBackend("git-native");
-      const securityBackend = createMockBackend("aeq-server");
+      const securityBackend = createMockBackend("bmux-server");
 
       const routingConfig: RoutingConfig = {
         defaultBackend: "git-native",
         routes: [
           {
             domains: ["security", "auth"],
-            backend: "aeq-server",
+            backend: "bmux-server",
             backendConfig: { type: "server" },
           },
         ],
@@ -710,7 +710,7 @@ describe("Harness Integration", () => {
 
       const provider = new BreakpointMuxInteractionProvider({
         defaultBackend,
-        backends: { "aeq-server": securityBackend },
+        backends: { "bmux-server": securityBackend },
         routingConfig,
       });
 
@@ -914,14 +914,14 @@ describe("Harness Integration", () => {
     it("routes to default when domain is undefined and no tags", async () => {
       const { BreakpointMuxInteractionProvider } = await importInteractionProvider();
       const defaultBackend = createMockBackend("git-native");
-      const securityBackend = createMockBackend("aeq-server");
+      const securityBackend = createMockBackend("bmux-server");
 
       const routingConfig: RoutingConfig = {
         defaultBackend: "git-native",
         routes: [
           {
             domains: ["security"],
-            backend: "aeq-server",
+            backend: "bmux-server",
             backendConfig: {},
           },
         ],
@@ -929,7 +929,7 @@ describe("Harness Integration", () => {
 
       const provider = new BreakpointMuxInteractionProvider({
         defaultBackend,
-        backends: { "aeq-server": securityBackend },
+        backends: { "bmux-server": securityBackend },
         routingConfig,
       });
 
@@ -1125,7 +1125,7 @@ describe("Harness Integration", () => {
     it("routes different domains to different backends", async () => {
       const { BreakpointMuxInteractionProvider } = await importInteractionProvider();
       const defaultBackend = createMockBackend("git-native");
-      const securityBackend = createMockBackend("aeq-server");
+      const securityBackend = createMockBackend("bmux-server");
       const opsBackend = createMockBackend("github-issues");
 
       const routingConfig: RoutingConfig = {
@@ -1133,7 +1133,7 @@ describe("Harness Integration", () => {
         routes: [
           {
             domains: ["security"],
-            backend: "aeq-server",
+            backend: "bmux-server",
             backendConfig: {},
           },
           {
@@ -1148,13 +1148,13 @@ describe("Harness Integration", () => {
       const provider = new BreakpointMuxInteractionProvider({
         defaultBackend,
         backends: {
-          "aeq-server": securityBackend,
+          "bmux-server": securityBackend,
           "github-issues": opsBackend,
         },
         routingConfig,
       });
 
-      // Security question -> aeq-server
+      // Security question -> bmux-server
       await provider.handleBreakpoint("Sec question", {
         label: "Security review",
         domain: "security",

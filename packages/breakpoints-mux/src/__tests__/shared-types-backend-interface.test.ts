@@ -1172,8 +1172,8 @@ describe("Section 3: Domain Types and Zod Schemas", () => {
       const rule: RoutingRule = {
         domains: ["security", "auth"],
         tags: ["security-review"],
-        backend: "aeq-server",
-        backendConfig: { type: "server", url: "https://aeq.a5c.ai" },
+        backend: "bmux-server",
+        backendConfig: { type: "server", url: "https://bmux.a5c.ai" },
       };
       const result = RoutingRuleSchema.safeParse(rule);
       expect(result.success).toBe(true);
@@ -1226,8 +1226,8 @@ describe("Section 3: Domain Types and Zod Schemas", () => {
         routes: [
           {
             domains: ["security"],
-            backend: "aeq-server",
-            backendConfig: { type: "server", url: "https://aeq.a5c.ai" },
+            backend: "bmux-server",
+            backendConfig: { type: "server", url: "https://bmux.a5c.ai" },
           },
         ],
       };

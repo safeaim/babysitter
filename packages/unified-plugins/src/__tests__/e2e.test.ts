@@ -107,6 +107,12 @@ describe('e2e: sample plugin compilation', () => {
         fs.readFileSync(path.join(result.outputDir, 'plugin.json'), 'utf-8')
       );
       expect(pluginJson.name).toBe('sample-plugin');
+      expect(pluginJson.author).toEqual({ name: 'a5c.ai' });
+
+      const claudePluginJson = JSON.parse(
+        fs.readFileSync(path.join(result.outputDir, '.claude-plugin/plugin.json'), 'utf-8')
+      );
+      expect(claudePluginJson.author).toEqual({ name: 'a5c.ai' });
     });
 
     it('codex: should emit package.json with bin scripts', () => {

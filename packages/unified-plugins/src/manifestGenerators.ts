@@ -10,11 +10,14 @@ type ResolvedManifest = A5cPluginManifest & {
 };
 
 export function generateClaudeCodeManifest(manifest: A5cPluginManifest): string {
+  const author = typeof manifest.author === 'string'
+    ? { name: manifest.author }
+    : manifest.author;
   const pluginJson: Record<string, unknown> = {
     name: manifest.name,
     version: manifest.version,
     description: manifest.description,
-    author: manifest.author,
+    author,
     license: manifest.license,
   };
 

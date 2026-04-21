@@ -72,12 +72,14 @@ export function generateManifests(
     case 'claude-code': {
       const ccManifest = generateClaudeCodeManifest(filteredManifest);
       files.push({ path: 'plugin.json', content: ccManifest });
-      const authorStr = typeof manifest.author === 'string' ? manifest.author : manifest.author.name;
+      const author = typeof manifest.author === 'string'
+        ? { name: manifest.author }
+        : manifest.author;
       files.push({ path: '.claude-plugin/plugin.json', content: JSON.stringify({
         name: manifest.name,
         version: manifest.version,
         description: manifest.description,
-        author: authorStr,
+        author,
       }, null, 2) + '\n' });
       break;
     }

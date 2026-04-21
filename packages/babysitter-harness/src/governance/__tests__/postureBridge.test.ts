@@ -5,7 +5,7 @@ import {
 } from '../postureBridge';
 import type { PolicyRule } from '../types';
 import type { ActionCategory, ApprovalPosture } from "@a5c-ai/babysitter-sdk";
-import { DEFAULT_POSTURES } from "@a5c-ai/babysitter-sdk";
+import { DEFAULT_POSTURES } from "../../breakpoints/postures";
 
 describe('Posture-to-policy bridge', () => {
   describe('postureToPolicyRules', () => {

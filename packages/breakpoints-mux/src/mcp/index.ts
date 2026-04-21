@@ -1,4 +1,11 @@
-export { createBreakpointMcpServer, startBreakpointMcpServer } from "./server.js";
+export {
+  createBreakpointMcpServer,
+  startBreakpointMcpServer,
+  startHttpBreakpointMcpServer,
+} from "./server.js";
+
+export { createHttpMcpServer, startHttpMcpServer } from "./http-transport.js";
+export type { HttpMcpServerOptions, HttpMcpServerResult } from "./http-transport.js";
 
 export {
   handleAskBreakpoint,

@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
+import type { HttpMcpServerOptions, HttpMcpServerResult } from "./http-transport.js";
 import {
   askBreakpointDescription,
   askBreakpointParams,
@@ -194,4 +195,21 @@ export async function startBreakpointMcpServer(): Promise<void> {
   const server = createBreakpointMcpServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
+}
+
+/**
+ * Start the breakpoints-mux MCP server on HTTP transport with Streamable HTTP.
+ *
+ * The HTTP server provides:
+ * - POST/GET/DELETE /mcp -- MCP Streamable HTTP transport
+ * - GET /healthz -- health check
+ * - Bearer token authentication (when BPX_MCP_TOKEN is set or token is provided)
+ */
+export async function startHttpBreakpointMcpServer(
+  options?: HttpMcpServerOptions,
+): Promise<HttpMcpServerResult> {
+  // Dynamic import to avoid pulling in http-transport for stdio-only usage
+  const { startHttpMcpServer } = await import("./http-transport.js");
+  const server = createBreakpointMcpServer();
+  return startHttpMcpServer(server, options);
 }

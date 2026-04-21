@@ -12,10 +12,6 @@ function getUserHome() {
   return os.homedir();
 }
 
-function getGlobalStateDir() {
-  return process.env.BABYSITTER_GLOBAL_STATE_DIR || path.join(getUserHome(), '.a5c');
-}
-
 function getHarnessHome() {
   return path.join(os.homedir(), '.openclaw');
 }
@@ -123,7 +119,27 @@ function removeMarketplaceEntry(marketplacePath) {
   writeJson(marketplacePath, marketplace);
 }
 
-function resolveBabysitterCommand(packageRoot) {
+function warnWindowsHooks() {
+  if (process.platform === 'win32') {
+    console.warn('[' + PLUGIN_NAME + '] Windows detected — shell hooks (.sh) require Git Bash or WSL.');
+  }
+}
+
+function runPostInstall(pluginRoot) {
+  const postInstall = path.join(pluginRoot, 'scripts', 'post-install.js');
+  if (fs.existsSync(postInstall)) {
+    spawnSync(process.execPath, [postInstall], {
+      cwd: pluginRoot, stdio: 'inherit',
+      env: { ...process.env, PLUGIN_ROOT: pluginRoot },
+    });
+  }
+}
+
+function getGlobalStateDir() {
+  return process.env.BABYSITTER_GLOBAL_STATE_DIR || path.join(getUserHome(), '.a5c');
+}
+
+function resolveCliCommand(packageRoot) {
   try {
     const result = spawnSync('babysitter', ['--version'], { stdio: 'pipe', timeout: 10000 });
     if (result.status === 0) return 'babysitter';
@@ -134,8 +150,8 @@ function resolveBabysitterCommand(packageRoot) {
   return `npx -y @a5c-ai/babysitter-sdk@${ver}`;
 }
 
-function runBabysitterCli(packageRoot, cliArgs, options = {}) {
-  const cmd = resolveBabysitterCommand(packageRoot);
+function runCli(packageRoot, cliArgs, options = {}) {
+  const cmd = resolveCliCommand(packageRoot);
   const parts = cmd.split(' ');
   const result = spawnSync(parts[0], [...parts.slice(1), ...cliArgs], {
     stdio: options.stdio || 'inherit',
@@ -156,14 +172,14 @@ function ensureGlobalProcessLibrary(packageRoot) {
   const defaultSpec = readJson(path.join(stateDir, 'process-library-defaults.json'));
   const cloneDir = defaultSpec && defaultSpec.cloneDir
     ? defaultSpec.cloneDir
-    : path.join(stateDir, 'process-library', 'babysitter-repo');
-  runBabysitterCli(packageRoot, [
+    : path.join(stateDir, 'process-library', PLUGIN_NAME + '-repo');
+  runCli(packageRoot, [
     'process-library:clone',
     '--dir', cloneDir,
     '--state-dir', stateDir,
     '--json',
   ], { stdio: 'pipe' });
-  runBabysitterCli(packageRoot, [
+  runCli(packageRoot, [
     'process-library:use',
     '--dir', cloneDir,
     '--state-dir', stateDir,
@@ -177,27 +193,11 @@ function ensureGlobalProcessLibrary(packageRoot) {
   };
 }
 
-function warnWindowsHooks() {
-  if (process.platform === 'win32') {
-    console.warn('[' + PLUGIN_NAME + '] Windows detected — shell hooks (.sh) require Git Bash or WSL.');
-  }
-}
-
-function runPostInstall(pluginRoot) {
-  const postInstall = path.join(pluginRoot, 'scripts', 'post-install.js');
-  if (fs.existsSync(postInstall)) {
-    spawnSync(process.execPath, [postInstall], {
-      cwd: pluginRoot, stdio: 'inherit',
-      env: { ...process.env, PLUGIN_ROOT: pluginRoot },
-    });
-  }
-}
 
 module.exports = {
   PLUGIN_NAME,
   PLUGIN_CATEGORY,
   getUserHome,
-  getGlobalStateDir,
   getHarnessHome,
   getHomePluginRoot,
   getHomeMarketplacePath,
@@ -210,9 +210,10 @@ module.exports = {
   normalizeMarketplaceSourcePath,
   ensureMarketplaceEntry,
   removeMarketplaceEntry,
-  resolveBabysitterCommand,
-  runBabysitterCli,
-  ensureGlobalProcessLibrary,
   warnWindowsHooks,
   runPostInstall,
+  getGlobalStateDir,
+  resolveCliCommand,
+  runCli,
+  ensureGlobalProcessLibrary,
 };

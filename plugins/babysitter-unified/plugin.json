@@ -47,6 +47,13 @@
     "versions.json",
     "hooks/"
   ],
+  "installSurface": "bin/install-shared-sdk.js",
+  "installSurfaceExports": [
+    "getGlobalStateDir",
+    "resolveCliCommand",
+    "runCli",
+    "ensureGlobalProcessLibrary"
+  ],
   "targets": {
     "claude-code": {
       "hookConfig": {
@@ -94,12 +101,26 @@
         "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-codex#readme",
         "repository": "https://github.com/a5c-ai/babysitter"
       },
+      "harnessInstallSurface": "per-harness/codex/bin/install-surface.js",
+      "harnessInstallSurfaceExports": [
+        "LEGACY_MARKETPLACE_PLUGIN_NAMES", "LEGACY_SKILL_NAMES", "LEGACY_PROMPT_NAMES",
+        "LEGACY_HOOK_SCRIPT_NAMES", "DEFAULT_MARKETPLACE", "PLUGIN_BUNDLE_ENTRIES",
+        "getCodexHome", "getHomePluginRoot", "getHomeMarketplacePath",
+        "renderCodexConfigToml", "copyRecursive", "copyPluginBundle",
+        "insertRootKey", "ensureSectionLine", "ensureWritableRoots",
+        "mergeCodexConfig", "mergeCodexConfigFile",
+        "resolveBabysitterCommand", "runBabysitterCli", "ensureGlobalProcessLibrary",
+        "getMarketplaceRootDir", "normalizeMarketplaceSourcePath",
+        "ensureMarketplaceEntry", "removeMarketplaceEntry",
+        "removeLegacyCodexSurface", "installManagedSkills",
+        "mergeManagedHooksConfig", "installManagedHooks",
+        "installCodexSurface", "warnWindowsHooks"
+      ],
       "extraFiles": {
         "skills/babysit/SKILL.md": "file:per-harness/codex/babysit-SKILL.md",
         "assets/icon.svg": "file:per-harness/codex/assets/icon.svg",
         "assets/logo.png": "file:per-harness/codex/assets/logo.png",
         "assets/logo.svg": "file:per-harness/codex/assets/logo.svg",
-        "bin/install-shared.js": "file:per-harness/codex/bin/install-shared.js",
         "README.md": "file:per-harness/codex/README.md"
       }
     },
@@ -115,9 +136,19 @@
         "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-cursor#readme",
         "repository": "https://github.com/a5c-ai/babysitter"
       },
+      "harnessInstallSurface": "per-harness/cursor/bin/install-surface.js",
+      "harnessInstallSurfaceExports": [
+        "HOOK_SCRIPT_NAMES", "DEFAULT_MARKETPLACE",
+        "MANAGED_HOOKS_CONFIG_PATHS", "PLUGIN_BUNDLE_ENTRIES",
+        "getCursorHome", "getHomePluginRoot", "getHomeMarketplacePath",
+        "copyRecursive", "copyPluginBundle",
+        "normalizeMarketplaceSourcePath", "normalizeMarketplaceName",
+        "ensureMarketplaceEntry", "removeMarketplaceEntry",
+        "getManagedHooksConfigPath", "mergeManagedHooksConfig",
+        "removeManagedHooks", "installCursorSurface", "warnWindowsHooks"
+      ],
       "extraFiles": {
         "skills/babysit/SKILL.md": "file:per-harness/cursor/babysit-SKILL.md",
-        "bin/install-shared.js": "file:per-harness/cursor/bin/install-shared.js",
         "README.md": "file:per-harness/cursor/README.md"
       }
     },
@@ -133,10 +164,29 @@
     },
     "github-copilot": {
       "npmPackageName": "@a5c-ai/babysitter-github",
+      "harnessInstallSurface": "per-harness/github/bin/install-surface.js",
+      "harnessInstallSurfaceExports": [
+        "LEGACY_HOOK_SCRIPT_NAMES", "HOOK_SCRIPT_NAMES",
+        "DEFAULT_MARKETPLACE", "PLUGIN_BUNDLE_ENTRIES",
+        "CLOUD_AGENT_BUNDLE_ENTRIES", "MANAGED_BLOCK_START", "MANAGED_BLOCK_END",
+        "getCopilotHome", "getHomePluginRoot", "getHomeMarketplacePath",
+        "writeJson",
+        "replaceManagedMarkdownBlock", "writeManagedMarkdown",
+        "readSdkVersion", "toLowerHyphenName", "rewriteCloudSkill",
+        "registerCopilotPlugin", "deregisterCopilotPlugin",
+        "installManagedSkills", "mergeManagedHooksConfig", "installManagedHooks",
+        "removeLegacyHooks", "installCopilotSurface",
+        "renderCloudAgentAgentsBlock", "renderCloudAgentCopilotInstructionsBlock",
+        "renderCloudAgentSetupWorkflow", "installCloudAgentBundle",
+        "installCloudAgentSkills", "installCloudAgentInstructions",
+        "installCloudAgentSetupSteps", "installCloudAgentSurface",
+        "normalizeMarketplaceSourcePath",
+        "ensureMarketplaceEntry", "removeMarketplaceEntry",
+        "warnWindowsHooks", "copyPluginBundle", "copyRecursive"
+      ],
       "extraFiles": {
         "AGENTS.md": "file:per-harness/github/AGENTS.md",
         "skills/babysit/SKILL.md": "file:per-harness/github/babysit-SKILL.md",
-        "bin/install-shared.js": "file:per-harness/github/bin/install-shared.js",
         "README.md": "file:per-harness/github/README.md"
       }
     },
@@ -159,11 +209,33 @@
       }
     },
     "opencode": {
+      "harnessInstallSurface": "per-harness/opencode/bin/install-surface.js",
+      "harnessInstallSurfaceExports": [
+        "PLUGIN_BUNDLE_ENTRIES",
+        "HOOK_SCRIPT_NAMES",
+        "DEFAULT_MARKETPLACE",
+        "getOpenCodeHome",
+        "getHomePluginRoot",
+        "getHomeMarketplacePath",
+        "copyRecursive",
+        "copyPluginBundle",
+        "writeIndexJs",
+        "mergeHooksConfig",
+        "removeManagedHooks",
+        "normalizeMarketplaceName",
+        "normalizeMarketplaceSourcePath",
+        "ensureMarketplaceEntry",
+        "removeMarketplaceEntry",
+        "getAccomplishDataDir",
+        "isAccomplishInstalled",
+        "getAccomplishOpenCodeHome",
+        "installAccomplishSurface",
+        "installOpenCodeSurface"
+      ],
       "extraFiles": {
         "skills/babysit/SKILL.md": "file:per-harness/opencode/babysit-SKILL.md",
         "commands/status.md": "file:per-harness/opencode/status-command.md",
         "skills/accomplish-status/SKILL.md": "file:per-harness/opencode/accomplish-status-skill/SKILL.md",
-        "bin/install-shared.js": "file:per-harness/opencode/bin/install-shared.js",
         "README.md": "file:per-harness/opencode/README.md"
       }
     },

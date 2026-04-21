@@ -55,6 +55,11 @@ export interface A5cPluginManifest {
   // Lifecycle scripts (relative to source dir, copied to output and called by generated installer)
   postInstall?: string;
 
+  // Path to SDK-specific install-shared surface file (appended to the generic base)
+  installSurface?: string;
+  // Export names contributed by the install surface file
+  installSurfaceExports?: string[];
+
   // Hook Configuration
   hookConfig?: {
     proxyAdapter?: boolean;
@@ -73,6 +78,9 @@ export interface TargetOverride {
     settings?: unknown[];
   };
   extraFiles?: Record<string, string>;
+  // Per-harness install-shared surface (appended after base + SDK surface)
+  harnessInstallSurface?: string;
+  harnessInstallSurfaceExports?: string[];
   // Pattern for hook output filenames: {{name}}-proxied-{{slug}}-hook.sh
   // Supports {{name}}, {{slug}} (canonical), {{native}} (target-native hook name)
   hookFilePattern?: string;

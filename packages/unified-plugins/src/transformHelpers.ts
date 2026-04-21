@@ -97,11 +97,11 @@ for (var i = 0; i < process.argv.length; i++) {
   }
 }
 
-var dest = shared.getPluginHome('workspace');
+var dest = shared.getHomePluginRoot('workspace');
 console.log('[${manifest.name}] Team install to ' + dest);
 
 var src = process.env.PLUGIN_PACKAGE_ROOT || path.resolve(__dirname, '..');
-shared.copyDir(src, dest);
+shared.copyPluginBundle(src, dest);
 shared.runPostInstall(dest);
 console.log('[${manifest.name}] Team install complete.');
 `;

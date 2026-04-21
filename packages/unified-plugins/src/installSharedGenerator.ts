@@ -1,11 +1,13 @@
-// Generator for install-shared.js — the shared install infrastructure
-import { resolveSdkConfig } from './sdkConfig.js';
-// Produces the common utility functions with target-specific values
-// populated from the manifest and target profile.
+// Generator for install-shared — generic plugin installation infrastructure.
+// Only contains utilities any plugin would need: file ops, marketplace
+// management, per-harness plugin paths.
+// SDK-specific concepts (global state dirs, CLI resolution, process libraries)
+// are provided by the plugin author via the manifest's `installSurface` field.
 
 import * as fs from 'fs';
 import * as path from 'path';
 import type { A5cPluginManifest, TargetProfile } from './types.js';
+import { resolveSdkConfig } from './sdkConfig.js';
 
 function getHomeDirCode(targetProfile: TargetProfile, stateDir: string): string {
   switch (targetProfile.name) {
@@ -44,22 +46,6 @@ export function generateInstallShared(
   const pluginsDirCode = getPluginsDirCode(targetProfile);
   const marketplacePathCode = getMarketplacePathCode(targetProfile);
 
-  // Check for per-harness surface file
-  let surfaceCode = '';
-  if (sourceDir) {
-    // Look for per-harness install-shared surface in extraFiles
-    const override = manifest.targets?.[targetProfile.name];
-    const isEsm = targetProfile.name === 'pi' || targetProfile.name === 'oh-my-pi' || targetProfile.name === 'openclaw';
-    const ext = isEsm ? '.cjs' : '.js';
-    const surfaceRef = override?.extraFiles?.[`bin/install-shared${ext}`];
-    if (typeof surfaceRef === 'string' && surfaceRef.startsWith('file:')) {
-      const surfacePath = path.join(sourceDir, surfaceRef.slice(5));
-      if (fs.existsSync(surfacePath)) {
-        surfaceCode = fs.readFileSync(surfacePath, 'utf-8');
-      }
-    }
-  }
-
   const base = `'use strict';
 
 const fs = require('fs');
@@ -72,10 +58,6 @@ const PLUGIN_CATEGORY = 'Coding';
 
 function getUserHome() {
   return os.homedir();
-}
-
-function getGlobalStateDir() {
-  return process.env.${sdk.envPrefix}_GLOBAL_STATE_DIR || path.join(getUserHome(), '${sdk.stateDir}');
 }
 
 function getHarnessHome() {
@@ -185,60 +167,6 @@ function removeMarketplaceEntry(marketplacePath) {
   writeJson(marketplacePath, marketplace);
 }
 
-function resolveCliCommand(packageRoot) {
-  try {
-    const result = spawnSync('${sdk.cli}', ['--version'], { stdio: 'pipe', timeout: 10000 });
-    if (result.status === 0) return '${sdk.cli}';
-  } catch {}
-  const versionsPath = path.join(packageRoot, 'versions.json');
-  const versions = readJson(versionsPath) || {};
-  const ver = versions.sdkVersion || 'latest';
-  return \`npx -y ${sdk.package}@\${ver}\`;
-}
-
-function runCli(packageRoot, cliArgs, options = {}) {
-  const cmd = resolveCliCommand(packageRoot);
-  const parts = cmd.split(' ');
-  const result = spawnSync(parts[0], [...parts.slice(1), ...cliArgs], {
-    stdio: options.stdio || 'inherit',
-    timeout: options.timeout || 120000,
-    cwd: options.cwd || process.cwd(),
-    env: { ...process.env, ...options.env },
-  });
-  return result;
-}
-
-function ensureGlobalProcessLibrary(packageRoot) {
-  const stateDir = getGlobalStateDir();
-  const activeFile = path.join(stateDir, 'active', 'process-library.json');
-  let active = readJson(activeFile);
-  if (active && active.binding && active.binding.dir) {
-    return active;
-  }
-  const defaultSpec = readJson(path.join(stateDir, 'process-library-defaults.json'));
-  const cloneDir = defaultSpec && defaultSpec.cloneDir
-    ? defaultSpec.cloneDir
-    : path.join(stateDir, 'process-library', '${pluginName}-repo');
-  runCli(packageRoot, [
-    'process-library:clone',
-    '--dir', cloneDir,
-    '--state-dir', stateDir,
-    '--json',
-  ], { stdio: 'pipe' });
-  runCli(packageRoot, [
-    'process-library:use',
-    '--dir', cloneDir,
-    '--state-dir', stateDir,
-    '--json',
-  ], { stdio: 'pipe' });
-  active = readJson(activeFile);
-  return {
-    binding: active && active.binding ? active.binding : { dir: cloneDir },
-    defaultSpec: defaultSpec || { cloneDir },
-    stateFile: activeFile,
-  };
-}
-
 function warnWindowsHooks() {
   if (process.platform === 'win32') {
     console.warn('[' + PLUGIN_NAME + '] Windows detected — shell hooks (.sh) require Git Bash or WSL.');
@@ -256,35 +184,65 @@ function runPostInstall(pluginRoot) {
 }
 `;
 
-  const exports = `
-module.exports = {
-  PLUGIN_NAME,
-  PLUGIN_CATEGORY,
-  getUserHome,
-  getGlobalStateDir,
-  getHarnessHome,
-  getHomePluginRoot,
-  getHomeMarketplacePath,
-  writeFileIfChanged,
-  copyRecursive,
-  copyPluginBundle,
-  readJson,
-  writeJson,
-  ensureExecutable,
-  normalizeMarketplaceSourcePath,
-  ensureMarketplaceEntry,
-  removeMarketplaceEntry,
-  resolveCliCommand,
-  runCli,
-  ensureGlobalProcessLibrary,
-  warnWindowsHooks,
-  runPostInstall,
-};
-`;
+  const baseExports = [
+    'PLUGIN_NAME',
+    'PLUGIN_CATEGORY',
+    'getUserHome',
+    'getHarnessHome',
+    'getHomePluginRoot',
+    'getHomeMarketplacePath',
+    'writeFileIfChanged',
+    'copyRecursive',
+    'copyPluginBundle',
+    'readJson',
+    'writeJson',
+    'ensureExecutable',
+    'normalizeMarketplaceSourcePath',
+    'ensureMarketplaceEntry',
+    'removeMarketplaceEntry',
+    'warnWindowsHooks',
+    'runPostInstall',
+  ];
 
-  if (surfaceCode) {
-    return base + '\n// --- Target-specific surface ---\n\n' + surfaceCode + '\n' + exports;
+  // Read plugin-specific surface (SDK concepts: global state, CLI resolution, etc.)
+  let sdkSurface = '';
+  const surfaceExports: string[] = [];
+  if (sourceDir && manifest.installSurface) {
+    const surfacePath = path.join(sourceDir, manifest.installSurface);
+    if (fs.existsSync(surfacePath)) {
+      sdkSurface = fs.readFileSync(surfacePath, 'utf-8');
+    }
+    if (manifest.installSurfaceExports) {
+      surfaceExports.push(...manifest.installSurfaceExports);
+    }
   }
 
-  return base + exports;
+  // Read per-harness surface (harness-specific installation logic)
+  let harnessSurface = '';
+  const harnessSurfaceExports: string[] = [];
+  const override = manifest.targets?.[targetProfile.name];
+  if (sourceDir && override?.harnessInstallSurface) {
+    const surfacePath = path.join(sourceDir, override.harnessInstallSurface as string);
+    if (fs.existsSync(surfacePath)) {
+      harnessSurface = fs.readFileSync(surfacePath, 'utf-8');
+    }
+    if (Array.isArray(override.harnessInstallSurfaceExports)) {
+      harnessSurfaceExports.push(...(override.harnessInstallSurfaceExports as string[]));
+    }
+  }
+
+  // Deduplicate: per-harness exports override base/SDK exports of the same name
+  const overrideSet = new Set([...surfaceExports, ...harnessSurfaceExports]);
+  const dedupedBase = baseExports.filter(e => !overrideSet.has(e));
+  const allExports = [...dedupedBase, ...surfaceExports, ...harnessSurfaceExports];
+  const exportsBlock = `\nmodule.exports = {\n  ${allExports.join(',\n  ')},\n};\n`;
+
+  let result = base;
+  if (sdkSurface) {
+    result += '\n' + sdkSurface + '\n';
+  }
+  if (harnessSurface) {
+    result += '\n' + harnessSurface + '\n';
+  }
+  return result + exportsBlock;
 }

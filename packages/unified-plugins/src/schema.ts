@@ -101,6 +101,11 @@ export const A5C_PLUGIN_SCHEMA = {
         },
       },
     },
+    sdk: { type: 'object' },
+    hookFilePattern: { type: 'string' },
+    postInstall: { type: 'string' },
+    installSurface: { type: 'string' },
+    installSurfaceExports: { type: 'array', items: { type: 'string' } },
   },
   additionalProperties: false,
 };

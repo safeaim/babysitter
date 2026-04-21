@@ -1,12 +1,3 @@
-'use strict';
-
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { spawnSync } = require('child_process');
-
-const PLUGIN_NAME = 'babysitter';
-const PLUGIN_CATEGORY = 'Coding';
 const LEGACY_MARKETPLACE_PLUGIN_NAMES = ['babysitter-codex'];
 const LEGACY_SKILL_NAMES = [
   'babysit',
@@ -73,19 +64,6 @@ function getCodexHome() {
   return path.join(os.homedir(), '.codex');
 }
 
-function getUserHome() {
-  if (process.env.USERPROFILE) return path.resolve(process.env.USERPROFILE);
-  if (process.env.HOME) return path.resolve(process.env.HOME);
-  return os.homedir();
-}
-
-function getGlobalStateDir() {
-  if (process.env.BABYSITTER_GLOBAL_STATE_DIR) {
-    return path.resolve(process.env.BABYSITTER_GLOBAL_STATE_DIR);
-  }
-  return path.join(getUserHome(), '.a5c');
-}
-
 function getHomePluginRoot() {
   if (process.env.BABYSITTER_CODEX_PLUGIN_DIR) {
     return path.resolve(process.env.BABYSITTER_CODEX_PLUGIN_DIR, PLUGIN_NAME);
@@ -118,18 +96,6 @@ function renderCodexConfigToml() {
     'max_threads = 4',
     '',
   ].join('\n');
-}
-
-function writeFileIfChanged(filePath, contents) {
-  if (fs.existsSync(filePath)) {
-    const current = fs.readFileSync(filePath, 'utf8');
-    if (current === contents) {
-      return false;
-    }
-  }
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, contents, 'utf8');
-  return true;
 }
 
 function copyRecursive(src, dest) {
@@ -299,22 +265,6 @@ function ensureGlobalProcessLibrary(packageRoot) {
       { cwd: packageRoot },
     ),
   );
-}
-
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-function writeJson(filePath, value) {
-  writeFileIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
-}
-
-function ensureExecutable(filePath) {
-  try {
-    fs.chmodSync(filePath, 0o755);
-  } catch {
-    // Best-effort only. Windows and some filesystems may ignore mode changes.
-  }
 }
 
 function getMarketplaceRootDir(marketplacePath) {
@@ -509,18 +459,3 @@ function warnWindowsHooks() {
   console.warn('[babysitter] Note: Codex hooks on Windows require Codex CLI >= 0.119.0.');
   console.warn('[babysitter] If hooks do not fire, run `codex --version` and upgrade if you are below 0.119.0.');
 }
-
-module.exports = {
-  copyPluginBundle,
-  ensureGlobalProcessLibrary,
-  ensureMarketplaceEntry,
-  getCodexHome,
-  getHomeMarketplacePath,
-  getHomePluginRoot,
-  installCodexSurface,
-  mergeCodexConfigFile,
-  removeLegacyCodexSurface,
-  removeMarketplaceEntry,
-  warnWindowsHooks,
-  writeJson,
-};

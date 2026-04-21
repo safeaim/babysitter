@@ -1,18 +1,13 @@
-'use strict';
+// Cursor-specific install surface.
+// Appended after the compiler base and SDK surface — can override base functions.
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { spawnSync } = require('child_process');
-
-const PLUGIN_NAME = 'babysitter';
-const PLUGIN_CATEGORY = 'Coding';
 const HOOK_SCRIPT_NAMES = [
   'session-start.sh',
   'session-start.ps1',
   'stop-hook.sh',
   'stop-hook.ps1',
 ];
+
 const DEFAULT_MARKETPLACE = {
   name: 'local-plugins',
   interface: {
@@ -20,10 +15,12 @@ const DEFAULT_MARKETPLACE = {
   },
   plugins: [],
 };
+
 const MANAGED_HOOKS_CONFIG_PATHS = [
   path.join('hooks', 'hooks-cursor.json'),
   'hooks.json',
 ];
+
 const PLUGIN_BUNDLE_ENTRIES = [
   '.cursor-plugin',
   'plugin.json',
@@ -40,19 +37,6 @@ function getCursorHome() {
   return path.join(os.homedir(), '.cursor');
 }
 
-function getUserHome() {
-  if (process.env.USERPROFILE) return path.resolve(process.env.USERPROFILE);
-  if (process.env.HOME) return path.resolve(process.env.HOME);
-  return os.homedir();
-}
-
-function getGlobalStateDir() {
-  if (process.env.BABYSITTER_GLOBAL_STATE_DIR) {
-    return path.resolve(process.env.BABYSITTER_GLOBAL_STATE_DIR);
-  }
-  return path.join(getUserHome(), '.a5c');
-}
-
 function getHomePluginRoot() {
   if (process.env.BABYSITTER_CURSOR_PLUGIN_DIR) {
     return path.resolve(process.env.BABYSITTER_CURSOR_PLUGIN_DIR, PLUGIN_NAME);
@@ -67,18 +51,6 @@ function getHomeMarketplacePath() {
   return path.join(getUserHome(), '.agents', 'plugins', 'marketplace.json');
 }
 
-function writeFileIfChanged(filePath, contents) {
-  if (fs.existsSync(filePath)) {
-    const current = fs.readFileSync(filePath, 'utf8');
-    if (current === contents) {
-      return false;
-    }
-  }
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, contents, 'utf8');
-  return true;
-}
-
 function copyRecursive(src, dest) {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
@@ -90,6 +62,7 @@ function copyRecursive(src, dest) {
     return;
   }
 
+  // Strip UTF-8 BOM from SKILL.md files
   if (path.basename(src) === 'SKILL.md') {
     const file = fs.readFileSync(src);
     const hasBom = file.length >= 3 && file[0] === 0xef && file[1] === 0xbb && file[2] === 0xbf;
@@ -116,14 +89,6 @@ function copyPluginBundle(packageRoot, pluginRoot) {
   }
 }
 
-function ensureExecutable(filePath) {
-  try {
-    fs.chmodSync(filePath, 0o755);
-  } catch {
-    // Best-effort only. Windows and some filesystems may ignore mode changes.
-  }
-}
-
 function normalizeMarketplaceSourcePath(marketplacePath, pluginSourcePath) {
   let next = pluginSourcePath;
   if (path.isAbsolute(next)) {
@@ -134,24 +99,6 @@ function normalizeMarketplaceSourcePath(marketplacePath, pluginSourcePath) {
     next = `./${next}`;
   }
   return next;
-}
-
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-function getManagedHooksConfigPath(packageRoot) {
-  for (const relativePath of MANAGED_HOOKS_CONFIG_PATHS) {
-    const candidate = path.join(packageRoot, relativePath);
-    if (fs.existsSync(candidate)) {
-      return candidate;
-    }
-  }
-  return null;
-}
-
-function writeJson(filePath, value) {
-  writeFileIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 function normalizeMarketplaceName(name) {
@@ -206,6 +153,16 @@ function removeMarketplaceEntry(marketplacePath) {
   }
   marketplace.plugins = marketplace.plugins.filter((entry) => entry && entry.name !== PLUGIN_NAME);
   writeJson(marketplacePath, marketplace);
+}
+
+function getManagedHooksConfigPath(packageRoot) {
+  for (const relativePath of MANAGED_HOOKS_CONFIG_PATHS) {
+    const candidate = path.join(packageRoot, relativePath);
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
 }
 
 function mergeManagedHooksConfig(packageRoot, cursorHome) {
@@ -313,62 +270,6 @@ function installCursorSurface(packageRoot, cursorHome) {
   }
 }
 
-function resolveBabysitterCommand(packageRoot) {
-  if (process.env.BABYSITTER_SDK_CLI) {
-    return {
-      command: process.execPath,
-      argsPrefix: [path.resolve(process.env.BABYSITTER_SDK_CLI)],
-    };
-  }
-  try {
-    return {
-      command: process.execPath,
-      argsPrefix: [
-        require.resolve('@a5c-ai/babysitter-sdk/dist/cli/main.js', {
-          paths: [packageRoot],
-        }),
-      ],
-    };
-  } catch {
-    return {
-      command: 'babysitter',
-      argsPrefix: [],
-    };
-  }
-}
-
-function runBabysitterCli(packageRoot, cliArgs, options = {}) {
-  const resolved = resolveBabysitterCommand(packageRoot);
-  const result = spawnSync(resolved.command, [...resolved.argsPrefix, ...cliArgs], {
-    cwd: options.cwd || process.cwd(),
-    stdio: ['ignore', 'pipe', 'pipe'],
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      ...(options.env || {}),
-    },
-  });
-  if (result.status !== 0) {
-    const stderr = (result.stderr || '').trim();
-    const stdout = (result.stdout || '').trim();
-    throw new Error(
-      `babysitter ${cliArgs.join(' ')} failed` +
-      (stderr ? `: ${stderr}` : stdout ? `: ${stdout}` : ''),
-    );
-  }
-  return result.stdout;
-}
-
-function ensureGlobalProcessLibrary(packageRoot) {
-  return JSON.parse(
-    runBabysitterCli(
-      packageRoot,
-      ['process-library:active', '--state-dir', getGlobalStateDir(), '--json'],
-      { cwd: packageRoot },
-    ),
-  );
-}
-
 function warnWindowsHooks() {
   if (process.platform !== 'win32') {
     return;
@@ -376,19 +277,3 @@ function warnWindowsHooks() {
   console.warn(`[${PLUGIN_NAME}] Note: On Windows, Cursor will use .ps1 PowerShell hooks.`);
   console.warn(`[${PLUGIN_NAME}] Both bash (.sh) and PowerShell (.ps1) hook scripts are included.`);
 }
-
-module.exports = {
-  copyPluginBundle,
-  ensureGlobalProcessLibrary,
-  ensureMarketplaceEntry,
-  getManagedHooksConfigPath,
-  getCursorHome,
-  getHomeMarketplacePath,
-  getHomePluginRoot,
-  installCursorSurface,
-  removeManagedHooks,
-  removeMarketplaceEntry,
-  warnWindowsHooks,
-  writeJson,
-  normalizeMarketplaceName,
-};

@@ -1,12 +1,9 @@
-'use strict';
+// Per-harness surface for github-copilot.
+// Contains only harness-specific constants, functions unique to GitHub Copilot,
+// and overrides of base/SDK-surface functions.
+// Generic infrastructure (file utils, marketplace base, SDK CLI resolution) is
+// provided by the compiler base and SDK surface layers.
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { spawnSync } = require('child_process');
-
-const PLUGIN_NAME = 'babysitter';
-const PLUGIN_CATEGORY = 'Coding';
 const LEGACY_HOOK_SCRIPT_NAMES = [
   'session-start.sh',
   'stop-hook.sh',
@@ -52,113 +49,11 @@ const CLOUD_AGENT_BUNDLE_ENTRIES = [
 const MANAGED_BLOCK_START = '<!-- BEGIN BABYSITTER GITHUB CLOUD AGENT -->';
 const MANAGED_BLOCK_END = '<!-- END BABYSITTER GITHUB CLOUD AGENT -->';
 
+// --- Harness-specific functions ---
+
 function getCopilotHome() {
   if (process.env.COPILOT_HOME) return path.resolve(process.env.COPILOT_HOME);
   return path.join(os.homedir(), '.copilot');
-}
-
-function getUserHome() {
-  if (process.env.USERPROFILE) return path.resolve(process.env.USERPROFILE);
-  if (process.env.HOME) return path.resolve(process.env.HOME);
-  return os.homedir();
-}
-
-function getGlobalStateDir() {
-  if (process.env.BABYSITTER_GLOBAL_STATE_DIR) {
-    return path.resolve(process.env.BABYSITTER_GLOBAL_STATE_DIR);
-  }
-  return path.join(getUserHome(), '.a5c');
-}
-
-function getHomePluginRoot() {
-  if (process.env.BABYSITTER_GITHUB_PLUGIN_DIR) {
-    return path.resolve(process.env.BABYSITTER_GITHUB_PLUGIN_DIR, PLUGIN_NAME);
-  }
-  return path.join(getCopilotHome(), 'plugins', PLUGIN_NAME);
-}
-
-function getHomeMarketplacePath() {
-  if (process.env.BABYSITTER_GITHUB_MARKETPLACE_PATH) {
-    return path.resolve(process.env.BABYSITTER_GITHUB_MARKETPLACE_PATH);
-  }
-  return path.join(getUserHome(), '.agents', 'plugins', 'marketplace.json');
-}
-
-function writeFileIfChanged(filePath, contents) {
-  if (fs.existsSync(filePath)) {
-    const current = fs.readFileSync(filePath, 'utf8');
-    if (current === contents) {
-      return false;
-    }
-  }
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, contents, 'utf8');
-  return true;
-}
-
-function copyRecursive(src, dest) {
-  const stat = fs.statSync(src);
-  if (stat.isDirectory()) {
-    fs.mkdirSync(dest, { recursive: true });
-    for (const entry of fs.readdirSync(src)) {
-      if (['node_modules', '.git', 'test', '.a5c'].includes(entry)) continue;
-      copyRecursive(path.join(src, entry), path.join(dest, entry));
-    }
-    return;
-  }
-
-  if (path.basename(src) === 'SKILL.md') {
-    const file = fs.readFileSync(src);
-    const hasBom = file.length >= 3 && file[0] === 0xef && file[1] === 0xbb && file[2] === 0xbf;
-    fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.writeFileSync(dest, hasBom ? file.subarray(3) : file);
-    return;
-  }
-
-  fs.mkdirSync(path.dirname(dest), { recursive: true });
-  fs.copyFileSync(src, dest);
-}
-
-function copyPluginBundle(packageRoot, pluginRoot) {
-  if (path.resolve(packageRoot) === path.resolve(pluginRoot)) {
-    return;
-  }
-  fs.rmSync(pluginRoot, { recursive: true, force: true });
-  fs.mkdirSync(pluginRoot, { recursive: true });
-  for (const entry of PLUGIN_BUNDLE_ENTRIES) {
-    const src = path.join(packageRoot, entry);
-    if (fs.existsSync(src)) {
-      copyRecursive(src, path.join(pluginRoot, entry));
-    }
-  }
-}
-
-function ensureExecutable(filePath) {
-  try {
-    fs.chmodSync(filePath, 0o755);
-  } catch {
-    // Best-effort only. Windows and some filesystems may ignore mode changes.
-  }
-}
-
-function normalizeMarketplaceSourcePath(marketplacePath, pluginSourcePath) {
-  let next = pluginSourcePath;
-  if (path.isAbsolute(next)) {
-    next = path.relative(path.dirname(marketplacePath), next);
-  }
-  next = String(next || '').replace(/\\/g, '/');
-  if (!next.startsWith('./') && !next.startsWith('../')) {
-    next = `./${next}`;
-  }
-  return next;
-}
-
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-function writeJson(filePath, value) {
-  writeFileIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 function replaceManagedMarkdownBlock(existing, block) {
@@ -232,52 +127,6 @@ function rewriteCloudSkill(skillId, contents) {
 
   next = next.replace(/^#\s+.+$/m, `# ${prefixedName}`);
   return next.replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';
-}
-
-function ensureMarketplaceEntry(marketplacePath, pluginSourcePath) {
-  const marketplace = fs.existsSync(marketplacePath)
-    ? readJson(marketplacePath)
-    : { ...DEFAULT_MARKETPLACE, plugins: [] };
-  marketplace.name = marketplace.name || DEFAULT_MARKETPLACE.name;
-  marketplace.interface = marketplace.interface || {};
-  marketplace.interface.displayName =
-    marketplace.interface.displayName || DEFAULT_MARKETPLACE.interface.displayName;
-  const nextEntry = {
-    name: PLUGIN_NAME,
-    source: {
-      source: 'local',
-      path: normalizeMarketplaceSourcePath(marketplacePath, pluginSourcePath),
-    },
-    policy: {
-      installation: 'AVAILABLE',
-      authentication: 'ON_INSTALL',
-    },
-    category: PLUGIN_CATEGORY,
-  };
-  const existingIndex = Array.isArray(marketplace.plugins)
-    ? marketplace.plugins.findIndex((entry) => entry && entry.name === PLUGIN_NAME)
-    : -1;
-  if (!Array.isArray(marketplace.plugins)) {
-    marketplace.plugins = [nextEntry];
-  } else if (existingIndex >= 0) {
-    marketplace.plugins[existingIndex] = nextEntry;
-  } else {
-    marketplace.plugins.push(nextEntry);
-  }
-  writeJson(marketplacePath, marketplace);
-  return nextEntry;
-}
-
-function removeMarketplaceEntry(marketplacePath) {
-  if (!fs.existsSync(marketplacePath)) {
-    return;
-  }
-  const marketplace = readJson(marketplacePath);
-  if (!Array.isArray(marketplace.plugins)) {
-    return;
-  }
-  marketplace.plugins = marketplace.plugins.filter((entry) => entry && entry.name !== PLUGIN_NAME);
-  writeJson(marketplacePath, marketplace);
 }
 
 /**
@@ -619,60 +468,82 @@ function installCloudAgentSurface(packageRoot, workspaceRoot) {
   };
 }
 
-function resolveBabysitterCommand(packageRoot) {
-  if (process.env.BABYSITTER_SDK_CLI) {
-    return {
-      command: process.execPath,
-      argsPrefix: [path.resolve(process.env.BABYSITTER_SDK_CLI)],
-    };
-  }
-  try {
-    return {
-      command: process.execPath,
-      argsPrefix: [
-        require.resolve('@a5c-ai/babysitter-sdk/dist/cli/main.js', {
-          paths: [packageRoot],
-        }),
-      ],
-    };
-  } catch {
-    return {
-      command: 'babysitter',
-      argsPrefix: [],
-    };
-  }
+// --- Overrides of base functions ---
+
+function writeJson(filePath, value) {
+  writeFileIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-function runBabysitterCli(packageRoot, cliArgs, options = {}) {
-  const resolved = resolveBabysitterCommand(packageRoot);
-  const result = spawnSync(resolved.command, [...resolved.argsPrefix, ...cliArgs], {
-    cwd: options.cwd || process.cwd(),
-    stdio: ['ignore', 'pipe', 'pipe'],
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      ...(options.env || {}),
+function normalizeMarketplaceSourcePath(marketplacePath, pluginSourcePath) {
+  let next = pluginSourcePath;
+  if (path.isAbsolute(next)) {
+    next = path.relative(path.dirname(marketplacePath), next);
+  }
+  next = String(next || '').replace(/\\/g, '/');
+  if (!next.startsWith('./') && !next.startsWith('../')) {
+    next = `./${next}`;
+  }
+  return next;
+}
+
+function getHomePluginRoot() {
+  if (process.env.BABYSITTER_GITHUB_PLUGIN_DIR) {
+    return path.resolve(process.env.BABYSITTER_GITHUB_PLUGIN_DIR, PLUGIN_NAME);
+  }
+  return path.join(getCopilotHome(), 'plugins', PLUGIN_NAME);
+}
+
+function getHomeMarketplacePath() {
+  if (process.env.BABYSITTER_GITHUB_MARKETPLACE_PATH) {
+    return path.resolve(process.env.BABYSITTER_GITHUB_MARKETPLACE_PATH);
+  }
+  return path.join(getUserHome(), '.agents', 'plugins', 'marketplace.json');
+}
+
+function ensureMarketplaceEntry(marketplacePath, pluginSourcePath) {
+  const marketplace = fs.existsSync(marketplacePath)
+    ? readJson(marketplacePath)
+    : { ...DEFAULT_MARKETPLACE, plugins: [] };
+  marketplace.name = marketplace.name || DEFAULT_MARKETPLACE.name;
+  marketplace.interface = marketplace.interface || {};
+  marketplace.interface.displayName =
+    marketplace.interface.displayName || DEFAULT_MARKETPLACE.interface.displayName;
+  const nextEntry = {
+    name: PLUGIN_NAME,
+    source: {
+      source: 'local',
+      path: normalizeMarketplaceSourcePath(marketplacePath, pluginSourcePath),
     },
-  });
-  if (result.status !== 0) {
-    const stderr = (result.stderr || '').trim();
-    const stdout = (result.stdout || '').trim();
-    throw new Error(
-      `babysitter ${cliArgs.join(' ')} failed` +
-      (stderr ? `: ${stderr}` : stdout ? `: ${stdout}` : ''),
-    );
+    policy: {
+      installation: 'AVAILABLE',
+      authentication: 'ON_INSTALL',
+    },
+    category: PLUGIN_CATEGORY,
+  };
+  const existingIndex = Array.isArray(marketplace.plugins)
+    ? marketplace.plugins.findIndex((entry) => entry && entry.name === PLUGIN_NAME)
+    : -1;
+  if (!Array.isArray(marketplace.plugins)) {
+    marketplace.plugins = [nextEntry];
+  } else if (existingIndex >= 0) {
+    marketplace.plugins[existingIndex] = nextEntry;
+  } else {
+    marketplace.plugins.push(nextEntry);
   }
-  return result.stdout;
+  writeJson(marketplacePath, marketplace);
+  return nextEntry;
 }
 
-function ensureGlobalProcessLibrary(packageRoot) {
-  return JSON.parse(
-    runBabysitterCli(
-      packageRoot,
-      ['process-library:active', '--state-dir', getGlobalStateDir(), '--json'],
-      { cwd: packageRoot },
-    ),
-  );
+function removeMarketplaceEntry(marketplacePath) {
+  if (!fs.existsSync(marketplacePath)) {
+    return;
+  }
+  const marketplace = readJson(marketplacePath);
+  if (!Array.isArray(marketplace.plugins)) {
+    return;
+  }
+  marketplace.plugins = marketplace.plugins.filter((entry) => entry && entry.name !== PLUGIN_NAME);
+  writeJson(marketplacePath, marketplace);
 }
 
 function warnWindowsHooks() {
@@ -683,19 +554,39 @@ function warnWindowsHooks() {
   console.warn(`[${PLUGIN_NAME}] Both bash (.sh) and PowerShell (.ps1) hook scripts are included.`);
 }
 
-module.exports = {
-  copyPluginBundle,
-  deregisterCopilotPlugin,
-  ensureGlobalProcessLibrary,
-  ensureMarketplaceEntry,
-  getCopilotHome,
-  getHomeMarketplacePath,
-  getHomePluginRoot,
-  installCopilotSurface,
-  installCloudAgentSurface,
-  registerCopilotPlugin,
-  removeLegacyHooks,
-  removeMarketplaceEntry,
-  warnWindowsHooks,
-  writeJson,
-};
+function copyPluginBundle(packageRoot, pluginRoot) {
+  if (path.resolve(packageRoot) === path.resolve(pluginRoot)) {
+    return;
+  }
+  fs.rmSync(pluginRoot, { recursive: true, force: true });
+  fs.mkdirSync(pluginRoot, { recursive: true });
+  for (const entry of PLUGIN_BUNDLE_ENTRIES) {
+    const src = path.join(packageRoot, entry);
+    if (fs.existsSync(src)) {
+      copyRecursive(src, path.join(pluginRoot, entry));
+    }
+  }
+}
+
+function copyRecursive(src, dest) {
+  const stat = fs.statSync(src);
+  if (stat.isDirectory()) {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const entry of fs.readdirSync(src)) {
+      if (['node_modules', '.git', 'test', '.a5c'].includes(entry)) continue;
+      copyRecursive(path.join(src, entry), path.join(dest, entry));
+    }
+    return;
+  }
+
+  if (path.basename(src) === 'SKILL.md') {
+    const file = fs.readFileSync(src);
+    const hasBom = file.length >= 3 && file[0] === 0xef && file[1] === 0xbb && file[2] === 0xbf;
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, hasBom ? file.subarray(3) : file);
+    return;
+  }
+
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.copyFileSync(src, dest);
+}

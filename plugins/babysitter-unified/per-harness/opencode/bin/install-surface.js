@@ -1,19 +1,13 @@
-#!/usr/bin/env node
-'use strict';
-
-/**
- * Shared installation utilities for babysitter-opencode plugin.
- *
- * Handles plugin bundle copying, OpenCode config registration,
- * marketplace entry management, and process library bootstrapping.
- */
-
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { spawnSync } = require('child_process');
-
-const PLUGIN_NAME = 'babysitter';
+// ---------------------------------------------------------------------------
+// Opencode harness-specific surface
+//
+// This file is appended by the unified plugin compiler after the generic
+// install-shared base and the SDK surface.  It may reference any identifier
+// already declared in those layers (PLUGIN_NAME, getUserHome, readJson,
+// writeJson, writeFileIfChanged, getGlobalStateDir, resolveCliCommand,
+// runCli, ensureGlobalProcessLibrary, etc.) and may re-declare functions
+// to override the base implementation.
+// ---------------------------------------------------------------------------
 
 const PLUGIN_BUNDLE_ENTRIES = [
   'plugin.json',
@@ -40,21 +34,8 @@ const DEFAULT_MARKETPLACE = {
 };
 
 // ---------------------------------------------------------------------------
-// Path helpers
+// Path helpers (override base)
 // ---------------------------------------------------------------------------
-
-function getUserHome() {
-  if (process.env.USERPROFILE) return path.resolve(process.env.USERPROFILE);
-  if (process.env.HOME) return path.resolve(process.env.HOME);
-  return os.homedir();
-}
-
-function getGlobalStateDir() {
-  if (process.env.BABYSITTER_GLOBAL_STATE_DIR) {
-    return path.resolve(process.env.BABYSITTER_GLOBAL_STATE_DIR);
-  }
-  return path.join(getUserHome(), '.a5c');
-}
 
 /**
  * Resolve the OpenCode config root.
@@ -81,26 +62,8 @@ function getHomeMarketplacePath(workspace) {
 }
 
 // ---------------------------------------------------------------------------
-// File utilities
+// File utilities (override base — adds BOM stripping for SKILL.md)
 // ---------------------------------------------------------------------------
-
-function writeFileIfChanged(filePath, contents) {
-  if (fs.existsSync(filePath)) {
-    const current = fs.readFileSync(filePath, 'utf8');
-    if (current === contents) return false;
-  }
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, contents, 'utf8');
-  return true;
-}
-
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-function writeJson(filePath, value) {
-  writeFileIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
-}
 
 function copyRecursive(src, dest) {
   const stat = fs.statSync(src);
@@ -127,7 +90,7 @@ function copyRecursive(src, dest) {
 }
 
 // ---------------------------------------------------------------------------
-// Plugin bundle
+// Plugin bundle (override base — uses PLUGIN_BUNDLE_ENTRIES allowlist)
 // ---------------------------------------------------------------------------
 
 function copyPluginBundle(packageRoot, pluginRoot) {
@@ -242,7 +205,7 @@ function removeManagedHooks(openCodeHome) {
 }
 
 // ---------------------------------------------------------------------------
-// Marketplace
+// Marketplace (override base — opencode format with normalizeMarketplaceName)
 // ---------------------------------------------------------------------------
 
 function normalizeMarketplaceName(name) {
@@ -305,66 +268,6 @@ function removeMarketplaceEntry(marketplacePath) {
   if (!Array.isArray(marketplace.plugins)) return;
   marketplace.plugins = marketplace.plugins.filter((entry) => entry && entry.name !== PLUGIN_NAME);
   writeJson(marketplacePath, marketplace);
-}
-
-// ---------------------------------------------------------------------------
-// Babysitter SDK CLI helpers
-// ---------------------------------------------------------------------------
-
-function resolveBabysitterCommand(packageRoot) {
-  if (process.env.BABYSITTER_SDK_CLI) {
-    return {
-      command: process.execPath,
-      argsPrefix: [path.resolve(process.env.BABYSITTER_SDK_CLI)],
-    };
-  }
-  try {
-    return {
-      command: process.execPath,
-      argsPrefix: [
-        require.resolve('@a5c-ai/babysitter-sdk/dist/cli/main.js', {
-          paths: [packageRoot],
-        }),
-      ],
-    };
-  } catch {
-    return {
-      command: 'babysitter',
-      argsPrefix: [],
-    };
-  }
-}
-
-function runBabysitterCli(packageRoot, cliArgs, options = {}) {
-  const resolved = resolveBabysitterCommand(packageRoot);
-  const result = spawnSync(resolved.command, [...resolved.argsPrefix, ...cliArgs], {
-    cwd: options.cwd || process.cwd(),
-    stdio: ['ignore', 'pipe', 'pipe'],
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      ...(options.env || {}),
-    },
-  });
-  if (result.status !== 0) {
-    const stderr = (result.stderr || '').trim();
-    const stdout = (result.stdout || '').trim();
-    throw new Error(
-      `babysitter ${cliArgs.join(' ')} failed` +
-      (stderr ? `: ${stderr}` : stdout ? `: ${stdout}` : ''),
-    );
-  }
-  return result.stdout;
-}
-
-function ensureGlobalProcessLibrary(packageRoot) {
-  return JSON.parse(
-    runBabysitterCli(
-      packageRoot,
-      ['process-library:active', '--state-dir', getGlobalStateDir(), '--json'],
-      { cwd: packageRoot },
-    ),
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -459,22 +362,3 @@ function installOpenCodeSurface(packageRoot, openCodeHome) {
   // Merge hooks config
   mergeHooksConfig(packageRoot, openCodeHome);
 }
-
-module.exports = {
-  copyPluginBundle,
-  copyRecursive,
-  ensureGlobalProcessLibrary,
-  ensureMarketplaceEntry,
-  getAccomplishDataDir,
-  getAccomplishOpenCodeHome,
-  getHomeMarketplacePath,
-  getHomePluginRoot,
-  getOpenCodeHome,
-  installAccomplishSurface,
-  installOpenCodeSurface,
-  isAccomplishInstalled,
-  removeManagedHooks,
-  removeMarketplaceEntry,
-  writeIndexJs,
-  writeJson,
-};

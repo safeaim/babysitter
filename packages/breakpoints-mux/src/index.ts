@@ -20,6 +20,12 @@ export {
   BreakpointWaitResultSchema,
   ProvenBreakpointAnswerSchema,
   ProvenVerificationResultSchema,
+  ExpertiseAreaSchema,
+  BreakpointBrowserSessionSchema,
+  BreakpointSessionViewSchema,
+  GitNativeBackendConfigSchema,
+  ServerBackendConfigSchema,
+  GitHubIssuesBackendConfigSchema,
   BackendConfigSchema,
   RoutingRuleSchema,
   RoutingConfigSchema,
@@ -54,6 +60,19 @@ export type {
   BreakpointWaitResult,
   ProvenBreakpointAnswer,
   ProvenVerificationResult,
+  ExpertiseArea,
+  BreakpointBrowserSession,
+  BreakpointSessionView,
+  ServerBackendConfig,
+  GitHubIssuesBackendConfig,
+  GitHubRepo,
+  ProjectMember,
+  TeamMember,
+  TeamInvitation,
+  Team,
+  KnownUser,
+  Project,
+  ProjectSummary,
   BackendConfig,
   RoutingRule,
   RoutingConfig,
@@ -115,3 +134,14 @@ export {
 } from "./harness/index.js";
 
 export type { BreakpointMuxProviderOptions } from "./harness/index.js";
+
+// ── Config Utilities ────────────────────────────────────────────────
+export {
+  resolveRepositoryRoot,
+  resolveConfigRoot,
+  resolveResponderDirectory,
+  resolveRoutingConfigPath,
+  loadRoutingConfigSync,
+} from "./config.js";
+
+export type { RepoConfigResolutionOptions } from "./config.js";

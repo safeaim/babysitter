@@ -211,15 +211,176 @@ export const ProvenVerificationResultSchema = z.object({
 });
 export type ProvenVerificationResult = z.infer<typeof ProvenVerificationResultSchema>;
 
+// ── ExpertiseArea ────────────────────────────────────────────────────────
+
+export const ExpertiseAreaSchema = z.object({
+  domain: z.string().min(1),
+  topics: z.array(z.string()),
+  keywords: z.array(z.string()),
+  proficiency: z.number().int().min(1).max(5),
+});
+export type ExpertiseArea = z.infer<typeof ExpertiseAreaSchema>;
+
+// ── BreakpointBrowserSession ────────────────────────────────────────────
+
+export const BreakpointBrowserSessionSchema = z.object({
+  breakpointId: z.string().min(1),
+  slug: z.string().min(1),
+  url: z.string().url(),
+  authToken: z.string().min(1),
+  expiresAt: z.string().datetime(),
+  mode: z.enum(["same-user", "responder"]),
+  responderId: z.string().min(1).optional(),
+  responderName: z.string().min(1).optional(),
+});
+export type BreakpointBrowserSession = z.infer<typeof BreakpointBrowserSessionSchema>;
+
+// ── BreakpointSessionView ───────────────────────────────────────────────
+
+export const BreakpointSessionViewSchema = z.object({
+  breakpoint: BreakpointSchema,
+  expiresAt: z.string().datetime(),
+  canAnswer: z.boolean(),
+  mode: z.enum(["same-user", "responder"]),
+  responderId: z.string().min(1).optional(),
+  responderName: z.string().min(1).optional(),
+});
+export type BreakpointSessionView = z.infer<typeof BreakpointSessionViewSchema>;
+
+// ── Organization Types ──────────────────────────────────────────────────
+
+export interface GitHubRepo {
+  id: string;
+  owner: string;
+  name: string;
+  fullName: string;
+  description: string;
+  url: string;
+  defaultBranch: string;
+  language: string | null;
+  isPrivate: boolean;
+  repoRoot?: string;
+  configRoot?: string;
+  responderDir?: string;
+  isConfigSource?: boolean;
+  connectedAt: string;
+  connectedBy: string;
+}
+
+export interface ProjectMember {
+  userId: string;
+  login: string;
+  name: string;
+  avatarUrl?: string;
+  role: "owner" | "member";
+  addedAt: string;
+}
+
+export interface TeamMember {
+  userId: string;
+  login: string;
+  name: string;
+  avatarUrl?: string;
+  role: "owner" | "member";
+  addedAt: string;
+}
+
+export interface TeamInvitation {
+  id: string;
+  teamId: string;
+  inviteeLogin: string;
+  inviteeUserId?: string;
+  inviterId: string;
+  inviterLogin: string;
+  status: "pending" | "accepted" | "revoked";
+  token: string;
+  createdAt: string;
+  acceptedAt?: string;
+  revokedAt?: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  description: string;
+  ownerId: string;
+  ownerLogin: string;
+  members: TeamMember[];
+  invitations: TeamInvitation[];
+  projectIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface KnownUser {
+  id: string;
+  login: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
+  provider: "github";
+  lastSeenAt: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  ownerId: string;
+  ownerLogin: string;
+  teamId?: string;
+  teamName?: string;
+  repos: GitHubRepo[];
+  members: ProjectMember[];
+  memberIds?: string[];
+  responderIds?: string[];
+  breakpointCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProjectSummary {
+  id: string;
+  name: string;
+  description: string;
+  ownerLogin: string;
+  teamName?: string;
+  repoCount: number;
+  breakpointCount: number;
+  memberCount: number;
+}
+
 // ── Routing Configuration ────────────────────────────────────────────────
 
+export const GitNativeBackendConfigSchema = z.object({
+  type: z.literal("git-native"),
+  breakpointsDir: z.string().optional(),
+  pollIntervalMs: z.number().positive().optional(),
+  timeoutMs: z.number().positive().optional(),
+});
+
+export const ServerBackendConfigSchema = z.object({
+  type: z.literal("server"),
+  url: z.string().min(1),
+  authToken: z.string().min(1).optional(),
+});
+export type ServerBackendConfig = z.infer<typeof ServerBackendConfigSchema>;
+
+export const GitHubIssuesBackendConfigSchema = z.object({
+  type: z.literal("github-issues"),
+  owner: z.string().min(1),
+  repo: z.string().min(1),
+  labels: z.array(z.string()).optional(),
+  assignees: z.array(z.string()).optional(),
+  pollIntervalMs: z.number().positive().optional(),
+  timeoutMs: z.number().positive().optional(),
+});
+export type GitHubIssuesBackendConfig = z.infer<typeof GitHubIssuesBackendConfigSchema>;
+
 export const BackendConfigSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("git-native"),
-    breakpointsDir: z.string().optional(),
-    pollIntervalMs: z.number().positive().optional(),
-    timeoutMs: z.number().positive().optional(),
-  }),
+  GitNativeBackendConfigSchema,
+  ServerBackendConfigSchema,
+  GitHubIssuesBackendConfigSchema,
 ]);
 export type BackendConfig = z.infer<typeof BackendConfigSchema>;
 

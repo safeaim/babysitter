@@ -19,8 +19,7 @@
 8. [Harness Integration](#8-harness-integration)
 9. [Naming Conventions](#9-naming-conventions)
 10. [Extension Points](#10-extension-points)
-11. [AEQ Repo Adaptation](#11-aeq-repo-adaptation)
-12. [Implementation Phases](#12-implementation-phases)
+11. [Implementation Phases](#11-implementation-phases)
 
 ---
 
@@ -31,22 +30,9 @@
 ### Design Principles
 
 - **Serverless by default.** The default git-native backend requires zero infrastructure -- no HTTP server, no database, no cloud service. Breakpoints are JSON files in a `.breakpoints/` directory, shared via git or a filesystem.
-- **Pluggable backends.** Any transport can be used by implementing the `BreakpointBackend` interface. The AEQ server backend and GitHub Issues backend are kept as external extensions in the AEQ repo.
+- **Pluggable backends.** Any transport can be used by implementing the `BreakpointBackend` interface. Extension backends can integrate with external services, APIs, or issue trackers.
 - **Cryptographic trust without a server.** The "proven breakpoints" subsystem uses Ed25519 key pairs stored in git to sign and verify answers, establishing trust chains without requiring a central authority.
 - **Compatible with babysitter.** Integrates with the babysitter-harness interaction system, auto-approval rules, posture enforcement, and `ProcessContext.breakpoint()`.
-- **Compatible with AEQ.** The interface design descends from AEQ's `QuestionBackend`, making migration straightforward. AEQ backends become extension backends for breakpoints-mux.
-
-### Terminology Mapping
-
-| AEQ Term | breakpoints-mux Term | Rationale |
-|----------|---------------------|-----------|
-| Question | Breakpoint | Aligns with babysitter's existing `breakpoint()` concept |
-| Answer | BreakpointAnswer | Response to a breakpoint |
-| Expert | Responder | More general; not all responders are "experts" |
-| QuestionBackend | BreakpointBackend | Follows the Breakpoint naming |
-| QuestionContext | BreakpointContext | Contextual information for the breakpoint |
-| QuestionRouting | BreakpointRouting | Routing configuration |
-| AnswerResult | BreakpointWaitResult | Result of waiting for an answer |
 
 ---
 
@@ -511,7 +497,7 @@ export interface ListRespondersParams {
  * HTTP server, GitHub Issues, etc.) while presenting a uniform API.
  */
 export interface BreakpointBackend {
-  /** Human-readable name for this backend (e.g., "git-native", "aeq-server"). */
+  /** Human-readable name for this backend (e.g., "git-native", "server", "github-issues"). */
   readonly name: string;
 
   /**
@@ -1810,10 +1796,10 @@ async function readAndParseConfig(filePath: string): Promise<RoutingConfig | nul
     {
       "domains": ["security", "auth"],
       "tags": ["security-review"],
-      "backend": "aeq-server",
+      "backend": "server",
       "backendConfig": {
         "type": "server",
-        "url": "https://aeq.a5c.ai/api/v1"
+        "url": "https://breakpoints.example.com/api/v1"
       }
     },
     {
@@ -1880,44 +1866,27 @@ ProcessContext.breakpoint()
 | Types/Interfaces | PascalCase | `BreakpointBackend`, `ProvenBreakpointAnswer` |
 | Zod schemas | PascalCase + `Schema` suffix | `BreakpointSchema`, `BreakpointAnswerSchema` |
 
-### 9.2 Domain Term Mapping
+### 9.2 Core Domain Terms
 
-All public APIs use the breakpoints-mux terminology:
-
-| AEQ Term | breakpoints-mux Term |
-|----------|---------------------|
-| `Question` | `Breakpoint` |
-| `Answer` | `BreakpointAnswer` |
-| `Expert` / `ExpertProfile` | `Responder` / `ResponderProfile` |
-| `QuestionBackend` | `BreakpointBackend` |
-| `QuestionContext` | `BreakpointContext` |
-| `QuestionRouting` | `BreakpointRouting` |
-| `AnswerResult` | `BreakpointWaitResult` |
-| `submitQuestion()` | `submitBreakpoint()` |
-| `getQuestion()` | `getBreakpoint()` |
-| `waitForAnswer()` | `waitForAnswer()` (unchanged) |
-| `listExperts()` | `listResponders()` |
-| `claimQuestion()` | `claimBreakpoint()` |
-| `submitAnswer()` | `answerBreakpoint()` |
-| `cancelQuestion()` | `cancelBreakpoint()` |
-| `listPendingQuestions()` | `listPendingBreakpoints()` |
-| `expertId` | `responderId` |
-| `expertName` | `responderName` |
-| `questionId` (in Answer) | `breakpointId` (in BreakpointAnswer) |
-| `targetExperts` | `targetResponders` |
+| Type | Term | Description |
+|------|------|-------------|
+| Core entity | `Breakpoint` | A question or decision point requiring human input |
+| Response | `BreakpointAnswer` | Response to a breakpoint |
+| Human role | `Responder` / `ResponderProfile` | Individual who can answer breakpoints |
+| Transport | `BreakpointBackend` | Pluggable transport interface |
+| Metadata | `BreakpointContext` | Contextual information for the breakpoint |
+| Routing | `BreakpointRouting` | Routing configuration |
+| Result | `BreakpointWaitResult` | Result of waiting for an answer |
 
 ### 9.3 MCP Tool Naming
 
-| AEQ Tool | breakpoints-mux Tool |
-|----------|---------------------|
-| `ask_expert_question` | `ask_breakpoint` |
-| `check_question_status` | `check_breakpoint_status` |
-| `list_domain_experts` | `list_breakpoints` |
-| `cancel_expert_question` | (via `ask_breakpoint` cancellation) |
-| `poll_expert_questions` | `list_breakpoints` |
-| `claim_expert_question` | (via `answer_breakpoint`) |
-| `answer_expert_question` | `answer_breakpoint` |
-| (new) | `verify_breakpoint_answer` |
+| Tool | Purpose |
+|------|---------|
+| `ask_breakpoint` | Submit a breakpoint and wait for answer |
+| `check_breakpoint_status` | Check status of pending breakpoint |
+| `list_breakpoints` | List pending breakpoints for a responder |
+| `answer_breakpoint` | Submit answer to a breakpoint |
+| `verify_breakpoint_answer` | Verify cryptographic signature |
 
 ---
 
@@ -1925,47 +1894,47 @@ All public APIs use the breakpoints-mux terminology:
 
 The `BreakpointBackend` interface is the primary extension point. Any external package can provide a backend implementation by implementing this interface.
 
-### 10.1 AEQ Server Backend (Extension)
+### 10.1 HTTP Server Backend (Extension Example)
 
-**Kept in the AEQ repo** as `@a5c-ai/aeq-server-backend` (or within `@a5c-ai/aeq-sdk`).
-
-Wraps the existing `ServerBackend` from AEQ, adapting the `QuestionBackend` interface to `BreakpointBackend`:
+An HTTP server backend can implement `BreakpointBackend` to integrate with a hosted breakpoints service:
 
 ```typescript
 import type { BreakpointBackend } from "@a5c-ai/breakpoints-mux";
-// Internal AEQ imports for ServerClient, AnswerPoller, etc.
 
-export class AeqServerBreakpointBackend implements BreakpointBackend {
-  readonly name = "aeq-server";
+export class ServerBreakpointBackend implements BreakpointBackend {
+  readonly name = "server";
 
-  // Adapts ServerClient calls to BreakpointBackend interface.
-  // Maps Breakpoint <-> Question, BreakpointAnswer <-> Answer, etc.
+  constructor(private config: { url: string; authToken?: string }) {}
 
   async submitBreakpoint(params: SubmitBreakpointParams): Promise<Breakpoint> {
-    // Convert SubmitBreakpointParams -> SubmitQuestionParams
-    // Call this.client.submitQuestion()
-    // Convert Question -> Breakpoint
+    const response = await fetch(`${this.config.url}/breakpoints`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(this.config.authToken && { Authorization: `Bearer ${this.config.authToken}` }),
+      },
+      body: JSON.stringify(params),
+    });
+    return response.json();
   }
 
-  // ... remaining methods follow the same adaptation pattern
+  // ... remaining methods make HTTP calls to the server API
 }
 ```
 
 **Backend config schema (registered externally):**
 
 ```typescript
-const AeqServerBackendConfigSchema = z.object({
+const ServerBackendConfigSchema = z.object({
   type: z.literal("server"),
   url: z.string().min(1),
   authToken: z.string().min(1).optional(),
 });
 ```
 
-### 10.2 GitHub Issues Backend (Extension)
+### 10.2 GitHub Issues Backend (Extension Example)
 
-**Kept in the AEQ repo** as part of `@a5c-ai/aeq-sdk`.
-
-Wraps the existing `GitHubIssuesBackend` from AEQ:
+A GitHub Issues backend can route breakpoints to GitHub Issues:
 
 ```typescript
 import type { BreakpointBackend } from "@a5c-ai/breakpoints-mux";
@@ -1973,8 +1942,15 @@ import type { BreakpointBackend } from "@a5c-ai/breakpoints-mux";
 export class GitHubIssuesBreakpointBackend implements BreakpointBackend {
   readonly name = "github-issues";
 
-  // Adapts GitHubIssuesBackend to BreakpointBackend interface.
-  // Maps Breakpoint <-> Question, BreakpointAnswer <-> Answer, etc.
+  constructor(private config: { owner: string; repo: string; token: string }) {}
+
+  async submitBreakpoint(params: SubmitBreakpointParams): Promise<Breakpoint> {
+    // Create GitHub Issue with breakpoint metadata
+    // Poll issue for answer in comments
+    // Map GitHub Issue back to Breakpoint
+  }
+
+  // ... remaining methods interact with GitHub API
 }
 ```
 
@@ -2020,7 +1996,7 @@ backendFactories.set("git-native", (config) => {
 
 /**
  * Register a custom backend factory.
- * Called by extension packages (e.g., AEQ server backend, GitHub Issues backend).
+ * Called by extension packages (e.g., server backend, GitHub Issues backend).
  */
 export function registerBackendFactory(
   name: string,
@@ -2066,7 +2042,7 @@ export function listRegisteredBackends(): string[] {
 
 ### 10.4 Backend Resolution for MCP Tools
 
-The MCP tools resolve backends using a strategy similar to AEQ's `backend-resolver.ts`:
+The MCP tools resolve backends using a multi-tier strategy:
 
 ```typescript
 /**
@@ -2113,71 +2089,7 @@ export function resolveBreakpointBackend(
 
 ---
 
-## 11. AEQ Repo Adaptation
-
-In the final phase, the AEQ repo will be adapted to work as an extension ecosystem for breakpoints-mux rather than a standalone system. This section outlines what moves, what stays, and what gets renamed.
-
-### 11.1 What Moves to breakpoints-mux
-
-| Current AEQ Location | New Location | Notes |
-|----------------------|--------------|-------|
-| `packages/shared/src/types.ts` (core types) | `breakpoints-mux/src/types.ts` | Renamed (Question->Breakpoint, etc.) |
-| `packages/sdk/src/providers/question-backend.ts` | `breakpoints-mux/src/backend.ts` | Renamed interface |
-| `packages/mcp-tool/src/server.ts` (tool registration) | `breakpoints-mux/src/mcp/server.ts` | New tool names |
-| (new) git-native backend | `breakpoints-mux/src/backends/git-native.ts` | New implementation |
-| (new) proven subsystem | `breakpoints-mux/src/proven/` | New implementation |
-
-### 11.2 What Stays in AEQ
-
-| AEQ Component | Reason |
-|---------------|--------|
-| `packages/server` | AEQ HTTP server, runs as a hosted backend service |
-| `packages/sdk/src/providers/server-backend.ts` | Adapts AEQ server to BreakpointBackend interface |
-| `packages/sdk/src/providers/github-issues-backend.ts` | Adapts GitHub Issues to BreakpointBackend interface |
-| `packages/auth` | JWT/OAuth, specific to AEQ server |
-| `packages/dashboard` | Next.js dashboard, specific to AEQ server |
-| `packages/cli` | AEQ-specific CLI for server interaction |
-| `packages/shared` (non-core types) | Auth types, project types, team types |
-
-### 11.3 What Gets Renamed in AEQ
-
-The AEQ SDK backends will be updated to implement `BreakpointBackend` from `@a5c-ai/breakpoints-mux` instead of the local `QuestionBackend` interface:
-
-```typescript
-// Before (AEQ-only):
-import type { QuestionBackend } from "./question-backend.js";
-export class ServerBackend implements QuestionBackend { ... }
-
-// After (breakpoints-mux extension):
-import type { BreakpointBackend } from "@a5c-ai/breakpoints-mux";
-export class AeqServerBreakpointBackend implements BreakpointBackend { ... }
-```
-
-The existing `QuestionBackend` interface will be deprecated with a type alias:
-
-```typescript
-/** @deprecated Use BreakpointBackend from @a5c-ai/breakpoints-mux */
-export type QuestionBackend = import("@a5c-ai/breakpoints-mux").BreakpointBackend;
-```
-
-### 11.4 Migration Path
-
-1. **Phase 1:** breakpoints-mux ships with git-native backend and proven subsystem. AEQ is unmodified.
-2. **Phase 2:** AEQ SDK adds `@a5c-ai/breakpoints-mux` as a dependency. Server and GitHub Issues backends implement `BreakpointBackend` alongside the existing `QuestionBackend`.
-3. **Phase 3:** AEQ MCP tool is updated to use breakpoints-mux's backend resolution, making git-native the default with AEQ server as an extension.
-4. **Phase 4:** Deprecate `QuestionBackend` interface. All new code uses `BreakpointBackend`.
-
-### 11.5 Backward Compatibility
-
-During the migration period:
-- The AEQ server continues to work unchanged.
-- The AEQ SDK exports both `QuestionBackend` (deprecated) and adapters for `BreakpointBackend`.
-- The MCP tool accepts both old tool names (via aliases) and new tool names.
-- Routing configuration supports both `.a5c/routing.json` (AEQ format) and `.a5c/breakpoints-routing.json` (new format).
-
----
-
-## 12. Implementation Phases
+## 11. Implementation Phases
 
 ### Phase 1: Core Types and Backend Interface
 - `src/types.ts` -- All Zod schemas and domain types
@@ -2232,14 +2144,6 @@ During the migration period:
   - `breakpoints keys rotate` -- Rotate a key
   - `breakpoints verify <id>` -- Verify answer signature
 - `bin/breakpoints-mux.js` -- CLI entry point
-
-### Phase 8: AEQ Repo Adaptation
-- Add `@a5c-ai/breakpoints-mux` dependency to AEQ SDK
-- Implement `AeqServerBreakpointBackend` adapter
-- Implement `GitHubIssuesBreakpointBackend` adapter
-- Update AEQ MCP tool to use breakpoints-mux backend resolution
-- Deprecate `QuestionBackend` with type alias
-- Add backward-compatible tool name aliases
 
 ---
 
@@ -2353,8 +2257,8 @@ export { loadRoutingConfig } from "./routing-rules.js";
   "routes": [
     {
       "domains": ["security"],
-      "backend": "aeq-server",
-      "backendConfig": { "type": "server", "url": "https://aeq.a5c.ai/api/v1" }
+      "backend": "server",
+      "backendConfig": { "type": "server", "url": "https://breakpoints.example.com/api/v1" }
     }
   ]
 }
@@ -2379,8 +2283,8 @@ export { loadRoutingConfig } from "./routing-rules.js";
 
 ## Appendix C: Compatibility Matrix
 
-| Feature | git-native | aeq-server (ext) | github-issues (ext) |
-|---------|-----------|-------------------|---------------------|
+| Feature | git-native | server (ext) | github-issues (ext) |
+|---------|-----------|--------------|---------------------|
 | submitBreakpoint | Yes | Yes | Yes |
 | getBreakpoint | Yes | Yes | Yes |
 | waitForAnswer | Polling | SSE + Polling | Polling |
@@ -2397,7 +2301,7 @@ export { loadRoutingConfig } from "./routing-rules.js";
 
 ## Appendix D: Test Strategy
 
-All tests use Vitest with the conventions established in both the AEQ and babysitter repos:
+All tests use Vitest with established conventions from the babysitter ecosystem:
 
 - **Unit tests:** Test types, schemas, key management, signing, verification in isolation.
 - **Integration tests:** Test git-native backend file I/O with a temporary directory, test MCP server tool handlers with mock backends.
@@ -2405,4 +2309,4 @@ All tests use Vitest with the conventions established in both the AEQ and babysi
 - **Fake timers:** Used for polling/timeout tests in `waitForAnswer`.
 - **No real git operations in tests:** Tests use temporary directories and direct file operations, not `git` commands.
 
-Target: 100+ tests across all test files, mirroring the coverage density of both parent repos.
+Target: 100+ tests across all test files with comprehensive coverage.

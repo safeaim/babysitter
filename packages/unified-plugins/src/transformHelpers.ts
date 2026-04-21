@@ -263,7 +263,7 @@ export async function ${handlerName}(context: Record<string, unknown>): Promise<
 `;
 }
 
-export function generateGeminiPostinstall(): string {
+export function generateGeminiPostinstall(pluginName: string): string {
   return `#!/usr/bin/env node
 'use strict';
 var path = require('path');
@@ -271,7 +271,7 @@ var spawnSync = require('child_process').spawnSync;
 var fs = require('fs');
 
 var PACKAGE_ROOT = path.resolve(__dirname, '..');
-var extDir = path.join(require('os').homedir(), '.gemini', 'extensions', 'babysitter');
+var extDir = path.join(require('os').homedir(), '.gemini', 'extensions', '${pluginName}');
 
 if (!process.env.npm_config_global) process.exit(0);
 try { if (fs.lstatSync(extDir).isSymbolicLink()) process.exit(0); } catch {}
@@ -281,23 +281,23 @@ try {
   if (result.status === 0) process.exit(0);
 } catch {}
 
-console.log('[babysitter-gemini] Gemini CLI not found. Run: babysitter-gemini install');
+console.log('[${pluginName}-gemini] Gemini CLI not found. Run: ${pluginName}-gemini install');
 `;
 }
 
-export function generateGeminiPreuninstall(): string {
+export function generateGeminiPreuninstall(pluginName: string): string {
   return `#!/usr/bin/env node
 'use strict';
 var path = require('path');
 var spawnSync = require('child_process').spawnSync;
 var fs = require('fs');
 
-var extDir = path.join(require('os').homedir(), '.gemini', 'extensions', 'babysitter');
+var extDir = path.join(require('os').homedir(), '.gemini', 'extensions', '${pluginName}');
 
 try { if (!fs.existsSync(extDir) || fs.lstatSync(extDir).isSymbolicLink()) process.exit(0); } catch {}
 
 try {
-  spawnSync('gemini', ['extensions', 'uninstall', 'babysitter'], { stdio: 'inherit', timeout: 30000 });
+  spawnSync('gemini', ['extensions', 'uninstall', '${pluginName}'], { stdio: 'inherit', timeout: 30000 });
 } catch {
   try { fs.rmSync(extDir, { recursive: true, force: true }); } catch {}
 }

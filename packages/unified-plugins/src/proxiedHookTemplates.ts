@@ -1,8 +1,9 @@
 // Proxied hook script templates for programmatic (non-shell-hook) targets
 // These Node.js scripts bridge programmatic extensions to the hooks-proxy CLI
 
-import type { TargetProfile } from './types.js';
+import type { A5cPluginManifest, TargetProfile } from './types.js';
 import { slugify } from './utils.js';
+import { resolveSdkConfig } from './sdkConfig.js';
 
 function getHookTitle(canonicalHook: string): string {
   return canonicalHook
@@ -14,8 +15,10 @@ function getHookTitle(canonicalHook: string): string {
 export function generateProxiedHookScript(
   canonicalHook: string,
   nativeHook: string,
-  targetProfile: TargetProfile
+  targetProfile: TargetProfile,
+  manifest: A5cPluginManifest
 ): string {
+  const sdk = resolveSdkConfig(manifest);
   const hookType = slugify(canonicalHook);
   const hookTitle = getHookTitle(canonicalHook);
   const adapterName = targetProfile.adapterName;
@@ -46,8 +49,8 @@ const PLUGIN_ROOT = process.env.${pluginRootEnvVar} || path.resolve(__dirname, "
 const GLOBAL_ROOT = process.env.BABYSITTER_GLOBAL_STATE_DIR || path.join(os.homedir(), ".a5c");
 const STATE_DIR = process.env.BABYSITTER_STATE_DIR || path.join(GLOBAL_ROOT, "state");
 const LOG_DIR = process.env.BABYSITTER_LOG_DIR || path.join(GLOBAL_ROOT, "logs");
-const LOG_FILE = path.join(LOG_DIR, "babysitter-${adapterName}-${hookType}-hook.log");
-const SDK_MARKER = path.join(PLUGIN_ROOT, ".babysitter-install-attempted");
+const LOG_FILE = path.join(LOG_DIR, "${manifest.name}-${adapterName}-${hookType}-hook.log");
+const SDK_MARKER = path.join(PLUGIN_ROOT, ".${manifest.name}-install-attempted");
 const PROXY_MARKER = path.join(PLUGIN_ROOT, ".hooks-proxy-install-attempted");
 
 function ensureDir(dir) {
@@ -104,20 +107,15 @@ function installPackage(npmPkg, version, marker) {
 
 function resolveHooksProxy() {
   try {
-    execSync("a5c-hooks-proxy --version", { stdio: "pipe", timeout: 5000 });
-    return "a5c-hooks-proxy";
-  } catch { /* not in PATH */ }
-  const localProxy = path.join(
-    process.env.HOME || process.env.USERPROFILE || "~",
-    ".local", "bin", process.platform === "win32" ? "a5c-hooks-proxy.exe" : "a5c-hooks-proxy"
-  );
-  if (existsSync(localProxy)) return localProxy;
+    execSync("npx -y ${sdk.proxyPackage} --version", { stdio: "pipe", timeout: 10000 });
+    return "npx -y ${sdk.proxyPackage}";
+  } catch { /* not available */ }
   return null;
 }
 
 function runViaProxy(proxy, hookType, inputJson) {
-  const handler = 'babysitter hook:run --harness unified --hook-type ' + hookType + ' --state-dir ' + STATE_DIR + ' --json';
-  const result = execSync('"' + proxy + '" invoke --adapter ${adapterName} --handler "' + handler + '" --json', {
+  const handler = '${sdk.cli} hook:run --harness unified --hook-type ' + hookType + ' --state-dir ' + STATE_DIR + ' --json';
+  const result = execSync(proxy + ' invoke --adapter ${adapterName} --handler "' + handler + '" --json', {
     input: inputJson,
     stdio: ["pipe", "pipe", "pipe"],
     timeout: 30000,
@@ -127,8 +125,8 @@ function runViaProxy(proxy, hookType, inputJson) {
 }
 
 function runViaNpxProxy(version, hookType, inputJson) {
-  const handler = 'babysitter hook:run --harness unified --hook-type ' + hookType + ' --state-dir ' + STATE_DIR + ' --json';
-  const result = execSync('npx -y "@a5c-ai/hooks-proxy-cli@' + version + '" invoke --adapter ${adapterName} --handler "' + handler + '" --json', {
+  const handler = '${sdk.cli} hook:run --harness unified --hook-type ' + hookType + ' --state-dir ' + STATE_DIR + ' --json';
+  const result = execSync('npx -y "${sdk.proxyPackage}@' + version + '" invoke --adapter ${adapterName} --handler "' + handler + '" --json', {
     input: inputJson,
     stdio: ["pipe", "pipe", "pipe"],
     timeout: 60000,
@@ -146,14 +144,14 @@ function main() {
 
   const sdkVersion = getSdkVersion();
 
-  var currentSdkVersion = getInstalledVersion("babysitter");
+  var currentSdkVersion = getInstalledVersion("${sdk.cli}");
   if (!currentSdkVersion || currentSdkVersion !== sdkVersion) {
-    installPackage("@a5c-ai/babysitter-sdk", sdkVersion, SDK_MARKER);
+    installPackage("${sdk.package}", sdkVersion, SDK_MARKER);
   }
 
-  var currentProxyVersion = getInstalledVersion("a5c-hooks-proxy");
+  var currentProxyVersion = getInstalledVersion("npx -y ${sdk.proxyPackage}");
   if (!currentProxyVersion || currentProxyVersion !== sdkVersion) {
-    installPackage("@a5c-ai/hooks-proxy-cli", sdkVersion, PROXY_MARKER);
+    installPackage("${sdk.proxyPackage}", sdkVersion, PROXY_MARKER);
   }
 
   var stdinData = "";

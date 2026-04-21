@@ -350,8 +350,8 @@ export function generateExtraFiles(
 
   // Gemini: npm lifecycle scripts
   if (targetProfile.name === 'gemini') {
-    files.push({ path: 'bin/postinstall.js', content: generateGeminiPostinstall(), executable: true });
-    files.push({ path: 'bin/preuninstall.js', content: generateGeminiPreuninstall(), executable: true });
+    files.push({ path: 'bin/postinstall.js', content: generateGeminiPostinstall(manifest.name), executable: true });
+    files.push({ path: 'bin/preuninstall.js', content: generateGeminiPreuninstall(manifest.name), executable: true });
   }
 
   // Generate installation instructions for all targets

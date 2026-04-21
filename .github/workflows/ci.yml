@@ -60,6 +60,21 @@ jobs:
           set -euo pipefail
           npm run test:sdk 2>&1 | tee artifacts/test-logs/unit-tests.log
 
+      - name: Build breakpoints-mux
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/breakpoints-mux 2>&1 | tee artifacts/test-logs/breakpoints-mux-build.log
+
+      - name: Typecheck breakpoints-mux
+        run: |
+          set -euo pipefail
+          npm run typecheck --workspace=@a5c-ai/breakpoints-mux 2>&1 | tee artifacts/test-logs/breakpoints-mux-typecheck.log
+
+      - name: breakpoints-mux tests
+        run: |
+          set -euo pipefail
+          npm run test --workspace=@a5c-ai/breakpoints-mux 2>&1 | tee artifacts/test-logs/breakpoints-mux-tests.log
+
       - name: Build hooks-proxy
         run: |
           set -euo pipefail

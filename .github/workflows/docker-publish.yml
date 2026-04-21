@@ -7,9 +7,11 @@ on:
       - staging
       - develop
     paths:
+      - 'package-lock.json'
       - 'Dockerfile'
       - 'docker-entrypoint.sh'
       - 'docker-compose.yml'
+      - 'packages/breakpoints-mux/**'
       - 'packages/sdk/**'
       - 'plugins/babysitter/**'
       - 'plugins/babysitter-gemini/**'

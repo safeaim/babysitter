@@ -18,7 +18,7 @@ import { execSync, spawn } from "child_process";
 
 const CLI_AVAILABLE = (() => {
   try {
-    execSync("babysitter --version", { stdio: "pipe", timeout: 10000 });
+    execSync("babysitter-harness version", { stdio: "pipe", timeout: 10000 });
     return true;
   } catch {
     return false;
@@ -38,7 +38,7 @@ function spawnBabysitter(
   timeoutMs = 15000,
 ): Promise<{ lines: string[]; exitCode: number | null; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const child = spawn("babysitter", args, {
+    const child = spawn("babysitter-harness", args, {
       stdio: ["pipe", "pipe", "pipe"],
       shell: true,
       timeout: timeoutMs,
@@ -156,11 +156,11 @@ describe(
 
       it("--json flag produces parseable JSON output", async () => {
         const { lines, exitCode } = await spawnBabysitter(
-          ["harness:discover", "--json"],
+          ["discover", "--json"],
           15000,
         );
 
-        // harness:discover --json should produce valid JSON output
+        // discover --json should produce valid JSON output
         if (lines.length > 0) {
           const fullOutput = lines.join("\n");
           const parsed = tryParseJson(fullOutput);
@@ -180,7 +180,7 @@ describe(
           }
         }
 
-        // harness:discover should succeed even without harnesses installed
+        // discover should succeed even without harnesses installed
         expect(exitCode).toBe(0);
       });
 

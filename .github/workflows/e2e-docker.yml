@@ -3,9 +3,11 @@ name: E2E Docker Tests
 on:
   pull_request:
     paths:
+      - 'package-lock.json'
       - 'Dockerfile'
       - 'docker-entrypoint.sh'
       - 'docker-compose.yml'
+      - 'packages/breakpoints-mux/**'
       - 'packages/sdk/**'
       - 'plugins/babysitter/**'
       - 'plugins/babysitter-codex/**'
@@ -34,9 +36,11 @@ on:
       - staging
       - develop
     paths:
+      - 'package-lock.json'
       - 'Dockerfile'
       - 'docker-entrypoint.sh'
       - 'docker-compose.yml'
+      - 'packages/breakpoints-mux/**'
       - 'packages/sdk/**'
       - 'plugins/babysitter/**'
       - 'plugins/babysitter-codex/**'

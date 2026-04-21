@@ -28,7 +28,6 @@ function coreAgentUsage(commandName: string): string {
   ${commandName} profile:merge --user|--project --input <file> [--dir <dir>] [--json]
   ${commandName} profile:render --user|--project [--dir <dir>] [--json]
   ${commandName} instructions:babysit-skill --harness <name> [--interactive|--no-interactive] [--json]
-  ${commandName} harness:discover [--json]
   ${commandName} harness:install <name> [--workspace <dir>] [--json] [--dry-run] [--verbose]
   ${commandName} harness:install-plugin <name> [--workspace <dir>] [--json] [--dry-run] [--verbose]`;
 }
@@ -67,8 +66,6 @@ function coreHumanUsage(commandName: string): string {
   ${commandName} compression:toggle <layer> <on|off> [--json]
   ${commandName} compression:set <layer.key> <value> [--json]
   ${commandName} compression:reset [--json]
-  ${commandName} harness:discover [--json]
-  ${commandName} harness:list [--json]
   ${commandName} harness:install <name> [--workspace <dir>] [--json] [--dry-run] [--verbose]
   ${commandName} harness:install-plugin <name> [--workspace <dir>] [--json] [--dry-run] [--verbose]
   ${commandName} instructions:process-create --harness <name> [--interactive|--no-interactive] [--json]

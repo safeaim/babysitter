@@ -115,6 +115,7 @@ export {
   loadPrivateKey,
   rotateKey,
   signAnswer,
+  signAnswerWithKeyRecord,
   verifyAnswer,
 } from "./proven/index.js";
 

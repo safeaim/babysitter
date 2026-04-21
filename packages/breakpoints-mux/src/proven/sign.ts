@@ -1,6 +1,7 @@
 import { createPrivateKey, sign as cryptoSign } from "node:crypto";
 import type { BreakpointAnswer, ProvenBreakpointAnswer } from "../types.js";
 import { loadPrivateKey } from "./keys.js";
+import type { PrivateKeyRecord } from "./types.js";
 
 /**
  * Fields included in the signature. The order is canonical.
@@ -43,6 +44,19 @@ export async function signAnswer(
     throw new Error(`Private key not found for fingerprint: ${fingerprint}`);
   }
 
+  return signAnswerWithKeyRecord(answer, keyRecord);
+}
+
+/**
+ * Sign a BreakpointAnswer using an already-loaded PrivateKeyRecord.
+ *
+ * This avoids requiring the key to be persisted on disk and is useful
+ * for backends that load the key from a configured path.
+ */
+export function signAnswerWithKeyRecord(
+  answer: BreakpointAnswer,
+  keyRecord: PrivateKeyRecord,
+): ProvenBreakpointAnswer {
   const privateKey = createPrivateKey({
     key: Buffer.from(keyRecord.privateKey, "base64"),
     format: "der",
@@ -55,7 +69,7 @@ export async function signAnswer(
   return {
     ...answer,
     signature: signature.toString("base64"),
-    publicKeyFingerprint: fingerprint,
+    publicKeyFingerprint: keyRecord.fingerprint,
     signedAt: new Date().toISOString(),
     signedFields: [...SIGNED_FIELDS],
   };

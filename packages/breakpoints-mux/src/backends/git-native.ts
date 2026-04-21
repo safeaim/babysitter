@@ -10,6 +10,8 @@ import type {
   Breakpoint,
   BreakpointAnswer,
   BreakpointWaitResult,
+  ProvenBreakpointAnswer,
+  ProvenVerificationResult,
 } from "../types.js";
 import {
   generateBreakpointId,
@@ -18,7 +20,11 @@ import {
   BREAKPOINTS_DIR,
   BreakpointSchema,
   BreakpointAnswerSchema,
+  ProvenBreakpointAnswerSchema,
 } from "../types.js";
+import { signAnswerWithKeyRecord } from "../proven/sign.js";
+import { verifyAnswer as verifyProvenAnswer } from "../proven/verify.js";
+import type { PrivateKeyRecord } from "../proven/types.js";
 
 export interface GitNativeBackendOptions {
   /** Path to the .breakpoints directory. Defaults to `.breakpoints` in cwd. */
@@ -27,6 +33,8 @@ export interface GitNativeBackendOptions {
   pollIntervalMs?: number;
   /** Default timeout in ms. Defaults to 30 minutes. */
   timeoutMs?: number;
+  /** Path to a .key.json private key file for signing answers. Optional. */
+  signingKeyPath?: string;
 }
 
 export class GitNativeBackend implements BreakpointBackend {
@@ -35,12 +43,14 @@ export class GitNativeBackend implements BreakpointBackend {
   private breakpointsDir: string;
   private defaultPollIntervalMs: number;
   private defaultTimeoutMs: number;
+  private signingKeyPath: string | undefined;
 
   constructor(options?: GitNativeBackendOptions) {
     this.breakpointsDir = options?.breakpointsDir
       ?? path.resolve(process.cwd(), BREAKPOINTS_DIR);
     this.defaultPollIntervalMs = options?.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
     this.defaultTimeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    this.signingKeyPath = options?.signingKeyPath;
   }
 
   private breakpointPath(id: string): string {
@@ -49,6 +59,36 @@ export class GitNativeBackend implements BreakpointBackend {
 
   private answerPath(id: string): string {
     return path.join(this.breakpointsDir, `${id}.answer.json`);
+  }
+
+  private provenPath(id: string): string {
+    return path.join(this.breakpointsDir, `${id}.proven.json`);
+  }
+
+  /**
+   * Load the signing key from the configured signingKeyPath.
+   * Returns null if no signing key is configured or the file cannot be read.
+   */
+  private async loadSigningKey(): Promise<PrivateKeyRecord | null> {
+    if (!this.signingKeyPath) return null;
+    try {
+      const raw = await fs.readFile(this.signingKeyPath, "utf-8");
+      return JSON.parse(raw) as PrivateKeyRecord;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Load a proven answer file for a breakpoint, if it exists.
+   */
+  private async loadProvenAnswer(id: string): Promise<ProvenBreakpointAnswer | null> {
+    try {
+      const raw = await fs.readFile(this.provenPath(id), "utf-8");
+      return ProvenBreakpointAnswerSchema.parse(JSON.parse(raw));
+    } catch {
+      return null;
+    }
   }
 
   async submitBreakpoint(params: SubmitBreakpointParams): Promise<Breakpoint> {
@@ -100,6 +140,15 @@ export class GitNativeBackend implements BreakpointBackend {
       }
     } catch (err) {
       if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+    }
+
+    // Check for proven file and attach verification metadata
+    const provenAnswer = await this.loadProvenAnswer(id);
+    if (provenAnswer && breakpoint.answers.length > 0) {
+      const verification = await this.verifyProvenFile(id, provenAnswer);
+      // Attach verification result as metadata on the breakpoint
+      (breakpoint as Breakpoint & { provenVerification?: ProvenVerificationResult })
+        .provenVerification = verification;
     }
 
     return breakpoint;
@@ -258,6 +307,17 @@ export class GitNativeBackend implements BreakpointBackend {
       "utf-8",
     );
 
+    // Sign the answer if a signing key is configured
+    const signingKey = await this.loadSigningKey();
+    if (signingKey) {
+      const provenAnswer = signAnswerWithKeyRecord(breakpointAnswer, signingKey);
+      await fs.writeFile(
+        this.provenPath(id),
+        JSON.stringify(provenAnswer, null, 2) + "\n",
+        "utf-8",
+      );
+    }
+
     // Update the breakpoint status
     const breakpoint = await this.getBreakpoint(id);
     breakpoint.status = "answered";
@@ -296,5 +356,35 @@ export class GitNativeBackend implements BreakpointBackend {
     );
 
     return breakpoint;
+  }
+
+  /**
+   * Verify a proven answer file against trusted public keys.
+   * Loads the .proven.json for the given breakpoint and verifies its signature.
+   */
+  async verifyAnswer(id: string): Promise<ProvenVerificationResult> {
+    const provenAnswer = await this.loadProvenAnswer(id);
+    if (!provenAnswer) {
+      return {
+        valid: false,
+        reason: "No proven answer file found",
+        verifiedAt: new Date().toISOString(),
+      };
+    }
+
+    return this.verifyProvenFile(id, provenAnswer);
+  }
+
+  /**
+   * Verify a loaded ProvenBreakpointAnswer against trusted keys in the
+   * breakpoints directory.
+   */
+  private async verifyProvenFile(
+    _id: string,
+    provenAnswer: ProvenBreakpointAnswer,
+  ): Promise<ProvenVerificationResult> {
+    // The proven/verify module's loadTrustedPublicKeys uses baseDir/.keys/trusted/
+    // Our breakpointsDir IS the .breakpoints directory, so we pass it as baseDir.
+    return verifyProvenAnswer(provenAnswer, this.breakpointsDir);
   }
 }

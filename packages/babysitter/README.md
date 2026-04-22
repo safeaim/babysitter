@@ -27,7 +27,7 @@ For harness runtime orchestration commands such as `call`, `yolo`,
 `invoke`, `resume`, `start-server`, and `tui`, install the optional harness CLI:
 
 ```bash
-npm install -g @a5c-ai/babysitter-harness
+npm install -g @a5c-ai/babysitter-agent
 babysitter-harness --help-human
 ```
 

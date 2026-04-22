@@ -1,20 +1,20 @@
 /**
  * Unified harness adapter.
  *
- * Delegates hook plumbing to @a5c-ai/hooks-proxy via subprocess while
+ * Delegates hook plumbing to @a5c-ai/hooks-mux via subprocess while
  * keeping babysitter-specific orchestration logic (iteration tracking,
  * journal inspection, continuation building) in the SDK.
  *
  * This adapter is the DEFAULT fallback when no harness-specific adapter
- * is detected.  It imports NO hooks-proxy packages — all communication
+ * is detected.  It imports NO hooks-mux packages — all communication
  * is via subprocess stdin/stdout and environment variables.
  *
  * Key env vars:
  * - AGENT_UNIFIED_ADAPTER=1        — force-enable the adapter
- * - AGENT_SESSION_ID               — session identifier (hooks-proxy convention)
+ * - AGENT_SESSION_ID               — session identifier (hooks-mux convention)
  * - AGENT_CAPABILITIES_JSON        — JSON-serialised proxy capabilities
- * - AGENT_HOOKS_PROXY_PATH         — custom path to the hooks-proxy binary
- * - AGENT_SESSION_ID               — session ID (from hooks-proxy)
+ * - AGENT_HOOKS_PROXY_PATH         — custom path to the hooks-mux binary
+ * - AGENT_SESSION_ID               — session ID (from hooks-mux)
  */
 
 import * as path from "node:path";
@@ -99,12 +99,12 @@ export function createUnifiedAdapter(): HarnessAdapter {
 
     getMissingSessionIdHint(): string {
       return (
-        "Set AGENT_SESSION_ID (hooks-proxy convention) or pass --session-id explicitly."
+        "Set AGENT_SESSION_ID (hooks-mux convention) or pass --session-id explicitly."
       );
     },
 
     supportsHookType(_hookType: string): boolean {
-      // The unified adapter supports all hook types — hooks-proxy
+      // The unified adapter supports all hook types — hooks-mux
       // handles the actual dispatch to the underlying harness.
       return true;
     },
@@ -206,7 +206,7 @@ export function createUnifiedAdapter(): HarnessAdapter {
 
     findHookDispatcherPath(_startCwd: string): string | null {
       // The unified adapter does not ship its own hook dispatcher —
-      // hooks-proxy is the dispatcher.
+      // hooks-mux is the dispatcher.
       return null;
     },
 

@@ -496,7 +496,7 @@ describe("handleHookRun stop", () => {
 });
 
 describe("handleHookRun session-start", () => {
-  it("initializes session state from stdin session_id (env file writing moved to hooks-proxy)", async () => {
+  it("initializes session state from stdin session_id (env file writing moved to hooks-mux)", async () => {
     const code = await callWithStdin(
       JSON.stringify({ session_id: "my-session-42" }),
       {
@@ -507,7 +507,7 @@ describe("handleHookRun session-start", () => {
       },
     );
     expect(code).toBe(0);
-    // Session state file should be created (env file writing is now handled by hooks-proxy)
+    // Session state file should be created (env file writing is now handled by hooks-mux)
     const sessionPath = getSessionFilePath(stateDir, "my-session-42");
     const stat = await fs.stat(sessionPath).catch(() => null);
     expect(stat).not.toBeNull();

@@ -77,27 +77,27 @@ jobs:
           set -euo pipefail
           npm run test --workspace=@a5c-ai/breakpoints-mux 2>&1 | tee artifacts/logs/breakpoints-mux-tests.log
 
-      - name: Build hooks-proxy
+      - name: Build hooks-mux
         run: |
           set -euo pipefail
-          npm run build:hooks-proxy 2>&1 | tee artifacts/logs/hooks-proxy-build.log
+          npm run build:hooks-mux 2>&1 | tee artifacts/logs/hooks-mux-build.log
 
       - name: Hooks-proxy unit tests
         run: |
           set -euo pipefail
-          npm run test:hooks-proxy 2>&1 | tee artifacts/logs/hooks-proxy-tests.log
+          npm run test:hooks-mux 2>&1 | tee artifacts/logs/hooks-mux-tests.log
 
-      - name: Build and test unified-plugins
+      - name: Build and test agent-plugins-mux
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/unified-plugins 2>&1 | tee artifacts/logs/unified-plugins-build.log
-          npm run test --workspace=@a5c-ai/unified-plugins 2>&1 | tee artifacts/logs/unified-plugins-tests.log
+          npm run build --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/logs/agent-plugins-mux-build.log
+          npm run test --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/logs/agent-plugins-mux-tests.log
 
       - name: Build and test babysitter-harness
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/babysitter-harness 2>&1 | tee artifacts/logs/babysitter-harness-build.log
-          npm run test --workspace=@a5c-ai/babysitter-harness 2>&1 | tee artifacts/logs/babysitter-harness-tests.log
+          npm run build --workspace=@a5c-ai/babysitter-agent 2>&1 | tee artifacts/logs/babysitter-harness-build.log
+          npm run test --workspace=@a5c-ai/babysitter-agent 2>&1 | tee artifacts/logs/babysitter-harness-tests.log
 
       - name: babysitter-codex package tests
         run: |
@@ -208,7 +208,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json packages/sdk/package.json packages/babysitter/package.json packages/babysitter-harness/package.json packages/unified-plugins/package.json packages/breakpoints-mux/package.json packages/hooks-proxy/core/package.json packages/hooks-proxy/cli/package.json packages/hooks-proxy/adapter-claude/package.json packages/hooks-proxy/adapter-codex/package.json packages/hooks-proxy/adapter-gemini/package.json packages/hooks-proxy/adapter-copilot/package.json packages/hooks-proxy/adapter-cursor/package.json packages/hooks-proxy/adapter-pi/package.json packages/hooks-proxy/adapter-oh-my-pi/package.json packages/hooks-proxy/adapter-opencode/package.json packages/hooks-proxy/adapter-openclaw/package.json package-lock.json CHANGELOG.md plugins/babysitter/.claude-plugin/plugin.json plugins/babysitter/plugin.json plugins/babysitter/versions.json plugins/babysitter-codex/package.json plugins/babysitter-codex/versions.json plugins/babysitter-gemini/package.json plugins/babysitter-gemini/plugin.json plugins/babysitter-gemini/gemini-extension.json plugins/babysitter-gemini/versions.json plugins/babysitter-pi/package.json plugins/babysitter-pi/versions.json plugins/babysitter-omp/package.json plugins/babysitter-omp/versions.json plugins/babysitter-opencode/package.json plugins/babysitter-opencode/plugin.json plugins/babysitter-opencode/versions.json plugins/babysitter-openclaw/package.json plugins/babysitter-openclaw/plugin.json plugins/babysitter-openclaw/openclaw.plugin.json plugins/babysitter-openclaw/versions.json plugins/babysitter-github/plugin.json plugins/babysitter-github/versions.json plugins/babysitter-github/package.json plugins/babysitter-cursor/plugin.json plugins/babysitter-cursor/versions.json plugins/babysitter-cursor/package.json plugins/babysitter-paperclip/package.json plugins/babysitter-paperclip/versions.json .claude-plugin/marketplace.json
+          git add package.json packages/sdk/package.json packages/babysitter/package.json packages/babysitter-agent/package.json packages/agent-plugins-mux/package.json packages/breakpoints-mux/package.json packages/hooks-mux/core/package.json packages/hooks-mux/cli/package.json packages/hooks-mux/adapter-claude/package.json packages/hooks-mux/adapter-codex/package.json packages/hooks-mux/adapter-gemini/package.json packages/hooks-mux/adapter-copilot/package.json packages/hooks-mux/adapter-cursor/package.json packages/hooks-mux/adapter-pi/package.json packages/hooks-mux/adapter-oh-my-pi/package.json packages/hooks-mux/adapter-opencode/package.json packages/hooks-mux/adapter-openclaw/package.json package-lock.json CHANGELOG.md plugins/babysitter/.claude-plugin/plugin.json plugins/babysitter/plugin.json plugins/babysitter/versions.json plugins/babysitter-codex/package.json plugins/babysitter-codex/versions.json plugins/babysitter-gemini/package.json plugins/babysitter-gemini/plugin.json plugins/babysitter-gemini/gemini-extension.json plugins/babysitter-gemini/versions.json plugins/babysitter-pi/package.json plugins/babysitter-pi/versions.json plugins/babysitter-omp/package.json plugins/babysitter-omp/versions.json plugins/babysitter-opencode/package.json plugins/babysitter-opencode/plugin.json plugins/babysitter-opencode/versions.json plugins/babysitter-openclaw/package.json plugins/babysitter-openclaw/plugin.json plugins/babysitter-openclaw/openclaw.plugin.json plugins/babysitter-openclaw/versions.json plugins/babysitter-github/plugin.json plugins/babysitter-github/versions.json plugins/babysitter-github/package.json plugins/babysitter-cursor/plugin.json plugins/babysitter-cursor/versions.json plugins/babysitter-cursor/package.json plugins/babysitter-paperclip/package.json plugins/babysitter-paperclip/versions.json .claude-plugin/marketplace.json
           if git diff --cached --quiet; then
             echo "No version changes detected."
           else
@@ -234,26 +234,26 @@ jobs:
           set -euo pipefail
           npm run build --workspace=@a5c-ai/breakpoints-mux
 
-      - name: Build unified-plugins
+      - name: Build agent-plugins-mux
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/unified-plugins
+          npm run build --workspace=@a5c-ai/agent-plugins-mux
 
-      - name: Build hooks-proxy
+      - name: Build hooks-mux
         run: |
           set -euo pipefail
-          npm run build:hooks-proxy
+          npm run build:hooks-mux
 
       - name: Hooks-proxy unit tests
         run: |
           set -euo pipefail
-          npm run test:hooks-proxy
+          npm run test:hooks-mux
 
       - name: Pack npm artifacts
         run: |
           set -euo pipefail
           npm pack --workspace=@a5c-ai/babysitter-sdk --pack-destination artifacts/release
-          npm pack --workspace=@a5c-ai/unified-plugins --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-plugins-mux --pack-destination artifacts/release
           npm pack --workspace=@a5c-ai/breakpoints-mux --pack-destination artifacts/release
           (cd packages/babysitter && npm pack --pack-destination ../../artifacts/release)
           (cd plugins/babysitter-codex && npm pack --pack-destination ../../artifacts/release)
@@ -284,12 +284,12 @@ jobs:
           set -euo pipefail
           npm publish --workspace=@a5c-ai/babysitter-sdk --access public
 
-      - name: Publish unified-plugins to npm
+      - name: Publish agent-plugins-mux to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          npm publish --workspace=@a5c-ai/unified-plugins --access public
+          npm publish --workspace=@a5c-ai/agent-plugins-mux --access public
 
       - name: Publish breakpoints-mux to npm
         env:
@@ -478,12 +478,12 @@ jobs:
           npm run deploy
         working-directory: plugins/babysitter-paperclip
 
-      - name: Publish hooks-proxy packages
+      - name: Publish hooks-mux packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for pkg in @a5c-ai/hooks-proxy-core @a5c-ai/hooks-proxy-cli @a5c-ai/hooks-proxy-adapter-claude @a5c-ai/hooks-proxy-adapter-codex @a5c-ai/hooks-proxy-adapter-gemini @a5c-ai/hooks-proxy-adapter-copilot @a5c-ai/hooks-proxy-adapter-cursor @a5c-ai/hooks-proxy-adapter-pi @a5c-ai/hooks-proxy-adapter-oh-my-pi @a5c-ai/hooks-proxy-adapter-opencode @a5c-ai/hooks-proxy-adapter-openclaw; do
+          for pkg in @a5c-ai/hooks-mux-core @a5c-ai/hooks-mux-cli @a5c-ai/hooks-mux-adapter-claude @a5c-ai/hooks-mux-adapter-codex @a5c-ai/hooks-mux-adapter-gemini @a5c-ai/hooks-mux-adapter-copilot @a5c-ai/hooks-mux-adapter-cursor @a5c-ai/hooks-mux-adapter-pi @a5c-ai/hooks-mux-adapter-oh-my-pi @a5c-ai/hooks-mux-adapter-opencode @a5c-ai/hooks-mux-adapter-openclaw; do
             echo "Publishing $pkg..."
             npm publish --workspace=$pkg --access public
           done

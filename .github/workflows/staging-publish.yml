@@ -67,27 +67,27 @@ jobs:
           set -euo pipefail
           npm run test:sdk 2>&1 | tee artifacts/logs/sdk-tests.log
 
-      - name: Build hooks-proxy
+      - name: Build hooks-mux
         run: |
           set -euo pipefail
-          npm run build:hooks-proxy 2>&1 | tee artifacts/logs/hooks-proxy-build.log
+          npm run build:hooks-mux 2>&1 | tee artifacts/logs/hooks-mux-build.log
 
       - name: Hooks-proxy unit tests
         run: |
           set -euo pipefail
-          npm run test:hooks-proxy 2>&1 | tee artifacts/logs/hooks-proxy-tests.log
+          npm run test:hooks-mux 2>&1 | tee artifacts/logs/hooks-mux-tests.log
 
-      - name: Build and test unified-plugins
+      - name: Build and test agent-plugins-mux
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/unified-plugins 2>&1 | tee artifacts/logs/unified-plugins-build.log
-          npm run test --workspace=@a5c-ai/unified-plugins 2>&1 | tee artifacts/logs/unified-plugins-tests.log
+          npm run build --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/logs/agent-plugins-mux-build.log
+          npm run test --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/logs/agent-plugins-mux-tests.log
 
       - name: Build and test babysitter-harness
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/babysitter-harness 2>&1 | tee artifacts/logs/babysitter-harness-build.log
-          npm run test --workspace=@a5c-ai/babysitter-harness 2>&1 | tee artifacts/logs/babysitter-harness-tests.log
+          npm run build --workspace=@a5c-ai/babysitter-agent 2>&1 | tee artifacts/logs/babysitter-harness-build.log
+          npm run test --workspace=@a5c-ai/babysitter-agent 2>&1 | tee artifacts/logs/babysitter-harness-tests.log
 
       - name: babysitter-codex package tests
         run: |
@@ -206,7 +206,7 @@ jobs:
           BASE_PAPERCLIP=$(node -e "console.log(require('./plugins/babysitter-paperclip/package.json').version)")
           IFS='.' read -r PAPERCLIP_MAJOR PAPERCLIP_MINOR PAPERCLIP_PATCH <<< "$BASE_PAPERCLIP"
           PAPERCLIP_NEXT_PATCH=$((PAPERCLIP_PATCH + 1))
-          BASE_UNIFIED=$(node -e "console.log(require('./packages/unified-plugins/package.json').version)")
+          BASE_UNIFIED=$(node -e "console.log(require('./packages/agent-plugins-mux/package.json').version)")
           IFS='.' read -r UNIFIED_MAJOR UNIFIED_MINOR UNIFIED_PATCH <<< "$BASE_UNIFIED"
           UNIFIED_NEXT_PATCH=$((UNIFIED_PATCH + 1))
           SHORT_SHA=$(git rev-parse --short HEAD)
@@ -232,7 +232,7 @@ jobs:
           echo "staging_version_opencode=$STAGING_VERSION_OPENCODE" >> "$GITHUB_OUTPUT"
           echo "staging_version_openclaw=$STAGING_VERSION_OPENCLAW" >> "$GITHUB_OUTPUT"
           echo "staging_version_paperclip=$STAGING_VERSION_PAPERCLIP" >> "$GITHUB_OUTPUT"
-          echo "Setting unified-plugins staging version: $STAGING_VERSION_UNIFIED"
+          echo "Setting agent-plugins-mux staging version: $STAGING_VERSION_UNIFIED"
           echo "Setting SDK staging version: $STAGING_VERSION_SDK"
           echo "Setting Codex staging version: $STAGING_VERSION_CODEX"
           echo "Setting GitHub staging version: $STAGING_VERSION_GITHUB"
@@ -256,7 +256,7 @@ jobs:
               data.version = '${STAGING_VERSION_SDK}';
               fs.writeFileSync(p, JSON.stringify(data, null, 2) + '\n');
             }
-            const unifiedPkgPath = 'packages/unified-plugins/package.json';
+            const unifiedPkgPath = 'packages/agent-plugins-mux/package.json';
             const unifiedPkg = JSON.parse(fs.readFileSync(unifiedPkgPath, 'utf8'));
             unifiedPkg.version = '${STAGING_VERSION_UNIFIED}';
             fs.writeFileSync(unifiedPkgPath, JSON.stringify(unifiedPkg, null, 2) + '\n');
@@ -325,22 +325,22 @@ jobs:
             paperclipPkg.version = '${STAGING_VERSION_PAPERCLIP}';
             fs.writeFileSync(paperclipPkgPath, JSON.stringify(paperclipPkg, null, 2) + '\n');
             for (const path of [
-              'packages/hooks-proxy/core/package.json',
-              'packages/hooks-proxy/cli/package.json',
-              'packages/hooks-proxy/adapter-claude/package.json',
-              'packages/hooks-proxy/adapter-codex/package.json',
-              'packages/hooks-proxy/adapter-gemini/package.json',
-              'packages/hooks-proxy/adapter-copilot/package.json',
-              'packages/hooks-proxy/adapter-cursor/package.json',
-              'packages/hooks-proxy/adapter-pi/package.json',
-              'packages/hooks-proxy/adapter-oh-my-pi/package.json',
-              'packages/hooks-proxy/adapter-opencode/package.json',
-              'packages/hooks-proxy/adapter-openclaw/package.json'
+              'packages/hooks-mux/core/package.json',
+              'packages/hooks-mux/cli/package.json',
+              'packages/hooks-mux/adapter-claude/package.json',
+              'packages/hooks-mux/adapter-codex/package.json',
+              'packages/hooks-mux/adapter-gemini/package.json',
+              'packages/hooks-mux/adapter-copilot/package.json',
+              'packages/hooks-mux/adapter-cursor/package.json',
+              'packages/hooks-mux/adapter-pi/package.json',
+              'packages/hooks-mux/adapter-oh-my-pi/package.json',
+              'packages/hooks-mux/adapter-opencode/package.json',
+              'packages/hooks-mux/adapter-openclaw/package.json'
             ]) {
               const data = JSON.parse(fs.readFileSync(path, 'utf8'));
               data.version = '${STAGING_VERSION_SDK}';
-              if (data.dependencies?.['@a5c-ai/hooks-proxy-core']) {
-                data.dependencies['@a5c-ai/hooks-proxy-core'] = '${STAGING_VERSION_SDK}';
+              if (data.dependencies?.['@a5c-ai/hooks-mux-core']) {
+                data.dependencies['@a5c-ai/hooks-mux-core'] = '${STAGING_VERSION_SDK}';
               }
               fs.writeFileSync(path, JSON.stringify(data, null, 2) + '\n');
             }
@@ -384,15 +384,15 @@ jobs:
           set -euo pipefail
           npm run build:sdk
 
-      - name: Build hooks-proxy
+      - name: Build hooks-mux
         run: |
           set -euo pipefail
-          npm run build:hooks-proxy
+          npm run build:hooks-mux
 
       - name: Hooks-proxy unit tests
         run: |
           set -euo pipefail
-          npm run test:hooks-proxy
+          npm run test:hooks-mux
 
       - name: Publish SDK to npm (staging tag)
         env:
@@ -401,12 +401,12 @@ jobs:
           set -euo pipefail
           npm publish --workspace=@a5c-ai/babysitter-sdk --access public --tag staging
 
-      - name: Publish unified-plugins to npm (staging tag)
+      - name: Publish agent-plugins-mux to npm (staging tag)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          npm publish --workspace=@a5c-ai/unified-plugins --access public --tag staging
+          npm publish --workspace=@a5c-ai/agent-plugins-mux --access public --tag staging
 
       - name: Inject SDK dependency into codex package for publish
         run: |
@@ -592,12 +592,12 @@ jobs:
           npm run deploy:staging
         working-directory: plugins/babysitter-paperclip
 
-      - name: Publish hooks-proxy packages (staging)
+      - name: Publish hooks-mux packages (staging)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for pkg in @a5c-ai/hooks-proxy-core @a5c-ai/hooks-proxy-cli @a5c-ai/hooks-proxy-adapter-claude @a5c-ai/hooks-proxy-adapter-codex @a5c-ai/hooks-proxy-adapter-gemini @a5c-ai/hooks-proxy-adapter-copilot @a5c-ai/hooks-proxy-adapter-cursor @a5c-ai/hooks-proxy-adapter-pi @a5c-ai/hooks-proxy-adapter-oh-my-pi @a5c-ai/hooks-proxy-adapter-opencode @a5c-ai/hooks-proxy-adapter-openclaw; do
+          for pkg in @a5c-ai/hooks-mux-core @a5c-ai/hooks-mux-cli @a5c-ai/hooks-mux-adapter-claude @a5c-ai/hooks-mux-adapter-codex @a5c-ai/hooks-mux-adapter-gemini @a5c-ai/hooks-mux-adapter-copilot @a5c-ai/hooks-mux-adapter-cursor @a5c-ai/hooks-mux-adapter-pi @a5c-ai/hooks-mux-adapter-oh-my-pi @a5c-ai/hooks-mux-adapter-opencode @a5c-ai/hooks-mux-adapter-openclaw; do
             echo "Publishing $pkg..."
             npm publish --workspace=$pkg --access public --tag staging
           done

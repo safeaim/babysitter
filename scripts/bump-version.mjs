@@ -86,19 +86,19 @@ const workspaceManifestPaths = [
   "package.json",
   "packages/sdk/package.json",
   "packages/babysitter/package.json",
-  "packages/babysitter-harness/package.json",
-  "packages/unified-plugins/package.json",
-  "packages/hooks-proxy/core/package.json",
-  "packages/hooks-proxy/cli/package.json",
-  "packages/hooks-proxy/adapter-claude/package.json",
-  "packages/hooks-proxy/adapter-codex/package.json",
-  "packages/hooks-proxy/adapter-gemini/package.json",
-  "packages/hooks-proxy/adapter-copilot/package.json",
-  "packages/hooks-proxy/adapter-cursor/package.json",
-  "packages/hooks-proxy/adapter-pi/package.json",
-  "packages/hooks-proxy/adapter-oh-my-pi/package.json",
-  "packages/hooks-proxy/adapter-opencode/package.json",
-  "packages/hooks-proxy/adapter-openclaw/package.json",
+  "packages/babysitter-agent/package.json",
+  "packages/agent-plugins-mux/package.json",
+  "packages/hooks-mux/core/package.json",
+  "packages/hooks-mux/cli/package.json",
+  "packages/hooks-mux/adapter-claude/package.json",
+  "packages/hooks-mux/adapter-codex/package.json",
+  "packages/hooks-mux/adapter-gemini/package.json",
+  "packages/hooks-mux/adapter-copilot/package.json",
+  "packages/hooks-mux/adapter-cursor/package.json",
+  "packages/hooks-mux/adapter-pi/package.json",
+  "packages/hooks-mux/adapter-oh-my-pi/package.json",
+  "packages/hooks-mux/adapter-opencode/package.json",
+  "packages/hooks-mux/adapter-openclaw/package.json",
 ];
 
 const pluginPackageManifestPaths = [
@@ -173,7 +173,7 @@ for (const path of [...workspaceManifestPaths, ...pluginPackageManifestPaths, ..
 
 for (const path of [
   "packages/babysitter/package.json",
-  "packages/babysitter-harness/package.json",
+  "packages/babysitter-agent/package.json",
   "plugins/babysitter-codex/package.json",
   "plugins/babysitter-github/package.json",
   "plugins/babysitter-cursor/package.json",
@@ -188,18 +188,18 @@ for (const path of [
 }
 
 for (const path of [
-  "packages/hooks-proxy/cli/package.json",
-  "packages/hooks-proxy/adapter-claude/package.json",
-  "packages/hooks-proxy/adapter-codex/package.json",
-  "packages/hooks-proxy/adapter-gemini/package.json",
-  "packages/hooks-proxy/adapter-copilot/package.json",
-  "packages/hooks-proxy/adapter-cursor/package.json",
-  "packages/hooks-proxy/adapter-pi/package.json",
-  "packages/hooks-proxy/adapter-oh-my-pi/package.json",
-  "packages/hooks-proxy/adapter-opencode/package.json",
-  "packages/hooks-proxy/adapter-openclaw/package.json",
+  "packages/hooks-mux/cli/package.json",
+  "packages/hooks-mux/adapter-claude/package.json",
+  "packages/hooks-mux/adapter-codex/package.json",
+  "packages/hooks-mux/adapter-gemini/package.json",
+  "packages/hooks-mux/adapter-copilot/package.json",
+  "packages/hooks-mux/adapter-cursor/package.json",
+  "packages/hooks-mux/adapter-pi/package.json",
+  "packages/hooks-mux/adapter-oh-my-pi/package.json",
+  "packages/hooks-mux/adapter-opencode/package.json",
+  "packages/hooks-mux/adapter-openclaw/package.json",
 ]) {
-  syncDependencyVersion(path, "@a5c-ai/hooks-proxy-core", newVersion);
+  syncDependencyVersion(path, "@a5c-ai/hooks-mux-core", newVersion);
 }
 
 for (const path of versionsJsonPaths) {

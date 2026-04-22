@@ -34,7 +34,7 @@ This document defines package responsibilities for the current V6 stage. It inte
 - Constraints:
 - must preserve install and operational expectations for existing users.
 
-### `@a5c-ai/babysitter-harness`
+### `@a5c-ai/babysitter-agent`
 
 - State: Current
 - Role: harness runtime and orchestration-facing execution layer

@@ -6,7 +6,7 @@ name: Generate Plugins
 #     branches: [main, staging]
 #     paths:
 #       - 'plugins/babysitter-unified/**'
-#       - 'packages/unified-plugins/**'
+#       - 'packages/agent-plugins-mux/**'
 #   workflow_dispatch:
 
 on:
@@ -46,10 +46,10 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Build unified-plugins compiler
+      - name: Build agent-plugins-mux compiler
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/unified-plugins
+          npm run build --workspace=@a5c-ai/agent-plugins-mux
 
       - name: Generate all target plugins
         run: |

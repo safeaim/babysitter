@@ -1,0 +1,25 @@
+import type { ProviderConfig } from '@a5c-ai/agent-mux-core';
+import type { HarnessProviderTranslation } from '../provider-translation.js';
+
+export function translateForGenericOpenAI(config: ProviderConfig): HarnessProviderTranslation {
+  const env: Record<string, string> = {};
+  const args: string[] = [];
+
+  // OpenAI-compatible providers can be reached directly
+  if (config.params['apiBase']) {
+    env['OPENAI_BASE_URL'] = String(config.params['apiBase']);
+  }
+  if (config.auth.apiKey) {
+    env['OPENAI_API_KEY'] = config.auth.apiKey;
+  }
+
+  const directProviders = ['openai', 'groq', 'fireworks', 'together', 'deepseek',
+    'mistral', 'cerebras', 'sambanova', 'openrouter', 'ollama', 'local',
+    'lmstudio', 'vllm', 'custom'];
+
+  if (directProviders.includes(config.provider)) {
+    return { env, args, proxyRequired: false };
+  }
+
+  return { env, args, proxyRequired: true, proxyExposedTransport: 'openai-chat' };
+}

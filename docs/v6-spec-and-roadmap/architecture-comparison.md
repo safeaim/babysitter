@@ -42,7 +42,7 @@ This document provides an architectural comparison between the current a5c.ai ha
 
 ```
 Monolithic Package Structure
-├── @a5c-ai/babysitter-harness (all functionality)
+├── @a5c-ai/babysitter-agent (all functionality)
 │   ├── governance/ (policies, authorities, sandbox)
 │   ├── session/ (state, context, history, memory)
 │   ├── mcp/ (channels, transport, client tools)
@@ -51,8 +51,8 @@ Monolithic Package Structure
 │   ├── daemon/ (infrastructure)
 │   └── pi/ (wrapper integration)
 └── Supporting packages
-    ├── @a5c-ai/hooks-proxy
-    ├── @a5c-ai/unified-plugins
+    ├── @a5c-ai/hooks-mux
+    ├── @a5c-ai/agent-plugins-mux
     └── @a5c-ai/babysitter-sdk
 ```
 
@@ -62,8 +62,8 @@ Monolithic Package Structure
 Layered Architecture
 ├── Infrastructure Layer (Dispatch/Mux)
 │   ├── @a5c-ai/agent-mux (unchanged)
-│   ├── @a5c-ai/hooks-mux (evolved from hooks-proxy)
-│   └── @a5c-ai/agent-plugins-mux (evolved from unified-plugins)
+│   ├── @a5c-ai/hooks-mux (evolved from hooks-mux)
+│   └── @a5c-ai/agent-plugins-mux (evolved from agent-plugins-mux)
 ├── Runtime Layer (Engine)
 │   └── @a5c-ai/agent-runtime (filesystem-free core)
 ├── Platform Layer (Persistence + Plugins)
@@ -111,7 +111,7 @@ Layered Architecture
 ### Current Deployment
 
 **Single Package Model**:
-- Install `@a5c-ai/babysitter-harness`
+- Install `@a5c-ai/babysitter-agent`
 - Get all functionality regardless of needs
 - Large bundle size for all use cases
 - Monolithic configuration
@@ -254,7 +254,7 @@ Layered Architecture
 ### Current Integration Patterns
 
 **Agent-Mux Integration**: Direct integration with monolithic interface
-**Hook Integration**: Via hooks-proxy with limited extensibility
+**Hook Integration**: Via hooks-mux with limited extensibility
 **MCP Integration**: Built-in MCP client functionality
 
 ### V6 Integration Patterns

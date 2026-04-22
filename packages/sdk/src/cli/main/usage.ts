@@ -80,7 +80,7 @@ function coreHumanUsage(commandName: string): string {
   ${commandName} configure [show|validate|paths] [--json] [--defaults-only]
   ${commandName} version
 
-Harness runtime commands are provided by the optional ${"@a5c-ai/babysitter-harness"} package:
+Harness runtime commands are provided by the optional ${"@a5c-ai/babysitter-agent"} package:
   babysitter-harness call --harness claude-code --prompt "implement feature X" --workspace .
   babysitter-harness start-server [--transport <stdio|websocket>]`;
 }

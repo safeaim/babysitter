@@ -49,6 +49,6 @@ export {
   densityFilterText,
   estimateTokens,
 } from "./compression/density-filter";
-// compaction moved to @a5c-ai/babysitter-harness (GAP-PERF-002)
-// mcpClient moved to @a5c-ai/babysitter-harness (GAP-REMOTE-006)
-// mcpChannels moved to @a5c-ai/babysitter-harness (interactive feature)
+// compaction moved to @a5c-ai/babysitter-agent (GAP-PERF-002)
+// mcpClient moved to @a5c-ai/babysitter-agent (GAP-REMOTE-006)
+// mcpChannels moved to @a5c-ai/babysitter-agent (interactive feature)

@@ -68,8 +68,8 @@ Infrastructure Layer (Unified Dispatch/Mux)
 ├── @a5c-ai/agent-mux-cli
 ├── @a5c-ai/agent-mux (main SDK)
 ├── @a5c-ai/agent-mux-gateway
-├── @a5c-ai/hooks-mux (renamed from hooks-proxy)
-└── @a5c-ai/agent-plugins-mux (renamed from unified-plugins)
+├── @a5c-ai/hooks-mux (renamed from hooks-mux)
+└── @a5c-ai/agent-plugins-mux (renamed from agent-plugins-mux)
 
 Runtime Layer (Engine)
 └── @a5c-ai/agent-runtime

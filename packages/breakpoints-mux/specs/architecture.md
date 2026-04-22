@@ -1819,7 +1819,7 @@ async function readAndParseConfig(filePath: string): Promise<RoutingConfig | nul
 
 ### 8.4 Integration with babysitter-harness
 
-The harness integration plugs into the existing interaction system in `packages/babysitter-harness/src/interaction/`. The breakpoints-mux provider is registered alongside the existing terminal-based `askUserQuestion` system.
+The harness integration plugs into the existing interaction system in `packages/babysitter-agent/src/interaction/`. The breakpoints-mux provider is registered alongside the existing terminal-based `askUserQuestion` system.
 
 The integration point is in the harness's breakpoint effect resolver. When a process calls `ctx.breakpoint(payload, options)`, the harness:
 

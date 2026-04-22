@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "description": "Babysitter hook registration for Oh-My-Pi. Maps Oh-My-Pi extension events to unified babysitter hook scripts with hooks-proxy support.",
+  "description": "Babysitter hook registration for Oh-My-Pi. Maps Oh-My-Pi extension events to unified babysitter hook scripts with hooks-mux support.",
   "hooks": {
     "session_start": [
       {
         "type": "command",
         "script": "hooks/babysitter-proxied-session-start.js",
-        "description": "Initialize babysitter session state and inject context (proxied via a5c-hooks-proxy)",
+        "description": "Initialize babysitter session state and inject context (proxied via a5c-hooks-mux)",
         "timeoutMs": 30000
       }
     ],
@@ -14,7 +14,7 @@
       {
         "type": "command",
         "script": "hooks/babysitter-proxied-tool-call.js",
-        "description": "Pre-tool-use hook for babysitter awareness (proxied via a5c-hooks-proxy)",
+        "description": "Pre-tool-use hook for babysitter awareness (proxied via a5c-hooks-mux)",
         "timeoutMs": 10000
       }
     ],
@@ -22,7 +22,7 @@
       {
         "type": "command",
         "script": "hooks/babysitter-proxied-context.js",
-        "description": "Context injection for babysitter orchestration (proxied via a5c-hooks-proxy)",
+        "description": "Context injection for babysitter orchestration (proxied via a5c-hooks-mux)",
         "timeoutMs": 10000
       }
     ],
@@ -30,7 +30,7 @@
       {
         "type": "command",
         "script": "hooks/babysitter-proxied-before-provider-request.js",
-        "description": "Before provider request hook for babysitter observability (proxied via a5c-hooks-proxy)",
+        "description": "Before provider request hook for babysitter observability (proxied via a5c-hooks-mux)",
         "timeoutMs": 10000
       }
     ],
@@ -38,7 +38,7 @@
       {
         "type": "command",
         "script": "hooks/babysitter-proxied-stop.js",
-        "description": "Check for pending babysitter effects when agent completes a turn (proxied via a5c-hooks-proxy)",
+        "description": "Check for pending babysitter effects when agent completes a turn (proxied via a5c-hooks-mux)",
         "timeoutMs": 30000
       }
     ]

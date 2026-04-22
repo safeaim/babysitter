@@ -81,4 +81,5 @@ plugins/babysitter-gemini/.babysitter-install-attempted
 packages/sdk/**/*.d.ts
 packages/sdk/src/**/*.js
 generated-plugins/
+legacy/
 .claude/skills/welcome/SKILL.md

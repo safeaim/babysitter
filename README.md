@@ -181,7 +181,7 @@ The plugin auto-detects which underlying harness (Claude Code, Codex, Gemini CLI
 Babysitter ships with a built-in **internal harness** that runs processes programmatically without any external AI coding agent. This is useful for CI/CD pipelines, scripts, automated testing, and headless orchestration:
 
 ```bash
-npm install -g @a5c-ai/babysitter-harness
+npm install -g @a5c-ai/babysitter-agent
 
 # Run a process definition using the internal harness
 babysitter-harness call --harness internal --process .a5c/processes/my-process.js#process --workspace .
@@ -268,11 +268,11 @@ Claude will create an orchestration run, execute tasks step-by-step, handle qual
 
 ## Harness CLI Wrappers
 
-Beyond the in-session skill commands (`/babysitter:call`, etc.), Babysitter provides an optional runtime CLI package, `@a5c-ai/babysitter-harness`, for orchestration, session management, MCP serving, daemon utilities, and the TUI. The main `babysitter` CLI keeps SDK management plus `harness:install` and `harness:install-plugin`.
+Beyond the in-session skill commands (`/babysitter:call`, etc.), Babysitter provides an optional runtime CLI package, `@a5c-ai/babysitter-agent`, for orchestration, session management, MCP serving, daemon utilities, and the TUI. The main `babysitter` CLI keeps SDK management plus `harness:install` and `harness:install-plugin`.
 
 ```bash
 npm install -g @a5c-ai/babysitter
-npm install -g @a5c-ai/babysitter-harness
+npm install -g @a5c-ai/babysitter-agent
 ```
 
 ### Running Processes via a Harness

@@ -31,9 +31,9 @@ Edit `.github/CODEOWNERS`:
 
 ```
 # Remove this:
-/packages/cli/   @org/old-team
+/packages/agent-mux/cli/   @org/old-team
 # Add this:
-/packages/cli/   @org/new-team @org/maintainers
+/packages/agent-mux/cli/   @org/new-team @org/maintainers
 ```
 
 Notify `@org/old-team` in the PR description.

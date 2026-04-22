@@ -57,4 +57,4 @@ export {
   resolveClaudeCodeSessionDir,
 } from "./collector";
 
-// effectCost moved to @a5c-ai/babysitter-harness (GAP-SUBOBS-003)
+// effectCost moved to @a5c-ai/babysitter-agent (GAP-SUBOBS-003)

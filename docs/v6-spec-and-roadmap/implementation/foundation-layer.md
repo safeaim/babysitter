@@ -23,8 +23,8 @@ The foundation layer establishes the core runtime and infrastructure components 
 ### Infrastructure Foundation
 
 **Package Structure**
-- Establish `hooks-proxy` → `hooks-mux` evolution
-- Establish `unified-plugins` → `agent-plugins-mux` evolution
+- Establish `hooks-mux` → `hooks-mux` evolution
+- Establish `agent-plugins-mux` → `agent-plugins-mux` evolution
 - Update import references across codebase
 - Implement package compatibility layers
 

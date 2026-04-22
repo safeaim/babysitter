@@ -7,9 +7,9 @@
 The current a5c.ai harness stack consists of:
 
 - **`@a5c-ai/agent-mux`** - Agent dispatch/multiplexing layer
-- **`@a5c-ai/hooks-proxy`** - Hook normalization across harnesses  
-- **`@a5c-ai/unified-plugins`** - Cross-harness plugin compiler
-- **`@a5c-ai/babysitter-harness`** - Monolithic orchestration runtime
+- **`@a5c-ai/hooks-mux`** - Hook normalization across harnesses  
+- **`@a5c-ai/agent-plugins-mux`** - Cross-harness plugin compiler
+- **`@a5c-ai/babysitter-agent`** - Monolithic orchestration runtime
 - **`@a5c-ai/babysitter-sdk`** - Core SDK for orchestration
 
 ## Current Pain Points
@@ -34,8 +34,8 @@ The current a5c.ai harness stack consists of:
 
 Current confusing terminology will be updated:
 - `babysitter-harness` → `babysitter-agent`
-- `hooks-proxy` → `hooks-mux` 
-- `unified-plugins` → `agent-plugins-mux`
+- `hooks-mux` → `hooks-mux` 
+- `agent-plugins-mux` → `agent-plugins-mux`
 
 This harmonization provides clearer naming that reflects the actual purpose of each package → [Package Specifications](package-specs.md)
 

@@ -155,7 +155,7 @@ Root `tsconfig.json` as a solution config:
   "files": [],
   "references": [
     { "path": "./packages/sdk" },
-    { "path": "./packages/cli" }
+    { "path": "./packages/agent-mux/cli" }
   ]
 }
 ```

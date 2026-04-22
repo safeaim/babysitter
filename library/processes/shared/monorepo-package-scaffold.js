@@ -151,7 +151,8 @@ export function createPackageScaffold(config) {
           },
           instructions: [
             `Read the root package.json to identify the workspace manager (npm workspaces, pnpm, yarn).`,
-            `Identify the workspace glob patterns (e.g., "packages/*").`,
+            `Identify the workspace glob patterns (e.g., "packages/*",
+    "packages/agent-mux/*").`,
             referencePackage
               ? `Read ${referencePackage}/package.json and ${referencePackage}/tsconfig.json to extract conventions: module system, build scripts, test framework, lint config, directory structure.`
               : 'No reference package specified — use standard TypeScript library conventions.',

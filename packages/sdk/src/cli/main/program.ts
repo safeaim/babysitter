@@ -15,7 +15,7 @@ export const CORE_PROGRAM: CliProgram = {
 export const HARNESS_PROGRAM: CliProgram = {
   variant: "harness",
   commandName: "babysitter-harness",
-  packageName: "@a5c-ai/babysitter-harness",
+  packageName: "@a5c-ai/babysitter-agent",
 };
 
 export const HARNESS_RUNTIME_COMMANDS = [

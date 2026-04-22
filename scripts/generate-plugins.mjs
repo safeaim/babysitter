@@ -9,7 +9,7 @@ import { join, resolve, relative } from 'node:path';
 const ROOT = resolve(import.meta.dirname, '..');
 const UNIFIED_SOURCE = join(ROOT, 'plugins/babysitter-unified');
 const DEFAULT_OUTPUT = join(ROOT, 'generated-plugins');
-const COMPILER_PKG = join(ROOT, 'packages/unified-plugins');
+const COMPILER_PKG = join(ROOT, 'packages/agent-plugins-mux');
 
 const args = process.argv.slice(2);
 const outputDir = getArg('--output') || DEFAULT_OUTPUT;
@@ -24,8 +24,8 @@ function getArg(flag) {
 // Build the compiler if needed
 const distCli = join(COMPILER_PKG, 'dist/cli.js');
 if (!existsSync(distCli)) {
-  console.log('[generate] Building unified-plugins compiler...');
-  execSync('npm run build --workspace=@a5c-ai/unified-plugins', {
+  console.log('[generate] Building agent-plugins-mux compiler...');
+  execSync('npm run build --workspace=@a5c-ai/agent-plugins-mux', {
     cwd: ROOT,
     stdio: 'inherit',
   });

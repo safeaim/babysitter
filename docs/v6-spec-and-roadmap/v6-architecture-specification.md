@@ -82,7 +82,7 @@ The next stage keeps the current monorepo shape and improves it in place:
 
 - `packages/sdk`: continue as the durable runtime/orchestration core.
 - `packages/babysitter`: remain the primary CLI package.
-- `packages/babysitter-harness`: remain the harness runtime while internal seams are clarified.
+- `packages/babysitter-agent`: remain the harness runtime while internal seams are clarified.
 - `plugins/*`: remain first-class integration boundaries and packaging reality checks.
 - `.a5c/processes` and process-library integration: remain orchestration delivery mechanisms.
 

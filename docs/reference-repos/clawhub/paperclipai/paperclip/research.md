@@ -28,7 +28,7 @@ Architecture: Server orchestrates multiple AI agents (each running in their own 
 
 **HIGH VALUE** -- Paperclip's architecture is remarkably parallel to babysitter's. Both are TypeScript monorepos that orchestrate AI agents across multiple harness CLIs. Key architectural parallels and differences:
 
-1. **Multi-harness adapter pattern**: Paperclip's packages/adapters/ mirrors babysitter's harness/ directory. Both have adapters for claude-code, codex, cursor, gemini, opencode, pi. This validates babysitter's architectural choices.
+1. **Multi-harness adapter pattern**: Paperclip's packages/agent-mux/adapters/ mirrors babysitter's harness/ directory. Both have adapters for claude-code, codex, cursor, gemini, opencode, pi. This validates babysitter's architectural choices.
 
 2. **Goal-to-task decomposition**: Paperclip breaks business goals into agent-assignable tasks, similar to babysitter's process -> task decomposition. However, Paperclip adds org-level concepts (roles, budgets, governance).
 

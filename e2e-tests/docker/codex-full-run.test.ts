@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import path from "path";
 import {
+  CODEX_HOOKS_DIR,
   buildCodexImage,
   CODEX_SKILL_DIR,
   dockerExec,
@@ -30,8 +31,11 @@ describeCodex("Codex Docker E2E", () => {
     const codexVersion = dockerExec("codex --version").trim();
     const babysitterVersion = dockerExec("babysitter --version").trim();
     const skillManifest = dockerExec(`test -f ${CODEX_SKILL_DIR}/SKILL.md && echo ok`).trim();
-    const globalStopHook = dockerExec("test -f /home/codex/.codex/hooks/babysitter-stop-hook.sh && echo ok").trim();
+    const globalStopHook = dockerExec(`test -f ${CODEX_HOOKS_DIR}/babysitter-proxied-stop.sh && echo ok`).trim();
     const globalHooksConfig = dockerExec("test -f /home/codex/.codex/hooks.json && echo ok").trim();
+    const legacyStopHookRemoved = dockerExec(
+      `if [ ! -f ${CODEX_HOOKS_DIR}/babysitter-stop-hook.sh ]; then echo ok; fi`,
+    ).trim();
     const callSkill = dockerExec("test -f /home/codex/.codex/skills/call/SKILL.md && echo ok").trim();
     const planSkill = dockerExec("test -f /home/codex/.codex/skills/plan/SKILL.md && echo ok").trim();
     const resumeSkill = dockerExec("test -f /home/codex/.codex/skills/resume/SKILL.md && echo ok").trim();
@@ -44,6 +48,7 @@ describeCodex("Codex Docker E2E", () => {
     expect(skillManifest).toBe("ok");
     expect(globalStopHook).toBe("ok");
     expect(globalHooksConfig).toBe("ok");
+    expect(legacyStopHookRemoved).toBe("ok");
     expect(callSkill).toBe("ok");
     expect(planSkill).toBe("ok");
     expect(resumeSkill).toBe("ok");

@@ -3,6 +3,7 @@ import { execSync, ExecSyncOptions } from "child_process";
 export const CODEX_IMAGE = "babysitter-codex-e2e:test";
 export const CODEX_CONTAINER = "babysitter-codex-e2e-container";
 export const CODEX_SKILL_DIR = "/home/codex/.codex/skills/babysit";
+export const CODEX_HOOKS_DIR = "/home/codex/.codex/hooks";
 
 const DEFAULT_OPTS: ExecSyncOptions = {
   encoding: "utf-8" as BufferEncoding,

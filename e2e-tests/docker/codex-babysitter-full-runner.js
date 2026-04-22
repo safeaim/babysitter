@@ -188,24 +188,26 @@ function workspaceAgents() {
 }
 
 function workspaceHooksConfig(hooksDir) {
+  const proxiedCommand = (scriptName) =>
+    `npx -y @a5c-ai/hooks-mux-cli invoke --adapter codex --handler "bash ${path.join(hooksDir, scriptName)}" --json`;
   return {
     hooks: {
       SessionStart: [
         {
-          matcher: "*",
-          hooks: [{ type: "command", command: path.join(hooksDir, "babysitter-session-start.sh") }],
+          matcher: ".*",
+          hooks: [{ type: "command", command: proxiedCommand("babysitter-proxied-session-start.sh") }],
         },
       ],
       UserPromptSubmit: [
         {
-          matcher: "*",
-          hooks: [{ type: "command", command: path.join(hooksDir, "user-prompt-submit.sh") }],
+          matcher: ".*",
+          hooks: [{ type: "command", command: proxiedCommand("babysitter-proxied-user-prompt-submit.sh") }],
         },
       ],
       Stop: [
         {
-          matcher: "*",
-          hooks: [{ type: "command", command: path.join(hooksDir, "babysitter-stop-hook.sh") }],
+          matcher: ".*",
+          hooks: [{ type: "command", command: proxiedCommand("babysitter-proxied-stop.sh") }],
         },
       ],
     },
@@ -611,9 +613,9 @@ function collectTaskSummaries(runDir) {
 }
 
 function main() {
-  if (!fs.existsSync(path.join(HOOKS_DIR, "babysitter-stop-hook.sh"))) {
-    fail("Installed Codex global hooks are missing the stop hook script", {
-      expectedPath: path.join(HOOKS_DIR, "babysitter-stop-hook.sh"),
+  if (!fs.existsSync(path.join(HOOKS_DIR, "babysitter-proxied-stop.sh"))) {
+    fail("Installed Codex global hooks are missing the proxied stop hook script", {
+      expectedPath: path.join(HOOKS_DIR, "babysitter-proxied-stop.sh"),
     });
   }
 

@@ -38,6 +38,7 @@ COPY package.json package-lock.json* ./
 COPY packages/sdk/package.json ./packages/sdk/
 COPY packages/babysitter-harness/package.json ./packages/babysitter-harness/
 COPY scripts/patch-webpackbar-progress-plugin.cjs ./scripts/
+COPY scripts/patch-agent-mux-exports.cjs ./scripts/
 
 # Install all dependencies (including dev for build)
 RUN npm install --include=dev

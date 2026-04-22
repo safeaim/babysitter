@@ -273,17 +273,32 @@ export function generateOpenCodeHooksJson(
 
 export function generateOpenClawHooksJson(
   manifest: A5cPluginManifest,
-  targetProfile: TargetProfile
+  _targetProfile: TargetProfile
 ): string {
   const hooks: Record<string, unknown> = {};
-  const pat = getPattern(manifest, targetProfile.name);
-  const sdk = resolveSdkConfig(manifest);
+  const pat = getPattern(manifest, 'openclaw');
 
-  iterateHooks(manifest, targetProfile, (canonical, native, handler) => {
-    const slug = slugify(canonical);
-    const cmd = resolveCmd(handler, slug, targetProfile.adapterName, '.', manifest.name, native, sdk.proxyPackage, pat);
-    hooks[native] = [{ matcher: '*', hooks: [{ type: 'command', command: cmd }] }];
-  });
+  const sessionStartHandler = manifest.hooks?.SessionStart;
+  if (typeof sessionStartHandler === 'string') {
+    const cmd = `./${applyPattern(
+      pat || '{{name}}-proxied-{{native}}.sh',
+      manifest.name,
+      slugify('SessionStart'),
+      'session-start'
+    )}`;
+    hooks.SessionStart = [{ matcher: '*', hooks: [{ type: 'command', command: cmd }] }];
+  }
+
+  const stopHandler = manifest.hooks?.Stop;
+  if (typeof stopHandler === 'string') {
+    const cmd = `./${applyPattern(
+      pat || '{{name}}-proxied-{{native}}.sh',
+      manifest.name,
+      slugify('Stop'),
+      'stop-hook'
+    )}`;
+    hooks.Stop = [{ matcher: '*', hooks: [{ type: 'command', command: cmd }] }];
+  }
 
   return JSON.stringify({
     description: `${manifest.name} plugin hooks for OpenClaw`,

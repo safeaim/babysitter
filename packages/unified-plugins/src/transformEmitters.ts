@@ -12,6 +12,7 @@ import {
   generatePiManifest,
   generateOhMyPiManifest,
   generateOpenCodeManifest,
+  generateOpenClawPackageManifest,
   generateOpenClawManifest,
 } from './manifestGenerators.js';
 import { generateProgrammaticExtension } from './proxiedHookTemplates.js';
@@ -161,6 +162,10 @@ export function generateManifests(
       });
       break;
     case 'openclaw':
+      files.push({
+        path: 'package.json',
+        content: generateOpenClawPackageManifest(filteredManifest),
+      });
       files.push({
         path: 'plugin.json',
         content: generateOpenClawManifest(filteredManifest),

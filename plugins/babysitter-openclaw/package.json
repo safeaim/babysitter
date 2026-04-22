@@ -1,51 +1,68 @@
 {
   "name": "@a5c-ai/babysitter-openclaw",
   "version": "5.0.0",
+  "type": "module",
   "description": "Orchestrate complex, multi-step workflows with event-sourced state management, hook-based extensibility, and human-in-the-loop approval",
+  "openclaw": {
+    "extensions": [
+      "./extensions"
+    ],
+    "compat": {
+      "minVersion": "0.1.0"
+    },
+    "build": {
+      "hooks": "extensions/index.ts"
+    }
+  },
+  "keywords": [
+    "babysitter",
+    "openclaw",
+    "orchestration",
+    "ai-agent",
+    "sdk-integration"
+  ],
+  "dependencies": {
+    "@a5c-ai/babysitter-sdk": "5.0.0"
+  },
+  "peerDependencies": {
+    "openclaw": "*"
+  },
   "scripts": {
+    "postinstall": "node bin/install.cjs --global",
+    "preuninstall": "node bin/uninstall.cjs --global",
+    "test": "node --test test/integration.test.js",
+    "test:integration": "node --test test/integration.test.js",
+    "test:packaged-install": "node test/packaged-install.test.cjs",
+    "sync:commands": "node scripts/sync-command-docs.cjs",
     "deploy": "npm publish --access public",
     "deploy:staging": "npm publish --access public --tag staging",
-    "postinstall": "node bin/install.cjs",
-    "preuninstall": "node bin/uninstall.cjs",
-    "team:install": "node scripts/team-install.cjs",
-    "sync:commands": "node scripts/sync-command-docs.cjs",
-    "test": "node --test test/integration.test.js"
+    "team:install": "node scripts/team-install.cjs"
   },
   "bin": {
     "babysitter-openclaw": "bin/cli.cjs"
   },
   "files": [
     "bin/",
+    "package.json",
+    "versions.json",
+    "plugin.json",
+    "openclaw.plugin.json",
     "hooks/",
-    "hooks/",
+    "hooks.json",
+    "extensions/",
     "skills/",
     "commands/",
     "scripts/",
-    "plugin.json",
-    "README.md",
-    "versions.json",
-    "package.json"
-  ],
-  "keywords": [
-    "babysitter",
-    "openclaw",
-    "orchestration"
+    "README.md"
   ],
   "author": "a5c.ai",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "@a5c-ai/babysitter-sdk": "5.0.0"
-  },
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/a5c-ai/babysitter"
   },
-  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-openclaw#readme",
-  "peerDependencies": {
-    "openclaw": "*"
-  }
+  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-openclaw#readme"
 }

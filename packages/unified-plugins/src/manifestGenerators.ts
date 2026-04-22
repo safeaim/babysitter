@@ -289,6 +289,67 @@ export function generateOpenCodeManifest(manifest: A5cPluginManifest): string {
   return JSON.stringify(pluginJson, null, 2) + '\n';
 }
 
+export function generateOpenClawPackageManifest(manifest: ResolvedManifest): string {
+  const packageJson: Record<string, unknown> = {
+    name: manifest.npmPackageName || (() => { const s = resolveSdkConfig(manifest); return `${s.scope}/${manifest.name}-openclaw`; })(),
+    version: manifest.version,
+    type: 'module',
+    description: manifest.description,
+    openclaw: {
+      extensions: ['./extensions'],
+      compat: {
+        minVersion: '0.1.0',
+      },
+      build: {
+        hooks: 'extensions/index.ts',
+      },
+    },
+    keywords: ['babysitter', 'openclaw', 'orchestration', 'ai-agent', 'sdk-integration'],
+    dependencies: {
+      [resolveSdkConfig(manifest).package]: manifest.version,
+    },
+    peerDependencies: {
+      openclaw: '*',
+    },
+    scripts: {
+      postinstall: 'node bin/install.cjs --global',
+      preuninstall: 'node bin/uninstall.cjs --global',
+      test: 'node --test test/integration.test.js',
+      'test:integration': 'node --test test/integration.test.js',
+      'test:packaged-install': 'node test/packaged-install.test.cjs',
+      'sync:commands': 'node scripts/sync-command-docs.cjs',
+      deploy: 'npm publish --access public',
+      'deploy:staging': 'npm publish --access public --tag staging',
+    },
+    bin: { [`${manifest.name}-openclaw`]: 'bin/cli.cjs' },
+    files: [
+      'bin/',
+      'package.json',
+      'versions.json',
+      'plugin.json',
+      'openclaw.plugin.json',
+      'hooks/',
+      'hooks.json',
+      'extensions/',
+      'skills/',
+      'commands/',
+      'scripts/',
+      'README.md',
+    ],
+    author: typeof manifest.author === 'string' ? manifest.author : manifest.author.name,
+    license: manifest.license,
+    publishConfig: { access: 'public' },
+  };
+
+  if (manifest.repository) {
+    packageJson.repository = manifest.repository;
+    const repoUrl = typeof manifest.repository === 'string' ? manifest.repository : manifest.repository.url;
+    packageJson.homepage = `${repoUrl}/tree/main/plugins/babysitter-openclaw#readme`;
+  }
+
+  return JSON.stringify(packageJson, null, 2) + '\n';
+}
+
 export function generateOpenClawManifest(manifest: A5cPluginManifest): string {
   const pluginJson: Record<string, unknown> = {
     name: manifest.name,
@@ -296,7 +357,7 @@ export function generateOpenClawManifest(manifest: A5cPluginManifest): string {
     description: manifest.description,
     author: manifest.author,
     license: manifest.license,
-    hooks: 'hooks/hooks.json',
+    hooks: 'hooks.json',
     commands: 'commands/',
     skills: 'skills/',
   };

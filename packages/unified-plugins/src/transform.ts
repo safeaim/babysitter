@@ -303,6 +303,27 @@ function transformHooks(
     }
   }
 
+  if (targetProfile.name === 'openclaw' && typeof manifest.hooks.Stop === 'string') {
+    const stopSource = path.join(sourceDir, manifest.hooks.Stop);
+    if (fs.existsSync(stopSource)) {
+      const rawContent = fs.readFileSync(stopSource, 'utf-8');
+      const content = rawContent.replace(
+        /ADAPTER_NAME="\$\{ADAPTER_NAME:\?[^}]*\}"/,
+        'ADAPTER_NAME="${ADAPTER_NAME:-openclaw}"'
+      );
+      const stopOutName = hookFilePattern
+        ? hookFilePattern
+          .replace(/\{\{name\}\}/g, manifest.name)
+          .replace(/\{\{slug\}\}/g, toSlug('Stop'))
+          .replace(/\{\{native\}\}/g, 'stop-hook')
+        : path.basename(manifest.hooks.Stop);
+      const stopPath = `hooks/${stopOutName}`;
+      if (!files.some((file) => file.path === stopPath)) {
+        files.push({ path: stopPath, content, executable: true });
+      }
+    }
+  }
+
   // Generate hook registration file for shell-hook targets
   if (targetProfile.hookRegistrationFormat) {
     const hookRegFile = generateHookRegistrationFile(
@@ -359,7 +380,7 @@ function generateHookRegistrationFile(
       break;
     case 'openclaw':
       content = generateOpenClawHooksJson(manifest, targetProfile);
-      filePath = 'hooks/hooks.json';
+      filePath = 'hooks.json';
       break;
     default:
       return null;

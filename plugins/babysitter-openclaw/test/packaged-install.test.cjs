@@ -83,8 +83,8 @@ try {
     'extensions/hooks/session-end.ts',
     'extensions/hooks/before-prompt-build.ts',
     'extensions/hooks/agent-end.ts',
-    'hooks/babysitter-session-start.sh',
-    'hooks/babysitter-stop-hook.sh',
+    'hooks/babysitter-proxied-session-start.sh',
+    'hooks/babysitter-proxied-stop-hook.sh',
     'skills/babysit/SKILL.md',
     'skills/call/SKILL.md',
     'commands/call.md',
@@ -105,7 +105,7 @@ try {
 
   // Validate command count
   const commandFiles = fs.readdirSync(path.join(packagedRoot, 'commands')).filter((name) => name.endsWith('.md'));
-  assert.strictEqual(commandFiles.length, 15, `expected 15 command files, found ${commandFiles.length}`);
+  assert.strictEqual(commandFiles.length, 16, `expected 16 command files, found ${commandFiles.length}`);
 
   // Validate skill count
   const skillDirs = fs

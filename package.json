@@ -75,6 +75,7 @@
     }
   },
   "dependencies": {
+    "@a5c-ai/compendium": "^0.1.0",
     "@a5c-ai/agent-mux": "^0.4.9"
   }
 }

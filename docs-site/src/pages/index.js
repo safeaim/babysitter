@@ -37,6 +37,24 @@ const stats = [
   { label: 'Core modes', value: 'Call, Yolo, Plan, Forever' }
 ];
 
+const pillars = [
+  {
+    title: 'Source-first',
+    description:
+      'The site is built from the repository docs tree, so process guidance, setup material, and reference pages do not drift from the codebase.'
+  },
+  {
+    title: 'Replay-aware',
+    description:
+      'The docs match how Babysitter works: iterations, evidence, approvals, and deterministic convergence instead of vibes-only automation.'
+  },
+  {
+    title: 'Operator-friendly',
+    description:
+      'Quickstart paths, CLI reference, plugins, and deployment guides are grouped around the real questions users hit while running the system.'
+  }
+];
+
 export default function Home() {
   return (
     <Layout
@@ -45,13 +63,13 @@ export default function Home() {
     >
       <main className={styles.page}>
         <section className={styles.hero}>
-          <div className={styles.heroGlow} />
           <div className={styles.heroCopy}>
-            <p className={styles.kicker}>GitHub Pages docs from the repo source tree</p>
-            <h1>Babysitter, documented like the orchestration system it ships.</h1>
+            <p className={styles.kicker}>Repository ledger · canonical docs surface</p>
+            <h1>Babysitter, documented like the system actually runs.</h1>
             <p className={styles.lead}>
-              The site is built straight from <code>./docs</code>, so product docs, process
-              guidance, setup guides, and research live in one auditable source of truth.
+              Built straight from <code>./docs</code>. User guide, setup guides, process design,
+              plugins, and research all live in one auditable source of truth instead of a second
+              marketing-shaped copy of the repo.
             </p>
             <div className={styles.actions}>
               <Link className="button button--primary button--lg" to="/docs/user-guide/">
@@ -63,21 +81,35 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.heroPanel}>
-            <div className={styles.terminal}>
-              <div className={styles.terminalBar}>
-                <span />
-                <span />
-                <span />
+            <div className={styles.panel}>
+              <div className={styles.panelHead}>
+                <span className={styles.panelNum}>07</span>
+                <span>Operator Ledger</span>
+                <span className={styles.panelMeta}>Docs surface</span>
               </div>
-              <pre>
-                <code>{`/babysitter:call add tests and gates
+              <div className={styles.panelBody}>
+                <div className={styles.specRow}>
+                  <span>Source tree</span>
+                  <strong>./docs</strong>
+                </div>
+                <div className={styles.specRow}>
+                  <span>Default loop</span>
+                  <strong>Plan → Execute → Verify</strong>
+                </div>
+                <div className={styles.specRow}>
+                  <span>Primary outputs</span>
+                  <strong>Runs, tasks, sessions, gates</strong>
+                </div>
+                <pre className={styles.terminal}>
+                  <code>{`/babysitter:call add tests and gates
 
 Iteration 1  -> code + tests
 Iteration 2  -> verify failures
 Iteration 3  -> converge to target
 
 Result: documented, replayable, reviewable`}</code>
-              </pre>
+                </pre>
+              </div>
             </div>
           </div>
         </section>
@@ -116,27 +148,12 @@ Result: documented, replayable, reviewable`}</code>
             <h2>One docs tree, one build, one deployment path.</h2>
           </div>
           <div className={styles.grid}>
-            <div className={styles.card}>
-              <h3>Source-first</h3>
-              <p>
-                The Pages site reads the existing repository markdown instead of introducing a
-                second content directory that would drift.
-              </p>
-            </div>
-            <div className={styles.card}>
-              <h3>Repo-native</h3>
-              <p>
-                The setup stays inside the npm workspace and deploys through GitHub Actions, which
-                matches the rest of this project’s release surface.
-              </p>
-            </div>
-            <div className={styles.card}>
-              <h3>Audit-friendly</h3>
-              <p>
-                Docusaurus gives the repo a browsable static site without hiding the original docs
-                files or the process history behind another platform.
-              </p>
-            </div>
+            {pillars.map((pillar) => (
+              <div key={pillar.title} className={styles.card}>
+                <h3>{pillar.title}</h3>
+                <p>{pillar.description}</p>
+              </div>
+            ))}
           </div>
         </section>
       </main>

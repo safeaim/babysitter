@@ -1,0 +1,20 @@
+{
+  "id": "frontend-expert",
+  "name": "Alex Chen",
+  "title": "Senior Frontend Engineer",
+  "expertiseAreas": [
+    {
+      "domain": "frontend",
+      "topics": ["React", "TypeScript", "CSS", "accessibility", "performance"],
+      "keywords": ["component", "UI", "UX", "responsive", "animation"],
+      "proficiency": 5
+    }
+  ],
+  "availability": true,
+  "responseTimeSla": 1800000,
+  "sessionConfig": {
+    "timezone": "America/Los_Angeles",
+    "schedule": "weekdays 9-17",
+    "maxConcurrentQuestions": 3
+  }
+}

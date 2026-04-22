@@ -11,8 +11,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@a5c-ai/agent-mux-ui': path.resolve(rootDir, '..', 'ui', 'src', 'index.ts'),
-      'react-native': path.resolve(rootDir, '..', '..', 'node_modules', 'react-native-web'),
-      'react-native$': path.resolve(rootDir, '..', '..', 'node_modules', 'react-native-web'),
+      'react-native': path.resolve(rootDir, '..', '..', '..', 'node_modules', 'react-native-web'),
+      'react-native$': path.resolve(rootDir, '..', '..', '..', 'node_modules', 'react-native-web'),
       '@webui': path.join(rootDir, 'src'),
     },
     dedupe: ['react', 'react-dom'],

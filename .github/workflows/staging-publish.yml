@@ -77,6 +77,16 @@ jobs:
           set -euo pipefail
           npm run test:hooks-mux 2>&1 | tee artifacts/logs/hooks-mux-tests.log
 
+      - name: Build agent-mux packages
+        run: |
+          set -euo pipefail
+          npm run build:agent-mux 2>&1 | tee artifacts/logs/agent-mux-build.log
+
+      - name: agent-mux tests
+        run: |
+          set -euo pipefail
+          npm run test:agent-mux 2>&1 | tee artifacts/logs/agent-mux-tests.log
+
       - name: Build and test agent-plugins-mux
         run: |
           set -euo pipefail
@@ -209,9 +219,13 @@ jobs:
           BASE_UNIFIED=$(node -e "console.log(require('./packages/agent-plugins-mux/package.json').version)")
           IFS='.' read -r UNIFIED_MAJOR UNIFIED_MINOR UNIFIED_PATCH <<< "$BASE_UNIFIED"
           UNIFIED_NEXT_PATCH=$((UNIFIED_PATCH + 1))
+          BASE_AGENT_MUX=$(node -e "console.log(require('./packages/agent-mux/sdk/package.json').version)")
+          IFS='.' read -r AGENT_MUX_MAJOR AGENT_MUX_MINOR AGENT_MUX_PATCH <<< "$BASE_AGENT_MUX"
+          AGENT_MUX_NEXT_PATCH=$((AGENT_MUX_PATCH + 1))
           SHORT_SHA=$(git rev-parse --short HEAD)
           STAGING_VERSION_UNIFIED="${UNIFIED_MAJOR}.${UNIFIED_MINOR}.${UNIFIED_NEXT_PATCH}-staging.${SHORT_SHA}"
           STAGING_VERSION_SDK="${SDK_MAJOR}.${SDK_MINOR}.${SDK_NEXT_PATCH}-staging.${SHORT_SHA}"
+          STAGING_VERSION_AGENT_MUX="${AGENT_MUX_MAJOR}.${AGENT_MUX_MINOR}.${AGENT_MUX_NEXT_PATCH}-staging.${SHORT_SHA}"
           STAGING_VERSION_CODEX="${CODEX_MAJOR}.${CODEX_MINOR}.${CODEX_NEXT_PATCH}-staging.${SHORT_SHA}"
           STAGING_VERSION_GITHUB="${GITHUB_MAJOR}.${GITHUB_MINOR}.${GITHUB_NEXT_PATCH}-staging.${SHORT_SHA}"
           STAGING_VERSION_CURSOR="${CURSOR_MAJOR}.${CURSOR_MINOR}.${CURSOR_NEXT_PATCH}-staging.${SHORT_SHA}"
@@ -223,6 +237,7 @@ jobs:
           STAGING_VERSION_PAPERCLIP="${PAPERCLIP_MAJOR}.${PAPERCLIP_MINOR}.${PAPERCLIP_NEXT_PATCH}-staging.${SHORT_SHA}"
           echo "staging_version_unified=$STAGING_VERSION_UNIFIED" >> "$GITHUB_OUTPUT"
           echo "staging_version_sdk=$STAGING_VERSION_SDK" >> "$GITHUB_OUTPUT"
+          echo "staging_version_agent_mux=$STAGING_VERSION_AGENT_MUX" >> "$GITHUB_OUTPUT"
           echo "staging_version_codex=$STAGING_VERSION_CODEX" >> "$GITHUB_OUTPUT"
           echo "staging_version_github=$STAGING_VERSION_GITHUB" >> "$GITHUB_OUTPUT"
           echo "staging_version_cursor=$STAGING_VERSION_CURSOR" >> "$GITHUB_OUTPUT"
@@ -234,6 +249,7 @@ jobs:
           echo "staging_version_paperclip=$STAGING_VERSION_PAPERCLIP" >> "$GITHUB_OUTPUT"
           echo "Setting agent-plugins-mux staging version: $STAGING_VERSION_UNIFIED"
           echo "Setting SDK staging version: $STAGING_VERSION_SDK"
+          echo "Setting agent-mux staging version: $STAGING_VERSION_AGENT_MUX"
           echo "Setting Codex staging version: $STAGING_VERSION_CODEX"
           echo "Setting GitHub staging version: $STAGING_VERSION_GITHUB"
           echo "Setting Cursor staging version: $STAGING_VERSION_CURSOR"
@@ -260,6 +276,41 @@ jobs:
             const unifiedPkg = JSON.parse(fs.readFileSync(unifiedPkgPath, 'utf8'));
             unifiedPkg.version = '${STAGING_VERSION_UNIFIED}';
             fs.writeFileSync(unifiedPkgPath, JSON.stringify(unifiedPkg, null, 2) + '\n');
+            const agentMuxPackagePaths = [
+              'packages/agent-mux/adapters/package.json',
+              'packages/agent-mux/cli/package.json',
+              'packages/agent-mux/core/package.json',
+              'packages/agent-mux/gateway/package.json',
+              'packages/agent-mux/harness-mock/package.json',
+              'packages/agent-mux/mobile-android-app/package.json',
+              'packages/agent-mux/mobile-ios-app/package.json',
+              'packages/agent-mux/observability/package.json',
+              'packages/agent-mux/sdk/package.json',
+              'packages/agent-mux/tui/package.json',
+              'packages/agent-mux/tv-androidtv-app/package.json',
+              'packages/agent-mux/tv-appletv-app/package.json',
+              'packages/agent-mux/ui/package.json',
+              'packages/agent-mux/watch-watchos-app/package.json',
+              'packages/agent-mux/watch-wearos-app/package.json',
+              'packages/agent-mux/webui/package.json'
+            ];
+            for (const pkgPath of agentMuxPackagePaths) {
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+              pkg.version = '${STAGING_VERSION_AGENT_MUX}';
+              for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies', 'devDependencies']) {
+                if (!pkg[field]) continue;
+                for (const depName of ['@a5c-ai/agent-mux', '@a5c-ai/agent-mux-adapters', '@a5c-ai/agent-mux-cli', '@a5c-ai/agent-mux-core', '@a5c-ai/agent-mux-gateway', '@a5c-ai/agent-mux-observability', '@a5c-ai/agent-mux-ui']) {
+                  if (pkg[field][depName]) {
+                    pkg[field][depName] = pkg[field][depName].startsWith('^')
+                      ? '^${STAGING_VERSION_AGENT_MUX}'
+                      : pkg[field][depName].startsWith('~')
+                        ? '~${STAGING_VERSION_AGENT_MUX}'
+                        : '${STAGING_VERSION_AGENT_MUX}';
+                  }
+                }
+              }
+              fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+            }
             const codexPkgPath = 'plugins/babysitter-codex/package.json';
             const codexPkg = JSON.parse(fs.readFileSync(codexPkgPath, 'utf8'));
             codexPkg.version = '${STAGING_VERSION_CODEX}';
@@ -394,6 +445,16 @@ jobs:
           set -euo pipefail
           npm run test:hooks-mux
 
+      - name: Build agent-mux packages
+        run: |
+          set -euo pipefail
+          npm run build:agent-mux
+
+      - name: agent-mux tests
+        run: |
+          set -euo pipefail
+          npm run test:agent-mux
+
       - name: Publish SDK to npm (staging tag)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -407,6 +468,16 @@ jobs:
         run: |
           set -euo pipefail
           npm publish --workspace=@a5c-ai/agent-plugins-mux --access public --tag staging
+
+      - name: Publish agent-mux packages (staging)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          for pkg in @a5c-ai/agent-mux-observability @a5c-ai/agent-mux-core @a5c-ai/agent-mux-adapters @a5c-ai/agent-mux-harness-mock @a5c-ai/agent-mux-ui @a5c-ai/agent-mux-gateway @a5c-ai/agent-mux-cli @a5c-ai/agent-mux-webui @a5c-ai/agent-mux @a5c-ai/agent-mux-tui; do
+            echo "Publishing $pkg..."
+            npm publish --workspace=$pkg --access public --tag staging
+          done
 
       - name: Inject SDK dependency into codex package for publish
         run: |

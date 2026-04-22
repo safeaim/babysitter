@@ -53,6 +53,16 @@ function createStubConn(id: string): StubConn {
   };
 }
 
+async function waitUntil(predicate: () => boolean, timeoutMs: number = 2_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (!predicate()) {
+    if (Date.now() > deadline) {
+      throw new Error('Timed out waiting for condition');
+    }
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+}
+
 describe('gateway run manager', () => {
   const tempDirs: string[] = [];
 
@@ -100,7 +110,7 @@ describe('gateway run manager', () => {
       delta: 'b',
       accumulated: 'ab',
     });
-    await new Promise((resolve) => setTimeout(resolve, 25));
+    await waitUntil(() => (manager as any).eventLog.getSeqState(run.runId).tailSeq >= 3);
 
     const conn = createStubConn('left');
     await manager.subscribe(conn as unknown as ClientConn, run.runId, 1);
@@ -112,7 +122,7 @@ describe('gateway run manager', () => {
       timestamp: Date.now(),
       text: 'done',
     });
-    await new Promise((resolve) => setTimeout(resolve, 25));
+    await waitUntil(() => conn.frames.filter((frame) => frame['type'] === 'run.event').length >= 3);
 
     const runEvents = conn.frames.filter((frame) => frame['type'] === 'run.event');
     expect(runEvents.map((frame) => frame['seq'])).toEqual([2, 3, 4]);
@@ -153,7 +163,7 @@ describe('gateway run manager', () => {
         accumulated: String(index),
       });
     }
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await waitUntil(() => (manager as any).eventLog.getSeqState(run.runId).headSeq > 1);
 
     const conn = createStubConn('stale');
     await manager.subscribe(conn as unknown as ClientConn, run.runId, 0);

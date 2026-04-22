@@ -32,14 +32,14 @@ export function EventList(props: EventListProps): JSX.Element {
 
   if (Platform.OS === 'web') {
     return (
-      <ScrollView onScroll={(event) => props.onScrollPositionChange?.(event.nativeEvent.contentOffset.y)}>
+      <ScrollView onScroll={(event: { nativeEvent: { contentOffset: { y: number } } }) => props.onScrollPositionChange?.(event.nativeEvent.contentOffset.y)}>
         <View>{content}</View>
       </ScrollView>
     );
   }
 
   return (
-    <ScrollView onScroll={(event) => props.onScrollPositionChange?.(event.nativeEvent.contentOffset.y)}>
+    <ScrollView onScroll={(event: { nativeEvent: { contentOffset: { y: number } } }) => props.onScrollPositionChange?.(event.nativeEvent.contentOffset.y)}>
       <View>{content}</View>
     </ScrollView>
   );

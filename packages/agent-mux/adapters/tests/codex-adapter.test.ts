@@ -267,13 +267,17 @@ describe('CodexAdapter', () => {
 
   describe('detectAuth', () => {
     const originalEnv = process.env;
+    let tempCodexHome: string;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       process.env = { ...originalEnv };
+      tempCodexHome = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-home-'));
+      process.env['CODEX_HOME'] = tempCodexHome;
     });
 
-    afterEach(() => {
+    afterEach(async () => {
       process.env = originalEnv;
+      await fs.rm(tempCodexHome, { recursive: true, force: true });
     });
 
     it('returns authenticated with OPENAI_API_KEY', async () => {

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom-v6';
 
 import { HomePage } from './pages/HomePage.js';
 import { LoginPage } from './pages/LoginPage.js';

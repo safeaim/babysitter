@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams, useParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom-v6';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { useGateway } from '@a5c-ai/agent-mux-ui';

@@ -87,6 +87,16 @@ jobs:
           set -euo pipefail
           npm run test:hooks-mux 2>&1 | tee artifacts/logs/hooks-mux-tests.log
 
+      - name: Build agent-mux packages
+        run: |
+          set -euo pipefail
+          npm run build:agent-mux 2>&1 | tee artifacts/logs/agent-mux-build.log
+
+      - name: agent-mux tests
+        run: |
+          set -euo pipefail
+          npm run test:agent-mux 2>&1 | tee artifacts/logs/agent-mux-tests.log
+
       - name: Build and test agent-plugins-mux
         run: |
           set -euo pipefail
@@ -208,7 +218,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json packages/sdk/package.json packages/babysitter/package.json packages/babysitter-agent/package.json packages/agent-plugins-mux/package.json packages/breakpoints-mux/package.json packages/hooks-mux/core/package.json packages/hooks-mux/cli/package.json packages/hooks-mux/adapter-claude/package.json packages/hooks-mux/adapter-codex/package.json packages/hooks-mux/adapter-gemini/package.json packages/hooks-mux/adapter-copilot/package.json packages/hooks-mux/adapter-cursor/package.json packages/hooks-mux/adapter-pi/package.json packages/hooks-mux/adapter-oh-my-pi/package.json packages/hooks-mux/adapter-opencode/package.json packages/hooks-mux/adapter-openclaw/package.json package-lock.json CHANGELOG.md plugins/babysitter/.claude-plugin/plugin.json plugins/babysitter/plugin.json plugins/babysitter/versions.json plugins/babysitter-codex/package.json plugins/babysitter-codex/versions.json plugins/babysitter-gemini/package.json plugins/babysitter-gemini/plugin.json plugins/babysitter-gemini/gemini-extension.json plugins/babysitter-gemini/versions.json plugins/babysitter-pi/package.json plugins/babysitter-pi/versions.json plugins/babysitter-omp/package.json plugins/babysitter-omp/versions.json plugins/babysitter-opencode/package.json plugins/babysitter-opencode/plugin.json plugins/babysitter-opencode/versions.json plugins/babysitter-openclaw/package.json plugins/babysitter-openclaw/plugin.json plugins/babysitter-openclaw/openclaw.plugin.json plugins/babysitter-openclaw/versions.json plugins/babysitter-github/plugin.json plugins/babysitter-github/versions.json plugins/babysitter-github/package.json plugins/babysitter-cursor/plugin.json plugins/babysitter-cursor/versions.json plugins/babysitter-cursor/package.json plugins/babysitter-paperclip/package.json plugins/babysitter-paperclip/versions.json .claude-plugin/marketplace.json
+          git add package.json packages/sdk/package.json packages/babysitter/package.json packages/babysitter-agent/package.json packages/agent-plugins-mux/package.json packages/breakpoints-mux/package.json packages/hooks-mux/core/package.json packages/hooks-mux/cli/package.json packages/hooks-mux/adapter-claude/package.json packages/hooks-mux/adapter-codex/package.json packages/hooks-mux/adapter-gemini/package.json packages/hooks-mux/adapter-copilot/package.json packages/hooks-mux/adapter-cursor/package.json packages/hooks-mux/adapter-pi/package.json packages/hooks-mux/adapter-oh-my-pi/package.json packages/hooks-mux/adapter-opencode/package.json packages/hooks-mux/adapter-openclaw/package.json packages/agent-mux/adapters/package.json packages/agent-mux/cli/package.json packages/agent-mux/core/package.json packages/agent-mux/gateway/package.json packages/agent-mux/harness-mock/package.json packages/agent-mux/mobile-android-app/package.json packages/agent-mux/mobile-ios-app/package.json packages/agent-mux/observability/package.json packages/agent-mux/sdk/package.json packages/agent-mux/tui/package.json packages/agent-mux/tv-androidtv-app/package.json packages/agent-mux/tv-appletv-app/package.json packages/agent-mux/ui/package.json packages/agent-mux/watch-watchos-app/package.json packages/agent-mux/watch-wearos-app/package.json packages/agent-mux/webui/package.json package-lock.json CHANGELOG.md plugins/babysitter/.claude-plugin/plugin.json plugins/babysitter/plugin.json plugins/babysitter/versions.json plugins/babysitter-codex/package.json plugins/babysitter-codex/versions.json plugins/babysitter-gemini/package.json plugins/babysitter-gemini/plugin.json plugins/babysitter-gemini/gemini-extension.json plugins/babysitter-gemini/versions.json plugins/babysitter-pi/package.json plugins/babysitter-pi/versions.json plugins/babysitter-omp/package.json plugins/babysitter-omp/versions.json plugins/babysitter-opencode/package.json plugins/babysitter-opencode/plugin.json plugins/babysitter-opencode/versions.json plugins/babysitter-openclaw/package.json plugins/babysitter-openclaw/plugin.json plugins/babysitter-openclaw/openclaw.plugin.json plugins/babysitter-openclaw/versions.json plugins/babysitter-github/plugin.json plugins/babysitter-github/versions.json plugins/babysitter-github/package.json plugins/babysitter-cursor/plugin.json plugins/babysitter-cursor/versions.json plugins/babysitter-cursor/package.json plugins/babysitter-paperclip/package.json plugins/babysitter-paperclip/versions.json .claude-plugin/marketplace.json
           if git diff --cached --quiet; then
             echo "No version changes detected."
           else
@@ -249,12 +259,32 @@ jobs:
           set -euo pipefail
           npm run test:hooks-mux
 
+      - name: Build agent-mux packages
+        run: |
+          set -euo pipefail
+          npm run build:agent-mux
+
+      - name: agent-mux tests
+        run: |
+          set -euo pipefail
+          npm run test:agent-mux
+
       - name: Pack npm artifacts
         run: |
           set -euo pipefail
           npm pack --workspace=@a5c-ai/babysitter-sdk --pack-destination artifacts/release
           npm pack --workspace=@a5c-ai/agent-plugins-mux --pack-destination artifacts/release
           npm pack --workspace=@a5c-ai/breakpoints-mux --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-observability --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-core --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-adapters --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-harness-mock --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-ui --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-gateway --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-cli --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-webui --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux --pack-destination artifacts/release
+          npm pack --workspace=@a5c-ai/agent-mux-tui --pack-destination artifacts/release
           (cd packages/babysitter && npm pack --pack-destination ../../artifacts/release)
           (cd plugins/babysitter-codex && npm pack --pack-destination ../../artifacts/release)
           (cd plugins/babysitter-github && npm pack --pack-destination ../../artifacts/release)
@@ -297,6 +327,16 @@ jobs:
         run: |
           set -euo pipefail
           npm publish --workspace=@a5c-ai/breakpoints-mux --access public
+
+      - name: Publish agent-mux packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          for pkg in @a5c-ai/agent-mux-observability @a5c-ai/agent-mux-core @a5c-ai/agent-mux-adapters @a5c-ai/agent-mux-harness-mock @a5c-ai/agent-mux-ui @a5c-ai/agent-mux-gateway @a5c-ai/agent-mux-cli @a5c-ai/agent-mux-webui @a5c-ai/agent-mux @a5c-ai/agent-mux-tui; do
+            echo "Publishing $pkg..."
+            npm publish --workspace=$pkg --access public
+          done
 
       - name: Inject SDK dependency into codex package for publish
         run: |

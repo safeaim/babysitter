@@ -49,8 +49,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
     "codegen": "tsx src/codegen/swift-types.ts && tsx src/codegen/kotlin-types.ts",
+    "test": "vitest run --config ../../../vitest.config.ts \"tests/**/*.test.ts\" \"tests/**/*.test.tsx\" \"src/**/*.test.ts\" \"src/**/*.test.tsx\"",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

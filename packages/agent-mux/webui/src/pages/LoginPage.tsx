@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v6';
 
 import { useGatewayAuth } from '../providers/GatewayProvider.js';
 

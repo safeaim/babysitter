@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { CodexSdkAdapter } from '../src/codex-sdk-adapter.js';
@@ -170,13 +171,17 @@ describe('CodexSdkAdapter', () => {
 
   describe('authentication', () => {
     let originalEnv: NodeJS.ProcessEnv;
+    let tempCodexHome: string;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       originalEnv = { ...process.env };
+      tempCodexHome = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-sdk-home-'));
+      process.env.CODEX_HOME = tempCodexHome;
     });
 
-    afterEach(() => {
+    afterEach(async () => {
       process.env = originalEnv;
+      await fs.rm(tempCodexHome, { recursive: true, force: true });
     });
 
     it('detects OpenAI API key', async () => {
@@ -244,14 +249,18 @@ describe('CodexSdkAdapter', () => {
 
   describe('execution', () => {
     let originalEnv: NodeJS.ProcessEnv;
+    let tempCodexHome: string;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       originalEnv = { ...process.env };
+      tempCodexHome = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-sdk-home-'));
+      process.env.CODEX_HOME = tempCodexHome;
       process.env.OPENAI_API_KEY = 'sk-test123';
     });
 
-    afterEach(() => {
+    afterEach(async () => {
       process.env = originalEnv;
+      await fs.rm(tempCodexHome, { recursive: true, force: true });
     });
 
     it('validates run options', async () => {

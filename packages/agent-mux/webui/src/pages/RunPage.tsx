@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom-v6';
 import { useRun } from '@a5c-ai/agent-mux-ui';
 
 export function SessionPendingPage(): JSX.Element {

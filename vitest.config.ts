@@ -3,6 +3,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     include: ['packages/*/src/**/*.test.{ts,tsx}', 'packages/*/tests/**/*.test.{ts,tsx}', 'packages/agent-mux/*/src/**/*.test.{ts,tsx}', 'packages/agent-mux/*/tests/**/*.test.{ts,tsx}'],
+    setupFiles: ['vitest.setup.ts'],
     environment: 'node',
     coverage: {
       provider: 'v8',

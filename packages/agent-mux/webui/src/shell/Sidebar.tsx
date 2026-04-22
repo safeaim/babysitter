@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom-v6';
 
 export function Sidebar(): JSX.Element {
   return (

@@ -37,7 +37,7 @@ type UnionAliasModel = {
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const srcRoot = path.resolve(scriptDir, '..');
 const packageRoot = path.resolve(srcRoot, '..');
-const repoRoot = path.resolve(packageRoot, '..', '..');
+const repoRoot = path.resolve(packageRoot, '..', '..', '..');
 const protocolPath = path.join(srcRoot, 'protocol', 'v1.ts');
 const outputPath = path.join(packageRoot, 'build', 'schema', 'kotlin', 'AmuxProtocol.kt');
 

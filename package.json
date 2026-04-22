@@ -32,6 +32,8 @@
     "token:eval": "bash scripts/eval-compression.sh",
     "build:observer": "npm run build --workspace=@a5c-ai/babysitter-observer-dashboard",
     "test:observer": "npm run test --workspace=@a5c-ai/babysitter-observer-dashboard",
+    "build:agent-mux": "node scripts/agent-mux-build.cjs build",
+    "test:agent-mux": "node scripts/agent-mux-build.cjs test",
     "build:hooks-mux": "node scripts/hooks-mux-build.cjs build",
     "test:hooks-mux": "node scripts/hooks-mux-build.cjs test",
     "lint:hooks-mux": "node scripts/hooks-mux-build.cjs lint",
@@ -46,10 +48,13 @@
   "devDependencies": {
     "@docusaurus/core": "^3.0.0",
     "@docusaurus/preset-classic": "^3.0.0",
+    "@anthropic-ai/claude-agent-sdk": "^0.2.113",
+    "@vitejs/plugin-react": "^6.0.1",
     "@mdx-js/react": "^3.0.0",
     "prism-react-renderer": "^2.0.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "react-router-dom-v6": "npm:react-router-dom@^6.30.2"
   },
   "overrides": {
     "@radix-ui/react-dialog": {

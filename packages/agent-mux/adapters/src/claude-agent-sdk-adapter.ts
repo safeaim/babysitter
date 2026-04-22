@@ -935,7 +935,10 @@ export class ClaudeAgentSdkAdapter extends BaseProgrammaticAdapter {
     }
 
     if (message.type === 'result') {
-      const cost = this.extractCostFromResult(message, modelId);
+      const cost = this.extractCostFromResult(
+        message as ClaudeSdkMessage & { type: 'result'; usage?: unknown; total_cost_usd?: number },
+        modelId,
+      );
       if (cost) {
         events.push(this.createCostEvent(runId, cost));
       }
@@ -984,7 +987,10 @@ export class ClaudeAgentSdkAdapter extends BaseProgrammaticAdapter {
     }
   }
 
-  private extractCostFromResult(result: Extract<ClaudeSdkMessage, { type: 'result' }>, modelId: string): CostRecord | null {
+  private extractCostFromResult(
+    result: ClaudeSdkMessage & { type: 'result'; usage?: unknown; total_cost_usd?: number },
+    modelId: string,
+  ): CostRecord | null {
     const model = this.models.find((candidate) => candidate.modelId === modelId);
     if (!model) {
       return null;

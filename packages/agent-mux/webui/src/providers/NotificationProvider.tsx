@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useHookRequests } from '@a5c-ai/agent-mux-ui';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v6';
 
 import { requestDesktopNotificationPermission, showDesktopHookNotification } from '../web-only/desktop-notifications.js';
 import { useGatewayAuth } from './GatewayProvider.js';

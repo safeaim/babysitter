@@ -34,6 +34,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const PACKAGE_ROOT = path.resolve(__dirname, '..');
+let shared;
+try { shared = require('./install-shared'); } catch {}
 
 function printUsage() {
   console.error([
@@ -90,6 +92,9 @@ function main() {
   }
 
   if (command === 'install') {
+    if (shared && typeof shared.harnessCliRoute === 'function' && shared.harnessCliRoute(rest, PACKAGE_ROOT, runNodeScript)) {
+      return;
+    }
     const parsed = parseInstallArgs(rest);
     if (parsed.scope === 'workspace') {
       const args = [];
@@ -142,6 +147,9 @@ function main() {
   try {
     shared.copyPluginBundle(PACKAGE_ROOT, pluginRoot);
     shared.ensureMarketplaceEntry(marketplacePath, pluginRoot);
+    if (typeof shared.harnessInstall === 'function') {
+      shared.harnessInstall(PACKAGE_ROOT, pluginRoot);
+    }
     shared.runPostInstall && shared.runPostInstall(pluginRoot);
     console.log(\`[\${shared.PLUGIN_NAME}] Installation complete!\`);
     console.log(\`[\${shared.PLUGIN_NAME}] Restart your IDE/CLI to pick up the plugin.\`);

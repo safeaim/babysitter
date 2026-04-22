@@ -1,0 +1,46 @@
+name: "amux-proxy: CI"
+on:
+  push:
+    branches: [main]
+    paths: ["packages/amux-proxy/**"]
+  pull_request:
+    paths: ["packages/amux-proxy/**"]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -e ".[dev]"
+        working-directory: packages/amux-proxy
+      - run: |
+          . .venv/bin/activate
+          ruff check .
+        working-directory: packages/amux-proxy
+      - run: |
+          . .venv/bin/activate
+          ruff format --check .
+        working-directory: packages/amux-proxy
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -e ".[all]"
+        working-directory: packages/amux-proxy
+      - run: |
+          . .venv/bin/activate
+          python -m pytest --tb=short -q
+        working-directory: packages/amux-proxy

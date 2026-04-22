@@ -213,13 +213,15 @@ export function generateManifests(
       scripts.test = 'node test/integration.test.js';
       scripts['sync:commands'] = 'node scripts/sync-command-docs.cjs';
     }
-    const packageFiles = ['bin/', 'hooks/', 'skills/', 'commands/', 'scripts/', 'plugin.json', 'README.md', 'versions.json', 'package.json'];
+    const packageFiles = ['bin/'];
     if (targetProfile.name === 'github-copilot' || targetProfile.name === 'cursor') {
-      packageFiles.splice(2, 0, 'hooks.json');
-      if (targetProfile.name === 'github-copilot') {
-        packageFiles.push('AGENTS.md');
-      }
+      packageFiles.push('hooks.json');
     }
+    packageFiles.push('hooks/', 'skills/', 'commands/', 'scripts/', 'plugin.json');
+    if (targetProfile.name === 'github-copilot') {
+      packageFiles.push('AGENTS.md');
+    }
+    packageFiles.push('README.md', 'versions.json', 'package.json');
     const pkgJson: Record<string, unknown> = {
       name: npmPkg,
       version: manifest.version,

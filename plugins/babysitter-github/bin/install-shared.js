@@ -206,12 +206,12 @@ const LEGACY_HOOK_SCRIPT_NAMES = [
   'user-prompt-submit.sh',
 ];
 const HOOK_SCRIPT_NAMES = [
-  'session-start.sh',
-  'session-start.ps1',
-  'session-end.sh',
-  'session-end.ps1',
-  'user-prompt-submitted.sh',
-  'user-prompt-submitted.ps1',
+  'babysitter-proxied-session-start.sh',
+  'babysitter-proxied-session-start.ps1',
+  'babysitter-proxied-session-end.sh',
+  'babysitter-proxied-session-end.ps1',
+  'babysitter-proxied-user-prompt-submitted.sh',
+  'babysitter-proxied-user-prompt-submitted.ps1',
 ];
 const DEFAULT_MARKETPLACE = {
   name: 'local-plugins',

@@ -5,6 +5,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const PACKAGE_ROOT = path.resolve(__dirname, '..');
+let shared;
+try { shared = require('./install-shared'); } catch {}
 
 function printUsage() {
   console.error([
@@ -18,7 +20,6 @@ function printUsage() {
 function parseInstallArgs(argv) {
   let scope = 'global';
   let workspace = null;
-  let cloudAgent = false;
   const passthrough = [];
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -38,15 +39,10 @@ function parseInstallArgs(argv) {
       }
       continue;
     }
-    if (arg === '--cloud-agent') {
-      cloudAgent = true;
-      passthrough.push(arg);
-      continue;
-    }
     passthrough.push(arg);
   }
 
-  return { scope, workspace, cloudAgent, passthrough };
+  return { scope, workspace, passthrough };
 }
 
 function runNodeScript(scriptPath, args, extraEnv = {}) {
@@ -67,15 +63,10 @@ function main() {
   }
 
   if (command === 'install') {
-    const parsed = parseInstallArgs(rest);
-    if (parsed.cloudAgent) {
-      const args = [...parsed.passthrough];
-      if (parsed.workspace) {
-        args.push('--workspace', parsed.workspace);
-      }
-      runNodeScript(path.join(PACKAGE_ROOT, 'bin', 'install.js'), args);
+    if (shared && typeof shared.harnessCliRoute === 'function' && shared.harnessCliRoute(rest, PACKAGE_ROOT, runNodeScript)) {
       return;
     }
+    const parsed = parseInstallArgs(rest);
     if (parsed.scope === 'workspace') {
       const args = [];
       if (parsed.workspace) {

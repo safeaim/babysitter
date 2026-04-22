@@ -77,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "npx a5c-hooks-mux invoke --adapter claude --handler \"bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-pre-compact.sh\" --json"
+            "command": "npx -y @a5c-ai/hooks-mux-cli invoke --adapter claude --handler \"bash ${CLAUDE_PLUGIN_ROOT}/hooks/babysitter-proxied-pre-compact.sh\" --json"
           }
         ]
       }

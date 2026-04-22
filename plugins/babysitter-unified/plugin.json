@@ -104,7 +104,7 @@
       "harnessInstallSurface": "per-harness/codex/bin/install-surface.js",
       "harnessInstallSurfaceExports": [
         "LEGACY_MARKETPLACE_PLUGIN_NAMES", "LEGACY_SKILL_NAMES", "LEGACY_PROMPT_NAMES",
-        "LEGACY_HOOK_SCRIPT_NAMES", "DEFAULT_MARKETPLACE", "PLUGIN_BUNDLE_ENTRIES",
+        "LEGACY_HOOK_SCRIPT_NAMES", "MANAGED_HOOK_SCRIPT_NAMES", "DEFAULT_MARKETPLACE", "PLUGIN_BUNDLE_ENTRIES",
         "getCodexHome", "getHomePluginRoot", "getHomeMarketplacePath",
         "renderCodexConfigToml", "copyRecursive", "copyPluginBundle",
         "insertRootKey", "ensureSectionLine", "ensureWritableRoots",
@@ -114,7 +114,7 @@
         "ensureMarketplaceEntry", "removeMarketplaceEntry",
         "removeLegacyCodexSurface", "installManagedSkills",
         "mergeManagedHooksConfig", "installManagedHooks",
-        "installCodexSurface", "warnWindowsHooks"
+        "installCodexSurface", "harnessInstall", "harnessTeamInstall", "warnWindowsHooks"
       ],
       "extraFiles": {
         "skills/babysit/SKILL.md": "file:per-harness/codex/babysit-SKILL.md",
@@ -182,7 +182,8 @@
         "installCloudAgentSetupSteps", "installCloudAgentSurface",
         "normalizeMarketplaceSourcePath",
         "ensureMarketplaceEntry", "removeMarketplaceEntry",
-        "warnWindowsHooks", "copyPluginBundle", "copyRecursive"
+        "warnWindowsHooks", "copyPluginBundle", "copyRecursive",
+        "harnessCliRoute", "harnessInstall"
       ],
       "extraFiles": {
         "AGENTS.md": "file:per-harness/github/AGENTS.md",

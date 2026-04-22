@@ -199,7 +199,7 @@ export function generateGeminiHooksJson(
   return JSON.stringify({
     description: `${manifest.name} plugin hooks for Gemini CLI`,
     hooks,
-  }, null, 2);
+  }, null, 2) + '\n';
 }
 
 export function generateGithubCopilotHooksJson(
@@ -268,7 +268,7 @@ export function generateOpenCodeHooksJson(
     version: 1,
     description: `${manifest.name} hook registration for OpenCode.`,
     hooks,
-  }, null, 2);
+  }, null, 2) + '\n';
 }
 
 export function generateOpenClawHooksJson(
@@ -303,5 +303,5 @@ export function generateOpenClawHooksJson(
   return JSON.stringify({
     description: `${manifest.name} plugin hooks for OpenClaw`,
     hooks,
-  }, null, 2);
+  }, null, 2) + '\n';
 }

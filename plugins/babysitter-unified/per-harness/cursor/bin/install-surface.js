@@ -2,10 +2,10 @@
 // Appended after the compiler base and SDK surface — can override base functions.
 
 const HOOK_SCRIPT_NAMES = [
-  'session-start.sh',
-  'session-start.ps1',
-  'stop-hook.sh',
-  'stop-hook.ps1',
+  'babysitter-proxied-session-start.sh',
+  'babysitter-proxied-session-start.ps1',
+  'babysitter-proxied-stop.sh',
+  'babysitter-proxied-stop.ps1',
 ];
 
 const DEFAULT_MARKETPLACE = {

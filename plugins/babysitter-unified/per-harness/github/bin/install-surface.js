@@ -10,12 +10,12 @@ const LEGACY_HOOK_SCRIPT_NAMES = [
   'user-prompt-submit.sh',
 ];
 const HOOK_SCRIPT_NAMES = [
-  'session-start.sh',
-  'session-start.ps1',
-  'session-end.sh',
-  'session-end.ps1',
-  'user-prompt-submitted.sh',
-  'user-prompt-submitted.ps1',
+  'babysitter-proxied-session-start.sh',
+  'babysitter-proxied-session-start.ps1',
+  'babysitter-proxied-session-end.sh',
+  'babysitter-proxied-session-end.ps1',
+  'babysitter-proxied-user-prompt-submitted.sh',
+  'babysitter-proxied-user-prompt-submitted.ps1',
 ];
 const DEFAULT_MARKETPLACE = {
   name: 'local-plugins',
@@ -589,4 +589,34 @@ function copyRecursive(src, dest) {
 
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.copyFileSync(src, dest);
+}
+
+function harnessCliRoute(argv, packageRoot, runNodeScript) {
+  if (argv.includes('--cloud-agent')) {
+    const args = argv.filter(a => a !== '--cloud-agent');
+    args.push('--cloud-agent');
+    runNodeScript(path.join(packageRoot, 'bin', 'install.js'), args);
+    return true;
+  }
+  return false;
+}
+
+function harnessInstall(packageRoot, _pluginRoot) {
+  const argv = process.argv.slice(2);
+  if (!argv.includes('--cloud-agent')) return;
+  const workspaceIdx = argv.indexOf('--workspace');
+  const workspaceRoot = (workspaceIdx >= 0 && argv[workspaceIdx + 1])
+    ? path.resolve(argv[workspaceIdx + 1])
+    : process.cwd();
+  console.log(`[${PLUGIN_NAME}] Installing cloud-agent support into ${workspaceRoot}`);
+  const activeProcessLibrary = runCli(packageRoot, [
+    'process-library:active',
+    '--json',
+  ], { stdio: 'pipe' });
+  if (activeProcessLibrary.status !== 0) {
+    ensureGlobalProcessLibrary(packageRoot);
+  }
+  installCloudAgentSurface(packageRoot, workspaceRoot);
+  console.log(`[${PLUGIN_NAME}] Cloud-agent installation complete!`);
+  process.exit(0);
 }

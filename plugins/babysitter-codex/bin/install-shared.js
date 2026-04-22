@@ -697,13 +697,48 @@ function installCodexSurface(packageRoot, codexHome) {
   installManagedHooks(packageRoot, codexHome);
 }
 
+function harnessTeamInstall(packageRoot, pluginRoot, workspace) {
+  var marketplacePath = path.join(workspace, '.agents', 'plugins', 'marketplace.json');
+  var codexHome = path.join(workspace, '.codex');
+  var codexConfigPath = path.join(codexHome, 'config.toml');
+  var teamDir = path.join(workspace, '.a5c', 'team');
+
+  var processLibraryState = ensureGlobalProcessLibrary(packageRoot);
+  ensureMarketplaceEntry(marketplacePath, pluginRoot);
+  mergeCodexConfigFile(codexConfigPath);
+  installCodexSurface(packageRoot, codexHome);
+  warnWindowsHooks();
+
+  writeJson(path.join(teamDir, 'install.json'), {
+    packageRoot: packageRoot,
+    workspaceRoot: workspace,
+    pluginRoot: pluginRoot,
+    marketplacePath: marketplacePath,
+    codexConfigPath: codexConfigPath,
+    processLibraryCloneDir: (processLibraryState.defaultSpec && processLibraryState.defaultSpec.cloneDir)
+      || (processLibraryState.binding && processLibraryState.binding.dir),
+    processLibraryStateFile: processLibraryState.stateFile
+      || path.join(getGlobalStateDir(), 'active', 'process-library.json'),
+  });
+  writeJson(path.join(teamDir, 'profile.json'), {
+    pluginRoot: pluginRoot,
+    marketplacePath: marketplacePath,
+    codexConfigPath: codexConfigPath,
+    processLibraryLookupCommand: 'babysitter process-library:active --json',
+  });
+}
+
+function harnessInstall(packageRoot, _pluginRoot) {
+  const codexConfigPath = path.join(getCodexHome(), 'config.toml');
+  mergeCodexConfigFile(codexConfigPath);
+  ensureGlobalProcessLibrary(packageRoot);
+  warnWindowsHooks();
+}
+
 function warnWindowsHooks() {
   if (process.platform !== 'win32') {
     return;
   }
-  // Codex enabled Windows hooks in v0.119.0 (2026-04-10, openai/codex#17268).
-  // Older Codex CLIs still skip hook execution on Windows; warn so users on
-  // pinned/older versions know to upgrade.
   console.warn('[babysitter] Note: Codex hooks on Windows require Codex CLI >= 0.119.0.');
   console.warn('[babysitter] If hooks do not fire, run `codex --version` and upgrade if you are below 0.119.0.');
 }
@@ -753,5 +788,7 @@ module.exports = {
   mergeManagedHooksConfig,
   installManagedHooks,
   installCodexSurface,
+  harnessInstall,
+  harnessTeamInstall,
   warnWindowsHooks,
 };

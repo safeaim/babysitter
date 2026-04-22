@@ -3,14 +3,46 @@ title: agent-mux
 hide_table_of_contents: true
 ---
 
-# agent-mux
+<section class="amux-home__hero">
 
-**One client, every coding agent.** Drive Claude Code, Codex, Gemini, Cursor, OpenCode, Copilot, and more from a single streaming API — locally, in Docker, or in Kubernetes.
+# One client, every coding agent.
 
-- Unified `RunOptions` and `AgentEvent` model across 11 adapters
-- Session save/resume, hooks, and MCP plugin management
-- Mock harness for deterministic tests
-- Multi-agent dispatch and remote invocation
+<p class="amux-home__lede">
+Drive Claude Code, Codex, Gemini, Cursor, OpenCode, Copilot, and more from one streaming API. Local, Docker, SSH, and Kubernetes all fit the same contract.
+</p>
+
+<div class="amux-home__actions">
+  <a class="button button--primary button--lg" href="/docs/tutorials/getting-started">Open the docs</a>
+  <a class="button button--secondary button--lg" href="https://github.com/a5c-ai/agent-mux">View on GitHub</a>
+</div>
+
+<ul class="amux-home__stats">
+  <li><strong>11</strong><span>adapters</span></li>
+  <li><strong>4</strong><span>invocation modes</span></li>
+  <li><strong>1</strong><span>event model</span></li>
+  <li><strong>∞</strong><span>automation surfaces</span></li>
+</ul>
+
+</section>
+
+<section class="amux-home__grid">
+  <div class="amux-home__card">
+    <h2>Unified runtime</h2>
+    <p>`RunOptions` and `AgentEvent` stay stable across every supported harness.</p>
+  </div>
+  <div class="amux-home__card">
+    <h2>Sessions + hooks</h2>
+    <p>List, read, resume, fork, and automate agent sessions with native or virtual hooks.</p>
+  </div>
+  <div class="amux-home__card">
+    <h2>Deterministic tests</h2>
+    <p>The mock harness gives you replayable scenarios without real binaries or keys.</p>
+  </div>
+  <div class="amux-home__card">
+    <h2>Remote dispatch</h2>
+    <p>Run the same adapter contract locally, in containers, over SSH, or in Kubernetes.</p>
+  </div>
+</section>
 
 ## Get started
 

@@ -1,5 +1,8 @@
+import { createRequire } from 'node:module';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+
+const require = createRequire(import.meta.url);
 
 const config: Config = {
   title: 'agent-mux',
@@ -27,7 +30,9 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/a5c-ai/agent-mux/edit/main/',
         },
-        theme: { customCss: './src/css/custom.css' },
+        theme: {
+          customCss: [require.resolve('@a5c-ai/compendium/css'), './src/css/custom.css'],
+        },
       } satisfies Preset.Options,
     ],
   ],

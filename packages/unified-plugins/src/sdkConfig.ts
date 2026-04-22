@@ -19,7 +19,7 @@ export function resolveSdkConfig(manifest: A5cPluginManifest): SdkConfig {
   return {
     package: sdk.package || `${sdk.scope || '@' + name}/${name}-sdk`,
     cli: sdk.cli || name,
-    proxyPackage: sdk.proxyPackage || `a5c-hooks-proxy`,
+    proxyPackage: sdk.proxyPackage || `@a5c-ai/hooks-proxy-cli`,
     scope: sdk.scope || `@${name}`,
     envPrefix: sdk.envPrefix || name.toUpperCase().replace(/-/g, '_'),
     stateDir: sdk.stateDir || `.${name}`,

@@ -164,7 +164,7 @@ export function FilterPanel({
       {/* Entity Type Filters */}
       {showEntityTypes && (
         <div>
-          <h4 className="mb-3 text-sm font-medium text-white">Entity Type</h4>
+          <h4 className="mb-3 text-sm font-medium text-[var(--tkc-ink)]">Entity Type</h4>
           <div className="space-y-2">
             {entityTypeOptions.map((option) => {
               const isChecked = filters.entityTypes?.includes(option.value) || false;
@@ -174,15 +174,15 @@ export function FilterPanel({
                   className={cn(
                     "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 transition-colors",
                     isChecked
-                      ? "bg-[rgba(0,223,223,0.1)] text-[var(--scifi-cyan)]"
-                      : "text-[rgba(255,255,255,0.5)] hover:bg-[var(--scifi-surface)]"
+                      ? "bg-[rgba(192,58,43,0.08)] text-[var(--tkc-cinnabar)]"
+                      : "text-[var(--tkc-ink-quiet)] hover:bg-[var(--tkc-panel-muted)]"
                   )}
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => handleEntityTypeToggle(option.value)}
-                    className="h-4 w-4 rounded border-[rgba(0,223,223,0.3)] bg-[var(--scifi-surface)] text-[var(--scifi-cyan)] focus:ring-[var(--scifi-cyan)]"
+                    className="h-4 w-4 rounded border-[var(--tkc-rule-m)] bg-[rgba(255,255,255,0.65)] text-[var(--tkc-cinnabar)] focus:ring-[var(--tkc-cinnabar)]"
                   />
                   {option.icon}
                   <span className="text-sm">{option.label}</span>
@@ -196,14 +196,12 @@ export function FilterPanel({
       {/* Domain Filter */}
       {showDomain && domains.length > 0 && (
         <div>
-          <h4 className="mb-3 text-sm font-medium text-white">Domain</h4>
+          <h4 className="mb-3 text-sm font-medium text-[var(--tkc-ink)]">Domain</h4>
           <select
             value={filters.domain || ""}
             onChange={(e) => handleDomainChange(e.target.value)}
-            className="w-full rounded-sm bg-[var(--scifi-surface)] px-3 py-2 text-sm text-white focus:outline-none"
-            style={{
-              border: '1px solid rgba(0, 223, 223, 0.2)',
-            }}
+            className="w-full rounded-md border border-[var(--tkc-rule-m)] bg-[rgba(255,255,255,0.6)] px-3 py-2 text-sm text-[var(--tkc-ink)] focus:outline-none"
+            style={{ fontFamily: "var(--font-body)" }}
           >
             <option value="">All Domains</option>
             {domains.map((domain) => (
@@ -218,14 +216,12 @@ export function FilterPanel({
       {/* Category Filter */}
       {showCategory && categories.length > 0 && (
         <div>
-          <h4 className="mb-3 text-sm font-medium text-white">Category</h4>
+          <h4 className="mb-3 text-sm font-medium text-[var(--tkc-ink)]">Category</h4>
           <select
             value={filters.category || ""}
             onChange={(e) => handleCategoryChange(e.target.value)}
-            className="w-full rounded-sm bg-[var(--scifi-surface)] px-3 py-2 text-sm text-white focus:outline-none"
-            style={{
-              border: '1px solid rgba(0, 223, 223, 0.2)',
-            }}
+            className="w-full rounded-md border border-[var(--tkc-rule-m)] bg-[rgba(255,255,255,0.6)] px-3 py-2 text-sm text-[var(--tkc-ink)] focus:outline-none"
+            style={{ fontFamily: "var(--font-body)" }}
           >
             <option value="">All Categories</option>
             {categories.map((category) => (
@@ -240,7 +236,7 @@ export function FilterPanel({
       {/* Expertise Multi-Select */}
       {showExpertise && expertiseOptions.length > 0 && (
         <div>
-          <h4 className="mb-3 text-sm font-medium text-white">Expertise</h4>
+          <h4 className="mb-3 text-sm font-medium text-[var(--tkc-ink)]">Expertise</h4>
           <div className="flex flex-wrap gap-1.5">
             {expertiseOptions.map((exp) => {
               const isSelected = filters.expertise?.includes(exp) || false;

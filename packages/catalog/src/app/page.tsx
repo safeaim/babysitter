@@ -62,7 +62,7 @@ export default async function DashboardPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
       ),
-      color: "bg-[rgba(0,223,223,0.1)] text-[var(--scifi-cyan)]",
+      color: "bg-[rgba(192,58,43,0.08)] text-[var(--tkc-cinnabar)]",
       count: analytics?.counts.processes,
     },
     {
@@ -74,7 +74,7 @@ export default async function DashboardPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
         </svg>
       ),
-      color: "bg-[rgba(123,97,255,0.1)] text-[#7B61FF]",
+      color: "bg-[rgba(43,42,107,0.08)] text-[var(--tkc-lapis)]",
       count: analytics?.counts.domains,
     },
     {
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
-      color: "bg-[rgba(0,255,136,0.1)] text-[#00FF88]",
+      color: "bg-[rgba(47,111,94,0.08)] text-[var(--tkc-success-strong)]",
       count: analytics?.counts.skills,
     },
     {
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
       ),
-      color: "bg-[rgba(255,215,0,0.1)] text-[var(--scifi-yellow)]",
+      color: "bg-[rgba(179,126,62,0.08)] text-[var(--tkc-amber)]",
       count: analytics?.counts.agents,
     },
   ];
@@ -107,32 +107,30 @@ export default async function DashboardPage() {
     <div className="container py-10">
       {/* Hero Section */}
       <section
-        className="mx-auto flex max-w-[980px] flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-16 lg:pb-12 relative"
+        className="catalog-frame relative mx-auto flex max-w-[980px] flex-col items-center gap-4 overflow-hidden rounded-[20px] px-6 py-10 text-center md:px-12 md:py-14 lg:px-16"
       >
-        {/* Subtle glow behind hero */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, rgba(0, 223, 223, 0.05) 0%, transparent 70%)',
+            background:
+              "radial-gradient(circle at top, rgba(201,138,62,0.18) 0%, transparent 44%), linear-gradient(180deg, rgba(255,255,255,0.32), transparent)",
           }}
         />
 
         <Badge variant="neon" className="mb-4">
-          Babysitter Framework
+          The Compendium Edition
         </Badge>
         <h1
-          className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1] text-white relative"
-          style={{
-            textShadow: '0 0 30px rgba(0, 223, 223, 0.2), 0 0 60px rgba(255, 0, 224, 0.1)',
-          }}
+          className="relative max-w-4xl text-center text-4xl font-semibold leading-tight tracking-tight md:text-6xl"
+          style={{ color: "var(--tkc-ink)", fontFamily: "var(--font-display)" }}
         >
           Process Library Catalog
         </h1>
-        <p className="max-w-[750px] text-center text-lg text-[rgba(255,255,255,0.5)] sm:text-xl relative">
+        <p className="relative max-w-[750px] text-center text-lg text-[var(--tkc-ink-soft)] sm:text-xl">
           Browse and explore process definitions, agents, and skills for
           building intelligent automation workflows.
         </p>
-        <div className="flex w-full items-center justify-center space-x-4 py-4 md:pb-10 relative">
+        <div className="relative flex w-full items-center justify-center space-x-4 py-4 md:pb-4">
           <Link
             href={"/processes" as Route}
             className="btn-neon inline-flex h-10 items-center justify-center px-8 text-sm font-medium"
@@ -226,8 +224,8 @@ export default async function DashboardPage() {
       {/* Quick Links Section */}
       <section className="mt-12">
         <div className="mb-6 flex flex-col gap-2">
-          <h2 className="text-2xl font-bold tracking-tight text-white">Quick Links</h2>
-          <p className="text-[rgba(255,255,255,0.4)]">
+          <h2 className="text-2xl font-bold tracking-tight text-[var(--tkc-ink)]">Quick Links</h2>
+          <p className="text-[var(--tkc-ink-quiet)]">
             Navigate to key sections of the catalog.
           </p>
         </div>
@@ -268,8 +266,8 @@ export default async function DashboardPage() {
       {/* Recent Activity Section */}
       <section className="mt-12">
         <div className="mb-6 flex flex-col gap-2">
-          <h2 className="text-2xl font-bold tracking-tight text-white">Recent Activity</h2>
-          <p className="text-[rgba(255,255,255,0.4)]">
+          <h2 className="text-2xl font-bold tracking-tight text-[var(--tkc-ink)]">Recent Activity</h2>
+          <p className="text-[var(--tkc-ink-quiet)]">
             Latest additions and modifications to the catalog.
           </p>
         </div>

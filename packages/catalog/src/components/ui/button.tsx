@@ -1,34 +1,32 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--scifi-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border text-sm transition-all focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          // Neon cyan outline button
-          "text-[var(--scifi-cyan)] shadow border border-[rgba(0,223,223,0.4)] bg-[rgba(0,223,223,0.08)] hover:bg-[rgba(0,223,223,0.15)]",
+          "border-[var(--tkc-rule)] bg-[image:var(--tkc-surface)] text-[var(--tkc-ink)] shadow-[0_2px_0_var(--tkc-rule)] hover:-translate-y-px hover:bg-[image:var(--tkc-surface-hover)] hover:shadow-[0_3px_0_var(--tkc-rule)]",
         destructive:
-          "bg-[rgba(255,51,102,0.15)] text-[#FF3366] border border-[rgba(255,51,102,0.3)] shadow-sm hover:bg-[rgba(255,51,102,0.25)]",
+          "border-[#5a120b] bg-[linear-gradient(180deg,#d04a3b_0%,#8a2519_100%)] text-[var(--tkc-danger-fg)] shadow-[0_2px_0_#5a120b] hover:-translate-y-px hover:shadow-[0_3px_0_#5a120b]",
         outline:
-          // Neon outline with subtle bg
-          "border border-[rgba(255,255,255,0.15)] bg-transparent shadow-sm hover:bg-[var(--scifi-surface)] text-[rgba(255,255,255,0.7)] hover:text-white",
+          "border-[var(--tkc-rule-m)] bg-[rgba(255,255,255,0.55)] text-[var(--tkc-ink-soft)] hover:bg-[var(--tkc-panel)] hover:text-[var(--tkc-ink)]",
         secondary:
-          "bg-[var(--scifi-surface)] text-[rgba(255,255,255,0.7)] shadow-sm hover:bg-[var(--scifi-surface-light)] border border-[rgba(255,255,255,0.1)]",
-        ghost: "hover:bg-[var(--scifi-surface)] hover:text-[var(--scifi-cyan)]",
-        link: "text-[var(--scifi-cyan)] underline-offset-4 hover:underline hover:text-[var(--scifi-bright-cyan)]",
-        // Magenta neon variant
+          "border-[var(--tkc-rule-m)] bg-[rgba(255,251,244,0.78)] text-[var(--tkc-ink)] hover:bg-[var(--tkc-panel)]",
+        ghost:
+          "border-transparent bg-transparent text-[var(--tkc-ink-soft)] shadow-none hover:bg-[var(--tkc-panel-muted)] hover:text-[var(--tkc-ink)]",
+        link:
+          "border-transparent bg-transparent p-0 text-[var(--tkc-cinnabar)] shadow-none hover:text-[var(--tkc-link-hover)] hover:underline",
         magenta:
-          "text-[var(--scifi-magenta)] border border-[rgba(255,0,224,0.4)] bg-[rgba(255,0,224,0.08)] hover:bg-[rgba(255,0,224,0.15)]",
+          "border-[var(--tkc-rule)] bg-[linear-gradient(180deg,#f0ddba_0%,#d7b072_100%)] text-[var(--tkc-ink)] shadow-[0_2px_0_var(--tkc-rule)] hover:-translate-y-px hover:shadow-[0_3px_0_var(--tkc-rule)]",
       },
       size: {
         default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-sm px-3 text-xs",
-        lg: "h-10 rounded-sm px-8",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-10 px-8",
         icon: "h-9 w-9",
       },
     },
@@ -41,31 +39,19 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-}
+    VariantProps<typeof buttonVariants> {}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, style, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-
-    // Apply neon glow styling for default and magenta variants
-    const neonStyle = (variant === "default" || variant === "magenta" || variant === undefined) ? {
-      fontFamily: 'var(--font-header, var(--font-scifi-header))',
-      letterSpacing: '0.05em',
-      textTransform: 'uppercase' as const,
-      fontSize: '0.8em',
-      boxShadow: variant === "magenta"
-        ? '0 0 8px rgba(255, 0, 224, 0.15), inset 0 0 4px rgba(255, 0, 224, 0.05)'
-        : '0 0 8px rgba(0, 223, 223, 0.15), inset 0 0 4px rgba(0, 223, 223, 0.05)',
-      ...style,
-    } : style;
-
+  ({ className, variant, size, style, ...props }, ref) => {
     return (
-      <Comp
+      <button
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        style={neonStyle}
+        style={{
+          fontFamily: variant === "link" ? "var(--font-body)" : "var(--font-display)",
+          fontStyle: variant === "link" ? "normal" : "italic",
+          ...style,
+        }}
         {...props}
       />
     );

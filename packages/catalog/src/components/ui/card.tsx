@@ -9,23 +9,26 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-sm text-card-foreground shadow-sm relative",
-      // Sci-fi dark card with neon border
-      "bg-[#12121a] border border-[rgba(255,0,224,0.15)]",
-      "hover:border-[rgba(0,223,223,0.4)]",
+      "relative rounded-lg border text-card-foreground",
+      "border-[var(--tkc-rule-m)] bg-[color:var(--tkc-panel)]",
       className
     )}
     style={{
-      boxShadow: '0 0 12px rgba(0, 0, 0, 0.3), 0 0 4px rgba(255, 0, 224, 0.05)',
-      transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+      boxShadow:
+        "inset 0 1px 0 rgba(255,255,255,0.48), 0 16px 32px rgba(39,25,12,0.08)",
+      transition: "box-shadow 0.24s ease, border-color 0.24s ease, transform 0.24s ease",
       ...style,
     }}
     onMouseEnter={(e) => {
-      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 20px rgba(0,223,223,0.3), 0 0 12px rgba(0, 0, 0, 0.3)';
+      (e.currentTarget as HTMLDivElement).style.boxShadow =
+        "inset 0 1px 0 rgba(255,255,255,0.54), 0 20px 42px rgba(39,25,12,0.12)";
+      (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
       onMouseEnter?.(e);
     }}
     onMouseLeave={(e) => {
-      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 12px rgba(0, 0, 0, 0.3), 0 0 4px rgba(255, 0, 224, 0.05)';
+      (e.currentTarget as HTMLDivElement).style.boxShadow =
+        "inset 0 1px 0 rgba(255,255,255,0.48), 0 16px 32px rgba(39,25,12,0.08)";
+      (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
       onMouseLeave?.(e);
     }}
     {...props}
@@ -37,11 +40,7 @@ const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
 ));
 CardHeader.displayName = "CardHeader";
 
@@ -51,14 +50,8 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "font-semibold leading-none tracking-tight",
-      // Sci-fi header text
-      "text-white"
-    )}
-    style={{
-      fontFamily: 'var(--font-header, var(--font-scifi-header))',
-    }}
+    className={cn("font-semibold leading-none tracking-tight text-[var(--tkc-ink)]", className)}
+    style={{ fontFamily: "var(--font-display)" }}
     {...props}
   />
 ));
@@ -70,10 +63,8 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-[rgba(255,255,255,0.5)]", className)}
-    style={{
-      fontFamily: 'var(--font-body, var(--font-scifi-body))',
-    }}
+    className={cn("text-sm text-[var(--tkc-ink-quiet)]", className)}
+    style={{ fontFamily: "var(--font-body)" }}
     {...props}
   />
 ));
@@ -91,11 +82,7 @@ const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
 ));
 CardFooter.displayName = "CardFooter";
 

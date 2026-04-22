@@ -41,7 +41,7 @@ export function ArwesFrame({
       {/* Content */}
       <div className="relative z-10">{children}</div>
 
-      <style jsx>{`
+      <style>{`
         .arwes-frame {
           background: var(--arwes-frame-bg);
           border: 1px solid var(--arwes-frame-line);

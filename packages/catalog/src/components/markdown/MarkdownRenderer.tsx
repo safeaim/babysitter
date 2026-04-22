@@ -149,50 +149,38 @@ export function MarkdownRenderer({
       ),
 
       // Styled tables
-      table: ({ children, ...props }) => (
+      table: ({ children }) => (
         <div className="my-4 overflow-x-auto">
-          <table
-            className="min-w-full divide-y divide-zinc-200 border border-zinc-200 dark:divide-zinc-700 dark:border-zinc-700"
-            {...props}
-          >
+          <table className="min-w-full divide-y divide-zinc-200 border border-zinc-200 dark:divide-zinc-700 dark:border-zinc-700">
             {children}
           </table>
         </div>
       ),
-      thead: ({ children, ...props }) => (
-        <thead className="bg-zinc-50 dark:bg-zinc-800" {...props}>
+      thead: ({ children }) => (
+        <thead className="bg-zinc-50 dark:bg-zinc-800">
           {children}
         </thead>
       ),
-      th: ({ children, ...props }) => (
-        <th
-          className="px-4 py-2 text-left text-sm font-semibold text-zinc-700 dark:text-zinc-300"
-          {...props}
-        >
+      th: ({ children }) => (
+        <th className="px-4 py-2 text-left text-sm font-semibold text-zinc-700 dark:text-zinc-300">
           {children}
         </th>
       ),
-      td: ({ children, ...props }) => (
-        <td
-          className="border-t border-zinc-200 px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400"
-          {...props}
-        >
+      td: ({ children }) => (
+        <td className="border-t border-zinc-200 px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
           {children}
         </td>
       ),
 
       // Styled blockquotes
-      blockquote: ({ children, ...props }) => (
-        <blockquote
-          className="my-4 border-l-4 border-zinc-300 bg-zinc-50 py-2 pl-4 pr-4 italic text-zinc-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-          {...props}
-        >
+      blockquote: ({ children }) => (
+        <blockquote className="my-4 border-l-4 border-zinc-300 bg-zinc-50 py-2 pl-4 pr-4 italic text-zinc-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
           {children}
         </blockquote>
       ),
 
       // Task lists
-      input: ({ type, checked, ...props }) => {
+      input: ({ type, checked }) => {
         if (type === 'checkbox') {
           return (
             <input
@@ -200,53 +188,49 @@ export function MarkdownRenderer({
               checked={checked}
               disabled
               className="mr-2 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 dark:border-zinc-600"
-              {...props}
             />
           );
         }
-        return <input type={type} {...props} />;
+        return <input type={type} />;
       },
 
       // Styled lists
-      ul: ({ children, ...props }) => (
-        <ul className="my-2 list-disc space-y-1 pl-6" {...props}>
+      ul: ({ children }) => (
+        <ul className="my-2 list-disc space-y-1 pl-6">
           {children}
         </ul>
       ),
-      ol: ({ children, ...props }) => (
-        <ol className="my-2 list-decimal space-y-1 pl-6" {...props}>
+      ol: ({ children }) => (
+        <ol className="my-2 list-decimal space-y-1 pl-6">
           {children}
         </ol>
       ),
-      li: ({ children, ...props }) => (
-        <li className="text-zinc-700 dark:text-zinc-300" {...props}>
+      li: ({ children }) => (
+        <li className="text-zinc-700 dark:text-zinc-300">
           {children}
         </li>
       ),
 
       // Paragraphs
-      p: ({ children, ...props }) => (
-        <p className="my-4 leading-relaxed text-zinc-700 dark:text-zinc-300" {...props}>
+      p: ({ children }) => (
+        <p className="my-4 leading-relaxed text-zinc-700 dark:text-zinc-300">
           {children}
         </p>
       ),
 
       // Horizontal rule
-      hr: (props) => (
-        <hr
-          className="my-8 border-zinc-200 dark:border-zinc-700"
-          {...props}
-        />
+      hr: () => (
+        <hr className="my-8 border-zinc-200 dark:border-zinc-700" />
       ),
 
       // Strong and emphasis
-      strong: ({ children, ...props }) => (
-        <strong className="font-semibold text-zinc-900 dark:text-zinc-100" {...props}>
+      strong: ({ children }) => (
+        <strong className="font-semibold text-zinc-900 dark:text-zinc-100">
           {children}
         </strong>
       ),
-      em: ({ children, ...props }) => (
-        <em className="italic" {...props}>
+      em: ({ children }) => (
+        <em className="italic">
           {children}
         </em>
       ),

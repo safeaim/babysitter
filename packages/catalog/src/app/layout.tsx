@@ -1,21 +1,32 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  EB_Garamond,
+  JetBrains_Mono,
+} from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
-const inter = Inter({
+const display = Cormorant_Garamond({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-body",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-display-ui",
+  weight: ["400", "500", "600", "700"],
 });
 
-const orbitron = Orbitron({
+const bodyFont = EB_Garamond({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-header",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-body-ui",
+  weight: ["400", "500", "600", "700"],
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono-ui",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -46,7 +57,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${orbitron.variable} ${inter.variable} min-h-screen antialiased`}>
+      <body
+        className={`${display.variable} ${bodyFont.variable} ${mono.variable} min-h-screen antialiased`}
+      >
         <div className="relative flex min-h-screen flex-col">
           <Header />
           <main className="flex-1">{children}</main>

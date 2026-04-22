@@ -115,7 +115,7 @@ export function ArwesText({
     >
       {displayText}
       {!isComplete && <span className="arwes-text__cursor">|</span>}
-      <style jsx>{`
+      <style>{`
         .arwes-text {
           display: inline;
         }

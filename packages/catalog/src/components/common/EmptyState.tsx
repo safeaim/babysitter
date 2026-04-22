@@ -97,9 +97,9 @@ export function EmptyState({
         >
           {actionLabel && (
             actionHref ? (
-              <Button asChild>
-                <a href={actionHref}>{actionLabel}</a>
-              </Button>
+              <a href={actionHref}>
+                <Button>{actionLabel}</Button>
+              </a>
             ) : (
               <Button onClick={onAction}>{actionLabel}</Button>
             )

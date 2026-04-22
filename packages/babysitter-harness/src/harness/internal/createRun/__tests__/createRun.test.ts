@@ -176,6 +176,7 @@ vi.mock("node:fs", async () => {
 });
 
 import { handleHarnessCreateRun, selectHarness } from "..";
+import { ensureRunAndMaybeBindFromProcessDefinition } from "../planProcess/runState";
 import {
   discoverHarnesses,
   detectCallerHarness,
@@ -2653,16 +2654,19 @@ describe("handleHarnessCreateRun", () => {
         output: "done",
       });
 
-      const code = await handleHarnessCreateRun({
+      const result = await ensureRunAndMaybeBindFromProcessDefinition({
         processPath: "/tmp/process.js",
+        prompt: "",
         runsDir: "/tmp/runs",
-        harness: "claude-code",
-        json: false,
-        verbose: false,
+        selectedHarnessName: "claude-code",
+        maxIterations: 256,
         interactive: false,
+        verbose: false,
+        json: false,
       });
 
-      expect(code).toBe(0);
+      expect(result.runId).toBe("run-claude-marker");
+      expect(result.boundSession).toBe(true);
       await expect(
         fs.access(path.join(globalStateRoot, "state", `${leakedSessionId}.md`)),
       ).resolves.toBeUndefined();
@@ -2698,16 +2702,19 @@ describe("handleHarnessCreateRun", () => {
         output: "done",
       });
 
-      const code = await handleHarnessCreateRun({
+      const result = await ensureRunAndMaybeBindFromProcessDefinition({
         processPath: "/tmp/process.js",
+        prompt: "",
         runsDir: "/tmp/runs",
-        harness: "claude-code",
-        json: false,
-        verbose: false,
+        selectedHarnessName: "claude-code",
+        maxIterations: 256,
         interactive: false,
+        verbose: false,
+        json: false,
       });
 
-      expect(code).toBe(0);
+      expect(result.runId).toBe("run-claude-marker-enabled");
+      expect(result.boundSession).toBe(true);
       // Exact marker-vs-env precedence is covered by claudeCodeResolutionPrecedence
       // and cliRuns tests. This suite only verifies that create-run still
       // completes and persists some bound claude session state when markers are enabled.

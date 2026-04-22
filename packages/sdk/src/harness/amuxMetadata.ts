@@ -1,15 +1,12 @@
+import { builtinModules } from "node:module";
+
 /**
- * Resolves adapter metadata from @a5c-ai/agent-mux (hard dependency).
- * Used by babysitter adapters to derive capabilities, env signals, etc.
+ * Resolves adapter metadata from @a5c-ai/agent-mux when available.
  *
- * agent-mux adapters carry comprehensive per-adapter metadata:
- * - hostEnvSignals: env vars indicating the harness is active
- * - capabilities: AgentCapabilities with fields like supportsSkills, supportsThinking, etc.
- * - models: ModelCapabilities with context windows, pricing
- * - sessionDir(): where sessions are stored
- *
- * Instead of duplicating this data, babysitter adapters import it.
- * If agent-mux is missing or broken, the SDK fails loudly.
+ * Some environments used by validation and CI can load the babysitter SDK but
+ * cannot load the full agent-mux runtime graph. In those cases we fall back to
+ * a static metadata table so harness adapters can still resolve activation
+ * signals, prompt capabilities, and session binding behavior.
  */
 
 /**
@@ -44,6 +41,173 @@ export interface AmuxAdapterMetadata {
   /** Session directory (resolved). */
   sessionDir: string;
 }
+
+const FALLBACK_SESSION_DIR = ".a5c/runs";
+
+const STATIC_FALLBACK_METADATA: Record<string, AmuxAdapterMetadata> = {
+  claude: {
+    name: "claude",
+    hostEnvSignals: ["CLAUDE_ENV_FILE"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: true,
+      requiresToolApproval: true,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: true,
+      hasStopHook: true,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  codex: {
+    name: "codex",
+    hostEnvSignals: ["CODEX_THREAD_ID", "CODEX_SESSION_ID", "CODEX_PLUGIN_ROOT"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: true,
+      hasStopHook: true,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  cursor: {
+    name: "cursor",
+    hostEnvSignals: ["CURSOR_PROJECT_DIR", "CURSOR_VERSION"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: true,
+      hasStopHook: true,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  gemini: {
+    name: "gemini",
+    hostEnvSignals: ["GEMINI_SESSION_ID", "GEMINI_CWD", "GEMINI_PROJECT_DIR"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: true,
+      hasStopHook: true,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  copilot: {
+    name: "copilot",
+    hostEnvSignals: ["COPILOT_SESSION_ID"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: true,
+      hasStopHook: true,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  omp: {
+    name: "omp",
+    hostEnvSignals: ["OMP_SESSION_ID"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: true,
+      hasStopHook: true,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  opencode: {
+    name: "opencode",
+    hostEnvSignals: ["AGENT_SESSION_ID", "OPENCODE_SESSION_ID"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: true,
+      hasStopHook: true,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  openclaw: {
+    name: "openclaw",
+    hostEnvSignals: [],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: false,
+      hasStopHook: false,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+  pi: {
+    name: "pi",
+    hostEnvSignals: ["PI_SESSION_ID"],
+    capabilities: {
+      supportsSkills: true,
+      supportsThinking: true,
+      supportsMCP: false,
+      requiresToolApproval: false,
+      supportsInteractiveMode: true,
+      supportsStdinInjection: true,
+      supportsSubagentDispatch: false,
+      supportsParallelExecution: false,
+      supportsImageInput: true,
+      hasRuntimeHooks: false,
+      hasStopHook: false,
+    },
+    sessionDir: FALLBACK_SESSION_DIR,
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Name mapping (babysitter harness name -> agent-mux adapter name)
@@ -120,6 +284,10 @@ function getCache(): Map<string, AmuxAdapterMetadata> {
 
 let _amuxOverride: Record<string, unknown> | undefined;
 
+function hasNodeSqliteBuiltin(): boolean {
+  return builtinModules.includes("node:sqlite") || builtinModules.includes("sqlite");
+}
+
 function requireAmux(): Record<string, unknown> {
   if (_amuxOverride) return _amuxOverride;
   // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
@@ -136,6 +304,38 @@ export function _setAmuxModuleForTesting(mod: Record<string, unknown> | undefine
   _amuxOverride = mod;
 }
 
+function cloneMetadata(metadata: AmuxAdapterMetadata): AmuxAdapterMetadata {
+  return {
+    ...metadata,
+    hostEnvSignals: [...metadata.hostEnvSignals],
+    capabilities: { ...metadata.capabilities },
+  };
+}
+
+function getFallbackAdapterMetadata(harnessName: string, amuxName: string): AmuxAdapterMetadata {
+  const fallback = STATIC_FALLBACK_METADATA[amuxName];
+  if (!fallback) {
+    throw new Error(
+      `No fallback adapter metadata is defined for harness "${harnessName}" ` +
+      `(agent-mux adapter "${amuxName}").`,
+    );
+  }
+  return cloneMetadata(fallback);
+}
+
+function shouldUseFallbackMetadata(error: unknown): boolean {
+  const code = typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code?: unknown }).code)
+    : "";
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    code === "ERR_UNKNOWN_BUILTIN_MODULE" ||
+    code === "ERR_MODULE_NOT_FOUND" ||
+    code === "MODULE_NOT_FOUND" ||
+    message.includes("node:sqlite")
+  );
+}
+
 export function getAmuxAdapterMetadata(harnessName: string): AmuxAdapterMetadata {
   const cache = getCache();
   const amuxName = mapHarnessName(harnessName);
@@ -145,19 +345,47 @@ export function getAmuxAdapterMetadata(harnessName: string): AmuxAdapterMetadata
     return cached;
   }
 
-  const amux = requireAmux();
-  const createClient = amux.createClient as (() => AmuxClient) | undefined;
-  const registerBuiltInAdapters = amux.registerBuiltInAdapters as ((client: AmuxClient) => void) | undefined;
-
-  if (!createClient || !registerBuiltInAdapters) {
-    throw new Error(
-      `@a5c-ai/agent-mux is installed but does not export createClient/registerBuiltInAdapters. ` +
-      `Ensure @a5c-ai/agent-mux is up to date.`,
-    );
+  if (!hasNodeSqliteBuiltin()) {
+    const fallback = getFallbackAdapterMetadata(harnessName, amuxName);
+    cache.set(amuxName, fallback);
+    return fallback;
   }
 
-  const client = createClient();
-  registerBuiltInAdapters(client);
+  let amux: Record<string, unknown>;
+  let createClient: (() => AmuxClient) | undefined;
+  let registerBuiltInAdapters: ((client: AmuxClient) => void) | undefined;
+
+  try {
+    amux = requireAmux();
+    createClient = amux.createClient as (() => AmuxClient) | undefined;
+    registerBuiltInAdapters = amux.registerBuiltInAdapters as ((client: AmuxClient) => void) | undefined;
+  } catch (error) {
+    if (shouldUseFallbackMetadata(error)) {
+      const fallback = getFallbackAdapterMetadata(harnessName, amuxName);
+      cache.set(amuxName, fallback);
+      return fallback;
+    }
+    throw error;
+  }
+
+  if (!createClient || !registerBuiltInAdapters) {
+    const fallback = getFallbackAdapterMetadata(harnessName, amuxName);
+    cache.set(amuxName, fallback);
+    return fallback;
+  }
+
+  let client: AmuxClient;
+  try {
+    client = createClient();
+    registerBuiltInAdapters(client);
+  } catch (error) {
+    if (shouldUseFallbackMetadata(error)) {
+      const fallback = getFallbackAdapterMetadata(harnessName, amuxName);
+      cache.set(amuxName, fallback);
+      return fallback;
+    }
+    throw error;
+  }
 
   const adapter = client.adapters.get(amuxName);
   if (!adapter) {

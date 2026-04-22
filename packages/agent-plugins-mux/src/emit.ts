@@ -26,7 +26,11 @@ export function emit(
       fs.mkdirSync(dir, { recursive: true });
 
       // Write file
-      fs.writeFileSync(fullPath, file.content, 'utf-8');
+      if (file.binaryContent) {
+        fs.writeFileSync(fullPath, file.binaryContent);
+      } else {
+        fs.writeFileSync(fullPath, file.content, 'utf-8');
+      }
 
       // Make executable if needed
       if (file.executable) {

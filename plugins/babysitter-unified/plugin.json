@@ -106,6 +106,7 @@
         "LEGACY_MARKETPLACE_PLUGIN_NAMES", "LEGACY_SKILL_NAMES", "LEGACY_PROMPT_NAMES",
         "LEGACY_HOOK_SCRIPT_NAMES", "MANAGED_HOOK_SCRIPT_NAMES", "DEFAULT_MARKETPLACE", "PLUGIN_BUNDLE_ENTRIES",
         "getCodexHome", "getHomePluginRoot", "getHomeMarketplacePath",
+        "getWorkspacePluginRoot", "getWorkspaceMarketplacePath",
         "renderCodexConfigToml", "copyRecursive", "copyPluginBundle",
         "insertRootKey", "ensureSectionLine", "ensureWritableRoots",
         "mergeCodexConfig", "mergeCodexConfigFile",
@@ -188,6 +189,8 @@
       "extraFiles": {
         "AGENTS.md": "file:per-harness/github/AGENTS.md",
         "skills/babysit/SKILL.md": "file:per-harness/github/babysit-SKILL.md",
+        "bin/cli.js": "file:per-harness/github/bin/cli.js",
+        "bin/install.js": "file:per-harness/github/bin/install.js",
         "README.md": "file:per-harness/github/README.md"
       }
     },

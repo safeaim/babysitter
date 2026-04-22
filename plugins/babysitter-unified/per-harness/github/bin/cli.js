@@ -11,9 +11,9 @@ try { shared = require('./install-shared'); } catch {}
 function printUsage() {
   console.error([
     'Usage:',
-    '  babysitter-openclaw install [--global]',
-    '  babysitter-openclaw install --workspace [path]',
-    '  babysitter-openclaw uninstall',
+    '  babysitter-github install [--global]',
+    '  babysitter-github install --workspace [path]',
+    '  babysitter-github uninstall',
   ].join('\n'));
 }
 
@@ -67,6 +67,14 @@ function main() {
       return;
     }
     const parsed = parseInstallArgs(rest);
+    if (parsed.passthrough.includes('--cloud-agent')) {
+      const args = [...parsed.passthrough];
+      if (parsed.workspace) {
+        args.push('--workspace', parsed.workspace);
+      }
+      runNodeScript(path.join(PACKAGE_ROOT, 'bin', 'install.js'), args);
+      return;
+    }
     if (parsed.scope === 'workspace') {
       const args = [];
       if (parsed.workspace) {
@@ -74,18 +82,18 @@ function main() {
       }
       args.push(...parsed.passthrough);
       runNodeScript(
-        path.join(PACKAGE_ROOT, 'scripts', 'team-install.cjs'),
+        path.join(PACKAGE_ROOT, 'scripts', 'team-install.js'),
         args,
         { PLUGIN_PACKAGE_ROOT: PACKAGE_ROOT },
       );
       return;
     }
-    runNodeScript(path.join(PACKAGE_ROOT, 'bin', 'install.cjs'), parsed.passthrough);
+    runNodeScript(path.join(PACKAGE_ROOT, 'bin', 'install.js'), parsed.passthrough);
     return;
   }
 
   if (command === 'uninstall') {
-    runNodeScript(path.join(PACKAGE_ROOT, 'bin', 'uninstall.cjs'), rest);
+    runNodeScript(path.join(PACKAGE_ROOT, 'bin', 'uninstall.js'), rest);
     return;
   }
 

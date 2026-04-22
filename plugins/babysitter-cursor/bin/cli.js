@@ -5,6 +5,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const PACKAGE_ROOT = path.resolve(__dirname, '..');
+let shared;
+try { shared = require('./install-shared'); } catch {}
 
 function printUsage() {
   console.error([
@@ -61,6 +63,9 @@ function main() {
   }
 
   if (command === 'install') {
+    if (shared && typeof shared.harnessCliRoute === 'function' && shared.harnessCliRoute(rest, PACKAGE_ROOT, runNodeScript)) {
+      return;
+    }
     const parsed = parseInstallArgs(rest);
     if (parsed.scope === 'workspace') {
       const args = [];

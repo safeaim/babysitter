@@ -415,10 +415,19 @@ export function generateExtraFiles(
         const srcPath = value.slice(5);
         const fullPath = path.join(sourceDir, srcPath);
         if (fs.existsSync(fullPath)) {
-          files.push({
-            path: outputPath,
-            content: fs.readFileSync(fullPath, 'utf-8'),
-          });
+          const isBinary = /\.(png|jpg|jpeg|gif|ico|woff2?|ttf|eot|svg|pdf)$/i.test(outputPath);
+          if (isBinary) {
+            files.push({
+              path: outputPath,
+              content: '',
+              binaryContent: fs.readFileSync(fullPath),
+            });
+          } else {
+            files.push({
+              path: outputPath,
+              content: fs.readFileSync(fullPath, 'utf-8'),
+            });
+          }
         }
       } else {
         files.push({ path: outputPath, content: value });

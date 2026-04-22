@@ -749,6 +749,9 @@ function warnWindowsHooks() {
   if (process.platform !== 'win32') {
     return;
   }
+  // Codex enabled Windows hooks in v0.119.0 (2026-04-10, openai/codex#17268).
+  // Older Codex CLIs still skip hook execution on Windows; warn so users on
+  // pinned/older versions know to upgrade.
   console.warn('[babysitter] Note: Codex hooks on Windows require Codex CLI >= 0.119.0.');
   console.warn('[babysitter] If hooks do not fire, run `codex --version` and upgrade if you are below 0.119.0.');
 }

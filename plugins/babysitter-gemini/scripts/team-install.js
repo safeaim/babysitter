@@ -11,10 +11,13 @@ for (var i = 0; i < process.argv.length; i++) {
   }
 }
 
+var src = process.env.PLUGIN_PACKAGE_ROOT || path.resolve(__dirname, '..');
 var dest = shared.getHomePluginRoot('workspace');
 console.log('[babysitter] Team install to ' + dest);
 
-var src = process.env.PLUGIN_PACKAGE_ROOT || path.resolve(__dirname, '..');
 shared.copyPluginBundle(src, dest);
+if (typeof shared.harnessTeamInstall === 'function') {
+  shared.harnessTeamInstall(src, dest, workspace);
+}
 shared.runPostInstall(dest);
 console.log('[babysitter] Team install complete.');

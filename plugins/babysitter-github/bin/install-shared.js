@@ -787,6 +787,36 @@ function copyRecursive(src, dest) {
   fs.copyFileSync(src, dest);
 }
 
+function harnessCliRoute(argv, packageRoot, runNodeScript) {
+  if (argv.includes('--cloud-agent')) {
+    const args = argv.filter(a => a !== '--cloud-agent');
+    args.push('--cloud-agent');
+    runNodeScript(path.join(packageRoot, 'bin', 'install.js'), args);
+    return true;
+  }
+  return false;
+}
+
+function harnessInstall(packageRoot, _pluginRoot) {
+  const argv = process.argv.slice(2);
+  if (!argv.includes('--cloud-agent')) return;
+  const workspaceIdx = argv.indexOf('--workspace');
+  const workspaceRoot = (workspaceIdx >= 0 && argv[workspaceIdx + 1])
+    ? path.resolve(argv[workspaceIdx + 1])
+    : process.cwd();
+  console.log(`[${PLUGIN_NAME}] Installing cloud-agent support into ${workspaceRoot}`);
+  const activeProcessLibrary = runCli(packageRoot, [
+    'process-library:active',
+    '--json',
+  ], { stdio: 'pipe' });
+  if (activeProcessLibrary.status !== 0) {
+    ensureGlobalProcessLibrary(packageRoot);
+  }
+  installCloudAgentSurface(packageRoot, workspaceRoot);
+  console.log(`[${PLUGIN_NAME}] Cloud-agent installation complete!`);
+  process.exit(0);
+}
+
 
 module.exports = {
   PLUGIN_NAME,
@@ -838,4 +868,6 @@ module.exports = {
   warnWindowsHooks,
   copyPluginBundle,
   copyRecursive,
+  harnessCliRoute,
+  harnessInstall,
 };

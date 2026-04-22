@@ -141,6 +141,7 @@ export interface ResolveResult {
 export interface TransformedFile {
   path: string;
   content: string;
+  binaryContent?: Buffer;
   executable?: boolean;
 }
 

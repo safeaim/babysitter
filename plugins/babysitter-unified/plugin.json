@@ -122,7 +122,8 @@
         "assets/icon.svg": "file:per-harness/codex/assets/icon.svg",
         "assets/logo.png": "file:per-harness/codex/assets/logo.png",
         "assets/logo.svg": "file:per-harness/codex/assets/logo.svg",
-        "README.md": "file:per-harness/codex/README.md"
+        "README.md": "file:per-harness/codex/README.md",
+        "scripts/team-install.js": "file:per-harness/codex/scripts/team-install.js"
       }
     },
     "cursor": {

@@ -1,58 +1,36 @@
 /**
  * agent-mux type adapters for babysitter-harness.
  *
- * Imports canonical types from @a5c-ai/agent-mux (a real dependency) and
- * re-exports them alongside thin adapter interfaces that bridge the
- * small shape differences between the mux API and what babysitter-harness
- * consumes internally.
+ * Keeps a structural compatibility layer for the subset of agent-mux surface
+ * that babysitter-harness consumes, without requiring TypeScript to resolve the
+ * full @a5c-ai/agent-mux package during babysitter-harness compilation.
  *
  * @module harness/amux/amuxTypes
  */
 
-import type {
-  RunOptions as MuxRunOptions,
-  RunHandle as MuxRunHandle,
-} from "@a5c-ai/agent-mux";
-import type {
-  AgentMuxClient as MuxClient,
-  ClientOptions as MuxClientOptions,
-} from "@a5c-ai/agent-mux";
-import type {
-  BaseEvent as MuxBaseEvent,
-  AgentName as MuxAgentName,
-} from "@a5c-ai/agent-mux";
-
-// Re-export canonical types directly
-export type { MuxRunOptions, MuxRunHandle, MuxClient, MuxClientOptions, MuxBaseEvent, MuxAgentName };
-
 // ---------------------------------------------------------------------------
-// Run options (thin alias — babysitter uses a subset of MuxRunOptions)
+// Run options
 // ---------------------------------------------------------------------------
 
 /**
  * Options accepted by AmuxClient.run().
- *
- * This is a subset of the canonical MuxRunOptions that babysitter-harness
- * actually uses. Structurally compatible — no adapter needed.
  */
-export type AmuxRunOptions = Pick<
-  MuxRunOptions,
-  | "agent"
-  | "prompt"
-  | "model"
-  | "cwd"
-  | "sessionId"
-  | "timeout"
-  | "approvalMode"
-  | "stream"
-  | "nonInteractive"
-  | "maxTurns"
-  | "env"
-  | "skills"
-> & {
+export interface AmuxRunOptions {
+  agent: string;
+  prompt: string;
+  model?: string;
+  cwd?: string;
+  sessionId?: string;
+  timeout?: number;
+  approvalMode?: string;
+  stream?: boolean;
+  nonInteractive?: boolean;
+  maxTurns?: number;
+  env?: Record<string, string>;
+  skills?: string[];
   /** Hook configuration forwarded to the agent. */
   hooks?: unknown;
-};
+}
 
 // ---------------------------------------------------------------------------
 // Run handle (adapter — real RunHandle is thenable + AsyncIterable)
@@ -61,7 +39,7 @@ export type AmuxRunOptions = Pick<
 /**
  * Adapter interface for the RunHandle returned by AgentMuxClient.run().
  *
- * The real MuxRunHandle is simultaneously an AsyncIterable<AgentEvent>,
+ * The real run handle is simultaneously an AsyncIterable<AgentEvent>,
  * an EventEmitter, and a thenable (Promise<RunResult>). babysitter-harness
  * only needs the event stream, session metadata, and abort control.
  */
@@ -85,9 +63,9 @@ export interface AmuxRunHandle {
 /**
  * Canonical agent event emitted by agent-mux adapters.
  *
- * Extends the real MuxBaseEvent. The real type uses `timestamp: number`
- * (Unix epoch ms); this alias keeps `string` (ISO-8601) for backward
- * compat with babysitter event mappers. The amuxBridge casts as needed.
+ * The real type uses `timestamp: number` (Unix epoch ms); this adapter keeps
+ * `string` (ISO-8601) for backward compat with babysitter event mappers. The
+ * bridge and tests rely on structural compatibility only.
  */
 export interface AmuxAgentEvent {
   /** Event type discriminator. */
@@ -124,8 +102,8 @@ export interface AmuxInteractionChannel {
 /**
  * Programmatic client for invoking agents via agent-mux.
  *
- * This is the subset of MuxClient that babysitter-harness depends on.
- * The real AgentMuxClient has many more methods (adapters, models,
+ * This is the subset of the real client that babysitter-harness depends on.
+ * The concrete agent-mux client has many more methods (adapters, models,
  * sessions, config, auth, profiles, plugins, detectHost).
  */
 export interface AmuxClient {
@@ -162,7 +140,7 @@ export interface AmuxAuthCheck {
 /**
  * Extended client interface that exposes adapter discovery.
  *
- * Maps to the real AgentMuxClient which has `.adapters` and `.auth`
+ * Maps to the real client which has `.adapters` and `.auth`
  * sub-managers.
  */
 export interface AmuxClientWithDiscovery extends AmuxClient {

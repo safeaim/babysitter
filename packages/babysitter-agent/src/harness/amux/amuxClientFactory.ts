@@ -9,9 +9,21 @@ import { builtinModules } from "node:module";
 import type { AmuxClient } from "./amuxTypes";
 
 let cachedClient: AmuxClient | null = null;
+let amuxOverride:
+  | { createClient: (options: Record<string, unknown>) => AmuxClient }
+  | undefined;
 
 function hasNodeSqliteBuiltin(): boolean {
   return builtinModules.includes("node:sqlite") || builtinModules.includes("sqlite");
+}
+
+function requireAmux(): { createClient: (options: Record<string, unknown>) => AmuxClient } {
+  if (amuxOverride) {
+    return amuxOverride;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
+  const mod: { createClient: (options: Record<string, unknown>) => AmuxClient } = require("@a5c-ai/agent-mux");
+  return mod;
 }
 
 function normalizeAmuxLoadError(error: unknown): Error {
@@ -36,22 +48,24 @@ function normalizeAmuxLoadError(error: unknown): Error {
 /**
  * Get or create the singleton AmuxClient.
  */
-export async function getAmuxClient(): Promise<AmuxClient> {
-  if (cachedClient) return cachedClient;
-  if (!hasNodeSqliteBuiltin()) {
+export function getAmuxClient(): Promise<AmuxClient> {
+  if (cachedClient) {
+    return Promise.resolve(cachedClient);
+  }
+  if (!amuxOverride && !hasNodeSqliteBuiltin()) {
     throw normalizeAmuxLoadError(
       new Error("Missing required built-in module: node:sqlite"),
     );
   }
 
   try {
-    const { createClient } = await import("@a5c-ai/agent-mux");
+    const { createClient } = requireAmux();
     const client = createClient({
       stream: true,
       debug: false,
     });
-    cachedClient = client as unknown as AmuxClient;
-    return cachedClient;
+    cachedClient = client;
+    return Promise.resolve(cachedClient);
   } catch (error) {
     throw normalizeAmuxLoadError(error);
   }
@@ -74,5 +88,17 @@ export async function isAmuxAvailable(): Promise<boolean> {
  * @internal
  */
 export function _resetAmuxClientCache(): void {
+  cachedClient = null;
+}
+
+/**
+ * Override the agent-mux module for testing.
+ * Pass `undefined` to restore require-based resolution.
+ * @internal
+ */
+export function _setAmuxModuleForTesting(
+  mod: { createClient: (options: Record<string, unknown>) => AmuxClient } | undefined,
+): void {
+  amuxOverride = mod;
   cachedClient = null;
 }

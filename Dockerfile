@@ -37,6 +37,12 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY packages/sdk/package.json ./packages/sdk/
 COPY packages/babysitter-agent/package.json ./packages/babysitter-agent/
+COPY packages/agent-mux/sdk/package.json ./packages/agent-mux/sdk/
+COPY packages/agent-mux/core/package.json ./packages/agent-mux/core/
+COPY packages/agent-mux/cli/package.json ./packages/agent-mux/cli/
+COPY packages/agent-mux/adapters/package.json ./packages/agent-mux/adapters/
+COPY packages/agent-mux/gateway/package.json ./packages/agent-mux/gateway/
+COPY packages/agent-mux/observability/package.json ./packages/agent-mux/observability/
 COPY scripts/patch-webpackbar-progress-plugin.cjs ./scripts/
 COPY scripts/patch-agent-mux-exports.cjs ./scripts/
 

@@ -2,122 +2,434 @@
 
 ## Objective
 
-Build a JS transport and provider mux that preserves the current `amux-proxy` surface while replacing the Python/LiteLLM internals with repo-native TypeScript modules.
+Build a JS proxy package that preserves the current `amux-proxy` external contract while separating two internal concerns cleanly:
+
+- **protocols**: what the harness talks
+- **providers**: where the request actually goes
+
+The package should be designed so a protocol can evolve without re-implementing provider auth/discovery logic, and a provider can evolve without re-implementing protocol parsing/rendering logic.
+
+## Terminology
+
+### Protocol
+
+A protocol is the harness-facing wire contract exposed by the proxy.
+
+Examples:
+
+- Anthropic Messages
+- OpenAI Chat Completions
+- OpenAI Responses
+- Google GenerateContent
+- Bedrock Converse
+- Vertex-native GenerateContent
+- Azure Foundry chat completions
+
+### Provider
+
+A provider is the upstream execution target plus its operational rules.
+
+Examples:
+
+- OpenAI direct
+- Anthropic direct
+- Google direct
+- Bedrock
+- Vertex
+- Azure/Foundry
+- custom OpenAI-compatible endpoint
+
+## Design rule
+
+**Protocol is not provider.**
+
+The old transport-centric framing made it too easy to bury provider behavior inside protocol handlers. This architecture forbids that.
+
+In particular:
+
+- auth resolution belongs to providers
+- endpoint/path construction belongs to providers
+- model alias and deployment resolution belong to providers
+- request body parsing and response framing belong to protocols
 
 ## Top-level shape
 
-The implementation should split into four layers.
+The implementation should be organized around two first-class layers plus a narrow shared seam.
 
-### 1. HTTP server and routing
+### 1. Protocol layer
 
-- start from a small Node HTTP surface, preferably aligned with the existing `agent-mux` gateway conventions
-- mount the current transport endpoints unchanged
-- expose `GET /health`, `GET /v1/models`, and `POST /v1/count_tokens`
-- apply auth, timeout, and logging consistently before provider execution
+Suggested module area:
 
-### 2. Transport codecs
+- `src/protocols/*`
 
-Each exposed transport should live in its own codec module:
+Each protocol module owns:
 
-- `anthropic`
-- `openai-chat`
-- `openai-responses`
-- `google`
-- `passthrough`
-- `bedrock-converse`
-- `vertex-native`
-- `azure-foundry`
+- route registration
+- auth extraction from incoming harness requests
+- request body validation
+- conversion into a normalized completion request
+- response rendering
+- streaming event rendering
+- protocol-native error translation
 
-Each codec is responsible for:
+Suggested protocol interface:
 
-- decoding the harness request body and headers
-- mapping them into a normalized request model
-- handling streaming frame conversion
-- mapping provider errors back into the transport-specific error shape
+```ts
+interface ProtocolCodec {
+  id: ExposedTransportId;
+  mount(router: Hono, deps: ProtocolRuntimeDeps): void;
+  decode(request: Request, ctx: ProtocolRequestContext): Promise<NormalizedCompletionRequest>;
+  encode(result: NormalizedCompletionResult, ctx: ProtocolResponseContext): Response;
+  encodeError(error: NormalizedProxyError, ctx: ProtocolResponseContext): Response;
+  encodeStream(
+    stream: AsyncIterable<NormalizedStreamEvent>,
+    ctx: ProtocolResponseContext,
+  ): Response;
+}
+```
 
-## Normalized request model
+### 2. Provider layer
 
-The transport layer should hand provider adapters a transport-neutral object rather than provider-specific payloads. The useful minimum is:
+Suggested module area:
 
-- request metadata
-- model id
-- messages and content parts
-- tool definitions
-- tool choice mode
-- generation controls
-- stream mode
-- auth and context overrides
+- `src/providers/*`
 
-The normalized response side should also be explicit:
+Each provider module owns:
 
-- assistant output chunks
-- tool call events
-- final usage data
-- finish reason
-- structured provider errors
-
-That keeps transport codecs and provider adapters independently testable.
-
-## Provider adapters
-
-Provider adapters should be keyed by the canonical provider ids already used by `agent-mux` core. They should reuse the config resolved by `babysitter/packages/agent-mux/core/src/provider-resolver.ts` instead of inventing a second provider model.
-
-The adapter families are:
-
-- OpenAI-compatible HTTP providers
-- native Anthropic
-- native Google
-- native Bedrock
-- native Vertex
-- native Azure and Foundry
-- passthrough and custom base URL forwarding
-
-Adapters own:
-
-- auth injection
-- provider request body mapping
-- provider-native stream parsing
+- auth acquisition and injection
+- base URL and path resolution
+- provider request mapping
+- provider-native streaming parser
 - model listing
-- token counting or deterministic fallback
-- provider alias normalization such as `vertex_ai` to `vertex`
+- token counting
+- provider capability reporting
 
-## Streaming model
+Suggested provider interface:
 
-Streaming should be represented internally as normalized events, then rendered outward by each transport codec. That avoids repeating the same chunk assembly logic in every endpoint.
+```ts
+interface ProviderAdapter {
+  id: CanonicalProviderId;
+  describeCapabilities(config: ProxyConfig): ProviderCapabilities;
+  complete(
+    request: NormalizedCompletionRequest,
+    ctx: ProviderExecutionContext,
+  ): Promise<NormalizedCompletionResult>;
+  stream(
+    request: NormalizedCompletionRequest,
+    ctx: ProviderExecutionContext,
+  ): AsyncIterable<NormalizedStreamEvent>;
+  listModels(ctx: ProviderExecutionContext): Promise<ModelDescriptor[]>;
+  countTokens(
+    request: NormalizedTokenCountRequest,
+    ctx: ProviderExecutionContext,
+  ): Promise<TokenCountResult>;
+}
+```
 
-The internal event model should cover:
+### Shared seam: normalized core
+
+Suggested module area:
+
+- `src/core/*`
+
+The shared seam should define:
+
+- normalized request types
+- normalized result types
+- normalized streaming events
+- provider capability descriptors
+- cross-layer error types
+
+This seam is where protocol/provider coordination happens.
+
+## Context sensitivity without coupling
+
+The layers must be context-aware without becoming entangled.
+
+### Protocol layer needs provider context for
+
+- deciding whether tool calling can be passed through
+- deciding whether reasoning or thinking blocks can be represented faithfully
+- deciding whether token counting is supported natively or needs fallback behavior
+- deciding whether streaming should be downgraded, buffered, or rejected
+
+### Provider layer needs protocol context for
+
+- shaping tool call arguments so the harness receives the right protocol form
+- preserving finish reasons that the harness depends on
+- deciding whether to emit richer metadata or reduce to the protocol’s legal surface
+- mapping upstream errors into a normalized form that can be rendered back correctly
+
+That means the core seam should carry both:
+
+- **provider capabilities**
+- **protocol hints**
+
+but never raw protocol-specific payloads across the layer boundary.
+
+## Runtime flow
+
+### Control plane
+
+1. `agent-mux` resolves canonical provider config.
+2. `translate-for-harness.ts` decides the exposed protocol expected by the harness.
+3. `launch.ts` spawns `amux-proxy` with `AMUX_PROXY_*`.
+4. `transport-mux` boots the protocol codec and provider adapter implied by that config.
+
+### Data plane
+
+1. inbound request enters the selected protocol route
+2. protocol auth is validated against the proxy token
+3. protocol payload is decoded into a normalized request
+4. provider adapter resolves endpoint/auth/model nuances and executes upstream
+5. provider-native response/stream is normalized
+6. protocol codec renders the normalized result back into the harness-facing protocol
+
+## Config model
+
+The package contract already expects a config layer around:
+
+- `createProxyConfig(...)`
+- `readProxyConfigFromEnv()`
+- `validateProxyConfig(...)`
+
+The minimal config surface already pinned by tests is:
+
+```ts
+interface ProxyConfig {
+  targetProvider: string;
+  targetModel: string;
+  exposedTransport: ExposedTransportId;
+  authToken?: string;
+  host: string;   // defaults to 127.0.0.1
+  port: number;   // defaults to 0
+  stream: boolean; // defaults to true
+  apiBase?: string;
+  logLevel?: 'debug' | 'info' | 'warn' | 'error';
+}
+```
+
+Validation rules already implied by tests:
+
+- `targetProvider` is required
+- `targetModel` is required
+- `exposedTransport` is required
+- invalid transport ids are rejected
+
+## Route contract already pinned by tests
+
+The server contract should continue to mount the following routes.
+
+### Shared routes
+
+- `GET /health`
+- `GET /v1/models`
+- `POST /v1/count_tokens`
+
+`GET /v1/models` is already expected by tests to expose the configured target model through an OpenAI-style `data` array where `data[0].id === targetModel`.
+
+### Protocol routes
+
+| Protocol id | Route shape | Notes |
+|---|---|---|
+| `anthropic` | `POST /v1/messages` | accepts `x-api-key` or bearer auth |
+| `openai-chat` | `POST /v1/chat/completions` | returns `object: "chat.completion"` |
+| `openai-responses` | `POST /v1/responses` | returns `object: "response"` |
+| `google` | `POST /v1beta/models/*` | public Gemini-style route |
+| `passthrough` | `/passthrough/*` | forwards upstream path directly |
+| `bedrock-converse` | `POST /converse` | Bedrock-native surface |
+| `vertex-native` | `POST /v1/projects/.../publishers/.../models/...:generateContent` | Vertex-specific route shape |
+| `azure-foundry` | `POST /models/chat/completions` | Foundry-specific route shape |
+
+## Auth model
+
+There are two different auth domains and they must stay separate.
+
+### Proxy-boundary auth
+
+Owned by the protocol/server boundary:
+
+- incoming harness request must present the proxy token
+- `x-api-key` is accepted
+- `Authorization: Bearer ...` is accepted
+- missing or wrong token returns `401`
+- `/health` and `/v1/models` remain unauthenticated for startup/discovery checks
+
+### Upstream provider auth
+
+Owned by the provider layer:
+
+- API keys
+- IAM / AWS signing
+- ADC / service account credentials
+- Azure deployment credentials
+- custom bearer/token-command flows
+
+The protocol layer should never know how upstream auth is constructed.
+
+## Normalized request/result model
+
+The tests already imply a completion seam with the following minimum shape.
+
+### Request
+
+```ts
+interface NormalizedCompletionRequest {
+  model: string;
+  messages: NormalizedMessage[];
+  tools?: NormalizedToolDefinition[];
+  toolChoice?: NormalizedToolChoice;
+  stream?: boolean;
+  generation?: {
+    maxTokens?: number;
+    temperature?: number;
+    topP?: number;
+    stop?: string[];
+  };
+  protocolHints?: {
+    exposedTransport: ExposedTransportId;
+  };
+}
+```
+
+### Result
+
+```ts
+interface NormalizedCompletionResult {
+  id: string;
+  model: string;
+  role: 'assistant';
+  text: string;
+  finishReason: string;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  toolCalls?: NormalizedToolCall[];
+}
+```
+
+### Stream events
+
+The normalized stream model should cover at least:
 
 - text delta
-- reasoning or metadata delta when present
-- tool call start, delta, and complete
+- tool call start
+- tool call delta
+- tool call complete
 - usage snapshot
 - terminal completion
 - terminal error
 
-## Integration points already live in repo
+## Server/runtime API
 
-The `transport-mux` implementation has to fit the existing launcher path, not replace it.
+The tests already pin two runtime entrypoints.
 
-- `babysitter/packages/agent-mux/cli/src/commands/launch.ts`
-  - decides whether proxying is required
-  - spawns `amux-proxy`
-  - injects `AMUX_PROXY_TARGET_PROVIDER`, `AMUX_PROXY_TARGET_MODEL`, `AMUX_PROXY_EXPOSED_TRANSPORT`, `AMUX_PROXY_PORT`, and `AMUX_PROXY_LOG_LEVEL`
-- `babysitter/packages/agent-mux/core/src/provider-resolver.ts`
-  - resolves canonical provider ids
-  - translates default models
-  - merges env, profile, and CLI settings
-- `babysitter/packages/agent-mux/adapters/src/translate-for-harness.ts`
-  - determines the harness-facing transport contract
-  - tells the launcher whether proxying is required
+### In-process app creation
 
-## Verification expectations
+```ts
+createTransportMuxApp({
+  config,
+  completionEngine?,
+})
+```
 
-Deterministic checks should be first-class:
+Use this for route/unit tests and protocol characterization.
 
-- characterization tests for current transport behavior
-- per-transport request and response fixture tests
-- provider adapter tests with mocked upstreams
-- launcher integration tests for env injection and binary discovery
-- end-to-end tests that prove the same harness-facing contract still works after the JS migration
+### Real listener startup
 
-The architecture is only acceptable if those tests can validate the implementation without depending on LiteLLM behavior as hidden glue.
+```ts
+const server = await startProxyServer(config);
+server.url;
+await server.stop();
+```
+
+Use this for live HTTP/e2e verification and launcher integration.
+
+## Capability negotiation
+
+The most important architectural refinement for this package is explicit capability negotiation.
+
+Suggested provider capability shape:
+
+```ts
+interface ProviderCapabilities {
+  supportsStreaming: boolean;
+  supportsTools: boolean;
+  supportsReasoningBlocks: boolean;
+  supportsTokenCounting: boolean;
+  supportsSystemPrompts: boolean;
+  supportsResponseSchema: boolean;
+  upstreamProtocol:
+    | 'anthropic'
+    | 'openai-chat'
+    | 'openai-responses'
+    | 'google'
+    | 'bedrock-converse'
+    | 'vertex-native'
+    | 'azure-foundry'
+    | 'custom';
+}
+```
+
+Negotiation rules:
+
+- protocol codecs may reject unsupported features early with protocol-native errors
+- provider adapters may downgrade only when the behavior is documented and test-covered
+- silent feature loss should be avoided unless the passthrough protocol explicitly allows it
+
+## Tests as architectural guardrails
+
+This package is still ahead in tests/specs relative to implementation. That is acceptable, but the docs should describe what is already pinned.
+
+Current tests already cover:
+
+- config defaults and validation
+- route mounting by protocol id
+- proxy-boundary auth behavior
+- protocol-specific response shaping
+- passthrough forwarding
+- live HTTP roundtrip via `startProxyServer(...)`
+
+The next implementation should preserve that structure and grow it rather than replacing it.
+
+## Recommended source layout
+
+The package can land incrementally, but this is the layout the architecture is pushing toward:
+
+```text
+src/
+  bin/
+    amux-proxy.ts
+  config.ts
+  server.ts
+  types.ts
+  core/
+    errors.ts
+    normalize.ts
+    capabilities.ts
+  protocols/
+    anthropic.ts
+    openai-chat.ts
+    openai-responses.ts
+    google.ts
+    passthrough.ts
+    bedrock-converse.ts
+    vertex-native.ts
+    azure-foundry.ts
+  providers/
+    openai.ts
+    anthropic.ts
+    google.ts
+    bedrock.ts
+    vertex.ts
+    foundry.ts
+    passthrough.ts
+  shared/
+    auth.ts
+    http.ts
+    logging.ts
+```
+
+That layout keeps protocol code and provider code searchable, testable, and difficult to accidentally re-entangle.

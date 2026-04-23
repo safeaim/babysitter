@@ -104,6 +104,8 @@ The following names may be useful as future concepts, but they are not current p
 
 For now, they should be treated as directional language only. Any one of them needs a decision record, validation plan, and migration story before it becomes normative.
 
+This does not block metaplugins as an implemented pattern. In current V6 terms, metaplugins are higher-order capability abstractions over existing plugin and hook packaging surfaces, including on legacy non-Babysitter agents. The deferred item here is the standalone package name `@a5c-ai/agent-platform-meta-plugins`, not the ability to ship capability bundles for concerns like memory systems, governance, or policy enforcement. `@a5c-ai/agent-plugins-mux` remains the compiler that emits the concrete per-harness plugin outputs those metaplugins rely on.
+
 ## 4. Responsibility Rules
 
 All package changes proposed under V6 should follow these rules:
@@ -144,6 +146,8 @@ The following spec patterns are explicitly rejected for the current V6 stage:
 
 - multi-page invented API blocks for packages that do not exist,
 - broad claims of plugin isolation or governance enforcement without implementation evidence,
+- describing metaplugins as unavailable until a future standalone package exists,
+- equating metaplugins with `agent-plugins-mux` or with any single concrete unified plugin bundle,
 - dependency graphs that imply committed packages without migration sequencing,
 - package lists that obscure which items are real versus hypothetical.
 

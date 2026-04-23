@@ -40,7 +40,7 @@ The V6 architecture refactoring success is measured across multiple dimensions w
 - Hook system operational with event acknowledgment
 
 **Phase 2: Platform Layer** → [Platform Layer](platform-layer.md)  
-- Plugin system operational with meta-plugins and security isolation
+- Plugin system operational, with metaplugin composition and concrete plugin delivery validated as separate concerns
 - Session management fully migrated with persistence and recovery
 - Orchestration plugin functional with babysitter SDK integration
 - Performance targets maintained within acceptable variance

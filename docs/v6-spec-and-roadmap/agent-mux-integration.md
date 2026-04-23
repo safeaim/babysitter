@@ -90,6 +90,8 @@ The plugin and hook story spans multiple packages:
 - `packages/hooks-mux/*` normalizes hook contracts across harnesses.
 - per-harness plugin bundles remain the real installation surfaces users consume.
 
+For V6, this package set is the concrete delivery path for metaplugins on legacy non-Babysitter agents. The metaplugin itself is the higher-order capability being expressed across plugin and hook surfaces; `agent-plugins-mux` only compiles the concrete outputs that carry it. The intended examples are memory systems, governance or policy engines, and discipline-enforcement layers. The `babysitter-unified` plugin family fits here as a first-party unified plugin source and deployment surface, not as the definition of metaplugins.
+
 ### 4. UI And Surface Consumption
 
 The agent-mux UI, TUI, mobile, TV, and watch packages are downstream consumers of the dispatch layer. They are part of the stack, but they do not redefine the architectural center of V6.

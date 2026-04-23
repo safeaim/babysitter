@@ -26,7 +26,7 @@ This document provides an architectural comparison between the current a5c.ai ag
 
 **Layered Plugin Architecture**
 - Clear separation between runtime, platform, and application layers
-- Plugin-first design with meta-plugin extensibility
+- Plugin-first design with metaplugins as a higher-order composition layer over plugins and hooks
 - Selective deployment and functionality composition
 - Isolated state management with defined interfaces
 
@@ -89,7 +89,7 @@ Layered Architecture
 ### 2. Plugin System
 
 **Current**: Limited extensibility, hard-coded functionality
-**V6**: Meta-plugin framework with dynamic loading and extension capabilities
+**V6**: Meta-plugin framework for composing capability concerns above concrete plugin and hook surfaces
 
 ### 3. Session Management
 
@@ -243,7 +243,7 @@ Layered Architecture
 
 **Capabilities**:
 - Plugin-based customization
-- Meta-plugin framework for deep extensions
+- Meta-plugin framework for deep extensions built atop plugin and hook surfaces
 - Hook type extensions
 - Network-distributed functionality
 - Plugin marketplace ecosystem
@@ -260,7 +260,7 @@ Layered Architecture
 ### V6 Integration Patterns
 
 **Agent-Mux Integration**: Layered integration with clear protocol boundaries
-**Hook Integration**: Via hooks-mux with meta-plugin extensibility
+**Hook Integration**: Via hooks-mux with meta-plugin composition over concrete hook and plugin surfaces
 **MCP Integration**: Plugin-based MCP integration with replaceable implementations
 
 ## Summary

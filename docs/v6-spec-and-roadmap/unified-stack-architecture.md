@@ -85,6 +85,8 @@ These packages solve cross-cutting problems:
 - `agent-plugins-mux` compiles one canonical plugin description into harness-specific outputs.
 - `breakpoints-mux` routes human approvals and structured breakpoint responses.
 
+This support layer is part of the delivery path for metaplugins on legacy non-Babysitter agents, but it is not the metaplugin abstraction itself. Metaplugins sit one level higher: they package reusable capability concerns across plugin and hook surfaces. `agent-plugins-mux` emits the concrete bundles those concerns need, while unified plugin sources such as `plugins/babysitter-unified/` provide one first-party authoring surface for that delivery.
+
 ### 4. Distribution And Installation Surfaces
 
 Owned primarily by:
@@ -138,6 +140,7 @@ Breakpoint routing is a distinct concern. `breakpoints-mux` should be discussed 
 - `packages/sdk` is still the main center of gravity.
 - agent-mux is already integrated as repo content, workspace packages, and documentation.
 - Unified plugin authoring coexists with per-harness plugin bundles.
+- Metaplugins are a current capability-layer concept over plugin and hook surfaces, with `agent-plugins-mux` serving as the concrete bundle compiler for legacy non-Babysitter agents.
 
 ## What Is Deferred
 

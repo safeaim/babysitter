@@ -9,7 +9,7 @@ The platform layer builds on the foundation to provide plugin systems, session m
 ### Core Platform Implementation
 
 **Plugin Framework**
-- Implement meta-plugin architecture with lifecycle management → [Plugin Ecosystem](../plugin-ecosystem.md)
+- Implement meta-plugin architecture with lifecycle management, where metaplugins compose capability concerns above concrete plugin and hook bundles → [Plugin Ecosystem](../plugin-ecosystem.md)
 - Create plugin dependency resolution with security validation
 - Add plugin marketplace integration with governance framework
 - Build plugin isolation and resource limit enforcement
@@ -27,6 +27,8 @@ The platform layer builds on the foundation to provide plugin systems, session m
 - Implement hook type extension system for pipeline processing
 - Add dynamic plugin loading with security sandbox enforcement
 - Create plugin pipeline processing with resource monitoring
+
+If this future package is pursued, it should host metaplugin composition logic rather than replace concrete plugin packaging. The current repo evidence still treats unified plugins and per-harness bundles as the install surfaces, with `agent-plugins-mux` responsible for compiling those outputs.
 
 **Orchestration Plugin**
 - Create `@a5c-ai/agent-platform-orchestration-plugin` package

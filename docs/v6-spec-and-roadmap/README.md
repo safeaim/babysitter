@@ -35,10 +35,13 @@ V6 does not currently commit to:
 Start here:
 
 1. [System Overview](system-overview.md)
-2. [V6 Vision](v6-vision.md)
-3. [V6 Architecture Specification](v6-architecture-specification.md)
-4. [V6 Implementation Roadmap](v6-implementation-roadmap.md)
-5. [Package Specifications](package-specs.md)
+2. [Glossary](glossary.md)
+3. [Unified Stack Architecture](unified-stack-architecture.md)
+4. [Stack Guide](stack-guide.md)
+5. [V6 Vision](v6-vision.md)
+6. [V6 Architecture Specification](v6-architecture-specification.md)
+7. [V6 Implementation Roadmap](v6-implementation-roadmap.md)
+8. [Package Specifications](package-specs.md)
 
 Use these as constraints:
 
@@ -51,6 +54,9 @@ Use these as constraints:
 Core planning documents:
 
 - [System Overview](system-overview.md) - current system boundaries and ecosystem position
+- [Glossary](glossary.md) - canonical terminology for the unified Babysitter, agent-mux, and mux-support stack
+- [Unified Stack Architecture](unified-stack-architecture.md) - how the current monorepo stack fits together end to end
+- [Stack Guide](stack-guide.md) - where to start reading and which package/docs own which concerns
 - [Current State Analysis](current-state.md) - repository reality and pain points
 - [V6 Vision](v6-vision.md) - principles, non-goals, and decision filters
 - [V6 Architecture Specification](v6-architecture-specification.md) - normative architecture for the next executable stage

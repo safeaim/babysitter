@@ -1,151 +1,116 @@
 # Agent-Mux Repository Integration
 
-→ [Documentation Index](README.md) | Related: [V6 Vision](v6-vision.md) | [Package Specifications](package-specs.md)
+→ [Documentation Index](README.md) | Related: [Unified Stack Architecture](unified-stack-architecture.md) | [Package Specifications](package-specs.md)
 
 ## Integration Overview
 
-As part of the V6 architecture refactoring, the agent-mux repository (`C:\work\agent-mux\`) will be unified into the babysitter monorepo. This integration consolidates the agent dispatch layer with the orchestration platform for improved cohesion and simplified maintenance.
+`agent-mux` is already part of this monorepo under `packages/agent-mux/*`. The V6 task is not to speculate about a future migration from a separate checkout. The V6 task is to describe how the dispatch layer, orchestration layer, hook normalization layer, and plugin packaging surfaces fit together now.
 
-## Agent-Mux Repository Structure
+## Current Repository Reality
 
-The agent-mux repository contains the following packages:
+The integrated `agent-mux` package family includes:
 
 ### Core Infrastructure
+
 - **`@a5c-ai/agent-mux-core`** - Core types, client, and stream engine
-- **`@a5c-ai/agent-mux-adapters`** - Harness adapters for various coding agents
-- **`@a5c-ai/agent-mux-cli`** - Command-line interface
-- **`@a5c-ai/agent-mux`** - Main SDK package ("Unified dispatch layer for local CLI-based AI coding agents")
-- **`@a5c-ai/agent-mux-gateway`** - Gateway services
+- **`@a5c-ai/agent-mux-adapters`** - Built-in harness adapters
+- **`@a5c-ai/agent-mux-cli`** - `amux` command-line interface
+- **`@a5c-ai/agent-mux`** - Main SDK package and dispatch surface
+- **`@a5c-ai/agent-mux-gateway`** - Gateway services for remote and browser-facing surfaces
 
 ### User Interfaces
-- **`@a5c-ai/agent-mux-ui`** - Core UI components
-- **`@a5c-ai/agent-mux-webui`** - Web interface
-- **`@a5c-ai/agent-mux-tui`** - Terminal user interface
+
+- **`@a5c-ai/agent-mux-ui`** - Shared UI foundation
+- **`@a5c-ai/agent-mux-webui`** - Browser interface
+- **`@a5c-ai/agent-mux-tui`** - Terminal interface
 
 ### Platform-Specific Applications
-- **`@a5c-ai/agent-mux-mobile-ios-app`** - iOS mobile application
-- **`@a5c-ai/agent-mux-mobile-android-app`** - Android mobile application
-- **`@a5c-ai/agent-mux-tv-androidtv-app`** - Android TV application
-- **`@a5c-ai/agent-mux-tv-appletv-app`** - Apple TV application
-- **`@a5c-ai/agent-mux-watch-watchos-app`** - watchOS application
-- **`@a5c-ai/agent-mux-watch-wearos-app`** - Wear OS application
+
+- **`@a5c-ai/agent-mux-mobile-ios-app`**
+- **`@a5c-ai/agent-mux-mobile-android-app`**
+- **`@a5c-ai/agent-mux-tv-androidtv-app`**
+- **`@a5c-ai/agent-mux-tv-appletv-app`**
+- **`@a5c-ai/agent-mux-watch-watchos-app`**
+- **`@a5c-ai/agent-mux-watch-wearos-app`**
 
 ### Supporting Services
-- **`@a5c-ai/agent-mux-observability`** - Monitoring and observability
-- **`@a5c-ai/agent-mux-harness-mock`** - Testing and development mocks
-- **`@a5c-ai/amux-proxy`** - Python proxy service
 
-## Integration Strategy
+- **`@a5c-ai/agent-mux-observability`**
+- **`@a5c-ai/agent-mux-harness-mock`**
+- **`@a5c-ai/amux-proxy`**
 
-### Package Migration Plan
+## How Agent-Mux Fits Into The Stack
 
-**Phase 1: Core Infrastructure Integration**
-- Migrate `agent-mux-core`, `agent-mux-adapters`, `agent-mux-cli`, and `agent-mux` packages
-- Update `babysitter-agent` dependencies to use local agent-mux packages
-- Maintain existing API compatibility during transition
+Agent-mux is the dispatch layer, not the orchestration core.
 
-**Phase 2: Service Layer Integration**  
-- Integrate `agent-mux-gateway` and `agent-mux-observability`
-- Consolidate monitoring and observability with babysitter observability systems
-- Merge gateway functionality with babysitter service infrastructure
+- Babysitter owns runs, replay, effect lifecycles, process execution, and CLI orchestration.
+- agent-mux owns harness-facing adapter behavior, normalized event streams, invocation modes, and agent-running APIs.
+- `hooks-mux` normalizes hook payloads across harnesses.
+- `agent-plugins-mux` compiles the unified plugin authoring surface into harness-specific bundles.
+- `breakpoints-mux` handles routed human approval and response flows when those are needed.
 
-**Phase 3: UI and Application Integration**
-- Migrate UI packages (`agent-mux-ui`, `agent-mux-webui`, `agent-mux-tui`)
-- Integrate TUI with existing `@a5c-ai/babysitter-tui-plugins`
-- Consolidate web interfaces with catalog and observer dashboard
+This means the integration is already a package-and-boundary question inside one repository, not a cross-repo migration plan.
 
-**Phase 4: Platform Applications** 
-- Migrate mobile and platform-specific applications
-- Integrate with unified babysitter ecosystem
-- Maintain platform-specific build and deployment processes
+## Normative V6 Position
 
-### Updated Package Hierarchy
+V6 currently commits to:
 
-```
-Infrastructure Layer (Unified Dispatch/Mux)
-├── @a5c-ai/agent-mux-core
-├── @a5c-ai/agent-mux-adapters  
-├── @a5c-ai/agent-mux-cli
-├── @a5c-ai/agent-mux (main SDK)
-├── @a5c-ai/agent-mux-gateway
-├── @a5c-ai/hooks-mux (renamed from hooks-mux)
-└── @a5c-ai/agent-plugins-mux (renamed from agent-plugins-mux)
+- documenting the actual responsibility split between Babysitter and agent-mux,
+- using the current package layout as the source of truth,
+- improving naming, validation, and docs around the existing seams,
+- avoiding claims that a deeper runtime/platform/application decomposition is already decided.
 
-Runtime Layer (Engine)
-└── @a5c-ai/agent-runtime
+V6 does not currently commit to forcing agent-mux into a new package hierarchy just because those names are possible to imagine.
 
-Platform Layer (Persistence + Plugins)
-├── @a5c-ai/agent-platform
-└── @a5c-ai/agent-platform-meta-plugins
+## Integration Points That Matter Today
 
-Orchestration Layer (Domain-Specific)
-├── @a5c-ai/agent-platform-orchestration-plugin
-├── @a5c-ai/babysitter-sdk (unchanged)
-└── @a5c-ai/babysitter-agent (current renamed package target)
+### 1. Package Workspaces
 
-User Interface Layer
-├── @a5c-ai/agent-mux-ui
-├── @a5c-ai/agent-mux-webui
-├── @a5c-ai/agent-mux-tui (integrated with babysitter-tui-plugins)
-├── @a5c-ai/catalog (enhanced web interface)
-└── @a5c-ai/observer-dashboard (enhanced observability)
+The monorepo root includes:
 
-Platform Applications
-├── @a5c-ai/agent-mux-mobile-ios-app
-├── @a5c-ai/agent-mux-mobile-android-app
-├── @a5c-ai/agent-mux-tv-*-app (TV applications)
-└── @a5c-ai/agent-mux-watch-*-app (watch applications)
+- `packages/*`
+- `packages/agent-mux/*`
+- `packages/hooks-mux/*`
 
-Supporting Services
-├── @a5c-ai/agent-mux-observability (integrated with babysitter observability)
-├── @a5c-ai/agent-mux-harness-mock
-└── @a5c-ai/amux-proxy
-```
+That workspace layout is already evidence that agent-mux is part of the repo's current operating model.
 
-## Integration Dependencies
+### 2. Orchestration To Dispatch Boundary
 
-### Repository Structure Updates
+The main integration seam is:
 
-**Workspace Configuration**: Update root `package.json` to include all agent-mux packages in workspace configuration
+- Babysitter tells the system what work to do and in what order.
+- agent-mux knows how to execute harness-facing agent work consistently.
 
-**Build System Alignment**: Harmonize TypeScript, ESLint, and build configurations between repositories
+### 3. Hooks And Plugin Distribution
 
-**Version Synchronization**: Establish unified versioning strategy across all packages
+The plugin and hook story spans multiple packages:
 
-### API Compatibility
+- `plugins/babysitter-unified/` is the canonical plugin authoring surface.
+- `packages/agent-plugins-mux` is the compiler for harness-specific outputs.
+- `packages/hooks-mux/*` normalizes hook contracts across harnesses.
+- per-harness plugin bundles remain the real installation surfaces users consume.
 
-**Backward Compatibility**: Maintain existing agent-mux API surface during transition period
+### 4. UI And Surface Consumption
 
-**Deprecation Strategy**: Provide clear migration path for external consumers of agent-mux packages
+The agent-mux UI, TUI, mobile, TV, and watch packages are downstream consumers of the dispatch layer. They are part of the stack, but they do not redefine the architectural center of V6.
 
-**Protocol Alignment**: Ensure agent-mux protocols align with babysitter orchestration patterns
+## Deferred Questions
 
-### Testing Integration
+These may still become important later, but V6 does not treat them as settled:
 
-**Test Suite Consolidation**: Integrate agent-mux test suites with babysitter testing infrastructure → [Testing Framework](testing-framework.md)
+- whether any deeper package split is justified inside `babysitter-agent`,
+- whether some agent-mux support subsystems should be promoted into stronger standalone boundaries,
+- whether future naming should formalize a larger runtime/platform/application vocabulary.
 
-**E2E Testing**: Establish comprehensive end-to-end testing across unified platform
+## Practical Reading Order
 
-**Mock and Harness Testing**: Integrate `agent-mux-harness-mock` with babysitter testing tools
+For the current integrated story, read:
 
-## Architecture Impact
-
-### Enhanced Capabilities
-
-**Unified Agent Dispatch**: Consolidated agent multiplexing and orchestration in single repository
-
-**Improved UI/UX**: Comprehensive user interface options from command-line to mobile applications
-
-**Enhanced Observability**: Integrated monitoring across agent dispatch and orchestration layers
-
-### Simplified Maintenance
-
-**Single Repository**: Reduced complexity of cross-repository dependencies and version coordination
-
-**Unified Development**: Streamlined development workflow with all components in single monorepo
-
-**Consistent Release Process**: Single release pipeline for entire agent platform ecosystem
+1. [Unified Stack Architecture](unified-stack-architecture.md)
+2. [Package Specifications](package-specs.md)
+3. [docs/agent-mux/README](../agent-mux/README.md)
+4. `packages/agent-mux/README.md`
 
 ---
 
-**Related Documents**: [V6 Vision](v6-vision.md) | [Package Specifications](package-specs.md) | [Implementation Roadmap](implementation/)
+**Related Documents**: [Unified Stack Architecture](unified-stack-architecture.md) | [Package Specifications](package-specs.md) | [Stack Guide](stack-guide.md)

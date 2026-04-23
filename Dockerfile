@@ -37,12 +37,17 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY packages/sdk/package.json ./packages/sdk/
 COPY packages/babysitter-agent/package.json ./packages/babysitter-agent/
+COPY packages/agent-core/package.json ./packages/agent-core/
 COPY packages/agent-mux/sdk/package.json ./packages/agent-mux/sdk/
 COPY packages/agent-mux/core/package.json ./packages/agent-mux/core/
 COPY packages/agent-mux/cli/package.json ./packages/agent-mux/cli/
 COPY packages/agent-mux/adapters/package.json ./packages/agent-mux/adapters/
 COPY packages/agent-mux/gateway/package.json ./packages/agent-mux/gateway/
 COPY packages/agent-mux/observability/package.json ./packages/agent-mux/observability/
+COPY packages/agent-mux/harness-mock/package.json ./packages/agent-mux/harness-mock/
+COPY packages/agent-mux/ui/package.json ./packages/agent-mux/ui/
+COPY packages/agent-mux/webui/package.json ./packages/agent-mux/webui/
+COPY packages/agent-mux/tui/package.json ./packages/agent-mux/tui/
 COPY scripts/patch-webpackbar-progress-plugin.cjs ./scripts/
 COPY scripts/patch-agent-mux-exports.cjs ./scripts/
 
@@ -52,15 +57,17 @@ RUN npm install --include=dev
 # Copy the rest of the application
 COPY . .
 
-# Build the SDK and harness CLI
+# Build the SDK and agent runtime packages
 RUN npm run build:sdk && \
+    npm run build:agent-mux && \
+    npm run build --workspace=@a5c-ai/agent-core && \
     npm run build --workspace=@a5c-ai/babysitter-agent
 
 # Clean up dev dependencies after build
 ENV NODE_ENV=production
 
-# Install the SDK and harness CLI globally
-RUN npm install -g ./packages/sdk ./packages/babysitter-agent
+# Install the SDK and agent runtime packages globally
+RUN npm install -g ./packages/sdk ./packages/agent-core ./packages/babysitter-agent
 
 # Read plugin version from plugin.json (single source of truth)
 RUN PLUGIN_VERSION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('plugins/babysitter/plugin.json','utf8')).version)") && \

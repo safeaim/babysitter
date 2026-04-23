@@ -23,16 +23,43 @@ function quote(value) {
   return `"${value.replace(/(["$`\\])/g, '\\$1')}"`;
 }
 
-function getTestGlobs(pkg) {
+function collectTestFiles(rootDir) {
+  if (!fs.existsSync(rootDir)) {
+    return [];
+  }
+
+  const entries = fs.readdirSync(rootDir, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(rootDir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...collectTestFiles(fullPath));
+      continue;
+    }
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    if (!entry.name.endsWith('.test.ts') && !entry.name.endsWith('.test.tsx')) {
+      continue;
+    }
+
+    files.push(path.relative(repoRoot, fullPath).split(path.sep).join('/'));
+  }
+
+  return files;
+}
+
+function getTestRoots(pkg) {
   if (pkg === 'packages/agent-mux/sdk') {
-    return ['packages/agent-mux/tests/**/*.test.ts', 'packages/agent-mux/tests/**/*.test.tsx'];
+    return ['packages/agent-mux/tests'];
   }
 
   return [
-    `${pkg}/tests/**/*.test.ts`,
-    `${pkg}/tests/**/*.test.tsx`,
-    `${pkg}/src/**/*.test.ts`,
-    `${pkg}/src/**/*.test.tsx`,
+    `${pkg}/tests`,
+    `${pkg}/src`,
   ];
 }
 
@@ -41,8 +68,7 @@ for (const pkg of packages) {
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
   const scriptName = mode === 'test' ? 'test' : 'build';
   if (mode === 'test') {
-    const testGlobs = getTestGlobs(pkg);
-    const testFiles = testGlobs.flatMap((pattern) => fs.globSync(pattern, { cwd: repoRoot }));
+    const testFiles = [...new Set(getTestRoots(pkg).flatMap((root) => collectTestFiles(path.join(repoRoot, root))))];
     if (testFiles.length === 0) {
       console.log(`\n=== ${pkg} (${mode}) skipped: no test files ===`);
       continue;

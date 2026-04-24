@@ -106,3 +106,25 @@ export interface WebhookAutomationRule extends AutomationRuleBase {
 }
 
 export type AutomationRule = TimerAutomationRule | WebhookAutomationRule;
+
+export type AutomationExecutionStatus = "created" | "skipped";
+
+export interface AutomationExecutionRecord {
+  readonly id: string;
+  readonly ruleId: string;
+  readonly ruleName: string;
+  readonly triggerType: AutomationRule["trigger"]["type"];
+  readonly status: AutomationExecutionStatus;
+  readonly triggeredAt: string;
+  readonly triggeredBy: string;
+  readonly source: AutomationRuleSourceMetadata;
+  readonly projectId: string;
+  readonly boardProjectId: string;
+  readonly issueId?: string;
+  readonly issueKey?: string;
+  readonly issueSource?: KanbanIssueSource;
+  readonly stateAtExecution: AutomationRuleLifecycleState;
+  readonly skipReason?: string;
+  readonly inputs?: Readonly<Record<string, unknown>>;
+  readonly metadata?: Readonly<Record<string, unknown>>;
+}

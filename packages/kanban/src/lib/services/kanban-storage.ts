@@ -2,7 +2,10 @@ import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import type { AutomationRule } from '../../../../agent-mux/core/src/automation.js';
+import type {
+  AutomationExecutionRecord,
+  AutomationRule,
+} from '../../../../agent-mux/core/src/automation.js';
 import type { KanbanIssue, KanbanProject } from '../../../../agent-mux/core/src/kanban.js';
 
 export const KANBAN_BACKLOG_FILE_PATH =
@@ -18,6 +21,7 @@ export interface KanbanStoragePayload {
   projects?: readonly StoredKanbanProject[];
   issues?: readonly StoredKanbanIssue[];
   automationRules?: readonly AutomationRule[];
+  automationExecutions?: readonly AutomationExecutionRecord[];
 }
 
 export interface KanbanStorageDeps {

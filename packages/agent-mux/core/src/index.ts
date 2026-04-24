@@ -355,6 +355,8 @@ export type {
   TimerAutomationRule,
   WebhookAutomationRule,
   AutomationRule,
+  AutomationExecutionStatus,
+  AutomationExecutionRecord,
 } from './automation.js';
 
 // Auth types (canonical from dedicated module)

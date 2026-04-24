@@ -9,6 +9,8 @@
 import { startDaemon, stopDaemon, getDaemonStatus, loadDaemonConfig, runDaemonLoop } from "../../daemon";
 import * as path from "node:path";
 import * as os from "node:os";
+import { executeAutomationTrigger } from "../../daemon/automationExecutor";
+import { isAutomationTriggerEvent } from "../../daemon/types";
 
 function defaultDaemonDir(): string {
   return path.join(os.homedir(), ".a5c", "daemon");
@@ -132,6 +134,12 @@ export async function handleDaemonRun(args: {
   await runDaemonLoop(config, {
     signal: ac.signal,
     logDir: daemonDir,
+    onTrigger: (trigger) => {
+      if (!isAutomationTriggerEvent(trigger)) {
+        return undefined;
+      }
+      return executeAutomationTrigger(trigger);
+    },
   });
 
   return 0;

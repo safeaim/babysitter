@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import type { AgentMuxClient, AgentEvent, RunHandle } from '@a5c-ai/agent-mux';
 import type { EventStream } from './event-stream.js';
+import type { TuiViewport } from './layout.js';
 
 export type PromptHandler = (prompt: string) => void | Promise<void>;
 
@@ -26,6 +27,7 @@ export interface TuiViewProps {
   active: boolean;
   eventStream: EventStream;
   emit: (event: TuiInternalEvent) => void;
+  viewport?: TuiViewport;
   /** Optional global filter string (e.g. set via top-level `/` in chat). */
   filter?: string;
   /** Optional session selection routed by emit(session:detail). */

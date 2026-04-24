@@ -15,6 +15,35 @@ afterEach(async () => {
 describe("BacklogQueryService", () => {
   it("returns a seeded backlog summary and links matching run summaries", async () => {
     const service = new BacklogQueryService({
+      reviewService: {
+        listReviews: vi.fn().mockResolvedValue({
+          generatedAt: "2026-04-24T00:00:00.000Z",
+          artifacts: [
+            {
+              id: "review-1",
+              targetType: "issue",
+              targetId: "KANBAN-GAP-004",
+              targetLabel: "KANBAN-GAP-004",
+              title: "Review diff workflow primitives",
+              decision: "pending",
+              queueState: "queued",
+              updatedAt: "2026-04-24T00:00:00.000Z",
+              diff: [],
+              comments: [],
+            },
+          ],
+          queue: [],
+          summary: {
+            total: 1,
+            issueCount: 1,
+            workspaceCount: 0,
+            pendingCount: 1,
+            changesRequestedCount: 0,
+            approvedCount: 0,
+            openCommentCount: 0,
+          },
+        }),
+      } as never,
       runQueryService: {
         listProjects: vi.fn().mockResolvedValue({
           recentCompletionWindowMs: 14400000,
@@ -43,6 +72,7 @@ describe("BacklogQueryService", () => {
     expect(overview.summary.issueCount).toBeGreaterThanOrEqual(7);
     expect(overview.summary.needsDecompositionCount).toBeGreaterThanOrEqual(1);
     expect(overview.snapshot.projects[0]?.linkedRunSummary?.activeRuns).toBe(2);
+    expect(overview.snapshot.issues.find((issue) => issue.id === "KANBAN-GAP-004")?.review?.decision).toBe("pending");
     expect(overview.board.projects[0]?.columns.find((column) => column.id === "todo")?.issueCount).toBeGreaterThan(0);
     expect(overview.snapshot.issues.find((issue) => issue.key === "KANBAN-DEBT-003")).toMatchObject({
       childIssueIds: ["KANBAN-GAP-001", "KANBAN-GAP-002", "KANBAN-GAP-003"],
@@ -60,6 +90,22 @@ describe("BacklogQueryService", () => {
     const service = new BacklogQueryService({
       backlogFilePath,
       now: () => "2026-04-24T12:00:00.000Z",
+      reviewService: {
+        listReviews: vi.fn().mockResolvedValue({
+          generatedAt: "2026-04-24T12:00:00.000Z",
+          artifacts: [],
+          queue: [],
+          summary: {
+            total: 0,
+            issueCount: 0,
+            workspaceCount: 0,
+            pendingCount: 0,
+            changesRequestedCount: 0,
+            approvedCount: 0,
+            openCommentCount: 0,
+          },
+        }),
+      } as never,
       runQueryService: {
         listProjects: vi.fn().mockResolvedValue({
           recentCompletionWindowMs: 14400000,
@@ -85,8 +131,123 @@ describe("BacklogQueryService", () => {
     );
   });
 
+  it("links a repository and creates a pull request through persisted backlog data", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kanban-backlog-"));
+    tempDirs.push(tempDir);
+    const backlogFilePath = path.join(tempDir, "kanban-backlog.json");
+
+    const service = new BacklogQueryService({
+      backlogFilePath,
+      now: () => "2026-04-24T12:00:00.000Z",
+      runQueryService: {
+        listProjects: vi.fn().mockResolvedValue({
+          recentCompletionWindowMs: 14400000,
+          projects: [],
+        }),
+      } as never,
+    });
+
+    await service.linkRepository({
+      issueId: "KANBAN-GAP-001-A",
+      owner: "a5c-ai",
+      name: "babysitter",
+      branchName: "feat/kanban-gap-001-a",
+    });
+
+    const overview = await service.createPullRequest({
+      issueId: "KANBAN-GAP-001-A",
+      title: "KANBAN-GAP-001-A: Define canonical project and issue entities",
+      reviewers: "kanban-maintainers, codeowners",
+    });
+
+    const issue = overview.snapshot.issues.find((candidate) => candidate.id === "KANBAN-GAP-001-A");
+    expect(issue?.repositoryLifecycle?.repositoryId).toBe("repo-github-a5c-ai-babysitter");
+    expect(issue?.repositoryLifecycle?.pullRequest?.number).toBeGreaterThan(0);
+    expect(issue?.repositoryLifecycle?.pullRequest?.reviewLinks).toHaveLength(2);
+    expect(
+      overview.snapshot.projects[0]?.repositories.find(
+        (repository) => repository.id === "repo-github-a5c-ai-babysitter",
+      )?.fullName,
+    ).toBe("a5c-ai/babysitter");
+
+    const persisted = JSON.parse(await fs.readFile(backlogFilePath, "utf8")) as {
+      projects: Array<{ repositories?: Array<{ id: string }> }>;
+      issues: Array<{
+        id: string;
+        repositoryLifecycle?: { pullRequest?: { title: string } };
+      }>;
+    };
+    expect(persisted.projects[0]?.repositories?.[0]?.id).toBe("repo-github-a5c-ai-babysitter");
+    expect(
+      persisted.issues.find((candidate) => candidate.id === "KANBAN-GAP-001-A")?.repositoryLifecycle
+        ?.pullRequest?.title,
+    ).toBe("KANBAN-GAP-001-A: Define canonical project and issue entities");
+  });
+
+  it("updates repository settings for the linked repository", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kanban-backlog-"));
+    tempDirs.push(tempDir);
+    const backlogFilePath = path.join(tempDir, "kanban-backlog.json");
+
+    const service = new BacklogQueryService({
+      backlogFilePath,
+      now: () => "2026-04-24T12:00:00.000Z",
+      runQueryService: {
+        listProjects: vi.fn().mockResolvedValue({
+          recentCompletionWindowMs: 14400000,
+          projects: [],
+        }),
+      } as never,
+    });
+
+    await service.linkRepository({
+      issueId: "KANBAN-GAP-001-B",
+      owner: "a5c-ai",
+      name: "babysitter",
+      branchName: "feat/kanban-gap-001-b",
+    });
+
+    const overview = await service.updateRepositorySettings({
+      issueId: "KANBAN-GAP-001-B",
+      settings: {
+        baseBranch: "release/next",
+        ciProvider: "Buildkite",
+        publishTarget: "internal-registry",
+        autoMerge: true,
+        requiredApprovals: 3,
+      },
+    });
+
+    const repository = overview.snapshot.projects[0]?.repositories.find(
+      (candidate) => candidate.id === "repo-github-a5c-ai-babysitter",
+    );
+    expect(repository?.settings).toMatchObject({
+      baseBranch: "release/next",
+      ciProvider: "Buildkite",
+      publishTarget: "internal-registry",
+      autoMerge: true,
+      requiredApprovals: 3,
+    });
+  });
+
   it("rejects moves that violate board policy", async () => {
     const service = new BacklogQueryService({
+      reviewService: {
+        listReviews: vi.fn().mockResolvedValue({
+          generatedAt: "2026-04-24T12:00:00.000Z",
+          artifacts: [],
+          queue: [],
+          summary: {
+            total: 0,
+            issueCount: 0,
+            workspaceCount: 0,
+            pendingCount: 0,
+            changesRequestedCount: 0,
+            approvedCount: 0,
+            openCommentCount: 0,
+          },
+        }),
+      } as never,
       runQueryService: {
         listProjects: vi.fn().mockResolvedValue({
           recentCompletionWindowMs: 14400000,

@@ -31,6 +31,25 @@ const mockBacklogOverview = {
         labels: [],
         assignees: [],
         statuses: [],
+        repositories: [
+          {
+            id: 'repo-github-a5c-ai-babysitter',
+            owner: 'a5c-ai',
+            name: 'babysitter',
+            fullName: 'a5c-ai/babysitter',
+            provider: 'github',
+            url: 'https://github.com/a5c-ai/babysitter',
+            defaultBranch: 'main',
+            linkedAt: new Date().toISOString(),
+            settings: {
+              baseBranch: 'main',
+              autoMerge: false,
+              requiredApprovals: 2,
+              ciProvider: 'GitHub Actions',
+              publishTarget: 'npm',
+            },
+          },
+        ],
         metrics: {
           totalIssues: 1,
           readyIssues: 1,
@@ -69,6 +88,39 @@ const mockBacklogOverview = {
           blockedReasons: [],
           runIds: [],
           sessionIds: [],
+        },
+        repositoryLifecycle: {
+          repositoryId: 'repo-github-a5c-ai-babysitter',
+          branchName: 'feat/mock-kanban',
+          reviewStatus: 'pending',
+          mergeStatus: 'blocked',
+          publishStatus: 'not-ready',
+          ciGates: [
+            {
+              id: 'ci-mock',
+              name: 'Kanban tests',
+              required: true,
+              status: 'pending',
+            },
+          ],
+          pullRequest: {
+            id: 'pr-1',
+            number: 1,
+            title: 'Mock PR',
+            status: 'in-review',
+            branchName: 'feat/mock-kanban',
+            baseBranch: 'main',
+            mergeStatus: 'blocked',
+            reviewLinks: [
+              {
+                id: 'review-1',
+                label: 'Codeowners',
+                status: 'pending',
+              },
+            ],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
         },
       },
     ],
@@ -109,6 +161,56 @@ const mockBacklogOverview = {
             dependencyCount: 0,
             childCount: 3,
             acceptanceProgress: { satisfied: 1, total: 1 },
+            repository: {
+              id: 'repo-github-a5c-ai-babysitter',
+              owner: 'a5c-ai',
+              name: 'babysitter',
+              fullName: 'a5c-ai/babysitter',
+              provider: 'github',
+              url: 'https://github.com/a5c-ai/babysitter',
+              defaultBranch: 'main',
+              linkedAt: new Date().toISOString(),
+              settings: {
+                baseBranch: 'main',
+                autoMerge: false,
+                requiredApprovals: 2,
+                ciProvider: 'GitHub Actions',
+                publishTarget: 'npm',
+              },
+            },
+            repositoryLifecycle: {
+              repositoryId: 'repo-github-a5c-ai-babysitter',
+              branchName: 'feat/mock-kanban',
+              reviewStatus: 'pending',
+              mergeStatus: 'blocked',
+              publishStatus: 'not-ready',
+              ciGates: [
+                {
+                  id: 'ci-mock',
+                  name: 'Kanban tests',
+                  required: true,
+                  status: 'pending',
+                },
+              ],
+              pullRequest: {
+                id: 'pr-1',
+                number: 1,
+                title: 'Mock PR',
+                status: 'in-review',
+                branchName: 'feat/mock-kanban',
+                baseBranch: 'main',
+                mergeStatus: 'blocked',
+                reviewLinks: [
+                  {
+                    id: 'review-1',
+                    label: 'Codeowners',
+                    status: 'pending',
+                  },
+                ],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            },
             moveTargets: [
               {
                 state: 'done',
@@ -141,6 +243,46 @@ const mockBacklogOverview = {
     completedCount: 0,
     needsDecompositionCount: 0,
     inProgressCount: 0,
+  },
+};
+const mockReviewSnapshot = {
+  generatedAt: new Date().toISOString(),
+  artifacts: [
+    {
+      id: "review-issue-kanban-gap-004",
+      targetType: "issue",
+      targetId: "KANBAN-GAP-004",
+      targetLabel: "KANBAN-GAP-004",
+      title: "Review diff workflow primitives",
+      decision: "pending",
+      queueState: "queued",
+      updatedAt: new Date().toISOString(),
+      diff: [],
+      comments: [],
+    },
+  ],
+  queue: [
+    {
+      artifactId: "review-issue-kanban-gap-004",
+      targetType: "issue",
+      targetId: "KANBAN-GAP-004",
+      targetLabel: "KANBAN-GAP-004",
+      title: "Review diff workflow primitives",
+      decision: "pending",
+      queueState: "queued",
+      commentCount: 0,
+      openCommentCount: 0,
+      updatedAt: new Date().toISOString(),
+    },
+  ],
+  summary: {
+    total: 1,
+    issueCount: 1,
+    workspaceCount: 0,
+    pendingCount: 1,
+    changesRequestedCount: 0,
+    approvedCount: 0,
+    openCommentCount: 0,
   },
 };
 
@@ -234,5 +376,21 @@ export const handlers = [
 
   http.get('/api/backlog', () => {
     return HttpResponse.json(mockBacklogOverview);
+  }),
+
+  http.post('/api/backlog', async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({
+      ...mockBacklogOverview,
+      lastAction: body.action ?? null,
+    });
+  }),
+
+  http.get('/api/reviews', () => {
+    return HttpResponse.json(mockReviewSnapshot);
+  }),
+
+  http.post('/api/reviews', () => {
+    return HttpResponse.json(mockReviewSnapshot);
   }),
 ];

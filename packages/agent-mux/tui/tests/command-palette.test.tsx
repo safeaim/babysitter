@@ -52,4 +52,32 @@ describe('CommandPalette', () => {
     await new Promise((r) => setTimeout(r, 50));
     expect(onCancel).toHaveBeenCalled();
   });
+
+  it('truncates and caps visible actions for narrow overlays', async () => {
+    const onPick = vi.fn();
+    const onCancel = vi.fn();
+    const { lastFrame, rerender } = render(
+      <CommandPalette
+        views={views}
+        commands={cmds}
+        onPick={onPick}
+        onCancel={onCancel}
+        width={24}
+        maxItems={2}
+      />,
+    );
+    rerender(
+      <CommandPalette
+        views={views}
+        commands={cmds}
+        onPick={onPick}
+        onCancel={onCancel}
+        width={24}
+        maxItems={2}
+      />,
+    );
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('… 2 more');
+    expect(frame).toContain('view: Sessions');
+  });
 });

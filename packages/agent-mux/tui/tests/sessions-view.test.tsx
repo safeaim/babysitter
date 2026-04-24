@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render } from 'ink-testing-library';
 import { EventStream } from '../src/event-stream.js';
+import { createViewport, type TuiViewport } from '../src/layout.js';
 import SessionsViewPlugin from '../src/plugins/sessions-view.js';
 import type { TuiInternalEvent } from '../src/plugin.js';
 
@@ -38,6 +39,7 @@ function extractView() {
     active: boolean;
     eventStream: EventStream;
     emit: (e: TuiInternalEvent) => void;
+    viewport?: TuiViewport;
   }>;
 }
 
@@ -107,5 +109,44 @@ describe('sessions-view selection + resume', () => {
     rerender(<View client={client} active={true} eventStream={stream} emit={emit} />);
     expect(lastFrame()).toContain('sess-a');
     expect(lastFrame()).not.toContain('No sessions found.');
+  });
+
+  it('compacts and windows the list for narrow, short terminals', async () => {
+    const View = extractView();
+    const client = makeClient([
+      { sessionId: 'sess-a', agent: 'claude-code' },
+      { sessionId: 'sess-b', agent: 'claude-code' },
+      { sessionId: 'sess-long-session-id-1234567890', agent: 'claude-code' },
+      { sessionId: 'sess-d', agent: 'claude-code' },
+      { sessionId: 'sess-e', agent: 'claude-code' },
+      { sessionId: 'sess-f', agent: 'claude-code' },
+    ]);
+    const stream = new EventStream();
+    const emit = vi.fn();
+    const viewport = createViewport(42, 14);
+    const { lastFrame, rerender } = render(
+      <View
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        viewport={viewport}
+      />,
+    );
+    await flush();
+    rerender(
+      <View
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        viewport={viewport}
+      />,
+    );
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('Enter resume · d details · D diff · R refresh');
+    expect(frame).toContain('… 2 more');
+    expect(frame).toMatch(/sess.*….*7890/);
+    expect(frame).not.toContain('sess-f');
   });
 });

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
+import { truncateEnd } from './layout.js';
 
 export interface ModelOption {
   agent: string;
@@ -10,9 +11,19 @@ export interface ModelPickerProps {
   models: ModelOption[];
   onPick(option: ModelOption): void;
   onCancel(): void;
+  title?: string;
+  width?: number;
+  maxItems?: number;
 }
 
-export function ModelPicker({ models, onPick, onCancel }: ModelPickerProps) {
+export function ModelPicker({
+  models,
+  onPick,
+  onCancel,
+  title = 'model',
+  width = 80,
+  maxItems = 8,
+}: ModelPickerProps) {
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
   const filtered = query
@@ -22,6 +33,9 @@ export function ModelPicker({ models, onPick, onCancel }: ModelPickerProps) {
           m.agent.toLowerCase().includes(query.toLowerCase()),
       )
     : models;
+
+  const visible = filtered.slice(0, Math.max(1, maxItems));
+  const rowWidth = Math.max(12, width - 6);
 
   useInput((input, key) => {
     if (key.escape) {
@@ -55,23 +69,27 @@ export function ModelPicker({ models, onPick, onCancel }: ModelPickerProps) {
   return (
     <Box flexDirection="column" borderStyle="round" paddingX={1}>
       <Box>
-        <Text color="cyan">model: </Text>
+        <Text color="cyan">{title}: </Text>
         <Text>{query}</Text>
         <Text color="cyan">▌</Text>
       </Box>
       {filtered.length === 0 ? (
         <Text dimColor>(no matches)</Text>
       ) : (
-        filtered.slice(0, 8).map((m, i) => {
+        visible.map((m, i) => {
           const sel = i === cursor;
+          const label = truncateEnd(`${m.agent} ${m.modelId}`, rowWidth);
           return (
             <Text key={m.agent + ':' + m.modelId} color={sel ? 'green' : undefined}>
               {sel ? '> ' : '  '}
-              <Text color="cyan">{m.agent}</Text> {m.modelId}
+              {label}
             </Text>
           );
         })
       )}
+      {filtered.length > visible.length ? (
+        <Text dimColor>… {filtered.length - visible.length} more</Text>
+      ) : null}
     </Box>
   );
 }

@@ -1,15 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Text, useInput, useApp } from 'ink';
+import { Box, Text, useApp, useInput, useStdout } from 'ink';
 import { logger } from '@a5c-ai/agent-mux-observability';
 import type { AgentMuxClient, AgentEvent, DeferredPromptTarget, RunHandle } from '@a5c-ai/agent-mux';
 import { createRegistry, createContext, loadPlugins, type Registry } from './registry.js';
 import type { TuiPlugin, TuiViewProps, EventRenderer } from './plugin.js';
 import { EventStream } from './event-stream.js';
-import { PromptInput } from './prompt-input.js';
+import {
+  PromptInput,
+  createEmptyPromptInputState,
+  insertPromptInput,
+  type PromptInputState,
+} from './prompt-input.js';
 import { CommandPalette, type PaletteAction } from './command-palette.js';
 import { ModelPicker, type ModelOption } from './model-picker.js';
 import { loadHistory, appendHistory } from './prompt-history-store.js';
 import { resolveSessionDispatchPlan } from './session-dispatch.js';
+import { createViewport, packSegments, type TuiSegment } from './layout.js';
 
 export interface AppProps {
   client: AgentMuxClient;
@@ -76,6 +82,27 @@ function pickRenderers(renderers: EventRenderer[], ev: AgentEvent): EventRendere
   return renderers.find((r) => r.id === 'fallback');
 }
 
+function SegmentLines({ lines }: { lines: TuiSegment[][] }) {
+  return (
+    <Box flexDirection="column">
+      {lines.map((line, lineIndex) => (
+        <Box key={`line:${lineIndex}`}>
+          {line.map((segment, segmentIndex) => (
+            <Text
+              key={segment.key}
+              color={segment.color}
+              dimColor={segment.dimColor}
+            >
+              {segmentIndex > 0 ? ' · ' : ''}
+              {segment.text}
+            </Text>
+          ))}
+        </Box>
+      ))}
+    </Box>
+  );
+}
+
 export function App({
   client,
   plugins,
@@ -84,11 +111,35 @@ export function App({
   disableChatAutoPrompt = false,
 }: AppProps) {
   const { exit } = useApp();
+  const { stdout } = useStdout();
+  const [stdoutDimensions, setStdoutDimensions] = useState(() => ({
+    width: stdout?.columns ?? 80,
+    height: stdout?.rows ?? 24,
+  }));
+  useEffect(() => {
+    if (!stdout) return;
+    const sync = () => {
+      setStdoutDimensions({
+        width: stdout.columns ?? 80,
+        height: stdout.rows ?? 24,
+      });
+    };
+    sync();
+    stdout.on('resize', sync);
+    return () => {
+      stdout.off('resize', sync);
+    };
+  }, [stdout]);
+  const viewport = useMemo(
+    () => createViewport(stdoutDimensions.width, stdoutDimensions.height),
+    [stdoutDimensions.height, stdoutDimensions.width],
+  );
   const [status, setStatus] = useState<string>('');
   const [, setPluginLoadVersion] = useState(0);
   const [activeId, setActiveId] = useState<string>(initialViewId);
   const [promptMode, setPromptMode] = useState<boolean>(false);
   const [chatPromptDismissed, setChatPromptDismissed] = useState<boolean>(false);
+  const [chatPromptState, setChatPromptState] = useState<PromptInputState>(() => createEmptyPromptInputState());
   const [pendingResume, setPendingResume] = useState<
     { agent: string; sessionId: string } | null
   >(null);
@@ -188,8 +239,27 @@ export function App({
     return { registry: r, stream: s };
   }, [client, plugins]);
 
+  const active = registry.views.find((v) => v.id === activeId) ?? registry.views[0];
+
   useInput((input, key) => {
     if (promptMode || filterMode || paletteMode || modelPickerMode || profilePickerMode || agentPickerMode) return; // child input owns keys while open
+    if (active?.id === 'chat' && chatPromptDismissed) {
+      if (key.escape) {
+        setChatPromptDismissed(false);
+        setChatPromptState(createEmptyPromptInputState());
+        const fallbackView = registry.views.find((view) => view.id !== 'chat');
+        if (fallbackView) {
+          setActiveId(fallbackView.id);
+        }
+        return;
+      }
+      if (input && !key.ctrl && !key.meta) {
+        setChatPromptState((current) => insertPromptInput(current, input));
+        setChatPromptDismissed(false);
+        setPromptMode(true);
+        return;
+      }
+    }
     if (input === 'q' || (key.ctrl && input === 'c')) {
       exit();
       return;
@@ -265,12 +335,21 @@ export function App({
     }
   });
 
-  const active = registry.views.find((v) => v.id === activeId) ?? registry.views[0];
-
+  const navLines = useMemo(
+    () =>
+      packSegments(
+        registry.views.map((v) => ({
+          key: v.id,
+          text: `[${v.hotkey ?? '?'}] ${v.title}`,
+          color: v.id === active?.id ? 'green' : 'gray',
+        })),
+        viewport.width,
+      ),
+    [active?.id, registry.views, viewport.width],
+  );
   // Chat view has an always-on inline prompt. Auto-focus when entering chat
-  // and no modal is open. Esc inside PromptInput flips promptMode off, which
-  // re-enables global hotkeys; any hotkey that switches away from chat also
-  // clears it. This is the simplest model that keeps global navigation working.
+  // and no modal is open. The draft itself lives at the app level so Esc can
+  // temporarily dismiss the composer without losing the current prompt.
   useEffect(() => {
     if (
       !disableChatAutoPrompt &&
@@ -501,15 +580,70 @@ export function App({
     }
   }
 
+  const footerSegments: TuiSegment[] = [
+    {
+      key: 'controls',
+      text: viewport.isVeryNarrow
+        ? '/ filter, : palette'
+        : 'shift+tab: mode, /: filter, :: palette',
+      dimColor: true,
+    },
+    { key: 'mode', text: `mode=${execMode}`, color: EXEC_MODE_COLORS[execMode] },
+    { key: 'agent', text: `agent=${currentAgent ?? defaultAgent}`, color: 'cyan' },
+  ];
+  if (filter) {
+    footerSegments.push({
+      key: 'filter',
+      text: viewport.isVeryNarrow ? `filter=${filter}` : `filter="${filter}"`,
+      color: 'cyan',
+    });
+  }
+  if (currentModel) {
+    footerSegments.push({
+      key: 'model',
+      text: `model=${currentModel.agent}/${currentModel.modelId}`,
+      color: 'magenta',
+    });
+  }
+  if (currentProfile) {
+    footerSegments.push({ key: 'profile', text: `profile=${currentProfile}`, color: 'blue' });
+  }
+  if (currentHandleRef.current) {
+    footerSegments.push({ key: 'interrupt', text: 'i: interrupt', color: 'yellow' });
+    if (!viewport.isVeryNarrow) {
+      footerSegments.push({
+        key: 'deferred',
+        text: '/queue, /steer, /steer-tool',
+        color: 'yellow',
+      });
+    }
+  }
+  if (pendingApproval) {
+    footerSegments.push({ key: 'approval', text: 'y/n: approve', color: 'yellow' });
+  }
+  footerSegments.push({ key: 'quit', text: 'q: quit', dimColor: true });
+  if (!viewport.isVeryNarrow && registry.views.length > 1) {
+    footerSegments.push({
+      key: 'views',
+      text: registry.views
+        .filter((v) => v.hotkey)
+        .map((v) => `${v.hotkey}:${v.title.toLowerCase()}`)
+        .join(' '),
+      dimColor: true,
+    });
+  }
+  if (!viewport.isShort && !viewport.isVeryNarrow && registry.commands.length > 0) {
+    footerSegments.push({
+      key: 'commands',
+      text: registry.commands.map((c) => `${c.hotkey}:${c.label}`).join(' '),
+      dimColor: true,
+    });
+  }
+  const footerLines = packSegments(footerSegments, viewport.width);
+
   return (
     <Box flexDirection="column">
-      <Box>
-        {registry.views.map((v) => (
-          <Text key={v.id} color={v.id === active?.id ? 'green' : 'gray'}>
-            [{v.hotkey ?? '?'}] {v.title}{'  '}
-          </Text>
-        ))}
-      </Box>
+      <SegmentLines lines={navLines} />
       <Box borderStyle="single" flexDirection="column" paddingX={1}>
         {ViewWithRenderers ? (
           <ViewWithRenderers
@@ -517,6 +651,7 @@ export function App({
             active={true}
             eventStream={stream}
             emit={viewEmit}
+            viewport={viewport}
             filter={filter || undefined}
             selection={selection}
             activeSessions={activeSessions}
@@ -546,6 +681,9 @@ export function App({
       {profilePickerMode ? (
         <ModelPicker
           models={availableProfiles.map((n) => ({ agent: 'profile', modelId: n }))}
+          maxItems={viewport.overlayRowLimit}
+          width={viewport.contentWidth}
+          title="profile"
           onCancel={() => setProfilePickerMode(false)}
           onPick={(m) => {
             setCurrentProfile(m.modelId);
@@ -557,6 +695,8 @@ export function App({
       {modelPickerMode ? (
         <ModelPicker
           models={availableModels}
+          maxItems={viewport.overlayRowLimit}
+          width={viewport.contentWidth}
           onCancel={() => setModelPickerMode(false)}
           onPick={(m) => {
             setCurrentModel(m);
@@ -567,10 +707,13 @@ export function App({
       ) : null}
       {agentPickerMode ? (
         <ModelPicker
+          title="agent"
           models={(() => {
             try { return client.adapters.list().map((a: { agent: string; displayName: string }) => ({ agent: a.agent, modelId: a.displayName })); }
             catch { return []; }
           })()}
+          maxItems={viewport.overlayRowLimit}
+          width={viewport.contentWidth}
           onCancel={() => setAgentPickerMode(false)}
           onPick={(m) => {
             setCurrentAgent(m.agent);
@@ -584,6 +727,8 @@ export function App({
         <CommandPalette
           views={registry.views}
           commands={registry.commands}
+          maxItems={viewport.overlayRowLimit}
+          width={viewport.contentWidth}
           onCancel={() => setPaletteMode(false)}
           onPick={(a: PaletteAction) => {
             setPaletteMode(false);
@@ -612,42 +757,14 @@ export function App({
       ) : null}
       <Box flexDirection="column">
         {status ? <Text dimColor>{status}</Text> : null}
-        <Box>
-          <Text dimColor>shift+tab: mode · /: filter · :: palette · m: model · N: agent · P: profile</Text>
-          <Text color={EXEC_MODE_COLORS[execMode]}> · mode={execMode}</Text>
-          <Text color="cyan"> · agent={currentAgent ?? defaultAgent}</Text>
-          {filter ? <Text color="cyan"> · filter=&quot;{filter}&quot;</Text> : null}
-          {currentModel ? (
-            <Text color="magenta"> · model={currentModel.agent}/{currentModel.modelId}</Text>
-          ) : null}
-          {currentProfile ? (
-            <Text color="blue"> · profile={currentProfile}</Text>
-          ) : null}
-          {currentHandleRef.current ? <Text color="yellow"> · i: interrupt</Text> : null}
-          {currentHandleRef.current ? <Text color="yellow"> · /queue · /steer · /steer-tool</Text> : null}
-          {pendingApproval ? <Text color="yellow"> · y/n: approve/deny</Text> : null}
-          <Text dimColor> · q: quit</Text>
-          {registry.views.length > 1 ? (
-            <Text dimColor>
-              {' · '}
-              {registry.views
-                .filter((v) => v.hotkey)
-                .map((v) => `${v.hotkey}:${v.title.toLowerCase()}`)
-                .join(' ')}
-            </Text>
-          ) : null}
-          {registry.commands.length > 0 ? (
-            <Text dimColor>
-              {' · '}
-              {registry.commands.map((c) => `${c.hotkey}:${c.label}`).join(' ')}
-            </Text>
-          ) : null}
-        </Box>
+        <SegmentLines lines={footerLines} />
         {promptMode ? (
           <PromptInput
             label="> "
             labelColor={EXEC_MODE_COLORS[execMode]}
             onSubmit={handlePromptSubmit}
+            initialState={chatPromptState}
+            onStateChange={setChatPromptState}
             onCancel={() => {
               setPromptMode(false);
               if (active?.id === 'chat') {

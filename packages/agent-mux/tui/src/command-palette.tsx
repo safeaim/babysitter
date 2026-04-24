@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import type { TuiCommand, TuiView } from './plugin.js';
+import { truncateEnd } from './layout.js';
 
 export interface PaletteAction {
   id: string;
@@ -14,6 +15,8 @@ export interface CommandPaletteProps {
   commands: TuiCommand[];
   onPick(action: PaletteAction): void;
   onCancel(): void;
+  width?: number;
+  maxItems?: number;
 }
 
 function buildActions(views: TuiView[], commands: TuiCommand[]): PaletteAction[] {
@@ -37,13 +40,22 @@ function buildActions(views: TuiView[], commands: TuiCommand[]): PaletteAction[]
   return actions;
 }
 
-export function CommandPalette({ views, commands, onPick, onCancel }: CommandPaletteProps) {
+export function CommandPalette({
+  views,
+  commands,
+  onPick,
+  onCancel,
+  width = 80,
+  maxItems = 8,
+}: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
   const all = buildActions(views, commands);
   const filtered = query
     ? all.filter((a) => a.label.toLowerCase().includes(query.toLowerCase()))
     : all;
+  const visible = filtered.slice(0, Math.max(1, maxItems));
+  const rowWidth = Math.max(12, width - 6);
 
   useInput((input, key) => {
     if (key.escape) {
@@ -84,17 +96,23 @@ export function CommandPalette({ views, commands, onPick, onCancel }: CommandPal
       {filtered.length === 0 ? (
         <Text dimColor>(no matches)</Text>
       ) : (
-        filtered.slice(0, 8).map((a, i) => {
+        visible.map((a, i) => {
           const sel = i === cursor;
+          const label = truncateEnd(
+            a.hint ? `${a.label} ${a.hint}` : a.label,
+            rowWidth,
+          );
           return (
             <Text key={a.id} color={sel ? 'green' : undefined}>
               {sel ? '> ' : '  '}
-              {a.label}
-              {a.hint ? <Text dimColor> {a.hint}</Text> : null}
+              {label}
             </Text>
           );
         })
       )}
+      {filtered.length > visible.length ? (
+        <Text dimColor>… {filtered.length - visible.length} more</Text>
+      ) : null}
     </Box>
   );
 }

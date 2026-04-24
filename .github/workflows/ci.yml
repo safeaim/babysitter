@@ -50,6 +50,11 @@ jobs:
           set -euo pipefail
           npm run verify:metadata 2>&1 | tee artifacts/test-logs/metadata.log
 
+      - name: Architecture boundary gate
+        run: |
+          set -euo pipefail
+          npm run test:architecture 2>&1 | tee artifacts/test-logs/architecture.log
+
       - name: Build runtime graph
         run: |
           set -euo pipefail

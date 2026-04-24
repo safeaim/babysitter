@@ -17,16 +17,16 @@ The current repository provides these concrete validation commands and workflow 
 | Agent mux | `npm run build:agent-mux`, `npm run test:agent-mux` | Build and test coverage for the current agent-mux packages |
 | Agent plugins mux | `npm run build --workspace=@a5c-ai/agent-plugins-mux`, `npm run test --workspace=@a5c-ai/agent-plugins-mux` | Build and test coverage for the current compiler package |
 | Breakpoints mux | `npm run build --workspace=@a5c-ai/breakpoints-mux`, `npm run typecheck --workspace=@a5c-ai/breakpoints-mux`, `npm run test --workspace=@a5c-ai/breakpoints-mux` | Build, typecheck, and test coverage for the current breakpoints workspace |
+| Architecture boundaries | `npm run test:architecture` | Enforces the `@a5c-ai/babysitter-agent` seam contract and repo package-family dependency rules for the current orchestration, dispatch, support, consumer, and distribution surfaces |
 | Plugin packaging checks | `npm run validate:ci --prefix plugins/<plugin>` for first-class plugins | Packaged-install and integration validation for the listed plugin packages |
 | Metadata checks | `npm run verify:metadata` | Repository/package metadata consistency checks only |
 | Docs build | `npm run docs:build` | Docusaurus buildability for the docs site |
-| CI wiring | `.github/workflows/ci.yml`, `.github/workflows/docs-site.yml` | The commands above are run in automation where those workflows explicitly invoke them |
+| CI wiring | `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.github/workflows/staging-publish.yml`, `.github/workflows/docs-site.yml` | The commands above are run in automation where those workflows explicitly invoke them |
 
 ## What The Current Surface Does Not Prove
 
 The current automated surface does **not** provide a dedicated repository-wide gate for:
 
-- architectural layer-boundary enforcement,
 - interface contract compliance across all package seams,
 - runtime/platform/application validation as distinct required lanes,
 - continuous architectural compliance beyond the build, test, packaging, and metadata checks already named above.
@@ -40,24 +40,30 @@ V6 may still use runtime, platform, and application language as architectural fr
 The nearest concrete validations available now are:
 
 - SDK/package tests for the current runtime and CLI surface,
+- `npm run test:architecture` for the current seam contract and documented package-family dependency boundaries,
 - hooks-mux and agent-mux build/test commands for the current integration seams,
 - plugin `validate:ci` checks for packaged plugin behavior,
 - docs and metadata checks for publication hygiene.
 
 An available but not currently required command such as `npm run test:e2e:docker` should be treated as optional coverage unless a roadmap slice explicitly promotes it into a required gate.
 
-## Deferred Future Slice: Architecture-Gate Validation
+## Current Slice: Architecture-Gate Validation
 
-Architecture-boundary testing and contract validation are deferred until they are implemented as an explicit slice.
+Architecture-boundary testing now exists as an explicit repository slice.
 
 | Slice item | Owner | Required commands | Status |
 | --- | --- | --- | --- |
-| Architecture boundary gate | SDK maintainers | Add and wire `npm run test:architecture` | Deferred, not implemented today |
+| Architecture boundary gate | SDK maintainers | `npm run test:architecture` | Implemented |
 | Interface contract gate | SDK maintainers | Add and wire `npm run test:contracts` | Deferred, not implemented today |
-| CI promotion of architecture gates | CI maintainers | Add the new commands to `.github/workflows/ci.yml` | Deferred, not implemented today |
-| Documentation claim promotion | V6 documentation owners | Update V6 docs only after the new commands exist and run in CI | Deferred, not implemented today |
+| CI promotion of architecture gates | CI maintainers | Run `npm run test:architecture` in `.github/workflows/ci.yml`, `release.yml`, and `staging-publish.yml` | Implemented |
+| Documentation claim promotion | V6 documentation owners | Cite the implemented command and workflow gates where architecture claims depend on them | Implemented for the current architecture gate slice |
 
-Until that slice lands, the V6 testing story should cite only the commands and workflows in the current automated validation surface.
+Today `npm run test:architecture` proves two current claims only:
+
+- the accepted `@a5c-ai/babysitter-agent` seam contract still matches the owned top-level runtime domains and public exports,
+- repo package dependencies still follow the documented direction of the orchestration core, dispatch layer, support systems, downstream consumers, and first-class distribution bundles.
+
+It does not yet prove broad interface-contract compliance or a full runtime/platform/application matrix.
 
 ---
 

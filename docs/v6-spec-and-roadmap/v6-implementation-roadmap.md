@@ -211,13 +211,13 @@ If a claim cannot meet that bar, it should be phrased as a hypothesis instead of
 
 Repo-wide targets such as "all performance targets met", "zero regressions", or trend-based regression detection are not minimum-acceptable V6 gates unless a concrete slice owner, measurement command, and enforcement point already exist.
 
-## 8A. Deferred Future Slice: Architecture-Gate Validation
+## 8A. Current Slice: Architecture-Gate Validation
 
-This slice is intentionally deferred until the repo is ready to add and maintain explicit enforcement.
+This slice is now implemented for the current repo boundaries.
 
 ### Purpose
 
-Turn architecture-boundary and interface-contract language into executable gates instead of documentation intent.
+Turn architecture-boundary language into an executable gate instead of documentation intent, while leaving interface-contract validation deferred until a narrower contract slice is ready.
 
 ### Owners
 
@@ -231,13 +231,20 @@ Turn architecture-boundary and interface-contract language into executable gates
 - `npm run test:contracts` for repository interface-contract checks
 - `npm run test:e2e:docker` if a promoted slice depends on end-to-end runtime proof
 
-These command names are part of the proposed slice definition, not current repository guarantees.
+Only `npm run test:architecture` is a current repository guarantee in this slice. The contract and E2E commands remain deferred.
 
-### Entry Criteria
+### Implemented Scope
 
-- an owner is assigned for each command,
-- the target boundary or contract is written down precisely enough to fail deterministically,
-- the CI cost and rollback path are documented.
+`npm run test:architecture` currently enforces:
+
+- the `@a5c-ai/babysitter-agent` seam contract already accepted in ADR-001,
+- repo package-family dependency direction across the orchestration core, dispatch layer, cross-harness support systems, downstream consumers, and first-class install bundles.
+
+The gate runs in:
+
+- `.github/workflows/ci.yml`,
+- `.github/workflows/release.yml`,
+- `.github/workflows/staging-publish.yml`.
 
 ### Exit Criteria
 
@@ -245,9 +252,10 @@ These command names are part of the proposed slice definition, not current repos
 - the new commands run in CI,
 - V6 docs are updated to cite those commands explicitly where claims depend on them.
 
-### Until This Slice Lands
+### Remaining Deferred Work
 
-V6 docs should describe architecture-boundary and contract validation as deferred work rather than current enforcement.
+- `npm run test:contracts` remains deferred until a concrete cross-package contract slice is written down precisely enough to fail deterministically.
+- `npm run test:e2e:docker` remains optional coverage unless another accepted slice promotes it into a required gate.
 
 ## 9. Deliverables By Maturity Level
 

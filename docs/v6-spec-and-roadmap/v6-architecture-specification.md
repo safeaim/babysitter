@@ -168,6 +168,7 @@ The slice should stop or roll back if:
 - deeper runtime/platform decomposition,
 - broader plugin platform formalization,
 - dedicated packages for governance, memory, cost, observability,
+- enterprise identity, authorization, audit-integrity, and automated security-operations narratives unless they ship with implementation evidence and explicit test coverage,
 - advanced marketplace and remote execution models.
 
 ### 8.3 Invalidated
@@ -184,6 +185,7 @@ Architecture docs must:
 - describe the repository as it exists before describing a target,
 - say whether a section is normative or exploratory,
 - avoid large invented API blocks unless the interface is needed for an imminent implementation,
+- security architecture docs must keep normative content limited to implemented controls with repo evidence; unsupported identity, isolation, audit, or monitoring capabilities belong in deferred sections,
 - cross-link to adversarial analyses when a claim was narrowed because of them.
 
 ## 10. Success Conditions

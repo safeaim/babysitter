@@ -2,125 +2,104 @@
 
 → [Documentation Index](README.md) | Previous: [Plugin Ecosystem](plugin-ecosystem.md) | Next: [Testing Framework](testing-framework.md)
 
-## Threat Model and Attack Vectors
+## V6 Security Status
+
+This document is intentionally conservative. Under the V6 architecture rules, security language is normative only when it maps to current repository surfaces, operational workflows, and explicit validation. Hard isolation, capability-safety, or enterprise security-program language is deferred unless the repo also shows the implementation and tests for it → [V6 Architecture Specification](v6-architecture-specification.md)
+
+### Normative For This Stage
+
+- process-defined governance and approval gates,
+- event-sourced run journals and replayable state,
+- plugin manifests, hook routing, and per-harness plugin compilation as concrete control surfaces,
+- conservative documentation of sandbox and permission limits instead of blanket guarantees.
+
+### Deferred For This Stage
+
+- enterprise identity and authorization programs,
+- tamper-evident or cryptographically protected audit systems,
+- active anomaly detection and automatic threat response,
+- strong plugin isolation or capability enforcement claims.
+
+## Threat Model and Documentation Boundaries
 
 ### Primary Attack Vectors
 
-**Code Injection Attacks**: Malicious plugin code execution, script injection through tool interfaces
+**Code Injection**: Malicious plugin code, unsafe hook behavior, or prompt-driven command execution
 
-**Privilege Escalation**: Plugin attempting to access unauthorized system resources or APIs
+**Privilege Escalation**: A tool, plugin, or harness obtaining broader filesystem, process, or network access than intended
 
-**Data Exfiltration**: Unauthorized access to session data, credentials, or sensitive project information
+**Data Exposure**: Unauthorized access to session state, prompts, credentials, or project artifacts
 
-**Denial of Service**: Resource exhaustion attacks through infinite loops or memory consumption
+**Resource Exhaustion**: Infinite loops, runaway shells, or excessive memory/CPU usage
 
-**Supply Chain Attacks**: Compromised plugins or dependencies introducing malicious functionality → [Plugin Ecosystem](plugin-ecosystem.md)
+**Supply Chain Risk**: Compromised dependencies, plugin bundles, or generated install surfaces → [Plugin Ecosystem](plugin-ecosystem.md)
 
-### Trust Boundaries
+### Trust Boundaries As They Exist Now
 
-**Runtime Layer**: Trusted execution environment with direct model access
+**Harness Boundary**: External CLIs and model providers are operational dependencies, not proven isolation barriers
 
-**Platform Layer**: Semi-trusted with filesystem access and plugin management
+**Filesystem Boundary**: The current stack uses filesystem-backed state, artifacts, and plugin surfaces, so access must be treated as a real security concern rather than an abstract platform detail
 
-**Plugin Boundary**: Untrusted code requiring isolation and validation
+**Plugin and Hook Boundary**: Unified plugin sources, manifests, and hook adapters are validation surfaces that require careful review, packaging discipline, and explicit documentation of limits
 
-**Network Boundary**: External communications requiring encryption and authentication
+**Network Boundary**: External services and package registries expand the attack surface and require per-integration scrutiny
 
-## Security Boundaries and Isolation
+## Normative V6 Security Controls
 
-### Layer-Based Security Model
+### Governance and Approval Controls
 
-**Agent Runtime**: Memory isolation, no direct filesystem access, controlled model API access → [Package Specifications](package-specs.md)
+**Human Approval Breakpoints**: Risky workflow steps can require explicit user approval before execution
 
-**Agent Platform**: Plugin sandbox enforcement, filesystem permission boundaries, session isolation
+**Deterministic Workflow Gates**: Process-defined shell checks, replay, and task state give V6 a concrete way to validate some operational claims without implying broader security guarantees
 
-**Application Layer**: Policy engine integration, mandate enforcement, authority chain validation
+**Rollback-Oriented Execution**: Runs, journals, and task artifacts make it possible to inspect what happened and recover from bad orchestration state
 
-### Plugin Security Isolation
+### Packaging and Validation Controls
 
-**Process Isolation**: Plugins execute in separate processes with restricted system calls
-- **Reality Check**: JavaScript process isolation is limited - plugins can access shared memory, spawn child processes, and bypass isolation through native modules
-- **Enhanced Controls**: Worker thread isolation, API blocking, resource monitoring, and filesystem access controls → [Adversarial Improvements](adversarial-improvements.md)
+**Plugin Manifests and Generated Bundles**: The concrete delivery path is the plugin and hook surface that the repo already builds and ships
 
-**Capability-Based Security**: Plugins declare required capabilities, granted minimal necessary permissions
-- **Reality Check**: Capability declarations don't prevent runtime privilege escalation or transitive dependency exploitation
-- **Enhanced Validation**: Runtime capability enforcement, dependency scanning, and security monitoring
+**Command-Level Validation**: Claims that exceed generic risk framing should point to real commands, tests, or package outputs, not only to architecture narrative
 
-**Resource Limits**: CPU, memory, and I/O quotas enforced per plugin instance → [Performance Considerations](performance-docs.md)
-- **Reality Check**: Resource limits can be bypassed through child processes, worker threads, or memory fragmentation attacks
-- **Enhanced Monitoring**: Cross-process resource tracking, memory leak detection, and resource exhaustion prevention
+**Scoped Documentation**: V6 documentation must distinguish current controls from future ambitions instead of presenting a full enterprise security stack as already shipped
 
-**API Surface Control**: Limited, well-defined API endpoints for plugin-platform communication
-- **Reality Check**: API surface control requires comprehensive blocking of dangerous JavaScript APIs (eval, Function, require, import)
-- **Enhanced Security**: API interception, dynamic import blocking, and eval/Function constructor prevention
+### Sandbox and Isolation Language
 
-## Authentication, Authorization, and Audit
+**No Hard Isolation Claim**: V6 does not claim process isolation, capability safety, or plugin-safe execution by default
 
-### Authentication Framework
+**Harness-Specific Limits**: A harness may expose permission prompts, sandboxing modes, or restricted tool surfaces, but those are implementation details that must be documented where they actually exist
 
-**Multi-Factor Authentication**: Support for hardware tokens, biometric, and time-based OTP
+**Evidence Before Assurance**: Any stronger security statement needs implementation evidence and explicit test coverage before it becomes normative → [V6 Architecture Specification](v6-architecture-specification.md)
 
-**Single Sign-On Integration**: SAML, OAuth 2.0, and OpenID Connect compatibility
+## Deferred Security Goals
 
-**Certificate-Based Authentication**: X.509 certificates for service-to-service authentication
+The following topics may still matter strategically, but they are not current V6 commitments:
 
-### Authorization Model
+- **Enterprise Identity**: Multi-factor authentication, Single Sign-On integration, and X.509-based service authentication
+- **Enterprise Authorization**: Role-based access control, attribute-based access control, and centralized policy-enforcement narratives
+- **Tamper-Evident Audit Guarantees**: Cryptographic signatures, checksums, or comparable audit-log integrity systems
+- **Active Monitoring and Automated Response**: Anomaly detection, automatic threat mitigation, and automated forensic or recovery flows
+- **Stronger Isolation**: Harder plugin containment, runtime capability enforcement, and deeper resource-abuse controls
 
-**Role-Based Access Control (RBAC)**: Hierarchical role definitions with inherited permissions
+These items should be described as goals, hypotheses, or future implementation work until the repo contains the concrete enforcement path and validation that would justify stronger wording.
 
-**Attribute-Based Access Control (ABAC)**: Context-aware decisions based on user, resource, and environment attributes
+## Documentation Rule For Security Topics
 
-**Policy Engine Integration**: Centralized policy evaluation with distributed enforcement points
+- mark sections as normative or deferred,
+- tie normative claims to present repo surfaces, commands, or tests,
+- prefer explicit limitations over assurance language,
+- treat future security programs as roadmap material rather than present architecture.
 
-### Comprehensive Audit Logging
+## Secure Development Posture For This Stage
 
-**Security Event Logging**: All authentication, authorization, and policy decisions logged with full context
+### Security-Oriented Engineering Practices
 
-**Plugin Action Tracking**: Complete audit trail of plugin installations, executions, and resource access
+**Least Privilege As An Operating Goal**: Prefer narrow permissions and reviewable task scopes, but do not represent that preference as a proved platform guarantee
 
-**Data Access Logging**: Detailed logging of all data access patterns and modifications
+**Defense Through Reviewable Surfaces**: Process definitions, journals, manifests, and generated outputs are part of the control story because they can be inspected and validated
 
-**Integrity Verification**: Cryptographic signatures and checksums for audit log integrity
+**Validation Before Promotion**: Security-sensitive claims should move from deferred to normative only when backed by implementation evidence, tests, and repository paths
 
-## Security Monitoring and Incident Response
-
-### Real-Time Security Monitoring
-
-**Anomaly Detection**: Machine learning-based detection of unusual access patterns or plugin behavior
-
-**Policy Violation Detection**: Real-time alerts for authorization failures and policy violations
-
-**Resource Abuse Monitoring**: Detection of unusual resource consumption or performance degradation
-
-### Incident Response Procedures
-
-**Automatic Threat Mitigation**: Immediate plugin isolation and session termination for detected threats
-
-**Escalation Procedures**: Defined escalation paths for different threat severity levels
-
-**Forensic Investigation Support**: Detailed logging and state capture for post-incident analysis
-
-**Recovery Procedures**: Automated rollback and system restoration capabilities → [Implementation Roadmap](implementation/operational-readiness.md)
-
-## Secure Development and Deployment
-
-### Security-by-Design Principles
-
-**Least Privilege**: All components operate with minimal necessary permissions
-
-**Defense in Depth**: Multiple layers of security controls and validation
-
-**Fail Secure**: System fails to a secure state when security controls are compromised
-
-**Input Validation**: Comprehensive validation of all external inputs and plugin interfaces
-
-### Secure Deployment Practices
-
-**Supply Chain Security**: Cryptographic verification of all components and dependencies
-
-**Configuration Security**: Secure defaults with security-focused configuration validation
-
-**Update Security**: Signed updates with rollback capabilities and integrity verification
+**Rollback Planning**: Recovery and rollback remain essential because the current stack is operationally complex and not yet a fully hardened security platform
 
 ---
 

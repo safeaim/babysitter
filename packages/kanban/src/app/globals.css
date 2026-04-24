@@ -528,6 +528,34 @@ a:hover {
   );
 }
 
+.tkc-input {
+  width: 100%;
+  border-radius: 0.875rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--background-secondary) 88%, transparent);
+  padding: 0.75rem 0.875rem;
+  color: var(--foreground);
+  transition: border-color var(--transition-fast, 160ms ease),
+    box-shadow var(--transition-fast, 160ms ease),
+    background-color var(--transition-fast, 160ms ease);
+}
+
+.tkc-input::placeholder {
+  color: color-mix(in srgb, var(--foreground-muted) 82%, transparent);
+}
+
+.tkc-input:focus {
+  outline: none;
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 1px var(--ring);
+  background: color-mix(in srgb, var(--background-secondary) 96%, transparent);
+}
+
+.tkc-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 /* Accessibility: respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .animate-pulse-dot,

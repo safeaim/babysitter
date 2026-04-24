@@ -76,15 +76,15 @@ vi.mock('lucide-react', () => {
   // All icon names used across the codebase
   const iconNames = [
     'Activity', 'AlertCircle', 'AlertTriangle', 'ArrowLeft', 'ArrowRight',
-    'ArrowUpDown', 'Bell', 'Bot',
+    'ArrowRightLeft', 'ArrowUpDown', 'Bell', 'Bot',
     'CalendarDays', 'Check', 'CheckCircle2', 'ChevronDown', 'ChevronLeft',
-    'ChevronRight', 'ChevronUp', 'Circle', 'Clock', 'Code', 'Cog', 'Copy',
+    'ChevronRight', 'ChevronUp', 'Circle', 'Clock', 'Clock3', 'Code', 'Cog', 'Copy',
     'Columns3', 'CornerDownRight', 'ExternalLink', 'Eye', 'EyeOff', 'FileDiff', 'FileJson', 'FileText', 'FolderGit2', 'FolderOpen',
     'GitBranch', 'Github',
     'Hand', 'Hash', 'HelpCircle', 'History', 'Inbox', 'Info', 'Layers',
     'Loader2', 'MessageSquareText', 'MessageSquareWarning', 'Moon', 'Palette', 'PlaySquare',
-    'Pause', 'Percent', 'Pin', 'Plus', 'Puzzle', 'RefreshCw', 'Search', 'Settings',
-    'Sun', 'Tag', 'Terminal', 'Timer', 'Trash2', 'Wifi', 'WifiOff', 'Workflow',
+    'Pause', 'Percent', 'Pin', 'Play', 'Plus', 'Power', 'Puzzle', 'RefreshCw', 'Search', 'Settings',
+    'Siren', 'Sun', 'Tag', 'Terminal', 'Timer', 'Trash2', 'Webhook', 'Wifi', 'WifiOff', 'Workflow',
     'ListTodo', 'Wrench', 'Archive', 'RotateCcw',
     'X', 'XCircle',
   ];

@@ -71,6 +71,9 @@ export default function DashboardPage() {
                 <Link href="/workspaces">Open workspaces</Link>
               </Button>
               <Button asChild variant="outline">
+                <Link href="/automations">Manage automations</Link>
+              </Button>
+              <Button asChild variant="outline">
                 <Link href="/sessions">Browse sessions</Link>
               </Button>
               <Button asChild variant="ghost">

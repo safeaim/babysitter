@@ -28,6 +28,10 @@ function formatUsd(totalUsd: number | null): string {
   }).format(totalUsd);
 }
 
+function workspaceHref(cwd: string): string {
+  return `/workspaces?workspace=${encodeURIComponent(cwd)}`;
+}
+
 function buildTranscript(
   runs: Array<Record<string, unknown>>,
   eventBuffers: Record<string, { events: Record<string, unknown>[] } | undefined>,
@@ -187,6 +191,7 @@ function SessionDetailContent() {
   );
   const runIds = useMemo(() => runs.map((run) => String(run.runId ?? "")), [runs]);
   const totalCost = useMemo(() => accumulateEventCost(runIds, eventBuffers), [eventBuffers, runIds]);
+  const workspacePath = typeof session?.cwd === "string" && session.cwd.length > 0 ? session.cwd : null;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -308,6 +313,17 @@ function SessionDetailContent() {
 
         <aside className="rounded-3xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold tracking-tight">Runs in this session</h2>
+          {workspacePath ? (
+            <div className="mt-4 rounded-2xl border border-border bg-background/65 p-4">
+              <div className="text-xs uppercase tracking-[0.2em] text-foreground-muted">Workspace</div>
+              <p className="mt-2 font-mono text-xs text-foreground-muted">{workspacePath}</p>
+              <div className="mt-3">
+                <Link href={workspaceHref(workspacePath)} className="text-sm font-medium text-primary">
+                  Open workspace lifecycle
+                </Link>
+              </div>
+            </div>
+          ) : null}
           <div className="mt-4 grid gap-3">
             {runs.map((run) => (
               <article key={String(run.runId)} className="rounded-2xl border border-border bg-background/65 p-4">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button, LogoWordmark } from "@a5c-ai/compendium";
-import { Bell, Columns3, GitBranch, Github, Moon, PlaySquare, Settings, Sun, Wifi, WifiOff } from "lucide-react";
+import { Bell, Columns3, Github, Moon, Sun, Wifi, WifiOff } from "lucide-react";
 
 import { useGatewayAuth } from "@/components/agent-mux/gateway-provider";
 import { NotificationPanel } from "@/components/notifications/notification-panel";
@@ -13,13 +13,9 @@ import { useEventStream } from "@/hooks/use-event-stream";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { useTheme } from "@/components/shared/theme-provider";
 import { cn } from "@/lib/cn";
+import { APP_HEADER_NAV_ITEMS } from "@/components/shared/app-header-nav";
 
-const NAV_ITEMS = [
-  { href: "/", label: "Board", icon: Columns3 },
-  { href: "/sessions", label: "Sessions", icon: PlaySquare },
-  { href: "/inbox", label: "Inbox", icon: GitBranch },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+export const WORKSPACES_HREF = "/workspaces";
 
 export function AppHeader() {
   const pathname = usePathname();
@@ -53,7 +49,7 @@ export function AppHeader() {
           </Link>
 
           <nav className="ml-4 hidden items-center gap-1 md:flex">
-            {NAV_ITEMS.map((item) => {
+            {APP_HEADER_NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (

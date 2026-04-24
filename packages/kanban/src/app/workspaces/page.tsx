@@ -1,0 +1,43 @@
+"use client";
+
+import { useMemo } from "react";
+import { useStore } from "zustand";
+import { useShallow } from "zustand/react/shallow";
+
+import { useGatewayAuth } from "@/components/agent-mux/gateway-provider";
+import { WorkspacesPageContent } from "@/components/workspaces/workspaces-page";
+import { useGateway } from "@/lib/agent-mux-ui";
+
+export default function WorkspacesPage() {
+  const { isAuthenticated } = useGatewayAuth();
+  const { store } = useGateway();
+  const sessions = useStore(store, useShallow((state) => Object.values(state.sessions.byId)));
+
+  const workspaceSessions = useMemo(
+    () =>
+      sessions.flatMap((session) => {
+        const sessionId = typeof session.sessionId === "string" ? session.sessionId : "";
+        const agent = typeof session.agent === "string" ? session.agent : "";
+        const status = session.status === "active" ? "active" : "inactive";
+        if (!sessionId || !agent) {
+          return [];
+        }
+
+        return [
+          {
+            sessionId,
+            agent,
+            status,
+            cwd: typeof session.cwd === "string" ? session.cwd : undefined,
+            title: typeof session.title === "string" ? session.title : undefined,
+            updatedAt: typeof session.updatedAt === "number" ? session.updatedAt : undefined,
+            activeRunId: typeof session.activeRunId === "string" ? session.activeRunId : null,
+            latestRunId: typeof session.latestRunId === "string" ? session.latestRunId : null,
+          },
+        ];
+      }),
+    [sessions],
+  );
+
+  return <WorkspacesPageContent isAuthenticated={isAuthenticated} sessions={workspaceSessions} />;
+}

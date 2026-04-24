@@ -20,6 +20,10 @@ function formatUsd(totalUsd: number | null): string | null {
   }).format(totalUsd);
 }
 
+function workspaceHref(cwd: string): string {
+  return `/workspaces?workspace=${encodeURIComponent(cwd)}`;
+}
+
 export default function SessionsPage() {
   return (
     <RequireGatewayAuth>
@@ -66,6 +70,7 @@ function SessionsContent() {
             turnCount: typeof session.turnCount === "number" ? session.turnCount : null,
             messageCount: typeof session.messageCount === "number" ? session.messageCount : null,
             costTotalUsd: costTotalUsd > 0 ? costTotalUsd : null,
+            cwd: typeof session.cwd === "string" ? session.cwd : null,
           };
         })
         .sort((left, right) => right.updatedAt - left.updatedAt),
@@ -115,6 +120,7 @@ function SessionColumn(props: {
     turnCount: number | null;
     messageCount: number | null;
     costTotalUsd: number | null;
+    cwd: string | null;
   }>;
 }) {
   return (
@@ -138,10 +144,20 @@ function SessionColumn(props: {
               {session.turnCount != null ? ` · ${session.turnCount} turns` : ""}
               {formatUsd(session.costTotalUsd) ? ` · ${formatUsd(session.costTotalUsd)}` : ""}
             </p>
+            {session.cwd ? (
+              <p className="mt-2 font-mono text-xs text-foreground-muted" title={session.cwd}>
+                {session.cwd}
+              </p>
+            ) : null}
             <div className="mt-4 flex gap-3">
               <Link href={`/sessions/${session.sessionId}`} className="text-sm font-medium text-primary">
                 Open chat
               </Link>
+              {session.cwd ? (
+                <Link href={workspaceHref(session.cwd)} className="text-sm font-medium text-primary">
+                  Open workspace
+                </Link>
+              ) : null}
             </div>
           </article>
         ))}

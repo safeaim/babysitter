@@ -100,4 +100,29 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(toolApproval?.evidenceRefs).toContain("web-claude-code-permission-modes");
     expect(sessionResume?.evidenceRefs).toContain("web-claude-code-checkpointing");
   });
+
+  it("records capability-specific external evidence for other agent vendors as well", () => {
+    const evidenceIds = new Set(getOntologyEvidenceSnapshot().evidenceSources.map((entry) => entry.evidenceId));
+    expect(evidenceIds.has("web-codex-hooks")).toBe(true);
+    expect(evidenceIds.has("web-gemini-cli-session-management")).toBe(true);
+    expect(evidenceIds.has("web-github-copilot-cli-hooks")).toBe(true);
+    expect(evidenceIds.has("web-cursor-hooks")).toBe(true);
+    expect(evidenceIds.has("web-opencode-plugins")).toBe(true);
+    expect(evidenceIds.has("web-omp-session-resume")).toBe(true);
+
+    const graph = getCatalogGraphSnapshot();
+    const codexHooks = graph.nodes.find((node) => node.id === "capabilitySupport:codex:ge-0-119-0:runtime-hooks");
+    const geminiResume = graph.nodes.find((node) => node.id === "capabilitySupport:gemini:ge-0-0-0:session-resume");
+    const copilotMcp = graph.nodes.find((node) => node.id === "capabilitySupport:copilot:ge-0-0-0:mcp");
+    const cursorHooks = graph.nodes.find((node) => node.id === "capabilitySupport:cursor:ge-0-0-0:runtime-hooks");
+    const opencodeHooks = graph.nodes.find((node) => node.id === "capabilitySupport:opencode:ge-0-0-0:runtime-hooks");
+    const ompResume = graph.nodes.find((node) => node.id === "capabilitySupport:omp:ge-0-0-0:session-resume");
+
+    expect(codexHooks?.evidenceRefs).toContain("web-codex-hooks");
+    expect(geminiResume?.evidenceRefs).toContain("web-gemini-cli-session-management");
+    expect(copilotMcp?.evidenceRefs).toContain("web-github-copilot-cli-mcp");
+    expect(cursorHooks?.evidenceRefs).toContain("web-cursor-hooks");
+    expect(opencodeHooks?.evidenceRefs).toContain("web-opencode-plugins");
+    expect(ompResume?.evidenceRefs).toContain("web-omp-session-resume");
+  });
 });

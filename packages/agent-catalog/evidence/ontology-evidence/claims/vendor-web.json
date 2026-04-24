@@ -208,6 +208,255 @@
       ]
     },
     {
+      "id": "claim:web-codex-core-agentic",
+      "kind": "Claim",
+      "claimId": "web-codex-core-agentic",
+      "statement": "Codex is documented as an interactive coding agent surface with CLI workflows, tool use, and persistent thread-oriented execution.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-codex-cli",
+        "web-codex-cli-features"
+      ]
+    },
+    {
+      "id": "claim:web-codex-hooks",
+      "kind": "Claim",
+      "claimId": "web-codex-hooks",
+      "statement": "Codex exposes a native hook system for lifecycle automation and command interception.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-codex-hooks"
+      ]
+    },
+    {
+      "id": "claim:web-codex-image-input",
+      "kind": "Claim",
+      "claimId": "web-codex-image-input",
+      "statement": "Codex documents multimodal CLI workflows, providing an official basis for image-aware interactions even though the local ontology still normalizes them as a single image-input capability.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "low",
+      "status": "current",
+      "evidenceIds": [
+        "web-codex-cli-features",
+        "web-codex-cli"
+      ]
+    },
+    {
+      "id": "claim:web-codex-session-resume",
+      "kind": "Claim",
+      "claimId": "web-codex-session-resume",
+      "statement": "Codex preserves local transcripts and thread state so users can continue prior work instead of starting a fresh session every time.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-codex-cli-features",
+        "web-codex-cli-reference"
+      ]
+    },
+    {
+      "id": "claim:web-codex-skills",
+      "kind": "Claim",
+      "claimId": "web-codex-skills",
+      "statement": "Codex supports discoverable skills that can be activated explicitly or implicitly during CLI and IDE workflows.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-codex-skills"
+      ]
+    },
+    {
+      "id": "claim:web-codex-stdin-injection",
+      "kind": "Claim",
+      "claimId": "web-codex-stdin-injection",
+      "statement": "Codex documents non-interactive CLI usage for scripted and CI flows, providing an official basis for prompt injection through CLI entrypoints.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-codex-noninteractive",
+        "web-codex-cli-reference"
+      ]
+    },
+    {
+      "id": "claim:web-cursor-core-agentic",
+      "kind": "Claim",
+      "claimId": "web-cursor-core-agentic",
+      "statement": "Cursor documents both IDE and CLI agent surfaces for autonomous coding tasks, command execution, and file editing.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-cursor-agent-overview",
+        "web-cursor-cli-overview",
+        "web-cursor-cli-using"
+      ]
+    },
+    {
+      "id": "claim:web-cursor-hooks",
+      "kind": "Claim",
+      "claimId": "web-cursor-hooks",
+      "statement": "Cursor exposes a built-in hook system, with local target metadata refining which hook names map into the normalized ontology.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-cursor-hooks",
+        "repo-target-cursor",
+        "repo-target-index"
+      ]
+    },
+    {
+      "id": "claim:web-cursor-image-input",
+      "kind": "Claim",
+      "claimId": "web-cursor-image-input",
+      "statement": "Cursor documents image-capable file reads and image generation within agent workflows, providing a first-party basis for multimodal support.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "low",
+      "status": "current",
+      "evidenceIds": [
+        "web-cursor-agent-overview"
+      ]
+    },
+    {
+      "id": "claim:web-cursor-rules",
+      "kind": "Claim",
+      "claimId": "web-cursor-rules",
+      "statement": "Cursor provides persistent rule files and AGENTS.md integration, which is the first-party basis for reusable guidance and skill-like context.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-cursor-rules"
+      ]
+    },
+    {
+      "id": "claim:web-cursor-session-resume",
+      "kind": "Claim",
+      "claimId": "web-cursor-session-resume",
+      "statement": "Cursor documents checkpoint restoration and persistent CLI shell-mode context, which together form the strongest first-party basis for resuming work across turns.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-cursor-agent-overview",
+        "web-cursor-cli-shell-mode"
+      ]
+    },
+    {
+      "id": "claim:web-cursor-stdin-injection",
+      "kind": "Claim",
+      "claimId": "web-cursor-stdin-injection",
+      "statement": "Cursor documents headless and CLI prompting flows that support non-interactive execution.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-cursor-cli-headless",
+        "web-cursor-cli-using"
+      ]
+    },
+    {
+      "id": "claim:web-gemini-cli-core-agentic",
+      "kind": "Claim",
+      "claimId": "web-gemini-cli-core-agentic",
+      "statement": "Gemini CLI is documented as a terminal-based coding agent with interactive and automation-oriented workflows.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-gemini-cli-index",
+        "web-gemini-cli-reference"
+      ]
+    },
+    {
+      "id": "claim:web-gemini-cli-hooks",
+      "kind": "Claim",
+      "claimId": "web-gemini-cli-hooks",
+      "statement": "Gemini CLI exposes a native hook system with documented lifecycle events including SessionStart, SessionEnd, and AfterAgent-style end-of-loop controls.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-gemini-cli-hooks",
+        "web-gemini-cli-index"
+      ]
+    },
+    {
+      "id": "claim:web-gemini-cli-image-input",
+      "kind": "Claim",
+      "claimId": "web-gemini-cli-image-input",
+      "statement": "Gemini CLI public docs and release notes include multimodal input surfaces, including recent clipboard image support in the CLI.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "low",
+      "status": "current",
+      "evidenceIds": [
+        "web-gemini-cli-index",
+        "web-gemini-cli-changelog"
+      ]
+    },
+    {
+      "id": "claim:web-gemini-cli-session-resume",
+      "kind": "Claim",
+      "claimId": "web-gemini-cli-session-resume",
+      "statement": "Gemini CLI supports resuming and restoring previous work through session-management and checkpointing flows.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-gemini-cli-session-management",
+        "web-gemini-cli-checkpointing"
+      ]
+    },
+    {
+      "id": "claim:web-gemini-cli-skills",
+      "kind": "Claim",
+      "claimId": "web-gemini-cli-skills",
+      "statement": "Gemini CLI supports discoverable agent skills across workspace, user, and extension tiers.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-gemini-cli-skills"
+      ]
+    },
+    {
+      "id": "claim:web-gemini-cli-stdin-injection",
+      "kind": "Claim",
+      "claimId": "web-gemini-cli-stdin-injection",
+      "statement": "Gemini CLI documents headless and piped execution paths, providing a first-party basis for scripted prompt injection.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-gemini-cli-headless",
+        "web-gemini-cli-reference"
+      ]
+    },
+    {
       "id": "claim:web-gemini-hooks",
       "kind": "Claim",
       "claimId": "web-gemini-hooks",
@@ -234,6 +483,102 @@
       ]
     },
     {
+      "id": "claim:web-github-copilot-cli-core-agentic",
+      "kind": "Claim",
+      "claimId": "web-github-copilot-cli-core-agentic",
+      "statement": "GitHub Copilot CLI is documented as an interactive agentic coding workflow with repository-aware execution.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-github-copilot-cli-overview",
+        "web-github-copilot-cli-getting-started"
+      ]
+    },
+    {
+      "id": "claim:web-github-copilot-cli-hooks",
+      "kind": "Claim",
+      "claimId": "web-github-copilot-cli-hooks",
+      "statement": "Copilot CLI exposes a first-party hooks system for repository and CLI execution flows.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-github-copilot-cli-hooks",
+        "web-github-copilot-hooks-config"
+      ]
+    },
+    {
+      "id": "claim:web-github-copilot-cli-mcp",
+      "kind": "Claim",
+      "claimId": "web-github-copilot-cli-mcp",
+      "statement": "Copilot CLI and Copilot cloud agent both document MCP integration as a native extensibility surface.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-github-copilot-cli-mcp",
+        "web-github-copilot-mcp"
+      ]
+    },
+    {
+      "id": "claim:web-github-copilot-cli-session-resume",
+      "kind": "Claim",
+      "claimId": "web-github-copilot-cli-session-resume",
+      "statement": "GitHub documents Copilot CLI session and customization storage in the local configuration directory, providing a first-party basis for persisted session flows.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-github-copilot-cli-config-dir",
+        "web-github-copilot-cli-getting-started"
+      ]
+    },
+    {
+      "id": "claim:web-github-copilot-cli-skills",
+      "kind": "Claim",
+      "claimId": "web-github-copilot-cli-skills",
+      "statement": "GitHub documents Copilot CLI plugins as reusable packages that can bundle agents, skills, hooks, and integrations.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-github-copilot-cli-plugins",
+        "web-github-copilot-cli-plugin-reference"
+      ]
+    },
+    {
+      "id": "claim:web-github-copilot-custom-instructions",
+      "kind": "Claim",
+      "claimId": "web-github-copilot-custom-instructions",
+      "statement": "GitHub documents persistent custom instructions for Copilot, which is the first-party basis for durable skill-like contextual guidance in the broader Copilot surface.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-github-copilot-custom-instructions"
+      ]
+    },
+    {
+      "id": "claim:web-github-copilot-image-input",
+      "kind": "Claim",
+      "claimId": "web-github-copilot-image-input",
+      "statement": "Copilot SDK sessions support image attachments, which provides the strongest first-party public evidence for image-aware Copilot agent flows.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "low",
+      "status": "current",
+      "evidenceIds": [
+        "web-github-copilot-sdk-image-input"
+      ]
+    },
+    {
       "id": "claim:web-github-copilot-mcp",
       "kind": "Claim",
       "claimId": "web-github-copilot-mcp",
@@ -247,6 +592,58 @@
       ]
     },
     {
+      "id": "claim:web-omp-core-agentic",
+      "kind": "Claim",
+      "claimId": "web-omp-core-agentic",
+      "statement": "Oh-My-Pi is documented as a terminal coding agent with interactive workflows and a broad tool surface.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-omp-readme"
+      ]
+    },
+    {
+      "id": "claim:web-omp-hooks",
+      "kind": "Claim",
+      "claimId": "web-omp-hooks",
+      "statement": "Oh-My-Pi documents a hook subsystem with session and tool lifecycle events, even though the current runtime prefers the extension runner path by default.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-omp-hooks"
+      ]
+    },
+    {
+      "id": "claim:web-omp-session-resume",
+      "kind": "Claim",
+      "claimId": "web-omp-session-resume",
+      "statement": "Oh-My-Pi documents resume, continue, fork, and session switching flows as part of the operator-visible session lifecycle.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-omp-session-resume"
+      ]
+    },
+    {
+      "id": "claim:web-omp-skills",
+      "kind": "Claim",
+      "claimId": "web-omp-skills",
+      "statement": "Oh-My-Pi documents file-backed skills that are discovered at startup and exposed on demand.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-omp-skills"
+      ]
+    },
+    {
       "id": "claim:web-openai-codex-skills",
       "kind": "Claim",
       "claimId": "web-openai-codex-skills",
@@ -257,6 +654,59 @@
       "status": "current",
       "evidenceIds": [
         "web-openai-codex-skills"
+      ]
+    },
+    {
+      "id": "claim:web-opencode-commands",
+      "kind": "Claim",
+      "claimId": "web-opencode-commands",
+      "statement": "OpenCode documents built-in and custom command surfaces, which is the strongest first-party basis for reusable task-specific guidance in the local ontology.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-opencode-commands"
+      ]
+    },
+    {
+      "id": "claim:web-opencode-core-agentic",
+      "kind": "Claim",
+      "claimId": "web-opencode-core-agentic",
+      "statement": "OpenCode documents an interactive terminal UI for project work and provider-backed coding workflows.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-opencode-tui",
+        "web-opencode-providers"
+      ]
+    },
+    {
+      "id": "claim:web-opencode-plugins",
+      "kind": "Claim",
+      "claimId": "web-opencode-plugins",
+      "statement": "OpenCode plugins extend runtime behavior through hooks and custom functionality, providing a first-party basis for runtime extensibility.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "medium",
+      "status": "current",
+      "evidenceIds": [
+        "web-opencode-plugins"
+      ]
+    },
+    {
+      "id": "claim:web-opencode-session-storage",
+      "kind": "Claim",
+      "claimId": "web-opencode-session-storage",
+      "statement": "OpenCode documents where local config and sessions are stored, which is the strongest first-party public basis for persisted session semantics.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "low",
+      "status": "current",
+      "evidenceIds": [
+        "web-opencode-windows-wsl"
       ]
     }
   ]

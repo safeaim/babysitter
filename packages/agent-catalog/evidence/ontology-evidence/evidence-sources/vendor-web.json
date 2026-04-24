@@ -235,6 +235,236 @@
       "trustLevel": "official-web"
     },
     {
+      "id": "evidence:web-codex-cli",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-codex-cli",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://developers.openai.com/codex/cli",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "Codex CLI overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-codex-cli-features",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-codex-cli-features",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://developers.openai.com/codex/cli/features",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "interactive features, transcripts, and multimodal tooling",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-codex-cli-reference",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-codex-cli-reference",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://developers.openai.com/codex/cli/reference",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "command and flag reference",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-codex-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-codex-hooks",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://developers.openai.com/codex/hooks",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "lifecycle hooks and automation",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-codex-noninteractive",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-codex-noninteractive",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://developers.openai.com/codex/noninteractive",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "scripted and CI-oriented usage",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-codex-skills",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-codex-skills",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://developers.openai.com/codex/skills",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "skill discovery and activation",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-agent-overview",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-agent-overview",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/agent/overview",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "agent overview, tools, checkpoints, and image-capable reads",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-cli-headless",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-cli-headless",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/cli/headless",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "non-interactive and CI usage",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-cli-overview",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-cli-overview",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/cli/overview",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "terminal CLI overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-cli-shell-mode",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-cli-shell-mode",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/cli/shell-mode",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "persistent CLI context and command history",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-cli-using",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-cli-using",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/cli/using",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "agent use from the CLI",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-hooks",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/hooks",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "built-in hook system",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-mcp",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-mcp",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/mcp",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "MCP integration surface",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-rules",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-rules",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/rules",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "persistent instructions and project rules",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-cursor-subagents",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-cursor-subagents",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://cursor.com/docs/subagents",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "specialized task-specific subagents",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-changelog",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-changelog",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/changelogs/index.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "recent multimodal and approval changes",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-checkpointing",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-checkpointing",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/checkpointing.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "checkpoint creation and restore",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-headless",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-headless",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/headless.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "headless and automation mode",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-hooks",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/index.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "hook events and lifecycle impact",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-index",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-index",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/index.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "documentation index and feature map",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-reference",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-reference",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/cli-reference.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "CLI commands and resume flags",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-session-management",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-session-management",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/session-management.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "resume, list, and manage sessions",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-cli-skills",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-cli-skills",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/skills.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "agent skills discovery and management",
+      "trustLevel": "official-web"
+    },
+    {
       "id": "evidence:web-gemini-hooks",
       "kind": "EvidenceSource",
       "evidenceId": "web-gemini-hooks",
@@ -255,6 +485,96 @@
       "trustLevel": "official-web"
     },
     {
+      "id": "evidence:web-github-copilot-cli-config-dir",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-cli-config-dir",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "session data and customization storage",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-cli-getting-started",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-cli-getting-started",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-getting-started",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "interactive CLI getting started",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-cli-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-cli-hooks",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-hooks",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "hooks usage in Copilot CLI",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-cli-mcp",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-cli-mcp",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "CLI MCP server setup",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-cli-overview",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-cli-overview",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli-agents/overview",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "Copilot CLI agent overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-cli-plugin-reference",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-cli-plugin-reference",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "plugin.json and component layout",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-cli-plugins",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-cli-plugins",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/concepts/agents/copilot-cli/about-cli-plugins",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "plugins with reusable agents, skills, hooks, and integrations",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-custom-instructions",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-custom-instructions",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/configure-custom-instructions",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "persistent custom instructions",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-hooks-config",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-hooks-config",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/reference/hooks-configuration",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "hook configuration reference",
+      "trustLevel": "official-web"
+    },
+    {
       "id": "evidence:web-github-copilot-mcp",
       "kind": "EvidenceSource",
       "evidenceId": "web-github-copilot-mcp",
@@ -265,6 +585,66 @@
       "trustLevel": "official-web"
     },
     {
+      "id": "evidence:web-github-copilot-sdk-image-input",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-sdk-image-input",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/use-copilot-sdk/image-input",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "image attachments in Copilot SDK sessions",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-omp-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-omp-hooks",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/hooks.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "hook subsystem and lifecycle events",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-omp-mcp",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-omp-mcp",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/mcp-config.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "MCP configuration and discovery",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-omp-readme",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-omp-readme",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/README.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "terminal agent overview and feature list",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-omp-session-resume",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-omp-session-resume",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/session-operations-export-share-fork-resume.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "resume, continue, export, fork, and session switching",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-omp-skills",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-omp-skills",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/skills.md",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "skill discovery and runtime exposure",
+      "trustLevel": "official-web"
+    },
+    {
       "id": "evidence:web-openai-codex-skills",
       "kind": "EvidenceSource",
       "evidenceId": "web-openai-codex-skills",
@@ -272,6 +652,56 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/skills",
       "capturedAt": "2026-04-23T00:00:00.000Z",
       "locator": "Codex skills guide",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-opencode-commands",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-opencode-commands",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://opencode.ai/docs/commands/",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "built-in and custom commands",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-opencode-plugins",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-opencode-plugins",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://opencode.ai/docs/plugins/",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "plugin and hook-based extensibility",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-opencode-providers",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-opencode-providers",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://opencode.ai/docs/providers/",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "model provider configuration",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-opencode-tui",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-opencode-tui",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://opencode.ai/docs/tui/",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "terminal UI overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-opencode-windows-wsl",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-opencode-windows-wsl",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://opencode.ai/docs/windows-wsl/",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "config and session storage locations",
       "trustLevel": "official-web"
     }
   ]

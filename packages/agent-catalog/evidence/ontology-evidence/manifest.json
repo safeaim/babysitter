@@ -26,7 +26,7 @@
       "entryKind": "claims",
       "group": "vendor-web",
       "relativePath": "claims/vendor-web.json",
-      "entryCount": 18
+      "entryCount": 51
     },
     {
       "entryKind": "evidence-sources",
@@ -50,7 +50,7 @@
       "entryKind": "evidence-sources",
       "group": "vendor-web",
       "relativePath": "evidence-sources/vendor-web.json",
-      "entryCount": 27
+      "entryCount": 70
     }
   ]
 }

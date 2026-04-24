@@ -1,6 +1,6 @@
 kind: EdgeDocument
 documentPath: edges/relations/provenance/runtime-and-capabilities-capabilitySupport-agents-opencode.yaml
-generatedAt: 2026-04-23T00:00:00.000Z
+generatedAt: 2026-04-24T00:00:00.000Z
 edges:
   - id: edge:capabilitySupport:opencode:ge-0-0-0:skills:claim:repo-sdk-fallback
     relation: supported_by_claim
@@ -14,30 +14,38 @@ edges:
     to: claim:repo-target-index
     evidenceRefs:
       - repo-target-index
+  - id: edge:capabilitySupport:opencode:ge-0-0-0:skills:claim:web-opencode-commands
+    relation: supported_by_claim
+    from: capabilitySupport:opencode:ge-0-0-0:skills
+    to: claim:web-opencode-commands
+    evidenceRefs:
+      - web-opencode-commands
   - id: edge:capabilitySupport:opencode:ge-0-0-0:thinking:claim:repo-sdk-fallback
     relation: supported_by_claim
     from: capabilitySupport:opencode:ge-0-0-0:thinking
     to: claim:repo-sdk-fallback
     evidenceRefs:
       - repo-sdk-fallback
-  - id: edge:capabilitySupport:opencode:ge-0-0-0:thinking:claim:repo-target-index
+  - id: edge:capabilitySupport:opencode:ge-0-0-0:thinking:claim:web-opencode-core-agentic
     relation: supported_by_claim
     from: capabilitySupport:opencode:ge-0-0-0:thinking
-    to: claim:repo-target-index
+    to: claim:web-opencode-core-agentic
     evidenceRefs:
-      - repo-target-index
+      - web-opencode-tui
+      - web-opencode-providers
   - id: edge:capabilitySupport:opencode:ge-0-0-0:interactive-mode:claim:repo-sdk-fallback
     relation: supported_by_claim
     from: capabilitySupport:opencode:ge-0-0-0:interactive-mode
     to: claim:repo-sdk-fallback
     evidenceRefs:
       - repo-sdk-fallback
-  - id: edge:capabilitySupport:opencode:ge-0-0-0:interactive-mode:claim:repo-target-index
+  - id: edge:capabilitySupport:opencode:ge-0-0-0:interactive-mode:claim:web-opencode-core-agentic
     relation: supported_by_claim
     from: capabilitySupport:opencode:ge-0-0-0:interactive-mode
-    to: claim:repo-target-index
+    to: claim:web-opencode-core-agentic
     evidenceRefs:
-      - repo-target-index
+      - web-opencode-tui
+      - web-opencode-providers
   - id: edge:capabilitySupport:opencode:ge-0-0-0:stdin-injection:claim:repo-sdk-fallback
     relation: supported_by_claim
     from: capabilitySupport:opencode:ge-0-0-0:stdin-injection
@@ -74,6 +82,12 @@ edges:
     to: claim:repo-target-index
     evidenceRefs:
       - repo-target-index
+  - id: edge:capabilitySupport:opencode:ge-0-0-0:runtime-hooks:claim:web-opencode-plugins
+    relation: supported_by_claim
+    from: capabilitySupport:opencode:ge-0-0-0:runtime-hooks
+    to: claim:web-opencode-plugins
+    evidenceRefs:
+      - web-opencode-plugins
   - id: edge:capabilitySupport:opencode:ge-0-0-0:stop-hook:claim:repo-sdk-fallback
     relation: supported_by_claim
     from: capabilitySupport:opencode:ge-0-0-0:stop-hook
@@ -86,6 +100,12 @@ edges:
     to: claim:repo-target-index
     evidenceRefs:
       - repo-target-index
+  - id: edge:capabilitySupport:opencode:ge-0-0-0:stop-hook:claim:web-opencode-plugins
+    relation: supported_by_claim
+    from: capabilitySupport:opencode:ge-0-0-0:stop-hook
+    to: claim:web-opencode-plugins
+    evidenceRefs:
+      - web-opencode-plugins
   - id: edge:capabilitySupport:opencode:ge-0-0-0:session-resume:claim:repo-sdk-fallback
     relation: supported_by_claim
     from: capabilitySupport:opencode:ge-0-0-0:session-resume
@@ -98,3 +118,9 @@ edges:
     to: claim:repo-target-index
     evidenceRefs:
       - repo-target-index
+  - id: edge:capabilitySupport:opencode:ge-0-0-0:session-resume:claim:web-opencode-session-storage
+    relation: supported_by_claim
+    from: capabilitySupport:opencode:ge-0-0-0:session-resume
+    to: claim:web-opencode-session-storage
+    evidenceRefs:
+      - web-opencode-windows-wsl

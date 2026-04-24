@@ -1,6 +1,6 @@
 kind: NodeDocument
 documentPath: nodes/capabilities/supports/agents/cursor.yaml
-generatedAt: 2026-04-23T00:00:00.000Z
+generatedAt: 2026-04-24T00:00:00.000Z
 nodes:
   - id: capabilitySupport:cursor:ge-0-0-0:skills
     kind: CapabilitySupport
@@ -10,11 +10,12 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: &a1
+    notes: Cursor rules and AGENTS.md support provide the strongest first-party basis for reusable persistent guidance in the local skills abstraction.
+    evidenceRefs: &cursorSkills
       - repo-sdk-fallback
       - repo-target-cursor
       - repo-target-index
+      - web-cursor-rules
   - id: capabilitySupport:cursor:ge-0-0-0:thinking
     kind: CapabilitySupport
     supportId: capabilitySupport:cursor:ge-0-0-0:thinking
@@ -23,8 +24,12 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: *a1
+    notes: Cursor documents both IDE and terminal agent surfaces for autonomous coding tasks.
+    evidenceRefs: &cursorCore
+      - repo-sdk-fallback
+      - web-cursor-agent-overview
+      - web-cursor-cli-overview
+      - web-cursor-cli-using
   - id: capabilitySupport:cursor:ge-0-0-0:interactive-mode
     kind: CapabilitySupport
     supportId: capabilitySupport:cursor:ge-0-0-0:interactive-mode
@@ -33,8 +38,8 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: *a1
+    notes: Interactive Cursor behavior is backed by the CLI and agent docs rather than repo-only target metadata.
+    evidenceRefs: *cursorCore
   - id: capabilitySupport:cursor:ge-0-0-0:stdin-injection
     kind: CapabilitySupport
     supportId: capabilitySupport:cursor:ge-0-0-0:stdin-injection
@@ -43,8 +48,11 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: *a1
+    notes: Cursor documents headless and terminal-driven execution flows for non-interactive usage.
+    evidenceRefs: &cursorStdin
+      - repo-sdk-fallback
+      - web-cursor-cli-headless
+      - web-cursor-cli-using
   - id: capabilitySupport:cursor:ge-0-0-0:image-input
     kind: CapabilitySupport
     supportId: capabilitySupport:cursor:ge-0-0-0:image-input
@@ -53,8 +61,10 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: *a1
+    notes: Cursor's agent overview documents image-capable reads and image generation, which is the strongest public basis for multimodal support.
+    evidenceRefs: &cursorImages
+      - repo-sdk-fallback
+      - web-cursor-agent-overview
   - id: capabilitySupport:cursor:ge-0-0-0:runtime-hooks
     kind: CapabilitySupport
     supportId: capabilitySupport:cursor:ge-0-0-0:runtime-hooks
@@ -63,8 +73,12 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: *a1
+    notes: Cursor exposes hooks directly and the local target profile refines which canonical hook names map into the shared ontology.
+    evidenceRefs: &cursorHooks
+      - repo-sdk-fallback
+      - repo-target-cursor
+      - repo-target-index
+      - web-cursor-hooks
   - id: capabilitySupport:cursor:ge-0-0-0:stop-hook
     kind: CapabilitySupport
     supportId: capabilitySupport:cursor:ge-0-0-0:stop-hook
@@ -73,8 +87,8 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: *a1
+    notes: The normalized stop-hook capability is grounded in Cursor hooks plus the local stop-name mapping.
+    evidenceRefs: *cursorHooks
   - id: capabilitySupport:cursor:ge-0-0-0:session-resume
     kind: CapabilitySupport
     supportId: capabilitySupport:cursor:ge-0-0-0:session-resume
@@ -83,5 +97,8 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:cursor:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: Cursor shell-hook target with derived skills and sessionStart/stop lifecycle mapping.
-    evidenceRefs: *a1
+    notes: Cursor documents checkpoint restoration and persistent shell-mode context, which is the strongest public basis for resuming work.
+    evidenceRefs: &cursorResume
+      - repo-sdk-fallback
+      - web-cursor-agent-overview
+      - web-cursor-cli-shell-mode

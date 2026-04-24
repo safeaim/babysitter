@@ -1,6 +1,6 @@
 kind: NodeDocument
 documentPath: nodes/capabilities/supports/agents/opencode.yaml
-generatedAt: 2026-04-23T00:00:00.000Z
+generatedAt: 2026-04-24T00:00:00.000Z
 nodes:
   - id: capabilitySupport:opencode:ge-0-0-0:skills
     kind: CapabilitySupport
@@ -10,10 +10,11 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: &a1
+    notes: OpenCode documents reusable command surfaces, which is the strongest first-party basis for the local skills abstraction.
+    evidenceRefs: &opencodeSkills
       - repo-sdk-fallback
       - repo-target-index
+      - web-opencode-commands
   - id: capabilitySupport:opencode:ge-0-0-0:thinking
     kind: CapabilitySupport
     supportId: capabilitySupport:opencode:ge-0-0-0:thinking
@@ -22,8 +23,11 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: *a1
+    notes: OpenCode is documented as an interactive terminal coding surface backed by configurable providers.
+    evidenceRefs: &opencodeCore
+      - repo-sdk-fallback
+      - web-opencode-tui
+      - web-opencode-providers
   - id: capabilitySupport:opencode:ge-0-0-0:interactive-mode
     kind: CapabilitySupport
     supportId: capabilitySupport:opencode:ge-0-0-0:interactive-mode
@@ -32,8 +36,8 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: *a1
+    notes: Interactive terminal use is documented directly in the OpenCode TUI docs.
+    evidenceRefs: *opencodeCore
   - id: capabilitySupport:opencode:ge-0-0-0:stdin-injection
     kind: CapabilitySupport
     supportId: capabilitySupport:opencode:ge-0-0-0:stdin-injection
@@ -42,8 +46,10 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: *a1
+    notes: Public docs are thinner for non-interactive prompt injection, so the local fallback metadata remains the primary source of truth.
+    evidenceRefs:
+      - repo-sdk-fallback
+      - repo-target-index
   - id: capabilitySupport:opencode:ge-0-0-0:image-input
     kind: CapabilitySupport
     supportId: capabilitySupport:opencode:ge-0-0-0:image-input
@@ -52,8 +58,10 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: *a1
+    notes: Public OpenCode docs do not provide strong technical detail for image input, so this row keeps the local fallback metadata only.
+    evidenceRefs:
+      - repo-sdk-fallback
+      - repo-target-index
   - id: capabilitySupport:opencode:ge-0-0-0:runtime-hooks
     kind: CapabilitySupport
     supportId: capabilitySupport:opencode:ge-0-0-0:runtime-hooks
@@ -62,8 +70,11 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: *a1
+    notes: OpenCode plugins expose hook-based extensibility, which is the strongest first-party basis for runtime hooks.
+    evidenceRefs: &opencodeHooks
+      - repo-sdk-fallback
+      - repo-target-index
+      - web-opencode-plugins
   - id: capabilitySupport:opencode:ge-0-0-0:stop-hook
     kind: CapabilitySupport
     supportId: capabilitySupport:opencode:ge-0-0-0:stop-hook
@@ -72,8 +83,8 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: *a1
+    notes: The local ontology still normalizes stop-hook separately, but the public first-party support is the broader plugin hook system.
+    evidenceRefs: *opencodeHooks
   - id: capabilitySupport:opencode:ge-0-0-0:session-resume
     kind: CapabilitySupport
     supportId: capabilitySupport:opencode:ge-0-0-0:session-resume
@@ -82,5 +93,8 @@ nodes:
     subjectKind: AgentVersion
     subjectId: agentVersion:opencode:ge-0-0-0
     versionRange: ">=0.0.0"
-    notes: OpenCode exposes event-style session and tool hooks plus standard interactive fallback metadata.
-    evidenceRefs: *a1
+    notes: Public OpenCode docs describe where sessions are stored, which is useful but still weaker than the local fallback metadata for full resume semantics.
+    evidenceRefs:
+      - repo-sdk-fallback
+      - repo-target-index
+      - web-opencode-windows-wsl

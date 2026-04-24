@@ -1,0 +1,116 @@
+kind: NodeDocument
+documentPath: nodes/evidence/codex-web.yaml
+generatedAt: 2026-04-24T00:00:00.000Z
+nodes:
+  - id: evidence:web-codex-cli
+    kind: EvidenceSource
+    evidenceId: web-codex-cli
+    kindLabel: web
+    sourcePathOrUrl: https://developers.openai.com/codex/cli
+    capturedAt: 2026-04-24T00:00:00.000Z
+    locator: Codex CLI overview
+    trustLevel: official-web
+  - id: evidence:web-codex-skills
+    kind: EvidenceSource
+    evidenceId: web-codex-skills
+    kindLabel: web
+    sourcePathOrUrl: https://developers.openai.com/codex/skills
+    capturedAt: 2026-04-24T00:00:00.000Z
+    locator: skill discovery and activation
+    trustLevel: official-web
+  - id: evidence:web-codex-hooks
+    kind: EvidenceSource
+    evidenceId: web-codex-hooks
+    kindLabel: web
+    sourcePathOrUrl: https://developers.openai.com/codex/hooks
+    capturedAt: 2026-04-24T00:00:00.000Z
+    locator: lifecycle hooks and automation
+    trustLevel: official-web
+  - id: evidence:web-codex-cli-reference
+    kind: EvidenceSource
+    evidenceId: web-codex-cli-reference
+    kindLabel: web
+    sourcePathOrUrl: https://developers.openai.com/codex/cli/reference
+    capturedAt: 2026-04-24T00:00:00.000Z
+    locator: command and flag reference
+    trustLevel: official-web
+  - id: evidence:web-codex-cli-features
+    kind: EvidenceSource
+    evidenceId: web-codex-cli-features
+    kindLabel: web
+    sourcePathOrUrl: https://developers.openai.com/codex/cli/features
+    capturedAt: 2026-04-24T00:00:00.000Z
+    locator: interactive features, transcripts, and multimodal tooling
+    trustLevel: official-web
+  - id: evidence:web-codex-noninteractive
+    kind: EvidenceSource
+    evidenceId: web-codex-noninteractive
+    kindLabel: web
+    sourcePathOrUrl: https://developers.openai.com/codex/noninteractive
+    capturedAt: 2026-04-24T00:00:00.000Z
+    locator: scripted and CI-oriented usage
+    trustLevel: official-web
+  - id: claim:web-codex-core-agentic
+    kind: Claim
+    claimId: web-codex-core-agentic
+    statement: Codex is documented as an interactive coding agent surface with CLI workflows, tool use, and persistent thread-oriented execution.
+    subjectKind: catalog
+    subjectId: graph:agent-catalog
+    confidence: medium
+    status: current
+    evidenceIds:
+      - web-codex-cli
+      - web-codex-cli-features
+  - id: claim:web-codex-skills
+    kind: Claim
+    claimId: web-codex-skills
+    statement: Codex supports discoverable skills that can be activated explicitly or implicitly during CLI and IDE workflows.
+    subjectKind: catalog
+    subjectId: graph:agent-catalog
+    confidence: medium
+    status: current
+    evidenceIds:
+      - web-codex-skills
+  - id: claim:web-codex-hooks
+    kind: Claim
+    claimId: web-codex-hooks
+    statement: Codex exposes a native hook system for lifecycle automation and command interception.
+    subjectKind: catalog
+    subjectId: graph:agent-catalog
+    confidence: medium
+    status: current
+    evidenceIds:
+      - web-codex-hooks
+  - id: claim:web-codex-stdin-injection
+    kind: Claim
+    claimId: web-codex-stdin-injection
+    statement: Codex documents non-interactive CLI usage for scripted and CI flows, providing an official basis for prompt injection through CLI entrypoints.
+    subjectKind: catalog
+    subjectId: graph:agent-catalog
+    confidence: medium
+    status: current
+    evidenceIds:
+      - web-codex-noninteractive
+      - web-codex-cli-reference
+  - id: claim:web-codex-image-input
+    kind: Claim
+    claimId: web-codex-image-input
+    statement: Codex documents multimodal CLI workflows, providing an official basis for image-aware interactions even though the local ontology still normalizes them as a single image-input capability.
+    subjectKind: catalog
+    subjectId: graph:agent-catalog
+    confidence: low
+    status: current
+    evidenceIds:
+      - web-codex-cli-features
+      - web-codex-cli
+  - id: claim:web-codex-session-resume
+    kind: Claim
+    claimId: web-codex-session-resume
+    statement: Codex preserves local transcripts and thread state so users can continue prior work instead of starting a fresh session every time.
+    subjectKind: catalog
+    subjectId: graph:agent-catalog
+    confidence: medium
+    status: current
+    evidenceIds:
+      - web-codex-cli-features
+      - web-codex-cli-reference

@@ -18,7 +18,15 @@ import {
 import { generateProgrammaticExtension } from './proxiedHookTemplates.js';
 import { generateCliBinScript, generateInstallScript, generateUninstallScript } from './binTemplates.js';
 import { generateInstallInstructions } from './installInstructions.js';
-import { generateHarnessManifest, generateTeamInstall, generateOpenClawNativeHooksSection, generateOpenCodeAccomplishSkill, generateGeminiPostinstall, generateGeminiPreuninstall } from './transformHelpers.js';
+import {
+  generateHarnessManifest,
+  generateTeamInstall,
+  generateOpenClawNativeHooksSection,
+  generateOpenCodeAccomplishSkill,
+  generateGeminiPostinstall,
+  generateGeminiPreuninstall,
+  resolveExtraFiles,
+} from './transformHelpers.js';
 import { generateInstallShared } from './installSharedGenerator.js';
 import { resolveSdkConfig } from './sdkConfig.js';
 import { getCommandPaths } from './transform.js';
@@ -408,9 +416,9 @@ export function generateExtraFiles(
     content: `node_modules/\ndist/\n${sdkCfg.stateDir}/runs/\n${sdkCfg.stateDir}/logs/\n${sdkCfg.stateDir}/processes/\n${sdkCfg.stateDir}/artifacts/\n${sdkCfg.stateDir}/session.json\n${sdkCfg.stateDir}/current-run.json\n${sdkCfg.stateDir}/observer.json\n${sdkCfg.stateDir}/index/\n${sdkCfg.stateDir}/team/\n${sdkCfg.stateDir}/config/rules.local.json\n*.sqlite\n*.sqlite-shm\n*.sqlite-wal\n*.log\n.DS_Store\n`,
   });
   // Emit target-override extraFiles
-  const targetOverride = manifest.targets?.[targetProfile.name];
-  if (targetOverride?.extraFiles) {
-    for (const [outputPath, value] of Object.entries(targetOverride.extraFiles)) {
+  const extraFiles = resolveExtraFiles(manifest, targetProfile);
+  if (Object.keys(extraFiles).length > 0) {
+    for (const [outputPath, value] of Object.entries(extraFiles)) {
       if (value.startsWith('file:')) {
         const srcPath = value.slice(5);
         const fullPath = path.join(sourceDir, srcPath);

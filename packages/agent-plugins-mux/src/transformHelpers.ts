@@ -3,6 +3,75 @@
 
 import type { A5cPluginManifest, TargetProfile } from './types.js';
 
+function buildTemplateVars(
+  manifest: A5cPluginManifest,
+  targetProfile: TargetProfile
+): Record<string, string> {
+  const override = manifest.targets?.[targetProfile.name];
+  const overrideVars = override?.templateVars ?? {};
+  const targetDir = typeof overrideVars.targetDir === 'string' ? overrideVars.targetDir : targetProfile.name;
+  return {
+    target: targetProfile.name,
+    targetName: targetProfile.name,
+    targetDir,
+    ...overrideVars,
+  };
+}
+
+function interpolateTemplate(
+  value: string,
+  vars: Record<string, string>
+): string {
+  return value.replace(/\{\{([a-zA-Z0-9_-]+)\}\}/g, (match, key) => vars[key] ?? match);
+}
+
+export function resolveExtraFiles(
+  manifest: A5cPluginManifest,
+  targetProfile: TargetProfile
+): Record<string, string> {
+  const override = manifest.targets?.[targetProfile.name];
+  const vars = buildTemplateVars(manifest, targetProfile);
+  const resolved: Record<string, string> = {};
+
+  for (const setName of override?.extraFileSets ?? []) {
+    const set = manifest.extraFileSets?.[setName];
+    if (!set) continue;
+    for (const [outputPath, value] of Object.entries(set)) {
+      resolved[interpolateTemplate(outputPath, vars)] = interpolateTemplate(value, vars);
+    }
+  }
+
+  for (const [outputPath, value] of Object.entries(override?.extraFiles ?? {})) {
+    resolved[interpolateTemplate(outputPath, vars)] = interpolateTemplate(value, vars);
+  }
+
+  return resolved;
+}
+
+export function resolveHarnessInstallSurfaceExports(
+  manifest: A5cPluginManifest,
+  targetProfile: TargetProfile
+): string[] {
+  const override = manifest.targets?.[targetProfile.name];
+  const resolved: string[] = [];
+  const seen = new Set<string>();
+  const addEntries = (entries?: string[]) => {
+    if (!Array.isArray(entries)) return;
+    for (const entry of entries) {
+      if (typeof entry !== 'string' || seen.has(entry)) continue;
+      seen.add(entry);
+      resolved.push(entry);
+    }
+  };
+
+  for (const setName of override?.harnessInstallSurfaceExportSets ?? []) {
+    addEntries(manifest.harnessInstallSurfaceExportSets?.[setName]);
+  }
+  addEntries(override?.harnessInstallSurfaceExports);
+
+  return resolved;
+}
+
 export function generatePs1Wrapper(
   hookSlug: string,
   adapterName: string,

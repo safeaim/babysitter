@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { A5cPluginManifest, TargetProfile } from './types.js';
 import { resolveSdkConfig } from './sdkConfig.js';
+import { resolveHarnessInstallSurfaceExports } from './transformHelpers.js';
 
 function getHomeDirCode(targetProfile: TargetProfile, stateDir: string): string {
   switch (targetProfile.name) {
@@ -219,15 +220,12 @@ function runPostInstall(pluginRoot) {
 
   // Read per-harness surface (harness-specific installation logic)
   let harnessSurface = '';
-  const harnessSurfaceExports: string[] = [];
+  const harnessSurfaceExports = resolveHarnessInstallSurfaceExports(manifest, targetProfile);
   const override = manifest.targets?.[targetProfile.name];
   if (sourceDir && override?.harnessInstallSurface) {
     const surfacePath = path.join(sourceDir, override.harnessInstallSurface as string);
     if (fs.existsSync(surfacePath)) {
       harnessSurface = fs.readFileSync(surfacePath, 'utf-8');
-    }
-    if (Array.isArray(override.harnessInstallSurfaceExports)) {
-      harnessSurfaceExports.push(...(override.harnessInstallSurfaceExports as string[]));
     }
   }
 

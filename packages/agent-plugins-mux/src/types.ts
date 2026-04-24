@@ -35,6 +35,13 @@ export interface A5cPluginManifest {
   // Target-Specific Overrides
   targets?: Record<string, TargetOverride>;
 
+  // Shared target file bundles keyed by set name. Entries may use {{target}},
+  // {{targetDir}}, and target override templateVars in paths and values.
+  extraFileSets?: Record<string, Record<string, string>>;
+
+  // Shared per-harness install-surface export groups keyed by set name.
+  harnessInstallSurfaceExportSets?: Record<string, string[]>;
+
   // SDK infrastructure — defaults to babysitter SDK if not specified
   sdk?: {
     package?: string;      // e.g. @a5c-ai/babysitter-sdk
@@ -77,9 +84,12 @@ export interface TargetOverride {
     contextFileName?: string;
     settings?: unknown[];
   };
+  extraFileSets?: string[];
   extraFiles?: Record<string, string>;
+  templateVars?: Record<string, string>;
   // Per-harness install-shared surface (appended after base + SDK surface)
   harnessInstallSurface?: string;
+  harnessInstallSurfaceExportSets?: string[];
   harnessInstallSurfaceExports?: string[];
   // Pattern for hook output filenames: {{name}}-proxied-{{slug}}-hook.sh
   // Supports {{name}}, {{slug}} (canonical), {{native}} (target-native hook name)

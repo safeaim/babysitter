@@ -61,6 +61,20 @@ export const A5C_PLUGIN_SCHEMA = {
       type: 'object',
       additionalProperties: { type: 'string' },
     },
+    extraFileSets: {
+      type: 'object',
+      additionalProperties: {
+        type: 'object',
+        additionalProperties: { type: 'string' },
+      },
+    },
+    harnessInstallSurfaceExportSets: {
+      type: 'object',
+      additionalProperties: {
+        type: 'array',
+        items: { type: 'string' },
+      },
+    },
     targets: {
       type: 'object',
       additionalProperties: {
@@ -78,9 +92,21 @@ export const A5C_PLUGIN_SCHEMA = {
             type: 'object',
             additionalProperties: { type: ['string', 'null'] },
           },
+          extraFileSets: {
+            type: 'array',
+            items: { type: 'string' },
+          },
           extraFiles: {
             type: 'object',
             additionalProperties: { type: 'string' },
+          },
+          templateVars: {
+            type: 'object',
+            additionalProperties: { type: 'string' },
+          },
+          harnessInstallSurfaceExportSets: {
+            type: 'array',
+            items: { type: 'string' },
           },
         },
         additionalProperties: true,

@@ -262,3 +262,51 @@ jobs:
           name: observer-logs
           path: artifacts/observer-logs
           if-no-files-found: error
+
+  kanban:
+    name: Kanban
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Prepare artifact directories
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/kanban-logs
+
+      - name: Build kanban
+        run: |
+          set -euo pipefail
+          npm run build:kanban 2>&1 | tee artifacts/kanban-logs/build.log
+
+      - name: Build CLI
+        run: |
+          set -euo pipefail
+          npm run build:cli --workspace=@a5c-ai/kanban 2>&1 | tee artifacts/kanban-logs/build-cli.log
+
+      - name: Unit tests
+        run: |
+          set -euo pipefail
+          npm run test:kanban 2>&1 | tee artifacts/kanban-logs/unit-tests.log
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kanban-logs
+          path: artifacts/kanban-logs
+          if-no-files-found: error

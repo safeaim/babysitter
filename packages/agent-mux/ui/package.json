@@ -34,6 +34,12 @@
         "default": "./dist/index.js"
       }
     },
+    "./gateway": {
+      "import": {
+        "types": "./dist/gateway.d.ts",
+        "default": "./dist/gateway.js"
+      }
+    },
     "./protocol": {
       "import": {
         "types": "./dist/protocol/v1.d.ts",

@@ -1,6 +1,4 @@
-import { classifyTool } from '../../../../core/src/tools/index.js';
-import type { AgentName } from '../../../../core/src/types.js';
-import type { ToolClassification } from '../../../../core/src/tools/index.js';
+import { classifyTool, type AgentName, type ToolClassification } from '@a5c-ai/agent-mux-core';
 
 import type { ReactNode } from 'react';
 

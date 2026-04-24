@@ -1,8 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import { classifyTool } from '../../../../core/src/tools/index.js';
-import type { AgentName } from '../../../../core/src/types.js';
+import { classifyTool, type AgentName } from '@a5c-ai/agent-mux-core';
 
 import { Card } from '../primitives/Card.js';
 import { Text } from '../primitives/Text.js';

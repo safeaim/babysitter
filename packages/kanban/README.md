@@ -1,0 +1,73 @@
+# @a5c-ai/kanban
+
+[![npm version](https://img.shields.io/npm/v/@a5c-ai/kanban.svg)](https://www.npmjs.com/package/@a5c-ai/kanban)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
+
+Kanban surface for Babysitter runs and agent-mux sessions.
+
+## What It Is
+
+`@a5c-ai/kanban` is a single Next.js app under `packages/kanban` that combines:
+
+- Babysitter run observability
+- agent-mux session creation and live session browsing
+- hook approval and inbox flows routed through agent-mux
+
+The package is intentionally thin. It should wrap existing `agent-mux` capabilities instead of reimplementing deep gateway, session, or transport logic locally. If the UI needs a capability that does not exist yet, extend `agent-mux` directly and consume it here.
+
+## Current Product Shape
+
+- Run dashboard with live updates from Babysitter watcher state
+- Session browser and new-session flow backed by agent-mux
+- Gateway login and token persistence for local agent-mux access
+- Inbox and hook approval surfaces backed by agent-mux UI primitives
+- Compendium-based shell, forms, buttons, and branding primitives
+- Settings page for runtime and gateway visibility
+
+## Quick Start
+
+### Run directly from the monorepo
+
+```bash
+npm install
+npm run build --workspace=@a5c-ai/kanban
+npm run build:cli --workspace=@a5c-ai/kanban
+npm run start --workspace=@a5c-ai/kanban
+```
+
+### Development
+
+```bash
+npm run dev --workspace=@a5c-ai/kanban
+```
+
+The app runs on `http://localhost:4800` by default.
+
+## CLI
+
+The package also publishes a `kanban` CLI entrypoint:
+
+```bash
+kanban --help
+```
+
+The CLI launches the packaged Next.js app in the same way the observer dashboard package does.
+
+## Design System
+
+The app should use the Compendium design system for user-facing controls and shared branding. When new UI is added:
+
+- prefer Compendium components first
+- keep local styling aligned with existing Compendium tokens
+- avoid adding one-off primitives when Compendium already covers the case
+
+## Scope Boundaries
+
+- `packages/kanban` owns the Next.js shell and Babysitter-specific workflow presentation
+- `packages/agent-mux` owns deep gateway, session, and transport integrations
+- missing transport or session features should be added to `agent-mux`, then consumed here
+
+## Gap Map
+
+Feature gaps versus the original Vibe Kanban implementation are tracked in [gaps-and-debt.md](./gaps-and-debt.md).

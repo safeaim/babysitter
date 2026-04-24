@@ -266,7 +266,8 @@ jobs:
             const pkgs = [
               'package.json',
               'packages/sdk/package.json',
-              'packages/babysitter/package.json'
+              'packages/babysitter/package.json',
+              'packages/kanban/package.json'
             ];
             for (const p of pkgs) {
               const data = JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -456,6 +457,12 @@ jobs:
           set -euo pipefail
           npm run test:agent-mux
 
+      - name: Build and test kanban
+        run: |
+          set -euo pipefail
+          npm run build:kanban
+          npm run test:kanban
+
       - name: Publish SDK to npm (staging tag)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -469,6 +476,13 @@ jobs:
         run: |
           set -euo pipefail
           npm publish --workspace=@a5c-ai/agent-plugins-mux --access public --tag staging
+
+      - name: Publish kanban to npm (staging tag)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          npm publish --workspace=@a5c-ai/kanban --access public --tag staging
 
       - name: Publish agent-mux packages (staging)
         env:

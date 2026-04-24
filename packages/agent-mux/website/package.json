@@ -21,6 +21,7 @@
     "typescript": "^5.4"
   },
   "overrides": {
+    "webpackbar": "file:../../../third_party/webpackbar",
     "webpack": "5.97.1"
   },
   "browserslist": {

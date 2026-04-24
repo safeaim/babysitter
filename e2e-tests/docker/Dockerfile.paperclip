@@ -20,8 +20,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY packages/sdk/package.json ./packages/sdk/
 COPY plugins/babysitter-paperclip/package.json ./plugins/babysitter-paperclip/
-COPY scripts/patch-webpackbar-progress-plugin.cjs ./scripts/
-COPY scripts/patch-agent-mux-exports.cjs ./scripts/
+COPY third_party/webpackbar ./third_party/webpackbar
 
 RUN npm install --include=dev
 

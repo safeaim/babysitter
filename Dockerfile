@@ -48,8 +48,7 @@ COPY packages/agent-mux/harness-mock/package.json ./packages/agent-mux/harness-m
 COPY packages/agent-mux/ui/package.json ./packages/agent-mux/ui/
 COPY packages/agent-mux/webui/package.json ./packages/agent-mux/webui/
 COPY packages/agent-mux/tui/package.json ./packages/agent-mux/tui/
-COPY scripts/patch-webpackbar-progress-plugin.cjs ./scripts/
-COPY scripts/patch-agent-mux-exports.cjs ./scripts/
+COPY third_party/webpackbar ./third_party/webpackbar
 
 # Install all dependencies (including dev for build)
 RUN npm install --include=dev

@@ -18,7 +18,6 @@
     "packages/hooks-mux/adapter-openclaw"
   ],
   "scripts": {
-    "postinstall": "node ./scripts/patch-webpackbar-progress-plugin.cjs && node ./scripts/patch-agent-mux-exports.cjs",
     "check:library-syntax": "node ./scripts/validate-library-js-syntax.cjs",
     "verify:metadata": "node ./scripts/check-package-metadata.cjs",
     "sync:sdk-command-templates": "node ./scripts/sync-sdk-command-templates.cjs",
@@ -57,6 +56,7 @@
     "react-router-dom-v6": "npm:react-router-dom@^6.30.2"
   },
   "overrides": {
+    "webpackbar": "file:third_party/webpackbar",
     "@radix-ui/react-dialog": {
       "@types/react": "18.2.79"
     },

@@ -36,6 +36,7 @@ WORKDIR /app
 # Copy package files first for better caching
 COPY package.json package-lock.json* ./
 COPY packages/sdk/package.json ./packages/sdk/
+COPY packages/agent-catalog/package.json ./packages/agent-catalog/
 COPY packages/babysitter-agent/package.json ./packages/babysitter-agent/
 COPY packages/agent-core/package.json ./packages/agent-core/
 COPY packages/agent-mux/sdk/package.json ./packages/agent-mux/sdk/

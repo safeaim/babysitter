@@ -42,8 +42,9 @@
     "generate:plugins": "node scripts/generate-plugins.mjs --output generated-plugins --compare .",
     "build:agent-plugins-mux": "npm run build --workspace=@a5c-ai/agent-plugins-mux",
     "test:agent-plugins-mux": "npm run test --workspace=@a5c-ai/agent-plugins-mux",
-    "docs:dev": "docusaurus start docs-site --host 0.0.0.0",
-    "docs:build": "docusaurus build docs-site",
+    "docs:prepare": "node ./scripts/ensure-webpackbar-patch.cjs",
+    "docs:dev": "npm run docs:prepare && docusaurus start docs-site --host 0.0.0.0",
+    "docs:build": "npm run docs:prepare && docusaurus build docs-site",
     "docs:serve": "docusaurus serve docs-site/build",
     "docs:clear": "docusaurus clear docs-site"
   },

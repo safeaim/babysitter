@@ -14,6 +14,7 @@ nodes:
       - CLAUDE_PLUGIN_ROOT
       - CLAUDE_ENV_FILE
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -31,6 +32,7 @@ nodes:
       - CODEX_PLUGIN_ROOT
       - CODEX_THREAD_ID
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -49,6 +51,7 @@ nodes:
     absentSignals:
       - CLAUDE_PLUGIN_ROOT
       - CLAUDE_ENV_FILE
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -66,6 +69,7 @@ nodes:
       - GEMINI_EXTENSION_PATH
       - BABYSITTER_EXTENSION_PATH
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -83,6 +87,7 @@ nodes:
       - COPILOT_HOME
       - COPILOT_GITHUB_TOKEN
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -100,6 +105,7 @@ nodes:
       - CURSOR_PROJECT_DIR
       - CURSOR_VERSION
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -117,6 +123,7 @@ nodes:
       - PI_PLUGIN_ROOT
       - PI_SESSION_ID
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -134,6 +141,7 @@ nodes:
       - OMP_PLUGIN_ROOT
       - OMP_SESSION_ID
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -151,6 +159,7 @@ nodes:
       - OPENCODE_CONFIG
       - ACCOMPLISH_TASK_ID
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.
@@ -168,6 +177,7 @@ nodes:
       - OPENCLAW_SHELL
       - OPENCLAW_HOME
     absentSignals: []
+    argvMatches: []
     metadataFields: []
     consumer: hooks-mux-core
     notes: Ordered adapter auto-detection rule used by hooks-mux.

@@ -26,6 +26,8 @@ nodes:
       - key: project_dir
         envVars:
           - CLAUDE_PROJECT_DIR
+    argvMatches:
+      - claude-code
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -50,6 +52,8 @@ nodes:
       - key: run_id
         envVars:
           - CODEX_RUN_ID
+    argvMatches:
+      - codex
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -70,6 +74,8 @@ nodes:
       - key: session_id
         envVars:
           - GEMINI_SESSION_ID
+    argvMatches:
+      - gemini-cli
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -91,6 +97,8 @@ nodes:
         envVars:
           - COPILOT_CLI_SESSION
           - GH_COPILOT_SESSION
+    argvMatches:
+      - copilot
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -112,6 +120,8 @@ nodes:
         envVars:
           - CURSOR_SESSION
           - CURSOR_AGENT_SESSION
+    argvMatches:
+      - cursor-cli
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -135,6 +145,8 @@ nodes:
       - key: run_id
         envVars:
           - OPENCODE_RUN_ID
+    argvMatches:
+      - opencode
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -158,6 +170,7 @@ nodes:
       - key: run_id
         envVars:
           - PI_RUN_ID
+    argvMatches: []
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -181,6 +194,7 @@ nodes:
       - key: run_id
         envVars:
           - OMP_RUN_ID
+    argvMatches: []
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -204,6 +218,7 @@ nodes:
       - key: run_id
         envVars:
           - OPENCLAW_RUN_ID
+    argvMatches: []
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -227,6 +242,7 @@ nodes:
       - key: run_id
         envVars:
           - HERMES_RUN_ID
+    argvMatches: []
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:

@@ -8,6 +8,7 @@
  */
 
 import { getHooksMuxDetectionRules } from '@a5c-ai/agent-catalog';
+import type { HooksMuxDetectionRule } from '@a5c-ai/agent-catalog';
 
 export interface DetectedHarness {
   /** Adapter name (e.g. 'claude', 'codex', 'gemini'). */
@@ -19,33 +20,10 @@ export interface DetectedHarness {
 }
 
 /**
- * Detection rule: a named probe that checks for harness-specific
- * environment variables.
- */
-interface DetectionRule {
-  adapter: string;
-  confidence: 'high' | 'medium' | 'low';
-  /** Env vars that, if any is set, constitute evidence for this harness. */
-  signals: string[];
-  /**
-   * Optional predicate for rules that need absence-of-other-signals logic
-   * (e.g. Codex medium-confidence requires no Claude signals).
-   */
-  condition?: (env: Record<string, string | undefined>) => boolean;
-}
-
-/**
  * Ordered list of detection rules.
  * First high-confidence match wins; checked sequentially.
  */
-const DETECTION_RULES: DetectionRule[] = getHooksMuxDetectionRules().map((rule) => ({
-  adapter: rule.adapter,
-  confidence: rule.confidence,
-  signals: [...rule.signals],
-  condition: rule.absentSignals
-    ? (env) => rule.absentSignals!.every((signal) => !env[signal])
-    : undefined,
-}));
+const DETECTION_RULES: HooksMuxDetectionRule[] = getHooksMuxDetectionRules();
 
 /**
  * Detect which harness the current process is running inside.
@@ -65,7 +43,7 @@ export function detectHarness(
 
   for (const rule of DETECTION_RULES) {
     // Check optional condition (e.g. absence of other signals)
-    if (rule.condition && !rule.condition(env)) {
+    if (rule.absentSignals?.some((signal) => env[signal])) {
       continue;
     }
 

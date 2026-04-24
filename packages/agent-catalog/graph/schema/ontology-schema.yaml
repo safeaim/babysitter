@@ -147,9 +147,19 @@ nodeKinds:
       - targetId
       - displayName
       - adapterName
+      - pluginRootEnvVar
+      - pluginRootEnvVarForExtension
       - manifestFormat
       - commandFormat
+      - skillHandling
+      - hookRegistrationFormat
+      - scriptVariants
+      - adapterFamily
+      - distribution
       - distributionModel
+      - installLayout
+      - packageMetadata
+      - componentSupport
       - npmPublishable
   PluginArtifact:
     requiredAttributes:
@@ -169,6 +179,7 @@ nodeKinds:
       - confidence
       - scope
       - signals
+      - argvMatches
   SessionSemantics:
     requiredAttributes:
       - id

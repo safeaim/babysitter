@@ -199,34 +199,28 @@ export function generateManifests(
     (targetProfile.distribution === 'npm-cli' || targetProfile.distribution === 'both') &&
     !files.some(f => f.path === 'package.json')
   ) {
+    const packageMetadata = targetProfile.packageMetadata ?? {};
     const overrideNpmPkg = manifest.targets?.[targetProfile.name]?.npmPackageName;
     const npmPkg = (typeof overrideNpmPkg === 'string' ? overrideNpmPkg : null) || targetProfile.npmPackageName || `${sdkCfg.scope}/${manifest.name}-${targetProfile.name}`;
-    const isEsm = targetProfile.name === 'pi' || targetProfile.name === 'oh-my-pi' || targetProfile.name === 'openclaw';
-    const ext = isEsm ? '.cjs' : '.js';
+    const isEsm = packageMetadata.moduleType === 'module';
+    const ext = packageMetadata.binScriptExt ?? (isEsm ? '.cjs' : '.js');
     const scripts: Record<string, string> = {
       deploy: 'npm publish --access public',
       'deploy:staging': 'npm publish --access public --tag staging',
     };
-    if (targetProfile.name === 'gemini' || targetProfile.name === 'github-copilot') {
+    if (packageMetadata.installLifecycle === 'plugin-scripts') {
       scripts['plugin:install'] = `node bin/install${ext} --global`;
       scripts['plugin:uninstall'] = `node bin/uninstall${ext} --global`;
-    } else if (targetProfile.name !== 'pi' && targetProfile.name !== 'oh-my-pi') {
+    } else if (packageMetadata.installLifecycle === 'postinstall') {
       scripts.postinstall = `node bin/install${ext}`;
       scripts.preuninstall = `node bin/uninstall${ext}`;
     }
     scripts['team:install'] = `node scripts/team-install${ext}`;
-    if (targetProfile.name === 'opencode') {
-      scripts.test = 'node test/integration.test.js';
-      scripts['sync:commands'] = 'node scripts/sync-command-docs.cjs';
+    for (const [scriptName, scriptValue] of Object.entries(packageMetadata.extraScripts ?? {})) {
+      scripts[scriptName] = scriptValue;
     }
-    const packageFiles = ['bin/'];
-    if (targetProfile.name === 'github-copilot' || targetProfile.name === 'cursor') {
-      packageFiles.push('hooks.json');
-    }
+    const packageFiles = ['bin/', ...(packageMetadata.extraPackageFiles ?? [])];
     packageFiles.push('hooks/', 'skills/', 'commands/', 'scripts/', 'plugin.json');
-    if (targetProfile.name === 'github-copilot') {
-      packageFiles.push('AGENTS.md');
-    }
     packageFiles.push('README.md', 'versions.json', 'package.json');
     const pkgJson: Record<string, unknown> = {
       name: npmPkg,
@@ -248,9 +242,7 @@ export function generateManifests(
       pkgJson.homepage = `${repoUrl}/tree/main/plugins/${npmPkg.split('/').pop()}#readme`;
     }
     if (targetProfile.adapterFamily === 'programmatic') {
-      const peerPkg = targetProfile.name === 'pi' ? '@mariozechner/pi-coding-agent'
-        : targetProfile.name === 'oh-my-pi' ? '@oh-my-pi/pi-coding-agent'
-        : targetProfile.name === 'openclaw' ? 'openclaw' : undefined;
+      const peerPkg = packageMetadata.peerDependencyPackage;
       if (peerPkg) pkgJson.peerDependencies = { [peerPkg]: '*' };
     }
     files.push({ path: 'package.json', content: JSON.stringify(pkgJson, null, 2) + '\n' });
@@ -380,15 +372,16 @@ export function generateExtraFiles(
 
   // Generate CLI bin scripts for npm-cli distribution targets
   if (targetProfile.distribution === 'npm-cli' || targetProfile.distribution === 'both') {
-    const isEsm = targetProfile.name === 'pi' || targetProfile.name === 'oh-my-pi' || targetProfile.name === 'openclaw';
-    const ext = isEsm ? '.cjs' : '.js';
+    const packageMetadata = targetProfile.packageMetadata ?? {};
+    const isEsm = packageMetadata.moduleType === 'module';
+    const ext = packageMetadata.binScriptExt ?? (isEsm ? '.cjs' : '.js');
     files.push({ path: `bin/cli${ext}`, content: generateCliBinScript(manifest, targetProfile), executable: true });
     files.push({ path: `bin/install${ext}`, content: generateInstallScript(manifest, targetProfile), executable: true });
     files.push({ path: `bin/uninstall${ext}`, content: generateUninstallScript(manifest, targetProfile), executable: true });
     files.push({ path: `bin/install-shared${ext}`, content: generateInstallShared(manifest, targetProfile, sourceDir) });
     files.push({ path: `scripts/team-install${ext}`, content: generateTeamInstall(manifest, targetProfile), executable: true });
 
-    if (targetProfile.name === 'opencode') {
+    if (packageMetadata.emitCjsWrappers) {
       files.push({ path: 'bin/cli.cjs', content: generateCjsWrapper('cli'), executable: true });
       files.push({ path: 'bin/install.cjs', content: generateCjsWrapper('install'), executable: true });
       files.push({ path: 'bin/uninstall.cjs', content: generateCjsWrapper('uninstall'), executable: true });

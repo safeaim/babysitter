@@ -6,7 +6,7 @@ import type {
   ComponentSupport,
   Diagnostic,
 } from './types.js';
-import { getTargetProfile } from './targets/index.js';
+import { getAllTargets, getTargetProfile } from './targets/index.js';
 import { deepMerge } from './utils.js';
 
 export function resolve(
@@ -23,7 +23,7 @@ export function resolve(
       category: 'compilation',
       message: `Unknown target: ${targetName}`,
       target: targetName,
-      suggestion: 'Valid targets: claude-code, codex, cursor, gemini, github-copilot, pi, oh-my-pi, opencode, openclaw',
+      suggestion: `Valid targets: ${getAllTargets().join(', ')}`,
     });
     // Return error result
     return {
@@ -42,6 +42,7 @@ export function resolve(
         npmPublishable: false,
         adapterFamily: 'shell-hook',
         distribution: 'marketplace',
+        componentSupport: { agents: 'unsupported', context: 'unsupported' },
       },
       componentSupport: {
         hooks: {},
@@ -74,8 +75,8 @@ export function resolve(
     hooks: {},
     commands: targetProfile.commandFormat === 'none' ? 'unsupported' : targetProfile.commandFormat === 'toml' ? 'toml' : 'native',
     skills: targetProfile.skillHandling === 'native' ? 'native' : targetProfile.skillHandling === 'derived-from-commands' ? 'derived' : 'unsupported',
-    agents: targetProfile.name === 'github-copilot' || targetProfile.name === 'pi' || targetProfile.name === 'oh-my-pi' ? 'native' : 'unsupported',
-    context: targetProfile.name === 'gemini' || targetProfile.name === 'github-copilot' || targetProfile.name === 'pi' || targetProfile.name === 'oh-my-pi' ? 'native' : 'unsupported',
+    agents: targetProfile.componentSupport?.agents ?? 'unsupported',
+    context: targetProfile.componentSupport?.context ?? 'unsupported',
   };
 
   // Determine hook support for each canonical hook

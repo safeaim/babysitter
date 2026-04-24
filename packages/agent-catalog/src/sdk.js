@@ -12,10 +12,13 @@ exports.getFallbackHarnessMetadata = getFallbackHarnessMetadata;
 exports.listFallbackHarnessMetadata = listFallbackHarnessMetadata;
 exports.getHostSignalMap = getHostSignalMap;
 exports.getHostMetadataFields = getHostMetadataFields;
+exports.getHostDetectionRules = getHostDetectionRules;
 exports.getHooksMuxDetectionRules = getHooksMuxDetectionRules;
 exports.getHarnessImages = getHarnessImages;
 exports.lookupHarnessImage = lookupHarnessImage;
 exports.listPluginTargets = listPluginTargets;
+exports.listPluginTargetDescriptors = listPluginTargetDescriptors;
+exports.getPluginTargetDescriptor = getPluginTargetDescriptor;
 exports.getHookCatalog = getHookCatalog;
 exports.getHookNameMap = getHookNameMap;
 exports.getUiAgentCards = getUiAgentCards;
@@ -92,6 +95,9 @@ function getHostSignalMap() {
 function getHostMetadataFields() {
     return clone(data_1.HOST_METADATA_FIELDS);
 }
+function getHostDetectionRules() {
+    return clone(data_1.HOST_DETECTION_RULES);
+}
 function getHooksMuxDetectionRules() {
     return clone(data_1.HOOKS_MUX_DETECTION_RULES);
 }
@@ -102,7 +108,14 @@ function lookupHarnessImage(harness) {
     return data_1.HARNESS_IMAGES.find((entry) => entry.harness === harness);
 }
 function listPluginTargets() {
-    return Array.from(new Set(data_1.AGENT_CATALOG.agents.flatMap((agent) => agent.pluginTargetIds))).sort();
+    return data_1.PLUGIN_TARGETS.map((target) => target.targetId).sort();
+}
+function listPluginTargetDescriptors() {
+    return clone(data_1.PLUGIN_TARGETS);
+}
+function getPluginTargetDescriptor(targetId) {
+    const target = data_1.PLUGIN_TARGETS.find((entry) => entry.targetId === targetId);
+    return target ? clone(target) : undefined;
 }
 function getHookCatalog() {
     return clone(data_1.HOOKS);

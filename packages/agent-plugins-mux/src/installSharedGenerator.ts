@@ -11,28 +11,27 @@ import { resolveSdkConfig } from './sdkConfig.js';
 import { resolveHarnessInstallSurfaceExports } from './transformHelpers.js';
 
 function getHomeDirCode(targetProfile: TargetProfile, stateDir: string): string {
-  switch (targetProfile.name) {
-    case 'codex': return `path.join(os.homedir(), '.codex')`;
-    case 'cursor': return `path.join(os.homedir(), '.cursor')`;
-    case 'github-copilot': return `path.join(os.homedir(), '.copilot')`;
-    case 'opencode': return `path.join(os.homedir(), '.opencode')`;
-    case 'openclaw': return `path.join(os.homedir(), '.openclaw')`;
-    default: return `path.join(os.homedir(), '${stateDir}')`;
+  const harnessHomeRelative = targetProfile.installLayout?.harnessHomeRelative;
+  if (!harnessHomeRelative) {
+    return `path.join(os.homedir(), '${stateDir}')`;
   }
+  return `path.join(os.homedir(), ${JSON.stringify(harnessHomeRelative)})`;
 }
 
 function getPluginsDirCode(targetProfile: TargetProfile): string {
-  switch (targetProfile.name) {
-    case 'codex': return `path.join(os.homedir(), '.agents', 'plugins')`;
-    default: return `path.join(getHarnessHome(), 'plugins')`;
+  const pluginsDirRelative = targetProfile.installLayout?.pluginsDirRelative;
+  if (!pluginsDirRelative) {
+    return `path.join(getHarnessHome(), 'plugins')`;
   }
+  return `path.join(os.homedir(), ${JSON.stringify(pluginsDirRelative)})`;
 }
 
 function getMarketplacePathCode(targetProfile: TargetProfile): string {
-  switch (targetProfile.name) {
-    case 'codex': return `path.join(os.homedir(), '.agents', 'plugins', 'marketplace.json')`;
-    default: return `path.join(getHarnessHome(), 'plugins', 'marketplace.json')`;
+  const marketplacePathRelative = targetProfile.installLayout?.marketplacePathRelative;
+  if (!marketplacePathRelative) {
+    return `path.join(getHarnessHome(), 'plugins', 'marketplace.json')`;
   }
+  return `path.join(os.homedir(), ${JSON.stringify(marketplacePathRelative)})`;
 }
 
 export function generateInstallShared(

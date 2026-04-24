@@ -4,7 +4,7 @@ import { resolveSdkConfig } from './sdkConfig.js';
 import type { A5cPluginManifest, TargetProfile } from './types.js';
 
 function getExt(targetProfile: TargetProfile): string {
-  return (targetProfile.name === 'pi' || targetProfile.name === 'oh-my-pi' || targetProfile.name === 'openclaw') ? '.cjs' : '.js';
+  return targetProfile.packageMetadata?.binScriptExt ?? '.js';
 }
 
 function getNpmPkg(manifest: A5cPluginManifest, targetProfile: TargetProfile): string {

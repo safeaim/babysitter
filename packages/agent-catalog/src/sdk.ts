@@ -3,11 +3,13 @@ import {
   FALLBACK_METADATA,
   GRAPH_DOCUMENT,
   HARNESS_IMAGES,
+  HOST_DETECTION_RULES,
   HOOKS,
   HOOKS_MUX_DETECTION_RULES,
   HOST_METADATA_FIELDS,
   HOST_SIGNAL_MAP,
   ONTOLOGY_SCHEMA,
+  PLUGIN_TARGETS,
 } from "./data";
 import { getCatalogGraph, listGraphNodes, listRelationshipsByRelation } from "./graph";
 import type {
@@ -20,7 +22,9 @@ import type {
   HookDescriptor,
   HooksMuxDetectionRule,
   HostMetadataField,
+  HostDetectionRule,
   OntologySchema,
+  PluginTargetDescriptor,
   UiAgentCard,
 } from "./models";
 
@@ -116,6 +120,10 @@ export function getHostMetadataFields(): Record<string, HostMetadataField[]> {
   return clone(HOST_METADATA_FIELDS);
 }
 
+export function getHostDetectionRules(): HostDetectionRule[] {
+  return clone(HOST_DETECTION_RULES);
+}
+
 export function getHooksMuxDetectionRules(): HooksMuxDetectionRule[] {
   return clone(HOOKS_MUX_DETECTION_RULES);
 }
@@ -129,7 +137,16 @@ export function lookupHarnessImage(harness: string): HarnessImageEntry | undefin
 }
 
 export function listPluginTargets(): string[] {
-  return Array.from(new Set(AGENT_CATALOG.agents.flatMap((agent) => agent.pluginTargetIds))).sort();
+  return PLUGIN_TARGETS.map((target) => target.targetId).sort();
+}
+
+export function listPluginTargetDescriptors(): PluginTargetDescriptor[] {
+  return clone(PLUGIN_TARGETS);
+}
+
+export function getPluginTargetDescriptor(targetId: string): PluginTargetDescriptor | undefined {
+  const target = PLUGIN_TARGETS.find((entry) => entry.targetId === targetId);
+  return target ? clone(target) : undefined;
 }
 
 export function getHookCatalog(): HookDescriptor[] {

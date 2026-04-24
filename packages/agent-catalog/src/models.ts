@@ -264,6 +264,59 @@ export interface HooksMuxDetectionRule {
   absentSignals?: string[];
 }
 
+export interface PluginInstallLayout {
+  harnessHomeRelative?: string | null;
+  pluginsDirRelative?: string | null;
+  marketplacePathRelative?: string | null;
+}
+
+export interface PluginPackageMetadata {
+  moduleType?: "commonjs" | "module";
+  binScriptExt?: ".js" | ".cjs";
+  installLifecycle?: "postinstall" | "plugin-scripts" | "none";
+  activationMessage?: "restart" | "codex-open-plugins";
+  extraPackageFiles?: string[];
+  extraScripts?: Record<string, string>;
+  peerDependencyPackage?: string;
+  emitCjsWrappers?: boolean;
+}
+
+export interface PluginComponentSupport {
+  agents: "native" | "unsupported";
+  context: "native" | "unsupported";
+}
+
+export interface PluginTargetDescriptor {
+  targetId: string;
+  displayName: string;
+  adapterName: string;
+  manifestFormat: string;
+  commandFormat: string;
+  distributionModel: string;
+  npmPublishable: boolean;
+  pluginRootEnvVar?: string | null;
+  pluginRootEnvVarForExtension?: string | null;
+  skillHandling?: "native" | "derived-from-commands" | "none";
+  hookRegistrationFormat?: string | null;
+  scriptVariants?: string[];
+  adapterFamily?: "shell-hook" | "programmatic";
+  distribution?: "marketplace" | "npm-cli" | "both";
+  marketplacePath?: string;
+  installLayout?: PluginInstallLayout;
+  packageMetadata?: PluginPackageMetadata;
+  componentSupport?: PluginComponentSupport;
+  supportedHooks: Record<string, string>;
+  evidenceIds: string[];
+}
+
+export interface HostDetectionRule {
+  agent: string;
+  confidence: "high" | "medium" | "low";
+  signals: string[];
+  metadataFields: HostMetadataField[];
+  argvMatches: string[];
+}
+
 export interface HarnessImageEntry {
   harness: string;
   image: string;

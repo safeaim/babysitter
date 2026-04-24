@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AGENT_CATALOG = exports.HARNESS_IMAGES = exports.FALLBACK_METADATA = exports.HOOKS_MUX_DETECTION_RULES = exports.HOST_METADATA_FIELDS = exports.HOST_SIGNAL_MAP = exports.AGENTS = exports.PROCESSES = exports.LIFECYCLE_NUANCES = exports.SESSION_NUANCES = exports.HOOKS = exports.MODALITIES = exports.CAPABILITIES = exports.TRANSPORTS = exports.MODELS = exports.PROVIDERS = exports.EVIDENCE = exports.ONTOLOGY_SCHEMA = exports.GRAPH_DOCUMENT = void 0;
+exports.AGENT_CATALOG = exports.PLUGIN_TARGETS = exports.HARNESS_IMAGES = exports.FALLBACK_METADATA = exports.HOOKS_MUX_DETECTION_RULES = exports.HOST_METADATA_FIELDS = exports.HOST_SIGNAL_MAP = exports.HOST_DETECTION_RULES = exports.AGENTS = exports.PROCESSES = exports.LIFECYCLE_NUANCES = exports.SESSION_NUANCES = exports.HOOKS = exports.MODALITIES = exports.CAPABILITIES = exports.TRANSPORTS = exports.MODELS = exports.PROVIDERS = exports.EVIDENCE = exports.ONTOLOGY_SCHEMA = exports.GRAPH_DOCUMENT = void 0;
 const graph_1 = require("./graph");
 const FALLBACK_SESSION_DIR = ".a5c/runs";
 function valueAsString(value) {
@@ -210,22 +210,26 @@ function buildHookDetectionRules() {
         absentSignals: stringArray(node.absentSignals),
     }));
 }
-function buildHostSignalMap() {
-    const entries = (0, graph_1.listNodesByKind)("DiscoverySignal")
+function buildHostDetectionRules() {
+    return (0, graph_1.listNodesByKind)("DiscoverySignal")
         .filter((node) => valueAsString(node.scope) === "host-detection")
-        .map((node) => [valueAsString(node.key), stringArray(node.signals)]);
-    return Object.fromEntries(entries);
-}
-function buildHostMetadataFields() {
-    const entries = (0, graph_1.listNodesByKind)("DiscoverySignal")
-        .filter((node) => valueAsString(node.scope) === "host-detection")
-        .map((node) => [
-        valueAsString(node.key),
-        (Array.isArray(node.metadataFields) ? node.metadataFields : []).map((field) => ({
+        .map((node) => ({
+        agent: valueAsString(node.key),
+        confidence: valueAsString(node.confidence) || "low",
+        signals: stringArray(node.signals),
+        metadataFields: (Array.isArray(node.metadataFields) ? node.metadataFields : []).map((field) => ({
             key: valueAsString(field.key),
             envVars: stringArray(field.envVars),
         })),
-    ]);
+        argvMatches: stringArray(node.argvMatches),
+    }));
+}
+function buildHostSignalMap() {
+    const entries = exports.HOST_DETECTION_RULES.map((rule) => [rule.agent, rule.signals]);
+    return Object.fromEntries(entries);
+}
+function buildHostMetadataFields() {
+    const entries = exports.HOST_DETECTION_RULES.map((rule) => [rule.agent, rule.metadataFields]);
     return Object.fromEntries(entries);
 }
 function capabilityBoolean(agentNodeId, capabilityId) {
@@ -307,6 +311,62 @@ function buildHarnessImages() {
         preinstalled: stringArray(node.scriptVariants).includes("preinstalled"),
     }));
 }
+function buildPluginTargetDescriptors() {
+    const hookNamesById = new Map(exports.HOOKS.map((hook) => [hook.hookId, hook.canonicalName]));
+    return (0, graph_1.listNodesByKind)("PluginTarget").map((node) => {
+        const targetId = valueAsString(node.targetId);
+        const supportedHooks = Object.fromEntries((0, graph_1.listNodesByKind)("HookMapping")
+            .filter((mapping) => valueAsString(mapping.targetId) === targetId)
+            .map((mapping) => {
+            const hookId = valueAsString(mapping.hookId);
+            return [hookNamesById.get(hookId) ?? hookId, valueAsString(mapping.nativeName)];
+        }));
+        return {
+            targetId,
+            displayName: valueAsString(node.displayName),
+            adapterName: valueAsString(node.adapterName),
+            manifestFormat: valueAsString(node.manifestFormat),
+            commandFormat: valueAsString(node.commandFormat),
+            distributionModel: valueAsString(node.distributionModel),
+            npmPublishable: Boolean(node.npmPublishable),
+            pluginRootEnvVar: node.pluginRootEnvVar === null ? null : valueAsString(node.pluginRootEnvVar) || undefined,
+            pluginRootEnvVarForExtension: node.pluginRootEnvVarForExtension === null ? null : valueAsString(node.pluginRootEnvVarForExtension) || undefined,
+            skillHandling: valueAsString(node.skillHandling) || undefined,
+            hookRegistrationFormat: valueAsString(node.hookRegistrationFormat) || undefined,
+            scriptVariants: stringArray(node.scriptVariants),
+            adapterFamily: valueAsString(node.adapterFamily) || undefined,
+            distribution: valueAsString(node.distribution) || undefined,
+            marketplacePath: valueAsString(node.marketplacePath) || undefined,
+            installLayout: node.installLayout && typeof node.installLayout === "object"
+                ? {
+                    harnessHomeRelative: valueAsString(node.installLayout.harnessHomeRelative) || null,
+                    pluginsDirRelative: valueAsString(node.installLayout.pluginsDirRelative) || null,
+                    marketplacePathRelative: valueAsString(node.installLayout.marketplacePathRelative) || null,
+                }
+                : undefined,
+            packageMetadata: node.packageMetadata && typeof node.packageMetadata === "object"
+                ? {
+                    moduleType: valueAsString(node.packageMetadata.moduleType) || undefined,
+                    binScriptExt: valueAsString(node.packageMetadata.binScriptExt) || undefined,
+                    installLifecycle: valueAsString(node.packageMetadata.installLifecycle) || undefined,
+                    activationMessage: valueAsString(node.packageMetadata.activationMessage) || undefined,
+                    extraPackageFiles: stringArray(node.packageMetadata.extraPackageFiles),
+                    extraScripts: node.packageMetadata.extraScripts ?? undefined,
+                    peerDependencyPackage: valueAsString(node.packageMetadata.peerDependencyPackage) || undefined,
+                    emitCjsWrappers: Boolean(node.packageMetadata.emitCjsWrappers),
+                }
+                : undefined,
+            componentSupport: node.componentSupport && typeof node.componentSupport === "object"
+                ? {
+                    agents: valueAsString(node.componentSupport.agents) || "unsupported",
+                    context: valueAsString(node.componentSupport.context) || "unsupported",
+                }
+                : undefined,
+            supportedHooks,
+            evidenceIds: nodeEvidenceIds(node),
+        };
+    });
+}
 const GRAPH = (0, graph_1.getCatalogGraph)();
 exports.GRAPH_DOCUMENT = (0, graph_1.getGraphDocument)();
 exports.ONTOLOGY_SCHEMA = (0, graph_1.getOntologySchema)();
@@ -324,12 +384,14 @@ exports.HOOKS = (0, graph_1.listNodesByKind)("HookSurface").map(toHookDescriptor
 exports.SESSION_NUANCES = (0, graph_1.listNodesByKind)("SessionSemantics").map(toSessionNuance);
 exports.LIFECYCLE_NUANCES = (0, graph_1.listNodesByKind)("LifecycleSemantics").map(toLifecycleNuance);
 exports.PROCESSES = (0, graph_1.listNodesByKind)("ProcessDescriptor").map(toProcessDescriptor);
+exports.HOST_DETECTION_RULES = buildHostDetectionRules();
 exports.AGENTS = (0, graph_1.listNodesByKind)("AgentVersion").map(toAgentVersion);
 exports.HOST_SIGNAL_MAP = buildHostSignalMap();
 exports.HOST_METADATA_FIELDS = buildHostMetadataFields();
 exports.HOOKS_MUX_DETECTION_RULES = buildHookDetectionRules();
 exports.FALLBACK_METADATA = buildFallbackMetadata();
 exports.HARNESS_IMAGES = buildHarnessImages();
+exports.PLUGIN_TARGETS = buildPluginTargetDescriptors();
 exports.AGENT_CATALOG = {
     schemaVersion: exports.GRAPH_DOCUMENT.schemaVersion,
     generatedAt: exports.GRAPH_DOCUMENT.generatedAt,

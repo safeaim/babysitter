@@ -5,8 +5,10 @@ import {
   getCatalogGraphSnapshot,
   getCatalogOntologySchema,
   getFallbackHarnessMetadata,
+  getHostDetectionRules,
   getHookNameMap,
   getHooksMuxDetectionRules,
+  getPluginTargetDescriptor,
   getOntologyEvidenceManifest,
   getOntologyEvidenceSnapshot,
   getUiAgentCards,
@@ -41,10 +43,25 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(rules.find((rule) => rule.adapter === "codex" && rule.confidence === "medium")).toBeDefined();
   });
 
+  it("exposes host-detection argv metadata from discovery-signal nodes", () => {
+    const rules = getHostDetectionRules();
+    expect(rules.find((rule) => rule.agent === "claude")?.argvMatches).toContain("claude-code");
+    expect(rules.find((rule) => rule.agent === "gemini")?.argvMatches).toContain("gemini-cli");
+  });
+
   it("exposes plugin hook-name mappings from hook-mapping nodes", () => {
     const hookMap = getHookNameMap();
     expect(hookMap.SessionStart.codex).toBe("SessionStart");
     expect(hookMap.AfterAgent.gemini).toBe("AfterAgent");
+  });
+
+  it("exposes compiler-facing plugin target descriptors from graph nodes", () => {
+    const codex = getPluginTargetDescriptor("codex");
+    expect(codex).toBeDefined();
+    expect(codex!.adapterName).toBe("codex");
+    expect(codex!.supportedHooks.Stop).toBe("Stop");
+    expect(codex!.installLayout?.marketplacePathRelative).toBe(".agents/plugins/marketplace.json");
+    expect(codex!.packageMetadata?.activationMessage).toBe("codex-open-plugins");
   });
 
   it("exposes UI cards and harness images from graph-derived wrappers", () => {

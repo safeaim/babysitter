@@ -7,12 +7,7 @@ export function generateProgrammaticExtension(
   targetProfile: TargetProfile,
   commandPaths?: string[]
 ): string {
-  const piPackage =
-    targetProfile.name === 'pi'
-      ? '@mariozechner/pi-coding-agent'
-      : targetProfile.name === 'oh-my-pi'
-        ? '@oh-my-pi/pi-coding-agent'
-        : null;
+  const piPackage = targetProfile.packageMetadata?.peerDependencyPackage ?? null;
 
   const pluginRootEnvVar = targetProfile.pluginRootEnvVarForExtension || 'PLUGIN_ROOT';
 

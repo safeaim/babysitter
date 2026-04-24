@@ -17,6 +17,7 @@ import type {
   GraphNode,
   HarnessFallbackMetadata,
   HarnessImageEntry,
+  HostDetectionRule,
   HookDescriptor,
   HooksMuxDetectionRule,
   HostMetadataField,
@@ -24,6 +25,9 @@ import type {
   ModelProviderVersion,
   ModelVersion,
   ModalityDescriptor,
+  PluginComponentSupport,
+  PluginPackageMetadata,
+  PluginTargetDescriptor,
   ProcessDescriptor,
   SessionNuance,
   TransportDescriptor,
@@ -268,23 +272,28 @@ function buildHookDetectionRules(): HooksMuxDetectionRule[] {
     }));
 }
 
-function buildHostSignalMap(): Record<string, string[]> {
-  const entries = listNodesByKind("DiscoverySignal")
+function buildHostDetectionRules(): HostDetectionRule[] {
+  return listNodesByKind("DiscoverySignal")
     .filter((node) => valueAsString(node.scope) === "host-detection")
-    .map((node) => [valueAsString(node.key), stringArray(node.signals)] as const);
+    .map((node) => ({
+      agent: valueAsString(node.key),
+      confidence: (valueAsString(node.confidence) as HostDetectionRule["confidence"]) || "low",
+      signals: stringArray(node.signals),
+      metadataFields: (Array.isArray(node.metadataFields) ? node.metadataFields : []).map((field) => ({
+        key: valueAsString((field as HostMetadataField).key),
+        envVars: stringArray((field as HostMetadataField).envVars),
+      })),
+      argvMatches: stringArray(node.argvMatches),
+    }));
+}
+
+function buildHostSignalMap(): Record<string, string[]> {
+  const entries = HOST_DETECTION_RULES.map((rule) => [rule.agent, rule.signals] as const);
   return Object.fromEntries(entries);
 }
 
 function buildHostMetadataFields(): Record<string, HostMetadataField[]> {
-  const entries = listNodesByKind("DiscoverySignal")
-    .filter((node) => valueAsString(node.scope) === "host-detection")
-    .map((node) => [
-      valueAsString(node.key),
-      (Array.isArray(node.metadataFields) ? node.metadataFields : []).map((field) => ({
-        key: valueAsString((field as HostMetadataField).key),
-        envVars: stringArray((field as HostMetadataField).envVars),
-      })),
-    ] as const);
+  const entries = HOST_DETECTION_RULES.map((rule) => [rule.agent, rule.metadataFields] as const);
   return Object.fromEntries(entries);
 }
 
@@ -366,6 +375,92 @@ function buildHarnessImages(): HarnessImageEntry[] {
     }));
 }
 
+function buildPluginTargetDescriptors(): PluginTargetDescriptor[] {
+  const hookNamesById = new Map(HOOKS.map((hook) => [hook.hookId, hook.canonicalName]));
+
+  return listNodesByKind("PluginTarget").map((node) => {
+    const targetId = valueAsString(node.targetId);
+    const supportedHooks = Object.fromEntries(
+      listNodesByKind("HookMapping")
+        .filter((mapping) => valueAsString(mapping.targetId) === targetId)
+        .map((mapping) => {
+          const hookId = valueAsString(mapping.hookId);
+          return [hookNamesById.get(hookId) ?? hookId, valueAsString(mapping.nativeName)] as const;
+        }),
+    );
+
+    return {
+      targetId,
+      displayName: valueAsString(node.displayName),
+      adapterName: valueAsString(node.adapterName),
+      manifestFormat: valueAsString(node.manifestFormat),
+      commandFormat: valueAsString(node.commandFormat),
+      distributionModel: valueAsString(node.distributionModel),
+      npmPublishable: Boolean(node.npmPublishable),
+      pluginRootEnvVar:
+        node.pluginRootEnvVar === null ? null : valueAsString(node.pluginRootEnvVar) || undefined,
+      pluginRootEnvVarForExtension:
+        node.pluginRootEnvVarForExtension === null
+          ? null
+          : valueAsString(node.pluginRootEnvVarForExtension) || undefined,
+      skillHandling:
+        (valueAsString(node.skillHandling) as PluginTargetDescriptor["skillHandling"]) || undefined,
+      hookRegistrationFormat: valueAsString(node.hookRegistrationFormat) || undefined,
+      scriptVariants: stringArray(node.scriptVariants),
+      adapterFamily:
+        (valueAsString(node.adapterFamily) as PluginTargetDescriptor["adapterFamily"]) || undefined,
+      distribution:
+        (valueAsString(node.distribution) as PluginTargetDescriptor["distribution"]) || undefined,
+      marketplacePath: valueAsString(node.marketplacePath) || undefined,
+      installLayout:
+        node.installLayout && typeof node.installLayout === "object"
+          ? {
+              harnessHomeRelative: valueAsString((node.installLayout as GraphNode).harnessHomeRelative) || null,
+              pluginsDirRelative: valueAsString((node.installLayout as GraphNode).pluginsDirRelative) || null,
+              marketplacePathRelative:
+                valueAsString((node.installLayout as GraphNode).marketplacePathRelative) || null,
+            }
+          : undefined,
+      packageMetadata:
+        node.packageMetadata && typeof node.packageMetadata === "object"
+          ? {
+              moduleType:
+                (valueAsString((node.packageMetadata as GraphNode).moduleType) as PluginPackageMetadata["moduleType"]) ||
+                undefined,
+              binScriptExt:
+                (valueAsString((node.packageMetadata as GraphNode).binScriptExt) as PluginPackageMetadata["binScriptExt"]) ||
+                undefined,
+              installLifecycle:
+                (valueAsString((node.packageMetadata as GraphNode).installLifecycle) as PluginPackageMetadata["installLifecycle"]) ||
+                undefined,
+              activationMessage:
+                (valueAsString((node.packageMetadata as GraphNode).activationMessage) as PluginPackageMetadata["activationMessage"]) ||
+                undefined,
+              extraPackageFiles: stringArray((node.packageMetadata as GraphNode).extraPackageFiles),
+              extraScripts:
+                ((node.packageMetadata as GraphNode).extraScripts as Record<string, string> | undefined) ?? undefined,
+              peerDependencyPackage:
+                valueAsString((node.packageMetadata as GraphNode).peerDependencyPackage) || undefined,
+              emitCjsWrappers: Boolean((node.packageMetadata as GraphNode).emitCjsWrappers),
+            }
+          : undefined,
+      componentSupport:
+        node.componentSupport && typeof node.componentSupport === "object"
+          ? {
+              agents:
+                (valueAsString((node.componentSupport as GraphNode).agents) as PluginComponentSupport["agents"]) ||
+                "unsupported",
+              context:
+                (valueAsString((node.componentSupport as GraphNode).context) as PluginComponentSupport["context"]) ||
+                "unsupported",
+            }
+          : undefined,
+      supportedHooks,
+      evidenceIds: nodeEvidenceIds(node),
+    };
+  });
+}
+
 const GRAPH = getCatalogGraph();
 export const GRAPH_DOCUMENT = getGraphDocument();
 export const ONTOLOGY_SCHEMA = getOntologySchema();
@@ -384,12 +479,14 @@ export const HOOKS = listNodesByKind("HookSurface").map(toHookDescriptor);
 export const SESSION_NUANCES = listNodesByKind("SessionSemantics").map(toSessionNuance);
 export const LIFECYCLE_NUANCES = listNodesByKind("LifecycleSemantics").map(toLifecycleNuance);
 export const PROCESSES = listNodesByKind("ProcessDescriptor").map(toProcessDescriptor);
+export const HOST_DETECTION_RULES = buildHostDetectionRules();
 export const AGENTS = listNodesByKind("AgentVersion").map(toAgentVersion);
 export const HOST_SIGNAL_MAP = buildHostSignalMap();
 export const HOST_METADATA_FIELDS = buildHostMetadataFields();
 export const HOOKS_MUX_DETECTION_RULES = buildHookDetectionRules();
 export const FALLBACK_METADATA = buildFallbackMetadata();
 export const HARNESS_IMAGES = buildHarnessImages();
+export const PLUGIN_TARGETS = buildPluginTargetDescriptors();
 
 export const AGENT_CATALOG: AgentCatalog = {
   schemaVersion: GRAPH_DOCUMENT.schemaVersion,

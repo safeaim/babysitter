@@ -46,6 +46,7 @@ npx @a5c-ai/agent-plugins-mux compile --target all --output dist/
 3. **Deterministic output**: Same input always produces identical output.
 4. **Lossless where possible, explicit degradation where not**: When a target does not support a component, the compiler emits a diagnostic rather than silently dropping it.
 5. **hooks-mux is a dependency, not internalized**: Hook execution routing goes through the hooks-mux subsystem. The compiler generates the shell/Node.js/PowerShell wrapper scripts that call into hooks-mux.
+6. **agent-catalog is authoritative for target metadata**: Target capabilities, hook mappings, install paths, argv detection hints, and package/bin generation metadata are read from `@a5c-ai/agent-catalog`; compiler code only adapts that declarative graph into emitted files.
 
 ---
 
@@ -510,6 +511,8 @@ The UPF defines a superset of hook names. Not all targets support all hooks.
 #### 3.3.2 The `babysitter-proxied-*` Hook Script Pattern
 
 All hook-capable targets use the same pattern: a **wrapper script** that ensures the SDK and hooks-mux are installed, then delegates to hooks-mux with the correct adapter name.
+
+The target-specific values injected into these templates (`adapterName`, plugin-root env var, script variant set, install path layout, package/bin behavior) are catalog-driven. The compiler should not introduce a second handwritten registry for those surfaces.
 
 The wrapper scripts follow a template with three variants:
 

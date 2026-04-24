@@ -182,6 +182,28 @@ export type HookRegistrationFormat =
 export type AdapterFamily = 'shell-hook' | 'programmatic';
 export type DistributionModel = 'marketplace' | 'npm-cli' | 'both';
 
+export interface InstallLayoutMetadata {
+  harnessHomeRelative?: string | null;
+  pluginsDirRelative?: string | null;
+  marketplacePathRelative?: string | null;
+}
+
+export interface PackageMetadata {
+  moduleType?: 'commonjs' | 'module';
+  binScriptExt?: '.js' | '.cjs';
+  installLifecycle?: 'postinstall' | 'plugin-scripts' | 'none';
+  activationMessage?: 'restart' | 'codex-open-plugins';
+  extraPackageFiles?: string[];
+  extraScripts?: Record<string, string>;
+  peerDependencyPackage?: string;
+  emitCjsWrappers?: boolean;
+}
+
+export interface TargetComponentSupport {
+  agents: 'native' | 'unsupported';
+  context: 'native' | 'unsupported';
+}
+
 export interface TargetProfile {
   name: string;
   displayName: string;
@@ -200,6 +222,9 @@ export interface TargetProfile {
   distribution: DistributionModel;
   pluginRootEnvVarForExtension?: string;
   marketplacePath?: string;
+  installLayout?: InstallLayoutMetadata;
+  packageMetadata?: PackageMetadata;
+  componentSupport?: TargetComponentSupport;
 }
 
 export interface FrontmatterData {

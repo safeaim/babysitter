@@ -177,6 +177,39 @@ nodes:
     requiresRuntimeHooks: true
     adapterFamily: opencode
     evidenceRefs: *a5
+  - id: hookMapping:subagent-stop:claude-code
+    kind: HookMapping
+    mappingId: hookMapping:subagent-stop:claude-code
+    hookId: subagent-stop
+    targetId: claude-code
+    nativeName: SubagentStop
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: claude
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:notification:claude-code
+    kind: HookMapping
+    mappingId: hookMapping:notification:claude-code
+    hookId: notification
+    targetId: claude-code
+    nativeName: Notification
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: claude
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:pre-compact:claude-code
+    kind: HookMapping
+    mappingId: hookMapping:pre-compact:claude-code
+    hookId: pre-compact
+    targetId: claude-code
+    nativeName: PreCompact
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: claude
+    evidenceRefs:
+      - repo-target-index
   - id: hookMapping:after-agent:gemini
     kind: HookMapping
     mappingId: hookMapping:after-agent:gemini
@@ -241,6 +274,116 @@ nodes:
     versionRange: ">=0.0.0"
     requiresRuntimeHooks: true
     adapterFamily: opencode
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:user-prompt-submit:pi
+    kind: HookMapping
+    mappingId: hookMapping:user-prompt-submit:pi
+    hookId: user-prompt-submit
+    targetId: pi
+    nativeName: context
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: pi
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:pre-tool-use:pi
+    kind: HookMapping
+    mappingId: hookMapping:pre-tool-use:pi
+    hookId: pre-tool-use
+    targetId: pi
+    nativeName: tool_call
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: pi
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:before-provider-request:pi
+    kind: HookMapping
+    mappingId: hookMapping:before-provider-request:pi
+    hookId: before-provider-request
+    targetId: pi
+    nativeName: before_provider_request
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: pi
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:session-start:pi
+    kind: HookMapping
+    mappingId: hookMapping:session-start:pi
+    hookId: session-start
+    targetId: pi
+    nativeName: session_start
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: pi
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:stop:pi
+    kind: HookMapping
+    mappingId: hookMapping:stop:pi
+    hookId: stop
+    targetId: pi
+    nativeName: stop
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: pi
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:user-prompt-submit:oh-my-pi
+    kind: HookMapping
+    mappingId: hookMapping:user-prompt-submit:oh-my-pi
+    hookId: user-prompt-submit
+    targetId: oh-my-pi
+    nativeName: context
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: omp
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:pre-tool-use:oh-my-pi
+    kind: HookMapping
+    mappingId: hookMapping:pre-tool-use:oh-my-pi
+    hookId: pre-tool-use
+    targetId: oh-my-pi
+    nativeName: tool_call
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: omp
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:before-provider-request:oh-my-pi
+    kind: HookMapping
+    mappingId: hookMapping:before-provider-request:oh-my-pi
+    hookId: before-provider-request
+    targetId: oh-my-pi
+    nativeName: before_provider_request
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: omp
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:session-start:oh-my-pi
+    kind: HookMapping
+    mappingId: hookMapping:session-start:oh-my-pi
+    hookId: session-start
+    targetId: oh-my-pi
+    nativeName: session_start
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: omp
+    evidenceRefs:
+      - repo-target-index
+  - id: hookMapping:stop:oh-my-pi
+    kind: HookMapping
+    mappingId: hookMapping:stop:oh-my-pi
+    hookId: stop
+    targetId: oh-my-pi
+    nativeName: stop
+    versionRange: ">=0.0.0"
+    requiresRuntimeHooks: true
+    adapterFamily: omp
     evidenceRefs:
       - repo-target-index
   - id: hookMapping:before-prompt-build:openclaw

@@ -7,11 +7,34 @@ nodes:
     targetId: claude-code
     displayName: Claude Code
     adapterName: claude
-    manifestFormat: plugin.json
+    pluginRootEnvVar: CLAUDE_PLUGIN_ROOT
+    pluginRootEnvVarForExtension: null
+    manifestFormat: plugin.json + openclaw.plugin.json
     commandFormat: markdown-commands
+    skillHandling: native
+    hookRegistrationFormat: claude-code
+    scriptVariants:
+      - bash
+    adapterFamily: shell-hook
+    distribution: marketplace
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/claude-code.ts
-    npmPublishable: true
+    marketplacePath: .claude-plugin/marketplace.json
+    installLayout:
+      harnessHomeRelative: null
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: commonjs
+      binScriptExt: .js
+      installLifecycle: none
+      activationMessage: restart
+      extraPackageFiles: []
+      extraScripts: {}
+      emitCjsWrappers: false
+    componentSupport:
+      agents: unsupported
+      context: unsupported
+    npmPublishable: false
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:codex
@@ -19,11 +42,34 @@ nodes:
     targetId: codex
     displayName: Codex
     adapterName: codex
+    pluginRootEnvVar: null
+    pluginRootEnvVarForExtension: null
     manifestFormat: package.json + hooks.json
     commandFormat: package-json commands
+    skillHandling: derived-from-commands
+    hookRegistrationFormat: codex
+    scriptVariants:
+      - bash
+    adapterFamily: shell-hook
+    distribution: npm-cli
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/codex.ts
-    npmPublishable: true
+    marketplacePath: .agents/plugins/marketplace.json
+    npmPublishable: false
+    installLayout:
+      harnessHomeRelative: .codex
+      pluginsDirRelative: .agents/plugins
+      marketplacePathRelative: .agents/plugins/marketplace.json
+    packageMetadata:
+      moduleType: commonjs
+      binScriptExt: .js
+      installLifecycle: none
+      activationMessage: codex-open-plugins
+      extraPackageFiles: []
+      extraScripts: {}
+      emitCjsWrappers: false
+    componentSupport:
+      agents: unsupported
+      context: unsupported
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:cursor
@@ -31,11 +77,36 @@ nodes:
     targetId: cursor
     displayName: Cursor
     adapterName: cursor
+    pluginRootEnvVar: CURSOR_PLUGIN_ROOT
+    pluginRootEnvVarForExtension: null
     manifestFormat: plugin.json
     commandFormat: markdown-commands
+    skillHandling: derived-from-commands
+    hookRegistrationFormat: cursor
+    scriptVariants:
+      - bash
+      - powershell
+    adapterFamily: shell-hook
+    distribution: both
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/cursor.ts
-    npmPublishable: true
+    marketplacePath: null
+    npmPublishable: false
+    installLayout:
+      harnessHomeRelative: .cursor
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: commonjs
+      binScriptExt: .js
+      installLifecycle: postinstall
+      activationMessage: restart
+      extraPackageFiles:
+        - hooks.json
+      extraScripts: {}
+      emitCjsWrappers: false
+    componentSupport:
+      agents: unsupported
+      context: unsupported
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:gemini
@@ -43,11 +114,34 @@ nodes:
     targetId: gemini
     displayName: Gemini CLI
     adapterName: gemini
+    pluginRootEnvVar: GEMINI_EXTENSION_PATH
+    pluginRootEnvVarForExtension: null
     manifestFormat: plugin.json + gemini-extension.json
     commandFormat: extension-manifest
+    skillHandling: native
+    hookRegistrationFormat: gemini
+    scriptVariants:
+      - bash
+    adapterFamily: shell-hook
+    distribution: npm-cli
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/gemini.ts
-    npmPublishable: true
+    marketplacePath: null
+    npmPublishable: false
+    installLayout:
+      harnessHomeRelative: null
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: commonjs
+      binScriptExt: .js
+      installLifecycle: plugin-scripts
+      activationMessage: restart
+      extraPackageFiles: []
+      extraScripts: {}
+      emitCjsWrappers: false
+    componentSupport:
+      agents: unsupported
+      context: native
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:github-copilot
@@ -55,11 +149,37 @@ nodes:
     targetId: github-copilot
     displayName: GitHub Copilot
     adapterName: copilot
+    pluginRootEnvVar: COPILOT_PLUGIN_DIR
+    pluginRootEnvVarForExtension: null
     manifestFormat: plugin.json
     commandFormat: markdown-commands
+    skillHandling: derived-from-commands
+    hookRegistrationFormat: github-copilot
+    scriptVariants:
+      - bash
+      - powershell
+    adapterFamily: shell-hook
+    distribution: both
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/github-copilot.ts
+    marketplacePath: null
     npmPublishable: true
+    installLayout:
+      harnessHomeRelative: .copilot
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: commonjs
+      binScriptExt: .js
+      installLifecycle: plugin-scripts
+      activationMessage: restart
+      extraPackageFiles:
+        - hooks.json
+        - AGENTS.md
+      extraScripts: {}
+      emitCjsWrappers: false
+    componentSupport:
+      agents: native
+      context: native
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:pi
@@ -67,11 +187,35 @@ nodes:
     targetId: pi
     displayName: Pi
     adapterName: pi
+    pluginRootEnvVar: null
+    pluginRootEnvVarForExtension: PI_PLUGIN_ROOT
     manifestFormat: state-only
-    commandFormat: none
+    commandFormat: markdown-commands
+    skillHandling: derived-from-commands
+    hookRegistrationFormat: null
+    scriptVariants:
+      - javascript
+    adapterFamily: programmatic
+    distribution: npm-cli
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/pi.ts
-    npmPublishable: false
+    marketplacePath: null
+    npmPublishable: true
+    installLayout:
+      harnessHomeRelative: null
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: module
+      binScriptExt: .cjs
+      installLifecycle: none
+      activationMessage: restart
+      extraPackageFiles: []
+      extraScripts: {}
+      peerDependencyPackage: '@mariozechner/pi-coding-agent'
+      emitCjsWrappers: false
+    componentSupport:
+      agents: native
+      context: native
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:oh-my-pi
@@ -79,11 +223,35 @@ nodes:
     targetId: oh-my-pi
     displayName: Oh-My-Pi
     adapterName: omp
+    pluginRootEnvVar: null
+    pluginRootEnvVarForExtension: OMP_PLUGIN_ROOT
     manifestFormat: state-only
-    commandFormat: none
+    commandFormat: markdown-commands
+    skillHandling: derived-from-commands
+    hookRegistrationFormat: null
+    scriptVariants:
+      - javascript
+    adapterFamily: programmatic
+    distribution: npm-cli
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/oh-my-pi.ts
-    npmPublishable: false
+    marketplacePath: null
+    npmPublishable: true
+    installLayout:
+      harnessHomeRelative: null
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: module
+      binScriptExt: .cjs
+      installLifecycle: none
+      activationMessage: restart
+      extraPackageFiles: []
+      extraScripts: {}
+      peerDependencyPackage: '@oh-my-pi/pi-coding-agent'
+      emitCjsWrappers: false
+    componentSupport:
+      agents: native
+      context: native
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:opencode
@@ -91,11 +259,36 @@ nodes:
     targetId: opencode
     displayName: OpenCode
     adapterName: opencode
+    pluginRootEnvVar: OPENCODE_PLUGIN_ROOT
+    pluginRootEnvVarForExtension: null
     manifestFormat: plugin.json
     commandFormat: event-hooks
+    skillHandling: derived-from-commands
+    hookRegistrationFormat: opencode
+    scriptVariants:
+      - javascript
+    adapterFamily: programmatic
+    distribution: npm-cli
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/opencode.ts
-    npmPublishable: true
+    marketplacePath: null
+    npmPublishable: false
+    installLayout:
+      harnessHomeRelative: .opencode
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: commonjs
+      binScriptExt: .js
+      installLifecycle: postinstall
+      activationMessage: restart
+      extraPackageFiles: []
+      extraScripts:
+        test: node test/integration.test.js
+        "sync:commands": node scripts/sync-command-docs.cjs
+      emitCjsWrappers: true
+    componentSupport:
+      agents: unsupported
+      context: unsupported
     evidenceRefs:
       - repo-target-index
   - id: pluginTarget:openclaw
@@ -103,10 +296,35 @@ nodes:
     targetId: openclaw
     displayName: OpenClaw
     adapterName: openclaw
+    pluginRootEnvVar: null
+    pluginRootEnvVarForExtension: null
     manifestFormat: plugin.json
     commandFormat: event-hooks
+    skillHandling: derived-from-commands
+    hookRegistrationFormat: openclaw
+    scriptVariants:
+      - bash
+      - typescript
+    adapterFamily: programmatic
+    distribution: npm-cli
     distributionModel: workspace-generated
-    marketplacePath: packages/agent-plugins-mux/src/targets/openclaw.ts
-    npmPublishable: true
+    marketplacePath: null
+    npmPublishable: false
+    installLayout:
+      harnessHomeRelative: .openclaw
+      pluginsDirRelative: null
+      marketplacePathRelative: null
+    packageMetadata:
+      moduleType: module
+      binScriptExt: .cjs
+      installLifecycle: none
+      activationMessage: restart
+      extraPackageFiles: []
+      extraScripts: {}
+      peerDependencyPackage: openclaw
+      emitCjsWrappers: false
+    componentSupport:
+      agents: unsupported
+      context: unsupported
     evidenceRefs:
       - repo-target-index

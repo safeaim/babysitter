@@ -116,7 +116,7 @@ function generateNpmCliBlock(
     '```',
     '',
   ];
-  if (targetProfile.name === 'codex') {
+  if (targetProfile.packageMetadata?.activationMessage === 'codex-open-plugins') {
     lines.push('Then open Codex and navigate to `/plugins` to activate the plugin.');
   } else {
     lines.push(`Restart ${targetProfile.displayName} to pick up the installed plugin.`);

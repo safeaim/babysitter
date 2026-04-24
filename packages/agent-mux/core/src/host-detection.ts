@@ -16,7 +16,7 @@
  * catalog is embedded here for when the adapters package is not loaded.
  */
 
-import { getHostMetadataFields, getHostSignalMap } from '@a5c-ai/agent-catalog';
+import { getHostDetectionRules, getHostMetadataFields, getHostSignalMap } from '@a5c-ai/agent-catalog';
 import type { AgentName } from './types.js';
 
 /** Information about a detected host harness. */
@@ -45,6 +45,7 @@ export type HostMetadataReader = (
 export type HostMetadataMap = Readonly<Record<string, HostMetadataReader>>;
 
 const HOST_METADATA_FIELDS = getHostMetadataFields();
+const HOST_DETECTION_RULES = getHostDetectionRules();
 
 function createMetadataReader(agent: string): HostMetadataReader {
   const fields = HOST_METADATA_FIELDS[agent] ?? [];
@@ -166,23 +167,17 @@ export function detectHostHarness(
 
   // argv heuristic fallback (low confidence).
   const joined = argv.join(' ').toLowerCase();
-  const argvPatterns: Array<{ agent: string; needle: string }> = [
-    { agent: 'claude', needle: 'claude-code' },
-    { agent: 'codex', needle: 'codex' },
-    { agent: 'gemini', needle: 'gemini-cli' },
-    { agent: 'copilot', needle: 'copilot' },
-    { agent: 'cursor', needle: 'cursor-cli' },
-    { agent: 'opencode', needle: 'opencode' },
-  ];
-  for (const { agent, needle } of argvPatterns) {
-    if (joined.includes(` ${needle}`) || joined.includes(`/${needle}`) || joined.includes(`\\${needle}`)) {
-      return {
-        agent,
-        confidence: 'low',
-        source: 'argv',
-        matchedSignals: [needle],
-        metadata: extractMetadata(agent, env, metadataReaders),
-      };
+  for (const rule of HOST_DETECTION_RULES) {
+    for (const needle of rule.argvMatches) {
+      if (joined.includes(` ${needle}`) || joined.includes(`/${needle}`) || joined.includes(`\\${needle}`)) {
+        return {
+          agent: rule.agent,
+          confidence: 'low',
+          source: 'argv',
+          matchedSignals: [needle],
+          metadata: extractMetadata(rule.agent, env, metadataReaders),
+        };
+      }
     }
   }
 

@@ -162,6 +162,7 @@ export interface KanbanIssueSource {
   readonly kind: 'seed' | 'file' | 'run-derived';
   readonly path?: string;
   readonly externalId?: string;
+  readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
 export interface KanbanPullRequestReviewLink {
@@ -353,6 +354,7 @@ export interface KanbanIssue {
   readonly repositoryLifecycle?: KanbanIssueRepositoryLifecycle;
   readonly activity: readonly KanbanActivityEntry[];
   readonly source?: KanbanIssueSource;
+  readonly metadata?: Readonly<Record<string, unknown>>;
   readonly review?: KanbanReviewSummary;
 }
 

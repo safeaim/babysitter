@@ -58,6 +58,26 @@ export interface BacklogOverview {
   summary: BacklogOverviewSummary;
 }
 
+export interface CreateBacklogIssueInput {
+  readonly projectId: string;
+  readonly title: string;
+  readonly summary?: string;
+  readonly description?: string;
+  readonly status?: KanbanIssue['status'];
+  readonly priority?: KanbanIssue['priority'];
+  readonly labelIds?: readonly string[];
+  readonly assigneeIds?: readonly string[];
+  readonly acceptanceCriteria?: readonly string[];
+  readonly decomposition?: readonly Pick<KanbanIssue['decomposition'][number], 'title' | 'kind' | 'status'>[];
+  readonly source?: KanbanIssue['source'];
+  readonly metadata?: Readonly<Record<string, unknown>>;
+}
+
+export interface CreateBacklogIssueResult {
+  readonly overview: BacklogOverview;
+  readonly issue: KanbanIssue;
+}
+
 type BacklogSeedProject = StoredKanbanProject;
 type BacklogSeedIssue = StoredKanbanIssue;
 
@@ -231,6 +251,57 @@ function nextPullRequestNumber(issues: readonly BacklogSeedIssue[]): number {
       ...issues.map((issue) => issue.repositoryLifecycle?.pullRequest?.number ?? 0),
     ) + 1
   );
+}
+
+function nextAutomationIssueKey(
+  project: Pick<BacklogSeedProject, 'key'>,
+  issues: readonly BacklogSeedIssue[],
+): string {
+  const prefix = `${project.key}-AUTO-`;
+  const nextNumber =
+    Math.max(
+      0,
+      ...issues.map((issue) => {
+        if (!issue.key.startsWith(prefix)) {
+          return 0;
+        }
+
+        const suffix = Number.parseInt(issue.key.slice(prefix.length), 10);
+        return Number.isFinite(suffix) ? suffix : 0;
+      }),
+    ) + 1;
+
+  return `${prefix}${String(nextNumber).padStart(3, '0')}`;
+}
+
+function readProjectLabels(
+  project: BacklogSeedProject,
+  labelIds: readonly string[],
+): BacklogSeedIssue['labels'] {
+  return labelIds.map((labelId) => {
+    const label = project.labels.find((candidate) => candidate.id === labelId);
+    if (!label) {
+      throw new AppError(`Label ${labelId} not found on project ${project.id}.`, 'BAD_REQUEST', 400);
+    }
+    return label;
+  });
+}
+
+function readProjectAssignees(
+  project: BacklogSeedProject,
+  assigneeIds: readonly string[],
+): BacklogSeedIssue['assignees'] {
+  return assigneeIds.map((assigneeId) => {
+    const assignee = project.assignees.find((candidate) => candidate.id === assigneeId);
+    if (!assignee) {
+      throw new AppError(
+        `Assignee ${assigneeId} not found on project ${project.id}.`,
+        'BAD_REQUEST',
+        400,
+      );
+    }
+    return assignee;
+  });
 }
 
 const defaultProjects: readonly BacklogSeedProject[] = [
@@ -1001,6 +1072,70 @@ export class BacklogQueryService {
   async getOverview(): Promise<BacklogOverview> {
     const { projects, issues } = await this.readSeedPayload();
     return this.buildOverviewFromPayload({ projects, issues });
+  }
+
+  async createIssue(input: CreateBacklogIssueInput): Promise<CreateBacklogIssueResult> {
+    const payload = await this.readSeedPayload();
+    const project = this.findProject(payload, input.projectId);
+
+    if (!input.title.trim()) {
+      throw new AppError('title is required.', 'BAD_REQUEST', 400);
+    }
+
+    const key = nextAutomationIssueKey(project, payload.issues);
+    const createdAt = this.deps.now();
+    const issue: BacklogSeedIssue = {
+      id: key,
+      key,
+      projectId: project.id,
+      title: input.title.trim(),
+      summary: input.summary?.trim() || undefined,
+      description: input.description?.trim() || undefined,
+      status: input.status ?? 'backlog',
+      priority: input.priority ?? 'medium',
+      labels: readProjectLabels(project, input.labelIds ?? []),
+      assignees: readProjectAssignees(project, input.assigneeIds ?? []),
+      dependencies: [],
+      acceptanceCriteria: (input.acceptanceCriteria ?? []).map((title, index) => ({
+        id: `${key}-ac-${index + 1}`,
+        title,
+        satisfied: false,
+      })),
+      decomposition: (input.decomposition ?? []).map((item, index) => ({
+        id: `${key}-decomp-${index + 1}`,
+        title: item.title,
+        kind: item.kind,
+        status: item.status,
+      })),
+      childIssueIds: [],
+      createdAt,
+      updatedAt: createdAt,
+      source: input.source,
+      metadata: input.metadata,
+    };
+
+    const nextProjects = payload.projects.map((candidate) =>
+      candidate.id === project.id
+        ? {
+            ...candidate,
+            issueIds: [...candidate.issueIds, issue.id],
+          }
+        : candidate,
+    );
+    const nextIssues = [...payload.issues, issue];
+    const overview = await this.persistPayload({
+      projects: nextProjects,
+      issues: nextIssues,
+    });
+    const createdIssue = overview.snapshot.issues.find((candidate) => candidate.id === issue.id);
+    if (!createdIssue) {
+      throw new AppError(`Created issue ${issue.id} could not be reloaded.`, 'INTERNAL_ERROR', 500);
+    }
+
+    return {
+      overview,
+      issue: createdIssue,
+    };
   }
 
   async moveIssue(input: {

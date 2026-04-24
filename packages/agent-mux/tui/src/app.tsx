@@ -15,6 +15,8 @@ export interface AppProps {
   client: AgentMuxClient;
   plugins: TuiPlugin[];
   defaultAgent?: string;
+  initialViewId?: string;
+  disableChatAutoPrompt?: boolean;
 }
 
 type ActiveRunCommand =
@@ -74,11 +76,17 @@ function pickRenderers(renderers: EventRenderer[], ev: AgentEvent): EventRendere
   return renderers.find((r) => r.id === 'fallback');
 }
 
-export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
+export function App({
+  client,
+  plugins,
+  defaultAgent = 'claude',
+  initialViewId = 'chat',
+  disableChatAutoPrompt = false,
+}: AppProps) {
   const { exit } = useApp();
   const [status, setStatus] = useState<string>('');
   const [, setPluginLoadVersion] = useState(0);
-  const [activeId, setActiveId] = useState<string>('chat');
+  const [activeId, setActiveId] = useState<string>(initialViewId);
   const [promptMode, setPromptMode] = useState<boolean>(false);
   const [chatPromptDismissed, setChatPromptDismissed] = useState<boolean>(false);
   const [pendingResume, setPendingResume] = useState<
@@ -265,6 +273,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
   // clears it. This is the simplest model that keeps global navigation working.
   useEffect(() => {
     if (
+      !disableChatAutoPrompt &&
       active?.id === 'chat' &&
       !promptMode &&
       !chatPromptDismissed &&
@@ -284,7 +293,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
         setChatPromptDismissed(false);
       }
     }
-  }, [active?.id, chatPromptDismissed, filterMode, paletteMode, modelPickerMode, profilePickerMode, agentPickerMode, promptMode]);
+  }, [active?.id, chatPromptDismissed, disableChatAutoPrompt, filterMode, paletteMode, modelPickerMode, profilePickerMode, agentPickerMode, promptMode]);
   const ActiveView = active?.component;
 
   const viewEmit = (ev: Parameters<TuiViewProps['emit']>[0]) => {

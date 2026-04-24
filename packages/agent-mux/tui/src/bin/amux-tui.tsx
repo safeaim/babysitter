@@ -15,6 +15,16 @@ function builtInAdaptersDisabled(): boolean {
   return value === '1' || value === 'true';
 }
 
+function chatAutoPromptDisabled(): boolean {
+  const value = process.env.AMUX_TUI_NO_AUTO_PROMPT;
+  return value === '1' || value === 'true';
+}
+
+function initialViewId(): string | undefined {
+  const value = process.env.AMUX_TUI_INITIAL_VIEW;
+  return value && value.trim() ? value.trim() : undefined;
+}
+
 async function main() {
   const client = createClient();
   if (!builtInAdaptersDisabled()) {
@@ -34,7 +44,14 @@ async function main() {
     }
   }
 
-  render(<App client={client} plugins={plugins} />);
+  render(
+    <App
+      client={client}
+      plugins={plugins}
+      initialViewId={initialViewId()}
+      disableChatAutoPrompt={chatAutoPromptDisabled()}
+    />,
+  );
 }
 
 void main();

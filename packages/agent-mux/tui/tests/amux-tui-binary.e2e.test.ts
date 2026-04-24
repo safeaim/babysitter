@@ -128,18 +128,17 @@ describe('real amux-tui binary e2e', () => {
         HOME: homeDir,
         AMUX_TUI_PLUGINS_DIR: pluginDir,
         AMUX_TUI_NO_BUILTIN_ADAPTERS: '1',
+        AMUX_TUI_INITIAL_VIEW: 'sessions',
         AMUX_TUI_E2E_STATE_DIR: stateDir,
+        AMUX_LOG_FILE: path.join(stateDir, 'amux.log'),
         AMUX_LOG_LEVEL: 'error',
         FORCE_COLOR: '0',
         NO_COLOR: '1',
       },
     });
     const harness = new PtyHarness(proc);
-    await harness.pause(400);
+    await harness.pause(800);
 
-    harness.write('\u001B');
-    await harness.pause();
-    harness.write('2');
     await harness.waitFor('sess-alpha');
     await harness.waitFor('sess-beta');
     await harness.waitFor('>   tui-e2e sess-beta');

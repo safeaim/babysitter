@@ -8,6 +8,8 @@ This phase focuses on performance optimization, comprehensive testing, and produ
 
 ### Performance Optimization
 
+This phase does not define standalone numeric performance promises. Any performance target referenced from this phase must be attached to a current implementation slice and must name the baseline, measurement command or procedure, acceptance threshold, and fallback action described in [Performance Considerations](../performance-docs.md).
+
 **Bundle Analysis & Optimization**
 - Bundle size analysis and tree-shaking optimization → [Performance Considerations](../performance-docs.md)
 - Memory usage profiling and optimization with leak detection
@@ -104,12 +106,15 @@ interface CompatibilityMatrix {
 
 ### Performance Targets Validation
 
-| Metric | Target | Validation Method |
-|--------|--------|------------------|
-| Bundle Size | < target per package | Automated size checking in CI |
-| Memory Usage | < baseline per layer | Memory profiling in test suite |
-| Load Time | < 200ms session creation | Performance benchmarking |
-| Plugin Overhead | < 10% per plugin | Resource monitoring |
+| Contract Element | Requirement In This Phase | Validation Method |
+|------------------|---------------------------|-------------------|
+| Slice Definition | Name the exact package, feature slice, or workflow under evaluation | Roadmap entry or PR scope |
+| Baseline | Record the starting value or current behavior source | Benchmark note or captured command output |
+| Measurement | Name the exact command or procedure used to measure the slice | Checked into docs or CI job definition |
+| Threshold | State the slice-specific acceptance threshold | Linked performance contract |
+| Fallback | State what happens if the threshold is missed | Explicit scope reduction, acceptance decision, or rollback |
+
+Until a benchmark harness and release gate exist for a slice, performance work in this phase is exploratory rather than normative.
 
 ### Quality Assurance
 
@@ -129,7 +134,7 @@ interface CompatibilityMatrix {
 
 **Pre-Release Checklist**
 - All automated tests passing with green CI status
-- Performance benchmarks meeting targets with documentation
+- Any claimed performance slice contracts executed and documented
 - Security review completed with sign-off
 - Documentation review completed with stakeholder approval
 - Migration guide validated with real-world scenarios
@@ -142,7 +147,7 @@ interface CompatibilityMatrix {
 
 ## Deliverables
 
-- Performance targets achieved with comprehensive validation
+- Slice-scoped performance contracts documented for any optimized slice
 - Complete test coverage established with automated quality gates
 - Comprehensive validation suite operational with continuous monitoring
 - System optimization complete with performance documentation

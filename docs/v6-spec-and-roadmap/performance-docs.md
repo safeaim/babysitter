@@ -15,6 +15,8 @@ Any V6 performance target must include:
 - acceptance threshold,
 - fallback action if the threshold is missed.
 
+If a document cannot name a current slice and its measurement command or procedure, it should not publish a normative numeric target. In that case the document should explicitly mark the figure as exploratory or omit it.
+
 ## Current Maturity Position
 
 At the current documentation stage, V6 does not commit to broad numeric performance improvements across many future packages. Earlier optimistic figures were useful as pressure tests, but they are not mature commitments without implementation context.

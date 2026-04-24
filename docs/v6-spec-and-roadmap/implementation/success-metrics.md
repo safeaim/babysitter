@@ -8,19 +8,17 @@ The V6 architecture refactoring success is measured across multiple dimensions w
 
 ### Quantitative Success Metrics
 
-#### Bundle Size Reduction
-| Package | Current | Target | Success Threshold |
-|---------|---------|--------|------------------|
-| agent-runtime | ~15MB (monolith) | < 2MB | 87% reduction achieved |
-| agent-platform | ~15MB (monolith) | < 5MB | 67% reduction achieved |
-| babysitter-agent | ~15MB (monolith) | < 10MB | 33% reduction achieved |
+#### Performance Contract Status
 
-#### Performance Benchmarks
-| Metric | Target | Measurement Method | Success Criteria |
-|--------|--------|-------------------|------------------|
-| Session Creation | < 200ms | Automated benchmarking | 95% of tests pass |
-| Plugin Loading | < 100ms per plugin | Load time monitoring | Average under target |
-| Memory Baseline | < 50MB runtime | Memory profiling | Sustained usage validation |
+Package-level bundle goals, broad memory targets, and generic startup latency goals are not normative success criteria in this document unless they are tied to a current executable slice.
+
+| Scope | Status | What Must Exist Before It Becomes Normative |
+|-------|--------|---------------------------------------------|
+| Bundle size changes | Exploratory until slice-scoped | Baseline source, named measurement command, threshold, and fallback |
+| Memory usage claims | Exploratory until slice-scoped | Scenario definition, named profiling procedure, threshold, and fallback |
+| Startup or plugin latency claims | Exploratory until slice-scoped | Named benchmark command, threshold, and explicit miss handling |
+
+The linked [Performance Considerations](../performance-docs.md) document is the source of truth for when a performance number becomes a target instead of a planning hypothesis.
 
 #### Quality Metrics
 | Aspect | Target | Validation | Success Threshold |
@@ -43,16 +41,16 @@ The V6 architecture refactoring success is measured across multiple dimensions w
 - Plugin system operational, with metaplugin composition and concrete plugin delivery validated as separate concerns
 - Session management fully migrated with persistence and recovery
 - Orchestration plugin functional with babysitter SDK integration
-- Performance targets maintained within acceptable variance
+- No performance commitment introduced without a slice-specific measurement contract
 
 **Phase 3: Application Layer** → [Application Layer](application-layer.md)
 - All functionality converted to plugins with proper isolation
 - New `babysitter-agent` feature-complete with existing functionality
-- Bundle size targets achieved across all packages
+- Any package-level performance claim linked to an executable slice contract
 - Agent-mux integration completed with API compatibility
 
 **Phase 4: Optimization & Polish** → [Optimization & Polish](optimization-polish.md)
-- All performance targets met or exceeded with validation
+- Any accepted performance target validated through a slice-specific contract
 - 90%+ test coverage achieved across all packages
 - Complete documentation published with user validation
 - Migration tooling validated with real-world scenarios
@@ -89,9 +87,9 @@ interface ComplianceResult {
 
 **Quality Gates**
 - Pre-merge validation for architectural compliance
-- Performance regression detection with alerting
-- Bundle size monitoring with trend analysis
-- Memory usage validation with leak detection
+- Performance regression detection for slices that define measurement commands
+- Bundle size monitoring only where a slice-specific contract exists
+- Memory usage validation only where a slice-specific contract exists
 
 ## Risk Mitigation Success
 
@@ -100,7 +98,7 @@ interface ComplianceResult {
 | Risk Category | Probability | Impact | Mitigation Status | Success Criteria |
 |---------------|-------------|--------|------------------|------------------|
 | Foundation Phase Risks | Medium | High | Active monitoring | Zero critical functionality loss |
-| Platform Phase Risks | Low | Medium | Performance monitoring | <5% performance overhead |
+| Platform Phase Risks | Low | Medium | Performance monitoring | Any overhead claim backed by a slice-specific contract |
 | Application Phase Risks | Medium | Medium | Comprehensive testing | 100% feature parity achieved |
 | Release Phase Risks | Low | High | Staged deployment | Zero production incidents |
 

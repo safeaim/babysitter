@@ -117,9 +117,9 @@ Layered Architecture
 - Monolithic configuration
 
 **Bundle Characteristics**:
-- ~15MB monolithic package
-- ~120MB baseline memory usage
-- All features always loaded
+- One deployable carries the full feature set and its resource costs together
+- Memory and startup costs are coupled to the monolith rather than to a selected slice
+- All features are always loaded
 
 ### V6 Deployment Options
 
@@ -129,10 +129,9 @@ Layered Architecture
 - **Complete Solution**: Add `@a5c-ai/babysitter-agent` for full orchestration
 
 **Bundle Characteristics**:
-- Runtime: <2MB
-- Platform: <5MB 
-- Complete: Composed as needed
-- Selective imports enable 60%+ size reduction
+- Runtime, platform, and complete deployments can be measured independently once slice-specific commands exist
+- Complete deployments are composed as needed
+- Selective imports can reduce shipped code for narrower deployments, but the amount must be proven per slice
 
 ## Functional Capability Comparison
 
@@ -173,13 +172,14 @@ Layered Architecture
 
 ## Performance Characteristics
 
+This comparison is intentionally qualitative. Broad bundle, memory, and latency figures were removed from the normative architecture comparison until a benchmark harness and release gate exist for a concrete slice.
+
 ### Current Performance Profile
 
 **Resource Usage**:
-- Bundle size: ~15MB monolithic
-- Memory usage: ~120MB baseline
-- Session startup: ~500ms
-- Tool execution overhead: ~100ms
+- Resource usage is measured at the monolith level rather than at a slice level
+- Startup and tool overhead include the cost of loading the integrated feature set
+- Fine-grained attribution is difficult because the deployment unit is broad
 
 **Characteristics**:
 - All functionality loaded regardless of use
@@ -189,10 +189,9 @@ Layered Architecture
 ### V6 Performance Profile
 
 **Resource Usage**:
-- Bundle size: Selective (2MB-15MB based on composition)
-- Memory usage: <50MB runtime, <100MB platform
-- Session startup: <200ms target
-- Tool execution overhead: <50ms target
+- Resource usage should be measured per deployment slice rather than inferred globally
+- Runtime-only, platform, and complete deployments may each carry different baselines
+- Any startup, memory, or overhead target requires a named benchmark command and fallback plan
 
 **Characteristics**:
 - Pay-for-what-you-use resource model

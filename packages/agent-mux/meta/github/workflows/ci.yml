@@ -43,8 +43,8 @@ jobs:
       - name: E2E tests
         run: npm run test:e2e
 
-      - name: Coverage
-        run: npx vitest run --coverage
+      - name: Coverage gate (package vitest thresholds)
+        run: npx vitest run --coverage --config vitest.config.ts
         if: matrix.node-version == 22
 
       - name: Verify built CLI runs

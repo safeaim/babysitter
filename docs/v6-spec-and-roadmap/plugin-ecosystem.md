@@ -25,7 +25,9 @@ V6 does not require a future standalone meta-plugin host package before those us
 
 ### Validation and Quality Assurance
 
-**Automated Testing Requirements**: Mandatory unit tests (>80% coverage), integration tests, and security validation
+Numeric coverage thresholds are package-scoped governance requirements, not a repo-wide default. Any package that claims a threshold must encode and enforce it in that package's own test configuration and CI job.
+
+**Automated Testing Requirements**: Mandatory unit tests, integration tests, and security validation, with any numeric coverage threshold declared and enforced in the package's own test config and CI job
 
 **Code Quality Standards**: Static analysis, dependency vulnerability scanning, and code style enforcement
 

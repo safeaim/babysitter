@@ -49,7 +49,7 @@ interface PerformanceValidator {
 ### Testing & Validation
 
 **Comprehensive Test Coverage**
-- Complete test coverage for all packages with quality gates → [Testing Framework](../testing-framework.md)
+- Complete test coverage expansion for all packages, with package-scoped quality gates where thresholds are declared → [Testing Framework](../testing-framework.md)
 - Integration test suite expansion with real-world scenarios
 - End-to-end functionality validation with user journey testing
 - Regression testing automation with continuous validation
@@ -118,8 +118,10 @@ Until a benchmark harness and release gate exist for a slice, performance work i
 
 ### Quality Assurance
 
+Coverage thresholds in this phase are package-scoped and must be enforced by the owning package's test configuration and CI job. V6 does not currently define a single repo-wide coverage percentage gate.
+
 **Automated Quality Gates**
-- Code coverage > 80% across all packages
+- Package-scoped coverage gates enforced by package-local test configuration and CI jobs where numeric thresholds are declared
 - Performance benchmarks within target ranges
 - Security vulnerability scanning with zero critical issues
 - API compatibility validation with breaking change detection
@@ -148,7 +150,7 @@ Until a benchmark harness and release gate exist for a slice, performance work i
 ## Deliverables
 
 - Slice-scoped performance contracts documented for any optimized slice
-- Complete test coverage established with automated quality gates
+- Package-scoped test coverage gates established where normative
 - Comprehensive validation suite operational with continuous monitoring
 - System optimization complete with performance documentation
 - Release preparation complete with migration and rollback procedures

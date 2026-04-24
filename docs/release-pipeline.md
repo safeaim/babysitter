@@ -3,12 +3,14 @@
 ## Workflow Overview
 - `.github/workflows/release.yml` owns production npm releases from `main`, guarded by the `release-main` concurrency group so only one run executes at a time.
 - `.github/workflows/staging-publish.yml` owns prerelease npm publishing from `staging`, guarded by the `staging-publish` concurrency group.
+- `@a5c-ai/kanban` is part of those central workflows; feature work such as Task Tags must keep using the same release ownership surface instead of introducing a package-specific publish path.
 - `@a5c-ai/babysitter-observer-dashboard` is part of those central workflows. The former standalone `.github/workflows/observer-dashboard-publish.yml` path is retired, so observer-dashboard no longer has a separate `main` release workflow.
 - Both central workflows validate, build, and publish observer-dashboard alongside the other public workspaces they own.
 
 ## Ownership Matrix
 - `release.yml` on `main`: validates the monorepo, bumps versions through `scripts/bump-version.mjs`, packs release artifacts, publishes public npm packages, tags `vX.Y.Z`, and creates the GitHub Release.
 - `staging-publish.yml` on `staging`: validates the monorepo, writes prerelease versions into the publishable package manifests, and publishes the same centrally-owned npm packages with the `staging` dist-tag.
+- `packages/kanban`: validated and published through the same central workflow pair; release-sensitive feature changes should be documented against `npm run build:kanban`, `npm run build:cli --workspace=@a5c-ai/kanban`, `npm run verify:release --workspace=@a5c-ai/kanban`, and `npm run test:kanban`.
 - `scripts/bump-version.mjs`: production version source of truth for the centrally versioned workspace packages, including `packages/observer-dashboard/package.json`.
 - `packages/observer-dashboard/README.md`: user-facing install guidance for the published package; it should describe the same central release ownership as this document.
 
@@ -37,3 +39,4 @@
 1. Ensure release-notes.md matches the changelog section before approving the release.
 2. Tabletop the rollback script quarterly (Release Eng + Security) to confirm tag deletion + changelog revert steps are still valid.
 3. When adding or removing a public package from the central release set, update all three ownership surfaces together: `release.yml`, `staging-publish.yml`, and `scripts/bump-version.mjs`.
+4. When `packages/kanban` gains new release-relevant surfaces such as Task Tags assets, release verification for `@a5c-ai/kanban` must be updated in the same change rather than relying on documentation-only intent.

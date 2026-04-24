@@ -43,10 +43,22 @@ That contract keeps the package name honest without pretending the rest of the s
 - Compendium-based shell, forms, buttons, and branding primitives
 - Settings page for runtime and gateway visibility
 
+## Task Tags Specification
+
+Full parity planning for original Vibe Kanban-style `Task Tags` now lives in [specs/task-tags-spec.md](./specs/task-tags-spec.md).
+
+That spec defines reusable snippet tags as a separate feature from issue labels and captures:
+
+- shared type ownership between `packages/agent-mux/core` and `packages/kanban`
+- expected Settings/API/editor surfaces in `packages/kanban`
+- implementation slices and acceptance criteria
+- CI/release contracts through the existing `kanban` workflow and central release pipelines
+
 ## Remaining Gaps
 
 The package still has meaningful product gaps, but they are now downstream of the target model rather than evidence that the package should be treated as observability-first:
 
+- full Task Tags feature implementation is specified but not yet shipped
 - deeper review and diff workflows
 - richer preview and runtime surfaces per workspace
 - repository and pull-request lifecycle controls

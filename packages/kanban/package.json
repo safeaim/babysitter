@@ -43,6 +43,7 @@
     ".next/*.json",
     ".next/package.json",
     "public",
+    "specs",
     "next.config.mjs",
     "postcss.config.mjs",
     "tsconfig.json",

@@ -51,6 +51,23 @@ Current gap:
 Preferred direction:
 - add issue/project APIs and models to `agent-mux` or an adjacent shared service layer, then render them here
 
+### 1a. Task Tags parity
+
+Original Vibe Kanban also exposes `Task Tags`: reusable text snippets inserted by typing `@` in task descriptions and follow-up/prompt workflows.
+
+Current gap:
+- `packages/kanban` has issue labels, but no Task Tags domain model
+- there is no settings CRUD surface for reusable snippets
+- there is no task-authoring or follow-up insertion/autocomplete surface
+- there is no shared type contract in `packages/agent-mux/core/src/kanban.ts`
+- there is no package-local specification tying the feature to current CI/release ownership
+
+Preferred direction:
+- treat Task Tags as a separate feature family from issue labels
+- define shared types in `packages/agent-mux/core` only where reuse is required
+- own the first CRUD/API/settings/editor experience in `packages/kanban`
+- implement against the feature spec in [`specs/task-tags-spec.md`](/var/tmp/vibe-kanban/worktrees/5566-full-task-tags-f/babysitter/packages/kanban/specs/task-tags-spec.md)
+
 ### 2. Actual kanban board mechanics
 
 Original Vibe Kanban has a real board with columns and issue movement semantics.
@@ -158,7 +175,8 @@ These are additions that should exist beyond Vibe Kanban parity because this pac
 
 ## Recommended Sequencing
 
-1. Mature shared `agent-mux` capabilities so issue/project/workspace data becomes a real shared system of record.
-2. Deepen board authoring, movement, and review workflows on top of the existing shared board model.
-3. Connect issue-driven workspace provisioning and richer workspace runtime surfaces.
-4. Add Babysitter-native observability overlays that strengthen execution without replacing the board-first product model.
+1. Land Task Tags shared type, package-local CRUD, and authoring-surface parity from [`specs/task-tags-spec.md`](/var/tmp/vibe-kanban/worktrees/5566-full-task-tags-f/babysitter/packages/kanban/specs/task-tags-spec.md).
+2. Mature shared `agent-mux` capabilities so issue/project/workspace data becomes a real shared system of record.
+3. Deepen board authoring, movement, and review workflows on top of the existing shared board model.
+4. Connect issue-driven workspace provisioning and richer workspace runtime surfaces.
+5. Add Babysitter-native observability overlays that strengthen execution without replacing the board-first product model.

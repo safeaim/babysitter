@@ -13,7 +13,8 @@
   },
   "files": [
     "dist",
-    "skills"
+    "skills",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"

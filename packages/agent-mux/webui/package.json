@@ -31,6 +31,7 @@
     "dist",
     "dist-types",
     "public",
+    "README.md",
     "LICENSE"
   ],
   "publishConfig": {

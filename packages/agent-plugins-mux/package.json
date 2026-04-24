@@ -39,6 +39,9 @@
     "dist/",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@a5c-ai/agent-catalog": "*"
   },

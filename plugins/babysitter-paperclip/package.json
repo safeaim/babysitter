@@ -2,8 +2,17 @@
   "name": "@a5c-ai/babysitter-paperclip",
   "version": "5.0.0",
   "description": "Babysitter orchestration plugin for Paperclip AI",
+  "license": "MIT",
   "type": "module",
   "main": "dist/worker.js",
+  "files": [
+    "dist/",
+    "README.md",
+    "versions.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node esbuild.config.mjs",
     "dev": "paperclip-plugin-dev-server --root . --ui-dir dist/ui --port 4177",

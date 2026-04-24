@@ -25,8 +25,12 @@
     }
   },
   "files": [
-    "dist/"
+    "dist/",
+    "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
     "clean": "rm -rf dist/",

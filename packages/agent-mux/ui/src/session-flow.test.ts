@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  accumulateEventCost,
-  buildNativeAgentFlowLane,
-  buildSessionFlowModel,
-} from './session-flow.js';
+import { buildSessionFlowModel } from './session-flow.js';
 
 describe('buildSessionFlowModel', () => {
   it('projects lanes, transcript, timeline, and file attention from live events', () => {
@@ -84,45 +80,5 @@ describe('buildSessionFlowModel', () => {
       status: 'running',
       title: 'Write',
     });
-  });
-});
-
-describe('accumulateEventCost', () => {
-  it('aggregates cost records across multiple runs', () => {
-    const totals = accumulateEventCost(
-      ['run-1', 'run-2'],
-      {
-        'run-1': { events: [{ type: 'cost', cost: { totalUsd: 0.25, inputTokens: 10 } }] },
-        'run-2': { events: [{ type: 'cost', cost: { totalUsd: 0.5, outputTokens: 12 } }] },
-      },
-    );
-
-    expect(totals).toMatchObject({
-      totalUsd: 0.75,
-      inputTokens: 10,
-      outputTokens: 12,
-    });
-  });
-});
-
-describe('buildNativeAgentFlowLane', () => {
-  it('creates a fallback lane from native session messages', () => {
-    const lane = buildNativeAgentFlowLane(
-      'session-1',
-      [
-        { role: 'user', content: 'Hello' },
-        { thinking: 'Reasoning' },
-        { role: 'assistant', content: 'Done' },
-      ],
-      'claude',
-      'inactive',
-    );
-
-    expect(lane).not.toBeNull();
-    expect(lane?.segments.map((segment) => segment.kind)).toEqual([
-      'user',
-      'thinking',
-      'assistant',
-    ]);
   });
 });

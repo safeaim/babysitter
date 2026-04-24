@@ -5,7 +5,10 @@
  * on a remote machine via SSH, or on a remote k8s cluster.
  */
 
-import { getHarnessImages } from '@a5c-ai/agent-catalog';
+import {
+  getHarnessImages,
+  lookupHarnessImage as lookupCatalogHarnessImage,
+} from '@a5c-ai/agent-catalog';
 
 // ---------------------------------------------------------------------------
 // Invocation Mode Discriminated Union
@@ -121,5 +124,5 @@ export const HARNESS_IMAGE_CATALOG: readonly HarnessImageEntry[] = getHarnessIma
  * Returns undefined if no catalog entry exists.
  */
 export function lookupHarnessImage(harness: string): HarnessImageEntry | undefined {
-  return HARNESS_IMAGE_CATALOG.find(e => e.harness === harness);
+  return lookupCatalogHarnessImage(harness);
 }

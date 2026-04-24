@@ -133,7 +133,9 @@ export function getHarnessImages(): HarnessImageEntry[] {
 }
 
 export function lookupHarnessImage(harness: string): HarnessImageEntry | undefined {
-  return HARNESS_IMAGES.find((entry) => entry.harness === harness);
+  const normalized = harness.toLowerCase();
+  const key = HARNESS_ALIASES[normalized] ?? normalized;
+  return HARNESS_IMAGES.find((entry) => entry.harness === key);
 }
 
 export function listPluginTargets(): string[] {

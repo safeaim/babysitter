@@ -68,8 +68,8 @@ describe('HARNESS_IMAGE_CATALOG', () => {
     const names = HARNESS_IMAGE_CATALOG.map(e => e.harness);
     expect(names).toContain('claude-code');
     expect(names).toContain('codex');
-    expect(names).toContain('aider');
-    expect(names).toContain('goose');
+    expect(names).toContain('cursor');
+    expect(names).toContain('github-copilot');
   });
 
   it('all entries have required fields', () => {
@@ -92,6 +92,12 @@ describe('lookupHarnessImage', () => {
   it('finds codex', () => {
     const entry = lookupHarnessImage('codex');
     expect(entry).toBeDefined();
+  });
+
+  it('resolves built-in agent aliases to harness images', () => {
+    const entry = lookupHarnessImage('claude');
+    expect(entry).toBeDefined();
+    expect(entry!.harness).toBe('claude-code');
   });
 
   it('returns undefined for unknown harness', () => {

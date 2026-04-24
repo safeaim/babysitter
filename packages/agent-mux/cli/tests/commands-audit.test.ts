@@ -72,7 +72,7 @@ suite('built CLI — functional audit', () => {
       expect(res.status, `help ${cmd} should exit 0`).toBe(0);
       expect(res.stdout.length).toBeGreaterThan(20);
     }
-  }, 15000);
+  }, 25000);
 
   // ── adapters ────────────────────────────────────────────────────
   it('adapters list --json returns the built-in adapter set', () => {

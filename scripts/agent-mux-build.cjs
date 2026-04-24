@@ -18,6 +18,21 @@ const packages = [
 ];
 
 const mode = process.argv[2] || 'build';
+const targetPackage = process.argv[3];
+
+function selectPackages(mode, targetPackage) {
+  if (!targetPackage) {
+    return packages;
+  }
+
+  const targetIndex = packages.indexOf(targetPackage);
+  if (targetIndex === -1) {
+    console.error(`Unknown agent-mux package target: ${targetPackage}`);
+    process.exit(1);
+  }
+
+  return mode === 'build' ? packages.slice(0, targetIndex + 1) : [targetPackage];
+}
 
 function quote(value) {
   return `"${value.replace(/(["$`\\])/g, '\\$1')}"`;
@@ -63,10 +78,10 @@ function getTestRoots(pkg) {
   ];
 }
 
-for (const pkg of packages) {
+for (const pkg of selectPackages(mode, targetPackage)) {
   const dir = path.join(repoRoot, pkg);
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
-  const scriptName = mode === 'test' ? 'test' : 'build';
+  const scriptName = mode === 'test' ? 'test' : (manifest.scripts?.['build:local'] ? 'build:local' : 'build');
   if (mode === 'test') {
     const testFiles = [...new Set(getTestRoots(pkg).flatMap((root) => collectTestFiles(path.join(repoRoot, root))))];
     if (testFiles.length === 0) {

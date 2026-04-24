@@ -19,7 +19,7 @@ export function DiffRenderer({ event }: { event: AgentEvent }) {
         <Text color="green">+{adds}</Text>{' '}
         <Text color="red">-{dels}</Text>
       </Text>
-      {lines.map((line, i) => {
+      {lines.map((line: string, i: number) => {
         if (line.startsWith('+++') || line.startsWith('---')) {
           return <Text key={i} dimColor>{line}</Text>;
         }

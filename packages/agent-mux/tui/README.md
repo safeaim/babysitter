@@ -12,6 +12,14 @@ npm i -g @a5c-ai/agent-mux-tui
 amux-tui
 ```
 
+## Development
+
+Package-level `build` and `test` scripts are routed through the repo-root
+`scripts/agent-mux-build.cjs` helper so `@a5c-ai/agent-mux-tui` runs with its
+agent-mux prerequisites built in dependency order and its tests executed from
+the repo root. Use `npm run build:local --workspace=@a5c-ai/agent-mux-tui`
+when you only want the package-local TypeScript compile.
+
 ## Writing a plugin
 
 ```ts

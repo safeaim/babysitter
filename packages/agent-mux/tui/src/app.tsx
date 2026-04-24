@@ -45,6 +45,8 @@ function describeDeferredTarget(target: DeferredPromptTarget): string {
       return 'the next agent response';
     case 'next-turn':
       return 'the next turn';
+    default:
+      return 'a later event';
   }
 }
 
@@ -200,7 +202,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
       void (async () => {
         try {
           const list = await client.profiles.list();
-          setAvailableProfiles(list.map((p) => p.name));
+          setAvailableProfiles(list.map((p: { name: string }) => p.name));
           setProfilePickerMode(true);
         } catch (e) {
           setStatus(`profiles: ${(e as Error).message}`);
@@ -326,7 +328,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
       const sum = result.summary;
       const head = result.operations
         .slice(0, 30)
-        .map((o, i) => `${i + 1}. ${(o as { kind?: string }).kind ?? 'op'}`)
+        .map((o: { type: string }, i: number) => `${i + 1}. ${o.type}`)
         .join('\n');
       const text =
         `\n--- session diff ---\n` +
@@ -538,7 +540,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
       {agentPickerMode ? (
         <ModelPicker
           models={(() => {
-            try { return client.adapters.list().map((a) => ({ agent: a.agent, modelId: a.displayName })); }
+            try { return client.adapters.list().map((a: { agent: string; displayName: string }) => ({ agent: a.agent, modelId: a.displayName })); }
             catch { return []; }
           })()}
           onCancel={() => setAgentPickerMode(false)}

@@ -26,6 +26,27 @@ function extract() {
   }>;
 }
 
+async function flush() {
+  await new Promise((r) => setTimeout(r, 10));
+}
+
+async function waitFor(check: () => void, timeoutMs: number = 500) {
+  const deadline = Date.now() + timeoutMs;
+  let lastError: unknown;
+
+  while (Date.now() < deadline) {
+    try {
+      check();
+      return;
+    } catch (error) {
+      lastError = error;
+      await flush();
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('Timed out waiting for hooks-view state');
+}
+
 let tmp: string;
 let prevCwd: string;
 let prevHome: string | undefined;
@@ -56,13 +77,16 @@ describe('hooks-view', () => {
     }));
     const View = extract();
     const stream = new EventStream();
-    const { lastFrame, rerender } = render(<View client={{} as never} active={true} eventStream={stream} emit={() => {}} />);
-    await new Promise((r) => setTimeout(r, 30));
-    rerender(<View client={{} as never} active={true} eventStream={stream} emit={() => {}} />);
-    const f = lastFrame() ?? '';
-    expect(f).toContain('Hooks');
-    expect(f).toContain('h1');
-    expect(f).toContain('PreToolUse');
+    const props = { client: {} as never, active: true, eventStream: stream, emit: () => {} };
+    const { lastFrame, rerender } = render(<View {...props} />);
+
+    await waitFor(() => {
+      rerender(<View {...props} />);
+      const frame = lastFrame() ?? '';
+      expect(frame).toContain('Hooks');
+      expect(frame).toContain('h1');
+      expect(frame).toContain('PreToolUse');
+    });
   });
 
   it('removes hook on d + y', async () => {
@@ -76,14 +100,26 @@ describe('hooks-view', () => {
     }));
     const View = extract();
     const stream = new EventStream();
-    const { stdin, rerender } = render(<View client={{} as never} active={true} eventStream={stream} emit={() => {}} />);
-    await new Promise((r) => setTimeout(r, 30));
-    rerender(<View client={{} as never} active={true} eventStream={stream} emit={() => {}} />);
+    const props = { client: {} as never, active: true, eventStream: stream, emit: () => {} };
+    const { stdin, lastFrame, rerender } = render(<View {...props} />);
+
+    await waitFor(() => {
+      rerender(<View {...props} />);
+      expect(lastFrame() ?? '').toContain('h1');
+    });
+
     stdin.write('d');
-    await new Promise((r) => setTimeout(r, 20));
+
+    await waitFor(() => {
+      rerender(<View {...props} />);
+      expect(lastFrame() ?? '').toContain('Remove hook h1? (y/n)');
+    });
+
     stdin.write('y');
-    await new Promise((r) => setTimeout(r, 50));
-    const after = JSON.parse(fs.readFileSync(hooksPath, 'utf8')) as { hooks: unknown[] };
-    expect(after.hooks.length).toBe(0);
+
+    await waitFor(() => {
+      const after = JSON.parse(fs.readFileSync(hooksPath, 'utf8')) as { hooks: unknown[] };
+      expect(after.hooks.length).toBe(0);
+    });
   });
 });

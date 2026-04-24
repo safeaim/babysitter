@@ -53,11 +53,12 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc --build && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
+    "build": "cd ../../.. && node scripts/agent-mux-build.cjs build packages/agent-mux/tui",
+    "build:local": "tsc --build && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
     "start": "node ./dist/bin/amux-tui.js",
     "dev": "npm run build && npm start",
     "prepublishOnly": "npm run build",
-    "test": "vitest run --config ../../../vitest.config.ts \"tests/**/*.test.ts\" \"tests/**/*.test.tsx\" \"src/**/*.test.ts\" \"src/**/*.test.tsx\""
+    "test": "cd ../../.. && node scripts/agent-mux-build.cjs test packages/agent-mux/tui"
   },
   "dependencies": {
     "@a5c-ai/agent-mux": "0.4.9",

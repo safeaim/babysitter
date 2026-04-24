@@ -59,7 +59,7 @@ function HooksView({ active }: TuiViewProps) {
     try {
       const mgr = new HookConfigManager();
       const list = await mgr.list();
-      const mapped: Row[] = list.map((h) => ({
+      const mapped: Row[] = list.map((h: { id: string; hookType: string; handler: string; target?: string; enabled?: boolean; priority?: number }) => ({
         id: h.id,
         hookType: h.hookType,
         handler: h.handler,

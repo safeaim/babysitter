@@ -29,7 +29,7 @@ These workspaces are part of the active monorepo and ship code or operational be
 
 | Workspace | Role | Validation path |
 | --- | --- | --- |
-| `packages/agent-core` | Internal harness support package | `.github/workflows/ci.yml` job `test` |
+| `packages/agent-core` | Internal harness support package | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` |
 | `packages/babysitter-agent` | Internal harness runtime CLI | `.github/workflows/ci.yml` job `test` |
 | `packages/agent-catalog` | private, non-release workspace package for the metadata catalog consumed by SDK, agent-mux, hooks-mux, plugin compiler, and catalog UI | `.github/workflows/ci.yml` job `workspace-coverage` |
 | `packages/catalog` | Internal Next.js catalog UI | `.github/workflows/ci.yml` job `workspace-coverage` |

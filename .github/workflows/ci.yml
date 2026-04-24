@@ -111,6 +111,11 @@ jobs:
           npm run build --workspace=@a5c-ai/agent-core 2>&1 | tee artifacts/test-logs/agent-core-build.log
           npm run build --workspace=@a5c-ai/babysitter-agent 2>&1 | tee artifacts/test-logs/babysitter-harness-build.log
 
+      - name: agent-core tests
+        run: |
+          set -euo pipefail
+          npm run test --workspace=@a5c-ai/agent-core 2>&1 | tee artifacts/test-logs/agent-core-tests.log
+
       - name: babysitter-harness tests
         run: |
           set -euo pipefail

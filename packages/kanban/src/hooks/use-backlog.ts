@@ -1,6 +1,14 @@
 "use client";
 
-import type { KanbanBacklogSnapshot } from "../../../agent-mux/core/src/kanban.js";
+import { useState } from "react";
+
+import { resilientFetch } from "@/lib/fetcher";
+
+import type {
+  KanbanBacklogSnapshot,
+  KanbanBoardSnapshot,
+  KanbanWorkflowState,
+} from "../../../agent-mux/core/src/kanban.js";
 
 import { useSmartPolling } from "./use-smart-polling";
 
@@ -17,10 +25,12 @@ export interface BacklogOverviewSummary {
 
 export interface BacklogOverviewResponse {
   snapshot: KanbanBacklogSnapshot;
+  board: KanbanBoardSnapshot;
   summary: BacklogOverviewSummary;
 }
 
 export function useBacklog(interval = 15000) {
+  const [movingIssueId, setMovingIssueId] = useState<string | null>(null);
   const { data, loading, error, refresh } = useSmartPolling<BacklogOverviewResponse>(
     "/api/backlog",
     {
@@ -29,11 +39,33 @@ export function useBacklog(interval = 15000) {
     },
   );
 
+  async function moveIssue(issueId: string, toState: KanbanWorkflowState): Promise<void> {
+    setMovingIssueId(issueId);
+    try {
+      const result = await resilientFetch<BacklogOverviewResponse>("/api/backlog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "move-issue", issueId, toState }),
+      });
+
+      if (!result.ok) {
+        throw new Error(result.error.message);
+      }
+
+      await refresh();
+    } finally {
+      setMovingIssueId(null);
+    }
+  }
+
   return {
     snapshot: data?.snapshot,
+    board: data?.board,
     summary: data?.summary,
     loading,
     error,
     refresh,
+    moveIssue,
+    movingIssueId,
   };
 }

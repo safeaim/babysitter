@@ -8,6 +8,10 @@ export type KanbanIssueStatus =
   | 'review'
   | 'done';
 
+export type KanbanWorkflowState = 'todo' | 'in-progress' | 'review' | 'done';
+
+export type KanbanSwimlaneId = 'expedite' | 'standard' | 'blocked';
+
 export type KanbanDispatchReadiness =
   | 'needs-decomposition'
   | 'ready'
@@ -142,12 +146,146 @@ export interface KanbanBacklogSnapshot {
   readonly issues: readonly KanbanIssue[];
 }
 
+export interface KanbanBoardPolicyHook {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly scope: 'board' | 'column' | 'card';
+  readonly blocking: boolean;
+  readonly columnIds?: readonly KanbanWorkflowState[];
+}
+
+export interface KanbanBoardPolicySignal {
+  readonly hookId: string;
+  readonly severity: 'info' | 'warning' | 'error';
+  readonly message: string;
+  readonly blocking: boolean;
+}
+
+export interface KanbanBoardMoveTarget {
+  readonly state: KanbanWorkflowState;
+  readonly allowed: boolean;
+  readonly signals: readonly KanbanBoardPolicySignal[];
+}
+
+export interface KanbanBoardCard {
+  readonly issueId: string;
+  readonly issueKey: string;
+  readonly projectId: string;
+  readonly title: string;
+  readonly summary?: string;
+  readonly workflowState: KanbanWorkflowState;
+  readonly swimlaneId: KanbanSwimlaneId;
+  readonly priority: KanbanPriority;
+  readonly readiness: KanbanDispatchReadiness;
+  readonly blocked: boolean;
+  readonly blockedReasons: readonly string[];
+  readonly labelNames: readonly string[];
+  readonly assigneeNames: readonly string[];
+  readonly dependencyCount: number;
+  readonly childCount: number;
+  readonly acceptanceProgress: {
+    readonly satisfied: number;
+    readonly total: number;
+  };
+  readonly moveTargets: readonly KanbanBoardMoveTarget[];
+  readonly policySignals: readonly KanbanBoardPolicySignal[];
+}
+
+export interface KanbanBoardColumn {
+  readonly id: KanbanWorkflowState;
+  readonly name: string;
+  readonly issueIds: readonly string[];
+  readonly issueCount: number;
+  readonly wipLimit?: number;
+  readonly isOverLimit: boolean;
+}
+
+export interface KanbanBoardSwimlane {
+  readonly id: KanbanSwimlaneId;
+  readonly name: string;
+  readonly issueIds: readonly string[];
+}
+
+export interface KanbanProjectBoard {
+  readonly projectId: string;
+  readonly projectKey: string;
+  readonly projectName: string;
+  readonly generatedAt: string;
+  readonly columns: readonly KanbanBoardColumn[];
+  readonly swimlanes: readonly KanbanBoardSwimlane[];
+  readonly cards: readonly KanbanBoardCard[];
+  readonly policyHooks: readonly KanbanBoardPolicyHook[];
+}
+
+export interface KanbanBoardSnapshot {
+  readonly generatedAt: string;
+  readonly projects: readonly KanbanProjectBoard[];
+}
+
+export interface KanbanIssueMoveEvaluation {
+  readonly issueId: string;
+  readonly fromState: KanbanWorkflowState;
+  readonly toState: KanbanWorkflowState;
+  readonly allowed: boolean;
+  readonly nextStatus?: KanbanIssueStatus;
+  readonly signals: readonly KanbanBoardPolicySignal[];
+}
+
 const DEFAULT_PROJECT_STATUSES: readonly KanbanStatusDefinition[] = [
   { id: 'backlog', name: 'Backlog', kind: 'backlog' },
   { id: 'ready', name: 'Ready', kind: 'backlog' },
   { id: 'in-progress', name: 'In Progress', kind: 'active', wipLimit: 3 },
   { id: 'review', name: 'Review', kind: 'active', wipLimit: 3 },
   { id: 'done', name: 'Done', kind: 'done' },
+];
+
+const WORKFLOW_STATE_ORDER: readonly KanbanWorkflowState[] = [
+  'todo',
+  'in-progress',
+  'review',
+  'done',
+];
+
+const DEFAULT_SWIMLANES: readonly Omit<KanbanBoardSwimlane, 'issueIds'>[] = [
+  { id: 'expedite', name: 'Expedite' },
+  { id: 'standard', name: 'Standard' },
+  { id: 'blocked', name: 'Blocked' },
+];
+
+const DEFAULT_BOARD_POLICY_HOOKS: readonly KanbanBoardPolicyHook[] = [
+  {
+    id: 'dispatch-ready',
+    name: 'Dispatch readiness gate',
+    description: 'Only ready issues can move from todo into active work.',
+    scope: 'card',
+    blocking: true,
+    columnIds: ['in-progress'],
+  },
+  {
+    id: 'wip-limit',
+    name: 'WIP limit',
+    description: 'Active workflow columns enforce configured work-in-progress limits.',
+    scope: 'column',
+    blocking: true,
+    columnIds: ['in-progress', 'review'],
+  },
+  {
+    id: 'blocked-flow',
+    name: 'Blocked flow gate',
+    description: 'Blocked issues cannot advance into review or done.',
+    scope: 'card',
+    blocking: true,
+    columnIds: ['review', 'done'],
+  },
+  {
+    id: 'acceptance-complete',
+    name: 'Acceptance completion gate',
+    description: 'Issues can only move to done after every acceptance criterion is satisfied.',
+    scope: 'card',
+    blocking: true,
+    columnIds: ['done'],
+  },
 ];
 
 function uniqueById<T extends { readonly id: string }>(items: readonly T[]): T[] {
@@ -159,6 +297,71 @@ function uniqueById<T extends { readonly id: string }>(items: readonly T[]): T[]
     normalized.push(item);
   }
   return normalized;
+}
+
+function uniqueStrings(values: readonly string[]): string[] {
+  return Array.from(new Set(values));
+}
+
+function getColumnName(state: KanbanWorkflowState): string {
+  switch (state) {
+    case 'todo':
+      return 'Todo';
+    case 'in-progress':
+      return 'In Progress';
+    case 'review':
+      return 'Review';
+    case 'done':
+      return 'Done';
+  }
+}
+
+function getColumnWipLimit(
+  project: KanbanProject,
+  state: KanbanWorkflowState,
+): number | undefined {
+  if (state === 'todo' || state === 'done') {
+    return undefined;
+  }
+
+  return project.statuses.find((status) => status.id === state)?.wipLimit;
+}
+
+function getAllowedMoveStates(currentState: KanbanWorkflowState): readonly KanbanWorkflowState[] {
+  switch (currentState) {
+    case 'todo':
+      return ['in-progress'];
+    case 'in-progress':
+      return ['todo', 'review'];
+    case 'review':
+      return ['in-progress', 'done'];
+    case 'done':
+      return ['review'];
+  }
+}
+
+function acceptanceProgress(issue: KanbanIssue): { satisfied: number; total: number } {
+  return {
+    satisfied: issue.acceptanceCriteria.filter((criterion) => criterion.satisfied).length,
+    total: issue.acceptanceCriteria.length,
+  };
+}
+
+function isBlockedIssue(issue: KanbanIssue): boolean {
+  return issue.status === 'blocked' || issue.dispatch.readiness === 'blocked';
+}
+
+function createPolicySignal(
+  hookId: KanbanBoardPolicySignal['hookId'],
+  message: string,
+  blocking = true,
+): KanbanBoardPolicySignal {
+  return {
+    hookId,
+    message,
+    blocking,
+    severity: blocking ? 'error' : 'warning',
+  };
 }
 
 function resolveReadiness(
@@ -241,6 +444,146 @@ export function normalizeKanbanIssue(
       sessionIds: Array.from(new Set(issue.dispatch?.sessionIds ?? [])),
       lastDispatchedAt: issue.dispatch?.lastDispatchedAt,
     },
+  };
+}
+
+export function resolveKanbanWorkflowState(issue: Pick<KanbanIssue, 'status'>): KanbanWorkflowState {
+  switch (issue.status) {
+    case 'in-progress':
+    case 'blocked':
+      return 'in-progress';
+    case 'review':
+      return 'review';
+    case 'done':
+      return 'done';
+    case 'backlog':
+    case 'ready':
+    default:
+      return 'todo';
+  }
+}
+
+export function resolveKanbanSwimlane(
+  issue: Pick<KanbanIssue, 'priority' | 'status' | 'dispatch'>,
+): KanbanSwimlaneId {
+  if (issue.status === 'blocked' || issue.dispatch.readiness === 'blocked') {
+    return 'blocked';
+  }
+
+  if (issue.priority === 'critical' || issue.priority === 'high') {
+    return 'expedite';
+  }
+
+  return 'standard';
+}
+
+export function resolveKanbanStatusForWorkflowState(
+  issue: Pick<KanbanIssue, 'status' | 'dispatch'>,
+  state: KanbanWorkflowState,
+): KanbanIssueStatus {
+  switch (state) {
+    case 'todo':
+      return issue.status === 'backlog' || issue.dispatch.readiness === 'needs-decomposition'
+        ? 'backlog'
+        : 'ready';
+    case 'in-progress':
+      return 'in-progress';
+    case 'review':
+      return 'review';
+    case 'done':
+      return 'done';
+  }
+}
+
+export function evaluateKanbanIssueMove(input: {
+  readonly project: KanbanProject;
+  readonly issues: readonly KanbanIssue[];
+  readonly issueId: string;
+  readonly toState: KanbanWorkflowState;
+}): KanbanIssueMoveEvaluation {
+  const issue = input.issues.find((candidate) => candidate.id === input.issueId);
+  if (!issue) {
+    return {
+      issueId: input.issueId,
+      fromState: 'todo',
+      toState: input.toState,
+      allowed: false,
+      signals: [createPolicySignal('dispatch-ready', `Issue ${input.issueId} does not exist.`)],
+    };
+  }
+
+  const fromState = resolveKanbanWorkflowState(issue);
+  const allowedStates = getAllowedMoveStates(fromState);
+  const signals: KanbanBoardPolicySignal[] = [];
+
+  if (!allowedStates.includes(input.toState)) {
+    signals.push(
+      createPolicySignal(
+        'dispatch-ready',
+        `Cannot move ${issue.key} from ${fromState} to ${input.toState}.`,
+      ),
+    );
+  }
+
+  if (input.toState === 'in-progress') {
+    if (issue.dispatch.readiness !== 'ready' && issue.dispatch.readiness !== 'dispatched') {
+      signals.push(
+        createPolicySignal(
+          'dispatch-ready',
+          `${issue.key} is ${issue.dispatch.readiness} and cannot start active work yet.`,
+        ),
+      );
+    }
+  }
+
+  if ((input.toState === 'review' || input.toState === 'done') && isBlockedIssue(issue)) {
+    signals.push(
+      createPolicySignal(
+        'blocked-flow',
+        `${issue.key} is blocked and cannot advance until the blocking reasons clear.`,
+      ),
+    );
+  }
+
+  if (input.toState === 'done') {
+    const progress = acceptanceProgress(issue);
+    if (progress.total > 0 && progress.satisfied < progress.total) {
+      signals.push(
+        createPolicySignal(
+          'acceptance-complete',
+          `${issue.key} has ${progress.total - progress.satisfied} acceptance checks remaining.`,
+        ),
+      );
+    }
+  }
+
+  const wipLimit = getColumnWipLimit(input.project, input.toState);
+  if (typeof wipLimit === 'number') {
+    const targetCount = input.issues.filter(
+      (candidate) =>
+        candidate.projectId === input.project.id &&
+        candidate.id !== issue.id &&
+        resolveKanbanWorkflowState(candidate) === input.toState,
+    ).length;
+    if (targetCount + 1 > wipLimit) {
+      signals.push(
+        createPolicySignal(
+          'wip-limit',
+          `${getColumnName(input.toState)} would exceed its WIP limit of ${wipLimit}.`,
+        ),
+      );
+    }
+  }
+
+  return {
+    issueId: issue.id,
+    fromState,
+    toState: input.toState,
+    allowed: signals.every((signal) => !signal.blocking),
+    nextStatus: signals.every((signal) => !signal.blocking)
+      ? resolveKanbanStatusForWorkflowState(issue, input.toState)
+      : undefined,
+    signals,
   };
 }
 
@@ -337,5 +680,130 @@ export function buildKanbanBacklogSnapshot(input: {
     generatedAt: input.generatedAt ?? new Date().toISOString(),
     projects,
     issues: normalizedIssues,
+  };
+}
+
+export function buildKanbanProjectBoard(input: {
+  readonly generatedAt?: string;
+  readonly project: KanbanProject;
+  readonly issues: readonly KanbanIssue[];
+}): KanbanProjectBoard {
+  const projectIssues = input.issues.filter((issue) => issue.projectId === input.project.id);
+  const cards: KanbanBoardCard[] = projectIssues.map((issue) => {
+    const workflowState = resolveKanbanWorkflowState(issue);
+    const swimlaneId = resolveKanbanSwimlane(issue);
+    const signals: KanbanBoardPolicySignal[] = [];
+    const progress = acceptanceProgress(issue);
+
+    if (isBlockedIssue(issue)) {
+      for (const reason of issue.dispatch.blockedReasons) {
+        signals.push(createPolicySignal('blocked-flow', reason, false));
+      }
+    }
+
+    if (issue.dispatch.readiness === 'needs-decomposition') {
+      signals.push(
+        createPolicySignal(
+          'dispatch-ready',
+          `${issue.key} still needs decomposition before it can be dispatched.`,
+          false,
+        ),
+      );
+    }
+
+    const currentLimit = getColumnWipLimit(input.project, workflowState);
+    if (typeof currentLimit === 'number') {
+      const currentCount = projectIssues.filter(
+        (candidate) => resolveKanbanWorkflowState(candidate) === workflowState,
+      ).length;
+      if (currentCount > currentLimit) {
+        signals.push(
+          createPolicySignal(
+            'wip-limit',
+            `${getColumnName(workflowState)} is over its WIP limit (${currentCount}/${currentLimit}).`,
+            false,
+          ),
+        );
+      }
+    }
+
+    return {
+      issueId: issue.id,
+      issueKey: issue.key,
+      projectId: issue.projectId,
+      title: issue.title,
+      summary: issue.summary,
+      workflowState,
+      swimlaneId,
+      priority: issue.priority,
+      readiness: issue.dispatch.readiness,
+      blocked: isBlockedIssue(issue),
+      blockedReasons: issue.dispatch.blockedReasons,
+      labelNames: uniqueStrings(issue.labels.map((label) => label.name)),
+      assigneeNames: uniqueStrings(issue.assignees.map((assignee) => assignee.displayName)),
+      dependencyCount: issue.dependencies.length,
+      childCount: issue.childIssueIds.length,
+      acceptanceProgress: progress,
+      moveTargets: getAllowedMoveStates(workflowState).map((state) => {
+        const evaluation = evaluateKanbanIssueMove({
+          project: input.project,
+          issues: projectIssues,
+          issueId: issue.id,
+          toState: state,
+        });
+        return {
+          state,
+          allowed: evaluation.allowed,
+          signals: evaluation.signals,
+        };
+      }),
+      policySignals: signals,
+    };
+  });
+
+  const columns = WORKFLOW_STATE_ORDER.map((state) => {
+    const issueIds = cards
+      .filter((card) => card.workflowState === state)
+      .map((card) => card.issueId);
+    const wipLimit = getColumnWipLimit(input.project, state);
+    return {
+      id: state,
+      name: getColumnName(state),
+      issueIds,
+      issueCount: issueIds.length,
+      wipLimit,
+      isOverLimit: typeof wipLimit === 'number' ? issueIds.length > wipLimit : false,
+    };
+  });
+
+  const swimlanes = DEFAULT_SWIMLANES.map((swimlane) => ({
+    ...swimlane,
+    issueIds: cards
+      .filter((card) => card.swimlaneId === swimlane.id)
+      .map((card) => card.issueId),
+  }));
+
+  return {
+    projectId: input.project.id,
+    projectKey: input.project.key,
+    projectName: input.project.name,
+    generatedAt: input.generatedAt ?? new Date().toISOString(),
+    columns,
+    swimlanes,
+    cards,
+    policyHooks: DEFAULT_BOARD_POLICY_HOOKS,
+  };
+}
+
+export function buildKanbanBoardSnapshot(snapshot: KanbanBacklogSnapshot): KanbanBoardSnapshot {
+  return {
+    generatedAt: snapshot.generatedAt,
+    projects: snapshot.projects.map((project) =>
+      buildKanbanProjectBoard({
+        generatedAt: snapshot.generatedAt,
+        project,
+        issues: snapshot.issues,
+      }),
+    ),
   };
 }

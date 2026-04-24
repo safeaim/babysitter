@@ -67,6 +67,72 @@ const mockBacklogOverview = {
       },
     ],
   },
+  board: {
+    generatedAt: new Date().toISOString(),
+    projects: [
+      {
+        projectId: 'kanban-app',
+        projectKey: 'KANBAN',
+        projectName: 'Kanban App',
+        generatedAt: new Date().toISOString(),
+        columns: [
+          { id: 'todo', name: 'Todo', issueIds: ['KANBAN-GAP-001'], issueCount: 1, isOverLimit: false },
+          { id: 'in-progress', name: 'In Progress', issueIds: [], issueCount: 0, wipLimit: 3, isOverLimit: false },
+          { id: 'review', name: 'Review', issueIds: [], issueCount: 0, wipLimit: 3, isOverLimit: false },
+          { id: 'done', name: 'Done', issueIds: [], issueCount: 0, isOverLimit: false },
+        ],
+        swimlanes: [
+          { id: 'expedite', name: 'Expedite', issueIds: [] },
+          { id: 'standard', name: 'Standard', issueIds: ['KANBAN-GAP-001'] },
+          { id: 'blocked', name: 'Blocked', issueIds: [] },
+        ],
+        cards: [
+          {
+            issueId: 'KANBAN-GAP-001',
+            issueKey: 'KANBAN-GAP-001',
+            projectId: 'kanban-app',
+            title: 'Add a first-class issue and project model to the kanban app',
+            workflowState: 'todo',
+            swimlaneId: 'standard',
+            priority: 'high',
+            readiness: 'needs-decomposition',
+            blocked: false,
+            blockedReasons: [],
+            labelNames: [],
+            assigneeNames: [],
+            dependencyCount: 0,
+            childCount: 0,
+            acceptanceProgress: { satisfied: 0, total: 0 },
+            moveTargets: [
+              {
+                state: 'in-progress',
+                allowed: false,
+                signals: [
+                  {
+                    hookId: 'dispatch-ready',
+                    severity: 'error',
+                    message: 'KANBAN-GAP-001 is needs-decomposition and cannot start active work yet.',
+                    blocking: true,
+                  },
+                ],
+              },
+            ],
+            policySignals: [],
+          },
+        ],
+        policyHooks: [
+          {
+            id: 'dispatch-ready',
+            name: 'Dispatch readiness gate',
+            description: 'Only ready issues can move from todo into active work.',
+            scope: 'card',
+            blocking: true,
+            columnIds: ['in-progress'],
+          },
+        ],
+      },
+    ],
+  },
   summary: {
     projectCount: 1,
     issueCount: 1,

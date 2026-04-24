@@ -57,9 +57,10 @@ export default function DashboardPage() {
               Babysitter run board with agent-mux session controls
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-foreground-muted">
-              The board below is Babysitter-native observability. Session creation, conversation, and
-              hook approvals live alongside it through agent-mux, so the package stays thin and mostly
-              wraps the existing integration layers instead of rebuilding them here.
+              The board below now combines a real kanban issue flow with Babysitter-native
+              observability. Session creation, conversation, and hook approvals still live alongside
+              it through agent-mux, so the package stays thin while the shared integration layers own
+              the board semantics.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Button asChild variant="primary">

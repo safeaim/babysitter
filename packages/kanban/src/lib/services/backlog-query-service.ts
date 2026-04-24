@@ -3,13 +3,18 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
+  buildKanbanBoardSnapshot,
   buildKanbanBacklogSnapshot,
+  evaluateKanbanIssueMove,
+  type KanbanBoardSnapshot,
   type KanbanBacklogSnapshot,
   type KanbanIssue,
   type KanbanProject,
+  type KanbanWorkflowState,
   type LinkedRunSummary,
 } from '../../../../agent-mux/core/src/kanban.js';
 
+import { AppError } from '../error-handler';
 import { RunQueryService } from './run-query-service';
 
 const BACKLOG_FILE_PATH =
@@ -31,6 +36,7 @@ export interface BacklogOverviewSummary {
 
 export interface BacklogOverview {
   snapshot: KanbanBacklogSnapshot;
+  board: KanbanBoardSnapshot;
   summary: BacklogOverviewSummary;
 }
 
@@ -228,13 +234,55 @@ const defaultIssues: readonly BacklogSeedIssue[] = [
     title: 'Add actual kanban board mechanics',
     summary:
       'Introduce board columns, issue movement semantics, and policies instead of a pure observability dashboard.',
+    description:
+      'The dashboard should become a real issue board with shared kanban primitives, workflow state transitions, WIP limits, swimlanes, and policy hooks instead of a UI-only observability model.',
     status: 'backlog',
     priority: 'medium',
     labels: [debtLabel],
     assignees: [],
     dependencies: [{ issueId: 'KANBAN-GAP-001', type: 'blocked-by' }],
-    acceptanceCriteria: [],
-    decomposition: [],
+    acceptanceCriteria: [
+      {
+        id: 'KANBAN-GAP-002-ac-1',
+        title: 'Expose shared board columns and card movement semantics.',
+        satisfied: false,
+      },
+      {
+        id: 'KANBAN-GAP-002-ac-2',
+        title: 'Support todo, in-progress, review, and done workflow transitions.',
+        satisfied: false,
+      },
+      {
+        id: 'KANBAN-GAP-002-ac-3',
+        title: 'Show WIP limits, swimlanes, and policy hooks on the board.',
+        satisfied: false,
+      },
+      {
+        id: 'KANBAN-GAP-002-ac-4',
+        title: 'Anchor board state in shared primitives instead of a local UI model.',
+        satisfied: false,
+      },
+    ],
+    decomposition: [
+      {
+        id: 'KANBAN-GAP-002-decomp-1',
+        title: 'Add shared board primitives in agent-mux core.',
+        kind: 'implementation',
+        status: 'ready',
+      },
+      {
+        id: 'KANBAN-GAP-002-decomp-2',
+        title: 'Persist workflow moves through the backlog service.',
+        kind: 'implementation',
+        status: 'ready',
+      },
+      {
+        id: 'KANBAN-GAP-002-decomp-3',
+        title: 'Render the dashboard as a real board with policy feedback.',
+        kind: 'validation',
+        status: 'ready',
+      },
+    ],
     childIssueIds: [],
     createdAt: '2026-04-24T00:00:00.000Z',
     updatedAt: '2026-04-24T00:00:00.000Z',
@@ -332,9 +380,25 @@ interface BacklogFilePayload {
   issues?: readonly BacklogSeedIssue[];
 }
 
-async function readBacklogFile(): Promise<BacklogFilePayload | null> {
+interface BacklogQueryServiceDeps {
+  runQueryService: Pick<RunQueryService, 'listProjects'>;
+  readFile: typeof fs.readFile;
+  writeFile: typeof fs.writeFile;
+  backlogFilePath: string;
+  now: () => string;
+}
+
+const defaultDeps: BacklogQueryServiceDeps = {
+  runQueryService: new RunQueryService(),
+  readFile: fs.readFile,
+  writeFile: fs.writeFile,
+  backlogFilePath: BACKLOG_FILE_PATH,
+  now: () => new Date().toISOString(),
+};
+
+async function readBacklogFile(deps: BacklogQueryServiceDeps): Promise<BacklogFilePayload | null> {
   try {
-    const raw = await fs.readFile(BACKLOG_FILE_PATH, 'utf8');
+    const raw = await deps.readFile(deps.backlogFilePath, 'utf8');
     return JSON.parse(raw) as BacklogFilePayload;
   } catch (error) {
     const errno = error as NodeJS.ErrnoException;
@@ -343,6 +407,13 @@ async function readBacklogFile(): Promise<BacklogFilePayload | null> {
     }
     throw error;
   }
+}
+
+async function writeBacklogFile(
+  deps: BacklogQueryServiceDeps,
+  payload: BacklogFilePayload,
+): Promise<void> {
+  await deps.writeFile(deps.backlogFilePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 }
 
 function buildSummary(snapshot: KanbanBacklogSnapshot): BacklogOverviewSummary {
@@ -387,20 +458,46 @@ function attachRunSummaries(
   };
 }
 
+function buildHydratedOverview(input: {
+  readonly generatedAt?: string;
+  readonly projects: readonly BacklogSeedProject[];
+  readonly issues: readonly BacklogSeedIssue[];
+  readonly runSummaries: readonly LinkedRunSummary[];
+}): BacklogOverview {
+  const snapshot = buildKanbanBacklogSnapshot({
+    generatedAt: input.generatedAt,
+    projects: input.projects,
+    issues: input.issues,
+  });
+  const hydratedSnapshot = attachRunSummaries(snapshot, input.runSummaries);
+  return {
+    snapshot: hydratedSnapshot,
+    board: buildKanbanBoardSnapshot(hydratedSnapshot),
+    summary: buildSummary(hydratedSnapshot),
+  };
+}
+
 export class BacklogQueryService {
-  constructor(private readonly runQueryService = new RunQueryService()) {}
+  private readonly deps: BacklogQueryServiceDeps;
 
-  async getOverview(): Promise<BacklogOverview> {
-    const backlogFile = await readBacklogFile();
-    const seedProjects = backlogFile?.projects?.length ? backlogFile.projects : defaultProjects;
-    const seedIssues = backlogFile?.issues?.length ? backlogFile.issues : defaultIssues;
-    const snapshot = buildKanbanBacklogSnapshot({
-      projects: seedProjects,
-      issues: seedIssues,
-    });
+  constructor(overrides: Partial<BacklogQueryServiceDeps> = {}) {
+    this.deps = { ...defaultDeps, ...overrides };
+  }
 
-    const runProjects = await this.runQueryService.listProjects();
-    const linkedRunSummaries: LinkedRunSummary[] = runProjects.projects.map((project) => ({
+  private async readSeedPayload(): Promise<{
+    projects: readonly BacklogSeedProject[];
+    issues: readonly BacklogSeedIssue[];
+  }> {
+    const backlogFile = await readBacklogFile(this.deps);
+    return {
+      projects: backlogFile?.projects?.length ? backlogFile.projects : defaultProjects,
+      issues: backlogFile?.issues?.length ? backlogFile.issues : defaultIssues,
+    };
+  }
+
+  private async listRunSummaries(): Promise<LinkedRunSummary[]> {
+    const runProjects = await this.deps.runQueryService.listProjects();
+    return runProjects.projects.map((project) => ({
       projectName: project.projectName,
       totalRuns: project.totalRuns,
       activeRuns: project.activeRuns,
@@ -409,12 +506,75 @@ export class BacklogQueryService {
       staleRuns: project.staleRuns,
       latestUpdate: project.latestUpdate,
     }));
+  }
 
-    const hydratedSnapshot = attachRunSummaries(snapshot, linkedRunSummaries);
+  async getOverview(): Promise<BacklogOverview> {
+    const { projects, issues } = await this.readSeedPayload();
+    return buildHydratedOverview({
+      projects,
+      issues,
+      runSummaries: await this.listRunSummaries(),
+      generatedAt: this.deps.now(),
+    });
+  }
 
-    return {
-      snapshot: hydratedSnapshot,
-      summary: buildSummary(hydratedSnapshot),
-    };
+  async moveIssue(input: {
+    readonly issueId: string;
+    readonly toState: KanbanWorkflowState;
+  }): Promise<BacklogOverview> {
+    const payload = await this.readSeedPayload();
+    const overview = buildHydratedOverview({
+      projects: payload.projects,
+      issues: payload.issues,
+      runSummaries: await this.listRunSummaries(),
+      generatedAt: this.deps.now(),
+    });
+
+    const issue = overview.snapshot.issues.find((candidate) => candidate.id === input.issueId);
+    if (!issue) {
+      throw new AppError(`Issue ${input.issueId} not found.`, 'NOT_FOUND', 404);
+    }
+
+    const project = overview.snapshot.projects.find((candidate) => candidate.id === issue.projectId);
+    if (!project) {
+      throw new AppError(`Project ${issue.projectId} not found.`, 'NOT_FOUND', 404);
+    }
+
+    const evaluation = evaluateKanbanIssueMove({
+      project,
+      issues: overview.snapshot.issues.filter((candidate) => candidate.projectId === project.id),
+      issueId: issue.id,
+      toState: input.toState,
+    });
+
+    if (!evaluation.allowed || !evaluation.nextStatus) {
+      throw new AppError(
+        evaluation.signals.map((signal) => signal.message).join(' '),
+        'KANBAN_POLICY_VIOLATION',
+        409,
+      );
+    }
+
+    const nextIssues = payload.issues.map((candidate) =>
+      candidate.id === input.issueId
+        ? {
+            ...candidate,
+            status: evaluation.nextStatus,
+            updatedAt: this.deps.now(),
+          }
+        : candidate,
+    );
+
+    await writeBacklogFile(this.deps, {
+      projects: payload.projects,
+      issues: nextIssues,
+    });
+
+    return buildHydratedOverview({
+      projects: payload.projects,
+      issues: nextIssues,
+      runSummaries: await this.listRunSummaries(),
+      generatedAt: this.deps.now(),
+    });
   }
 }

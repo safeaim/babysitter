@@ -260,6 +260,8 @@ export type {
 export type {
   KanbanPriority,
   KanbanIssueStatus,
+  KanbanWorkflowState,
+  KanbanSwimlaneId,
   KanbanDispatchReadiness,
   KanbanDependencyType,
   KanbanDecompositionStatus,
@@ -277,11 +279,26 @@ export type {
   LinkedRunSummary,
   KanbanProject,
   KanbanBacklogSnapshot,
+  KanbanBoardPolicyHook,
+  KanbanBoardPolicySignal,
+  KanbanBoardMoveTarget,
+  KanbanBoardCard,
+  KanbanBoardColumn,
+  KanbanBoardSwimlane,
+  KanbanProjectBoard,
+  KanbanBoardSnapshot,
+  KanbanIssueMoveEvaluation,
 } from './kanban.js';
 export {
   normalizeKanbanIssue,
+  resolveKanbanWorkflowState,
+  resolveKanbanSwimlane,
+  resolveKanbanStatusForWorkflowState,
+  evaluateKanbanIssueMove,
   computeKanbanProjectMetrics,
   buildKanbanBacklogSnapshot,
+  buildKanbanProjectBoard,
+  buildKanbanBoardSnapshot,
 } from './kanban.js';
 
 // Auth types (canonical from dedicated module)

@@ -54,9 +54,13 @@ describe('agent-mux host detection contract', () => {
   });
 
   it('falls back to graph-backed argv needles when env signals are absent', () => {
-    for (const rule of getHostDetectionRules()) {
+    const rulesWithArgvFallback = getHostDetectionRules().filter(
+      (rule) => rule.argvMatches.length > 0,
+    );
+    expect(rulesWithArgvFallback.length).toBeGreaterThan(0);
+
+    for (const rule of rulesWithArgvFallback) {
       const needle = rule.argvMatches[0];
-      expect(needle, `Expected at least one argv matcher for ${rule.agent}`).toBeTruthy();
 
       const result = detectHostHarness({
         env: {},

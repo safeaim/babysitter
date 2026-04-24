@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import type { AutomationRuleLifecycleState } from "../../../../../agent-mux/core/src/automation.js";
+import type { AutomationRuleLifecycleState } from "@a5c-ai/agent-mux-core";
 
 import { AppError, normalizeError } from "@/lib/error-handler";
 import { ensureInitialized } from "@/lib/server-init";

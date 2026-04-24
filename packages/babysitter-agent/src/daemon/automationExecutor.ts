@@ -10,33 +10,74 @@ import { randomUUID } from "node:crypto";
 import type {
   AutomationExecutionRecord,
   AutomationRule,
-} from "@a5c-ai/agent-mux-core";
-import type {
   KanbanAcceptanceCriterion,
   KanbanAssignee,
+  KanbanDependencyType,
   KanbanDecompositionItem,
   KanbanIssue,
+  KanbanIssueStatus,
   KanbanIssueSource,
   KanbanLabel,
+  KanbanPriority,
   KanbanProject,
-} from "@a5c-ai/agent-mux-core/kanban";
+} from "@a5c-ai/agent-mux-core";
 
 import type { AutomationTriggerEvent } from "./types";
 
 const DEFAULT_BACKLOG_FILE_PATH = process.env.KANBAN_BACKLOG_FILE
   ?? path.join(os.homedir(), ".a5c", "kanban-backlog.json");
 
-type StoredKanbanIssue = Omit<KanbanIssue, "dispatch"> & {
+type StoredKanbanIssue = Pick<
+  KanbanIssue,
+  | "id"
+  | "projectId"
+  | "key"
+  | "title"
+  | "summary"
+  | "description"
+  | "createdAt"
+  | "updatedAt"
+  | "source"
+> & {
+  readonly status: KanbanIssueStatus;
+  readonly priority: KanbanPriority;
+  readonly labels: readonly KanbanLabel[];
+  readonly assignees: readonly KanbanAssignee[];
+  readonly dependencies: ReadonlyArray<{
+    readonly issueId: string;
+    readonly type: KanbanDependencyType;
+  }>;
+  readonly acceptanceCriteria: readonly KanbanAcceptanceCriterion[];
+  readonly decomposition: readonly KanbanDecompositionItem[];
+  readonly childIssueIds: readonly string[];
   readonly dispatch?: Partial<KanbanIssue["dispatch"]>;
 };
 
-type StoredKanbanProject = Omit<KanbanProject, "metrics">;
+type StoredKanbanProject = Pick<
+  KanbanProject,
+  | "id"
+  | "key"
+  | "name"
+  | "description"
+  | "issueIds"
+  | "labels"
+  | "assignees"
+> & {
+  readonly statuses?: KanbanProject["statuses"];
+  readonly repositories?: KanbanProject["repositories"];
+  readonly linkedRunProjectName?: string;
+};
+
+type StoredAutomationExecutionRecord = Omit<AutomationExecutionRecord, "status" | "reason"> & {
+  readonly status: AutomationExecutionRecord["status"] | "skipped";
+  readonly skipReason?: string;
+};
 
 interface AutomationStoragePayload {
   projects?: readonly StoredKanbanProject[];
   issues?: readonly StoredKanbanIssue[];
   automationRules?: readonly AutomationRule[];
-  automationExecutions?: readonly AutomationExecutionRecord[];
+  automationExecutions?: readonly StoredAutomationExecutionRecord[];
 }
 
 export interface ExecuteAutomationTriggerOptions {
@@ -201,11 +242,11 @@ function createExecutionRecord(
   event: AutomationTriggerEvent,
   now: string,
   overrides: {
-    status: AutomationExecutionRecord["status"];
+    status: StoredAutomationExecutionRecord["status"];
     issue?: Pick<StoredKanbanIssue, "id" | "key" | "source">;
     skipReason?: string;
   },
-): AutomationExecutionRecord {
+): StoredAutomationExecutionRecord {
   return {
     id: `automation-exec-${randomUUID().toLowerCase()}`,
     ruleId: rule.id,
@@ -233,7 +274,7 @@ function createExecutionRecord(
 export async function executeAutomationTrigger(
   event: AutomationTriggerEvent,
   options: ExecuteAutomationTriggerOptions = {},
-): Promise<AutomationExecutionRecord> {
+): Promise<StoredAutomationExecutionRecord> {
   const backlogFilePath = options.backlogFilePath ?? DEFAULT_BACKLOG_FILE_PATH;
   const now = options.now?.() ?? new Date().toISOString();
   const storage = await readAutomationStorage(backlogFilePath);

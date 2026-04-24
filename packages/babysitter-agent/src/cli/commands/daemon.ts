@@ -134,11 +134,11 @@ export async function handleDaemonRun(args: {
   await runDaemonLoop(config, {
     signal: ac.signal,
     logDir: daemonDir,
-    onTrigger: (trigger) => {
+    onTrigger: async (trigger) => {
       if (!isAutomationTriggerEvent(trigger)) {
-        return undefined;
+        return;
       }
-      return executeAutomationTrigger(trigger);
+      await executeAutomationTrigger(trigger);
     },
   });
 

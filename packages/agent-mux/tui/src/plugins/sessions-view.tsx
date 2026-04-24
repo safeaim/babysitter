@@ -54,25 +54,26 @@ function SessionsView({ client, active, emit, activeSessions }: TuiViewProps) {
   }, [active, client, refreshTick]);
 
   useInput(
-    (_input, key) => {
+    (input, key) => {
+      const isSubmitKey = key.return || input === '\r' || input === '\n';
       if (sessions.length === 0) return;
       if (key.downArrow) setCursor((c) => Math.min(c + 1, sessions.length - 1));
       else if (key.upArrow) setCursor((c) => Math.max(c - 1, 0));
-      else if (key.return) {
+      else if (isSubmitKey) {
         const sel = sessions[cursor];
         if (!sel) return;
         emit({ type: 'session:select', agent: sel.agent, sessionId: sel.sessionId });
         emit({ type: 'view:switch', id: 'chat' });
-      } else if (_input === 'd') {
+      } else if (input === 'd') {
         const sel = sessions[cursor];
         if (!sel) return;
         emit({ type: 'session:detail', agent: sel.agent, sessionId: sel.sessionId });
         emit({ type: 'view:switch', id: 'session-detail' });
-      } else if (_input === 'D') {
+      } else if (input === 'D') {
         const sel = sessions[cursor];
         if (!sel) return;
         emit({ type: 'session:diff', agent: sel.agent, sessionId: sel.sessionId });
-      } else if (_input === 'R') {
+      } else if (input === 'R') {
         setRefreshTick((t) => t + 1);
       }
     },

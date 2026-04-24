@@ -76,8 +76,10 @@ function pickRenderers(renderers: EventRenderer[], ev: AgentEvent): EventRendere
 export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
   const { exit } = useApp();
   const [status, setStatus] = useState<string>('');
+  const [, setPluginLoadVersion] = useState(0);
   const [activeId, setActiveId] = useState<string>('chat');
   const [promptMode, setPromptMode] = useState<boolean>(false);
+  const [chatPromptDismissed, setChatPromptDismissed] = useState<boolean>(false);
   const [pendingResume, setPendingResume] = useState<
     { agent: string; sessionId: string } | null
   >(null);
@@ -171,7 +173,9 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
       },
       s,
     );
-    void loadPlugins(plugins, ctx);
+    void loadPlugins(plugins, ctx).then(() => {
+      setPluginLoadVersion((version) => version + 1);
+    });
     return { registry: r, stream: s };
   }, [client, plugins]);
 
@@ -262,6 +266,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
     if (
       active?.id === 'chat' &&
       !promptMode &&
+      !chatPromptDismissed &&
       !filterMode &&
       !paletteMode &&
       !modelPickerMode &&
@@ -270,10 +275,15 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
     ) {
       setPromptMode(true);
     }
-    if (active?.id !== 'chat' && promptMode) {
-      setPromptMode(false);
+    if (active?.id !== 'chat') {
+      if (promptMode) {
+        setPromptMode(false);
+      }
+      if (chatPromptDismissed) {
+        setChatPromptDismissed(false);
+      }
     }
-  }, [active?.id, filterMode, paletteMode, modelPickerMode, profilePickerMode, agentPickerMode, promptMode]);
+  }, [active?.id, chatPromptDismissed, filterMode, paletteMode, modelPickerMode, profilePickerMode, agentPickerMode, promptMode]);
   const ActiveView = active?.component;
 
   const viewEmit = (ev: Parameters<TuiViewProps['emit']>[0]) => {
@@ -300,7 +310,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
         stream.push({
           runId: 'transcript',
           agent,
-          timestamp: (m.timestamp ?? new Date()).toISOString(),
+          timestamp: new Date(m.timestamp ?? Date.now()).toISOString(),
           type: 'text_delta',
           delta: `[${m.role}] ${m.content}\n`,
         } as never);
@@ -362,6 +372,7 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
 
   async function handlePromptSubmit(prompt: string) {
     if (!prompt.trim()) return;
+    setChatPromptDismissed(false);
     setPromptHistory((h) => {
       const next = h.filter((p) => p !== prompt);
       next.push(prompt);
@@ -620,7 +631,12 @@ export function App({ client, plugins, defaultAgent = 'claude' }: AppProps) {
             label="> "
             labelColor={EXEC_MODE_COLORS[execMode]}
             onSubmit={handlePromptSubmit}
-            onCancel={() => setPromptMode(false)}
+            onCancel={() => {
+              setPromptMode(false);
+              if (active?.id === 'chat') {
+                setChatPromptDismissed(true);
+              }
+            }}
             onShiftTab={cycleExecMode}
             history={promptHistory}
           />

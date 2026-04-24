@@ -43,6 +43,7 @@ export function PromptInput({
   }
 
   useInput((input, key) => {
+    const isSubmitKey = key.return || input === '\r' || input === '\n';
     if (key.shift && key.tab && onShiftTab) {
       onShiftTab();
       return;
@@ -51,7 +52,7 @@ export function PromptInput({
       onCancel();
       return;
     }
-    if (key.return) {
+    if (isSubmitKey) {
       onSubmit(value);
       setValue('');
       setHistIdx(-1);

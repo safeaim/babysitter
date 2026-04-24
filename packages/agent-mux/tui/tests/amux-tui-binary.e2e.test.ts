@@ -1,0 +1,161 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as pty from 'node-pty';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function stripAnsi(value: string): string {
+  return value
+    .replace(/\u001B\][^\u0007]*(?:\u0007|\u001B\\)/g, '')
+    .replace(/\u001B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g, '')
+    .replace(/\r/g, '');
+}
+
+class PtyHarness {
+  private buffer = '';
+  private error: Error | null = null;
+  private readonly exitPromise: Promise<{ exitCode: number; signal: number }>;
+
+  constructor(private readonly proc: pty.IPty) {
+    proc.onData((chunk) => {
+      this.buffer += stripAnsi(chunk);
+    });
+    proc.on('error', (error: Error) => {
+      if (error.message.includes('EIO')) {
+        return;
+      }
+      this.error = error;
+    });
+    this.exitPromise = new Promise((resolve) => {
+      proc.onExit(({ exitCode, signal }) => {
+        resolve({ exitCode, signal });
+      });
+    });
+  }
+
+  text(): string {
+    return this.buffer;
+  }
+
+  checkpoint(): number {
+    return this.buffer.length;
+  }
+
+  write(value: string): void {
+    this.proc.write(value);
+  }
+
+  async pause(ms = 120): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async waitFor(fragment: string, timeoutMs = 10_000): Promise<void> {
+    await this.waitForSince(fragment, 0, timeoutMs);
+  }
+
+  async waitForSince(fragment: string, start: number, timeoutMs = 10_000): Promise<void> {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      if (this.error) {
+        throw this.error;
+      }
+      if (this.buffer.slice(start).includes(fragment)) {
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    throw new Error(`Timed out waiting for "${fragment}". Output:\n${this.buffer}`);
+  }
+
+  async close(): Promise<void> {
+    this.proc.write('\u001B');
+    await this.pause();
+    this.proc.write('q');
+    const result = await Promise.race([
+      this.exitPromise,
+      new Promise<{ exitCode: number; signal: number }>((resolve) =>
+        setTimeout(() => {
+          this.proc.kill();
+          resolve({ exitCode: -1, signal: 0 });
+        }, 5000),
+      ),
+    ]);
+    if (this.error) {
+      throw this.error;
+    }
+    expect(result.exitCode).toBe(0);
+  }
+}
+
+describe('real amux-tui binary e2e', () => {
+  const tempDirs: string[] = [];
+
+  afterEach(() => {
+    while (tempDirs.length > 0) {
+      const dir = tempDirs.pop();
+      if (dir) {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    }
+  });
+
+  it('loads external plugins and drives session detail, resume, and prompt dispatch through the real binary', async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'amux-tui-home-'));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'amux-tui-state-'));
+    tempDirs.push(homeDir, stateDir);
+
+    const pluginDir = path.resolve(__dirname, 'fixtures');
+    const binaryPath = path.resolve(__dirname, '../dist/bin/amux-tui.js');
+
+    const proc = pty.spawn(process.execPath, [binaryPath], {
+      name: 'xterm-color',
+      cols: 120,
+      rows: 40,
+      cwd: path.resolve(__dirname, '..'),
+      env: {
+        ...process.env,
+        HOME: homeDir,
+        AMUX_TUI_PLUGINS_DIR: pluginDir,
+        AMUX_TUI_E2E_STATE_DIR: stateDir,
+        FORCE_COLOR: '0',
+        NO_COLOR: '1',
+      },
+    });
+    const harness = new PtyHarness(proc);
+
+    await harness.waitFor('No messages yet.');
+
+    harness.write('\u001B');
+    await harness.pause();
+    harness.write('2');
+    await harness.waitFor('sess-alpha');
+    await harness.waitFor('sess-beta');
+    await harness.waitFor('>   tui-e2e sess-beta');
+
+    harness.write('d');
+    await harness.waitFor('sess-beta');
+    await harness.waitFor('turns: 2');
+
+    harness.write('e');
+    await harness.waitFor('Exported json');
+
+    const backCheckpoint = harness.checkpoint();
+    harness.write('b');
+    await harness.waitForSince('>   tui-e2e sess-beta', backCheckpoint);
+
+    const resumeCheckpoint = harness.checkpoint();
+    harness.write('\r');
+    await harness.waitForSince('[assistant] beta transcript', resumeCheckpoint);
+
+    harness.write('hello from binary e2e');
+    await harness.pause();
+    const promptCheckpoint = harness.checkpoint();
+    harness.write('\r');
+    await harness.waitForSince('reply:sess-beta:hello from binary e2e', promptCheckpoint);
+
+    await harness.close();
+  }, 30_000);
+});

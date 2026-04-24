@@ -2,8 +2,31 @@
 import React from 'react';
 import { render } from 'ink';
 import { createClient, registerBuiltInAdapters } from '@a5c-ai/agent-mux';
-import { App, builtinPlugins } from '../index.js';
+import { App, builtinPlugins, defaultExternalPluginsDir, loadExternalPlugins } from '../index.js';
 
-const client = createClient();
-registerBuiltInAdapters(client);
-render(<App client={client} plugins={builtinPlugins} />);
+function userPluginsDisabled(): boolean {
+  const value = process.env.AMUX_TUI_NO_USER_PLUGINS;
+  return value === '1' || value === 'true';
+}
+
+async function main() {
+  const client = createClient();
+  registerBuiltInAdapters(client);
+
+  const plugins = [...builtinPlugins];
+  if (!userPluginsDisabled()) {
+    try {
+      const external = await loadExternalPlugins(defaultExternalPluginsDir());
+      plugins.push(...external.plugins);
+      for (const error of external.errors) {
+        process.stderr.write(`amux-tui: failed to load plugin from ${error.source}: ${error.error}\n`);
+      }
+    } catch (error) {
+      process.stderr.write(`amux-tui: external plugin discovery failed: ${(error as Error).message}\n`);
+    }
+  }
+
+  render(<App client={client} plugins={plugins} />);
+}
+
+void main();

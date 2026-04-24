@@ -301,6 +301,17 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# Test 12: install/uninstall surface
+# ---------------------------------------------------------------------------
+echo ""
+echo "=== Test 12: Install/uninstall surface ==="
+if node "$PLUGIN_DIR/test/install-surface.test.js"; then
+  pass "normal install/uninstall materializes and cleans managed hook surface"
+else
+  fail "install/uninstall surface regression test failed"
+fi
+
+# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 echo ""

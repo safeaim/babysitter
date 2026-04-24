@@ -169,6 +169,32 @@ describe('e2e: sample plugin compilation', () => {
       expect(githubPluginJson.hooks).toBe('hooks.json');
     });
 
+    it('github-copilot: should emit managed hook install and cleanup in bin scripts', () => {
+      const result = compile({
+        source: SAMPLE_PLUGIN_DIR,
+        target: 'github-copilot',
+        output: path.join(tmpDir, 'github-install-surface-test'),
+      });
+
+      expect(result.status).not.toBe('error');
+
+      const installScript = fs.readFileSync(
+        path.join(result.outputDir, 'bin/install.js'),
+        'utf-8',
+      );
+      expect(installScript).toContain("typeof shared.registerCopilotPlugin === 'function'");
+      expect(installScript).toContain("typeof shared.installCopilotSurface === 'function'");
+      expect(installScript).toContain("typeof shared.warnWindowsHooks === 'function'");
+
+      const uninstallScript = fs.readFileSync(
+        path.join(result.outputDir, 'bin/uninstall.js'),
+        'utf-8',
+      );
+      expect(uninstallScript).toContain("typeof shared.deregisterCopilotPlugin === 'function'");
+      expect(uninstallScript).toContain("typeof shared.removeManagedHooks === 'function'");
+      expect(uninstallScript).toContain("typeof shared.removeMarketplaceEntry === 'function'");
+    });
+
     it('pi: should emit extensions with command registration', () => {
       const result = compile({
         source: SAMPLE_PLUGIN_DIR,

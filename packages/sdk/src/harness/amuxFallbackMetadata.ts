@@ -4,13 +4,6 @@ import type { AmuxAdapterMetadata } from "./amuxMetadata";
 const LEGACY_REPO_RUNS_DIR = ".a5c/runs";
 const DEFAULT_SESSION_DIR = resolveRunsDir();
 
-interface FallbackHarnessMetadata {
-  adapterName: string;
-  hostEnvSignals: readonly string[];
-  sessionDir: string;
-  capabilities: AmuxAdapterMetadata["capabilities"];
-}
-
 function resolveFallbackSessionDir(sessionDir: string): string {
   return sessionDir === LEGACY_REPO_RUNS_DIR
     ? resolveRunsDir()

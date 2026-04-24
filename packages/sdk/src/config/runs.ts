@@ -56,17 +56,20 @@ export function getRunsScope(): RunsScope {
 
 export function findRepoRoot(startDir = process.cwd()): string | undefined {
   let current = path.resolve(startDir);
-  while (true) {
+  let reachedRoot = false;
+  while (!reachedRoot) {
     if (isPresentPath(path.join(current, ".git")) || isPresentPath(path.join(current, ".a5c"))) {
       return current;
     }
 
     const parent = path.dirname(current);
     if (parent === current) {
-      return undefined;
+      reachedRoot = true;
+      continue;
     }
     current = parent;
   }
+  return undefined;
 }
 
 export function getRepoRoot(startDir = process.cwd()): string {

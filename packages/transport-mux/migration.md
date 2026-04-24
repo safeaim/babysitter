@@ -1,18 +1,14 @@
-# transport-mux migration closure
+# transport-mux migration backlog
 
-## Current runtime truth
+## Current status
 
-`packages/transport-mux` is the active JS package behind the `amux-proxy` binary in this repo.
-The live control-plane path is:
+`packages/transport-mux` is not the active `amux-proxy` runtime today. The package entrypoint is still mostly skeletal, so this document tracks the work required before the seam can be treated as executable, publishable, or cut over.
 
-1. `packages/agent-mux/cli/src/commands/launch.ts`
-2. `packages/agent-mux/core/src/provider-resolver.ts`
-3. `packages/agent-mux/adapters/src/translate-for-harness.ts`
-4. `packages/transport-mux`
+## Why this file exists
 
-This document is not a speculative roadmap. It is the closure checklist for finishing the cutover cleanly.
+The repo already pays some of the cost of extraction: a package name, dedicated docs, and tests that describe a desired runtime contract. Until the implementation boundary is real, this file exists to prevent the package metadata and docs from overstating that status.
 
-## What must stay stable
+## What would need to stay stable once cutover begins
 
 - binary name: `amux-proxy`
 - env contract: `AMUX_PROXY_*`
@@ -22,67 +18,59 @@ This document is not a speculative roadmap. It is the closure checklist for fini
 
 ## Package verification gates
 
-Run these commands before treating the package surface as healthy:
+Run these commands when editing this workspace:
 
 ```bash
 npm run build --workspace=@a5c-ai/transport-mux
 npm run test --workspace=@a5c-ai/transport-mux
-npm run build:agent-mux
-npm run test:agent-mux
 ```
 
-The package-level gates prove the `amux-proxy` binary, config helpers, route contract, and test-backed protocol surface still hold. The agent-mux gates prove the launcher path still resolves providers, picks harness transports, and spawns the proxy through the stable env contract.
+Those checks only validate the placeholder workspace and its contract tests. They do not prove that the package is ready to publish or that the launcher/runtime path has converged on this seam.
 
-## Closure checklist
+## Publication and cutover prerequisites
 
-The migration is complete only when every item below is true.
+Do not publish or cut over this package until every item below is true.
 
-### 1. Package docs are current
+### 1. The package exports a real runtime surface
 
-- `packages/transport-mux/README.md` describes `transport-mux` as the current runtime package, not a future direction.
-- install and verification guidance uses the real Node workspace commands shown above.
-- active docs point operators at `packages/transport-mux/README.md`, `packages/transport-mux/architecture.md`, and this file.
+- `packages/transport-mux/src/` exports the real server/config/runtime modules described by the tests and architecture docs.
+- the package entrypoint is more than placeholder metadata.
+- the `amux-proxy` executable exists here if this package is meant to own that binary.
 
-### 2. Launcher path is verified
+### 2. Docs describe the seam honestly
 
-- `packages/agent-mux/cli/src/commands/launch.ts` still spawns `amux-proxy` and rewrites harness env vars for the proxy URL.
-- `packages/agent-mux/core/src/provider-resolver.ts` remains the canonical provider-resolution source.
-- `packages/agent-mux/adapters/src/translate-for-harness.ts` remains the canonical transport-selection source.
+- `packages/transport-mux/README.md` describes this workspace as either a placeholder or an active runtime, never both.
+- `packages/transport-mux/architecture.md` is treated as intended design until the implementation catches up.
+- this file is used as a backlog for remaining work, not as closure proof.
 
-### 3. Publish surfaces are converged
+### 3. Launcher/runtime ownership is proven
 
-- release workflows pack and publish `@a5c-ai/transport-mux` from `packages/transport-mux/package.json`.
+- `packages/agent-mux/cli/src/commands/launch.ts` actually resolves into the runtime surface exported by this package.
+- `packages/agent-mux/core/src/provider-resolver.ts` and `packages/agent-mux/adapters/src/translate-for-harness.ts` stay aligned with that runtime.
+- operators no longer have to infer whether runtime truth lives in `packages/transport-mux` or elsewhere.
+
+### 4. Publish and CI surfaces are converged
+
+- release workflows intentionally publish `@a5c-ai/transport-mux` from this package.
 - staging workflows do the same for prerelease publication.
-- package docs no longer imply that the runtime ships from a different package surface.
+- CI treats this package as an active runtime package only after the executable surface exists.
 
-Current blocker:
-- the repo release and staging workflows do not yet publish `@a5c-ai/transport-mux`.
-
-### 4. CI surfaces are converged
-
-- CI runs the transport-mux workspace build/test gates as part of the normal repo path.
-- doc and package references do not imply a second runtime truth outside the Node workspace.
-
-Current blocker:
-- transport-mux is buildable and testable locally, but the repo-wide workflow references still need explicit convergence.
-
-### 5. Legacy container and package surfaces are retired or clearly archived
+### 5. Legacy surfaces are retired or clearly archived
 
 - legacy `amux-proxy` package/container surfaces are either removed from the active operational path or explicitly marked historical.
 - operators are not asked to infer whether the container, package, and launcher truth live in different places.
 
-Current blocker:
+## Current blockers
+
+- `src/index.ts` still exports placeholder metadata instead of the runtime surface described by the tests.
+- `package.json` previously advertised a public package and `amux-proxy` bin without that executable surface existing here.
+- repo docs and adjacent plans still contain references that can be read as if the cutover already happened.
 - legacy package and container assets still exist under `packages/agent-mux/amux-proxy` and `packages/agent-mux/meta/github/workflows`.
 
 ## Done criteria
 
-Do not call this migration closed until:
-
-- the JS package passes the verification gates
-- the launcher path remains stable on `AMUX_PROXY_*`
-- docs describe the JS package as the only active runtime truth for this path
-- publish, CI, and container surfaces no longer split operational truth across legacy and current package assumptions
+Only treat this migration as complete once the runtime surface exists here, the launcher path actually uses it, and the publish/CI/docs surfaces stop splitting operational truth.
 
 ## Main risk
 
-The real failure mode is not a broken route handler. It is operational drift: launcher behavior, docs, package publication, and container references silently describing different runtime truths. This checklist exists to keep those surfaces converged.
+The real failure mode is still operational drift: package metadata, launcher docs, release surfaces, and implementation state silently describing different runtime truths. This backlog exists to keep those surfaces honest until the seam is executable.

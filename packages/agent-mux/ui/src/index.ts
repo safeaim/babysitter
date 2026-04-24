@@ -3,6 +3,27 @@ export { GatewayClient } from './client/GatewayClient.js';
 export { createGatewayStore } from './store/index.js';
 export type { GatewayStoreState, EventBuffer, HookRequestRecord, AgentRecord } from './store/index.js';
 export { selectVisibleEventNodes, selectPendingHookRequests, selectCostTotals } from './store/selectors.js';
+export {
+  buildSessionTranscript,
+  buildAgentFlowLanes,
+  buildSessionFlowModel,
+  buildNativeTranscript,
+  buildNativeAgentFlowLane,
+  accumulateEventCost,
+} from './session-flow.js';
+export type {
+  NativeSessionMessage,
+  SessionCost,
+  SessionTranscriptNode,
+  SessionTranscriptNodeKind,
+  AgentFlowSegment,
+  AgentFlowSegmentKind,
+  AgentFlowSegmentStatus,
+  AgentFlowLane,
+  SessionFlowTimelineItem,
+  SessionFlowFileRecord,
+  SessionFlowModel,
+} from './session-flow.js';
 export { GatewayProvider } from './hooks/GatewayProvider.js';
 export { useGateway } from './hooks/useGateway.js';
 export { useConnection } from './hooks/useConnection.js';

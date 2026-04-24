@@ -45,6 +45,12 @@
         "types": "./dist/protocol/v1.d.ts",
         "default": "./dist/protocol/v1.js"
       }
+    },
+    "./session-flow": {
+      "import": {
+        "types": "./dist/session-flow.d.ts",
+        "default": "./dist/session-flow.js"
+      }
     }
   },
   "files": [

@@ -6,7 +6,7 @@ import { EventStream } from '../src/event-stream.js';
 
 const flush = () => new Promise((r) => setTimeout(r, 20));
 
-function makeClient(opts: { get?: unknown; export?: unknown } = {}) {
+function makeClient(opts: { get?: unknown; export?: unknown; watch?: unknown } = {}) {
   return {
     sessions: {
       get: vi.fn().mockResolvedValue(
@@ -19,6 +19,13 @@ function makeClient(opts: { get?: unknown; export?: unknown } = {}) {
         },
       ),
       export: vi.fn().mockResolvedValue(opts.export ?? '{"ok":true}'),
+      watch:
+        vi.fn(
+          opts.watch ??
+            (async function* () {
+              return;
+            }),
+        ),
     },
   } as never;
 }
@@ -53,6 +60,9 @@ describe('SessionDetailView', () => {
     expect(f).toContain('turns: 4');
     expect(f).toContain('$0.1234');
     expect(f).toContain('demo');
+    expect(f).toContain('m: export markdown');
+    expect(f).toContain('w: watch');
+    expect(f).toContain('r: resume');
   });
 
   it('shows hint when no selection', () => {
@@ -97,6 +107,125 @@ describe('SessionDetailView', () => {
     expect(client.sessions.export).toHaveBeenCalledWith('claude-code', 's1', 'json');
     const statusCall = emit.mock.calls.find((c) => c[0]?.type === 'status');
     expect(statusCall?.[0]?.message).toMatch(/Exported json/);
+  });
+
+  it('m key triggers markdown export, updates the status, and renders the export note', async () => {
+    const client = makeClient({ export: '# Session s1' });
+    const stream = new EventStream();
+    const emit = vi.fn();
+    const { stdin, lastFrame, rerender } = render(
+      <SessionDetailView
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        selection={{ agent: 'claude-code', sessionId: 's1' }}
+      />,
+    );
+    await flush();
+    rerender(
+      <SessionDetailView
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        selection={{ agent: 'claude-code', sessionId: 's1' }}
+      />,
+    );
+    stdin.write('m');
+    await flush();
+    expect(client.sessions.export).toHaveBeenCalledWith('claude-code', 's1', 'markdown');
+    expect(emit).toHaveBeenCalledWith({
+      type: 'status',
+      message: 'Exported markdown (12 chars)',
+    });
+    expect(lastFrame()).toContain('exported markdown (12 chars)');
+  });
+
+  it('w key switches to chat, streams watched events, and reports watch completion', async () => {
+    const watchedEvents = [
+      { type: 'message', role: 'assistant', content: 'hello' },
+      { type: 'message', role: 'assistant', content: 'world' },
+    ];
+    const client = makeClient({
+      watch: async function* () {
+        yield watchedEvents[0];
+        yield watchedEvents[1];
+      },
+    });
+    const stream = new EventStream();
+    const emit = vi.fn();
+    const { stdin, rerender } = render(
+      <SessionDetailView
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        selection={{ agent: 'claude-code', sessionId: 's1' }}
+      />,
+    );
+    await flush();
+    rerender(
+      <SessionDetailView
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        selection={{ agent: 'claude-code', sessionId: 's1' }}
+      />,
+    );
+    stdin.write('w');
+    await flush();
+    expect(client.sessions.watch).toHaveBeenCalledWith('claude-code', 's1');
+    expect(emit.mock.calls.map((c) => c[0])).toContainEqual({
+      type: 'status',
+      message: 'Watching claude-code/s1…',
+    });
+    expect(emit.mock.calls.map((c) => c[0])).toContainEqual({
+      type: 'view:switch',
+      id: 'chat',
+    });
+    expect(emit.mock.calls.map((c) => c[0])).toContainEqual({
+      type: 'status',
+      message: 'Watch ended.',
+    });
+    expect(stream.snapshot()).toEqual(watchedEvents);
+  });
+
+  it('r key emits session selection and switches to chat', async () => {
+    const client = makeClient();
+    const stream = new EventStream();
+    const emit = vi.fn();
+    const { stdin, rerender } = render(
+      <SessionDetailView
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        selection={{ agent: 'claude-code', sessionId: 's1' }}
+      />,
+    );
+    await flush();
+    rerender(
+      <SessionDetailView
+        client={client}
+        active={true}
+        eventStream={stream}
+        emit={emit}
+        selection={{ agent: 'claude-code', sessionId: 's1' }}
+      />,
+    );
+    stdin.write('r');
+    await flush();
+    expect(emit.mock.calls.map((c) => c[0])).toContainEqual({
+      type: 'session:select',
+      agent: 'claude-code',
+      sessionId: 's1',
+    });
+    expect(emit.mock.calls.map((c) => c[0])).toContainEqual({
+      type: 'view:switch',
+      id: 'chat',
+    });
   });
 
   it('Esc emits view:switch back to sessions', async () => {

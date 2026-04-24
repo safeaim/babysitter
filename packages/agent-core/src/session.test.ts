@@ -23,13 +23,39 @@ function createHandle(result: MockRunResult, events: unknown[] = []) {
   return handle;
 }
 
+function createPendingHandle(events: unknown[] = []) {
+  let resolveResult: ((result: MockRunResult) => void) | undefined;
+  const promise = new Promise<MockRunResult>((resolve) => {
+    resolveResult = resolve;
+  });
+
+  const handle = Object.assign(promise, {
+    send: vi.fn(async () => undefined),
+    queue: vi.fn(async () => undefined),
+    abort: vi.fn(async () => undefined),
+    async *[Symbol.asyncIterator]() {
+      for (const event of events) {
+        yield event;
+      }
+    },
+  });
+
+  return {
+    handle,
+    resolve(result: MockRunResult) {
+      resolveResult?.(result);
+    },
+  };
+}
+
 async function loadSessionModule(args: {
   handleResult?: MockRunResult;
   events?: unknown[];
+  runImplementation?: (options: Record<string, unknown>) => ReturnType<typeof createHandle>;
 }) {
   vi.resetModules();
 
-  const run = vi.fn((_options: Record<string, unknown>) => createHandle(
+  const run = vi.fn((options: Record<string, unknown>) => args.runImplementation?.(options) ?? createHandle(
     args.handleResult ?? { text: "ok", exitReason: "completed", exitCode: 0, sessionId: "session-1" },
     args.events,
   ));
@@ -149,5 +175,68 @@ describe("AgentCoreSessionHandle", () => {
     expect(secondCall?.[0]).toMatchObject({
       sessionId: "persisted-session",
     });
+  });
+
+  it("appends queued follow-up instructions to the next prompt only once", async () => {
+    const sessionModule = await loadSessionModule({});
+    const session = sessionModule.createAgentCoreSession();
+
+    await session.steer("Use the session export path");
+    await session.followUp("Add the registry regression");
+    await session.prompt("Implement tests");
+    await session.prompt("Verify again");
+
+    expect(sessionModule.run.mock.calls[0]?.[0]).toMatchObject({
+      prompt: [
+        "Implement tests",
+        "Follow-up instruction:\nUse the session export path",
+        "Follow-up instruction:\nAdd the registry regression",
+      ].join("\n\n"),
+    });
+    expect(sessionModule.run.mock.calls[1]?.[0]).toMatchObject({
+      prompt: "Verify again",
+    });
+  });
+
+  it("normalizes unknown event payloads for subscribers", async () => {
+    const sessionModule = await loadSessionModule({
+      events: [null, { foo: "bar" }, { type: "session_start", sessionId: "event-session" }],
+      handleResult: { text: "ok", exitReason: "completed", exitCode: 0, sessionId: "event-session" },
+    });
+    const session = sessionModule.createAgentCoreSession();
+    const received: Array<Record<string, unknown>> = [];
+
+    session.subscribe((event) => {
+      received.push(event as Record<string, unknown>);
+    });
+
+    await session.prompt("Inspect event flow");
+
+    expect(received).toEqual([
+      { type: "unknown", value: null },
+      { type: "unknown", foo: "bar" },
+      { type: "session_start", sessionId: "event-session" },
+    ]);
+    expect(session.sessionId).toBe("event-session");
+    expect(session.isStreaming).toBe(false);
+  });
+
+  it("rejects concurrent prompt attempts while a prompt is active", async () => {
+    const pending = createPendingHandle();
+    const sessionModule = await loadSessionModule({
+      runImplementation: () => pending.handle,
+    });
+    const session = sessionModule.createAgentCoreSession();
+
+    const firstPrompt = session.prompt("First prompt");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await expect(session.prompt("Second prompt")).rejects.toThrow(
+      "Agent core session is already processing a prompt",
+    );
+
+    pending.resolve({ text: "done", exitReason: "completed", exitCode: 0, sessionId: "session-1" });
+    await firstPrompt;
+    expect(session.isStreaming).toBe(false);
   });
 });

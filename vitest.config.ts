@@ -1,6 +1,16 @@
-import { defineConfig } from 'vitest/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-export default defineConfig({
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default {
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'packages/catalog/src'),
+      '@a5c-ai/agent-catalog': path.resolve(__dirname, 'packages/agent-catalog/src/index.ts'),
+      'next/server': path.resolve(__dirname, 'test-shims/next-server.ts'),
+    },
+  },
   test: {
     include: ['packages/*/src/**/*.test.{ts,tsx}', 'packages/*/tests/**/*.test.{ts,tsx}', 'packages/agent-mux/*/src/**/*.test.{ts,tsx}', 'packages/agent-mux/*/tests/**/*.test.{ts,tsx}'],
     setupFiles: ['vitest.setup.ts'],
@@ -24,4 +34,4 @@ export default defineConfig({
       },
     },
   },
-});
+};

@@ -6,6 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "test": "cd ../.. && npm exec --yes --package=vitest -- vitest run --config vitest.config.ts packages/catalog/src/**/*.test.ts",
+    "test:watch": "cd ../.. && npm exec --yes --package=vitest -- vitest --config vitest.config.ts packages/catalog/src/**/*.test.ts",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",

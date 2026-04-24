@@ -1,6 +1,6 @@
 kind: NodeDocument
 documentPath: nodes/processes-and-packages/ci-surfaces.yaml
-generatedAt: 2026-04-23T00:00:00.000Z
+generatedAt: 2026-04-24T00:00:00.000Z
 nodes:
   - id: ci:@a5c-ai/agent-catalog
     kind: CiSurface
@@ -32,11 +32,13 @@ nodes:
     ciId: "@a5c-ai/catalog"
     packageId: "@a5c-ai/catalog"
     scripts:
+      - test
       - type-check
     publishStrategy: application
     releaseChannels:
       - prod
     validationCommands:
+      - npm run test --workspace=process-library-catalog
       - cd packages/catalog && npm run type-check
     artifactExpectations:
       - .next/**

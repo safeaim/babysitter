@@ -17,7 +17,7 @@
     "validate:graph": "node ./scripts/validate-graph.cjs",
     "build": "npm run generate:evidence && tsc -p tsconfig.json && npm run validate:graph",
     "clean": "rimraf dist",
-    "test": "npm run generate:evidence && npm run validate:graph && cd ../.. && vitest run packages/agent-catalog/src/catalog.test.ts",
+    "test": "npm run generate:evidence && npm run validate:graph && cd ../.. && npm run test:agent-catalog-contracts",
     "ci:test": "npm run clean && npm run build && npm run test",
     "ci:staging": "npm run ci:test && npm run version:check",
     "ci:prod": "npm run ci:staging",

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import React from 'react';
 import { render } from 'ink';
-import { createClient, registerBuiltInAdapters } from '@a5c-ai/agent-mux';
+import { createClient } from '@a5c-ai/agent-mux-core';
+import { registerBuiltInAdapters } from '@a5c-ai/agent-mux-cli/bootstrap';
 import { App, builtinPlugins, defaultExternalPluginsDir, loadExternalPlugins } from '../index.js';
 
 function userPluginsDisabled(): boolean {

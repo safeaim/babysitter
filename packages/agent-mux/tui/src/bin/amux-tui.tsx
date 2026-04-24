@@ -3,6 +3,7 @@ import React from 'react';
 import { render } from 'ink';
 import { createClient } from '@a5c-ai/agent-mux-core';
 import { registerBuiltInAdapters } from '@a5c-ai/agent-mux-cli/bootstrap';
+import { reconfigureLogger } from '@a5c-ai/agent-mux-observability';
 import { App, builtinPlugins, defaultExternalPluginsDir, loadExternalPlugins } from '../index.js';
 
 function userPluginsDisabled(): boolean {
@@ -25,7 +26,23 @@ function initialViewId(): string | undefined {
   return value && value.trim() ? value.trim() : undefined;
 }
 
+function configureLoggingFromEnv(): void {
+  const logLevel = process.env.AMUX_LOG_LEVEL;
+  const logFile = process.env.AMUX_LOG_FILE;
+  if (!logLevel && !logFile) {
+    return;
+  }
+  if (!process.env.AMUX_OBSERVABILITY_MODE) {
+    process.env.AMUX_OBSERVABILITY_MODE = 'full';
+  }
+  reconfigureLogger({
+    level: logLevel,
+    logFile,
+  });
+}
+
 async function main() {
+  configureLoggingFromEnv();
   const client = createClient();
   if (!builtInAdaptersDisabled()) {
     registerBuiltInAdapters(client);

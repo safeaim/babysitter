@@ -240,6 +240,124 @@ export interface ProcessDescriptor {
   evidenceIds: string[];
 }
 
+export interface AgentProductDescriptor {
+  agentId: string;
+  displayName: string;
+  aliases: string[];
+  vendor: string;
+  families: string[];
+  status: string;
+  evidenceIds: string[];
+}
+
+export interface ModelProviderProductDescriptor {
+  providerId: string;
+  displayName: string;
+  kindLabel: string;
+  vendor: string;
+  homepage?: string | null;
+  apiFamilies: string[];
+  authKinds: string[];
+  evidenceIds: string[];
+}
+
+export interface ModelFamilyDescriptor {
+  modelId: string;
+  providerId: string;
+  label: string;
+  modalities: string[];
+  reasoningFamily?: string;
+  status: string;
+  evidenceIds: string[];
+}
+
+export interface TransportProtocolDescriptor {
+  transportId: string;
+  label: string;
+  protocolKind: string;
+  interactive: boolean;
+  streaming: boolean;
+  requestShape: string;
+  responseShape: string;
+  evidenceIds: string[];
+}
+
+export interface CapabilitySupportRecord {
+  supportId: string;
+  capabilityId: string;
+  supportLevel: string;
+  subjectKind: "AgentVersion" | "ModelProviderVersion" | "TransportRuntime" | "PluginTarget";
+  subjectId: string;
+  versionRange: string;
+  notes?: string;
+  evidenceIds: string[];
+}
+
+export interface HookMappingDescriptor {
+  mappingId: string;
+  hookId: string;
+  targetId: string;
+  nativeName: string;
+  versionRange: string;
+  requiresRuntimeHooks: boolean;
+  evidenceIds: string[];
+}
+
+export interface DiscoverySignalDescriptor {
+  signalId: string;
+  signalKind: string;
+  key: string;
+  matchMode: string;
+  confidence: "high" | "medium" | "low";
+  scope: string;
+  signals: string[];
+  absentSignals: string[];
+  argvMatches: string[];
+  metadataFields: HostMetadataField[];
+  evidenceIds: string[];
+}
+
+export interface PackageSurfaceDescriptor {
+  packageId: string;
+  packageName: string;
+  workspacePath: string;
+  moduleType: string;
+  surfaceKinds: string[];
+  sourceOfTruthRole: string;
+  evidenceIds: string[];
+}
+
+export interface PathDescriptorRecord {
+  pathId: string;
+  path: string;
+  pathKind: string;
+  ownerKind: string;
+  ownerId: string;
+  platform: string;
+  notes?: string;
+  evidenceIds: string[];
+}
+
+export interface CiSurfaceDescriptor {
+  ciId: string;
+  packageId: string;
+  scripts: string[];
+  publishStrategy: string;
+  releaseChannels: string[];
+  validationCommands: string[];
+  evidenceIds: string[];
+}
+
+export interface ClaimRecord {
+  claimId: string;
+  statement: string;
+  subjectKind: string;
+  subjectId: string;
+  confidence: string;
+  status: string;
+  evidenceIds: string[];
+}
+
 export interface AgentVersion {
   agentId: string;
   aliases: string[];
@@ -449,4 +567,61 @@ export interface AgentCatalog {
   agents: AgentVersion[];
   capabilityAssertions: CapabilityAssertion[];
   graph: GraphEdge[];
+}
+
+export interface AgentCapabilitySupportMatrix {
+  agent: AgentVersion;
+  capabilitySupport: CapabilitySupportRecord[];
+  capabilities: CapabilityDescriptor[];
+}
+
+export interface AgentVersionTopology {
+  agent: AgentVersion;
+  product?: AgentProductDescriptor;
+  capabilitySupport: CapabilitySupportRecord[];
+  capabilities: CapabilityDescriptor[];
+  defaultModels: ModelVersion[];
+  modelFamilies: ModelFamilyDescriptor[];
+  providerVersions: ModelProviderVersion[];
+  providers: ModelProviderProductDescriptor[];
+  transportRuntimes: TransportDescriptor[];
+  transportProtocols: TransportProtocolDescriptor[];
+  modalities: ModalityDescriptor[];
+  sessionSemantics: SessionNuance[];
+  lifecycleSemantics: LifecycleNuance[];
+  discoverySignals: DiscoverySignalDescriptor[];
+  hookMappings: HookMappingDescriptor[];
+  hooks: HookDescriptor[];
+  pluginTargets: PluginTargetDescriptor[];
+}
+
+export interface ProviderModelTopology {
+  provider: ModelProviderProductDescriptor;
+  versions: ModelProviderVersion[];
+  capabilitySupport: CapabilitySupportRecord[];
+  capabilities: CapabilityDescriptor[];
+  models: ModelVersion[];
+  modelFamilies: ModelFamilyDescriptor[];
+  agents: AgentVersion[];
+}
+
+export interface PackageTopology {
+  package: PackageSurfaceDescriptor;
+  processes: ProcessDescriptor[];
+  ciSurfaces: CiSurfaceDescriptor[];
+  directPaths: PathDescriptorRecord[];
+  processPaths: PathDescriptorRecord[];
+  wrapsGraphIds: string[];
+}
+
+export interface SubjectProvenance {
+  subjectId: string;
+  claims: ClaimRecord[];
+  evidence: EvidenceRecord[];
+}
+
+export interface OntologyEvidenceSearchResult {
+  query: string;
+  evidence: EvidenceRecord[];
+  claims: ClaimRecord[];
 }

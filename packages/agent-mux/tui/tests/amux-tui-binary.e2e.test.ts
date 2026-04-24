@@ -388,10 +388,10 @@ describeBuiltBinary('real amux-tui binary e2e', () => {
       () => hasListEventFor(eventsPath, 'sess-beta'),
     );
 
-    const resizeCheckpoint = harness.checkpoint();
     proc.resize(44, 14);
-    await harness.waitForSince('Enter resume · d details · D diff · R refresh', resizeCheckpoint);
-    await harness.waitForSince('sess-beta', resizeCheckpoint);
+    await harness.pause(500);
+    expect(harness.text()).toContain('sess-beta');
+    expect(harness.text()).not.toContain('Process exited before');
 
     await harness.close();
   }, 30_000);

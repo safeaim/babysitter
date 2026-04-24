@@ -21,6 +21,10 @@ if (!graphDocument.catalogVersion || typeof graphDocument.catalogVersion !== "st
   fail("agent-catalog.graph.yaml must declare catalogVersion.");
 }
 
+if (!graphDocument.evidencePolicy || typeof graphDocument.evidencePolicy !== "object") {
+  fail("agent-catalog.graph.yaml must declare an object evidencePolicy.");
+}
+
 if (!packageJson.files || !packageJson.files.includes("graph")) {
   fail("package.json must publish the graph directory.");
 }
@@ -29,7 +33,17 @@ if (!packageJson.files.includes("evidence")) {
   fail("package.json must publish the evidence directory.");
 }
 
-const requiredScripts = ["generate:evidence", "build", "test", "ci:test", "ci:staging", "ci:prod", "version:check"];
+const requiredScripts = [
+  "generate:evidence",
+  "build",
+  "test",
+  "validate:evidence:freshness",
+  "ci:evidence",
+  "ci:test",
+  "ci:staging",
+  "ci:prod",
+  "version:check",
+];
 const missingScripts = requiredScripts.filter((name) => !packageJson.scripts || !packageJson.scripts[name]);
 if (missingScripts.length > 0) {
   fail(`Missing required scripts: ${missingScripts.join(", ")}`);

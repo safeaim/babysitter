@@ -9,6 +9,8 @@ nodes:
     scripts:
       - build
       - test
+      - validate:evidence:freshness
+      - ci:evidence
       - ci:test
       - ci:staging
       - ci:prod
@@ -20,6 +22,7 @@ nodes:
       - prod
     validationCommands:
       - npm run build --workspace=@a5c-ai/agent-catalog
+      - npm run ci:evidence --workspace=@a5c-ai/agent-catalog
       - npm run test --workspace=@a5c-ai/agent-catalog
       - npm run version:check --workspace=@a5c-ai/agent-catalog
     artifactExpectations:

@@ -170,7 +170,8 @@ nodes:
       - key: run_id
         envVars:
           - PI_RUN_ID
-    argvMatches: []
+    argvMatches:
+      - pi
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -194,7 +195,9 @@ nodes:
       - key: run_id
         envVars:
           - OMP_RUN_ID
-    argvMatches: []
+    argvMatches:
+      - oh-my-pi
+      - omp
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -218,7 +221,8 @@ nodes:
       - key: run_id
         envVars:
           - OPENCLAW_RUN_ID
-    argvMatches: []
+    argvMatches:
+      - openclaw
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:
@@ -242,7 +246,8 @@ nodes:
       - key: run_id
         envVars:
           - HERMES_RUN_ID
-    argvMatches: []
+    argvMatches:
+      - hermes
     consumer: agent-mux-core
     notes: Host harness detection signals used by agent-mux.
     evidenceRefs:

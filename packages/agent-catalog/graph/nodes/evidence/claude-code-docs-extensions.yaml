@@ -10,6 +10,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: extension surface overview
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-claude-directory
     kind: EvidenceSource
     evidenceId: web-claude-code-claude-directory
@@ -18,6 +21,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: .claude directory layout
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-commands
     kind: EvidenceSource
     evidenceId: web-claude-code-commands
@@ -26,6 +32,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: built-in commands and bundled skills
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-skills
     kind: EvidenceSource
     evidenceId: web-claude-code-skills
@@ -34,6 +43,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: skill creation and invocation
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-hooks
     kind: EvidenceSource
     evidenceId: web-claude-code-hooks
@@ -42,6 +54,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: lifecycle hook reference
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-hooks-guide
     kind: EvidenceSource
     evidenceId: web-claude-code-hooks-guide
@@ -50,6 +65,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: workflow automation guide for hooks
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-mcp
     kind: EvidenceSource
     evidenceId: web-claude-code-mcp
@@ -58,6 +76,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: MCP integration
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-subagents
     kind: EvidenceSource
     evidenceId: web-claude-code-subagents
@@ -66,6 +87,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: custom subagents
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-agent-teams
     kind: EvidenceSource
     evidenceId: web-claude-code-agent-teams
@@ -74,6 +98,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: parallel Claude Code team orchestration
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-claude-code-tools-reference
     kind: EvidenceSource
     evidenceId: web-claude-code-tools-reference
@@ -82,3 +109,6 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: built-in tool and MCP references
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45

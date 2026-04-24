@@ -2,7 +2,7 @@
   "kind": "EvidenceShard",
   "entryKind": "evidence-sources",
   "group": "vendor-web",
-  "generatedAt": "2026-04-23T00:00:00.000Z",
+  "generatedAt": "2026-04-24T00:00:00.000Z",
   "entries": [
     {
       "id": "evidence:web-anthropic-claude-code",
@@ -12,7 +12,10 @@
       "sourcePathOrUrl": "https://www.anthropic.com/product/claude-code",
       "capturedAt": "2026-04-23T00:00:00.000Z",
       "locator": "product overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-anthropic-claude-code-auto-mode",
@@ -22,7 +25,10 @@
       "sourcePathOrUrl": "https://www.anthropic.com/engineering/claude-code-auto-mode",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "published Mar 25 2026; permission automation and approval-safety design",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-anthropic-claude-code-autonomy",
@@ -32,7 +38,10 @@
       "sourcePathOrUrl": "https://www.anthropic.com/news/enabling-claude-code-to-work-more-autonomously",
       "capturedAt": "2026-04-23T00:00:00.000Z",
       "locator": "Sep 29 2025 product update",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-anthropic-claude-code-sandboxing",
@@ -42,7 +51,10 @@
       "sourcePathOrUrl": "https://www.anthropic.com/engineering/claude-code-sandboxing",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "filesystem and network isolation for Claude Code sandboxing",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-agent-teams",
@@ -52,7 +64,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/agent-teams",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "parallel Claude Code team orchestration",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-checkpointing",
@@ -62,7 +77,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/checkpointing",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "checkpointed session state and rewind",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-claude-directory",
@@ -72,7 +90,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/claude-directory",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": ".claude directory layout",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-cli-reference",
@@ -82,7 +103,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/cli-reference",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "CLI flags and commands",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-commands",
@@ -92,7 +116,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/commands",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "built-in commands and bundled skills",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-features-overview",
@@ -102,7 +129,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/features-overview",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "extension surface overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-headless",
@@ -112,7 +142,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/headless",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "headless mode and continue flags",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-hooks",
@@ -122,7 +155,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/hooks",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "lifecycle hook reference",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-hooks-guide",
@@ -132,7 +168,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/hooks-guide",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "workflow automation guide for hooks",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-interactive-mode",
@@ -142,7 +181,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/interactive-mode",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "interactive session controls",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-mcp",
@@ -152,7 +194,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/mcp",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "MCP integration",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-overview",
@@ -162,7 +207,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/overview",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "Claude Code overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-permission-modes",
@@ -172,7 +220,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/permission-modes",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "permission mode selection",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-permissions",
@@ -182,7 +233,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/permissions",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "fine-grained permissions",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-quickstart",
@@ -192,7 +246,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/quickstart",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "terminal quickstart",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-skills",
@@ -202,7 +259,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/skills",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "skill creation and invocation",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-subagents",
@@ -212,7 +272,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/sub-agents",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "custom subagents",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-code-tools-reference",
@@ -222,7 +285,10 @@
       "sourcePathOrUrl": "https://code.claude.com/docs/en/tools-reference",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "built-in tool and MCP references",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-claude-platform-vision",
@@ -232,7 +298,10 @@
       "sourcePathOrUrl": "https://platform.claude.com/docs/en/build-with-claude/vision",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "image input and vision support",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-codex-cli",
@@ -242,7 +311,10 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/cli",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "Codex CLI overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-codex-cli-features",
@@ -252,7 +324,10 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/cli/features",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "interactive features, transcripts, and multimodal tooling",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-codex-cli-reference",
@@ -262,7 +337,10 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/cli/reference",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "command and flag reference",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-codex-hooks",
@@ -272,7 +350,10 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/hooks",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "lifecycle hooks and automation",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-codex-noninteractive",
@@ -282,7 +363,10 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/noninteractive",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "scripted and CI-oriented usage",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-codex-skills",
@@ -292,7 +376,10 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/skills",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "skill discovery and activation",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-agent-overview",
@@ -302,7 +389,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/agent/overview",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "agent overview, tools, checkpoints, and image-capable reads",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-cli-headless",
@@ -312,7 +402,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/cli/headless",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "non-interactive and CI usage",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-cli-overview",
@@ -322,7 +415,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/cli/overview",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "terminal CLI overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-cli-shell-mode",
@@ -332,7 +428,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/cli/shell-mode",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "persistent CLI context and command history",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-cli-using",
@@ -342,7 +441,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/cli/using",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "agent use from the CLI",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-hooks",
@@ -352,7 +454,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/hooks",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "built-in hook system",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-mcp",
@@ -362,7 +467,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/mcp",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "MCP integration surface",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-rules",
@@ -372,7 +480,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/rules",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "persistent instructions and project rules",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-cursor-subagents",
@@ -382,7 +493,10 @@
       "sourcePathOrUrl": "https://cursor.com/docs/subagents",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "specialized task-specific subagents",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-changelog",
@@ -392,7 +506,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/changelogs/index.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "recent multimodal and approval changes",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-checkpointing",
@@ -402,7 +519,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/checkpointing.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "checkpoint creation and restore",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-headless",
@@ -412,7 +532,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/headless.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "headless and automation mode",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-hooks",
@@ -422,7 +545,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/index.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "hook events and lifecycle impact",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-index",
@@ -432,7 +558,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/index.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "documentation index and feature map",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-reference",
@@ -442,7 +571,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/cli-reference.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "CLI commands and resume flags",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-session-management",
@@ -452,7 +584,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/session-management.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "resume, list, and manage sessions",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-cli-skills",
@@ -462,7 +597,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/skills.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "agent skills discovery and management",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-gemini-hooks",
@@ -472,7 +610,10 @@
       "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/tree/main/docs/hooks",
       "capturedAt": "2026-04-23T00:00:00.000Z",
       "locator": "Gemini CLI hooks docs",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-agent",
@@ -482,7 +623,10 @@
       "sourcePathOrUrl": "https://docs.github.com/enterprise-cloud@latest/copilot/how-tos/agents/copilot-coding-agent",
       "capturedAt": "2026-04-23T00:00:00.000Z",
       "locator": "Copilot coding agent documentation",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-cli-config-dir",
@@ -492,7 +636,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "session data and customization storage",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-cli-getting-started",
@@ -502,7 +649,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-getting-started",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "interactive CLI getting started",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-cli-hooks",
@@ -512,7 +662,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-hooks",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "hooks usage in Copilot CLI",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-cli-mcp",
@@ -522,7 +675,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "CLI MCP server setup",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-cli-overview",
@@ -532,7 +688,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli-agents/overview",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "Copilot CLI agent overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-cli-plugin-reference",
@@ -542,7 +701,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "plugin.json and component layout",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-cli-plugins",
@@ -552,7 +714,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/concepts/agents/copilot-cli/about-cli-plugins",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "plugins with reusable agents, skills, hooks, and integrations",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-custom-instructions",
@@ -562,7 +727,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/configure-custom-instructions",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "persistent custom instructions",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-hooks-config",
@@ -572,7 +740,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/reference/hooks-configuration",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "hook configuration reference",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-mcp",
@@ -582,7 +753,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent",
       "capturedAt": "2026-04-23T00:00:00.000Z",
       "locator": "Overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-github-copilot-sdk-image-input",
@@ -592,7 +766,10 @@
       "sourcePathOrUrl": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/use-copilot-sdk/image-input",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "image attachments in Copilot SDK sessions",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-omp-hooks",
@@ -602,7 +779,10 @@
       "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/hooks.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "hook subsystem and lifecycle events",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-omp-mcp",
@@ -612,7 +792,10 @@
       "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/mcp-config.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "MCP configuration and discovery",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-omp-readme",
@@ -622,7 +805,10 @@
       "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/README.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "terminal agent overview and feature list",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-omp-session-resume",
@@ -632,7 +818,10 @@
       "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/session-operations-export-share-fork-resume.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "resume, continue, export, fork, and session switching",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-omp-skills",
@@ -642,7 +831,10 @@
       "sourcePathOrUrl": "https://github.com/can1357/oh-my-pi/blob/main/docs/skills.md",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "skill discovery and runtime exposure",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-openai-codex-skills",
@@ -652,7 +844,10 @@
       "sourcePathOrUrl": "https://developers.openai.com/codex/skills",
       "capturedAt": "2026-04-23T00:00:00.000Z",
       "locator": "Codex skills guide",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-opencode-commands",
@@ -662,7 +857,10 @@
       "sourcePathOrUrl": "https://opencode.ai/docs/commands/",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "built-in and custom commands",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-opencode-plugins",
@@ -672,7 +870,10 @@
       "sourcePathOrUrl": "https://opencode.ai/docs/plugins/",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "plugin and hook-based extensibility",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-opencode-providers",
@@ -682,7 +883,10 @@
       "sourcePathOrUrl": "https://opencode.ai/docs/providers/",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "model provider configuration",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-opencode-tui",
@@ -692,7 +896,10 @@
       "sourcePathOrUrl": "https://opencode.ai/docs/tui/",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "terminal UI overview",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     },
     {
       "id": "evidence:web-opencode-windows-wsl",
@@ -702,7 +909,10 @@
       "sourcePathOrUrl": "https://opencode.ai/docs/windows-wsl/",
       "capturedAt": "2026-04-24T00:00:00.000Z",
       "locator": "config and session storage locations",
-      "trustLevel": "official-web"
+      "trustLevel": "official-web",
+      "reviewOwner": "@a5c-ai/agent-catalog",
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "freshnessWindowDays": 45
     }
   ]
 }

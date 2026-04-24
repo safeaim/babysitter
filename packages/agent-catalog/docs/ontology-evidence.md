@@ -30,6 +30,12 @@
 
 - repo-backed claims come from SDK fallback metadata, hooks-mux discovery, agent-mux host detection, agent-plugins-mux targets, transport-mux protocol/provider docs, and existing catalog/process surfaces
 - web-backed claims are limited to first-party vendor docs already referenced by the graph evidence nodes
+- vendor-backed evidence is currently defined as `kindLabel: web` plus `trustLevel: official-web`
+- every vendor-backed `EvidenceSource` must declare:
+  - `reviewOwner`: internal owner responsible for refresh
+  - `reviewedAt`: the last explicit review timestamp
+  - `freshnessWindowDays`: maximum allowed age for that review before CI fails
+- the graph root policy caps `freshnessWindowDays` at 45 days and defines the machine-checkable selector and reachability rules used by CI
 - every `Claim` now carries explicit provenance semantics:
   - `provenanceKind`: `repo-observation`, `vendor-documentation`, or `vendor-inference`
   - `evidenceStrength`: `corroborated`, `partial`, or `inferred`
@@ -39,3 +45,14 @@
 - `packages/agent-catalog/evidence/ontology-evidence/` is a derived directory export of evidence-source and claim nodes for easier external consumption
 - `manifest.json` lists the shard files; SDK consumers can assemble them through `getOntologyEvidenceSnapshot()`
 - the shard files are grouped into small batches by evidence domain so the derived export does not regress back into a single monolith
+
+## Refresh workflow
+
+1. Update the relevant YAML source under `packages/agent-catalog/graph/nodes/evidence/`.
+2. Re-check the vendor page, then update `capturedAt`, `reviewedAt`, `locator`, and any affected claims or `unresolvedGaps`.
+3. Run `npm run generate:evidence --workspace=@a5c-ai/agent-catalog`.
+4. Run `npm run validate:graph --workspace=@a5c-ai/agent-catalog`.
+5. Run `npm run validate:evidence:freshness --workspace=@a5c-ai/agent-catalog`.
+6. Before shipping, run `npm run ci:test --workspace=@a5c-ai/agent-catalog`.
+
+`validate:evidence:freshness` fails when vendor-backed evidence is stale, missing review metadata, no longer reachable, or no longer meets the corroboration/gap rules for vendor claims. For offline local work, set `AGENT_CATALOG_SKIP_VENDOR_WEB_CHECK=1` to skip the remote HTTP reachability pass; CI should not use that escape hatch.

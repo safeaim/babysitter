@@ -21,6 +21,123 @@ function ensureRequiredFields(subject, required, label) {
   }
 }
 
+function ensureNonEmptyString(value, label) {
+  if (typeof value !== "string" || value.length === 0) {
+    throw new Error(`Expected ${label} to be a non-empty string.`);
+  }
+}
+
+function ensureIsoDate(value, label) {
+  ensureNonEmptyString(value, label);
+  if (Number.isNaN(Date.parse(value))) {
+    throw new Error(`Expected ${label} to be an ISO-8601 timestamp.`);
+  }
+}
+
+function ensurePositiveInteger(value, label) {
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`Expected ${label} to be a positive integer.`);
+  }
+}
+
+function getVendorBackedEvidencePolicy(graphDocument) {
+  const policy = graphDocument.evidencePolicy;
+  if (!policy || typeof policy !== "object") {
+    throw new Error("GraphDocument.evidencePolicy must be an object.");
+  }
+  const vendorPolicy = policy.vendorBackedEvidence;
+  if (!vendorPolicy || typeof vendorPolicy !== "object") {
+    throw new Error("GraphDocument.evidencePolicy.vendorBackedEvidence must be defined.");
+  }
+  const selector = vendorPolicy.selector;
+  if (!selector || typeof selector !== "object") {
+    throw new Error("vendorBackedEvidence.selector must be defined.");
+  }
+  ensureArray(vendorPolicy.requiredAttributes, "vendorBackedEvidence.requiredAttributes");
+  ensureArray(selector.kindLabels, "vendorBackedEvidence.selector.kindLabels");
+  ensureArray(selector.trustLevels, "vendorBackedEvidence.selector.trustLevels");
+  ensurePositiveInteger(vendorPolicy.maxFreshnessWindowDays, "vendorBackedEvidence.maxFreshnessWindowDays");
+  ensureNonEmptyString(vendorPolicy.reviewOwnerPattern, "vendorBackedEvidence.reviewOwnerPattern");
+  return vendorPolicy;
+}
+
+function isVendorBackedEvidence(node, vendorPolicy) {
+  return (
+    node.kind === "EvidenceSource" &&
+    vendorPolicy.selector.kindLabels.includes(node.kindLabel) &&
+    vendorPolicy.selector.trustLevels.includes(node.trustLevel)
+  );
+}
+
+function validateVendorBackedEvidence(nodes, graphDocument) {
+  const vendorPolicy = getVendorBackedEvidencePolicy(graphDocument);
+  const reviewOwnerMatcher = new RegExp(vendorPolicy.reviewOwnerPattern);
+  const evidenceSources = nodes.filter((node) => node.kind === "EvidenceSource");
+  const claims = nodes.filter((node) => node.kind === "Claim");
+  const evidenceById = new Map(evidenceSources.map((node) => [node.evidenceId, node]));
+
+  for (const node of evidenceSources) {
+    if (!isVendorBackedEvidence(node, vendorPolicy)) {
+      continue;
+    }
+
+    for (const field of vendorPolicy.requiredAttributes) {
+      if (!(field in node)) {
+        throw new Error(`Vendor-backed evidence ${node.id} is missing required field "${field}".`);
+      }
+    }
+
+    ensureNonEmptyString(node.reviewOwner, `${node.id}.reviewOwner`);
+    ensureIsoDate(node.reviewedAt, `${node.id}.reviewedAt`);
+    ensureIsoDate(node.capturedAt, `${node.id}.capturedAt`);
+    ensurePositiveInteger(node.freshnessWindowDays, `${node.id}.freshnessWindowDays`);
+
+    if (!reviewOwnerMatcher.test(node.reviewOwner)) {
+      throw new Error(
+        `Vendor-backed evidence ${node.id} reviewOwner "${node.reviewOwner}" does not match ${vendorPolicy.reviewOwnerPattern}.`,
+      );
+    }
+
+    if (node.freshnessWindowDays > vendorPolicy.maxFreshnessWindowDays) {
+      throw new Error(
+        `Vendor-backed evidence ${node.id} freshnessWindowDays ${node.freshnessWindowDays} exceeds policy max ${vendorPolicy.maxFreshnessWindowDays}.`,
+      );
+    }
+
+    if (Date.parse(node.reviewedAt) < Date.parse(node.capturedAt)) {
+      throw new Error(`Vendor-backed evidence ${node.id} reviewedAt must be on or after capturedAt.`);
+    }
+  }
+
+  for (const claim of claims) {
+    if (claim.provenanceKind !== "vendor-documentation" && claim.provenanceKind !== "vendor-inference") {
+      continue;
+    }
+
+    const evidenceIds = ensureArray(claim.evidenceIds, `${claim.id}.evidenceIds`);
+    const vendorEvidenceIds = evidenceIds.filter((evidenceId) => {
+      const evidence = evidenceById.get(evidenceId);
+      return evidence ? isVendorBackedEvidence(evidence, vendorPolicy) : false;
+    });
+
+    if (vendorEvidenceIds.length === 0) {
+      throw new Error(`Vendor claim ${claim.id} must reference at least one vendor-backed evidence source.`);
+    }
+
+    if (
+      claim.provenanceKind === "vendor-documentation" &&
+      claim.evidenceStrength === "corroborated" &&
+      vendorEvidenceIds.length < 2
+    ) {
+      throw new Error(`Vendor claim ${claim.id} is marked corroborated but cites fewer than two vendor-backed sources.`);
+    }
+
+    if ((claim.provenanceKind === "vendor-inference" || claim.evidenceStrength !== "corroborated") && claim.unresolvedGaps.length === 0) {
+      throw new Error(`Vendor claim ${claim.id} must declare unresolvedGaps when evidence is not fully corroborated.`);
+    }
+  }
+}
+
 function listYamlFilesRecursively(targetPath) {
   const stat = fs.statSync(targetPath);
   if (stat.isFile()) {
@@ -78,6 +195,8 @@ function main() {
     nodeKinds.set(node.id, node.kind);
   }
 
+  validateVendorBackedEvidence(nodes, graphDocument);
+
   for (const edge of edges) {
     const edgeRule = schema.edgeKinds[edge.relation];
     if (!edgeRule) {
@@ -105,6 +224,7 @@ function main() {
         schemaVersion: graphDocument.schemaVersion,
         nodeCount: nodes.length,
         edgeCount: edges.length,
+        vendorEvidenceCount: nodes.filter((node) => node.kind === "EvidenceSource" && node.trustLevel === "official-web").length,
       },
       null,
       2,

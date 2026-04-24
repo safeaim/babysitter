@@ -10,6 +10,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: documentation index and feature map
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-gemini-cli-reference
     kind: EvidenceSource
     evidenceId: web-gemini-cli-reference
@@ -18,6 +21,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: CLI commands and resume flags
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-gemini-cli-skills
     kind: EvidenceSource
     evidenceId: web-gemini-cli-skills
@@ -26,6 +32,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: agent skills discovery and management
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-gemini-cli-headless
     kind: EvidenceSource
     evidenceId: web-gemini-cli-headless
@@ -34,6 +43,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: headless and automation mode
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-gemini-cli-session-management
     kind: EvidenceSource
     evidenceId: web-gemini-cli-session-management
@@ -42,6 +54,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: resume, list, and manage sessions
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-gemini-cli-checkpointing
     kind: EvidenceSource
     evidenceId: web-gemini-cli-checkpointing
@@ -50,6 +65,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: checkpoint creation and restore
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-gemini-cli-hooks
     kind: EvidenceSource
     evidenceId: web-gemini-cli-hooks
@@ -58,6 +76,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: hook events and lifecycle impact
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-gemini-cli-changelog
     kind: EvidenceSource
     evidenceId: web-gemini-cli-changelog
@@ -66,6 +87,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: recent multimodal and approval changes
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: claim:web-gemini-cli-core-agentic
     kind: Claim
     claimId: web-gemini-cli-core-agentic

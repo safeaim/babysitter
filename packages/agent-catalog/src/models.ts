@@ -51,7 +51,27 @@ export interface GraphDocument {
   imports: string[];
   schemaPath: string;
   defaultNamespace: string;
-  evidencePolicy: string;
+  evidencePolicy: GraphEvidencePolicy;
+}
+
+export interface VendorBackedEvidencePolicy {
+  selector: {
+    kindLabels: string[];
+    trustLevels: string[];
+  };
+  requiredAttributes: string[];
+  maxFreshnessWindowDays: number;
+  reviewOwnerPattern: string;
+  reachability: {
+    timeoutMs: number;
+    retries: number;
+    acceptedStatusCodes: number[];
+  };
+}
+
+export interface GraphEvidencePolicy {
+  summary: string;
+  vendorBackedEvidence: VendorBackedEvidencePolicy;
 }
 
 export interface OntologyKindRule {
@@ -85,6 +105,10 @@ export interface EvidenceRecord {
   excerptLocator: string;
   claim: string;
   capturedAt: string;
+  trustLevel: string;
+  reviewOwner: string;
+  reviewedAt: string;
+  freshnessWindowDays?: number;
 }
 
 export type ClaimConfidence = "high" | "medium" | "low";

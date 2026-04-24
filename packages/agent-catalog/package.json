@@ -17,10 +17,12 @@
     "check:src-artifacts": "node ./scripts/check-src-artifacts.cjs",
     "generate:evidence": "node ./scripts/generate-evidence.cjs",
     "validate:graph": "node ./scripts/validate-graph.cjs",
+    "validate:evidence:freshness": "node ./scripts/validate-evidence-freshness.cjs",
     "build": "npm run check:src-artifacts && npm run generate:evidence && tsc -p tsconfig.json && npm run validate:graph",
     "clean": "rimraf dist",
     "test": "npm run check:src-artifacts && npm run generate:evidence && npm run validate:graph && cd ../.. && npm run test:agent-catalog-contracts",
-    "ci:test": "npm run clean && npm run build && npm run test",
+    "ci:evidence": "npm run validate:evidence:freshness",
+    "ci:test": "npm run clean && npm run build && npm run ci:evidence && npm run test",
     "ci:staging": "npm run ci:test && npm run version:check",
     "ci:prod": "npm run ci:staging",
     "version:check": "node ./scripts/check-version.cjs"

@@ -166,6 +166,10 @@ function toClaimRecord(node: GraphNode): ClaimRecord {
 function toEvidenceRecord(node: GraphNode): EvidenceRecord {
   const evidenceId = valueAsString(node.evidenceId);
   const supportingClaims = CLAIMS_BY_EVIDENCE.get(evidenceId) ?? [];
+  const freshnessWindowDays =
+    typeof node.freshnessWindowDays === "number" && Number.isFinite(node.freshnessWindowDays)
+      ? node.freshnessWindowDays
+      : undefined;
   return {
     evidenceId,
     kind: valueAsString(node.kindLabel) === "web" ? "web" : "repo",
@@ -173,6 +177,10 @@ function toEvidenceRecord(node: GraphNode): EvidenceRecord {
     excerptLocator: valueAsString(node.locator),
     claim: valueAsString(supportingClaims[0]?.statement),
     capturedAt: valueAsString(node.capturedAt),
+    trustLevel: valueAsString(node.trustLevel),
+    reviewOwner: valueAsString(node.reviewOwner),
+    reviewedAt: valueAsString(node.reviewedAt),
+    freshnessWindowDays,
   };
 }
 

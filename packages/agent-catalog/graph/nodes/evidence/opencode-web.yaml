@@ -10,6 +10,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: terminal UI overview
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-opencode-commands
     kind: EvidenceSource
     evidenceId: web-opencode-commands
@@ -18,6 +21,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: built-in and custom commands
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-opencode-plugins
     kind: EvidenceSource
     evidenceId: web-opencode-plugins
@@ -26,6 +32,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: plugin and hook-based extensibility
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-opencode-providers
     kind: EvidenceSource
     evidenceId: web-opencode-providers
@@ -34,6 +43,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: model provider configuration
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-opencode-windows-wsl
     kind: EvidenceSource
     evidenceId: web-opencode-windows-wsl
@@ -42,6 +54,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: config and session storage locations
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: claim:web-opencode-core-agentic
     kind: Claim
     claimId: web-opencode-core-agentic

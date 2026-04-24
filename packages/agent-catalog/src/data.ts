@@ -300,6 +300,10 @@ function toAgentVersion(node: GraphNode): AgentVersion {
 }
 
 function toEvidenceRecord(node: GraphNode): EvidenceRecord {
+  const freshnessWindowDays =
+    typeof node.freshnessWindowDays === "number" && Number.isFinite(node.freshnessWindowDays)
+      ? node.freshnessWindowDays
+      : undefined;
   return {
     evidenceId: valueAsString(node.evidenceId),
     kind: valueAsString(node.kindLabel) === "web" ? "web" : "repo",
@@ -307,6 +311,10 @@ function toEvidenceRecord(node: GraphNode): EvidenceRecord {
     excerptLocator: valueAsString(node.locator),
     claim: valueAsString(getNodeById<GraphNode>(`claim:${valueAsString(node.evidenceId)}`)?.statement),
     capturedAt: valueAsString(node.capturedAt),
+    trustLevel: valueAsString(node.trustLevel),
+    reviewOwner: valueAsString(node.reviewOwner),
+    reviewedAt: valueAsString(node.reviewedAt),
+    freshnessWindowDays,
   };
 }
 

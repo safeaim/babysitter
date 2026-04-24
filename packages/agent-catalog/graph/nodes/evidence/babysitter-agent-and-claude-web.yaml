@@ -26,6 +26,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: published Mar 25 2026; permission automation and approval-safety design
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: evidence:web-anthropic-claude-code-sandboxing
     kind: EvidenceSource
     evidenceId: web-anthropic-claude-code-sandboxing
@@ -34,6 +37,9 @@ nodes:
     capturedAt: 2026-04-24T00:00:00.000Z
     locator: filesystem and network isolation for Claude Code sandboxing
     trustLevel: official-web
+    reviewOwner: "@a5c-ai/agent-catalog"
+    reviewedAt: 2026-04-24T00:00:00.000Z
+    freshnessWindowDays: 45
   - id: claim:repo-babysitter-agent-package
     kind: Claim
     claimId: repo-babysitter-agent-package

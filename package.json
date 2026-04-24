@@ -32,7 +32,7 @@
     "build:observer": "npm run build --workspace=@a5c-ai/babysitter-observer-dashboard",
     "test:observer": "npm run test --workspace=@a5c-ai/babysitter-observer-dashboard",
     "build:agent-mux": "node scripts/agent-mux-build.cjs build",
-    "test:agent-mux": "node scripts/agent-mux-build.cjs test",
+    "test:agent-mux": "node scripts/agent-mux-build.cjs build && node scripts/agent-mux-build.cjs test",
     "build:hooks-mux": "node scripts/hooks-mux-build.cjs build",
     "test:hooks-mux": "node scripts/hooks-mux-build.cjs test",
     "lint:hooks-mux": "node scripts/hooks-mux-build.cjs lint",

@@ -329,6 +329,8 @@ for (const path of [
 
 for (const path of [
   "package.json",
+  "packages/sdk/package.json",
+  "packages/babysitter-agent/package.json",
   "packages/agent-mux/adapters/package.json",
   "packages/agent-mux/cli/package.json",
   "packages/agent-mux/core/package.json",

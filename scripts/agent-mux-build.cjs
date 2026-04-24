@@ -54,7 +54,7 @@ function collectTestFiles(rootDir) {
 
 function getTestRoots(pkg) {
   if (pkg === 'packages/agent-mux/sdk') {
-    return ['packages/agent-mux/tests'];
+    return ['packages/agent-mux/tests', `${pkg}/tests`, `${pkg}/src`];
   }
 
   return [

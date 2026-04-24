@@ -51,6 +51,9 @@ export async function apiSubscribeRunEvents(
     if (!input.runId) {
       return fail("INVALID_INPUT", "runId must be a non-empty string");
     }
+    if (typeof input.runsDir === "string" && input.runsDir.trim().length === 0) {
+      return fail("INVALID_INPUT", "runsDir must be a non-empty string");
+    }
     const runDir = resolveExistingRunDir(input.runId, { override: input.runsDir ?? resolveRunsDir() });
     if (!(await pathExists(runDir))) {
       return fail("RUN_NOT_FOUND", `Run not found: ${input.runId}`);

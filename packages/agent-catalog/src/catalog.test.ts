@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   AGENT_CATALOG,
+  getCliNodeQuery,
   getCatalogGraphDocument,
   getCatalogGraphSnapshot,
   getCatalogOntologySchema,
@@ -9,6 +10,14 @@ import {
   getHostDetectionRules,
   getHookNameMap,
   getHooksMuxDetectionRules,
+  listCliAgentRelations,
+  listCliCapabilitySupport,
+  listCliEvidenceClaims,
+  listCliEvidenceSources,
+  listCliGraphEdges,
+  listCliGraphNodes,
+  listCliPackageRelations,
+  listCliProcessRelations,
   getPluginTargetDescriptor,
   getOntologyEvidenceManifest,
   getOntologyEvidenceSnapshot,
@@ -190,5 +199,65 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(assertionsById.get("capabilitySupport:codex:ge-0-119-0:image-input")?.evidenceStrength).toBe("inferred");
     expect(assertionsById.get("capabilitySupport:omp:ge-0-0-0:session-resume")?.evidenceStrength).toBe("partial");
     expect(assertionsById.get("capabilitySupport:omp:ge-0-0-0:session-resume")?.unresolvedGaps.length).toBeGreaterThan(0);
+  });
+
+  it("adds typed CLI graph traversal for node lookup, relations, and agent joins", () => {
+    const codexNode = getCliNodeQuery("agentVersion:codex:ge-0-119-0");
+    expect(codexNode).toBeDefined();
+    expect(codexNode!.node.kind).toBe("AgentVersion");
+    expect(codexNode!.outgoing.some((edge) => edge.relation === "defaults_to_model")).toBe(true);
+    expect(codexNode!.outgoing.some((edge) => edge.relation === "uses_transport" && edge.relatedNodeId === "transportRuntime:terminal-cli")).toBe(true);
+    expect(codexNode!.outgoing.some((edge) => edge.relation === "supports_modality" && edge.relatedNodeId === "modality:image")).toBe(true);
+    expect(codexNode!.incoming.some((edge) => edge.relation === "has_version")).toBe(true);
+
+    const codexAgentRows = listCliAgentRelations("codex");
+    expect(codexAgentRows).toHaveLength(2);
+    expect(codexAgentRows.find((row) => row.versionRange === ">=0.119.0")?.transportIds).toContain("terminal-cli");
+    expect(codexAgentRows.find((row) => row.versionRange === ">=0.119.0")?.modalityIds).toContain("image");
+
+    expect(listCliGraphNodes("AgentVersion").length).toBeGreaterThan(5);
+    expect(listCliGraphEdges({ fromNodeId: "agentVersion:codex:ge-0-119-0", relation: "uses_transport" })).toHaveLength(4);
+  });
+
+  it("adds CLI evidence and capability-matrix queries with version-scoped support rows", () => {
+    const codexHookSupport = listCliCapabilitySupport({
+      capabilityId: "runtime-hooks",
+      subjectIdPrefix: "agentVersion:codex:",
+    });
+
+    expect(codexHookSupport).toHaveLength(2);
+    expect(codexHookSupport.map((row) => row.versionRange)).toContain(">=0.119.0");
+    expect(codexHookSupport.map((row) => row.versionRange)).toContain(">=0.0.0 <0.119.0");
+    expect(codexHookSupport.every((row) => row.claimIds.includes("web-codex-hooks"))).toBe(true);
+    expect(codexHookSupport.every((row) => row.sourceIds.includes("web-codex-hooks"))).toBe(true);
+
+    const supportClaims = listCliEvidenceClaims({
+      nodeId: "capabilitySupport:codex:ge-0-119-0:runtime-hooks",
+      evidenceId: "web-codex-hooks",
+    });
+    expect(supportClaims.map((claim) => claim.claimId)).toContain("web-codex-hooks");
+
+    const supportSources = listCliEvidenceSources({
+      nodeId: "capabilitySupport:codex:ge-0-119-0:runtime-hooks",
+      claimId: "web-codex-hooks",
+    });
+    expect(supportSources).toHaveLength(1);
+    expect(supportSources[0].sourcePathOrUrl).toContain("codex");
+  });
+
+  it("adds CLI package, process, and path relationship rows for discovery workflows", () => {
+    const catalogPackage = listCliPackageRelations("@a5c-ai/catalog");
+    expect(catalogPackage).toHaveLength(1);
+    expect(catalogPackage[0].processIds).toContain("packages/catalog/process-library-catalog");
+    expect(catalogPackage[0].paths).toContain("packages/catalog/src/app/api/agents");
+    expect(catalogPackage[0].ciIds).toContain("@a5c-ai/catalog");
+    expect(catalogPackage[0].graphIds).toContain("graph:agent-catalog");
+
+    const catalogProcess = listCliProcessRelations("packages/catalog/process-library-catalog");
+    expect(catalogProcess).toHaveLength(1);
+    expect(catalogProcess[0].ownerPackageId).toBe("@a5c-ai/catalog");
+    expect(catalogProcess[0].paths).toContain("packages/catalog/process-library-catalog.js");
+    expect(catalogProcess[0].paths).toContain("packages/catalog/src/app");
+    expect(catalogProcess[0].paths).toContain("packages/catalog/src/lib");
   });
 });

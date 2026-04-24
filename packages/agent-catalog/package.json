@@ -14,11 +14,12 @@
     "evidence"
   ],
   "scripts": {
+    "check:src-artifacts": "node ./scripts/check-src-artifacts.cjs",
     "generate:evidence": "node ./scripts/generate-evidence.cjs",
     "validate:graph": "node ./scripts/validate-graph.cjs",
-    "build": "npm run generate:evidence && tsc -p tsconfig.json && npm run validate:graph",
+    "build": "npm run check:src-artifacts && npm run generate:evidence && tsc -p tsconfig.json && npm run validate:graph",
     "clean": "rimraf dist",
-    "test": "npm run generate:evidence && npm run validate:graph && cd ../.. && npm run test:agent-catalog-contracts",
+    "test": "npm run check:src-artifacts && npm run generate:evidence && npm run validate:graph && cd ../.. && npm run test:agent-catalog-contracts",
     "ci:test": "npm run clean && npm run build && npm run test",
     "ci:staging": "npm run ci:test && npm run version:check",
     "ci:prod": "npm run ci:staging",

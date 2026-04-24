@@ -9,6 +9,7 @@ import { useShallow } from "zustand/react/shallow";
 import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
 
 import { RequireGatewayAuth } from "@/components/agent-mux/require-gateway-auth";
+import { SessionObservabilityPanel } from "@/components/sessions/session-observability-panel";
 import { Button as LocalButton } from "@/components/ui/button";
 import { WorkspaceRuntimePanel } from "@/components/workspaces/workspace-runtime-panel";
 import { useGatewayFetch } from "@/components/agent-mux/gateway-provider";
@@ -262,6 +263,12 @@ function SessionDetailContent() {
           <StatCard label="Cost" value={formatUsd(totalCost)} />
         </div>
       </section>
+
+      <SessionObservabilityPanel
+        sessionId={sessionId}
+        runs={runs as Array<Record<string, unknown>>}
+        eventBuffers={eventBuffers}
+      />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <section className="rounded-3xl border border-border bg-card p-6 shadow-lg">

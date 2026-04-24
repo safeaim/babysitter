@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CheckCircle2, CornerDownRight, FileDiff, MessageSquareText, MessageSquareWarning, XCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -101,6 +102,47 @@ function commentsForAnchor(
   return comments.filter((comment) => anchorKey(comment.anchor) === key);
 }
 
+function buildFeedbackContext(artifact: KanbanReviewArtifact): Array<{
+  id: string;
+  label: string;
+  href: string;
+}> {
+  const context = new Map<string, { id: string; label: string; href: string }>();
+
+  if (artifact.targetType === "workspace") {
+    context.set(`workspace:${artifact.targetId}`, {
+      id: `workspace:${artifact.targetId}`,
+      label: "Workspace",
+      href: `/workspaces?workspace=${encodeURIComponent(artifact.targetId)}`,
+    });
+  }
+
+  for (const comment of artifact.comments) {
+    const source = comment.feedbackSource;
+    if (!source || source.kind !== "agent-feedback") {
+      continue;
+    }
+    if (source.runId) {
+      context.set(`run:${source.runId}:${source.effectId ?? ""}`, {
+        id: `run:${source.runId}:${source.effectId ?? ""}`,
+        label: source.effectId ? "Run task" : "Run",
+        href: source.effectId
+          ? `/runs/${source.runId}?effectId=${encodeURIComponent(source.effectId)}`
+          : `/runs/${source.runId}`,
+      });
+    }
+    if (source.sessionId) {
+      context.set(`session:${source.sessionId}`, {
+        id: `session:${source.sessionId}`,
+        label: "Session",
+        href: `/sessions/${source.sessionId}`,
+      });
+    }
+  }
+
+  return Array.from(context.values());
+}
+
 export function ReviewPanel(props: {
   title: string;
   description: string;
@@ -139,6 +181,10 @@ export function ReviewPanel(props: {
   const selectedArtifact = useMemo(
     () => props.artifacts.find((artifact) => artifact.id === selectedArtifactId) ?? null,
     [props.artifacts, selectedArtifactId],
+  );
+  const feedbackContext = useMemo(
+    () => (selectedArtifact ? buildFeedbackContext(selectedArtifact) : []),
+    [selectedArtifact],
   );
 
   useEffect(() => {
@@ -258,6 +304,20 @@ export function ReviewPanel(props: {
                 <h3 className="mt-3 text-xl font-semibold tracking-tight">{selectedArtifact.title}</h3>
                 {selectedArtifact.summary ? (
                   <p className="mt-2 text-sm leading-6 text-foreground-muted">{selectedArtifact.summary}</p>
+                ) : null}
+                {feedbackContext.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    {feedbackContext.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-foreground-muted hover:border-primary/30 hover:text-primary"
+                      >
+                        {item.label}
+                        <CornerDownRight className="h-3 w-3" />
+                      </Link>
+                    ))}
+                  </div>
                 ) : null}
                 <div className="mt-3 flex flex-wrap gap-3 text-sm text-foreground-muted">
                   {selectedArtifact.branch ? <span>Branch: {selectedArtifact.branch}</span> : null}

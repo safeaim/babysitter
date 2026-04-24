@@ -5,6 +5,7 @@ import { useRunDashboard } from "@/hooks/use-run-dashboard";
 import { useGatewayAuth } from "@/components/agent-mux/gateway-provider";
 import { BreakpointBanner } from "@/components/dashboard/breakpoint-banner";
 import { BacklogOverview } from "@/components/dashboard/backlog-overview";
+import { BabysitterOverlayPanel } from "@/components/dashboard/babysitter-overlay-panel";
 import { CatchUpBanner } from "@/components/dashboard/catch-up-banner";
 import { ExecutiveSummaryBanner } from "@/components/dashboard/executive-summary-banner";
 import { Button } from "@/components/ui/button";
@@ -103,6 +104,7 @@ export default function DashboardPage() {
         </section>
 
         <BacklogOverview />
+        <BabysitterOverlayPanel />
 
         {/* Global Search */}
         <GlobalSearch />

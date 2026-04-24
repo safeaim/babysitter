@@ -1,6 +1,6 @@
 "use client";
-import { useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useRunDetail } from "@/hooks/use-run-detail";
 import { useKeyboard } from "@/hooks/use-keyboard";
@@ -75,12 +75,14 @@ const TaskDetailPanel = dynamic(
 export default function RunDetailPage({ params }: { params: { runId: string } }) {
   const { runId } = params;
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { run, loading, error, hasBreakpointWaiting: _hasBreakpointWaiting } = useRunDetail(runId);
   const { notifications: _notifications, dismiss: _dismiss, notify: _notify } = useNotificationContext();
   const [selectedEffectId, setSelectedEffectId] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [showEventStream, setShowEventStream] = useState(true);
   const [activeTab, setActiveTab] = useState("agent");
+  const requestedEffectId = searchParams.get("effectId");
 
   const handleSelectEffect = useCallback((effectId: string) => {
     setSelectedEffectId(effectId);
@@ -107,6 +109,16 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
     if (!selectedEffectId) return null;
     return tasks.find((t) => t.effectId === selectedEffectId) || null;
   }, [tasks, selectedEffectId]);
+
+  useEffect(() => {
+    if (!requestedEffectId || !tasks.some((task) => task.effectId === requestedEffectId)) {
+      return;
+    }
+    if (selectedEffectId === requestedEffectId) {
+      return;
+    }
+    handleSelectEffect(requestedEffectId);
+  }, [handleSelectEffect, requestedEffectId, selectedEffectId, tasks]);
 
   const moveDown = useCallback(() => {
     if (!tasks.length) return;

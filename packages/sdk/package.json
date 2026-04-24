@@ -2,7 +2,7 @@
   "name": "@a5c-ai/babysitter-sdk",
   "version": "5.0.0",
   "description": "Storage and run-registry primitives for event-sourced babysitter workflows.",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,6 +15,9 @@
     "dist",
     "skills"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/copy-template-assets.cjs",
     "sync:command-templates": "node ../../scripts/sync-sdk-command-templates.cjs",

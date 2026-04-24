@@ -2,7 +2,7 @@
   "name": "@a5c-ai/babysitter",
   "version": "5.0.0",
   "description": "Metapackage for installing all babysitter npm packages",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "commonjs",
   "bin": {
     "babysitter": "bin/babysitter.js"
@@ -11,6 +11,9 @@
     "bin/",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "lint": "eslint \"bin/**/*.js\" --max-warnings=0"
   },

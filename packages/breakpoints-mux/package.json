@@ -50,7 +50,10 @@
     "lint": "eslint src/"
   },
   "author": "a5c.ai",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@octokit/auth-app": "^7.1.4",
     "@octokit/rest": "^21.1.1",

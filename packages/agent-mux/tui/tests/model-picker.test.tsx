@@ -48,4 +48,15 @@ describe('ModelPicker', () => {
     await new Promise((r) => setTimeout(r, 60));
     expect(onCancel).toHaveBeenCalled();
   });
+
+  it('caps visible rows for short overlays', () => {
+    const onPick = vi.fn();
+    const onCancel = vi.fn();
+    const { lastFrame } = render(
+      <ModelPicker models={models} onPick={onPick} onCancel={onCancel} maxItems={2} width={20} />,
+    );
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('… 1 more');
+    expect(frame).not.toContain('gpt-5');
+  });
 });

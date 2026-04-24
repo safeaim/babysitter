@@ -166,4 +166,43 @@ describe('real amux-tui binary e2e', () => {
 
     await harness.close();
   }, 30_000);
+
+  it('reflows the sessions view after a live terminal resize', async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'amux-tui-home-'));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'amux-tui-state-'));
+    tempDirs.push(homeDir, stateDir);
+
+    const pluginDir = path.resolve(__dirname, 'fixtures');
+    const binaryPath = path.resolve(__dirname, '../dist/bin/amux-tui.js');
+
+    const proc = pty.spawn(process.execPath, [binaryPath], {
+      name: 'xterm-color',
+      cols: 120,
+      rows: 40,
+      cwd: path.resolve(__dirname, '..'),
+      env: {
+        ...process.env,
+        HOME: homeDir,
+        AMUX_TUI_PLUGINS_DIR: pluginDir,
+        AMUX_TUI_E2E_STATE_DIR: stateDir,
+        FORCE_COLOR: '0',
+        NO_COLOR: '1',
+      },
+    });
+    const harness = new PtyHarness(proc);
+
+    await harness.waitFor('No messages yet.');
+    harness.write('\u001B');
+    await harness.pause();
+    harness.write('2');
+    await harness.waitFor('sess-alpha');
+    await harness.waitFor('sess-beta');
+
+    const resizeCheckpoint = harness.checkpoint();
+    proc.resize(44, 14);
+    await harness.waitForSince('Enter resume · d details · D diff · R refresh', resizeCheckpoint);
+    await harness.waitForSince('sess-beta', resizeCheckpoint);
+
+    await harness.close();
+  }, 30_000);
 });

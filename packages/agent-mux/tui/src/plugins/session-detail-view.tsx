@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { definePlugin, type TuiViewProps } from '../plugin.js';
+import { truncateMiddle } from '../layout.js';
 
 interface DetailState {
   loading: boolean;
@@ -17,7 +18,14 @@ interface DetailState {
   exportNote?: string;
 }
 
-export function SessionDetailView({ client, active, selection, emit, eventStream }: TuiViewProps) {
+export function SessionDetailView({
+  client,
+  active,
+  selection,
+  emit,
+  eventStream,
+  viewport,
+}: TuiViewProps) {
   const [state, setState] = useState<DetailState>({ loading: !!selection });
 
   useEffect(() => {
@@ -104,11 +112,25 @@ export function SessionDetailView({ client, active, selection, emit, eventStream
   if (state.loading) return <Text dimColor>Loading session…</Text>;
   if (state.error) return <Text color="red">Error: {state.error}</Text>;
   const d = state.data!;
+  const compact = Boolean(viewport?.isNarrow);
+  const sessionId = compact
+    ? truncateMiddle(d.sessionId, Math.max(12, viewport?.contentWidth ?? 40))
+    : d.sessionId;
+  const actionLines = compact
+    ? ['e json · m markdown · w watch', 'r resume · b/Esc back']
+    : ['e: export json · m: export markdown · w: watch · r: resume · b/Esc: back'];
   return (
     <Box flexDirection="column">
-      <Text>
-        <Text color="cyan">{d.agent}</Text> <Text bold>{d.sessionId}</Text>
-      </Text>
+      {compact ? (
+        <>
+          <Text color="cyan">{d.agent}</Text>
+          <Text bold>{sessionId}</Text>
+        </>
+      ) : (
+        <Text>
+          <Text color="cyan">{d.agent}</Text> <Text bold>{sessionId}</Text>
+        </Text>
+      )}
       {d.title ? <Text>title: {d.title}</Text> : null}
       {d.createdAt ? <Text dimColor>created: {d.createdAt}</Text> : null}
       {d.updatedAt ? <Text dimColor>updated: {d.updatedAt}</Text> : null}
@@ -117,7 +139,11 @@ export function SessionDetailView({ client, active, selection, emit, eventStream
         <Text>cost: ${d.totalCost.toFixed(4)}</Text>
       ) : null}
       {state.exportNote ? <Text color="green">{state.exportNote}</Text> : null}
-      <Text dimColor>e: export json · m: export markdown · w: watch · r: resume · b/Esc: back</Text>
+      {actionLines.map((line) => (
+        <Text key={line} dimColor>
+          {line}
+        </Text>
+      ))}
     </Box>
   );
 }

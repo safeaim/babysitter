@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { definePlugin, type TuiViewProps } from '../plugin.js';
+import { truncateMiddle, visibleWindow } from '../layout.js';
 
 interface Row {
   sessionId: string;
   agent: string;
 }
 
-function SessionsView({ client, active, emit, activeSessions }: TuiViewProps) {
+function SessionsView({ client, active, emit, activeSessions, viewport }: TuiViewProps) {
   const [sessions, setSessions] = useState<Row[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cursor, setCursor] = useState<number>(0);
@@ -82,20 +83,34 @@ function SessionsView({ client, active, emit, activeSessions }: TuiViewProps) {
 
   if (error) return <Text color="red">{error}</Text>;
   if (sessions.length === 0) return <Text dimColor>No sessions found.</Text>;
+  const visibleCount = Math.max(3, viewport?.listRowLimit ?? 12);
+  const { start, end } = visibleWindow(cursor, sessions.length, visibleCount);
+  const visibleSessions = sessions.slice(start, end);
+  const compact = Boolean(viewport?.isNarrow);
+  const rowWidth = Math.max(12, (viewport?.contentWidth ?? 76) - 8);
+  const headerHint = compact
+    ? 'Enter resume · d details · D diff · R refresh'
+    : '↑/↓ navigate · Enter: resume · d: details · D: mark/diff · R: refresh';
   return (
     <Box flexDirection="column">
-      {sessions.map((s, i) => {
-        const selected = i === cursor;
+      {start > 0 ? <Text dimColor>… {start} earlier</Text> : null}
+      {visibleSessions.map((s, i) => {
+        const absoluteIndex = start + i;
+        const selected = absoluteIndex === cursor;
         const isActive = activeSessions?.has(`${s.agent}:${s.sessionId}`) ?? false;
+        const sessionText = compact
+          ? truncateMiddle(s.sessionId, Math.max(8, rowWidth - s.agent.length - 3))
+          : s.sessionId;
         return (
           <Text key={s.agent + ':' + s.sessionId} color={selected ? 'green' : undefined}>
             {selected ? '> ' : '  '}
             {isActive ? <Text color="yellow">● </Text> : <Text>  </Text>}
-            <Text color="cyan">{s.agent}</Text> {s.sessionId}
+            <Text color="cyan">{s.agent}</Text> {sessionText}
           </Text>
         );
       })}
-      <Text dimColor>↑/↓ navigate · Enter: resume · d: details · D: mark/diff · R: refresh</Text>
+      {end < sessions.length ? <Text dimColor>… {sessions.length - end} more</Text> : null}
+      <Text dimColor>{headerHint}</Text>
     </Box>
   );
 }

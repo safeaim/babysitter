@@ -1,4 +1,15 @@
 export type KanbanPriority = 'critical' | 'high' | 'medium' | 'low';
+export type KanbanCollaboratorRole = 'owner' | 'maintainer' | 'contributor' | 'viewer';
+export type KanbanEntityVisibility = 'private' | 'team' | 'workspace-shared';
+export type KanbanActivityEntityType = 'project' | 'issue' | 'board' | 'workspace';
+export type KanbanActivityActorKind = 'human' | 'agent' | 'system';
+export type KanbanPermissionAction =
+  | 'manage-project-settings'
+  | 'manage-team-members'
+  | 'edit-board'
+  | 'assign-issues'
+  | 'review-work'
+  | 'manage-workspaces';
 
 export type KanbanIssueStatus =
   | 'backlog'
@@ -71,6 +82,52 @@ export interface KanbanAssignee {
   readonly displayName: string;
   readonly email?: string;
   readonly avatarUrl?: string;
+}
+
+export interface KanbanCollaborator extends KanbanAssignee {
+  readonly role: KanbanCollaboratorRole;
+}
+
+export interface KanbanPermissionGrant {
+  readonly action: KanbanPermissionAction;
+  readonly roles: readonly KanbanCollaboratorRole[];
+  readonly description?: string;
+}
+
+export interface KanbanTeamSettings {
+  readonly visibility: KanbanEntityVisibility;
+  readonly defaultRole: KanbanCollaboratorRole;
+  readonly allowSelfAssign: boolean;
+}
+
+export interface KanbanProjectSettings {
+  readonly reviewRequiredForDone: boolean;
+  readonly activityScope: 'project-and-issues' | 'all-board-entities';
+  readonly workspaceProvisioning: 'owners-maintainers' | 'contributors-and-up';
+}
+
+export interface KanbanActivityActor {
+  readonly kind: KanbanActivityActorKind;
+  readonly id: string;
+  readonly displayName: string;
+  readonly role?: KanbanCollaboratorRole;
+}
+
+export interface KanbanActivityEntry {
+  readonly id: string;
+  readonly entityType: KanbanActivityEntityType;
+  readonly entityId: string;
+  readonly action: string;
+  readonly summary: string;
+  readonly actor: KanbanActivityActor;
+  readonly createdAt: string;
+}
+
+export interface KanbanTeam {
+  readonly id: string;
+  readonly name: string;
+  readonly members: readonly KanbanCollaborator[];
+  readonly settings: KanbanTeamSettings;
 }
 
 export interface KanbanAcceptanceCriterion {
@@ -284,6 +341,7 @@ export interface KanbanIssue {
   readonly priority: KanbanPriority;
   readonly labels: readonly KanbanLabel[];
   readonly assignees: readonly KanbanAssignee[];
+  readonly collaborators: readonly KanbanCollaborator[];
   readonly dependencies: readonly KanbanIssueDependency[];
   readonly acceptanceCriteria: readonly KanbanAcceptanceCriterion[];
   readonly decomposition: readonly KanbanDecompositionItem[];
@@ -293,6 +351,7 @@ export interface KanbanIssue {
   readonly updatedAt: string;
   readonly dispatch: KanbanIssueDispatchState;
   readonly repositoryLifecycle?: KanbanIssueRepositoryLifecycle;
+  readonly activity: readonly KanbanActivityEntry[];
   readonly source?: KanbanIssueSource;
   readonly review?: KanbanReviewSummary;
 }
@@ -332,6 +391,10 @@ export interface KanbanProject {
   readonly issueIds: readonly string[];
   readonly labels: readonly KanbanLabel[];
   readonly assignees: readonly KanbanAssignee[];
+  readonly team: KanbanTeam;
+  readonly settings: KanbanProjectSettings;
+  readonly permissions: readonly KanbanPermissionGrant[];
+  readonly activity: readonly KanbanActivityEntry[];
   readonly statuses: readonly KanbanStatusDefinition[];
   readonly repositories: readonly KanbanRepositoryContext[];
   readonly linkedRunProjectName?: string;
@@ -381,8 +444,11 @@ export interface KanbanBoardCard {
   readonly blockedReasons: readonly string[];
   readonly labelNames: readonly string[];
   readonly assigneeNames: readonly string[];
+  readonly collaboratorNames: readonly string[];
   readonly dependencyCount: number;
   readonly childCount: number;
+  readonly activityCount: number;
+  readonly latestActivityAt?: string;
   readonly acceptanceProgress: {
     readonly satisfied: number;
     readonly total: number;
@@ -440,6 +506,51 @@ const DEFAULT_PROJECT_STATUSES: readonly KanbanStatusDefinition[] = [
   { id: 'in-progress', name: 'In Progress', kind: 'active', wipLimit: 3 },
   { id: 'review', name: 'Review', kind: 'active', wipLimit: 3 },
   { id: 'done', name: 'Done', kind: 'done' },
+];
+
+const DEFAULT_TEAM_SETTINGS: KanbanTeamSettings = {
+  visibility: 'team',
+  defaultRole: 'contributor',
+  allowSelfAssign: true,
+};
+
+const DEFAULT_PROJECT_SETTINGS: KanbanProjectSettings = {
+  reviewRequiredForDone: true,
+  activityScope: 'project-and-issues',
+  workspaceProvisioning: 'owners-maintainers',
+};
+
+const DEFAULT_PERMISSION_GRANTS: readonly KanbanPermissionGrant[] = [
+  {
+    action: 'manage-project-settings',
+    roles: ['owner', 'maintainer'],
+    description: 'Only owners and maintainers can change shared project settings.',
+  },
+  {
+    action: 'manage-team-members',
+    roles: ['owner', 'maintainer'],
+    description: 'Team roster and role changes require elevated project roles.',
+  },
+  {
+    action: 'edit-board',
+    roles: ['owner', 'maintainer', 'contributor'],
+    description: 'Contributors can move cards and edit the shared board.',
+  },
+  {
+    action: 'assign-issues',
+    roles: ['owner', 'maintainer', 'contributor'],
+    description: 'Contributors can collaborate and self-assign when team settings allow it.',
+  },
+  {
+    action: 'review-work',
+    roles: ['owner', 'maintainer', 'contributor', 'viewer'],
+    description: 'Every collaborator can participate in review and activity visibility.',
+  },
+  {
+    action: 'manage-workspaces',
+    roles: ['owner', 'maintainer'],
+    description: 'Workspace lifecycle actions remain restricted to trusted roles.',
+  },
 ];
 
 const WORKFLOW_STATE_ORDER: readonly KanbanWorkflowState[] = [
@@ -524,6 +635,96 @@ function uniqueById<T extends { readonly id: string }>(items: readonly T[]): T[]
 
 function uniqueStrings(values: readonly string[]): string[] {
   return Array.from(new Set(values));
+}
+
+function normalizeCollaboratorRole(role: KanbanCollaboratorRole | undefined): KanbanCollaboratorRole {
+  switch (role) {
+    case 'owner':
+    case 'maintainer':
+    case 'contributor':
+    case 'viewer':
+      return role;
+    default:
+      return 'contributor';
+  }
+}
+
+function normalizeCollaborator(collaborator: KanbanCollaborator): KanbanCollaborator {
+  return {
+    ...collaborator,
+    displayName: collaborator.displayName.trim(),
+    email: collaborator.email?.trim() || undefined,
+    avatarUrl: collaborator.avatarUrl?.trim() || undefined,
+    role: normalizeCollaboratorRole(collaborator.role),
+  };
+}
+
+function normalizeTeamSettings(settings: Partial<KanbanTeamSettings> | undefined): KanbanTeamSettings {
+  return {
+    visibility:
+      settings?.visibility === 'private' || settings?.visibility === 'workspace-shared'
+        ? settings.visibility
+        : DEFAULT_TEAM_SETTINGS.visibility,
+    defaultRole: normalizeCollaboratorRole(settings?.defaultRole ?? DEFAULT_TEAM_SETTINGS.defaultRole),
+    allowSelfAssign: settings?.allowSelfAssign ?? DEFAULT_TEAM_SETTINGS.allowSelfAssign,
+  };
+}
+
+function normalizeProjectSettings(
+  settings: Partial<KanbanProjectSettings> | undefined,
+): KanbanProjectSettings {
+  return {
+    reviewRequiredForDone: settings?.reviewRequiredForDone ?? DEFAULT_PROJECT_SETTINGS.reviewRequiredForDone,
+    activityScope:
+      settings?.activityScope === 'all-board-entities'
+        ? 'all-board-entities'
+        : DEFAULT_PROJECT_SETTINGS.activityScope,
+    workspaceProvisioning:
+      settings?.workspaceProvisioning === 'contributors-and-up'
+        ? 'contributors-and-up'
+        : DEFAULT_PROJECT_SETTINGS.workspaceProvisioning,
+  };
+}
+
+function normalizePermissionGrants(
+  permissions: readonly KanbanPermissionGrant[] | undefined,
+): KanbanPermissionGrant[] {
+  const seen = new Set<KanbanPermissionAction>();
+  const normalized: KanbanPermissionGrant[] = [];
+  for (const permission of permissions?.length ? permissions : DEFAULT_PERMISSION_GRANTS) {
+    if (seen.has(permission.action)) {
+      continue;
+    }
+    seen.add(permission.action);
+    normalized.push({
+      action: permission.action,
+      roles: uniqueStrings(permission.roles.map((role) => normalizeCollaboratorRole(role))) as KanbanCollaboratorRole[],
+      description: permission.description?.trim() || undefined,
+    });
+  }
+  return normalized;
+}
+
+function normalizeActivityEntry(entry: KanbanActivityEntry): KanbanActivityEntry {
+  return {
+    ...entry,
+    action: entry.action.trim(),
+    summary: entry.summary.trim(),
+    actor: {
+      ...entry.actor,
+      displayName: entry.actor.displayName.trim(),
+      role: entry.actor.role ? normalizeCollaboratorRole(entry.actor.role) : undefined,
+    },
+  };
+}
+
+function normalizeTeam(team: Partial<KanbanTeam> | undefined, project: Pick<KanbanProject, 'id' | 'name'>): KanbanTeam {
+  return {
+    id: team?.id?.trim() || `team-${project.id}`,
+    name: team?.name?.trim() || `${project.name} Team`,
+    members: uniqueById((team?.members ?? []).map(normalizeCollaborator)),
+    settings: normalizeTeamSettings(team?.settings),
+  };
 }
 
 function normalizeRepositorySettings(
@@ -775,7 +976,11 @@ export function summarizeKanbanReviewArtifact(
 }
 
 function resolveReadiness(
-  issue: Omit<KanbanIssue, 'dispatch'> & { readonly dispatch?: Partial<KanbanIssueDispatchState> },
+  issue: Omit<KanbanIssue, 'dispatch' | 'collaborators' | 'activity'> & {
+    readonly collaborators?: readonly KanbanCollaborator[];
+    readonly activity?: readonly KanbanActivityEntry[];
+    readonly dispatch?: Partial<KanbanIssueDispatchState>;
+  },
   issuesById: ReadonlyMap<string, KanbanIssue>,
 ): KanbanDispatchReadiness {
   if (issue.status === 'done') return 'completed';
@@ -804,7 +1009,11 @@ function resolveReadiness(
 }
 
 function resolveBlockedReasons(
-  issue: Omit<KanbanIssue, 'dispatch'> & { readonly dispatch?: Partial<KanbanIssueDispatchState> },
+  issue: Omit<KanbanIssue, 'dispatch' | 'collaborators' | 'activity'> & {
+    readonly collaborators?: readonly KanbanCollaborator[];
+    readonly activity?: readonly KanbanActivityEntry[];
+    readonly dispatch?: Partial<KanbanIssueDispatchState>;
+  },
   issuesById: ReadonlyMap<string, KanbanIssue>,
 ): string[] {
   const reasons = new Set<string>(issue.dispatch?.blockedReasons ?? []);
@@ -829,12 +1038,17 @@ function resolveBlockedReasons(
 }
 
 export function normalizeKanbanIssue(
-  issue: Omit<KanbanIssue, 'dispatch'> & { readonly dispatch?: Partial<KanbanIssueDispatchState> },
+  issue: Omit<KanbanIssue, 'dispatch' | 'collaborators' | 'activity'> & {
+    readonly collaborators?: readonly KanbanCollaborator[];
+    readonly activity?: readonly KanbanActivityEntry[];
+    readonly dispatch?: Partial<KanbanIssueDispatchState>;
+  },
   issuesById: ReadonlyMap<string, KanbanIssue>,
   repositoryMap: ReadonlyMap<string, KanbanRepositoryContext> = new Map(),
 ): KanbanIssue {
   const labels = uniqueById(issue.labels);
   const assignees = uniqueById(issue.assignees);
+  const collaborators = uniqueById((issue.collaborators ?? []).map(normalizeCollaborator));
   const acceptanceCriteria = uniqueById(issue.acceptanceCriteria);
   const decomposition = uniqueById(issue.decomposition);
   const childIssueIds = Array.from(new Set(issue.childIssueIds));
@@ -845,9 +1059,11 @@ export function normalizeKanbanIssue(
     ...issue,
     labels,
     assignees,
+    collaborators,
     acceptanceCriteria,
     decomposition,
     childIssueIds,
+    activity: uniqueById((issue.activity ?? []).map(normalizeActivityEntry)),
     dispatch: {
       readiness,
       blockedReasons,
@@ -1043,10 +1259,16 @@ export function computeKanbanProjectMetrics(issues: readonly KanbanIssue[]): Kan
 
 export function buildKanbanBacklogSnapshot(input: {
   readonly generatedAt?: string;
-  readonly projects: readonly (Omit<KanbanProject, 'metrics'> & {
+  readonly projects: readonly (Omit<KanbanProject, 'metrics' | 'team' | 'settings' | 'permissions' | 'activity'> & {
+    readonly team?: Partial<KanbanTeam>;
+    readonly settings?: Partial<KanbanProjectSettings>;
+    readonly permissions?: readonly KanbanPermissionGrant[];
+    readonly activity?: readonly KanbanActivityEntry[];
     readonly repositories?: readonly KanbanRepositoryContext[];
   })[];
-  readonly issues: readonly (Omit<KanbanIssue, 'dispatch'> & {
+  readonly issues: readonly (Omit<KanbanIssue, 'dispatch' | 'collaborators' | 'activity'> & {
+    readonly collaborators?: readonly KanbanCollaborator[];
+    readonly activity?: readonly KanbanActivityEntry[];
     readonly dispatch?: Partial<KanbanIssueDispatchState>;
   })[];
 }): KanbanBacklogSnapshot {
@@ -1054,6 +1276,8 @@ export function buildKanbanBacklogSnapshot(input: {
   for (const issue of input.issues) {
     issueSeedMap.set(issue.id, {
       ...issue,
+      collaborators: issue.collaborators ?? [],
+      activity: issue.activity ?? [],
       dispatch: {
         readiness: 'ready',
         blockedReasons: [],
@@ -1067,6 +1291,10 @@ export function buildKanbanBacklogSnapshot(input: {
     ...project,
     labels: uniqueById(project.labels),
     assignees: uniqueById(project.assignees),
+    team: normalizeTeam(project.team, project),
+    settings: normalizeProjectSettings(project.settings),
+    permissions: normalizePermissionGrants(project.permissions),
+    activity: uniqueById((project.activity ?? []).map(normalizeActivityEntry)),
     statuses: project.statuses.length > 0 ? project.statuses : DEFAULT_PROJECT_STATUSES,
     repositories: uniqueById((project.repositories ?? []).map(normalizeRepositoryContext)),
   }));
@@ -1194,8 +1422,11 @@ export function buildKanbanProjectBoard(input: {
       blockedReasons: issue.dispatch.blockedReasons,
       labelNames: uniqueStrings(issue.labels.map((label) => label.name)),
       assigneeNames: uniqueStrings(issue.assignees.map((assignee) => assignee.displayName)),
+      collaboratorNames: uniqueStrings(issue.collaborators.map((collaborator) => collaborator.displayName)),
       dependencyCount: issue.dependencies.length,
       childCount: issue.childIssueIds.length,
+      activityCount: issue.activity.length,
+      latestActivityAt: issue.activity[0]?.createdAt,
       acceptanceProgress: progress,
       repository,
       repositoryLifecycle: issue.repositoryLifecycle,

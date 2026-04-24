@@ -539,6 +539,7 @@ We welcome contributions! Here's how you can help:
 - **Suggest features**: Share your ideas for improvements
 - **Submit pull requests**: Fix bugs or add features
 - **Improve documentation**: Help make docs clearer
+- **Check workspace coverage**: [docs/workspace-validation.md](docs/workspace-validation.md)
 
 See [CONTRIBUTING.md](https://github.com/a5c-ai/babysitter/blob/main/CONTRIBUTING.md) for detailed guidelines.
 

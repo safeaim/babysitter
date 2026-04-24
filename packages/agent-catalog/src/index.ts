@@ -5,3 +5,4 @@ export * from "./graph";
 export * from "./sdk";
 export * from "./cli";
 export * from "./ui";
+export * from "./discovery";

@@ -3,8 +3,8 @@
  * GET /api/analytics - Dashboard metrics and statistics
  */
 
+import { getCatalogDiscoverySnapshot } from '@a5c-ai/agent-catalog';
 import { NextRequest } from 'next/server';
-import { initializeDatabase } from '@/lib/db/client';
 import {
   createSuccessResponse,
   internalErrorResponse,
@@ -13,91 +13,59 @@ import type { AnalyticsResponse, EntityDistribution, RecentActivityItem } from '
 
 export async function GET(_request: NextRequest) {
   try {
-    // Initialize database
-    const db = initializeDatabase();
-    const rawDb = db.getDb();
+    const snapshot = getCatalogDiscoverySnapshot();
 
-    // Get basic counts
-    const stats = db.getStats();
+    const byDomain: EntityDistribution[] = snapshot.domains
+      .map((domain) => ({
+        name: domain.name,
+        count: domain.agentCount + domain.skillCount,
+      }))
+      .sort((left, right) => right.count - left.count)
+      .slice(0, 10);
 
-    // Get distribution by domain
-    const byDomainSql = `
-      SELECT d.name, COUNT(DISTINCT a.id) + COUNT(DISTINCT sk.id) as count
-      FROM domains d
-      LEFT JOIN agents a ON a.domain_id = d.id
-      LEFT JOIN skills sk ON sk.domain_id = d.id
-      GROUP BY d.id, d.name
-      ORDER BY count DESC
-      LIMIT 10
-    `;
-    const byDomainRows = rawDb.prepare(byDomainSql).all() as Array<{ name: string; count: number }>;
-    const byDomain: EntityDistribution[] = byDomainRows.map(row => ({
-      name: row.name,
-      count: row.count,
-    }));
+    const byCategoryCounts = new Map<string, number>();
+    for (const process of snapshot.processes) {
+      if (!process.category) {
+        continue;
+      }
+      byCategoryCounts.set(process.category, (byCategoryCounts.get(process.category) ?? 0) + 1);
+    }
+    const byCategory: EntityDistribution[] = Array.from(byCategoryCounts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((left, right) => right.count - left.count)
+      .slice(0, 10);
 
-    // Get distribution by category (from processes)
-    const byCategorySql = `
-      SELECT category as name, COUNT(*) as count
-      FROM processes
-      WHERE category IS NOT NULL
-      GROUP BY category
-      ORDER BY count DESC
-      LIMIT 10
-    `;
-    const byCategoryRows = rawDb.prepare(byCategorySql).all() as Array<{ name: string; count: number }>;
-    const byCategory: EntityDistribution[] = byCategoryRows.map(row => ({
-      name: row.name,
-      count: row.count,
-    }));
-
-    // Get distribution by type
     const byType: EntityDistribution[] = [
-      { name: 'agents', count: stats.agentsCount },
-      { name: 'skills', count: stats.skillsCount },
-      { name: 'processes', count: stats.processesCount },
-      { name: 'domains', count: stats.domainsCount },
-      { name: 'specializations', count: stats.specializationsCount },
+      { name: 'agents', count: snapshot.counts.agents },
+      { name: 'skills', count: snapshot.counts.skills },
+      { name: 'processes', count: snapshot.counts.processes },
+      { name: 'domains', count: snapshot.counts.domains },
+      { name: 'specializations', count: snapshot.counts.specializations },
     ];
 
-    // Get recent activity (most recently updated items)
-    const recentActivitySql = `
-      SELECT 'agent' as type, id, name, updated_at FROM agents
-      UNION ALL
-      SELECT 'skill' as type, id, name, updated_at FROM skills
-      UNION ALL
-      SELECT 'process' as type, id, process_id as name, updated_at FROM processes
-      ORDER BY updated_at DESC
-      LIMIT 20
-    `;
-    const recentRows = rawDb.prepare(recentActivitySql).all() as Array<{
-      type: string;
-      id: number;
-      name: string;
-      updated_at: string;
-    }>;
+    const recentActivity: RecentActivityItem[] = [
+      ...snapshot.agents.map((agent) => ({ type: 'agent' as const, id: agent.id, name: agent.name, updatedAt: agent.updatedAt })),
+      ...snapshot.skills.map((skill) => ({ type: 'skill' as const, id: skill.id, name: skill.name, updatedAt: skill.updatedAt })),
+      ...snapshot.processes.map((process) => ({ type: 'process' as const, id: process.id, name: process.processId, updatedAt: process.updatedAt })),
+      ...snapshot.domains.map((domain) => ({ type: 'domain' as const, id: domain.id, name: domain.name, updatedAt: domain.updatedAt })),
+      ...snapshot.specializations.map((specialization) => ({ type: 'specialization' as const, id: specialization.id, name: specialization.name, updatedAt: specialization.updatedAt })),
+    ]
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+      .slice(0, 20);
 
-    const recentActivity: RecentActivityItem[] = recentRows.map(row => ({
-      type: row.type as 'agent' | 'skill' | 'process' | 'domain' | 'specialization',
-      id: row.id,
-      name: row.name,
-      updatedAt: row.updated_at,
-    }));
-
-    // Build response
     const analytics: AnalyticsResponse = {
       counts: {
-        domains: stats.domainsCount,
-        specializations: stats.specializationsCount,
-        agents: stats.agentsCount,
-        skills: stats.skillsCount,
-        processes: stats.processesCount,
+        domains: snapshot.counts.domains,
+        specializations: snapshot.counts.specializations,
+        agents: snapshot.counts.agents,
+        skills: snapshot.counts.skills,
+        processes: snapshot.counts.processes,
         total:
-          stats.domainsCount +
-          stats.specializationsCount +
-          stats.agentsCount +
-          stats.skillsCount +
-          stats.processesCount,
+          snapshot.counts.domains +
+          snapshot.counts.specializations +
+          snapshot.counts.agents +
+          snapshot.counts.skills +
+          snapshot.counts.processes,
       },
       distributions: {
         byDomain,
@@ -105,8 +73,8 @@ export async function GET(_request: NextRequest) {
         byType,
       },
       recentActivity,
-      databaseSize: stats.databaseSize,
-      lastIndexedAt: stats.lastIndexedAt,
+      databaseSize: snapshot.databaseSize,
+      lastIndexedAt: snapshot.generatedAt,
     };
 
     return createSuccessResponse(analytics);

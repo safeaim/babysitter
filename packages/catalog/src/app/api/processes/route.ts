@@ -3,27 +3,27 @@
  * GET /api/processes - List processes with filtering
  */
 
+import { listCatalogProcesses } from '@a5c-ai/agent-catalog';
 import { NextRequest } from 'next/server';
-import { initializeDatabase } from '@/lib/db/client';
-import { QueryBuilder } from '@/lib/db/queries';
-import type { ProcessRow } from '@/lib/db/types';
 import {
   parseListQueryParams,
   createPaginatedResponse,
   internalErrorResponse,
-  safeJsonParse,
-  mapSortField,
 } from '@/lib/api/utils';
 import type { ProcessListItem } from '@/lib/api/types';
 
-// Allowed sort fields mapping
-const SORT_FIELDS: Record<string, string> = {
-  id: 'process_id',
-  processId: 'process_id',
-  category: 'category',
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
-};
+function sortValueFor(process: ProcessListItem, sort: string | undefined): string {
+  switch (sort) {
+    case 'createdAt':
+      return process.createdAt;
+    case 'updatedAt':
+      return process.updatedAt;
+    case 'category':
+      return process.category ?? '';
+    default:
+      return process.processId;
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,44 +33,38 @@ export async function GET(request: NextRequest) {
     const { limit = 20, offset = 0, sort, order } = parseListQueryParams(searchParams);
     const category = searchParams.get('category');
 
-    // Initialize database
-    const db = initializeDatabase();
-    const builder = new QueryBuilder<ProcessRow>(db.getDb(), 'processes');
+    let processes: ProcessListItem[] = listCatalogProcesses().map((process) => ({
+      id: process.id,
+      processId: process.processId,
+      description: process.description,
+      category: process.category,
+      filePath: process.filePath,
+      taskCount: process.tasks.length,
+      createdAt: process.createdAt,
+      updatedAt: process.updatedAt,
+    }));
 
-    // Apply category filter
     if (category) {
-      builder.where('category', 'eq', category);
+      processes = processes.filter((process) => process.category === category);
     }
 
-    // Apply sorting
-    const sortField = mapSortField(sort, SORT_FIELDS, 'process_id');
-    builder.orderBy(sortField, order || 'asc');
-
-    // Get total count
-    const total = builder.count();
-
-    // Apply pagination
-    builder.limit(limit).offset(offset);
-
-    // Execute query
-    const rows = builder.all();
-
-    // Transform to API response format
-    const processes: ProcessListItem[] = rows.map(row => {
-      const tasks = safeJsonParse<unknown[]>(row.tasks, []);
-      return {
-        id: row.id,
-        processId: row.process_id,
-        description: row.description,
-        category: row.category,
-        filePath: row.file_path,
-        taskCount: tasks.length,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-      };
+    const sortKey = sort === 'createdAt' || sort === 'updatedAt' || sort === 'category'
+      ? sort
+      : sort === 'id'
+        ? 'id'
+        : 'processId';
+    const direction = order === 'desc' ? -1 : 1;
+    processes.sort((left, right) => {
+      if (sortKey === 'id') {
+        return (left.id - right.id) * direction;
+      }
+      const leftValue = sortValueFor(left, sortKey).toLowerCase();
+      const rightValue = sortValueFor(right, sortKey).toLowerCase();
+      return leftValue.localeCompare(rightValue) * direction;
     });
 
-    return createPaginatedResponse(processes, total, limit, offset);
+    const total = processes.length;
+    return createPaginatedResponse(processes.slice(offset, offset + limit), total, limit, offset);
   } catch (error) {
     return internalErrorResponse(error);
   }

@@ -1,6 +1,7 @@
 /**
  * @process packages/catalog/process-library-catalog
  * @description Full-stack Next.js catalog application for browsing the babysitter process library
+ * @deprecated Discovery is now served through @a5c-ai/agent-catalog. This process file remains as historical scaffolding rather than the active catalog data plane.
  * Provides search, filter, sort, pagination, analytics dashboard, markdown rendering with code highlighting,
  * frontmatter parsing, and process file AST extraction.
  * @inputs { projectName: string, outputDir: string, targetQuality?: number }

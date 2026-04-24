@@ -17,6 +17,7 @@ function stripAnsi(value: string): string {
 class PtyHarness {
   private buffer = '';
   private error: Error | null = null;
+  private exitResult: { exitCode: number; signal: number } | null = null;
   private readonly exitPromise: Promise<{ exitCode: number; signal: number }>;
 
   constructor(private readonly proc: pty.IPty) {
@@ -31,7 +32,9 @@ class PtyHarness {
     });
     this.exitPromise = new Promise((resolve) => {
       proc.onExit(({ exitCode, signal }) => {
-        resolve({ exitCode, signal });
+        const result = { exitCode, signal };
+        this.exitResult = result;
+        resolve(result);
       });
     });
   }
@@ -61,6 +64,11 @@ class PtyHarness {
     while (Date.now() < deadline) {
       if (this.error) {
         throw this.error;
+      }
+      if (this.exitResult) {
+        throw new Error(
+          `Process exited before "${fragment}" (exitCode=${this.exitResult.exitCode}, signal=${this.exitResult.signal}). Output:\n${this.buffer}`,
+        );
       }
       if (this.buffer.slice(start).includes(fragment)) {
         return;
@@ -125,8 +133,7 @@ describe('real amux-tui binary e2e', () => {
       },
     });
     const harness = new PtyHarness(proc);
-
-    await harness.waitFor('No messages yet.');
+    await harness.pause(400);
 
     harness.write('\u001B');
     await harness.pause();

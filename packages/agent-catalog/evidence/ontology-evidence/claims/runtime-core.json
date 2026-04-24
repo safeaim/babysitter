@@ -1,0 +1,73 @@
+{
+  "kind": "EvidenceShard",
+  "entryKind": "claims",
+  "group": "runtime-core",
+  "generatedAt": "2026-04-23T00:00:00.000Z",
+  "entries": [
+    {
+      "id": "claim:repo-agent-mux-host",
+      "kind": "Claim",
+      "claimId": "repo-agent-mux-host",
+      "statement": "Agent-mux maintains host-harness env signal precedence plus metadata extraction for session and run identifiers.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "high",
+      "status": "current",
+      "evidenceIds": [
+        "repo-agent-mux-host"
+      ]
+    },
+    {
+      "id": "claim:repo-sdk-fallback",
+      "kind": "Claim",
+      "claimId": "repo-sdk-fallback",
+      "statement": "Static fallback metadata defines per-harness host env signals, orchestration capabilities, and the shared session directory.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "high",
+      "status": "current",
+      "evidenceIds": [
+        "repo-sdk-fallback"
+      ]
+    },
+    {
+      "id": "claim:repo-transport-mux-architecture",
+      "kind": "Claim",
+      "claimId": "repo-transport-mux-architecture",
+      "statement": "transport-mux architecture formalizes separate protocol and provider layers, plus a normalized completion seam and shared route/auth contracts.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "high",
+      "status": "current",
+      "evidenceIds": [
+        "repo-transport-mux-architecture"
+      ]
+    },
+    {
+      "id": "claim:repo-transport-mux-migration",
+      "kind": "Claim",
+      "claimId": "repo-transport-mux-migration",
+      "statement": "transport-mux migration preserves the amux-proxy external contract while moving internal design to protocol/provider separation.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "high",
+      "status": "current",
+      "evidenceIds": [
+        "repo-transport-mux-migration"
+      ]
+    },
+    {
+      "id": "claim:repo-transport-mux-readme",
+      "kind": "Claim",
+      "claimId": "repo-transport-mux-readme",
+      "statement": "transport-mux distinguishes harness-facing protocols from upstream providers and enumerates the exposed transport ids used by amux-proxy.",
+      "subjectKind": "catalog",
+      "subjectId": "graph:agent-catalog",
+      "confidence": "high",
+      "status": "current",
+      "evidenceIds": [
+        "repo-transport-mux-readme"
+      ]
+    }
+  ]
+}

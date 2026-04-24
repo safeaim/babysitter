@@ -73,14 +73,12 @@ export default async function AgentDetailPage({ params }: PageProps) {
   if (agent.domainName) {
     breadcrumbItems.push({
       label: agent.domainName,
-      href: `/domains/${encodeURIComponent(agent.domainName)}`,
     });
   }
 
   if (agent.specializationName) {
     breadcrumbItems.push({
       label: agent.specializationName,
-      href: `/specializations/${encodeURIComponent(agent.specializationName)}`,
     });
   }
 
@@ -126,7 +124,7 @@ export async function generateMetadata({ params }: PageProps) {
   }
 
   return {
-    title: `${agent.name} - Agents - Process Catalog`,
+    title: `${agent.name} - Agent Catalog`,
     description: agent.description || `View details for the ${agent.name} agent`,
   };
 }

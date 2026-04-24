@@ -1,0 +1,88 @@
+{
+  "kind": "EvidenceShard",
+  "entryKind": "evidence-sources",
+  "group": "plugins-hooks-discovery",
+  "generatedAt": "2026-04-23T00:00:00.000Z",
+  "entries": [
+    {
+      "id": "evidence:repo-codex-windows-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-codex-windows-hooks",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "plugins/babysitter-codex/bin/install-shared.js",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 748-756",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-hooks-detector",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-hooks-detector",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/hooks-mux/core/src/discovery/detector.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-140",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-target-claude",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-target-claude",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-plugins-mux/src/targets/claude-code.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-21",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-target-codex",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-target-codex",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-plugins-mux/src/targets/codex.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-18",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-target-copilot",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-target-copilot",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-plugins-mux/src/targets/github-copilot.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-20",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-target-cursor",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-target-cursor",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-plugins-mux/src/targets/cursor.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-18",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-target-gemini",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-target-gemini",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-plugins-mux/src/targets/gemini.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-17",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-target-index",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-target-index",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-plugins-mux/src/targets/index.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-78",
+      "trustLevel": "repo"
+    }
+  ]
+}

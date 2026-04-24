@@ -1,0 +1,35 @@
+{
+  "name": "@a5c-ai/agent-catalog",
+  "version": "0.1.0",
+  "description": "Shared ontology and discovery catalog for harness agents, model providers, transports, hooks, capabilities, and process evidence.",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "graph",
+    "docs",
+    "evidence"
+  ],
+  "scripts": {
+    "generate:evidence": "node ./scripts/generate-evidence.cjs",
+    "validate:graph": "node ./scripts/validate-graph.cjs",
+    "build": "npm run generate:evidence && tsc -p tsconfig.json && npm run validate:graph",
+    "clean": "rimraf dist",
+    "test": "npm run generate:evidence && npm run validate:graph && cd ../.. && vitest run packages/agent-catalog/src/catalog.test.ts",
+    "ci:test": "npm run clean && npm run build && npm run test",
+    "ci:staging": "npm run ci:test && npm run version:check",
+    "ci:prod": "npm run ci:staging",
+    "version:check": "node ./scripts/check-version.cjs"
+  },
+  "dependencies": {
+    "yaml": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "rimraf": "^6.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

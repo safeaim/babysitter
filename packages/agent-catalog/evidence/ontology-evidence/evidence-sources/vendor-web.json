@@ -1,0 +1,278 @@
+{
+  "kind": "EvidenceShard",
+  "entryKind": "evidence-sources",
+  "group": "vendor-web",
+  "generatedAt": "2026-04-23T00:00:00.000Z",
+  "entries": [
+    {
+      "id": "evidence:web-anthropic-claude-code",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-anthropic-claude-code",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://www.anthropic.com/product/claude-code",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "product overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-anthropic-claude-code-auto-mode",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-anthropic-claude-code-auto-mode",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://www.anthropic.com/engineering/claude-code-auto-mode",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "published Mar 25 2026; permission automation and approval-safety design",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-anthropic-claude-code-autonomy",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-anthropic-claude-code-autonomy",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://www.anthropic.com/news/enabling-claude-code-to-work-more-autonomously",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "Sep 29 2025 product update",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-anthropic-claude-code-sandboxing",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-anthropic-claude-code-sandboxing",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://www.anthropic.com/engineering/claude-code-sandboxing",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "filesystem and network isolation for Claude Code sandboxing",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-agent-teams",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-agent-teams",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/agent-teams",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "parallel Claude Code team orchestration",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-checkpointing",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-checkpointing",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/checkpointing",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "checkpointed session state and rewind",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-claude-directory",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-claude-directory",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/claude-directory",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": ".claude directory layout",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-cli-reference",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-cli-reference",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/cli-reference",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "CLI flags and commands",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-commands",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-commands",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/commands",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "built-in commands and bundled skills",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-features-overview",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-features-overview",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/features-overview",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "extension surface overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-headless",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-headless",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/headless",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "headless mode and continue flags",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-hooks",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/hooks",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "lifecycle hook reference",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-hooks-guide",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-hooks-guide",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/hooks-guide",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "workflow automation guide for hooks",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-interactive-mode",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-interactive-mode",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/interactive-mode",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "interactive session controls",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-mcp",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-mcp",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/mcp",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "MCP integration",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-overview",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-overview",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/overview",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "Claude Code overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-permission-modes",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-permission-modes",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/permission-modes",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "permission mode selection",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-permissions",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-permissions",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/permissions",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "fine-grained permissions",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-quickstart",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-quickstart",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/quickstart",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "terminal quickstart",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-skills",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-skills",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/skills",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "skill creation and invocation",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-subagents",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-subagents",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/sub-agents",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "custom subagents",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-code-tools-reference",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-code-tools-reference",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://code.claude.com/docs/en/tools-reference",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "built-in tool and MCP references",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-claude-platform-vision",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-claude-platform-vision",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://platform.claude.com/docs/en/build-with-claude/vision",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "image input and vision support",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-gemini-hooks",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-gemini-hooks",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://github.com/google-gemini/gemini-cli/tree/main/docs/hooks",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "Gemini CLI hooks docs",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-agent",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-agent",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/enterprise-cloud@latest/copilot/how-tos/agents/copilot-coding-agent",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "Copilot coding agent documentation",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-github-copilot-mcp",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-github-copilot-mcp",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "Overview",
+      "trustLevel": "official-web"
+    },
+    {
+      "id": "evidence:web-openai-codex-skills",
+      "kind": "EvidenceSource",
+      "evidenceId": "web-openai-codex-skills",
+      "kindLabel": "web",
+      "sourcePathOrUrl": "https://developers.openai.com/codex/skills",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "Codex skills guide",
+      "trustLevel": "official-web"
+    }
+  ]
+}

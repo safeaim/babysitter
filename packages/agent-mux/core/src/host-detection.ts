@@ -16,6 +16,7 @@
  * catalog is embedded here for when the adapters package is not loaded.
  */
 
+import { getHostMetadataFields, getHostSignalMap } from '@a5c-ai/agent-catalog';
 import type { AgentName } from './types.js';
 
 /** Information about a detected host harness. */
@@ -43,47 +44,27 @@ export type HostMetadataReader = (
 /** Map from agent name -> metadata reader. Used by adapter contributions. */
 export type HostMetadataMap = Readonly<Record<string, HostMetadataReader>>;
 
+const HOST_METADATA_FIELDS = getHostMetadataFields();
+
+function createMetadataReader(agent: string): HostMetadataReader {
+  const fields = HOST_METADATA_FIELDS[agent] ?? [];
+  return (env) => {
+    const metadata: Record<string, string | number | boolean | null> = {};
+    for (const field of fields) {
+      const matched = field.envVars.find((envVar) => {
+        const value = env[envVar];
+        return value !== undefined && value !== '';
+      });
+      metadata[field.key] = matched ? env[matched] ?? null : null;
+    }
+    return metadata;
+  };
+}
+
 /** Default per-agent metadata extraction from common env vars. */
-export const DEFAULT_HOST_METADATA: HostMetadataMap = {
-  claude: (env) => ({
-    session_id: env.CLAUDE_CODE_SESSION_ID ?? null,
-    env_file: env.CLAUDE_ENV_FILE ?? null,
-    project_dir: env.CLAUDE_PROJECT_DIR ?? null,
-  }),
-  codex: (env) => ({
-    session_id: env.CODEX_SESSION_ID ?? null,
-    run_id: env.CODEX_RUN_ID ?? null,
-  }),
-  gemini: (env) => ({
-    session_id: env.GEMINI_SESSION_ID ?? null,
-  }),
-  copilot: (env) => ({
-    session_id: env.COPILOT_CLI_SESSION ?? env.GH_COPILOT_SESSION ?? null,
-  }),
-  cursor: (env) => ({
-    session_id: env.CURSOR_SESSION ?? env.CURSOR_AGENT_SESSION ?? null,
-  }),
-  opencode: (env) => ({
-    session_id: env.OPENCODE_SESSION ?? null,
-    run_id: env.OPENCODE_RUN_ID ?? null,
-  }),
-  pi: (env) => ({
-    session_id: env.PI_SESSION_ID ?? null,
-    run_id: env.PI_RUN_ID ?? null,
-  }),
-  omp: (env) => ({
-    session_id: env.OMP_SESSION_ID ?? null,
-    run_id: env.OMP_RUN_ID ?? null,
-  }),
-  openclaw: (env) => ({
-    session_id: env.OPENCLAW_SESSION ?? null,
-    run_id: env.OPENCLAW_RUN_ID ?? null,
-  }),
-  hermes: (env) => ({
-    session_id: env.HERMES_SESSION ?? null,
-    run_id: env.HERMES_RUN_ID ?? null,
-  }),
-};
+export const DEFAULT_HOST_METADATA: HostMetadataMap = Object.fromEntries(
+  Object.keys(HOST_METADATA_FIELDS).map((agent) => [agent, createMetadataReader(agent)]),
+);
 
 /**
  * Default env-signal catalog for the ten built-in harnesses.
@@ -93,16 +74,7 @@ export const DEFAULT_HOST_METADATA: HostMetadataMap = {
  * for plugin adapters.
  */
 export const DEFAULT_HOST_SIGNALS: HostSignalMap = {
-  claude: ['CLAUDECODE', 'CLAUDE_CODE_SESSION_ID', 'CLAUDE_CODE', 'CLAUDE_PROJECT_DIR'],
-  codex: ['CODEX_SESSION_ID', 'CODEX_RUN_ID', 'CODEX_CLI'],
-  gemini: ['GEMINI_CLI', 'GEMINI_SESSION_ID'],
-  copilot: ['COPILOT_CLI_SESSION', 'GH_COPILOT_SESSION'],
-  cursor: ['CURSOR_SESSION', 'CURSOR_AGENT_SESSION'],
-  opencode: ['OPENCODE_SESSION', 'OPENCODE_RUN_ID'],
-  pi: ['PI_RUN_ID', 'PI_SESSION_ID'],
-  omp: ['OMP_RUN_ID', 'OMP_SESSION_ID'],
-  openclaw: ['OPENCLAW_SESSION', 'OPENCLAW_RUN_ID'],
-  hermes: ['HERMES_SESSION', 'HERMES_RUN_ID'],
+  ...getHostSignalMap(),
 };
 
 /** Options for `detectHostHarness`. */

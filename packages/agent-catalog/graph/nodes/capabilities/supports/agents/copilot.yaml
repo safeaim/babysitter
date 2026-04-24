@@ -1,0 +1,98 @@
+kind: NodeDocument
+documentPath: nodes/capabilities/supports/agents/copilot.yaml
+generatedAt: 2026-04-23T00:00:00.000Z
+nodes:
+  - id: capabilitySupport:copilot:ge-0-0-0:skills
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:skills
+    capabilityId: skills
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: &a1
+      - repo-sdk-fallback
+      - repo-target-copilot
+      - repo-target-index
+      - web-github-copilot-agent
+  - id: capabilitySupport:copilot:ge-0-0-0:thinking
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:thinking
+    capabilityId: thinking
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1
+  - id: capabilitySupport:copilot:ge-0-0-0:interactive-mode
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:interactive-mode
+    capabilityId: interactive-mode
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1
+  - id: capabilitySupport:copilot:ge-0-0-0:stdin-injection
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:stdin-injection
+    capabilityId: stdin-injection
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1
+  - id: capabilitySupport:copilot:ge-0-0-0:image-input
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:image-input
+    capabilityId: image-input
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1
+  - id: capabilitySupport:copilot:ge-0-0-0:runtime-hooks
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:runtime-hooks
+    capabilityId: runtime-hooks
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1
+  - id: capabilitySupport:copilot:ge-0-0-0:stop-hook
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:stop-hook
+    capabilityId: stop-hook
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1
+  - id: capabilitySupport:copilot:ge-0-0-0:mcp
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:mcp
+    capabilityId: mcp
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1
+  - id: capabilitySupport:copilot:ge-0-0-0:session-resume
+    kind: CapabilitySupport
+    supportId: capabilitySupport:copilot:ge-0-0-0:session-resume
+    capabilityId: session-resume
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:copilot:ge-0-0-0
+    versionRange: ">=0.0.0"
+    notes: GitHub Copilot target with session lifecycle hooks, derived skills, and agentic workflow evidence.
+    evidenceRefs: *a1

@@ -70,11 +70,11 @@ export function AgentDetail({
 
       <Separator />
 
-      {/* Expertise Badges */}
+      {/* Capability Badges */}
       {agent.expertise && agent.expertise.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Expertise ({agent.expertise.length})</CardTitle>
+            <CardTitle className="text-lg">Capabilities ({agent.expertise.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">

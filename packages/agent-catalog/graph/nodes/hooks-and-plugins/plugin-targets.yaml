@@ -1,0 +1,112 @@
+kind: NodeDocument
+documentPath: nodes/hooks-and-plugins/plugin-targets.yaml
+generatedAt: 2026-04-23T00:00:00.000Z
+nodes:
+  - id: pluginTarget:claude-code
+    kind: PluginTarget
+    targetId: claude-code
+    displayName: Claude Code
+    adapterName: claude
+    manifestFormat: plugin.json
+    commandFormat: markdown-commands
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/claude-code.ts
+    npmPublishable: true
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:codex
+    kind: PluginTarget
+    targetId: codex
+    displayName: Codex
+    adapterName: codex
+    manifestFormat: package.json + hooks.json
+    commandFormat: package-json commands
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/codex.ts
+    npmPublishable: true
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:cursor
+    kind: PluginTarget
+    targetId: cursor
+    displayName: Cursor
+    adapterName: cursor
+    manifestFormat: plugin.json
+    commandFormat: markdown-commands
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/cursor.ts
+    npmPublishable: true
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:gemini
+    kind: PluginTarget
+    targetId: gemini
+    displayName: Gemini CLI
+    adapterName: gemini
+    manifestFormat: plugin.json + gemini-extension.json
+    commandFormat: extension-manifest
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/gemini.ts
+    npmPublishable: true
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:github-copilot
+    kind: PluginTarget
+    targetId: github-copilot
+    displayName: GitHub Copilot
+    adapterName: copilot
+    manifestFormat: plugin.json
+    commandFormat: markdown-commands
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/github-copilot.ts
+    npmPublishable: true
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:pi
+    kind: PluginTarget
+    targetId: pi
+    displayName: Pi
+    adapterName: pi
+    manifestFormat: state-only
+    commandFormat: none
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/pi.ts
+    npmPublishable: false
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:oh-my-pi
+    kind: PluginTarget
+    targetId: oh-my-pi
+    displayName: Oh-My-Pi
+    adapterName: omp
+    manifestFormat: state-only
+    commandFormat: none
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/oh-my-pi.ts
+    npmPublishable: false
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:opencode
+    kind: PluginTarget
+    targetId: opencode
+    displayName: OpenCode
+    adapterName: opencode
+    manifestFormat: plugin.json
+    commandFormat: event-hooks
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/opencode.ts
+    npmPublishable: true
+    evidenceRefs:
+      - repo-target-index
+  - id: pluginTarget:openclaw
+    kind: PluginTarget
+    targetId: openclaw
+    displayName: OpenClaw
+    adapterName: openclaw
+    manifestFormat: plugin.json
+    commandFormat: event-hooks
+    distributionModel: workspace-generated
+    marketplacePath: packages/agent-plugins-mux/src/targets/openclaw.ts
+    npmPublishable: true
+    evidenceRefs:
+      - repo-target-index

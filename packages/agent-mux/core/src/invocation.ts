@@ -5,6 +5,8 @@
  * on a remote machine via SSH, or on a remote k8s cluster.
  */
 
+import { getHarnessImages } from '@a5c-ai/agent-catalog';
+
 // ---------------------------------------------------------------------------
 // Invocation Mode Discriminated Union
 // ---------------------------------------------------------------------------
@@ -112,21 +114,7 @@ export interface HarnessImageEntry {
 }
 
 /** Default image catalog for built-in harnesses. */
-export const HARNESS_IMAGE_CATALOG: readonly HarnessImageEntry[] = [
-  { harness: 'claude-code', image: 'ghcr.io/anthropics/claude-code', preinstalled: true },
-  { harness: 'claude', image: 'ghcr.io/anthropics/claude-code', preinstalled: true },
-  { harness: 'codex', image: 'ghcr.io/openai/codex', preinstalled: true },
-  { harness: 'gemini', image: 'ghcr.io/google/gemini-cli', preinstalled: true },
-  { harness: 'copilot', image: 'ghcr.io/github/copilot-cli', preinstalled: true },
-  { harness: 'cursor', image: 'ghcr.io/cursor/cursor-agent', preinstalled: true },
-  { harness: 'opencode', image: 'ghcr.io/anomalyco/opencode', preinstalled: true },
-  { harness: 'pi', image: 'ghcr.io/a5c-ai/pi', preinstalled: true },
-  { harness: 'omp', image: 'ghcr.io/a5c-ai/omp', preinstalled: true },
-  { harness: 'openclaw', image: 'ghcr.io/openclaw/openclaw', preinstalled: true },
-  { harness: 'hermes', image: 'ghcr.io/a5c-ai/hermes', preinstalled: true },
-  { harness: 'aider', image: 'paulgauthier/aider', preinstalled: true },
-  { harness: 'goose', image: 'ghcr.io/block/goose', preinstalled: true },
-] as const;
+export const HARNESS_IMAGE_CATALOG: readonly HarnessImageEntry[] = getHarnessImages();
 
 /**
  * Look up the default image for a harness.

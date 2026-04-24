@@ -24,7 +24,9 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@a5c-ai/agent-catalog": "*"
+  },
   "devDependencies": {
     "typescript": "^5.7.0",
     "vitest": "^3.0.0",

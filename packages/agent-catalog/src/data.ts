@@ -1,0 +1,418 @@
+import {
+  getCatalogGraph,
+  getGraphDocument,
+  getOntologySchema,
+  getNodeById,
+  listGraphNodes,
+  listNodesByKind,
+  listOutgoingTargets,
+  listRelationshipsByRelation,
+} from "./graph";
+import type {
+  AgentCatalog,
+  AgentVersion,
+  CapabilityDescriptor,
+  EvidenceRecord,
+  GraphEdge,
+  GraphNode,
+  HarnessFallbackMetadata,
+  HarnessImageEntry,
+  HookDescriptor,
+  HooksMuxDetectionRule,
+  HostMetadataField,
+  LifecycleNuance,
+  ModelProviderVersion,
+  ModelVersion,
+  ModalityDescriptor,
+  ProcessDescriptor,
+  SessionNuance,
+  TransportDescriptor,
+} from "./models";
+
+const FALLBACK_SESSION_DIR = ".a5c/runs";
+
+function valueAsString(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  return "";
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === "string") : [];
+}
+
+function nodeEvidenceIds(node: GraphNode): string[] {
+  return stringArray(node.evidenceRefs);
+}
+
+function toModelProviderVersion(node: GraphNode): ModelProviderVersion {
+  const product = getNodeById<GraphNode>(`provider:${valueAsString(node.providerId)}`);
+  return {
+    providerId: valueAsString(node.providerId),
+    versionRange: valueAsString(node.versionRange),
+    displayName: valueAsString(product?.displayName) || valueAsString(node.providerId),
+    hostEnvSignals: stringArray(node.envSignals),
+    authSignals: stringArray(node.authSignals),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toModelVersion(node: GraphNode): ModelVersion {
+  const defaultForAgentIds = listRelationshipsByRelation("defaults_to_model")
+    .filter((edge) => edge.to === node.id)
+    .map((edge) => {
+      const agentNode = getNodeById(edge.from);
+      return valueAsString(agentNode?.agentId);
+    })
+    .filter(Boolean);
+
+  return {
+    modelId: valueAsString(node.modelId),
+    providerId: valueAsString(node.providerId),
+    versionRange: valueAsString(node.versionRange),
+    label: valueAsString(getNodeById<GraphNode>(`model:${valueAsString(node.modelId)}`)?.label) || valueAsString(node.modelId),
+    defaultForAgentIds,
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toTransportDescriptor(node: GraphNode): TransportDescriptor {
+  return {
+    transportId: valueAsString(node.runtimeId),
+    label: valueAsString(node.label),
+    interactive: Boolean(node.persistentSession) || Boolean(node.stdinInjection),
+    persistentSession: Boolean(node.persistentSession),
+    stdinInjection: Boolean(node.stdinInjection),
+    blockingStopHook: Boolean(node.blockingStopHook),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toCapabilityDescriptor(node: GraphNode): CapabilityDescriptor {
+  return {
+    capabilityId: valueAsString(node.capabilityId),
+    namespace: valueAsString(node.namespace),
+    label: valueAsString(node.label),
+    description: valueAsString(node.description),
+    producerPackages: stringArray(node.producerPackages),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toModalityDescriptor(node: GraphNode): ModalityDescriptor {
+  const direction = valueAsString(node.direction);
+  return {
+    modalityId: valueAsString(node.modalityId),
+    direction: direction === "input" || direction === "output" ? direction : "bidirectional",
+    label: valueAsString(node.label),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toHookDescriptor(node: GraphNode): HookDescriptor {
+  const targetNames = Object.fromEntries(
+    listGraphNodes()
+      .filter((candidate) => candidate.kind === "HookMapping" && valueAsString(candidate.hookId) === valueAsString(node.hookId))
+      .map((mapping) => [valueAsString(mapping.targetId), valueAsString(mapping.nativeName)]),
+  );
+
+  return {
+    hookId: valueAsString(node.hookId),
+    canonicalName: valueAsString(node.canonicalName),
+    targetNames,
+    requiresRuntimeHooks: Boolean(node.requiresRuntimeHooks),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toSessionNuance(node: GraphNode): SessionNuance {
+  return {
+    nuanceId: valueAsString(node.sessionSemanticsId),
+    agentId: valueAsString(node.agentId),
+    versionRange: valueAsString(node.versionRange),
+    sessionDirStrategy: valueAsString(node.sessionDirStrategy) || FALLBACK_SESSION_DIR,
+    envSignals: stringArray(node.sessionIdSources),
+    resumeSemantics: valueAsString(node.resumeSemantics),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toLifecycleNuance(node: GraphNode): LifecycleNuance {
+  return {
+    nuanceId: valueAsString(node.lifecycleSemanticsId),
+    agentId: valueAsString(node.agentId),
+    versionRange: valueAsString(node.versionRange),
+    runtimeHookMode: valueAsString(node.runtimeHookMode),
+    stopHookMode: valueAsString(node.stopHookMode),
+    pluginContextMode: valueAsString(node.pluginContextMode),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toProcessDescriptor(node: GraphNode): ProcessDescriptor {
+  return {
+    processId: valueAsString(node.processId),
+    category: valueAsString(node.category),
+    displayName: valueAsString(node.displayName),
+    description: valueAsString(node.description),
+    paths: stringArray(node.paths),
+    inputs: stringArray(node.inputs),
+    outputs: stringArray(node.outputs),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function agentCapabilityIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "supports_capability")
+    .map((supportNode) => valueAsString(supportNode.capabilityId) || valueAsString(listOutgoingTargets(supportNode.id, "for_capability")[0]?.capabilityId))
+    .filter(Boolean);
+}
+
+function agentHookIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "emits_hook")
+    .map((mapping) => valueAsString(mapping.hookId))
+    .filter(Boolean);
+}
+
+function agentTransportIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "uses_transport")
+    .filter((node) => node.kind === "TransportRuntime")
+    .map((node) => valueAsString(node.runtimeId))
+    .filter(Boolean);
+}
+
+function agentModalityIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "supports_modality")
+    .map((node) => valueAsString(node.modalityId))
+    .filter(Boolean);
+}
+
+function agentProviderIds(agentNodeId: string): string[] {
+  const providerIds = listOutgoingTargets(agentNodeId, "defaults_to_model")
+    .flatMap((modelNode) =>
+      listOutgoingTargets(modelNode.id, "provided_by").map((providerNode) => valueAsString(providerNode.providerId)),
+    )
+    .filter(Boolean);
+  return Array.from(new Set(providerIds));
+}
+
+function agentModelIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "defaults_to_model")
+    .map((node) => valueAsString(node.modelId))
+    .filter(Boolean);
+}
+
+function agentPluginTargetIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "targets_plugin_surface")
+    .map((node) => valueAsString(node.targetId))
+    .filter(Boolean);
+}
+
+function agentSessionNuanceIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "uses_session_semantics")
+    .map((node) => valueAsString(node.sessionSemanticsId))
+    .filter(Boolean);
+}
+
+function agentLifecycleNuanceIds(agentNodeId: string): string[] {
+  return listOutgoingTargets(agentNodeId, "uses_lifecycle_semantics")
+    .map((node) => valueAsString(node.lifecycleSemanticsId))
+    .filter(Boolean);
+}
+
+function toAgentVersion(node: GraphNode): AgentVersion {
+  return {
+    agentId: valueAsString(node.agentId),
+    aliases: stringArray(node.aliases),
+    versionRange: valueAsString(node.versionRange),
+    runtimeFamily: valueAsString(node.runtimeFamily),
+    displayName: valueAsString(node.displayName),
+    summary: valueAsString(node.summary),
+    sourcePackage: valueAsString(node.sourcePackage),
+    providerIds: agentProviderIds(node.id),
+    modelIds: agentModelIds(node.id),
+    transportIds: agentTransportIds(node.id),
+    modalityIds: agentModalityIds(node.id),
+    capabilityIds: agentCapabilityIds(node.id),
+    hookIds: agentHookIds(node.id),
+    pluginTargetIds: agentPluginTargetIds(node.id),
+    sessionNuanceIds: agentSessionNuanceIds(node.id),
+    lifecycleNuanceIds: agentLifecycleNuanceIds(node.id),
+    evidenceIds: nodeEvidenceIds(node),
+  };
+}
+
+function toEvidenceRecord(node: GraphNode): EvidenceRecord {
+  return {
+    evidenceId: valueAsString(node.evidenceId),
+    kind: valueAsString(node.kindLabel) === "web" ? "web" : "repo",
+    sourcePathOrUrl: valueAsString(node.sourcePathOrUrl),
+    excerptLocator: valueAsString(node.locator),
+    claim: valueAsString(getNodeById<GraphNode>(`claim:${valueAsString(node.evidenceId)}`)?.statement),
+    capturedAt: valueAsString(node.capturedAt),
+  };
+}
+
+function buildHookDetectionRules(): HooksMuxDetectionRule[] {
+  return listNodesByKind("DiscoverySignal")
+    .filter((node) => valueAsString(node.scope) === "hooks-mux")
+    .map((node) => ({
+      adapter: valueAsString(node.key),
+      confidence: (valueAsString(node.confidence) as HooksMuxDetectionRule["confidence"]) || "low",
+      signals: stringArray(node.signals),
+      absentSignals: stringArray(node.absentSignals),
+    }));
+}
+
+function buildHostSignalMap(): Record<string, string[]> {
+  const entries = listNodesByKind("DiscoverySignal")
+    .filter((node) => valueAsString(node.scope) === "host-detection")
+    .map((node) => [valueAsString(node.key), stringArray(node.signals)] as const);
+  return Object.fromEntries(entries);
+}
+
+function buildHostMetadataFields(): Record<string, HostMetadataField[]> {
+  const entries = listNodesByKind("DiscoverySignal")
+    .filter((node) => valueAsString(node.scope) === "host-detection")
+    .map((node) => [
+      valueAsString(node.key),
+      (Array.isArray(node.metadataFields) ? node.metadataFields : []).map((field) => ({
+        key: valueAsString((field as HostMetadataField).key),
+        envVars: stringArray((field as HostMetadataField).envVars),
+      })),
+    ] as const);
+  return Object.fromEntries(entries);
+}
+
+function capabilityBoolean(agentNodeId: string, capabilityId: string): boolean {
+  return agentCapabilityIds(agentNodeId).includes(capabilityId);
+}
+
+function adapterNameForAgent(agentId: string, aliases: string[]): string {
+  if (agentId === "claude") return "claude";
+  if (agentId === "gemini") return "gemini";
+  if (agentId === "copilot") return "copilot";
+  if (agentId === "omp") return "omp";
+  return aliases[0] === "claude-code" ? "claude" : agentId;
+}
+
+function fallbackHarnessId(agentId: string, aliases: string[]): string {
+  if (agentId === "claude") return "claude-code";
+  if (agentId === "gemini") return "gemini-cli";
+  if (agentId === "copilot") return "github-copilot";
+  if (agentId === "omp") return "oh-my-pi";
+  return aliases[0] ?? agentId;
+}
+
+function buildFallbackMetadata(): Record<string, HarnessFallbackMetadata> {
+  const sessionNuancesById = new Map(SESSION_NUANCES.map((nuance) => [nuance.nuanceId, nuance]));
+  const metadataEntries = AGENTS.filter((agent) => agent.runtimeFamily === "cli-harness").map((agent) => {
+    const sessionNuance = sessionNuancesById.get(agent.sessionNuanceIds[0]);
+    const harnessId = fallbackHarnessId(agent.agentId, agent.aliases);
+    return [
+      harnessId,
+      {
+        harnessId,
+        adapterName: adapterNameForAgent(agent.agentId, agent.aliases),
+        hostEnvSignals: sessionNuance?.envSignals ?? [],
+        sessionDir: sessionNuance?.sessionDirStrategy ?? FALLBACK_SESSION_DIR,
+        capabilities: {
+          supportsSkills: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "skills"),
+          supportsThinking: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "thinking"),
+          supportsMCP: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "mcp"),
+          requiresToolApproval: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "tool-approval"),
+          supportsInteractiveMode: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "interactive-mode"),
+          supportsStdinInjection: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "stdin-injection"),
+          supportsSubagentDispatch: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "subagent-dispatch"),
+          supportsParallelExecution: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "parallel-execution"),
+          supportsImageInput: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "image-input"),
+          hasRuntimeHooks: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "runtime-hooks"),
+          hasStopHook: capabilityBoolean(`agentVersion:${agent.agentId}:${slugify(agent.versionRange)}`, "stop-hook"),
+        },
+        evidenceIds: agent.evidenceIds,
+      },
+    ] as const;
+  });
+
+  return Object.fromEntries(metadataEntries);
+}
+
+function slugify(versionRange: string): string {
+  return versionRange
+    .replace(/>=/g, "ge-")
+    .replace(/<=/g, "le-")
+    .replace(/>/g, "gt-")
+    .replace(/</g, "lt-")
+    .replace(/=/g, "eq-")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .toLowerCase();
+}
+
+function buildHarnessImages(): HarnessImageEntry[] {
+  return listNodesByKind("PluginArtifact")
+    .filter((node) => valueAsString(node.artifactKind) === "container-image")
+    .map((node) => ({
+      harness: valueAsString(node.targetId),
+      image: valueAsString(node.pathPattern),
+      tag: valueAsString(node.installerSurface) || undefined,
+      preinstalled: stringArray(node.scriptVariants).includes("preinstalled"),
+    }));
+}
+
+const GRAPH = getCatalogGraph();
+export const GRAPH_DOCUMENT = getGraphDocument();
+export const ONTOLOGY_SCHEMA = getOntologySchema();
+
+export const EVIDENCE = listNodesByKind("EvidenceSource").map(toEvidenceRecord);
+export const PROVIDERS = listNodesByKind("ModelProviderVersion").map(toModelProviderVersion);
+export const MODELS = listNodesByKind("ModelVersion").map(toModelVersion);
+export const TRANSPORTS = listNodesByKind("TransportRuntime")
+  .filter((node) => valueAsString(node.runtimeId) !== "amux-proxy")
+  .map(toTransportDescriptor);
+export const CAPABILITIES = listNodesByKind("Capability").map(toCapabilityDescriptor);
+export const MODALITIES = listNodesByKind("Modality")
+  .filter((node) => !["json", "stream-events"].includes(valueAsString(node.modalityId)))
+  .map(toModalityDescriptor);
+export const HOOKS = listNodesByKind("HookSurface").map(toHookDescriptor);
+export const SESSION_NUANCES = listNodesByKind("SessionSemantics").map(toSessionNuance);
+export const LIFECYCLE_NUANCES = listNodesByKind("LifecycleSemantics").map(toLifecycleNuance);
+export const PROCESSES = listNodesByKind("ProcessDescriptor").map(toProcessDescriptor);
+export const AGENTS = listNodesByKind("AgentVersion").map(toAgentVersion);
+export const HOST_SIGNAL_MAP = buildHostSignalMap();
+export const HOST_METADATA_FIELDS = buildHostMetadataFields();
+export const HOOKS_MUX_DETECTION_RULES = buildHookDetectionRules();
+export const FALLBACK_METADATA = buildFallbackMetadata();
+export const HARNESS_IMAGES = buildHarnessImages();
+
+export const AGENT_CATALOG: AgentCatalog = {
+  schemaVersion: GRAPH_DOCUMENT.schemaVersion,
+  generatedAt: GRAPH_DOCUMENT.generatedAt,
+  evidence: EVIDENCE,
+  providers: PROVIDERS,
+  models: MODELS,
+  transports: TRANSPORTS,
+  capabilities: CAPABILITIES,
+  modalities: MODALITIES,
+  hooks: HOOKS,
+  sessionNuances: SESSION_NUANCES,
+  lifecycleNuances: LIFECYCLE_NUANCES,
+  processes: PROCESSES,
+  agents: AGENTS,
+  graph: GRAPH.edges.map(
+    (edge): GraphEdge => ({
+      edgeId: edge.id,
+      from: edge.from,
+      to: edge.to,
+      relation: edge.relation,
+      versionRange: valueAsString(edge.versionRange) || ">=0.0.0",
+      evidenceIds: stringArray(edge.evidenceRefs),
+    }),
+  ),
+};

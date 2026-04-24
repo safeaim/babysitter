@@ -1,0 +1,44 @@
+kind: NodeDocument
+documentPath: nodes/processes-and-packages/ci-surfaces.yaml
+generatedAt: 2026-04-23T00:00:00.000Z
+nodes:
+  - id: ci:@a5c-ai/agent-catalog
+    kind: CiSurface
+    ciId: "@a5c-ai/agent-catalog"
+    packageId: "@a5c-ai/agent-catalog"
+    scripts:
+      - build
+      - test
+      - ci:test
+      - ci:staging
+      - ci:prod
+      - version:check
+    publishStrategy: workspace-package
+    releaseChannels:
+      - test
+      - staging
+      - prod
+    validationCommands:
+      - npm run build --workspace=@a5c-ai/agent-catalog
+      - npm run test --workspace=@a5c-ai/agent-catalog
+      - npm run version:check --workspace=@a5c-ai/agent-catalog
+    artifactExpectations:
+      - dist/**
+      - graph/**
+    evidenceRefs:
+      - repo-agent-catalog-package
+  - id: ci:@a5c-ai/catalog
+    kind: CiSurface
+    ciId: "@a5c-ai/catalog"
+    packageId: "@a5c-ai/catalog"
+    scripts:
+      - type-check
+    publishStrategy: application
+    releaseChannels:
+      - prod
+    validationCommands:
+      - cd packages/catalog && npm run type-check
+    artifactExpectations:
+      - .next/**
+    evidenceRefs:
+      - repo-process-catalog

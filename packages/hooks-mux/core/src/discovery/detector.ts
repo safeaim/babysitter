@@ -7,6 +7,8 @@
  * particular flavour of AI assistant has summoned us.
  */
 
+import { getHooksMuxDetectionRules } from '@a5c-ai/agent-catalog';
+
 export interface DetectedHarness {
   /** Adapter name (e.g. 'claude', 'codex', 'gemini'). */
   adapter: string;
@@ -36,70 +38,14 @@ interface DetectionRule {
  * Ordered list of detection rules.
  * First high-confidence match wins; checked sequentially.
  */
-const DETECTION_RULES: DetectionRule[] = [
-  // 1. Claude Code
-  {
-    adapter: 'claude',
-    confidence: 'high',
-    signals: ['CLAUDE_PLUGIN_ROOT', 'CLAUDE_ENV_FILE'],
-  },
-  // 2. Codex — high if CODEX_PLUGIN_ROOT or CODEX_THREAD_ID is set
-  {
-    adapter: 'codex',
-    confidence: 'high',
-    signals: ['CODEX_PLUGIN_ROOT', 'CODEX_THREAD_ID'],
-  },
-  // 2b. Codex — medium if OPENAI_API_KEY is set but no Claude signals
-  {
-    adapter: 'codex',
-    confidence: 'medium',
-    signals: ['OPENAI_API_KEY'],
-    condition: (env) =>
-      !env['CLAUDE_PLUGIN_ROOT'] && !env['CLAUDE_ENV_FILE'],
-  },
-  // 3. Gemini CLI
-  {
-    adapter: 'gemini',
-    confidence: 'high',
-    signals: ['GEMINI_EXTENSION_PATH', 'BABYSITTER_EXTENSION_PATH'],
-  },
-  // 4. GitHub Copilot
-  {
-    adapter: 'copilot',
-    confidence: 'high',
-    signals: ['COPILOT_HOME', 'COPILOT_GITHUB_TOKEN'],
-  },
-  // 5. Cursor
-  {
-    adapter: 'cursor',
-    confidence: 'medium',
-    signals: ['CURSOR_PROJECT_DIR', 'CURSOR_VERSION'],
-  },
-  // 6. Pi
-  {
-    adapter: 'pi',
-    confidence: 'high',
-    signals: ['PI_PLUGIN_ROOT', 'PI_SESSION_ID'],
-  },
-  // 7. Oh-My-Pi
-  {
-    adapter: 'oh-my-pi',
-    confidence: 'high',
-    signals: ['OMP_PLUGIN_ROOT', 'OMP_SESSION_ID'],
-  },
-  // 8. OpenCode
-  {
-    adapter: 'opencode',
-    confidence: 'high',
-    signals: ['OPENCODE_CONFIG', 'ACCOMPLISH_TASK_ID'],
-  },
-  // 9. OpenClaw
-  {
-    adapter: 'openclaw',
-    confidence: 'medium',
-    signals: ['OPENCLAW_SHELL', 'OPENCLAW_HOME'],
-  },
-];
+const DETECTION_RULES: DetectionRule[] = getHooksMuxDetectionRules().map((rule) => ({
+  adapter: rule.adapter,
+  confidence: rule.confidence,
+  signals: [...rule.signals],
+  condition: rule.absentSignals
+    ? (env) => rule.absentSignals!.every((signal) => !env[signal])
+    : undefined,
+}));
 
 /**
  * Detect which harness the current process is running inside.

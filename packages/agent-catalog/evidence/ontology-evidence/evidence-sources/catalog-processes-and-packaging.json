@@ -1,0 +1,48 @@
+{
+  "kind": "EvidenceShard",
+  "entryKind": "evidence-sources",
+  "group": "catalog-processes-and-packaging",
+  "generatedAt": "2026-04-23T00:00:00.000Z",
+  "entries": [
+    {
+      "id": "evidence:repo-agent-catalog-package",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-agent-catalog-package",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-catalog/package.json",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "package metadata and scripts",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-agent-mux-model-catalog",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-agent-mux-model-catalog",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-mux/processes/model-catalog.js",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-120",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-babysitter-agent-package",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-babysitter-agent-package",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/babysitter-agent/package.json",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "package metadata, bin entry, and dependency surface",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-process-catalog",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-process-catalog",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/catalog/process-library-catalog.js",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-170",
+      "trustLevel": "repo"
+    }
+  ]
+}

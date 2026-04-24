@@ -1,0 +1,68 @@
+{
+  "kind": "EvidenceShard",
+  "entryKind": "evidence-sources",
+  "group": "runtime-core",
+  "generatedAt": "2026-04-23T00:00:00.000Z",
+  "entries": [
+    {
+      "id": "evidence:repo-agent-mux-host",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-agent-mux-host",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/agent-mux/core/src/host-detection.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-200",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-babysitter-agent-cli",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-babysitter-agent-cli",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/babysitter-agent/src/cli/dispatch.ts",
+      "capturedAt": "2026-04-24T00:00:00.000Z",
+      "locator": "lines 20-53 and 111-202",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-sdk-fallback",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-sdk-fallback",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/sdk/src/harness/amuxFallbackMetadata.ts",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "lines 1-170",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-transport-mux-architecture",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-transport-mux-architecture",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/transport-mux/architecture.md",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "sections: terminology, protocol layer, provider layer, route contract",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-transport-mux-migration",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-transport-mux-migration",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/transport-mux/migration.md",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "sections: staged order, server surface, auth surface",
+      "trustLevel": "repo"
+    },
+    {
+      "id": "evidence:repo-transport-mux-readme",
+      "kind": "EvidenceSource",
+      "evidenceId": "repo-transport-mux-readme",
+      "kindLabel": "repo",
+      "sourcePathOrUrl": "packages/transport-mux/README.md",
+      "capturedAt": "2026-04-23T00:00:00.000Z",
+      "locator": "sections: protocol layer, provider layer, route contract",
+      "trustLevel": "repo"
+    }
+  ]
+}

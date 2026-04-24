@@ -1,0 +1,22 @@
+kind: GraphDocument
+id: graph:agent-catalog
+graphId: graph:agent-catalog
+schemaVersion: 2026.04.agent-catalog-v2
+catalogVersion: 2026.04.agent-catalog-v2
+generatedAt: 2026-04-23T00:00:00.000Z
+owners:
+  - "@a5c-ai"
+imports:
+  - nodes/agents
+  - nodes/providers
+  - nodes/models.yaml
+  - nodes/transports.yaml
+  - nodes/capabilities
+  - nodes/hooks-and-plugins
+  - nodes/runtime-semantics
+  - nodes/processes-and-packages
+  - nodes/evidence
+  - edges/relations
+schemaPath: schema/ontology-schema.yaml
+defaultNamespace: a5c.agentCatalog
+evidencePolicy: All graph facts should resolve to claims and evidence sources; split YAML files are the source of truth.

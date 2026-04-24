@@ -91,11 +91,11 @@ export function AgentCard({
           )}
         </div>
 
-        {/* Expertise Badges */}
+        {/* Capability Badges */}
         {showExpertise && agent.expertise && agent.expertise.length > 0 && (
           <div className="space-y-1">
             {!isCompact && (
-              <p className="text-xs font-medium text-[rgba(255,255,255,0.4)]">Expertise:</p>
+              <p className="text-xs font-medium text-[rgba(255,255,255,0.4)]">Capabilities:</p>
             )}
             <div className="flex flex-wrap gap-1">
               {agent.expertise.slice(0, maxExpertise).map((exp, index) => (
@@ -119,7 +119,7 @@ export function AgentCard({
           isCompact ? "p-0 pt-2 border-t border-[rgba(255,0,224,0.1)]" : ""
         )}
       >
-        {/* Expertise count */}
+        {/* Capability count */}
         <div className="flex items-center gap-1">
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -129,7 +129,7 @@ export function AgentCard({
               d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
             />
           </svg>
-          <span>{agent.expertise?.length || 0} expertise areas</span>
+          <span>{agent.expertise?.length || 0} capabilities</span>
         </div>
 
         {/* Link indicator */}

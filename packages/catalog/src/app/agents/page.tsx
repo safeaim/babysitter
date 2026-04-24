@@ -8,7 +8,7 @@ import { SearchBar } from "@/components/catalog/SearchBar";
 import { FilterPanel } from "@/components/catalog/FilterPanel";
 import { EntityList } from "@/components/catalog/EntityList";
 import { AgentCard } from "@/components/catalog/EntityCard/AgentCard";
-import type { AgentListItem, DomainListItem } from "@/lib/api/types";
+import type { AgentListItem } from "@/lib/api/types";
 import type { Route } from "next";
 import AgentsLoading from "./loading";
 
@@ -17,7 +17,7 @@ function AgentsContent() {
   const searchParams = useSearchParams();
 
   const [agents, setAgents] = React.useState<AgentListItem[]>([]);
-  const [domains, setDomains] = React.useState<DomainListItem[]>([]);
+  const [domainOptions, setDomainOptions] = React.useState<string[]>([]);
   const [expertiseOptions, setExpertiseOptions] = React.useState<string[]>([]);
   const [total, setTotal] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -44,21 +44,17 @@ function AgentsContent() {
   React.useEffect(() => {
     const fetchReferenceData = async () => {
       try {
-        const domainsRes = await fetch("/api/domains?limit=100");
-        if (domainsRes.ok) {
-          const json = await domainsRes.json();
-          setDomains(json.data || []);
-        }
-
-        // Fetch all agents to extract unique expertise
         const agentsRes = await fetch("/api/agents?limit=1000");
         if (agentsRes.ok) {
           const json = await agentsRes.json();
           const allExpertise = new Set<string>();
+          const allDomains = new Set<string>();
           (json.data || []).forEach((agent: AgentListItem) => {
             (agent.expertise || []).forEach((exp) => allExpertise.add(exp));
+            if (agent.domainName) allDomains.add(agent.domainName);
           });
           setExpertiseOptions(Array.from(allExpertise).sort());
+          setDomainOptions(Array.from(allDomains).sort());
         }
       } catch (error) {
         console.error("Failed to fetch reference data:", error);
@@ -148,8 +144,6 @@ function AgentsContent() {
       )
     : agents;
 
-  const domainNames = domains.map((d) => d.name);
-
   return (
     <PageContainer>
       <Breadcrumb
@@ -162,7 +156,7 @@ function AgentsContent() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Agents</h1>
         <p className="mt-2 text-muted-foreground">
-          Discover specialized agents for task execution and automation.
+          Browse harness versions, providers, transports, hooks, and capabilities from the shared agent catalog.
         </p>
       </div>
 
@@ -175,7 +169,7 @@ function AgentsContent() {
               expertise: filterExpertise.length > 0 ? filterExpertise : undefined,
             }}
             onFilterChange={handleFilterChange}
-            domains={domainNames}
+            domains={domainOptions}
             expertiseOptions={expertiseOptions.slice(0, 20)}
             showEntityTypes={false}
             showDomain={true}
@@ -190,7 +184,7 @@ function AgentsContent() {
             <SearchBar
               value={searchQuery}
               onSearch={handleSearch}
-              domains={domainNames}
+              domains={domainOptions}
               suggestions={agents.slice(0, 5).map((a) => a.name)}
             />
           </div>

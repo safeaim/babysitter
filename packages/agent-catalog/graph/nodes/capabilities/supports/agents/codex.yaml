@@ -1,0 +1,174 @@
+kind: NodeDocument
+documentPath: nodes/capabilities/supports/agents/codex.yaml
+generatedAt: 2026-04-23T00:00:00.000Z
+nodes:
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:skills
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:skills
+    capabilityId: skills
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: &a1
+      - repo-sdk-fallback
+      - repo-target-codex
+      - repo-target-index
+      - repo-codex-windows-hooks
+      - web-openai-codex-skills
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:thinking
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:thinking
+    capabilityId: thinking
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: *a1
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:interactive-mode
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:interactive-mode
+    capabilityId: interactive-mode
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: *a1
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:stdin-injection
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:stdin-injection
+    capabilityId: stdin-injection
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: *a1
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:image-input
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:image-input
+    capabilityId: image-input
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: *a1
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:runtime-hooks
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:runtime-hooks
+    capabilityId: runtime-hooks
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: *a1
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:stop-hook
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:stop-hook
+    capabilityId: stop-hook
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: *a1
+  - id: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:session-resume
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-0-0-lt-0-119-0:session-resume
+    capabilityId: session-resume
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-0-0-lt-0-119-0
+    versionRange: ">=0.0.0 <0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and a version-specific Windows lifecycle limitation below 0.119.0.
+    evidenceRefs: *a1
+  - id: capabilitySupport:codex:ge-0-119-0:skills
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:skills
+    capabilityId: skills
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: &a2
+      - repo-sdk-fallback
+      - repo-target-codex
+      - repo-target-index
+      - repo-codex-windows-hooks
+      - web-openai-codex-skills
+  - id: capabilitySupport:codex:ge-0-119-0:thinking
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:thinking
+    capabilityId: thinking
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: *a2
+  - id: capabilitySupport:codex:ge-0-119-0:interactive-mode
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:interactive-mode
+    capabilityId: interactive-mode
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: *a2
+  - id: capabilitySupport:codex:ge-0-119-0:stdin-injection
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:stdin-injection
+    capabilityId: stdin-injection
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: *a2
+  - id: capabilitySupport:codex:ge-0-119-0:image-input
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:image-input
+    capabilityId: image-input
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: *a2
+  - id: capabilitySupport:codex:ge-0-119-0:runtime-hooks
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:runtime-hooks
+    capabilityId: runtime-hooks
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: *a2
+  - id: capabilitySupport:codex:ge-0-119-0:stop-hook
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:stop-hook
+    capabilityId: stop-hook
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: *a2
+  - id: capabilitySupport:codex:ge-0-119-0:session-resume
+    kind: CapabilitySupport
+    supportId: capabilitySupport:codex:ge-0-119-0:session-resume
+    capabilityId: session-resume
+    supportLevel: native
+    subjectKind: AgentVersion
+    subjectId: agentVersion:codex:ge-0-119-0
+    versionRange: ">=0.119.0"
+    notes: OpenAI terminal harness with hooks, skills, and documented Windows hook support starting in 0.119.0.
+    evidenceRefs: *a2

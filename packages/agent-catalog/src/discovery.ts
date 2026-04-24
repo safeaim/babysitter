@@ -501,7 +501,10 @@ function parseAgentFile(filePath: string): MutableAgent {
   };
 }
 
-function assignStableIds<T extends { id?: number }>(items: T[], keyFor: (item: T) => string): T[] {
+function assignStableIds<T extends object>(
+  items: T[],
+  keyFor: (item: T) => string,
+): Array<T & { id: number }> {
   return items
     .slice()
     .sort((left, right) => keyFor(left).localeCompare(keyFor(right)))

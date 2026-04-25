@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { PassThrough } from "node:stream";
@@ -82,8 +82,27 @@ function getTool(name: string, workspace: string, onToolUse?: (toolName: string,
   return tool;
 }
 
+function mockSpawnExit(exitCode = 0, stdoutText = "") {
+  vi.mocked(childProcess.spawn).mockImplementation(() => {
+    const processHandle = new PassThrough() as unknown as childProcess.ChildProcessWithoutNullStreams;
+    const stdout = new PassThrough();
+    const stderr = new PassThrough();
+    Object.assign(processHandle, { stdout, stderr });
+    setTimeout(() => {
+      if (stdoutText) {
+        stdout.write(stdoutText);
+      }
+      stdout.end();
+      stderr.end();
+      (processHandle as unknown as PassThrough).emit("close", exitCode);
+    }, 0);
+    return processHandle;
+  });
+}
+
 describe("agent-core tools", () => {
   afterEach(() => {
+    vi.clearAllMocks();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -189,5 +208,64 @@ describe("agent-core tools", () => {
     ).toContain("# Title & Stuff");
     expect(filterByRelevance("Alpha text\n\nBeta text", "Alpha focus")).toBe("Alpha text");
     expect(createAgentCoreToolDefinitionsFromIndex).toBe(createAgentCoreToolDefinitions);
+  });
+
+  it("scopes ast_edit to files matching the requested glob", async () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-ast-edit-glob-"));
+    const srcDir = path.join(workspace, "src");
+    const testDir = path.join(workspace, "test");
+    mkdirSync(srcDir, { recursive: true });
+    mkdirSync(testDir, { recursive: true });
+    writeFileSync(path.join(srcDir, "alpha.ts"), "const value = oldName;\n", "utf8");
+    writeFileSync(path.join(srcDir, "beta.ts"), "const value = oldName;\n", "utf8");
+    writeFileSync(path.join(testDir, "gamma.ts"), "const value = oldName;\n", "utf8");
+
+    mockSpawnExit();
+
+    const astEditTool = getTool("ast_edit", workspace);
+    const result = await astEditTool.execute("call-ast-edit-glob", {
+      ops: [{ pat: "oldName", rewrite: "newName" }],
+      lang: "typescript",
+      path: ".",
+      glob: "src/*.ts",
+    });
+
+    const invokedPaths = vi.mocked(childProcess.spawn).mock.calls.map((call) => String((call[1] as string[]).at(-1)));
+    expect(invokedPaths).toEqual([
+      path.join(workspace, "src", "alpha.ts"),
+      path.join(workspace, "src", "beta.ts"),
+    ]);
+    expect(getText(result)).toContain("src/alpha.ts: applied");
+    expect(getText(result)).toContain("src/beta.ts: applied");
+    expect(getText(result)).not.toContain("test/gamma.ts");
+  });
+
+  it("caps ast_edit rewrites to the requested file limit", async () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-ast-edit-limit-"));
+    const srcDir = path.join(workspace, "src");
+    mkdirSync(srcDir, { recursive: true });
+    writeFileSync(path.join(srcDir, "alpha.ts"), "const value = oldName;\n", "utf8");
+    writeFileSync(path.join(srcDir, "beta.ts"), "const value = oldName;\n", "utf8");
+    writeFileSync(path.join(srcDir, "gamma.ts"), "const value = oldName;\n", "utf8");
+
+    mockSpawnExit();
+
+    const astEditTool = getTool("ast_edit", workspace);
+    const result = await astEditTool.execute("call-ast-edit-limit", {
+      ops: [{ pat: "oldName", rewrite: "newName" }],
+      lang: "typescript",
+      path: "src",
+      glob: "*.ts",
+      limit: 2,
+    });
+
+    const invokedPaths = vi.mocked(childProcess.spawn).mock.calls.map((call) => String((call[1] as string[]).at(-1)));
+    expect(invokedPaths).toEqual([
+      path.join(workspace, "src", "alpha.ts"),
+      path.join(workspace, "src", "beta.ts"),
+    ]);
+    expect(getText(result)).toContain("src/alpha.ts: applied");
+    expect(getText(result)).toContain("src/beta.ts: applied");
+    expect(getText(result)).not.toContain("src/gamma.ts");
   });
 });

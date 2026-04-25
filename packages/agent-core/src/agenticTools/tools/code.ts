@@ -4,7 +4,7 @@ import { Type } from "@sinclair/typebox";
 import type { AgenticToolOptions, CustomToolDefinition, ToolResult } from "../types";
 import { DEFAULT_SEARCH_TIMEOUT, getRgPath, spawnAsync } from "../shared/process";
 import { errorResult, jsonResult, ok } from "../shared/results";
-import { resolveSafe } from "../shared/paths";
+import { globToRegex, resolveSafe } from "../shared/paths";
 
 interface NotebookJson {
   cells: NotebookCell[];
@@ -17,6 +17,60 @@ interface NotebookCell {
   metadata: Record<string, unknown>;
   outputs?: unknown[];
   [key: string]: unknown;
+}
+
+function collectScopedAstEditFiles(
+  targetPath: string,
+  globPattern?: string,
+  limit?: number,
+): string[] {
+  const maxFiles = limit == null ? undefined : Math.max(0, Math.floor(limit));
+  if (maxFiles === 0) {
+    return [];
+  }
+
+  let stat: fs.Stats | undefined;
+  try {
+    stat = fs.statSync(targetPath);
+  } catch {
+    return maxFiles === undefined ? [targetPath] : [targetPath].slice(0, maxFiles);
+  }
+
+  const scopeRoot = stat.isDirectory() ? targetPath : path.dirname(targetPath);
+  const files = stat.isDirectory() ? collectFilesRecursively(targetPath) : [targetPath];
+  const scopedFiles = globPattern
+    ? files.filter((filePath) => globToRegex(globPattern).test(path.relative(scopeRoot, filePath).replace(/\\/g, "/")))
+    : files;
+
+  return maxFiles == null ? scopedFiles : scopedFiles.slice(0, maxFiles);
+}
+
+function collectFilesRecursively(directory: string): string[] {
+  const results: string[] = [];
+  const walk = (currentDir: string) => {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(currentDir, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name));
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      if (entry.name === ".git" || entry.name === "node_modules") {
+        continue;
+      }
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+        continue;
+      }
+      results.push(fullPath);
+    }
+  };
+
+  walk(directory);
+
+  return results;
 }
 
 export function createCodeTools(options: AgenticToolOptions): CustomToolDefinition[] {
@@ -88,7 +142,7 @@ export function createCodeTools(options: AgenticToolOptions): CustomToolDefiniti
     {
       name: "ast_edit",
       label: "AST Transform",
-      description: "Apply AST-based rewrite operations via ast-grep (sg --rewrite).",
+      description: "Apply AST-based rewrite operations via ast-grep (sg --rewrite) to files selected by path, glob, and limit.",
       parameters: Type.Object({
         ops: Type.Array(
           Type.Object({
@@ -99,29 +153,47 @@ export function createCodeTools(options: AgenticToolOptions): CustomToolDefiniti
         ),
         lang: Type.String({ description: "Language (e.g. 'typescript')" }),
         path: Type.Optional(Type.String({ description: "Target path relative to workspace" })),
-        glob: Type.Optional(Type.String({ description: "File glob filter" })),
-        limit: Type.Optional(Type.Number({ description: "Max files to modify" })),
+        glob: Type.Optional(Type.String({ description: "File glob filter relative to the requested path" })),
+        limit: Type.Optional(Type.Number({ description: "Maximum number of matched files to modify" })),
       }),
       execute: async (_toolCallId, params) => {
         const targetPath = params.path ? resolveSafe(workspace, String(params.path)) : workspace;
+        const scopedFiles = collectScopedAstEditFiles(
+          targetPath,
+          params.glob ? String(params.glob) : undefined,
+          params.limit as number | undefined,
+        );
+        if (scopedFiles.length === 0) {
+          return ok("No files matched the requested scope.");
+        }
         const results = await Promise.all(
           (params.ops as Array<{ pat: string; rewrite: string }>).map(async (operation) => {
-            const result = await spawnAsync("sg", [
-              "run",
-              "--pattern",
-              operation.pat,
-              "--rewrite",
-              operation.rewrite,
-              "--lang",
-              String(params.lang),
-              "--update-all",
-              targetPath,
-            ], {
-              cwd: workspace,
-              timeout: DEFAULT_SEARCH_TIMEOUT,
-            });
-            const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
-            return `Pattern "${operation.pat}" -> "${operation.rewrite}": ${result.exitCode === 0 ? "applied" : "failed"}${output ? `\n${output}` : ""}`;
+            const operationResults = await Promise.all(
+              scopedFiles.map(async (filePath) => {
+                const result = await spawnAsync("sg", [
+                  "run",
+                  "--pattern",
+                  operation.pat,
+                  "--rewrite",
+                  operation.rewrite,
+                  "--lang",
+                  String(params.lang),
+                  "--update-all",
+                  filePath,
+                ], {
+                  cwd: workspace,
+                  timeout: DEFAULT_SEARCH_TIMEOUT,
+                });
+                return { filePath, result };
+              }),
+            );
+            const output = operationResults
+              .map(({ filePath, result }) => {
+                const details = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
+                return `${path.relative(workspace, filePath).replace(/\\/g, "/")}: ${result.exitCode === 0 ? "applied" : "failed"}${details ? `\n${details}` : ""}`;
+              })
+              .join("\n");
+            return `Pattern "${operation.pat}" -> "${operation.rewrite}"\n${output}`;
           }),
         );
         return ok(results.join("\n"));

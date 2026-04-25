@@ -82,11 +82,11 @@ vi.mock('lucide-react', () => {
     'Columns3', 'CornerDownRight', 'ExternalLink', 'Eye', 'EyeOff', 'FileDiff', 'FileJson', 'FileText', 'FolderGit2', 'FolderOpen',
     'GitBranch', 'Github',
     'Hand', 'Hash', 'HelpCircle', 'History', 'Inbox', 'Info', 'Layers',
-    'Loader2', 'MessageSquareText', 'MessageSquareWarning', 'Moon', 'Palette', 'PlaySquare',
+    'GripVertical', 'LayoutDashboard', 'Loader2', 'MessagesSquare', 'MessageSquareText', 'MessageSquareWarning', 'Moon', 'Palette', 'PanelLeft', 'PanelRight', 'PlaySquare',
     'Pause', 'Percent', 'Pin', 'Play', 'Plus', 'Power', 'Puzzle', 'RefreshCw', 'Search', 'Settings',
     'ShieldCheck', 'Siren', 'Sun', 'Tag', 'Terminal', 'Timer', 'TimerReset', 'Trash2',
-    'UserRoundPlus', 'Users', 'Webhook', 'Wifi', 'WifiOff', 'Workflow',
-    'ListTodo', 'Wrench', 'Archive', 'RotateCcw',
+    'TerminalSquare', 'UserRoundPlus', 'Users', 'Webhook', 'Wifi', 'WifiOff', 'Workflow',
+    'Link2', 'ListTodo', 'Wrench', 'Archive', 'RotateCcw',
     'X', 'XCircle',
   ];
 

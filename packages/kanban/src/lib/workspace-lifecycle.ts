@@ -40,6 +40,14 @@ export interface WorkspaceSessionSnapshot {
   runtime?: WorkspaceRuntimeSurface;
 }
 
+export interface WorkspaceIssueLink {
+  issueId: string;
+  issueKey: string;
+  issueTitle: string;
+  linkedAt: string;
+  source: "created-from-issue" | "linked-existing-workspace";
+}
+
 export interface WorkspaceInventoryItem {
   path: string;
   name: string;
@@ -94,6 +102,7 @@ export interface WorkspaceInventoryItem {
     canRebaseAbort: boolean;
   };
   review?: KanbanReviewSummary;
+  issues?: WorkspaceIssueLink[];
 }
 
 export interface WorkspaceInventoryResponse {
@@ -112,6 +121,12 @@ export interface WorkspaceActionResult {
   workspacePath: string;
   action: WorkspaceAction;
   message: string;
+}
+
+export interface WorkspaceProvisionResult {
+  workspacePath: string;
+  workspaceName: string;
+  branchName: string;
 }
 
 interface WorkspaceRegistryEntry {
@@ -341,6 +356,15 @@ function normalizeWorkspacePath(workspacePath: string): string {
   return path.resolve(workspacePath);
 }
 
+function slugifyWorkspaceName(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-") || "workspace";
+}
+
 function stripRefPrefix(branch: string | null): string | null {
   if (!branch) {
     return null;
@@ -517,9 +541,12 @@ export class WorkspaceLifecycleService {
   async listWorkspaces(input: {
     sessions?: WorkspaceSessionSnapshot[];
     reviewByWorkspacePath?: ReadonlyMap<string, KanbanReviewSummary>;
+    linkedIssuesByWorkspacePath?: ReadonlyMap<string, readonly WorkspaceIssueLink[]>;
   } = {}): Promise<WorkspaceInventoryResponse> {
     const sessions = input.sessions ?? [];
     const reviewByWorkspacePath = input.reviewByWorkspacePath ?? new Map<string, KanbanReviewSummary>();
+    const linkedIssuesByWorkspacePath =
+      input.linkedIssuesByWorkspacePath ?? new Map<string, readonly WorkspaceIssueLink[]>();
     const registry = await readRegistry(this.deps);
     const records = new Map<string, MutableWorkspaceRecord>();
 
@@ -728,6 +755,9 @@ export class WorkspaceLifecycleService {
             canRebaseAbort: rebaseStatus === "rebase-conflicts",
           },
           review: reviewByWorkspacePath.get(record.path),
+          issues: [...(linkedIssuesByWorkspacePath.get(record.path) ?? [])].sort((left, right) =>
+            left.issueKey.localeCompare(right.issueKey),
+          ),
         };
       })
       .sort((left, right) => {
@@ -753,6 +783,67 @@ export class WorkspaceLifecycleService {
         archived: workspaces.filter((workspace) => workspace.status === "archived").length,
         missing: workspaces.filter((workspace) => workspace.status === "missing").length,
       },
+    };
+  }
+
+  async provisionWorkspaceForIssue(input: {
+    issueKey: string;
+    issueTitle: string;
+  }): Promise<WorkspaceProvisionResult> {
+    const registry = await readRegistry(this.deps);
+    const seedPath = normalizeWorkspacePath(this.deps.cwd());
+    const cluster = await collectGitCluster(this.deps, seedPath);
+    const slugBase = slugifyWorkspaceName(input.issueKey || input.issueTitle);
+    const workspaceRoot = cluster.gitRoot
+      ? path.join(path.dirname(cluster.gitRoot), "worktrees")
+      : path.join(path.dirname(seedPath), "workspaces");
+    const branchBase = `vk/${slugBase}`;
+    const existingPaths = new Set<string>([
+      ...Object.keys(registry.workspaces).map(normalizeWorkspacePath),
+      ...cluster.worktrees.map((worktree) => normalizeWorkspacePath(worktree.path)),
+    ]);
+    const existingBranches = new Set<string>(
+      cluster.worktrees
+        .map((worktree) => worktree.branch)
+        .filter((branch): branch is string => typeof branch === "string" && branch.length > 0),
+    );
+
+    let suffix = 0;
+    let workspacePath = "";
+    let branchName = "";
+    while (true) {
+      const suffixLabel = suffix === 0 ? "" : `-${suffix + 1}`;
+      workspacePath = normalizeWorkspacePath(path.join(workspaceRoot, `${slugBase}${suffixLabel}`));
+      branchName = `${branchBase}${suffixLabel}`;
+      if (!existingPaths.has(workspacePath) && !existingBranches.has(branchName)) {
+        break;
+      }
+      suffix += 1;
+    }
+
+    if (cluster.gitRoot) {
+      await this.deps.execGit(["worktree", "add", "-b", branchName, workspacePath], cluster.gitRoot);
+    }
+
+    registry.workspaces[workspacePath] = {
+      path: workspacePath,
+      name: input.issueKey,
+      gitRoot: cluster.gitRoot,
+      commonDir: cluster.commonDir,
+      branch: branchName,
+      trackingBranch: null,
+      archivedAt: null,
+      cleanedAt: null,
+      notes: "",
+      notesUpdatedAt: null,
+      rebase: null,
+    };
+    await writeRegistry(this.deps, registry);
+
+    return {
+      workspacePath,
+      workspaceName: input.issueKey,
+      branchName,
     };
   }
 

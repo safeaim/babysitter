@@ -764,6 +764,24 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
                 </select>
               </label>
             </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(props.workspace.issues ?? []).length > 0 ? (
+                (props.workspace.issues ?? []).map((issue) => (
+                  <Link
+                    key={`${props.workspace.path}-${issue.issueId}`}
+                    href={`/?issueId=${encodeURIComponent(issue.issueId)}&issueKey=${encodeURIComponent(issue.issueKey)}`}
+                    className="rounded-full border border-border px-3 py-1.5 text-xs text-primary"
+                    data-testid={`workspace-issue-link-${issue.issueKey}`}
+                  >
+                    {issue.issueKey}
+                  </Link>
+                ))
+              ) : (
+                <span className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground-muted">
+                  No linked issues
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

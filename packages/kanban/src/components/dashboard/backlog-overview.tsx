@@ -24,8 +24,10 @@ import {
   FolderGit2,
   GitBranch,
   Layers,
+  Link2,
   ListTodo,
   Plus,
+  RefreshCw,
   Settings,
   ShieldAlert,
   ShieldCheck,
@@ -36,7 +38,7 @@ import {
   Users,
   Workflow,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useBacklog } from "@/hooks/use-backlog";
@@ -45,6 +47,7 @@ import { useReviews } from "@/hooks/use-reviews";
 import { useTaskTags } from "@/hooks/use-task-tags";
 import { ReviewPanel } from "@/components/review/review-panel";
 import { TaskTagAutocompleteTextarea } from "@/components/task-tags/task-tag-autocomplete-textarea";
+import type { WorkspaceInventoryItem, WorkspaceInventoryResponse } from "@/lib/workspace-lifecycle";
 
 const workflowOrder: readonly KanbanWorkflowState[] = ["todo", "in-progress", "review", "done"];
 
@@ -179,6 +182,32 @@ function formatActivity(timestamp?: string): string {
   });
 }
 
+function workspaceShellHref(workspacePath: string): string {
+  return `/workspaces?workspace=${encodeURIComponent(workspacePath)}`;
+}
+
+function workspaceLifecycleTone(status: string): string {
+  switch (status) {
+    case "active":
+      return "border-success/25 bg-success-muted text-success";
+    case "archived":
+      return "border-warning/25 bg-warning-muted text-warning";
+    case "missing":
+      return "border-error/25 bg-error-muted text-error";
+    default:
+      return "border-border bg-background text-foreground-muted";
+  }
+}
+
+async function loadIssueWorkspaceInventory(): Promise<WorkspaceInventoryResponse> {
+  const response = await fetch("/api/workspaces", { cache: "no-store" });
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? `Workspace inventory request failed: ${response.status}`);
+  }
+  return (await response.json()) as WorkspaceInventoryResponse;
+}
+
 type BoardPresentation = "board" | "list";
 type CreateEntrySource = "header" | "column";
 
@@ -209,6 +238,12 @@ interface IssueDetailDraft {
 interface IssueFieldState {
   status: IssueFieldSaveStatus;
   message: string | null;
+}
+
+interface IssueWorkspaceInventoryState {
+  items: WorkspaceInventoryItem[];
+  loading: boolean;
+  error: string | null;
 }
 
 type IssueFieldStateMap = Record<IssueDetailField, IssueFieldState>;
@@ -1521,6 +1556,11 @@ interface IssueDetailPanelProps {
     issueId: string;
     dispatchContextLabelIds: string[];
   }) => Promise<void>;
+  workspaceInventory: IssueWorkspaceInventoryState;
+  onRefreshWorkspaceInventory: () => void;
+  onCreateIssueWorkspace: (issueId: string) => Promise<void>;
+  onLinkIssueWorkspace: (input: { issueId: string; workspacePath: string }) => Promise<void>;
+  onOpenWorkspacePath: (workspacePath?: string) => void;
 }
 
 function IssueDetailPanel({
@@ -1552,6 +1592,11 @@ function IssueDetailPanel({
   onCreateSubIssue,
   onLinkChildIssue,
   onSaveDispatchContextLabels,
+  workspaceInventory,
+  onRefreshWorkspaceInventory,
+  onCreateIssueWorkspace,
+  onLinkIssueWorkspace,
+  onOpenWorkspacePath,
 }: IssueDetailPanelProps) {
   const issueById = new Map(issues.map((candidate) => [candidate.id, candidate] as const));
   const parentIssue = issue.parentIssueId ? issueById.get(issue.parentIssueId) : undefined;
@@ -1596,6 +1641,19 @@ function IssueDetailPanel({
   const linkedPullRequest = reviewArtifact?.linkedPullRequest;
   const ciGates = linkedPullRequest?.ciGates ?? card?.repositoryLifecycle?.ciGates ?? [];
   const recentReviewComments = [...(reviewArtifact?.comments ?? [])].slice(-2).reverse();
+  const workspaceInventoryByPath = useMemo(
+    () => new Map(workspaceInventory.items.map((workspace) => [workspace.path, workspace] as const)),
+    [workspaceInventory.items],
+  );
+  const linkedWorkspaces = issue.workspaceLinks ?? [];
+  const availableWorkspaceTargets = workspaceInventory.items.filter(
+    (workspace) =>
+      !workspace.missing &&
+      !linkedWorkspaces.some((link) => link.workspacePath === workspace.path),
+  );
+  const [selectedWorkspacePath, setSelectedWorkspacePath] = useState<string>(
+    availableWorkspaceTargets[0]?.path ?? "",
+  );
 
   useEffect(() => {
     setSelectedChildIssueId((current) =>
@@ -1604,6 +1662,14 @@ function IssueDetailPanel({
         : (linkableIssues[0]?.id ?? ""),
     );
   }, [linkableIssues]);
+
+  useEffect(() => {
+    setSelectedWorkspacePath((current) =>
+      current && availableWorkspaceTargets.some((workspace) => workspace.path === current)
+        ? current
+        : (availableWorkspaceTargets[0]?.path ?? ""),
+    );
+  }, [availableWorkspaceTargets]);
 
   function insertDescriptionSnippet(snippet: string) {
     const textarea = textareaRef.current;
@@ -2210,6 +2276,162 @@ function IssueDetailPanel({
         />
       </div>
 
+      <section className="mt-5 rounded-2xl border border-border bg-background/80 p-4" data-testid="issue-workspace-panel">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <FolderGit2 className="h-4 w-4" />
+              Linked workspaces
+            </div>
+            <div className="mt-1 text-xs text-foreground-muted">
+              Create a new execution workspace from this issue or attach one or more existing workspaces.
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => void onCreateIssueWorkspace(issue.id).then(() => onRefreshWorkspaceInventory())}
+              disabled={mutating}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 text-xs font-semibold text-primary disabled:opacity-50"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Create workspace
+            </button>
+            <button
+              type="button"
+              onClick={onRefreshWorkspaceInventory}
+              disabled={workspaceInventory.loading}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-3 text-xs font-semibold text-foreground-muted disabled:opacity-50"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        {workspaceInventory.loading ? (
+          <div className="mt-3 rounded-2xl border border-dashed border-border p-3 text-sm text-foreground-muted" data-testid="issue-workspace-loading">
+            Loading workspace association state…
+          </div>
+        ) : null}
+
+        {workspaceInventory.error ? (
+          <div className="mt-3 rounded-2xl border border-error/25 bg-error-muted p-3 text-sm text-error" data-testid="issue-workspace-error">
+            {workspaceInventory.error}
+          </div>
+        ) : null}
+
+        {linkedWorkspaces.length > 0 ? (
+          <div className="mt-4 space-y-3" data-testid="linked-workspaces-list">
+            {linkedWorkspaces.map((workspaceLink) => {
+              const workspace = workspaceInventoryByPath.get(workspaceLink.workspacePath);
+              const workspaceState = workspace?.status ?? "stale-link";
+              return (
+                <div key={`${issue.id}-${workspaceLink.workspacePath}`} className="rounded-2xl border border-border bg-card p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-foreground">{workspaceLink.workspaceName}</span>
+                        <span className={`rounded-full border px-2.5 py-1 text-xs ${workspaceLifecycleTone(workspaceState)}`}>
+                          {workspaceState === "stale-link" ? "stale link" : workspaceState}
+                        </span>
+                        <span className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground-muted">
+                          {workspaceLink.source === "created-from-issue" ? "created from issue" : "linked existing workspace"}
+                        </span>
+                      </div>
+                      <div className="mt-2 font-mono text-xs text-foreground-muted">{workspaceLink.workspacePath}</div>
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-foreground-muted">
+                        {workspaceLink.branchName ? (
+                          <span className="rounded-full border border-border px-2.5 py-1">{workspaceLink.branchName}</span>
+                        ) : null}
+                        <span className="rounded-full border border-border px-2.5 py-1">
+                          Linked {formatActivity(workspaceLink.linkedAt)}
+                        </span>
+                        {workspace?.issues && workspace.issues.length > 1 ? (
+                          <span className="rounded-full border border-border px-2.5 py-1">
+                            {workspace.issues.length} issue associations
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    {workspace ? (
+                      <button
+                        type="button"
+                        onClick={() => onOpenWorkspacePath(workspace.path)}
+                        className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-3 text-xs font-semibold text-foreground"
+                        data-testid={`open-workspace-${workspace.path}`}
+                      >
+                        <Link2 className="h-3.5 w-3.5" />
+                        Open workspace
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onOpenWorkspacePath()}
+                        className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-3 text-xs font-semibold text-foreground"
+                        data-testid={`recover-workspace-${workspaceLink.workspacePath}`}
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Open workspaces
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : !workspaceInventory.loading ? (
+          <div className="mt-3 rounded-2xl border border-dashed border-border p-3 text-sm text-foreground-muted" data-testid="issue-workspace-empty">
+            No workspaces are linked to this issue yet.
+          </div>
+        ) : null}
+
+        <form
+          className="mt-4 rounded-2xl border border-border bg-card p-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!selectedWorkspacePath) {
+              return;
+            }
+            void onLinkIssueWorkspace({
+              issueId: issue.id,
+              workspacePath: selectedWorkspacePath,
+            }).then(() => onRefreshWorkspaceInventory());
+          }}
+          data-testid="link-workspace-form"
+        >
+          <div className="text-sm font-semibold text-foreground">Link existing workspace</div>
+          {availableWorkspaceTargets.length > 0 ? (
+            <>
+              <select
+                aria-label="Existing workspace"
+                value={selectedWorkspacePath}
+                onChange={(event) => setSelectedWorkspacePath(event.target.value)}
+                className="mt-3 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground"
+              >
+                {availableWorkspaceTargets.map((workspace) => (
+                  <option key={workspace.path} value={workspace.path}>
+                    {workspace.name} - {workspace.path}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                disabled={mutating || !selectedWorkspacePath}
+                className="mt-3 inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground disabled:opacity-50"
+              >
+                Link workspace
+              </button>
+            </>
+          ) : (
+            <div className="mt-3 rounded-2xl border border-dashed border-border p-3 text-sm text-foreground-muted" data-testid="link-workspace-empty">
+              Every available workspace is already attached or waiting on recovery.
+            </div>
+          )}
+        </form>
+      </section>
+
       <section className="mt-5 rounded-2xl border border-border bg-background/80 p-4" data-testid="issue-relationship-panel">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Workflow className="h-4 w-4" />
@@ -2483,6 +2705,8 @@ export function BacklogOverview() {
     createSubIssue,
     linkChildIssue,
     updateIssueDetail,
+    createIssueWorkspace,
+    linkIssueWorkspace,
     movingIssueId,
     mutatingIssueId,
     creatingIssue,
@@ -2519,6 +2743,11 @@ export function BacklogOverview() {
   const [priorityEditing, setPriorityEditing] = useState(false);
   const [assigneeEditing, setAssigneeEditing] = useState(false);
   const [labelEditing, setLabelEditing] = useState(false);
+  const [workspaceInventory, setWorkspaceInventory] = useState<IssueWorkspaceInventoryState>({
+    items: [],
+    loading: false,
+    error: null,
+  });
   const previousFocusedIssueIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -2562,59 +2791,24 @@ export function BacklogOverview() {
     return () => window.clearTimeout(timeout);
   }, [createMode, draft.title, draft.summary, draft.priority, draft.workflowState]);
 
-  if (loading && !snapshot) {
-    return (
-      <section
-        className="mb-6 rounded-3xl border border-border bg-card p-6 shadow-lg"
-        data-testid="backlog-overview-loading"
-      >
-        <div className="animate-pulse space-y-3">
-          <div className="h-4 w-36 rounded bg-background-secondary" />
-          <div className="h-8 w-80 rounded bg-background-secondary" />
-          <div className="grid gap-3 md:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="h-20 rounded-2xl bg-background-secondary" />
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error || !snapshot || !summary || !board) {
-    return (
-      <section
-        className="mb-6 rounded-3xl border border-error/25 bg-error-muted p-6 text-sm text-error shadow-lg"
-        data-testid="backlog-overview-error"
-      >
-        Failed to load issue backlog model.
-      </section>
-    );
-  }
-
-  const primaryProject = snapshot.projects[0];
-  const primaryBoard = board.projects.find((candidate) => candidate.projectId === primaryProject?.id);
-  const issueById = new Map(snapshot.issues.map((issue) => [issue.id, issue] as const));
+  const primaryProject = snapshot?.projects[0];
+  const primaryBoard = primaryProject
+    ? board?.projects.find((candidate) => candidate.projectId === primaryProject.id)
+    : undefined;
+  const issueById = new Map((snapshot?.issues ?? []).map((issue) => [issue.id, issue] as const));
   const focusedIssue =
     (focusedIssueId ? issueById.get(focusedIssueId) : undefined) ??
-    (focusedIssueKey ? snapshot.issues.find((issue) => issue.key === focusedIssueKey) : undefined);
-  const focusedIssueCard = focusedIssue
-    ? primaryBoard?.cards.find((candidate) => candidate.issueId === focusedIssue.id)
-    : undefined;
+    (focusedIssueKey ? snapshot?.issues.find((issue) => issue.key === focusedIssueKey) : undefined);
+  const focusedIssueCard =
+    focusedIssue && primaryBoard
+      ? primaryBoard.cards.find((candidate) => candidate.issueId === focusedIssue.id)
+      : undefined;
   const focusedIssueDraft = focusedIssue
     ? issueDrafts[focusedIssue.id] ?? createIssueDetailDraft(focusedIssue)
     : null;
   const targetModelIssue =
-    snapshot.issues.find((issue) => issue.key === "KANBAN-GAP-004") ??
-    snapshot.issues.find((issue) => issue.key === "KANBAN-DEBT-003");
-
-  if (!primaryProject || !primaryBoard) {
-    return null;
-  }
-
-  const boardCards = primaryBoard.swimlanes.flatMap((swimlane) =>
-    workflowOrder.flatMap((state) => findCardsForCell(primaryBoard, swimlane.id, state)),
-  );
+    snapshot?.issues.find((issue) => issue.key === "KANBAN-GAP-004") ??
+    snapshot?.issues.find((issue) => issue.key === "KANBAN-DEBT-003");
 
   useEffect(() => {
     const nextFocusedIssueId = focusedIssue?.id ?? null;
@@ -2673,6 +2867,76 @@ export function BacklogOverview() {
 
     return () => window.clearTimeout(timeout);
   }, [focusedIssue, focusedIssueDraft]);
+
+  useEffect(() => {
+    if (!focusedIssue) {
+      return;
+    }
+
+    let cancelled = false;
+    setWorkspaceInventory((current) => ({ ...current, loading: true, error: null }));
+    void loadIssueWorkspaceInventory()
+      .then((payload) => {
+        if (!cancelled) {
+          setWorkspaceInventory({
+            items: payload.workspaces,
+            loading: false,
+            error: null,
+          });
+        }
+      })
+      .catch((cause) => {
+        if (!cancelled) {
+          setWorkspaceInventory({
+            items: [],
+            loading: false,
+            error: cause instanceof Error ? cause.message : String(cause),
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [focusedIssue?.id]);
+
+  if (loading && !snapshot) {
+    return (
+      <section
+        className="mb-6 rounded-3xl border border-border bg-card p-6 shadow-lg"
+        data-testid="backlog-overview-loading"
+      >
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 w-36 rounded bg-background-secondary" />
+          <div className="h-8 w-80 rounded bg-background-secondary" />
+          <div className="grid gap-3 md:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="h-20 rounded-2xl bg-background-secondary" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !snapshot || !summary || !board) {
+    return (
+      <section
+        className="mb-6 rounded-3xl border border-error/25 bg-error-muted p-6 text-sm text-error shadow-lg"
+        data-testid="backlog-overview-error"
+      >
+        Failed to load issue backlog model.
+      </section>
+    );
+  }
+
+  if (!primaryProject || !primaryBoard) {
+    return null;
+  }
+
+  const boardCards = primaryBoard.swimlanes.flatMap((swimlane) =>
+    workflowOrder.flatMap((state) => findCardsForCell(primaryBoard, swimlane.id, state)),
+  );
 
   function openCreateMode(source: CreateEntrySource, workflowState: KanbanWorkflowState = "todo") {
     clearFocusedIssue();
@@ -2847,6 +3111,32 @@ export function BacklogOverview() {
     params.delete("issueKey");
     const query = params.toString();
     router.push(query ? `/?${query}` : "/");
+  };
+
+  const refreshWorkspaceInventory = () => {
+    if (!focusedIssue) {
+      return;
+    }
+    setWorkspaceInventory((current) => ({ ...current, loading: true, error: null }));
+    void loadIssueWorkspaceInventory()
+      .then((payload) => {
+        setWorkspaceInventory({
+          items: payload.workspaces,
+          loading: false,
+          error: null,
+        });
+      })
+      .catch((cause) => {
+        setWorkspaceInventory({
+          items: [],
+          loading: false,
+          error: cause instanceof Error ? cause.message : String(cause),
+        });
+      });
+  };
+
+  const openWorkspacePath = (workspacePath?: string) => {
+    router.push(workspacePath ? workspaceShellHref(workspacePath) : "/workspaces");
   };
 
   const activeSidePanel = focusedIssue ? "issue" : createMode ? "create" : null;
@@ -3365,6 +3655,11 @@ export function BacklogOverview() {
             onCreateSubIssue={createSubIssue}
             onLinkChildIssue={linkChildIssue}
             onSaveDispatchContextLabels={updateIssueDispatchContextLabels}
+            workspaceInventory={workspaceInventory}
+            onRefreshWorkspaceInventory={refreshWorkspaceInventory}
+            onCreateIssueWorkspace={createIssueWorkspace}
+            onLinkIssueWorkspace={linkIssueWorkspace}
+            onOpenWorkspacePath={openWorkspacePath}
           />
         ) : createMode ? (
           <CreateIssuePanel

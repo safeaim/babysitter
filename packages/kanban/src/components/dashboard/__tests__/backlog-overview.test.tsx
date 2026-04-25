@@ -15,6 +15,8 @@ const updateIssueDispatchContextLabelsMock = vi.fn();
 const createIssueMock = vi.fn();
 const createSubIssueMock = vi.fn();
 const linkChildIssueMock = vi.fn();
+const createIssueWorkspaceMock = vi.fn();
+const linkIssueWorkspaceMock = vi.fn();
 const refreshMock = vi.fn();
 const push = vi.fn();
 
@@ -388,9 +390,101 @@ function buildBacklogState() {
     linkChildIssue: linkChildIssueMock,
     movingIssueId: null,
     mutatingIssueId: null,
+    createIssueWorkspace: createIssueWorkspaceMock,
+    linkIssueWorkspace: linkIssueWorkspaceMock,
     creatingIssue: creatingIssueState,
     mutationError: null,
     refresh: refreshMock,
+  };
+}
+
+function buildWorkspaceInventoryPayload() {
+  return {
+    summary: { total: 2, active: 1, idle: 1, archived: 0, missing: 0 },
+    workspaces: [
+      {
+        path: "/repo/worktrees/gap-007",
+        name: "KANBAN-GAP-007",
+        status: "active",
+        missing: false,
+        archivedAt: null,
+        cleanedAt: null,
+        lastActivityAt: "2026-04-24T14:00:00.000Z",
+        git: {
+          root: "/repo/main",
+          commonDir: "/repo/main/.git",
+          trackingBranch: "origin/vk/kanban-gap-007",
+          branch: "vk/kanban-gap-007",
+          head: "abc123",
+          ahead: 0,
+          behind: 0,
+          dirty: false,
+          uncommittedCount: 0,
+          isWorktree: true,
+          isPrimary: false,
+        },
+        notes: { value: "", updatedAt: null },
+        links: { editorHref: "vscode://file/repo/worktrees/gap-007" },
+        sessions: { total: 0, active: 0, items: [] },
+        runs: { total: 0, active: 0, items: [] },
+        actions: {
+          canArchive: true,
+          canCleanup: false,
+          canRecover: false,
+          canRebaseStart: false,
+          canRebaseAutoResolve: false,
+          canRebaseOpenInEditor: false,
+          canRebaseMarkResolved: false,
+          canRebaseAbort: false,
+        },
+        issues: [
+          {
+            issueId: "KANBAN-GAP-007",
+            issueKey: "KANBAN-GAP-007",
+            issueTitle: "Add team and collaboration primitives",
+            linkedAt: "2026-04-24T14:00:00.000Z",
+            source: "created-from-issue",
+          },
+        ],
+      },
+      {
+        path: "/repo/worktrees/shared",
+        name: "shared",
+        status: "idle",
+        missing: false,
+        archivedAt: null,
+        cleanedAt: null,
+        lastActivityAt: "2026-04-24T14:00:00.000Z",
+        git: {
+          root: "/repo/main",
+          commonDir: "/repo/main/.git",
+          trackingBranch: "origin/vk/shared",
+          branch: "vk/shared",
+          head: "def456",
+          ahead: 0,
+          behind: 0,
+          dirty: false,
+          uncommittedCount: 0,
+          isWorktree: true,
+          isPrimary: false,
+        },
+        notes: { value: "", updatedAt: null },
+        links: { editorHref: "vscode://file/repo/worktrees/shared" },
+        sessions: { total: 0, active: 0, items: [] },
+        runs: { total: 0, active: 0, items: [] },
+        actions: {
+          canArchive: true,
+          canCleanup: false,
+          canRecover: false,
+          canRebaseStart: false,
+          canRebaseAutoResolve: false,
+          canRebaseOpenInEditor: false,
+          canRebaseMarkResolved: false,
+          canRebaseAbort: false,
+        },
+        issues: [],
+      },
+    ],
   };
 }
 
@@ -415,6 +509,15 @@ vi.mock("@/hooks/use-reviews", () => ({
 describe("BacklogOverview", () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify(buildWorkspaceInventoryPayload()), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }),
+      ),
+    );
     creatingIssueState = false;
     searchParams = new URLSearchParams();
     issueReviewArtifacts = [];
@@ -426,6 +529,8 @@ describe("BacklogOverview", () => {
     createIssueMock.mockReset();
     createSubIssueMock.mockReset();
     linkChildIssueMock.mockReset();
+    createIssueWorkspaceMock.mockReset();
+    linkIssueWorkspaceMock.mockReset();
     updateProjectCollaborationMock.mockReset();
     updateIssueCollaborationMock.mockReset();
     updateIssueDetailMock.mockReset();
@@ -609,6 +714,143 @@ describe("BacklogOverview", () => {
         "dispatch-context-label-2",
       ],
     });
+  });
+
+  it("renders multiple linked workspaces and navigates to a linked workspace shell", async () => {
+    const user = setupUser();
+    searchParams = new URLSearchParams("issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
+    backlogState = {
+      ...buildBacklogState(),
+      snapshot: {
+        ...buildBacklogState().snapshot,
+        issues: buildBacklogState().snapshot.issues.map((issue) =>
+          issue.id === "KANBAN-GAP-007"
+            ? {
+                ...issue,
+                workspaceLinks: [
+                  {
+                    workspacePath: "/repo/worktrees/gap-007",
+                    workspaceName: "KANBAN-GAP-007",
+                    branchName: "vk/kanban-gap-007",
+                    linkedAt: "2026-04-24T14:00:00.000Z",
+                    source: "created-from-issue",
+                  },
+                  {
+                    workspacePath: "/repo/worktrees/shared",
+                    workspaceName: "shared",
+                    branchName: "vk/shared",
+                    linkedAt: "2026-04-24T15:00:00.000Z",
+                    source: "linked-existing-workspace",
+                  },
+                ],
+              }
+            : issue,
+        ),
+      },
+    };
+
+    render(<BacklogOverview />);
+
+    const linkedWorkspaces = await screen.findByTestId("linked-workspaces-list");
+    expect(linkedWorkspaces).toBeInTheDocument();
+    expect(within(linkedWorkspaces).getByText("KANBAN-GAP-007")).toBeInTheDocument();
+    expect(within(linkedWorkspaces).getByText("shared")).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("open-workspace-/repo/worktrees/gap-007"));
+    expect(push).toHaveBeenCalledWith("/workspaces?workspace=%2Frepo%2Fworktrees%2Fgap-007");
+  });
+
+  it("creates a workspace directly from the issue panel", async () => {
+    const user = setupUser();
+    searchParams = new URLSearchParams("issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
+    createIssueWorkspaceMock.mockResolvedValue(undefined);
+
+    render(<BacklogOverview />);
+
+    await user.click(await screen.findByRole("button", { name: "Create workspace" }));
+    expect(createIssueWorkspaceMock).toHaveBeenCalledWith("KANBAN-GAP-007");
+  });
+
+  it("links an existing workspace from the issue panel", async () => {
+    const user = setupUser();
+    searchParams = new URLSearchParams("issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
+    linkIssueWorkspaceMock.mockResolvedValue(undefined);
+
+    render(<BacklogOverview />);
+
+    await user.selectOptions(await screen.findByLabelText("Existing workspace"), "/repo/worktrees/shared");
+    await user.click(screen.getByRole("button", { name: "Link workspace" }));
+
+    expect(linkIssueWorkspaceMock).toHaveBeenCalledWith({
+      issueId: "KANBAN-GAP-007",
+      workspacePath: "/repo/worktrees/shared",
+    });
+  });
+
+  it("shows a stale linked workspace recovery state", async () => {
+    const user = setupUser();
+    searchParams = new URLSearchParams("issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({
+        summary: { total: 0, active: 0, idle: 0, archived: 0, missing: 0 },
+        workspaces: [],
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+    backlogState = {
+      ...buildBacklogState(),
+      snapshot: {
+        ...buildBacklogState().snapshot,
+        issues: buildBacklogState().snapshot.issues.map((issue) =>
+          issue.id === "KANBAN-GAP-007"
+            ? {
+                ...issue,
+                workspaceLinks: [
+                  {
+                    workspacePath: "/repo/worktrees/missing",
+                    workspaceName: "missing",
+                    linkedAt: "2026-04-24T15:00:00.000Z",
+                    source: "linked-existing-workspace",
+                  },
+                ],
+              }
+            : issue,
+        ),
+      },
+    };
+
+    render(<BacklogOverview />);
+
+    expect(await screen.findByText("stale link")).toBeInTheDocument();
+    await user.click(screen.getByTestId("recover-workspace-/repo/worktrees/missing"));
+    expect(push).toHaveBeenCalledWith("/workspaces");
+  });
+
+  it("shows workspace inventory loading and error states inside the issue panel", async () => {
+    searchParams = new URLSearchParams("issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
+    let resolveFetch: ((response: Response) => void) | undefined;
+    vi.mocked(fetch).mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolveFetch = resolve;
+        }),
+    );
+
+    render(<BacklogOverview />);
+    expect(await screen.findByTestId("issue-workspace-loading")).toBeInTheDocument();
+
+    resolveFetch?.(
+      new Response(JSON.stringify({ error: "Workspace API unavailable" }), {
+        status: 503,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    expect(await screen.findByTestId("issue-workspace-error")).toHaveTextContent(
+      "Workspace API unavailable",
+    );
   });
 
   it("keeps the issue detail panel beside list view when an issue is opened from list context", () => {
@@ -866,7 +1108,7 @@ describe("BacklogOverview", () => {
 
     expect(screen.getByText("Review and PR context")).toBeInTheDocument();
     expect(screen.getByText("PR review changes-requested")).toBeInTheDocument();
-    expect(screen.getByText("Tests: pending")).toBeInTheDocument();
+    expect(screen.getByText("Tests: Pending")).toBeInTheDocument();
     expect(screen.getByText("Map this review output directly onto the active issue.")).toBeInTheDocument();
   });
 });

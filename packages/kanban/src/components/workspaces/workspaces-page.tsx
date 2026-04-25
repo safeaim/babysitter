@@ -314,7 +314,8 @@ export function WorkspacesPageContent(props: {
   const [isPending, startTransition] = useTransition();
   const { snapshot } = useBacklog();
   const workspaceReviews = useReviews({ targetType: "workspace" });
-  const selectedWorkspacePath = props.selectedWorkspacePath ?? (searchParams.get("workspace")?.trim() || null);
+  const selectedWorkspacePath =
+    props.selectedWorkspacePath ?? (searchParams.get("workspace")?.trim() || null);
 
   const sessionFingerprint = useMemo(
     () =>
@@ -831,6 +832,7 @@ export function WorkspacesPageContent(props: {
           workspaces={groups.active}
           reviewByPath={liveReviewByPath}
           artifactByPath={liveArtifactByPath}
+          executionContextsBySessionId={executionContextsBySessionId}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -851,6 +853,7 @@ export function WorkspacesPageContent(props: {
           workspaces={groups.idle}
           reviewByPath={liveReviewByPath}
           artifactByPath={liveArtifactByPath}
+          executionContextsBySessionId={executionContextsBySessionId}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -871,6 +874,7 @@ export function WorkspacesPageContent(props: {
           workspaces={groups.archived}
           reviewByPath={liveReviewByPath}
           artifactByPath={liveArtifactByPath}
+          executionContextsBySessionId={executionContextsBySessionId}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -891,6 +895,7 @@ export function WorkspacesPageContent(props: {
           workspaces={groups.missing}
           reviewByPath={liveReviewByPath}
           artifactByPath={liveArtifactByPath}
+          executionContextsBySessionId={executionContextsBySessionId}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -948,6 +953,10 @@ function WorkspaceColumn(props: {
   reviewByPath: ReadonlyMap<
     string,
     NonNullable<WorkspaceInventoryItem["review"]>
+  >;
+  executionContextsBySessionId: ReadonlyMap<
+    string,
+    ReturnType<typeof findKanbanExecutionContextEnvelopesForSession>
   >;
   pendingAction: string | null;
   onAction: (
@@ -1114,6 +1123,20 @@ function WorkspaceColumn(props: {
                 <MiniStat label="Changes" value={workspace.git.dirty == null ? "unknown" : workspace.git.dirty ? "dirty" : "clean"} />
               </div>
 
+              {(workspace.issues ?? []).length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(workspace.issues ?? []).map((issue) => (
+                    <Link
+                      key={`${workspace.path}-${issue.issueId}`}
+                      href={`/?issueId=${encodeURIComponent(issue.issueId)}&issueKey=${encodeURIComponent(issue.issueKey)}`}
+                      className="rounded-full border border-border px-2.5 py-1 text-xs text-primary"
+                    >
+                      {issue.issueKey}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+
               <div className="mt-4 flex flex-wrap gap-3 text-sm text-foreground-muted">
                 {workspace.sessions.items.slice(0, 2).map((session) => (
                   <Link key={session.sessionId} href={`/sessions/${session.sessionId}`} className="text-primary">
@@ -1167,7 +1190,7 @@ function WorkspaceColumn(props: {
                     runtime={runtimeSession.runtime}
                     rebase={workspace.rebase}
                     sessionId={runtimeSession.sessionId}
-                    executionContexts={executionContextsBySessionId.get(runtimeSession.sessionId) ?? []}
+                    executionContexts={props.executionContextsBySessionId.get(runtimeSession.sessionId) ?? []}
                   />
                 ) : null}
                 <WorkspaceDetailsSidebar

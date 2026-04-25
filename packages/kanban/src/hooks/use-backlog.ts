@@ -79,6 +79,11 @@ export interface UpdateIssueDispatchContextLabelsInput {
   dispatchContextLabelIds: string[];
 }
 
+export interface LinkIssueWorkspaceInput {
+  issueId: string;
+  workspacePath: string;
+}
+
 export async function loadTaskTags(): Promise<readonly KanbanTaskTag[]> {
   const result = await resilientFetch<TaskTagListResponse>("/api/task-tags");
   if (!result.ok) {
@@ -385,6 +390,20 @@ export function useBacklog(interval = 15000) {
     );
   }
 
+  async function createIssueWorkspace(issueId: string): Promise<void> {
+    await mutateBacklog<BacklogOverviewResponse>(
+      { action: "create-issue-workspace", issueId },
+      issueId,
+    );
+  }
+
+  async function linkIssueWorkspace(input: LinkIssueWorkspaceInput): Promise<void> {
+    await mutateBacklog<BacklogOverviewResponse>(
+      { action: "link-issue-workspace", ...input },
+      input.issueId,
+    );
+  }
+
   return {
     snapshot: data?.snapshot,
     board: data?.board,
@@ -403,6 +422,8 @@ export function useBacklog(interval = 15000) {
     createSubIssue,
     linkChildIssue,
     updateIssueDetail,
+    createIssueWorkspace,
+    linkIssueWorkspace,
     movingIssueId,
     mutatingIssueId,
     creatingIssue,

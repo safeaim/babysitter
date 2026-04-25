@@ -15,6 +15,37 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+vi.mock("@radix-ui/react-dialog", () => ({
+  Root: ({ children }: { children?: unknown }) => <>{children}</>,
+  Trigger: ({ children }: { children?: unknown }) => <>{children}</>,
+  Portal: ({ children }: { children?: unknown }) => <>{children}</>,
+  Overlay: ({ children, ...props }: { children?: unknown; [key: string]: unknown }) => (
+    <div {...props}>{children}</div>
+  ),
+  Content: ({ children, ...props }: { children?: unknown; [key: string]: unknown }) => (
+    <div {...props}>{children}</div>
+  ),
+  Title: ({ children, ...props }: { children?: unknown; [key: string]: unknown }) => (
+    <div {...props}>{children}</div>
+  ),
+  Description: ({ children, ...props }: { children?: unknown; [key: string]: unknown }) => (
+    <div {...props}>{children}</div>
+  ),
+  Close: ({ children }: { children?: unknown }) => <>{children}</>,
+}));
+
+vi.mock("@/components/ui/button", () => ({
+  Button: ({
+    children,
+    asChild,
+    ...props
+  }: {
+    children?: unknown;
+    asChild?: boolean;
+    [key: string]: unknown;
+  }) => (asChild ? <>{children}</> : <button {...props}>{children}</button>),
+}));
+
 vi.mock("@/hooks/use-reviews", () => ({
   useReviews: () => ({
     loading: false,
@@ -38,8 +69,30 @@ vi.mock("@/components/sessions/session-observability-panel", () => ({
 }));
 
 vi.mock("@/components/workspaces/workspace-runtime-panel", () => ({
-  WorkspaceRuntimePanel: ({ sessionId }: { sessionId?: string }) => (
-    <div data-testid="workspace-runtime-panel">runtime {sessionId ?? "none"}</div>
+  WorkspaceRuntimePanel: ({
+    sessionId,
+    executionContexts,
+  }: {
+    sessionId?: string;
+    executionContexts?: Array<{
+      issue?: { title?: string };
+      dispatch?: { labels?: Array<{ label?: string }> };
+    }>;
+  }) => (
+    <div data-testid="workspace-runtime-panel">
+      <div>runtime {sessionId ?? "none"}</div>
+      {executionContexts && executionContexts.length > 0 ? (
+        <div>
+          <div>Execution context</div>
+          <div>Workspace-linked issue context</div>
+          <div>Issue title</div>
+          <div>{executionContexts[0]?.issue?.title}</div>
+          {executionContexts[0]?.dispatch?.labels?.map((label) => (
+            <div key={label.label}>{label.label}</div>
+          ))}
+        </div>
+      ) : null}
+    </div>
   ),
 }));
 
@@ -511,7 +564,9 @@ describe("workspaces-page helpers", () => {
       expect(screen.getByRole("button", { name: "Create PR" })).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Carry the CI and merge chips into the workspace sidebar.")).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Carry the CI and merge chips into the workspace sidebar.").length,
+    ).toBeGreaterThan(0);
 
     await user.click(screen.getByRole("button", { name: "Create PR" }));
 
@@ -703,9 +758,10 @@ describe("workspaces-page helpers", () => {
       expect(screen.getByText("Execution context")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Workspace-linked issue context")).toBeInTheDocument();
-    expect(screen.getByText("Issue title")).toBeInTheDocument();
-    expect(screen.getByText(/Tests First/)).toBeInTheDocument();
+    const runtimePanel = screen.getByTestId("workspace-runtime-panel");
+    expect(within(runtimePanel).getByText("Workspace-linked issue context")).toBeInTheDocument();
+    expect(within(runtimePanel).getAllByText("Issue title").length).toBeGreaterThan(0);
+    expect(within(runtimePanel).getByText(/Tests First/)).toBeInTheDocument();
   });
 
   it("surfaces editor action failures inside quick actions", async () => {
@@ -776,6 +832,9 @@ describe("workspaces-page helpers", () => {
   });
 
   it("renders the workspace shell when a workspace route selection is present", async () => {
+    window.innerWidth = 1440;
+    window.dispatchEvent(new Event("resize"));
+
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({
         summary: { total: 1, active: 1, idle: 0, archived: 0, missing: 0 },
@@ -833,6 +892,15 @@ describe("workspaces-page helpers", () => {
               ],
             },
             runs: { total: 2, active: 1, items: [] },
+            issues: [
+              {
+                issueId: "KANBAN-GAP-007",
+                issueKey: "KANBAN-GAP-007",
+                issueTitle: "Add team and collaboration primitives",
+                linkedAt: "2026-04-24T12:00:00.000Z",
+                source: "created-from-issue",
+              },
+            ],
             actions: {
               canArchive: true,
               canCleanup: false,
@@ -919,6 +987,10 @@ describe("workspaces-page helpers", () => {
     expect(screen.getByTestId("workspace-panel-context")).toBeInTheDocument();
     expect(screen.getByTestId("workspace-panel-details")).toBeInTheDocument();
     expect(screen.getByTestId("workspace-session-select")).toHaveValue("session-1");
+    expect(screen.getByTestId("workspace-issue-link-KANBAN-GAP-007")).toHaveAttribute(
+      "href",
+      "/?issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007",
+    );
     expect(screen.getByText("observability session-1")).toBeInTheDocument();
     expect(screen.getByText("runtime session-1")).toBeInTheDocument();
   });

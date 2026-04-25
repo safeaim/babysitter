@@ -11,12 +11,14 @@ import type {
 import { AppError, normalizeError } from '@/lib/error-handler';
 import { ensureInitialized } from '@/lib/server-init';
 import { BacklogQueryService } from '@/lib/services/backlog-query-service';
+import { WorkspaceLifecycleService } from '@/lib/workspace-lifecycle';
 
 export const dynamic = 'force-dynamic';
 
 const NO_CACHE_HEADERS = { 'Cache-Control': 'no-cache, no-store' };
 
 const service = new BacklogQueryService();
+const workspaceService = new WorkspaceLifecycleService();
 
 function isWorkflowState(value: unknown): value is KanbanWorkflowState {
   return value === 'todo' || value === 'in-progress' || value === 'review' || value === 'done';
@@ -309,6 +311,53 @@ export async function POST(request: Request) {
           childIssueId: body.childIssueId,
         });
         break;
+      case 'create-issue-workspace': {
+        if (typeof body.issueId !== 'string') {
+          throw new AppError('issueId is required.', 'BAD_REQUEST', 400);
+        }
+        const current = await service.getOverview();
+        const issue = current.snapshot.issues.find((candidate) => candidate.id === body.issueId);
+        if (!issue) {
+          throw new AppError(`Issue ${body.issueId} not found.`, 'NOT_FOUND', 404);
+        }
+        const provisioned = await workspaceService.provisionWorkspaceForIssue({
+          issueKey: issue.key,
+          issueTitle: issue.title,
+        });
+        overview = await service.linkIssueWorkspace({
+          issueId: issue.id,
+          workspacePath: provisioned.workspacePath,
+          workspaceName: provisioned.workspaceName,
+          branchName: provisioned.branchName,
+          source: 'created-from-issue',
+        });
+        break;
+      }
+      case 'link-issue-workspace': {
+        if (typeof body.issueId !== 'string' || typeof body.workspacePath !== 'string') {
+          throw new AppError('issueId and workspacePath are required.', 'BAD_REQUEST', 400);
+        }
+        const inventory = await workspaceService.listWorkspaces();
+        const workspace = inventory.workspaces.find((candidate) => candidate.path === body.workspacePath);
+        if (!workspace) {
+          throw new AppError(`Workspace ${body.workspacePath} not found.`, 'NOT_FOUND', 404);
+        }
+        if (workspace.missing) {
+          throw new AppError(
+            `Workspace ${body.workspacePath} is missing. Recover it before linking.`,
+            'BAD_REQUEST',
+            409,
+          );
+        }
+        overview = await service.linkIssueWorkspace({
+          issueId: body.issueId,
+          workspacePath: workspace.path,
+          workspaceName: workspace.name,
+          branchName: workspace.git.branch ?? undefined,
+          source: 'linked-existing-workspace',
+        });
+        break;
+      }
       default:
         throw new AppError('Unsupported backlog action.', 'BAD_REQUEST', 400);
     }

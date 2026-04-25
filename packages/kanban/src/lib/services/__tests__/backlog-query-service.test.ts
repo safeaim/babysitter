@@ -12,6 +12,38 @@ afterEach(async () => {
   await Promise.all(tempDirs.splice(0).map((dir) => fs.rm(dir, { recursive: true, force: true })));
 });
 
+function createBacklogService(options: {
+  backlogFilePath?: string;
+  now?: () => string;
+} = {}) {
+  return new BacklogQueryService({
+    backlogFilePath: options.backlogFilePath,
+    now: options.now ?? (() => "2026-04-24T12:00:00.000Z"),
+    reviewService: {
+      listReviews: vi.fn().mockResolvedValue({
+        generatedAt: "2026-04-24T12:00:00.000Z",
+        artifacts: [],
+        queue: [],
+        summary: {
+          total: 0,
+          issueCount: 0,
+          workspaceCount: 0,
+          pendingCount: 0,
+          changesRequestedCount: 0,
+          approvedCount: 0,
+          openCommentCount: 0,
+        },
+      }),
+    } as never,
+    runQueryService: {
+      listProjects: vi.fn().mockResolvedValue({
+        recentCompletionWindowMs: 14400000,
+        projects: [],
+      }),
+    } as never,
+  });
+}
+
 describe("BacklogQueryService", () => {
   it("returns a seeded backlog summary and links matching run summaries", async () => {
     const service = new BacklogQueryService({
@@ -906,6 +938,107 @@ describe("BacklogQueryService", () => {
         dispatchContextLabelIds: ["dispatch-context-label-missing"],
       }),
     ).rejects.toMatchObject({ code: "BAD_REQUEST", status: 400 });
+  });
+
+  it("persists issue workspace links and allows multiple workspace attachments on one issue", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kanban-backlog-"));
+    tempDirs.push(tempDir);
+    const backlogFilePath = path.join(tempDir, "kanban-backlog.json");
+    const service = createBacklogService({ backlogFilePath });
+
+    await service.linkIssueWorkspace({
+      issueId: "KANBAN-GAP-007",
+      workspacePath: "/repo/worktrees/kanban-gap-007",
+      workspaceName: "KANBAN-GAP-007",
+      branchName: "vk/kanban-gap-007",
+      source: "created-from-issue",
+    });
+
+    const overview = await service.linkIssueWorkspace({
+      issueId: "KANBAN-GAP-007",
+      workspacePath: "/repo/worktrees/shared",
+      workspaceName: "shared",
+      branchName: "vk/shared",
+      source: "linked-existing-workspace",
+    });
+
+    const issue = overview.snapshot.issues.find((candidate) => candidate.id === "KANBAN-GAP-007");
+    expect(issue?.workspaceLinks).toHaveLength(2);
+    expect(issue?.workspaceLinks.map((link) => link.workspacePath)).toEqual([
+      "/repo/worktrees/kanban-gap-007",
+      "/repo/worktrees/shared",
+    ]);
+
+    const persisted = JSON.parse(await fs.readFile(backlogFilePath, "utf8")) as {
+      issues: Array<{
+        id: string;
+        workspaceLinks?: Array<{ workspacePath: string; source: string }>;
+      }>;
+    };
+    expect(
+      persisted.issues.find((candidate) => candidate.id === "KANBAN-GAP-007")?.workspaceLinks,
+    ).toEqual([
+      expect.objectContaining({
+        workspacePath: "/repo/worktrees/kanban-gap-007",
+        source: "created-from-issue",
+      }),
+      expect.objectContaining({
+        workspacePath: "/repo/worktrees/shared",
+        source: "linked-existing-workspace",
+      }),
+    ]);
+
+    const refreshed = await service.getOverview();
+    expect(
+      refreshed.snapshot.issues.find((candidate) => candidate.id === "KANBAN-GAP-007")?.workspaceLinks
+        ?.map((link) => link.workspacePath),
+    ).toEqual(["/repo/worktrees/kanban-gap-007", "/repo/worktrees/shared"]);
+  });
+
+  it("rejects duplicate workspace linking on the same issue", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kanban-backlog-"));
+    tempDirs.push(tempDir);
+    const backlogFilePath = path.join(tempDir, "kanban-backlog.json");
+    const service = createBacklogService({ backlogFilePath });
+
+    await service.linkIssueWorkspace({
+      issueId: "KANBAN-GAP-007",
+      workspacePath: "/repo/worktrees/shared",
+      workspaceName: "shared",
+      source: "linked-existing-workspace",
+    });
+
+    await expect(
+      service.linkIssueWorkspace({
+        issueId: "KANBAN-GAP-007",
+        workspacePath: "/repo/worktrees/shared",
+        workspaceName: "shared",
+        source: "linked-existing-workspace",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST", status: 409 });
+  });
+
+  it("rejects linking one workspace to multiple issues", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kanban-backlog-"));
+    tempDirs.push(tempDir);
+    const backlogFilePath = path.join(tempDir, "kanban-backlog.json");
+    const service = createBacklogService({ backlogFilePath });
+
+    await service.linkIssueWorkspace({
+      issueId: "KANBAN-GAP-007",
+      workspacePath: "/repo/worktrees/shared",
+      workspaceName: "shared",
+      source: "linked-existing-workspace",
+    });
+
+    await expect(
+      service.linkIssueWorkspace({
+        issueId: "KANBAN-GAP-004",
+        workspacePath: "/repo/worktrees/shared",
+        workspaceName: "shared",
+        source: "linked-existing-workspace",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST", status: 409 });
   });
 
   it("rejects moves that violate board policy", async () => {

@@ -256,6 +256,14 @@ export interface KanbanIssueSource {
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
+export interface KanbanIssueWorkspaceLink {
+  readonly workspacePath: string;
+  readonly workspaceName: string;
+  readonly branchName?: string;
+  readonly linkedAt: string;
+  readonly source: 'created-from-issue' | 'linked-existing-workspace';
+}
+
 export interface KanbanPullRequestReviewLink {
   readonly id: string;
   readonly label: string;
@@ -502,6 +510,7 @@ export interface KanbanIssue {
   readonly updatedAt: string;
   readonly dispatch: KanbanIssueDispatchState;
   readonly repositoryLifecycle?: KanbanIssueRepositoryLifecycle;
+  readonly workspaceLinks?: readonly KanbanIssueWorkspaceLink[];
   readonly activity: readonly KanbanActivityEntry[];
   readonly source?: KanbanIssueSource;
   readonly metadata?: Readonly<Record<string, unknown>>;
@@ -1617,6 +1626,22 @@ export function normalizeKanbanIssue(
   const contextLabelProjections = projectDispatchContextLabels(dispatchContextLabels, contextLabels);
   const executionContext = buildDispatchContextExecutionEnvelope(dispatchContextLabels, contextLabels);
   const renderedContext = executionContext?.renderedBlock;
+  const workspaceLinks = Array.from(
+    new Map(
+      (issue.workspaceLinks ?? [])
+        .filter((link) => typeof link.workspacePath === 'string' && link.workspacePath.trim().length > 0)
+        .map((link) => [
+          link.workspacePath.trim(),
+          {
+            workspacePath: link.workspacePath.trim(),
+            workspaceName: link.workspaceName.trim() || link.workspacePath.trim(),
+            branchName: link.branchName?.trim() || undefined,
+            linkedAt: link.linkedAt,
+            source: link.source,
+          } satisfies KanbanIssueWorkspaceLink,
+        ] as const),
+    ).values(),
+  );
 
   return {
     ...issue,
@@ -1639,6 +1664,7 @@ export function normalizeKanbanIssue(
       lastDispatchedAt: issue.dispatch?.lastDispatchedAt,
     },
     repositoryLifecycle: normalizeIssueRepositoryLifecycle(issue.repositoryLifecycle, repositoryMap),
+    workspaceLinks,
   };
 }
 

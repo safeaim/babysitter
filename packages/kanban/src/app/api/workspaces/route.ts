@@ -4,6 +4,7 @@ import type { KanbanReviewArtifact, KanbanReviewComment, KanbanReviewSummary } f
 
 import { normalizeError } from "@/lib/error-handler";
 import { ReviewService } from "@/lib/review-service";
+import { BacklogQueryService } from "@/lib/services/backlog-query-service";
 import { WorkspaceLifecycleService, type WorkspaceSessionSnapshot } from "@/lib/workspace-lifecycle";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,7 @@ export const dynamic = "force-dynamic";
 const NO_CACHE_HEADERS = { "Cache-Control": "no-cache, no-store" };
 const service = new WorkspaceLifecycleService();
 const reviewService = new ReviewService();
+const backlogService = new BacklogQueryService();
 
 function readRuntime(value: unknown): WorkspaceRuntimeSurface | undefined {
   if (!value || typeof value !== "object") {
@@ -67,11 +69,40 @@ function buildReviewByWorkspacePath(
   );
 }
 
+async function buildLinkedIssuesByWorkspacePath() {
+  const overview = await backlogService.getOverview();
+  const map = new Map<string, Array<{
+    issueId: string;
+    issueKey: string;
+    issueTitle: string;
+    linkedAt: string;
+    source: "created-from-issue" | "linked-existing-workspace";
+  }>>();
+
+  for (const issue of overview.snapshot.issues) {
+    for (const workspaceLink of issue.workspaceLinks ?? []) {
+      const current = map.get(workspaceLink.workspacePath) ?? [];
+      current.push({
+        issueId: issue.id,
+        issueKey: issue.key,
+        issueTitle: issue.title,
+        linkedAt: workspaceLink.linkedAt,
+        source: workspaceLink.source,
+      });
+      map.set(workspaceLink.workspacePath, current);
+    }
+  }
+
+  return map;
+}
+
 export async function GET() {
   try {
     const reviews = await reviewService.listReviews({ targetType: "workspace" });
+    const linkedIssuesByWorkspacePath = await buildLinkedIssuesByWorkspacePath();
     const payload = await service.listWorkspaces({
       reviewByWorkspacePath: buildReviewByWorkspacePath(reviews.artifacts),
+      linkedIssuesByWorkspacePath,
     });
     return NextResponse.json(payload, { headers: NO_CACHE_HEADERS });
   } catch (error) {
@@ -86,6 +117,7 @@ export async function POST(request: Request) {
     const sessions = readSessions(body);
     const reviews = await reviewService.listReviews({ targetType: "workspace" });
     const reviewByWorkspacePath = buildReviewByWorkspacePath(reviews.artifacts);
+    const linkedIssuesByWorkspacePath = await buildLinkedIssuesByWorkspacePath();
 
     if (
       body.action === "archive" ||
@@ -109,11 +141,11 @@ export async function POST(request: Request) {
         note: typeof body.note === "string" ? body.note : undefined,
         sessions,
       });
-      const payload = await service.listWorkspaces({ sessions, reviewByWorkspacePath });
+      const payload = await service.listWorkspaces({ sessions, reviewByWorkspacePath, linkedIssuesByWorkspacePath });
       return NextResponse.json({ result, ...payload }, { headers: NO_CACHE_HEADERS });
     }
 
-    const payload = await service.listWorkspaces({ sessions, reviewByWorkspacePath });
+    const payload = await service.listWorkspaces({ sessions, reviewByWorkspacePath, linkedIssuesByWorkspacePath });
     return NextResponse.json(payload, { headers: NO_CACHE_HEADERS });
   } catch (error) {
     const normalized = normalizeError(error);

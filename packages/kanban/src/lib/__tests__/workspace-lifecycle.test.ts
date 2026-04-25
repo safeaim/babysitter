@@ -157,6 +157,44 @@ describe("WorkspaceLifecycleService", () => {
     expect(result.workspaces[0]?.actions.canRebaseStart).toBe(true);
   });
 
+  it("attaches linked issue associations to workspace inventory entries", async () => {
+    const service = new WorkspaceLifecycleService(createDeps());
+    const result = await service.listWorkspaces({
+      linkedIssuesByWorkspacePath: new Map([
+        [
+          repoPath("repo", "worktrees", "task"),
+          [
+            {
+              issueId: "KANBAN-GAP-008",
+              issueKey: "KANBAN-GAP-008",
+              issueTitle: "Add parent-child issue panel",
+              linkedAt: "2026-04-24T12:00:00.000Z",
+              source: "linked-existing-workspace",
+            },
+            {
+              issueId: "KANBAN-GAP-007",
+              issueKey: "KANBAN-GAP-007",
+              issueTitle: "Add team and collaboration primitives",
+              linkedAt: "2026-04-24T11:00:00.000Z",
+              source: "created-from-issue",
+            },
+          ],
+        ],
+      ]),
+    });
+
+    expect(result.workspaces[0]?.issues).toEqual([
+      expect.objectContaining({
+        issueId: "KANBAN-GAP-007",
+        issueKey: "KANBAN-GAP-007",
+      }),
+      expect.objectContaining({
+        issueId: "KANBAN-GAP-008",
+        issueKey: "KANBAN-GAP-008",
+      }),
+    ]);
+  });
+
   it("refuses cleanup for workspaces that are not archived and inactive", async () => {
     const service = new WorkspaceLifecycleService(createDeps());
 
@@ -394,5 +432,90 @@ describe("WorkspaceLifecycleService", () => {
     const updated = refreshed.workspaces.find((workspace) => workspace.path === orphanPath);
     expect(updated?.notes.value).toBe("Runtime reconnected. Retry rebase after sync.");
     expect(updated?.notes.updatedAt).toBe("2026-04-24T12:00:00.000Z");
+  });
+
+  it("provisions deterministic issue workspaces and suffixes duplicate path or branch names", async () => {
+    const kanbanPath = repoPath("repo", "packages", "kanban");
+    const mainPath = repoPath("repo", "main");
+    const commonDirPath = repoPath("repo", "common", ".git");
+    const existingWorkspacePath = repoPath("repo", "worktrees", "kanban-gap-007");
+    const provisionedWorkspacePath = repoPath("repo", "worktrees", "kanban-gap-007-2");
+    let registry = JSON.stringify({
+      version: 1,
+      workspaces: {
+        [existingWorkspacePath]: {
+          path: existingWorkspacePath,
+          name: "KANBAN-GAP-007",
+          gitRoot: mainPath,
+          commonDir: commonDirPath,
+          branch: "vk/kanban-gap-007",
+        },
+      },
+    });
+
+    const deps = createDeps({
+      readFile: vi.fn(async () => registry),
+      writeFile: vi.fn(async (_targetPath, contents) => {
+        registry = String(contents);
+      }),
+      execGit: vi.fn(async (args, cwd) => {
+        const key = `${cwd}::${args.join(" ")}`;
+        const map: Record<string, { stdout: string; stderr: string }> = {
+          [`${kanbanPath}::rev-parse --show-toplevel`]: { stdout: `${mainPath}\n`, stderr: "" },
+          [`${kanbanPath}::rev-parse --path-format=absolute --git-common-dir`]: {
+            stdout: `${commonDirPath}\n`,
+            stderr: "",
+          },
+          [`${kanbanPath}::worktree list --porcelain`]: {
+            stdout: [
+              `worktree ${mainPath}`,
+              "HEAD abc123",
+              "branch refs/heads/main",
+              "",
+              `worktree ${existingWorkspacePath}`,
+              "HEAD def456",
+              "branch refs/heads/vk/kanban-gap-007",
+              "",
+            ].join("\n"),
+            stderr: "",
+          },
+          [`${mainPath}::worktree add -b vk/kanban-gap-007-2 ${provisionedWorkspacePath}`]: {
+            stdout: "prepared\n",
+            stderr: "",
+          },
+        };
+
+        const value = map[key];
+        if (!value) {
+          throw new Error(`Unexpected git call: ${key}`);
+        }
+        return value;
+      }),
+    });
+
+    const service = new WorkspaceLifecycleService(deps);
+    const result = await service.provisionWorkspaceForIssue({
+      issueKey: "KANBAN-GAP-007",
+      issueTitle: "Add issue to workspace linking parity",
+    });
+
+    expect(result).toEqual({
+      workspacePath: provisionedWorkspacePath,
+      workspaceName: "KANBAN-GAP-007",
+      branchName: "vk/kanban-gap-007-2",
+    });
+    expect(deps.execGit).toHaveBeenCalledWith(
+      ["worktree", "add", "-b", "vk/kanban-gap-007-2", provisionedWorkspacePath],
+      mainPath,
+    );
+    expect(JSON.parse(registry)).toMatchObject({
+      workspaces: {
+        [provisionedWorkspacePath]: expect.objectContaining({
+          path: provisionedWorkspacePath,
+          branch: "vk/kanban-gap-007-2",
+          gitRoot: mainPath,
+        }),
+      },
+    });
   });
 });

@@ -106,7 +106,9 @@ export function WorkspaceDetailsSidebar(props: {
     },
   ) => void;
 }) {
-  const [draftNote, setDraftNote] = useState(props.workspace.notes.value);
+  const noteValue = props.workspace.notes?.value ?? "";
+  const noteUpdatedAt = props.workspace.notes?.updatedAt ?? null;
+  const [draftNote, setDraftNote] = useState(noteValue);
   const lastCommand = useMemo(() => latestCommand(props.runtime), [props.runtime]);
   const linkedPullRequest = props.reviewArtifact?.linkedPullRequest;
   const integration = props.reviewArtifact?.integration;
@@ -114,6 +116,7 @@ export function WorkspaceDetailsSidebar(props: {
   const repoName = props.workspace.git.root?.split("/").filter(Boolean).at(-1) ?? "Unavailable";
   const gitMetadataMissing = !props.workspace.git.root || !props.workspace.git.branch;
   const changeCount = props.workspace.git.uncommittedCount;
+  const editorHref = props.workspace.links?.editorHref ?? null;
   const syncSummary =
     props.workspace.git.ahead == null || props.workspace.git.behind == null
       ? "No upstream tracking"
@@ -141,8 +144,8 @@ export function WorkspaceDetailsSidebar(props: {
   );
 
   useEffect(() => {
-    setDraftNote(props.workspace.notes.value);
-  }, [props.workspace.notes.value, props.workspace.path]);
+    setDraftNote(noteValue);
+  }, [noteValue, props.workspace.path]);
 
   useEffect(() => {
     setProvider(integration?.provider ?? linkedPullRequest?.provider ?? "github");
@@ -268,14 +271,14 @@ export function WorkspaceDetailsSidebar(props: {
 
         <SidebarSection title="Notes" icon={FileText}>
           <div className="space-y-3">
-            {props.workspace.notes.value.trim().length === 0 ? (
+            {noteValue.trim().length === 0 ? (
               <SectionState
                 tone="neutral"
                 title="No workspace notes yet"
                 body="Capture operator context, next steps, or handoff details for this worktree."
               />
             ) : (
-              <p className="text-xs text-foreground-muted">Last updated {formatTimestamp(props.workspace.notes.updatedAt)}</p>
+              <p className="text-xs text-foreground-muted">Last updated {formatTimestamp(noteUpdatedAt)}</p>
             )}
             <textarea
               value={draftNote}
@@ -560,9 +563,9 @@ export function WorkspaceDetailsSidebar(props: {
                 onClick={() =>
                   props.workspace.actions.canRebaseOpenInEditor
                     ? props.onAction("rebase-open-in-editor", props.workspace)
-                    : props.onOpenInEditor(props.workspace, props.workspace.links.editorHref)
+                    : props.onOpenInEditor(props.workspace, editorHref)
                 }
-                disabled={quickActionBusy || !props.workspace.links.editorHref}
+                disabled={quickActionBusy || !editorHref}
               >
                 Open in editor
               </Button>

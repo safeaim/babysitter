@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import {
   buildKanbanBoardSnapshot,
   buildKanbanBacklogSnapshot,
@@ -142,6 +144,14 @@ export interface UpdateIssueDetailInput {
   readonly priority?: KanbanIssue['priority'];
   readonly assigneeIds?: readonly string[];
   readonly labelIds?: readonly string[];
+}
+
+export interface LinkIssueWorkspaceInput {
+  readonly issueId: string;
+  readonly workspacePath: string;
+  readonly workspaceName?: string;
+  readonly branchName?: string;
+  readonly source: "created-from-issue" | "linked-existing-workspace";
 }
 
 type BacklogSeedProject = StoredKanbanProject;
@@ -481,6 +491,10 @@ function appendUniqueIssueId(issueIds: readonly string[], issueId: string): stri
 
 function arrayEquals(left: readonly string[], right: readonly string[]): boolean {
   return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function normalizeWorkspacePath(value: string): string {
+  return path.resolve(value);
 }
 
 function wouldCreateParentChildCycle(
@@ -1406,10 +1420,6 @@ export class BacklogQueryService {
         sanitizeStoredIssue(issue, dispatchContextLabels),
       ),
       dispatchContextLabels,
-      issues: (backlogFile?.issues?.length ? backlogFile.issues : defaultIssues).map((issue) =>
-        sanitizeStoredIssue(issue, dispatchContextLabels),
-      ),
-      dispatchContextLabels,
     };
   }
 
@@ -2086,6 +2096,109 @@ export class BacklogQueryService {
                   id: 'tal',
                   displayName: 'Tal Muskal',
                   role: 'owner',
+                },
+                updatedAt,
+              ),
+              ...(candidate.activity ?? []),
+            ],
+          }
+        : candidate,
+    );
+
+    return this.persistPayload({
+      projects: nextProjects,
+      issues: nextIssues,
+      dispatchContextLabels: payload.dispatchContextLabels,
+    });
+  }
+
+  async linkIssueWorkspace(input: LinkIssueWorkspaceInput): Promise<BacklogOverview> {
+    const payload = await this.readSeedPayload();
+    const issue = this.findIssue(payload, input.issueId);
+    const normalizedWorkspacePath = normalizeWorkspacePath(input.workspacePath);
+    const workspaceName = input.workspaceName?.trim() || path.basename(normalizedWorkspacePath);
+    const branchName = input.branchName?.trim() || undefined;
+
+    if (!normalizedWorkspacePath) {
+      throw new AppError("workspacePath is required.", "BAD_REQUEST", 400);
+    }
+
+    if ((issue.workspaceLinks ?? []).some((link) => normalizeWorkspacePath(link.workspacePath) === normalizedWorkspacePath)) {
+      throw new AppError(
+        `${issue.key} is already linked to ${normalizedWorkspacePath}.`,
+        "BAD_REQUEST",
+        409,
+      );
+    }
+
+    const linkedIssue = payload.issues.find(
+      (candidate) =>
+        candidate.id !== issue.id &&
+        (candidate.workspaceLinks ?? []).some(
+          (link) => normalizeWorkspacePath(link.workspacePath) === normalizedWorkspacePath,
+        ),
+    );
+    if (linkedIssue) {
+      throw new AppError(
+        `${normalizedWorkspacePath} is already linked to ${linkedIssue.key}.`,
+        "BAD_REQUEST",
+        409,
+      );
+    }
+
+    const updatedAt = this.deps.now();
+    const nextIssues = payload.issues.map((candidate) =>
+      candidate.id === issue.id
+        ? {
+            ...candidate,
+            workspaceLinks: [
+              ...(candidate.workspaceLinks ?? []),
+              {
+                workspacePath: normalizedWorkspacePath,
+                workspaceName,
+                branchName,
+                linkedAt: updatedAt,
+                source: input.source,
+              },
+            ],
+            updatedAt,
+            activity: [
+              buildActivityEntry(
+                `activity-issue-workspace-link-${updatedAt}`,
+                "issue",
+                candidate.id,
+                "linked-workspace",
+                `${input.source === "created-from-issue" ? "Created" : "Linked"} workspace ${workspaceName} on ${candidate.key}.`,
+                {
+                  kind: "human",
+                  id: "tal",
+                  displayName: "Tal Muskal",
+                  role: "owner",
+                },
+                updatedAt,
+              ),
+              ...(candidate.activity ?? []),
+            ],
+          }
+        : candidate,
+    );
+
+    const nextProjects = payload.projects.map((candidate) =>
+      candidate.id === issue.projectId
+        ? {
+            ...candidate,
+            activity: [
+              buildActivityEntry(
+                `activity-project-workspace-link-${updatedAt}`,
+                "project",
+                candidate.id,
+                "linked-workspace",
+                `${input.source === "created-from-issue" ? "Created" : "Linked"} workspace ${workspaceName} from ${issue.key}.`,
+                {
+                  kind: "human",
+                  id: "tal",
+                  displayName: "Tal Muskal",
+                  role: "owner",
                 },
                 updatedAt,
               ),

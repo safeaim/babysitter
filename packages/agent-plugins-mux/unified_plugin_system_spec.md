@@ -2498,7 +2498,7 @@ Creates:
 
 ```
 plugins/my-plugin/
-  a5c-plugin.json
+  plugin.json
   versions.json
   commands/
     example.md

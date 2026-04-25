@@ -1,17 +1,28 @@
 #!/usr/bin/env node
 // CLI for agent-plugins-mux compiler
 
+import * as path from 'path';
 import * as process from 'process';
+import { fileURLToPath } from 'url';
 import { compile, compileAll } from './compiler.js';
 import { diffTarget, formatDiffResult } from './diff.js';
+import { INIT_TEMPLATES, scaffoldPlugin } from './init.js';
 import { validate } from './validate.js';
 import { getAllTargets } from './targets/index.js';
 import type { Diagnostic } from './types.js';
 
-const args = process.argv.slice(2);
+interface CliIo {
+  stdout: (message: string) => void;
+  stderr: (message: string) => void;
+}
 
-function showUsage() {
-  console.log(`
+const defaultIo: CliIo = {
+  stdout: (message) => console.log(message),
+  stderr: (message) => console.error(message),
+};
+
+function showUsage(io: CliIo) {
+  io.stdout(`
 agent-plugins-mux - Cross-harness plugin compiler for AI coding agents
 
 Usage:
@@ -34,6 +45,7 @@ Options:
   --output <dir>     Output directory
   --existing <dir>   Path to existing plugin directory (for diff)
   --name <name>      Plugin name (for init)
+  --template <name>  Template to use: ${INIT_TEMPLATES.join(', ')}
   --verify           Run verification checks after compilation
   --dry-run          Show what would be emitted without writing files
   --json             Output structured JSON result
@@ -46,7 +58,7 @@ Valid targets:
 `);
 }
 
-function parseArgs(): Record<string, string | boolean> {
+function parseArgs(args: string[]): Record<string, string | boolean> {
   const parsed: Record<string, string | boolean> = {};
 
   for (let i = 0; i < args.length; i++) {
@@ -109,7 +121,7 @@ function printDiagnostics(diagnostics: Diagnostic[], verbose = false) {
   }
 }
 
-function runCompile(parsed: Record<string, string | boolean>) {
+function runCompile(parsed: Record<string, string | boolean>, io: CliIo): number {
   const source = (parsed.source as string) || process.cwd();
   const target = parsed.target as string;
   const output = parsed.output as string;
@@ -119,21 +131,21 @@ function runCompile(parsed: Record<string, string | boolean>) {
   const verbose = parsed.verbose as boolean;
 
   if (!target || !output) {
-    console.error('Error: --target and --output are required');
-    process.exit(1);
+    io.stderr('Error: --target and --output are required');
+    return 1;
   }
 
   if (target === 'all') {
     const results = compileAll(source, output, { dryRun, verifyOutput });
 
     if (jsonOutput) {
-      console.log(JSON.stringify(results, null, 2));
+      io.stdout(JSON.stringify(results, null, 2));
     } else {
       for (const result of results) {
-        console.log(`\n=== Target: ${result.target} ===`);
-        console.log(`Status: ${result.status}`);
-        console.log(`Output: ${result.outputDir}`);
-        console.log(`Emitted files: ${result.emittedFiles.length}`);
+        io.stdout(`\n=== Target: ${result.target} ===`);
+        io.stdout(`Status: ${result.status}`);
+        io.stdout(`Output: ${result.outputDir}`);
+        io.stdout(`Emitted files: ${result.emittedFiles.length}`);
         printDiagnostics(result.diagnostics, verbose);
       }
 
@@ -141,13 +153,13 @@ function runCompile(parsed: Record<string, string | boolean>) {
       const warnings = results.filter((r) => r.status === 'warning').length;
       const success = results.filter((r) => r.status === 'success').length;
 
-      console.log(
+      io.stdout(
         `\n=== Overall ===\n${success} succeeded, ${warnings} with warnings, ${failed} failed`
       );
     }
 
     const hasErrors = results.some((r) => r.status === 'error');
-    process.exit(hasErrors ? 1 : 0);
+    return hasErrors ? 1 : 0;
   } else {
     const result = compile({
       source,
@@ -158,28 +170,28 @@ function runCompile(parsed: Record<string, string | boolean>) {
     });
 
     if (jsonOutput) {
-      console.log(JSON.stringify(result, null, 2));
+      io.stdout(JSON.stringify(result, null, 2));
     } else {
-      console.log(`Target: ${result.target}`);
-      console.log(`Status: ${result.status}`);
-      console.log(`Output: ${result.outputDir}`);
-      console.log(`Emitted files: ${result.emittedFiles.length}`);
+      io.stdout(`Target: ${result.target}`);
+      io.stdout(`Status: ${result.status}`);
+      io.stdout(`Output: ${result.outputDir}`);
+      io.stdout(`Emitted files: ${result.emittedFiles.length}`);
 
       if (result.verificationChecklist.length > 0 && verbose) {
-        console.log('\nVerification:');
+        io.stdout('\nVerification:');
         for (const check of result.verificationChecklist) {
-          console.log(`  ${check}`);
+          io.stdout(`  ${check}`);
         }
       }
 
       printDiagnostics(result.diagnostics, verbose);
     }
 
-    process.exit(result.status === 'error' ? 1 : 0);
+    return result.status === 'error' ? 1 : 0;
   }
 }
 
-function runValidate(parsed: Record<string, string | boolean>) {
+function runValidate(parsed: Record<string, string | boolean>, io: CliIo): number {
   const source = (parsed.source as string) || process.cwd();
   const jsonOutput = parsed.json as boolean;
   const verbose = parsed.verbose as boolean;
@@ -187,32 +199,32 @@ function runValidate(parsed: Record<string, string | boolean>) {
   const result = validate(source);
 
   if (jsonOutput) {
-    console.log(JSON.stringify(result, null, 2));
+    io.stdout(JSON.stringify(result, null, 2));
   } else {
-    console.log(`Valid: ${result.valid}`);
+    io.stdout(`Valid: ${result.valid}`);
     printDiagnostics(result.diagnostics, verbose);
   }
 
-  process.exit(result.valid ? 0 : 1);
+  return result.valid ? 0 : 1;
 }
 
-function runListTargets(parsed: Record<string, string | boolean>) {
+function runListTargets(parsed: Record<string, string | boolean>, io: CliIo): number {
   const jsonOutput = parsed.json as boolean;
   const targets = getAllTargets();
 
   if (jsonOutput) {
-    console.log(JSON.stringify(targets, null, 2));
+    io.stdout(JSON.stringify(targets, null, 2));
   } else {
-    console.log('Available targets:');
+    io.stdout('Available targets:');
     for (const target of targets) {
-      console.log(`  - ${target}`);
+      io.stdout(`  - ${target}`);
     }
   }
 
-  process.exit(0);
+  return 0;
 }
 
-function runDiff(parsed: Record<string, string | boolean>) {
+function runDiff(parsed: Record<string, string | boolean>, io: CliIo): number {
   const source = (parsed.source as string) || process.cwd();
   const target = parsed.target as string;
   const existing = parsed.existing as string;
@@ -220,40 +232,75 @@ function runDiff(parsed: Record<string, string | boolean>) {
   const verbose = parsed.verbose as boolean;
 
   if (!target || !existing) {
-    console.error('Error: --target and --existing are required');
-    process.exit(1);
+    io.stderr('Error: --target and --existing are required');
+    return 1;
   }
 
   if (target === 'all') {
-    console.error('Error: diff currently supports a single target; pass a specific --target name');
-    process.exit(1);
+    io.stderr('Error: diff currently supports a single target; pass a specific --target name');
+    return 1;
   }
 
   const result = diffTarget({ source, target, existing });
 
   if (jsonOutput) {
-    console.log(JSON.stringify(result, null, 2));
+    io.stdout(JSON.stringify(result, null, 2));
   } else {
-    console.log(formatDiffResult(result));
+    io.stdout(formatDiffResult(result));
     if (result.diagnostics.length > 0) {
       printDiagnostics(result.diagnostics, verbose);
     }
   }
 
-  process.exit(result.status === 'match' ? 0 : 1);
+  return result.status === 'match' ? 0 : 1;
 }
 
-function runInit(_parsed: Record<string, string | boolean>) {
-  console.error('Error: init command not yet implemented');
-  process.exit(1);
+function runInit(parsed: Record<string, string | boolean>, io: CliIo): number {
+  const name = parsed.name as string | undefined;
+  const template = parsed.template as string | undefined;
+  const output = (parsed.output as string | undefined) ?? process.cwd();
+  const dryRun = parsed['dry-run'] as boolean;
+  const jsonOutput = parsed.json as boolean;
+
+  if (!name) {
+    io.stderr('Error: --name is required');
+    return 1;
+  }
+
+  const result = scaffoldPlugin({
+    name,
+    template: template as (typeof INIT_TEMPLATES)[number] | undefined,
+    output,
+    dryRun,
+  });
+
+  if (jsonOutput) {
+    io.stdout(JSON.stringify(result, null, 2));
+  } else {
+    io.stdout(`Scaffolded template: ${result.template}`);
+    io.stdout(`Output: ${result.outputDir}`);
+    io.stdout(`Files: ${result.writtenFiles.length}`);
+
+    if (parsed.verbose) {
+      for (const file of result.writtenFiles) {
+        io.stdout(`  - ${file}`);
+      }
+    }
+
+    if (dryRun) {
+      io.stdout('Dry run only. No files were written.');
+    }
+  }
+
+  return 0;
 }
 
-function main() {
-  const parsed = parseArgs();
+export function runCli(args: string[], io: CliIo = defaultIo): number {
+  const parsed = parseArgs(args);
 
   if (parsed.help || !parsed.command) {
-    showUsage();
-    process.exit(0);
+    showUsage(io);
+    return 0;
   }
 
   const command = parsed.command as string;
@@ -261,32 +308,42 @@ function main() {
   try {
     switch (command) {
       case 'compile':
-        runCompile(parsed);
-        break;
+        return runCompile(parsed, io);
       case 'validate':
-        runValidate(parsed);
-        break;
+        return runValidate(parsed, io);
       case 'list-targets':
-        runListTargets(parsed);
-        break;
+        return runListTargets(parsed, io);
       case 'diff':
-        runDiff(parsed);
-        break;
+        return runDiff(parsed, io);
       case 'init':
-        runInit(parsed);
-        break;
+        return runInit(parsed, io);
       default:
-        console.error(`Unknown command: ${command}`);
-        showUsage();
-        process.exit(1);
+        io.stderr(`Unknown command: ${command}`);
+        showUsage(io);
+        return 1;
     }
   } catch (error) {
-    console.error(`Fatal error: ${(error as Error).message}`);
+    io.stderr(`Fatal error: ${(error as Error).message}`);
     if (parsed.verbose) {
-      console.error((error as Error).stack);
+      io.stderr((error as Error).stack ?? '');
     }
-    process.exit(1);
+    return 1;
   }
 }
 
-main();
+function isExecutedDirectly(): boolean {
+  const entryPoint = process.argv[1];
+  if (!entryPoint) {
+    return false;
+  }
+
+  return path.resolve(entryPoint) === fileURLToPath(import.meta.url);
+}
+
+function main() {
+  process.exit(runCli(process.argv.slice(2)));
+}
+
+if (isExecutedDirectly()) {
+  main();
+}

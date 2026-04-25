@@ -11,3 +11,4 @@ export * from './verify.js';
 export * from './compiler.js';
 export * from './diff.js';
 export * from './targets/index.js';
+export * from './init.js';

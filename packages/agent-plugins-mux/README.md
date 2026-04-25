@@ -22,9 +22,10 @@ The current public CLI commands are:
 
 - `compile --target <name|all> --output <dir>` to emit target plugin surfaces
 - `validate --source <dir>` to validate a unified plugin directory without writing output
+- `init --name <name> [--template <minimal|full|hooks-only>] [--output <dir>]` to scaffold a valid unified plugin source tree
 - `list-targets` to print the supported target registry
 
-The binary also reserves `diff` and `init`, but those commands currently exit with a not-implemented error. The supported targets are `claude-code`, `codex`, `cursor`, `gemini`, `github-copilot`, `pi`, `oh-my-pi`, `opencode`, and `openclaw`.
+The `diff` command is still reserved and currently exits with a not-implemented error. The supported targets are `claude-code`, `codex`, `cursor`, `gemini`, `github-copilot`, `pi`, `oh-my-pi`, `opencode`, and `openclaw`.
 
 ## API Surface
 

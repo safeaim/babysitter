@@ -113,7 +113,9 @@ export function compile(options: CompileOptions): CompilationResult {
   // Stage 5: VERIFY (optional)
   let verificationChecklist: string[] = [];
   if (verifyOutput && !dryRun) {
-    const verifyResult = verify(output, emitResult.emittedFiles);
+    const verifyResult = verify(output, emitResult.emittedFiles, {
+      outputBaseDir,
+    });
     diagnostics.push(...verifyResult.diagnostics);
     verificationChecklist = verifyResult.verificationChecklist;
   }

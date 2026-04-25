@@ -1736,4 +1736,3 @@ All types defined or referenced in this specification:
 `RunOptions` now carries an optional `invocation?: InvocationMode` — a discriminated union of `LocalInvocation | DockerInvocation | SshInvocation | K8sInvocation`. When omitted or set to `{ mode: 'local' }` the harness runs in-process on the host; other modes rewrap the spawn args via `buildInvocationCommand()`. See `docs/13-invocation-modes.md` for field definitions and semantics.
 
 Profiles may include an `invocation` field; it is merged onto `RunOptions` like any other field with caller overrides winning.
-

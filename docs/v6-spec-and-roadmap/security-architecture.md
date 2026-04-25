@@ -103,4 +103,4 @@ These items should be described as goals, hypotheses, or future implementation w
 
 ---
 
-**Related Documents**: [Plugin Ecosystem](plugin-ecosystem.md) | [Package Specifications](package-specs.md) | [Implementation Roadmap](implementation/)
+**Related Documents**: [Plugin Ecosystem](plugin-ecosystem.md) | [Package Specifications](package-specs.md) | [Implementation Roadmap](v6-implementation-roadmap.md)

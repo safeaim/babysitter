@@ -29,7 +29,7 @@ amux install opencode
 
 Install methods:
 - npm: `npm install -g @anomalyco/opencode`
-- brew (macOS): `brew install --cask opencode` 
+- brew (macOS): `brew install --cask opencode`
 - curl: `curl -fsSL https://opencode.ai/install | bash`
 
 Supported on macOS, Linux and Windows.

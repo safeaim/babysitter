@@ -416,6 +416,6 @@ Ensure the SDK is installed before the Gemini CLI step:
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 
 ### Babysitter Plugin
-- [Getting Started](../plugins/babysitter/GETTING_STARTED.md)
-- [Process Selection Guide](../plugins/babysitter/PROCESS_SELECTION.md)
-- [Troubleshooting](../plugins/babysitter/TROUBLESHOOTING.md)
+- [Getting Started](./reference/GETTING_STARTED.md)
+- [Process Selection Guide](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/PROCESS_SELECTION.md)
+- [Troubleshooting](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/TROUBLESHOOTING.md)

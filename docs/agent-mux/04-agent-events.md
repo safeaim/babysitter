@@ -4,6 +4,8 @@
 
 > **Note:** hermes-agent is included as a 10th supported agent per project requirements, extending the original scope's 9 agents. All ten built-in agents (claude, codex, gemini, copilot, cursor, opencode, pi, omp, openclaw, hermes) share the same event contract.
 
+Last refreshed: 2026-04-25
+
 ---
 
 ## 1. Overview
@@ -2141,4 +2143,3 @@ Total event types by category:
 ## Implementation Status (2026-04-12)
 
 The event union and parse-context contract are implemented as specified. The stream is produced by `StreamAssembler` and consumed by `RunHandleImpl.events()`. Adapters emit events by returning `AgentEvent | AgentEvent[] | null` from `parseEvent(line, context)`, driven by line buffering in `spawn-runner.ts`. No changes to the wire shape.
-

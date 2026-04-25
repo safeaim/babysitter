@@ -1686,4 +1686,3 @@ Complete reference of all `PluginManager` methods:
 ## Implementation Status (2026-04-12)
 
 The plugin surface (`PluginManager`, `InstalledPlugin`, `PluginListing`, `AgentAdapter.listPlugins` / `installPlugin` / `uninstallPlugin` / `searchPlugins`) is in place. Coverage across adapters is partial — plugin methods remain `optional` on the adapter interface, and adapters whose harnesses have no plugin system leave them undefined.
-

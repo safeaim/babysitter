@@ -1323,4 +1323,3 @@ readonly hostEnvSignals = [
 ### Built-in adapter count
 
 `@a5c-ai/agent-mux-adapters` now ships 11 adapters. The 11th is `agent-mux-remote`; see `docs/12-built-in-adapters.md`.
-

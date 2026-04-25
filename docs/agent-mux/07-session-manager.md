@@ -1144,4 +1144,3 @@ All types defined or referenced in this specification:
 - **`watch(agent, sessionId)`** is an `AsyncIterable<AgentEvent>` implemented in `packages/core/src/session-watch.ts` using `fs.watch(dir, { recursive: true })` with tail-reading to emit deltas as the harness writes them.
 
 Session files are written atomically by adapters via the tmp-then-rename helper in `packages/adapters/src/session-fs.ts`.
-

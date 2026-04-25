@@ -45,9 +45,9 @@ Start here:
 
 Use these as constraints:
 
-- [Adversarial Improvements](adversarial-improvements.md)
-- [Adversarial Unified Impossibility Synthesis](adversarial-unified-impossibility-synthesis.md)
-- [Adversarial V6 Architecture Specification Analysis](adversarial-v6-architecture-specification-analysis.md)
+- [Current State Analysis](current-state.md)
+- [Architecture Comparison](architecture-comparison.md)
+- [V6 Architecture Specification](v6-architecture-specification.md)
 
 ## Document Map
 
@@ -75,16 +75,16 @@ Supporting modules:
 
 The currently selected first executable V6 slice is the `@a5c-ai/babysitter-agent` seam contract. It keeps the existing package boundary intact while making runtime-domain ownership, subpath exports, and validation gates explicit.
 
-- Decision record: [ADR-001: Babysitter-Agent Seam Contract As The First Executable V6 Slice](decisions/ADR-001-babysitter-agent-seam-contract.md)
+- Decision record: [ADR-001: Babysitter-Agent Seam Contract As The First Executable V6 Slice](./decisions/ADR-001-babysitter-agent-seam-contract.md)
 - Repo-level validation command: `npm run verify:v6:seams`
 
 ## Implementation
 
-Implementation-phase docs live under [`implementation/`](implementation/) and describe what each roadmap phase is allowed to ship without promoting deferred package vocabulary into scope.
+Implementation-phase docs live under `implementation/` and describe what each roadmap phase is allowed to ship without promoting deferred package vocabulary into scope.
 
 ## Decision Records
 
-Decision records for concrete V6 structural moves live under [`decisions/`](decisions/). If a proposed rename, extraction, or seam change does not have a decision record, it is still design exploration rather than an accepted V6 slice.
+Decision records for concrete V6 structural moves live under `decisions/`. If a proposed rename, extraction, or seam change does not have a decision record, it is still design exploration rather than an accepted V6 slice.
 
 ## Maturity Standard
 

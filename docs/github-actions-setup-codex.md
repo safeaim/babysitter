@@ -385,6 +385,6 @@ If Codex cannot write files, check the sandbox mode:
 - [OpenAI Codex CLI](https://github.com/openai/codex)
 
 ### Babysitter Plugin
-- [Getting Started](../plugins/babysitter/GETTING_STARTED.md)
-- [Process Selection Guide](../plugins/babysitter/PROCESS_SELECTION.md)
-- [Troubleshooting](../plugins/babysitter/TROUBLESHOOTING.md)
+- [Getting Started](./reference/GETTING_STARTED.md)
+- [Process Selection Guide](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/PROCESS_SELECTION.md)
+- [Troubleshooting](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/TROUBLESHOOTING.md)

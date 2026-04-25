@@ -207,4 +207,4 @@ These still require explicit follow-up:
 
 ---
 
-Related documents: [README](README.md), [V6 Implementation Roadmap](v6-implementation-roadmap.md), [Package Specifications](package-specs.md), [Adversarial Improvements](adversarial-improvements.md)
+Related documents: [README](README.md), [V6 Implementation Roadmap](v6-implementation-roadmap.md), [Package Specifications](package-specs.md), [Current State Analysis](current-state.md)

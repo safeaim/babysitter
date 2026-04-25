@@ -1171,4 +1171,3 @@ The `ssh` invocation builder in `packages/core/src/spawn-invocation.ts` now:
   The wrapper `exec`s away so the sh is not an extra hop, backgrounds the real command, installs a signal trap forwarding TERM/INT to the child's PID, then `wait`s. When the local spawn-runner sends SIGTERM (then SIGKILL after the grace window) to the ssh client, the signal is propagated to the remote harness process for a clean shutdown.
 
 The wrapper appears exactly once per invocation and is covered by unit tests in `packages/core/tests/build-invocation-command.test.ts`.
-

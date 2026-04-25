@@ -1,10 +1,11 @@
 import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 
-const pathways = [
+const defaultPathways = [
   {
     title: 'Start Fast',
     href: '/docs/user-guide/getting-started/quickstart',
@@ -55,7 +56,38 @@ const pillars = [
   }
 ];
 
+const strictScopePathways = [
+  {
+    title: 'Stage The Gate',
+    href: '/docs/github-actions-setup-babysitter',
+    description:
+      'Start with the staged GitHub Actions and operational docs that are currently held to hard-fail link and sample validation.'
+  },
+  {
+    title: 'Check CLI Reality',
+    href: '/docs/cli-examples',
+    description:
+      'Validate the command surface against the docs-backed examples and smoke-oriented CLI walkthroughs.'
+  },
+  {
+    title: 'Review Reference',
+    href: '/docs/reference/GETTING_STARTED',
+    description:
+      'Use the staged reference entrypoint that is included in the strict docs QA scope today.'
+  },
+  {
+    title: 'Audit V6 Claims',
+    href: '/docs/v6-spec-and-roadmap/v6-implementation-roadmap',
+    description:
+      'Check the roadmap and validation claims that are now part of the staged docs quality gate.'
+  }
+];
+
 export default function Home() {
+  const { siteConfig } = useDocusaurusContext();
+  const strictDocScope = siteConfig.customFields?.strictDocScope === true;
+  const pathways = strictDocScope ? strictScopePathways : defaultPathways;
+
   return (
     <Layout
       title="Babysitter Docs"
@@ -72,12 +104,25 @@ export default function Home() {
               marketing-shaped copy of the repo.
             </p>
             <div className={styles.actions}>
-              <Link className="button button--primary button--lg" to="/docs/user-guide/">
-                Open the user guide
-              </Link>
-              <Link className="button button--secondary button--lg" to="/docs/plugins">
-                Explore plugins
-              </Link>
+              {strictDocScope ? (
+                <>
+                  <Link className="button button--primary button--lg" to="/docs/github-actions-setup-babysitter">
+                    Open staged docs
+                  </Link>
+                  <Link className="button button--secondary button--lg" to="/docs/cli-examples">
+                    Review CLI examples
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link className="button button--primary button--lg" to="/docs/user-guide/">
+                    Open the user guide
+                  </Link>
+                  <Link className="button button--secondary button--lg" to="/docs/plugins">
+                    Explore plugins
+                  </Link>
+                </>
+              )}
             </div>
           </div>
           <div className={styles.heroPanel}>

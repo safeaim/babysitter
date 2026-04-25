@@ -1551,4 +1551,3 @@ The adapters package exports an 11th built-in adapter, `agent-mux-remote`, for n
 ### Package layout
 
 The meta package `@a5c-ai/agent-mux` re-exports `core` and `adapters` (`packages/agent-mux/src/index.ts`). The CLI ships as a separate binary in `@a5c-ai/agent-mux-cli`. A fifth workspace, `@a5c-ai/agent-mux-harness-mock`, is test-only and is not part of the runtime meta-package. See `docs/14-harness-mock.md`.
-

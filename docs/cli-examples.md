@@ -200,7 +200,7 @@ rm -rf ~/.a5c/runs/run-20260112-130455
 
 ---
 
-Need another scenario documented? Open an issue with the desired flow (CLI flags, harness behavior, etc.) and the team will extend this file. For the deeper specification refer to [`sdk.md`](../sdk.md).
+Need another scenario documented? Open an issue with the desired flow (CLI flags, harness behavior, etc.) and the team will extend this file. For the deeper specification refer to [`babysitter_cli_surface_spec.md`](./reference/babysitter_cli_surface_spec.md).
 
 ---
 
@@ -236,4 +236,4 @@ pwsh -File scripts/docs/run_cli_examples.ps1 `
 5. **Archive run metadata.**
    - Each replay stores `_ci_artifacts/cli/run-metadata.json` with OS, Node version, git commit, and env vars so future contributors can reproduce the walkthrough exactly.
 
-Failing to regenerate outputs will cause the docs CI jobs (`docs:lint`, `docs:snippets`, `smoke:cli`, `docs:testing-readme`) to fail once the Part 7 verification matrix runs in CI. When in doubt, run `pnpm --filter @a5c-ai/babysitter-sdk run docs:plan` locally to execute all doc checks before opening a PR.
+Failing to regenerate outputs will cause the docs CI jobs (`docs:lint`, `docs:snippets`, `docs:links`, `docs:freshness`) and the SDK smoke job (`pnpm --filter @a5c-ai/babysitter-sdk run smoke:cli`) to fail once the verification matrix runs in CI. When in doubt, run `npm run docs:qa` locally to execute the repository docs gates before opening a PR.

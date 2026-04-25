@@ -110,7 +110,7 @@ For the current integrated story, read:
 
 1. [Unified Stack Architecture](unified-stack-architecture.md)
 2. [Package Specifications](package-specs.md)
-3. [docs/agent-mux/README](../agent-mux/README.md)
+3. [docs/agent-mux/README](https://github.com/a5c-ai/babysitter/blob/main/docs/agent-mux/README.md)
 4. `packages/agent-mux/README.md`
 
 ---

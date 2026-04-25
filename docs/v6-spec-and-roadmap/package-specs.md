@@ -155,4 +155,4 @@ The following spec patterns are explicitly rejected for the current V6 stage:
 
 ---
 
-Related documents: [V6 Architecture Specification](v6-architecture-specification.md), [V6 Implementation Roadmap](v6-implementation-roadmap.md), [Adversarial Improvements](adversarial-improvements.md)
+Related documents: [V6 Architecture Specification](v6-architecture-specification.md), [V6 Implementation Roadmap](v6-implementation-roadmap.md), [Current State Analysis](current-state.md)

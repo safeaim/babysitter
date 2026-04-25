@@ -49,17 +49,26 @@
     "build:agent-plugins-mux": "npm run build --workspace=@a5c-ai/agent-plugins-mux",
     "test:agent-plugins-mux": "npm run test --workspace=@a5c-ai/agent-plugins-mux",
     "docs:prepare": "node ./scripts/ensure-webpackbar-patch.cjs",
+    "docs:lint:markdown": "markdownlint-cli2",
+    "docs:lint:style": "node ./scripts/docs-style-check.cjs",
+    "docs:lint": "npm run docs:lint:markdown && npm run docs:lint:style",
+    "docs:snippets": "node ./scripts/docs-code-samples-check.cjs",
+    "docs:links": "node ./scripts/docs-link-check.cjs && node ./scripts/docs-strict-build.cjs",
+    "docs:freshness": "node ./scripts/docs-freshness-report.cjs && npm run validate:evidence:freshness --workspace=@a5c-ai/agent-catalog",
+    "docs:qa": "npm run docs:lint && npm run docs:snippets && npm run docs:links && npm run docs:freshness",
+    "docs:ci": "npm run docs:qa",
     "docs:dev": "npm run docs:prepare && docusaurus start docs-site --host 0.0.0.0",
     "docs:build": "npm run docs:prepare && docusaurus build docs-site",
     "docs:serve": "docusaurus serve docs-site/build",
     "docs:clear": "docusaurus clear docs-site"
   },
   "devDependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.113",
     "@docusaurus/core": "^3.0.0",
     "@docusaurus/preset-classic": "^3.0.0",
-    "@anthropic-ai/claude-agent-sdk": "^0.2.113",
-    "@vitejs/plugin-react": "^6.0.1",
     "@mdx-js/react": "^3.0.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "markdownlint-cli2": "^0.18.1",
     "prism-react-renderer": "^2.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -91,7 +100,7 @@
     }
   },
   "dependencies": {
-    "@a5c-ai/compendium": "^0.1.0",
-    "@a5c-ai/agent-mux": "^0.4.9"
+    "@a5c-ai/agent-mux": "^0.4.9",
+    "@a5c-ai/compendium": "^0.1.0"
   }
 }

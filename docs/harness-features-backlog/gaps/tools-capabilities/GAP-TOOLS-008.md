@@ -22,8 +22,8 @@ search.
 A `web_search` agentic tool with these params (matching CC's WebSearchTool):
 
 - **`query`** (string, required): Search query, minimum 2 characters
-- **`allowed_domains`** (string[], optional): Whitelist of domains to search
-- **`blocked_domains`** (string[], optional): Blacklist of domains to exclude
+- **`allowed_domains`** (string[], optional): Allowlist of domains to search
+- **`blocked_domains`** (string[], optional): Blocklist of domains to exclude
 
 Returns search results with titles, URLs, and snippets.
 

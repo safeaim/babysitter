@@ -1314,4 +1314,3 @@ Both session-file writes and config writes go through the unified helper in `pac
 This gives concurrent readers either the old bytes or the new bytes — never a torn state — and serialises concurrent writers so read-modify-write sequences in `ConfigManager.set()` and `addMcpServer()` / `removeMcpServer()` cannot interleave. `ConfigManagerImpl` additionally serialises `set()` calls per agent via an in-process write queue so the cache and on-disk state stay consistent.
 
 Every adapter's `writeConfig()` (JSON: claude, codex, copilot, cursor, gemini, omp, opencode, openclaw, pi; YAML: hermes) funnels through `writeJsonFileAtomic` / `writeTextFileAtomic` in `packages/adapters/src/session-fs.ts`, which simply delegate to the core `atomic-fs` primitives. There is no ad-hoc atomic-write code left in the adapter layer.
-

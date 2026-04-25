@@ -1,6 +1,6 @@
 # Testing and Validation Framework
 
-→ [Documentation Index](README.md) | Previous: [Security Architecture](security-architecture.md) | Next: [Performance Considerations](performance-docs.md)
+→ [Documentation Index](./README.md) | Previous: [Security Architecture](./security-architecture.md) | Next: [Performance Considerations](./performance-docs.md)
 
 ## Purpose
 
@@ -21,7 +21,7 @@ The current repository provides these concrete validation commands and workflow 
 | Architecture boundaries | `npm run test:architecture` | Enforces the `@a5c-ai/babysitter-agent` seam contract and repo package-family dependency rules for the current orchestration, dispatch, support, consumer, and distribution surfaces |
 | Plugin packaging checks | `npm run validate:ci --prefix plugins/<plugin>` for first-class plugins | Packaged-install and integration validation for the listed plugin packages |
 | Metadata checks | `npm run verify:metadata` | Repository/package metadata consistency checks only |
-| Docs build | `npm run docs:build` | Docusaurus buildability for the docs site |
+| Docs quality | `npm run docs:qa` | Markdown/style lint, command-sample validation, repo freshness reporting, evidence freshness, and Docusaurus broken-link/build validation for the staged docs corpus |
 | CI wiring | `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.github/workflows/staging-publish.yml`, `.github/workflows/docs-site.yml` | The commands above are run in automation where those workflows explicitly invoke them |
 
 ## What The Current Surface Does Not Prove
@@ -45,7 +45,7 @@ The nearest concrete validations available now are:
 - `npm run test:architecture` for the current seam contract and documented package-family dependency boundaries,
 - hooks-mux and agent-mux build/test commands for the current integration seams,
 - plugin `validate:ci` checks for packaged plugin behavior,
-- docs and metadata checks for publication hygiene.
+- docs QA and metadata checks for publication hygiene.
 
 An available but not currently required command such as `npm run test:e2e:docker` should be treated as optional coverage unless a roadmap slice explicitly promotes it into a required gate.
 

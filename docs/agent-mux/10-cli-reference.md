@@ -1113,7 +1113,7 @@ REPL mode is entered when:
 ### 13.2 REPL Behavior
 
 1. If an initial prompt is provided, it is sent as the first turn.
-2. After the agent completes its response, the CLI prints a prompt indicator (e.g., `amux> `) and waits for user input on stdin.
+2. After the agent completes its response, the CLI prints a prompt indicator (for example, `amux>`) and waits for user input on stdin.
 3. User input is sent to the running agent via `RunHandle.continue(prompt)`.
 4. Tool approval requests are handled inline: the CLI prints the request and prompts for `[y]es / [n]o / [a]lways` on stderr.
 5. The loop continues until:

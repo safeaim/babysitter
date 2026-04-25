@@ -92,8 +92,8 @@ This document summarizes research into which existing subprocess-based adapters 
 - Implement streaming via SDK native capabilities
 - Mock implementations for testing
 
-### Remote Adapters  
-- Extend `BaseRemoteAdapter` 
+### Remote Adapters
+- Extend `BaseRemoteAdapter`
 - HTTP/WebSocket connections to APIs
 - Server lifecycle management
 - Real-time bidirectional communication

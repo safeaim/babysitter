@@ -61,7 +61,6 @@ Babysitter Plugin Installation Verification
 All checks passed! The babysitter plugin is ready to use.
 ```
 
-
 ### Install Missing Dependencies
 
 **Node.js and npm:**
@@ -233,7 +232,7 @@ You can specify which methodology to use:
 /babysitter:call use Spec-Kit for implementing the requirements in spec.md
 ```
 
-See [PROCESS_SELECTION.md](./PROCESS_SELECTION.md) for help choosing the right methodology.
+See the [Process Selection Guide](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/PROCESS_SELECTION.md) for help choosing the right methodology.
 
 ---
 
@@ -355,7 +354,7 @@ Now that you understand how to use Babysitter, explore these resources:
 
 ### Choose Your Methodology
 
-See [PROCESS_SELECTION.md](./PROCESS_SELECTION.md) for a guide on choosing the right methodology:
+See the [Process Selection Guide](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/PROCESS_SELECTION.md) for a guide on choosing the right methodology:
 
 | Methodology | Best For |
 |-------------|----------|
@@ -383,12 +382,11 @@ See [PROCESS_SELECTION.md](./PROCESS_SELECTION.md) for a guide on choosing the r
 
 ### Advanced Topics
 
-- **[Plugin Specification](./BABYSITTER_PLUGIN_SPECIFICATION.md)** - Complete architecture documentation
-- **[Advanced Patterns](./skills/babysit/reference/ADVANCED_PATTERNS.md)** - Agent tasks, parallel execution
-- **[Troubleshooting Guide](./TROUBLESHOOTING.md)** - Comprehensive problem-solving
+- **[Plugin Specification](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/BABYSITTER_PLUGIN_SPECIFICATION.md)** - Complete architecture documentation
+- **[Advanced Patterns](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/ADVANCED_PATTERNS.md)** - Agent tasks, parallel execution
+- **[Troubleshooting Guide](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/TROUBLESHOOTING.md)** - Comprehensive problem-solving
 
 ### Utility Scripts
-
 
 ---
 

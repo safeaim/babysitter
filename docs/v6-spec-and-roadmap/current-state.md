@@ -36,7 +36,7 @@ The plugin side of the stack already exposes the pieces needed for metaplugins, 
 
 Current confusing terminology will be updated:
 - runtime binary: `babysitter-agent`
-- `hooks-mux` → `hooks-mux` 
+- `hooks-mux` → `hooks-mux`
 - `agent-plugins-mux` → `agent-plugins-mux`
 
 This harmonization provides clearer naming that reflects the actual purpose of each package → [Package Specifications](package-specs.md)

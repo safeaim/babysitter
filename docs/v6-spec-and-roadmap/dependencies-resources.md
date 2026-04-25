@@ -1,6 +1,6 @@
 # Dependencies & Resources
 
-→ [Documentation Index](README.md) | Related: [Implementation Roadmap](implementation/) | [Agent-Mux Integration](agent-mux-integration.md)
+→ [Documentation Index](README.md) | Related: [Implementation Roadmap](v6-implementation-roadmap.md) | [Agent-Mux Integration](agent-mux-integration.md)
 
 ## Internal Dependencies
 
@@ -50,4 +50,4 @@
 
 ---
 
-**Related Documents**: [Package Specifications](package-specs.md) | [Implementation Roadmap](implementation/) | [Testing Framework](testing-framework.md)
+**Related Documents**: [Package Specifications](package-specs.md) | [Implementation Roadmap](v6-implementation-roadmap.md) | [Testing Framework](testing-framework.md)

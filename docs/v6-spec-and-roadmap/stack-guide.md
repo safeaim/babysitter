@@ -42,7 +42,7 @@ Work mainly in:
 
 Read:
 
-- [docs/agent-mux/README](../agent-mux/README.md)
+- [docs/agent-mux/README](https://github.com/a5c-ai/babysitter/blob/main/docs/agent-mux/README.md)
 - [Agent-Mux Integration](agent-mux-integration.md)
 - [Unified Stack Architecture](unified-stack-architecture.md)
 

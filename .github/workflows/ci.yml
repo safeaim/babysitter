@@ -9,6 +9,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  docs-quality:
+    name: Docs QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Prepare docs QA artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/docs-qa
+
+      - name: Docs quality gates
+        run: |
+          set -euo pipefail
+          npm run docs:qa 2>&1 | tee artifacts/docs-qa/docs-qa.log
+
+      - name: Upload docs QA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-qa
+          path: artifacts/docs-qa
+          if-no-files-found: error
+
   test:
     name: Lint, Tests, Package
     runs-on: ubuntu-latest

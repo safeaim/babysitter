@@ -83,4 +83,4 @@ When a concrete slice is chosen, use a small metric set:
 
 ---
 
-**Related Documents**: [V6 Architecture Specification](v6-architecture-specification.md) | [V6 Implementation Roadmap](v6-implementation-roadmap.md) | [Adversarial Improvements](adversarial-improvements.md)
+**Related Documents**: [V6 Architecture Specification](v6-architecture-specification.md) | [V6 Implementation Roadmap](v6-implementation-roadmap.md) | [Current State Analysis](current-state.md)

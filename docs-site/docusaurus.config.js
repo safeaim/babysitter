@@ -1,5 +1,19 @@
 const { themes } = require('prism-react-renderer');
 
+const strictLinkValidation = process.env.DOCS_STRICT_LINKS === '1';
+const strictDocScope = process.env.DOCS_STRICT_SCOPE === '1';
+const strictDocInclude = [
+  'cli-examples.md',
+  'github-actions-setup-babysitter.md',
+  'github-actions-setup-claude-code.md',
+  'github-actions-setup-codex.md',
+  'github-actions-setup-gemini-cli.md',
+  'release-pipeline.md',
+  'reference/GETTING_STARTED.md',
+  'reference/babysitter_cli_surface_spec.md',
+  'v6-spec-and-roadmap/**'
+];
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Babysitter Docs',
@@ -11,11 +25,11 @@ const config = {
   projectName: 'babysitter',
   deploymentBranch: 'gh-pages',
   trailingSlash: false,
-  onBrokenLinks: 'warn',
+  onBrokenLinks: strictLinkValidation ? 'throw' : 'warn',
   markdown: {
     format: 'md',
     hooks: {
-      onBrokenMarkdownLinks: 'warn'
+      onBrokenMarkdownLinks: strictLinkValidation ? 'throw' : 'warn'
     }
   },
   i18n: {
@@ -29,6 +43,7 @@ const config = {
         docs: {
           path: '../docs',
           routeBasePath: 'docs',
+          ...(strictDocScope ? { include: strictDocInclude } : {}),
           exclude: [
             'retrospectives/hagaybar-budget-manager/banking-ux-polish.md',
             'retrospectives/joe-habu-superbabysitter/subagent-tdd-loop.md'
@@ -44,6 +59,9 @@ const config = {
       }
     ]
   ],
+  customFields: {
+    strictDocScope
+  },
   themeConfig: {
     image: 'img/logo.svg',
     navbar: {
@@ -52,48 +70,88 @@ const config = {
         alt: 'Babysitter logo',
         src: 'img/logo.svg'
       },
-      items: [
-        { to: '/', label: 'Home', position: 'left' },
-        {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          label: 'Docs',
-          position: 'left'
-        },
-        { to: '/docs/user-guide/', label: 'User Guide', position: 'left' },
-        { to: '/docs/plugins', label: 'Plugins', position: 'left' },
-        {
-          href: 'https://github.com/a5c-ai/babysitter',
-          label: 'GitHub',
-          position: 'right'
-        }
-      ]
+      items: strictDocScope
+        ? [
+            { to: '/', label: 'Home', position: 'left' },
+            {
+              type: 'docSidebar',
+              sidebarId: 'tutorialSidebar',
+              label: 'Docs',
+              position: 'left'
+            },
+            { to: '/docs/github-actions-setup-babysitter', label: 'GitHub Actions', position: 'left' },
+            {
+              href: 'https://github.com/a5c-ai/babysitter',
+              label: 'GitHub',
+              position: 'right'
+            }
+          ]
+        : [
+            { to: '/', label: 'Home', position: 'left' },
+            {
+              type: 'docSidebar',
+              sidebarId: 'tutorialSidebar',
+              label: 'Docs',
+              position: 'left'
+            },
+            { to: '/docs/user-guide/', label: 'User Guide', position: 'left' },
+            { to: '/docs/plugins', label: 'Plugins', position: 'left' },
+            {
+              href: 'https://github.com/a5c-ai/babysitter',
+              label: 'GitHub',
+              position: 'right'
+            }
+          ]
     },
     footer: {
       style: 'dark',
-      links: [
-        {
-          title: 'Start Here',
-          items: [
-            { label: 'Quickstart', to: '/docs/user-guide/getting-started/quickstart' },
-            { label: 'CLI Reference', to: '/docs/user-guide/reference/cli-reference' }
+      links: strictDocScope
+        ? [
+            {
+              title: 'Staged QA Scope',
+              items: [
+                { label: 'CLI Examples', to: '/docs/cli-examples' },
+                { label: 'GitHub Actions Setup', to: '/docs/github-actions-setup-babysitter' }
+              ]
+            },
+            {
+              title: 'Reference',
+              items: [
+                { label: 'Getting Started', to: '/docs/reference/GETTING_STARTED' },
+                { label: 'V6 Roadmap', to: '/docs/v6-spec-and-roadmap/v6-implementation-roadmap' }
+              ]
+            },
+            {
+              title: 'Community',
+              items: [
+                { label: 'Issues', href: 'https://github.com/a5c-ai/babysitter/issues' },
+                { label: 'Discussions', href: 'https://github.com/a5c-ai/babysitter/discussions' }
+              ]
+            }
           ]
-        },
-        {
-          title: 'Deep Dives',
-          items: [
-            { label: 'Process Library', to: '/docs/user-guide/features/process-library' },
-            { label: 'GitHub Actions Setup', to: '/docs/github-actions-setup-babysitter' }
-          ]
-        },
-        {
-          title: 'Community',
-          items: [
-            { label: 'Issues', href: 'https://github.com/a5c-ai/babysitter/issues' },
-            { label: 'Discussions', href: 'https://github.com/a5c-ai/babysitter/discussions' }
-          ]
-        }
-      ],
+        : [
+            {
+              title: 'Start Here',
+              items: [
+                { label: 'Quickstart', to: '/docs/user-guide/getting-started/quickstart' },
+                { label: 'CLI Reference', to: '/docs/user-guide/reference/cli-reference' }
+              ]
+            },
+            {
+              title: 'Deep Dives',
+              items: [
+                { label: 'Process Library', to: '/docs/user-guide/features/process-library' },
+                { label: 'GitHub Actions Setup', to: '/docs/github-actions-setup-babysitter' }
+              ]
+            },
+            {
+              title: 'Community',
+              items: [
+                { label: 'Issues', href: 'https://github.com/a5c-ai/babysitter/issues' },
+                { label: 'Discussions', href: 'https://github.com/a5c-ai/babysitter/discussions' }
+              ]
+            }
+          ],
       copyright: `Copyright ${new Date().getFullYear()} A5C AI`
     },
     prism: {

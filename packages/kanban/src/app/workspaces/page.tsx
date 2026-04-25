@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
 
 import { RequireGatewayAuth } from "@/components/agent-mux/require-gateway-auth";
 import { WorkspacesPageContent } from "@/components/workspaces/workspaces-page";
+import { useGatewayFetch } from "@/components/agent-mux/gateway-provider";
 import { useGateway } from "@/lib/agent-mux-ui";
 
 function readRuntime(value: unknown): WorkspaceRuntimeSurface | undefined {
@@ -25,8 +27,13 @@ export default function WorkspacesPage() {
 }
 
 function WorkspacesContent() {
+  const searchParams = useSearchParams();
+  const selectedWorkspacePath = searchParams.get("workspace");
+  const fetchGateway = useGatewayFetch();
   const { store } = useGateway();
   const sessions = useStore(store, useShallow((state) => Object.values(state.sessions.byId)));
+  const runs = useStore(store, useShallow((state) => Object.values(state.runs.byId)));
+  const eventBuffers = useStore(store, (state) => state.events.byRunId);
 
   const workspaceSessions = useMemo(
     () =>
@@ -55,5 +62,41 @@ function WorkspacesContent() {
     [sessions],
   );
 
-  return <WorkspacesPageContent isAuthenticated sessions={workspaceSessions} />;
+  async function handleSendPrompt(input: { sessionId: string; prompt: string; agent?: string }) {
+    const response = await fetchGateway(`/api/v1/sessions/${input.sessionId}/messages`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        prompt: input.prompt,
+        agent: input.agent,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gateway request failed: ${response.status}`);
+    }
+
+    const body = (await response.json()) as {
+      run?: Record<string, unknown>;
+      session?: Record<string, unknown>;
+    };
+
+    if (body.run?.runId) {
+      store.getState().actions.mergeRun(String(body.run.runId), body.run);
+    }
+    if (body.session?.sessionId) {
+      store.getState().actions.mergeSession(String(body.session.sessionId), body.session);
+    }
+  }
+
+  return (
+    <WorkspacesPageContent
+      isAuthenticated
+      sessions={workspaceSessions}
+      selectedWorkspacePath={selectedWorkspacePath}
+      allRuns={runs as Array<Record<string, unknown>>}
+      eventBuffers={eventBuffers}
+      onSendPrompt={handleSendPrompt}
+    />
+  );
 }

@@ -30,12 +30,25 @@ vi.mock("@/hooks/use-backlog", () => ({
   useBacklog: () => mockUseBacklog(),
 }));
 
+vi.mock("@/components/sessions/session-observability-panel", () => ({
+  SessionObservabilityPanel: ({ sessionId }: { sessionId: string }) => (
+    <div data-testid="session-observability-panel">observability {sessionId}</div>
+  ),
+}));
+
+vi.mock("@/components/workspaces/workspace-runtime-panel", () => ({
+  WorkspaceRuntimePanel: ({ sessionId }: { sessionId?: string }) => (
+    <div data-testid="workspace-runtime-panel">runtime {sessionId ?? "none"}</div>
+  ),
+}));
+
 describe("workspaces-page helpers", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("fetch", vi.fn());
     workspaceReviewArtifacts = [];
     mockUseBacklog.mockReturnValue({ snapshot: null });
+    window.localStorage.clear();
   });
 
   it("describes session-backed ownership when the gateway is connected", () => {
@@ -642,5 +655,153 @@ describe("workspaces-page helpers", () => {
     await user.click(screen.getByRole("button", { name: "Open in editor" }));
 
     expect(await screen.findByText(/Editor action failed for \/repo\/worktrees\/task/)).toBeInTheDocument();
+  });
+
+  it("renders the workspace shell when a workspace route selection is present", async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({
+        summary: { total: 1, active: 1, idle: 0, archived: 0, missing: 0 },
+        workspaces: [
+          {
+            path: "/repo/worktrees/task",
+            name: "task",
+            status: "active",
+            missing: false,
+            archivedAt: null,
+            cleanedAt: null,
+            lastActivityAt: "2026-04-24T12:00:00.000Z",
+            git: {
+              root: "/repo/main",
+              commonDir: "/repo/main/.git",
+              trackingBranch: "origin/vk/task",
+              branch: "vk/task",
+              head: "abc123",
+              ahead: 2,
+              behind: 1,
+              dirty: true,
+              uncommittedCount: 3,
+              isWorktree: true,
+              isPrimary: false,
+            },
+            notes: {
+              value: "Keep parity aligned with upstream shell.",
+              updatedAt: "2026-04-24T12:10:00.000Z",
+            },
+            links: {
+              editorHref: "vscode://file/repo/worktrees/task",
+            },
+            sessions: {
+              total: 2,
+              active: 1,
+              items: [
+                {
+                  sessionId: "session-1",
+                  agent: "codex",
+                  status: "active",
+                  cwd: "/repo/worktrees/task",
+                  title: "Workspace parity session",
+                  updatedAt: 1713960000000,
+                  latestRunId: "run-2",
+                },
+                {
+                  sessionId: "session-2",
+                  agent: "claude",
+                  status: "inactive",
+                  cwd: "/repo/worktrees/task",
+                  title: "Secondary session",
+                  updatedAt: 1713950000000,
+                  latestRunId: "run-3",
+                },
+              ],
+            },
+            runs: { total: 2, active: 1, items: [] },
+            actions: {
+              canArchive: true,
+              canCleanup: false,
+              canRecover: false,
+              canRebaseStart: false,
+              canRebaseAutoResolve: false,
+              canRebaseOpenInEditor: false,
+              canRebaseMarkResolved: false,
+              canRebaseAbort: false,
+            },
+          },
+        ],
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    render(
+      <WorkspacesPageContent
+        isAuthenticated
+        selectedWorkspacePath="/repo/worktrees/task"
+        sessions={[
+          {
+            sessionId: "session-1",
+            agent: "codex",
+            status: "active",
+            cwd: "/repo/worktrees/task",
+            title: "Workspace parity session",
+            updatedAt: 1713960000000,
+            latestRunId: "run-2",
+            runtime: {
+              updatedAt: 1713960000000,
+              workspacePath: "/repo/worktrees/task",
+              preview: {
+                status: "ready",
+                primaryUrl: "http://127.0.0.1:3000",
+                urls: ["http://127.0.0.1:3000"],
+                deviceProfiles: [],
+              },
+              terminal: {
+                status: "idle",
+                commands: [],
+              },
+              devServer: {
+                status: "running",
+                primaryUrl: "http://127.0.0.1:3000",
+                urls: ["http://127.0.0.1:3000"],
+                logs: [],
+              },
+            },
+          },
+          {
+            sessionId: "session-2",
+            agent: "claude",
+            status: "inactive",
+            cwd: "/repo/worktrees/task",
+            title: "Secondary session",
+            updatedAt: 1713950000000,
+            latestRunId: "run-3",
+          },
+        ]}
+        allRuns={[
+          { runId: "run-2", sessionId: "session-1", status: "running", startedAt: 2 },
+          { runId: "run-1", sessionId: "session-1", status: "completed", startedAt: 1 },
+          { runId: "run-3", sessionId: "session-2", status: "completed", startedAt: 3 },
+        ]}
+        eventBuffers={{
+          "run-1": { events: [{ type: "user_message", text: "Need workspace parity." }, { type: "message_stop", text: "Working on it." }] },
+          "run-2": { events: [{ type: "cost", cost: { totalUsd: 0.12 } }] },
+        }}
+        onSendPrompt={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-shell")).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId("workspace-context-bar")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-desktop-panels")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-panel-sidebar")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-panel-conversation")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-panel-context")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-panel-details")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-session-select")).toHaveValue("session-1");
+    expect(screen.getByText("observability session-1")).toBeInTheDocument();
+    expect(screen.getByText("runtime session-1")).toBeInTheDocument();
   });
 });

@@ -4,6 +4,7 @@ import { createComponentLogger, createSimpleLogger } from '../src/logger-simple.
 describe('SimpleLogger', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
   });
 
   it('writes structured log entries with merged context', () => {
@@ -40,9 +41,32 @@ describe('SimpleLogger', () => {
     });
   });
 
+  it('respects the configured log level threshold for parent and child loggers', () => {
+    const write = vi.spyOn(process.stderr, 'write').mockReturnValue(true);
+    vi.stubEnv('AMUX_LOG_LEVEL', 'error');
+
+    const logger = createSimpleLogger({ service: 'agent-mux' });
+    const child = logger.child({ component: 'worker' });
+
+    logger.debug({ runId: 'run-1' }, 'debug should be dropped');
+    child.info('info should be dropped');
+    child.error({ runId: 'run-1' }, 'error should remain');
+
+    expect(write).toHaveBeenCalledTimes(1);
+    const entry = JSON.parse(String(write.mock.calls[0]?.[0]).trim());
+    expect(entry).toMatchObject({
+      level: 'error',
+      msg: 'error should remain',
+      service: 'agent-mux',
+      component: 'worker',
+      runId: 'run-1',
+    });
+  });
+
   it('exposes the higher-level helper methods', () => {
     const write = vi.spyOn(process.stderr, 'write').mockReturnValue(true);
     const logger = createComponentLogger('scheduler', { sessionId: 'session-1' });
+    logger.level = 'debug';
 
     logger.runStart({
       runId: 'run-1',

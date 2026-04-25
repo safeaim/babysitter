@@ -5,6 +5,25 @@
 
 import { Logger, LogLevel, LogContext, CostInfo } from './types.js';
 
+const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
+  trace: 10,
+  debug: 20,
+  info: 30,
+  warn: 40,
+  error: 50,
+  fatal: 60,
+};
+
+function normalizeLogLevel(level: string | undefined): LogLevel {
+  if (!level) {
+    return 'info';
+  }
+  if (level in LOG_LEVEL_PRIORITY) {
+    return level as LogLevel;
+  }
+  return 'info';
+}
+
 /**
  * Simple logger implementation.
  */
@@ -12,11 +31,16 @@ class SimpleLogger implements Logger {
   private baseContext: LogContext;
   public level: string = 'info';
 
-  constructor(baseContext: LogContext = {}) {
+  constructor(baseContext: LogContext = {}, level?: string) {
     this.baseContext = baseContext;
+    this.level = normalizeLogLevel(level);
   }
 
   private log(level: LogLevel, msgOrObj: string | object, msg?: string): void {
+    if (LOG_LEVEL_PRIORITY[level] < LOG_LEVEL_PRIORITY[normalizeLogLevel(this.level)]) {
+      return;
+    }
+
     const timestamp = new Date().toISOString();
 
     let message: string;
@@ -67,7 +91,7 @@ class SimpleLogger implements Logger {
   }
 
   child(context: LogContext): Logger {
-    return new SimpleLogger({ ...this.baseContext, ...context });
+    return new SimpleLogger({ ...this.baseContext, ...context }, this.level);
   }
 
   runStart(context: { runId: string; agent: string; prompt: string; model?: string }): void {
@@ -133,7 +157,7 @@ class SimpleLogger implements Logger {
  * Create a simple logger instance.
  */
 export function createSimpleLogger(baseContext?: LogContext): Logger {
-  return new SimpleLogger(baseContext);
+  return new SimpleLogger(baseContext, process.env.AMUX_LOG_LEVEL);
 }
 
 /**

@@ -76,8 +76,16 @@ describe("BacklogQueryService", () => {
       "preserve_release_contract",
       "ui_copy_review",
     ]);
+    expect(overview.snapshot.projects[0]?.integrations.map((integration) => integration.provider)).toEqual([
+      "github",
+      "azure-repos",
+    ]);
     expect(overview.snapshot.projects[0]?.linkedRunSummary?.activeRuns).toBe(2);
     expect(overview.snapshot.issues.find((issue) => issue.id === "KANBAN-GAP-004")?.review?.decision).toBe("pending");
+    expect(overview.snapshot.issues.find((issue) => issue.id === "KANBAN-GAP-006")?.repositoryLifecycle?.integration).toMatchObject({
+      status: "missing-scopes",
+      linkState: "partially-linked",
+    });
     expect(overview.snapshot.issues.find((issue) => issue.id === "KANBAN-GAP-004")?.dispatch.contextLabels).toEqual([
       { labelId: "dispatch-context-label-tests-first" },
       { labelId: "dispatch-context-label-preserve-release-contract" },
@@ -445,6 +453,58 @@ describe("BacklogQueryService", () => {
       autoMerge: true,
       requiredApprovals: 3,
     });
+  });
+
+  it("supports Azure Repos repository linking and preserves provider-specific integration state", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kanban-backlog-"));
+    tempDirs.push(tempDir);
+    const backlogFilePath = path.join(tempDir, "kanban-backlog.json");
+
+    const service = new BacklogQueryService({
+      backlogFilePath,
+      now: () => "2026-04-24T12:00:00.000Z",
+      runQueryService: {
+        listProjects: vi.fn().mockResolvedValue({
+          recentCompletionWindowMs: 14400000,
+          projects: [],
+        }),
+      } as never,
+    });
+
+    const overview = await service.linkRepository({
+      issueId: "KANBAN-GAP-001-A",
+      owner: "a5c-ai",
+      name: "azure-kanban",
+      branchName: "feat/azure-kanban",
+      provider: "azure-repos",
+    });
+
+    const issue = overview.snapshot.issues.find((candidate) => candidate.id === "KANBAN-GAP-001-A");
+    expect(issue?.repositoryLifecycle?.integration).toMatchObject({
+      provider: "azure-repos",
+      status: "partial-setup",
+      actions: {
+        canCreatePullRequest: false,
+      },
+    });
+  });
+
+  it("rejects PR creation when integration prerequisites disable the action", async () => {
+    const service = new BacklogQueryService({
+      runQueryService: {
+        listProjects: vi.fn().mockResolvedValue({
+          recentCompletionWindowMs: 14400000,
+          projects: [],
+        }),
+      } as never,
+    });
+
+    await expect(
+      service.createPullRequest({
+        issueId: "KANBAN-GAP-006",
+        title: "Should be blocked",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST", status: 400 });
   });
 
   it("persists project collaboration policy, roster changes, and issue collaborators", async () => {

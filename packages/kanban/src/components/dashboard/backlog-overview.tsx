@@ -3,6 +3,8 @@
 import type {
   KanbanBoardCard,
   KanbanCollaboratorRole,
+  KanbanIntegrationProvider,
+  KanbanRepositoryIntegrationState,
   KanbanIssue,
   KanbanPermissionGrant,
   KanbanProject,
@@ -18,7 +20,6 @@ import {
   CheckCircle2,
   FolderGit2,
   GitBranch,
-  Github,
   Layers,
   ListTodo,
   Plus,
@@ -116,6 +117,33 @@ function lifecycleTone(status: string): string {
     default:
       return "border-border bg-background text-foreground-muted";
   }
+}
+
+function providerLabel(provider: string): string {
+  return provider === "azure-repos" ? "Azure Repos" : provider;
+}
+
+function integrationTone(status: KanbanRepositoryIntegrationState["status"]): string {
+  switch (status) {
+    case "connected":
+      return "border-success/25 bg-success-muted text-success";
+    case "partial-setup":
+    case "missing-scopes":
+      return "border-warning/25 bg-warning-muted text-warning";
+    case "expired-auth":
+    case "failing":
+      return "border-error/25 bg-error-muted text-error";
+    default:
+      return "border-border bg-background text-foreground-muted";
+  }
+}
+
+function integrationLabel(status: KanbanRepositoryIntegrationState["status"]): string {
+  return status.replace(/-/g, " ");
+}
+
+function linkStateLabel(linkState: NonNullable<KanbanRepositoryIntegrationState["linkState"]>): string {
+  return linkState === "partially-linked" ? "partially linked" : linkState;
 }
 
 function lifecycleLabel(status: string): string {
@@ -880,6 +908,7 @@ interface RepositoryLifecyclePanelProps {
   mutating: boolean;
   onLinkRepository: (input: {
     issueId: string;
+    provider?: KanbanIntegrationProvider;
     owner: string;
     name: string;
     branchName: string;
@@ -909,8 +938,12 @@ function RepositoryLifecyclePanel({
 }: RepositoryLifecyclePanelProps) {
   const repository = card.repository;
   const lifecycle = card.repositoryLifecycle;
+  const integration = lifecycle?.integration;
   const [owner, setOwner] = useState(repository?.owner ?? "a5c-ai");
   const [name, setName] = useState(repository?.name ?? "babysitter");
+  const [provider, setProvider] = useState<KanbanIntegrationProvider>(
+    repository?.provider === "azure-repos" ? "azure-repos" : "github",
+  );
   const [branchName, setBranchName] = useState(
     lifecycle?.branchName ?? `feature/${card.issueKey.toLowerCase()}`,
   );
@@ -945,6 +978,7 @@ function RepositoryLifecyclePanel({
             event.preventDefault();
             void onLinkRepository({
               issueId: card.issueId,
+              provider,
               owner,
               name,
               branchName,
@@ -952,6 +986,17 @@ function RepositoryLifecyclePanel({
             });
           }}
         >
+          <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+            Provider
+            <select
+              value={provider}
+              onChange={(event) => setProvider(event.target.value === "azure-repos" ? "azure-repos" : "github")}
+              className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
+            >
+              <option value="github">GitHub</option>
+              <option value="azure-repos">Azure Repos</option>
+            </select>
+          </label>
           <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
             Repo owner
             <input
@@ -1001,7 +1046,7 @@ function RepositoryLifecyclePanel({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Github className="h-4 w-4" />
+            <FolderGit2 className="h-4 w-4" />
             {repository.fullName}
           </div>
           <div className="mt-1 text-xs text-foreground-muted">
@@ -1009,7 +1054,7 @@ function RepositoryLifecyclePanel({
           </div>
         </div>
         <span className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground-muted">
-          {repository.provider}
+          {providerLabel(repository.provider)}
         </span>
       </div>
 
@@ -1023,7 +1068,36 @@ function RepositoryLifecyclePanel({
         <span className={`rounded-full border px-2.5 py-1 text-xs ${lifecycleTone(lifecycle.publishStatus)}`}>
           Publish {lifecycleLabel(lifecycle.publishStatus)}
         </span>
+        {integration ? (
+          <>
+            <span className={`rounded-full border px-2.5 py-1 text-xs ${integrationTone(integration.status)}`}>
+              {providerLabel(integration.provider)} {integrationLabel(integration.status)}
+            </span>
+            <span className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground-muted">
+              PR {linkStateLabel(integration.linkState)}
+            </span>
+          </>
+        ) : null}
       </div>
+
+      {integration ? (
+        <div className="mt-4 rounded-2xl border border-border bg-card/80 p-4">
+          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+            Integration guidance
+          </div>
+          <p className="mt-2 text-sm leading-6 text-foreground-muted">{integration.guidance}</p>
+          {integration.actions.reason ? (
+            <div className="mt-3 rounded-xl border border-warning/20 bg-warning/10 px-3 py-2 text-sm text-warning">
+              {integration.actions.reason}
+            </div>
+          ) : null}
+          {integration.missingScopes?.length ? (
+            <div className="mt-3 rounded-xl border border-warning/20 bg-warning/10 px-3 py-2 text-sm text-warning">
+              Missing scopes: {integration.missingScopes.join(", ")}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {lifecycle.pullRequest ? (
         <div className="mt-4 rounded-2xl border border-border bg-card/80 p-4">
@@ -1032,6 +1106,9 @@ function RepositoryLifecyclePanel({
             PR #{lifecycle.pullRequest.number}
             <span className={`rounded-full border px-2.5 py-1 text-xs ${lifecycleTone(lifecycle.pullRequest.status)}`}>
               {lifecycleLabel(lifecycle.pullRequest.status)}
+            </span>
+            <span className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground-muted">
+              {linkStateLabel(lifecycle.pullRequest.linkState ?? "linked")}
             </span>
           </div>
           <div className="mt-2 text-sm text-foreground">{lifecycle.pullRequest.title}</div>
@@ -1078,13 +1155,19 @@ function RepositoryLifecyclePanel({
           </label>
           <button
             type="submit"
-            disabled={mutating}
+            disabled={mutating || (integration ? !integration.actions.canCreatePullRequest : false)}
             className="inline-flex h-11 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 px-4 text-sm font-semibold text-primary disabled:opacity-50"
           >
             Create PR
           </button>
         </form>
       )}
+
+      {integration && !integration.actions.canCreatePullRequest && !lifecycle.pullRequest ? (
+        <p className="mt-3 text-sm text-warning">
+          Linked PR creation is disabled until {providerLabel(integration.provider)} setup issues are resolved.
+        </p>
+      ) : null}
 
       <div className="mt-4">
         <div className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
@@ -1903,11 +1986,11 @@ export function BacklogOverview() {
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                    <Github className="h-4 w-4" />
+                    <FolderGit2 className="h-4 w-4" />
                     {repository.fullName}
                   </div>
                   <span className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground-muted">
-                    {repository.provider}
+                    {providerLabel(repository.provider)}
                   </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs text-foreground-muted">

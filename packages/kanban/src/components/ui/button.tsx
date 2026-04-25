@@ -31,13 +31,8 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
     asChild?: boolean;
   };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SlotComp = Slot as any;
-
 export function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
   const classes = cn(buttonVariants({ variant, size }), className);
-  if (asChild) {
-    return <SlotComp className={classes} {...props} />;
-  }
-  return <button className={classes} {...props} />;
+  const Comp = asChild ? Slot : "button";
+  return <Comp className={classes} {...props} />;
 }

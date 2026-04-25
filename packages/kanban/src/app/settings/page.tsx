@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LogoWordmark } from "@a5c-ai/compendium";
 import { Activity, ShieldCheck, Users } from "lucide-react";
 import { useStore } from "zustand";
+import type { KanbanIntegrationConnection } from "@a5c-ai/agent-mux-core/kanban";
 
 import { Button } from "@/components/ui/button";
 import { useGatewayAuth } from "@/components/agent-mux/gateway-provider";
@@ -55,6 +56,21 @@ export default function SettingsPage() {
           ) : null}
         </div>
       </section>
+
+      {project?.integrations?.length ? (
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-lg" data-testid="integration-settings">
+          <h2 className="text-xl font-semibold tracking-tight">Repository integrations</h2>
+          <p className="mt-2 text-sm leading-6 text-foreground-muted">
+            GitHub and Azure Repos setup lives beside the board so missing auth, scopes, and project binding are
+            visible before linked PR actions fail in workspace or review flows.
+          </p>
+          <div className="mt-4 grid gap-4 xl:grid-cols-2">
+            {project.integrations.map((integration) => (
+              <IntegrationCard key={integration.provider} integration={integration} />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {project ? (
         <section className="rounded-3xl border border-border bg-card p-6 shadow-lg" data-testid="collaboration-settings">
@@ -241,5 +257,88 @@ function SettingCard(props: { label: string; value: string }) {
       <div className="text-xs uppercase tracking-[0.2em] text-foreground-muted">{props.label}</div>
       <div className="mt-2 text-sm font-medium">{props.value}</div>
     </div>
+  );
+}
+
+function integrationTone(status: KanbanIntegrationConnection["status"]): string {
+  switch (status) {
+    case "connected":
+      return "border-success/20 bg-success/10 text-success";
+    case "partial-setup":
+    case "missing-scopes":
+      return "border-warning/20 bg-warning/10 text-warning";
+    case "expired-auth":
+    case "failing":
+      return "border-error/20 bg-error/10 text-error";
+    default:
+      return "border-border bg-background text-foreground-muted";
+  }
+}
+
+function IntegrationCard(props: { integration: KanbanIntegrationConnection }) {
+  const { integration } = props;
+  const blockedActions = [
+    integration.actions.canCreatePullRequest ? null : "create linked PRs",
+    integration.actions.canManagePullRequest ? null : "sync linked PR state",
+    integration.actions.canApproveFromReview ? null : "approve from review",
+  ].filter(Boolean);
+
+  return (
+    <article className="rounded-2xl border border-border bg-background/60 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-sm font-semibold text-foreground">{integration.label}</div>
+          <div className="mt-1 text-xs text-foreground-muted">
+            {integration.accountLabel ?? "No account selected"}
+          </div>
+        </div>
+        <span className={`rounded-full border px-2.5 py-1 text-xs ${integrationTone(integration.status)}`}>
+          {integration.status.replace(/-/g, " ")}
+        </span>
+      </div>
+
+      <p className="mt-3 text-sm leading-6 text-foreground-muted">{integration.guidance}</p>
+
+      {integration.failureMessage ? (
+        <div className="mt-3 rounded-2xl border border-error/20 bg-error/10 px-3 py-2 text-sm text-error">
+          {integration.failureMessage}
+        </div>
+      ) : null}
+
+      {integration.missingScopes?.length ? (
+        <div className="mt-3 rounded-2xl border border-warning/20 bg-warning/10 px-3 py-2 text-sm text-warning">
+          Missing scopes: {integration.missingScopes.join(", ")}
+        </div>
+      ) : null}
+
+      <div className="mt-4 space-y-2">
+        {integration.prerequisites.map((prerequisite) => (
+          <div key={prerequisite.key} className="rounded-xl border border-border bg-card px-3 py-3 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="font-medium text-foreground">{prerequisite.label}</span>
+              <span
+                className={`rounded-full border px-2 py-0.5 text-xs ${
+                  prerequisite.satisfied
+                    ? "border-success/20 bg-success/10 text-success"
+                    : "border-warning/20 bg-warning/10 text-warning"
+                }`}
+              >
+                {prerequisite.satisfied ? "ready" : "missing"}
+              </span>
+            </div>
+            {prerequisite.guidance ? (
+              <div className="mt-2 text-xs leading-5 text-foreground-muted">{prerequisite.guidance}</div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      {blockedActions.length > 0 ? (
+        <div className="mt-4 rounded-2xl border border-border bg-card px-3 py-3 text-sm text-foreground-muted">
+          Blocked actions: {blockedActions.join(", ")}.
+          {integration.actions.reason ? ` ${integration.actions.reason}` : ""}
+        </div>
+      ) : null}
+    </article>
   );
 }

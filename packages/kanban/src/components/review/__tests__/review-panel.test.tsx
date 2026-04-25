@@ -15,6 +15,29 @@ const artifact = {
   decision: "pending" as const,
   queueState: "queued" as const,
   updatedAt: "2026-04-24T12:00:00.000Z",
+  integration: {
+    provider: "github" as const,
+    status: "missing-scopes" as const,
+    linkState: "partially-linked" as const,
+    guidance: "Reconnect GitHub with pull request write scope before approving from review.",
+    missingScopes: ["pull_requests:write"],
+    prerequisites: [],
+    actions: {
+      canCreatePullRequest: false,
+      canManagePullRequest: false,
+      canApproveFromReview: false,
+      reason: "GitHub scopes are incomplete for review actions.",
+    },
+  },
+  linkedPullRequest: {
+    provider: "github" as const,
+    status: "in-review" as const,
+    linkState: "partially-linked" as const,
+    title: "Add linked PR parity indicators",
+    number: 612,
+    integrationStatus: "missing-scopes" as const,
+    guidance: "The PR is linked but review actions are disabled until scopes are restored.",
+  },
   diff: [
     {
       id: "file-1",
@@ -60,7 +83,7 @@ const artifact = {
 };
 
 describe("ReviewPanel", () => {
-  it("renders queue state, mapped feedback, and dispatches approval actions", async () => {
+  it("renders linked PR state and disables review actions when integration scopes are missing", async () => {
     const onApprove = vi.fn();
     const onRequestChanges = vi.fn();
     const onAddComment = vi.fn();
@@ -104,8 +127,11 @@ describe("ReviewPanel", () => {
 
     expect(screen.getByText("Mapped from codex review feedback")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /request changes/i }));
-    expect(onRequestChanges).toHaveBeenCalledWith(artifact.id);
+    expect(screen.getByText(/GitHub PR #612/)).toBeInTheDocument();
+    expect(screen.getByText("partially linked")).toBeInTheDocument();
+    expect(screen.getByText("GitHub scopes are incomplete for review actions.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /request changes/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /approve/i })).toBeDisabled();
 
     await user.click(screen.getAllByRole("button", { name: /comment/i })[1]!);
     await user.type(screen.getByLabelText(/inline review comment/i), "Queue this follow-up for the dashboard badge.");

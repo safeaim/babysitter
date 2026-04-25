@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import type {
   KanbanDiffFile,
   KanbanDiffLine,
+  KanbanLinkedPullRequestSummary,
+  KanbanRepositoryIntegrationState,
   KanbanReviewArtifact,
   KanbanReviewComment,
   KanbanReviewCommentAnchor,
@@ -48,6 +50,25 @@ function queueTone(queueState: KanbanReviewArtifact["queueState"]): string {
     default:
       return "border-border text-foreground-muted";
   }
+}
+
+function integrationTone(status: KanbanRepositoryIntegrationState["status"]): string {
+  switch (status) {
+    case "connected":
+      return "border-success/20 bg-success/10 text-success";
+    case "partial-setup":
+    case "missing-scopes":
+      return "border-warning/20 bg-warning/10 text-warning";
+    case "expired-auth":
+    case "failing":
+      return "border-error/20 bg-error/10 text-error";
+    default:
+      return "border-border text-foreground-muted";
+  }
+}
+
+function providerLabel(provider: KanbanLinkedPullRequestSummary["provider"]): string {
+  return provider === "azure-repos" ? "Azure Repos" : "GitHub";
 }
 
 function lineNumbers(line: KanbanDiffLine): string {
@@ -186,6 +207,8 @@ export function ReviewPanel(props: {
     () => (selectedArtifact ? buildFeedbackContext(selectedArtifact) : []),
     [selectedArtifact],
   );
+  const integration = selectedArtifact?.integration;
+  const linkedPullRequest = selectedArtifact?.linkedPullRequest;
 
   useEffect(() => {
     if (!selectedArtifact || !draftAnchor) {
@@ -319,18 +342,54 @@ export function ReviewPanel(props: {
                     ))}
                   </div>
                 ) : null}
-                <div className="mt-3 flex flex-wrap gap-3 text-sm text-foreground-muted">
+              <div className="mt-3 flex flex-wrap gap-3 text-sm text-foreground-muted">
                   {selectedArtifact.branch ? <span>Branch: {selectedArtifact.branch}</span> : null}
                   <span>{selectedArtifact.diff.length} files changed</span>
                   <span>{selectedArtifact.comments.length} comments</span>
                 </div>
+                {linkedPullRequest || integration ? (
+                  <div className="mt-4 rounded-2xl border border-border bg-card/80 p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {linkedPullRequest ? (
+                        <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground-muted">
+                          {providerLabel(linkedPullRequest.provider)} PR{" "}
+                          {linkedPullRequest.number ? `#${linkedPullRequest.number}` : ""}
+                        </span>
+                      ) : null}
+                      {linkedPullRequest ? (
+                        <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground-muted">
+                          {linkedPullRequest.linkState === "partially-linked" ? "partially linked" : linkedPullRequest.linkState}
+                        </span>
+                      ) : null}
+                      {integration ? (
+                        <span className={cn("rounded-full border px-2 py-0.5 text-xs", integrationTone(integration.status))}>
+                          {integration.status.replace(/-/g, " ")}
+                        </span>
+                      ) : null}
+                    </div>
+                    {linkedPullRequest?.title ? (
+                      <p className="mt-2 text-sm text-foreground">{linkedPullRequest.title}</p>
+                    ) : null}
+                    <p className="mt-2 text-sm leading-6 text-foreground-muted">
+                      {integration?.guidance ?? linkedPullRequest?.guidance ?? "No linked PR guidance available."}
+                    </p>
+                    {integration?.actions.reason ? (
+                      <div className="mt-3 rounded-xl border border-warning/20 bg-warning/10 px-3 py-2 text-sm text-warning">
+                        {integration.actions.reason}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
 
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
                   onClick={() => void props.onRequestChanges(selectedArtifact.id)}
-                  disabled={props.pendingArtifactId === selectedArtifact.id}
+                  disabled={
+                    props.pendingArtifactId === selectedArtifact.id ||
+                    (integration ? !integration.actions.canApproveFromReview : false)
+                  }
                 >
                   <XCircle className="mr-2 h-4 w-4" />
                   Request changes
@@ -338,7 +397,10 @@ export function ReviewPanel(props: {
                 <Button
                   variant="default"
                   onClick={() => void props.onApprove(selectedArtifact.id)}
-                  disabled={props.pendingArtifactId === selectedArtifact.id}
+                  disabled={
+                    props.pendingArtifactId === selectedArtifact.id ||
+                    (integration ? !integration.actions.canApproveFromReview : false)
+                  }
                 >
                   <CheckCircle2 className="mr-2 h-4 w-4" />
                   Approve

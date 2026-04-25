@@ -533,4 +533,59 @@ describe("BacklogOverview", () => {
       "Linking this child would create a parent-child cycle.",
     );
   });
+
+  it("renders degraded integration guidance and disables PR creation when setup is incomplete", () => {
+    backlogState = buildBacklogState();
+    backlogState.snapshot.projects[0]!.repositories = [
+      {
+        id: "repo-azure-a5c-ai-kanban",
+        owner: "a5c-ai",
+        name: "kanban",
+        fullName: "a5c-ai/kanban",
+        provider: "azure-repos",
+        defaultBranch: "main",
+        linkedAt: "2026-04-24T14:00:00.000Z",
+        settings: {
+          baseBranch: "main",
+          autoMerge: false,
+          requiredApprovals: 2,
+          ciProvider: "Azure Pipelines",
+          publishTarget: "npm",
+        },
+      },
+    ];
+    backlogState.board.projects[0]!.cards[0] = {
+      ...backlogState.board.projects[0]!.cards[0]!,
+      repository: backlogState.snapshot.projects[0]!.repositories[0],
+      repositoryLifecycle: {
+        repositoryId: "repo-azure-a5c-ai-kanban",
+        branchName: "vk/task",
+        reviewStatus: "unlinked",
+        mergeStatus: "not-ready",
+        publishStatus: "not-ready",
+        ciGates: [],
+        integration: {
+          provider: "azure-repos",
+          status: "partial-setup",
+          linkState: "unlinked",
+          guidance: "Select an Azure DevOps project and grant code write scopes before creating linked PRs.",
+          missingScopes: ["code:write"],
+          prerequisites: [],
+          actions: {
+            canCreatePullRequest: false,
+            canManagePullRequest: false,
+            canApproveFromReview: false,
+            reason: "Azure Repos setup is incomplete.",
+          },
+        },
+      },
+    };
+
+    render(<BacklogOverview />);
+
+    expect(screen.getByText("Azure Repos partial setup")).toBeInTheDocument();
+    expect(screen.getByText("Missing scopes: code:write")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create PR" })).toBeDisabled();
+    expect(screen.getByText(/Linked PR creation is disabled until Azure Repos setup issues are resolved/)).toBeInTheDocument();
+  });
 });

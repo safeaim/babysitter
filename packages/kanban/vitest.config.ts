@@ -1,8 +1,18 @@
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
-const localReact = path.resolve(__dirname, './node_modules/react');
-const localReactDom = path.resolve(__dirname, './node_modules/react-dom');
+const localReact = path.resolve(__dirname, '../../node_modules/react');
+const localReactDom = path.resolve(__dirname, '../../node_modules/react-dom');
+const testingLibraryReact = path.resolve(
+  __dirname,
+  '../../node_modules/@testing-library/react/dist/@testing-library/react.esm.js',
+);
+const testingLibraryDom = path.resolve(
+  __dirname,
+  '../../node_modules/@testing-library/dom/dist/@testing-library/dom.esm.js',
+);
+const agentMuxCore = path.resolve(__dirname, '../agent-mux/core/src/index.ts');
+const agentMuxCoreKanban = path.resolve(__dirname, '../agent-mux/core/src/kanban.ts');
 
 export default defineConfig({
   oxc: {
@@ -41,6 +51,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@a5c-ai/agent-mux-core/kanban': agentMuxCoreKanban,
+      '@a5c-ai/agent-mux-core': agentMuxCore,
+      '@testing-library/react': testingLibraryReact,
+      '@testing-library/dom': testingLibraryDom,
       '@': path.resolve(__dirname, './src'),
       'react': localReact,
       'react/jsx-runtime': path.join(localReact, 'jsx-runtime'),

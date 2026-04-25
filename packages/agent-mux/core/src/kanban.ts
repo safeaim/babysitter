@@ -40,7 +40,19 @@ export type KanbanDecompositionKind =
   | 'validation'
   | 'coordination';
 
-export type KanbanRepositoryProvider = 'github' | 'gitlab' | 'bitbucket' | 'local';
+export type KanbanIntegrationProvider = 'github' | 'azure-repos';
+
+export type KanbanIntegrationStatus =
+  | 'connected'
+  | 'disconnected'
+  | 'partial-setup'
+  | 'expired-auth'
+  | 'missing-scopes'
+  | 'failing';
+
+export type KanbanPullRequestLinkState = 'unlinked' | 'linked' | 'partially-linked';
+
+export type KanbanRepositoryProvider = KanbanIntegrationProvider | 'gitlab' | 'bitbucket' | 'local';
 
 export type KanbanPullRequestStatus =
   | 'draft'
@@ -235,6 +247,44 @@ export interface KanbanRepositorySettings {
   readonly publishTarget?: string;
 }
 
+export interface KanbanIntegrationPrerequisite {
+  readonly key: string;
+  readonly label: string;
+  readonly satisfied: boolean;
+  readonly guidance?: string;
+}
+
+export interface KanbanIntegrationActionState {
+  readonly canCreatePullRequest: boolean;
+  readonly canManagePullRequest: boolean;
+  readonly canApproveFromReview: boolean;
+  readonly reason?: string;
+}
+
+export interface KanbanIntegrationConnection {
+  readonly provider: KanbanIntegrationProvider;
+  readonly label: string;
+  readonly status: KanbanIntegrationStatus;
+  readonly accountLabel?: string;
+  readonly connectedAt?: string;
+  readonly failureMessage?: string;
+  readonly missingScopes?: readonly string[];
+  readonly prerequisites: readonly KanbanIntegrationPrerequisite[];
+  readonly guidance: string;
+  readonly actions: KanbanIntegrationActionState;
+}
+
+export interface KanbanRepositoryIntegrationState {
+  readonly provider: KanbanIntegrationProvider;
+  readonly status: KanbanIntegrationStatus;
+  readonly linkState: KanbanPullRequestLinkState;
+  readonly failureMessage?: string;
+  readonly guidance: string;
+  readonly missingScopes?: readonly string[];
+  readonly prerequisites: readonly KanbanIntegrationPrerequisite[];
+  readonly actions: KanbanIntegrationActionState;
+}
+
 export interface KanbanRepositoryContext {
   readonly id: string;
   readonly name: string;
@@ -257,6 +307,7 @@ export interface KanbanPullRequest {
   readonly mergeStatus: KanbanMergeStatus;
   readonly reviewLinks: readonly KanbanPullRequestReviewLink[];
   readonly url?: string;
+  readonly linkState?: KanbanPullRequestLinkState;
   readonly createdAt: string;
   readonly updatedAt: string;
 }
@@ -269,8 +320,20 @@ export interface KanbanIssueRepositoryLifecycle {
   readonly publishStatus: KanbanPublishStatus;
   readonly ciGates: readonly KanbanCiGate[];
   readonly pullRequest?: KanbanPullRequest;
+  readonly integration?: KanbanRepositoryIntegrationState;
   readonly publishUrl?: string;
   readonly lastPublishedAt?: string;
+}
+
+export interface KanbanLinkedPullRequestSummary {
+  readonly provider: KanbanIntegrationProvider;
+  readonly status: KanbanPullRequestStatus;
+  readonly linkState: KanbanPullRequestLinkState;
+  readonly title: string;
+  readonly number?: number;
+  readonly url?: string;
+  readonly integrationStatus: KanbanIntegrationStatus;
+  readonly guidance?: string;
 }
 
 export interface KanbanReviewFeedbackSource {
@@ -344,6 +407,8 @@ export interface KanbanReviewArtifact {
   readonly queueState: KanbanReviewQueueState;
   readonly diff: readonly KanbanDiffFile[];
   readonly comments: readonly KanbanReviewComment[];
+  readonly integration?: KanbanRepositoryIntegrationState;
+  readonly linkedPullRequest?: KanbanLinkedPullRequestSummary;
   readonly updatedAt: string;
 }
 
@@ -443,6 +508,7 @@ export interface KanbanProject {
   readonly activity: readonly KanbanActivityEntry[];
   readonly statuses: readonly KanbanStatusDefinition[];
   readonly repositories: readonly KanbanRepositoryContext[];
+  readonly integrations: readonly KanbanIntegrationConnection[];
   readonly linkedRunProjectName?: string;
   readonly linkedRunSummary?: LinkedRunSummary;
   readonly metrics: KanbanProjectMetrics;
@@ -961,6 +1027,93 @@ function normalizeRepositoryContext(repository: KanbanRepositoryContext): Kanban
   };
 }
 
+function normalizeIntegrationPrerequisites(
+  prerequisites: readonly KanbanIntegrationPrerequisite[] | undefined,
+): KanbanIntegrationPrerequisite[] {
+  const seen = new Set<string>();
+  const normalized: KanbanIntegrationPrerequisite[] = [];
+  for (const prerequisite of prerequisites ?? []) {
+    const key = prerequisite.key.trim();
+    if (!key || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    normalized.push({
+      ...prerequisite,
+      key,
+      label: prerequisite.label.trim(),
+      guidance: prerequisite.guidance?.trim() || undefined,
+    });
+  }
+  return normalized;
+}
+
+function normalizeIntegrationActionState(
+  actions: KanbanIntegrationActionState | undefined,
+  status: KanbanIntegrationStatus,
+): KanbanIntegrationActionState {
+  const blockedByStatus =
+    status === 'disconnected' ||
+    status === 'expired-auth' ||
+    status === 'missing-scopes' ||
+    status === 'failing';
+  const canCreatePullRequest = actions?.canCreatePullRequest ?? !blockedByStatus;
+  const canManagePullRequest = actions?.canManagePullRequest ?? !blockedByStatus;
+  const canApproveFromReview = actions?.canApproveFromReview ?? !blockedByStatus;
+
+  return {
+    canCreatePullRequest,
+    canManagePullRequest,
+    canApproveFromReview,
+    reason: actions?.reason?.trim() || undefined,
+  };
+}
+
+function normalizeIntegrationConnection(
+  connection: KanbanIntegrationConnection,
+): KanbanIntegrationConnection {
+  return {
+    ...connection,
+    label: connection.label.trim(),
+    accountLabel: connection.accountLabel?.trim() || undefined,
+    connectedAt: connection.connectedAt,
+    failureMessage: connection.failureMessage?.trim() || undefined,
+    missingScopes: uniqueStrings((connection.missingScopes ?? []).map((scope) => scope.trim()).filter(Boolean)),
+    prerequisites: normalizeIntegrationPrerequisites(connection.prerequisites),
+    guidance: connection.guidance.trim(),
+    actions: normalizeIntegrationActionState(connection.actions, connection.status),
+  };
+}
+
+function normalizeRepositoryIntegrationState(
+  integration: KanbanRepositoryIntegrationState | undefined,
+  provider: KanbanRepositoryProvider | undefined,
+  pullRequest: KanbanPullRequest | undefined,
+): KanbanRepositoryIntegrationState | undefined {
+  if (!integration || (integration.provider !== 'github' && integration.provider !== 'azure-repos')) {
+    return undefined;
+  }
+
+  const normalizedLinkState =
+    integration.linkState ??
+    (pullRequest ? pullRequest.linkState ?? 'linked' : 'unlinked');
+
+  return {
+    ...integration,
+    provider: integration.provider,
+    status: integration.status,
+    linkState: normalizedLinkState,
+    failureMessage: integration.failureMessage?.trim() || undefined,
+    guidance: integration.guidance.trim(),
+    missingScopes: uniqueStrings((integration.missingScopes ?? []).map((scope) => scope.trim()).filter(Boolean)),
+    prerequisites: normalizeIntegrationPrerequisites(integration.prerequisites),
+    actions: normalizeIntegrationActionState(
+      integration.actions,
+      integration.status,
+    ),
+  };
+}
+
 function resolveReviewStatus(
   pullRequest?: Pick<KanbanPullRequest, 'status' | 'reviewLinks'>,
 ): KanbanReviewStatus {
@@ -1063,6 +1216,7 @@ function normalizeIssueRepositoryLifecycle(
           })),
         ),
         url: lifecycle.pullRequest.url?.trim() || undefined,
+        linkState: lifecycle.pullRequest.linkState ?? 'linked',
       }
     : undefined;
 
@@ -1082,6 +1236,11 @@ function normalizeIssueRepositoryLifecycle(
     ...lifecycle,
     branchName,
     ciGates,
+    integration: normalizeRepositoryIntegrationState(
+      lifecycle.integration,
+      repository?.provider,
+      pullRequest,
+    ),
     pullRequest: pullRequest
       ? {
           ...pullRequest,
@@ -1094,7 +1253,7 @@ function normalizeIssueRepositoryLifecycle(
                 : reviewStatus === 'changes-requested'
                   ? 'changes-requested'
                   : pullRequest.status,
-        }
+      }
       : undefined,
     reviewStatus,
     mergeStatus,
@@ -1468,12 +1627,13 @@ export function computeKanbanProjectMetrics(issues: readonly KanbanIssue[]): Kan
 
 export function buildKanbanBacklogSnapshot(input: {
   readonly generatedAt?: string;
-  readonly projects: readonly (Omit<KanbanProject, 'metrics' | 'team' | 'settings' | 'permissions' | 'activity'> & {
+  readonly projects: readonly (Omit<KanbanProject, 'metrics' | 'team' | 'settings' | 'permissions' | 'activity' | 'integrations'> & {
     readonly team?: Partial<KanbanTeam>;
     readonly settings?: Partial<KanbanProjectSettings>;
     readonly permissions?: readonly KanbanPermissionGrant[];
     readonly activity?: readonly KanbanActivityEntry[];
     readonly repositories?: readonly KanbanRepositoryContext[];
+    readonly integrations?: readonly KanbanIntegrationConnection[];
   })[];
   readonly issues: readonly (Omit<KanbanIssue, 'dispatch' | 'collaborators' | 'activity'> & {
     readonly collaborators?: readonly KanbanCollaborator[];
@@ -1516,6 +1676,13 @@ export function buildKanbanBacklogSnapshot(input: {
     activity: uniqueById((project.activity ?? []).map(normalizeActivityEntry)),
     statuses: project.statuses.length > 0 ? project.statuses : DEFAULT_PROJECT_STATUSES,
     repositories: uniqueById((project.repositories ?? []).map(normalizeRepositoryContext)),
+    integrations: Array.from(
+      new Map(
+        (project.integrations ?? [])
+          .map(normalizeIntegrationConnection)
+          .map((connection) => [connection.provider, connection] as const),
+      ).values(),
+    ),
   }));
   const repositoryMapByProject = new Map(
     projects.map((project) => [project.id, new Map(project.repositories.map((repository) => [repository.id, repository]))]),
@@ -1768,6 +1935,7 @@ export function linkKanbanIssueRepository<
   input: {
     readonly repositoryId: string;
     readonly branchName: string;
+    readonly integration?: KanbanRepositoryIntegrationState;
   },
 ): TIssue {
   return {
@@ -1780,6 +1948,7 @@ export function linkKanbanIssueRepository<
       publishStatus: issue.repositoryLifecycle?.publishStatus ?? 'not-ready',
       ciGates: issue.repositoryLifecycle?.ciGates ?? [],
       pullRequest: issue.repositoryLifecycle?.pullRequest,
+      integration: input.integration ?? issue.repositoryLifecycle?.integration,
       publishUrl: issue.repositoryLifecycle?.publishUrl,
       lastPublishedAt: issue.repositoryLifecycle?.lastPublishedAt,
     },
@@ -1798,6 +1967,7 @@ export function createKanbanIssuePullRequest<
     readonly branchName: string;
     readonly reviewLinks?: readonly Omit<KanbanPullRequestReviewLink, 'id'>[];
     readonly url?: string;
+    readonly linkState?: KanbanPullRequestLinkState;
   },
 ): TIssue {
   if (!issue.repositoryLifecycle) {
@@ -1843,6 +2013,7 @@ export function createKanbanIssuePullRequest<
         mergeStatus: 'blocked',
         reviewLinks,
         url: input.url?.trim() || undefined,
+        linkState: input.linkState ?? 'linked',
         createdAt: input.now,
         updatedAt: input.now,
       },

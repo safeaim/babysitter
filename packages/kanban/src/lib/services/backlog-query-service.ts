@@ -16,10 +16,15 @@ import {
   type KanbanBacklogSnapshot,
   type KanbanDispatchContextLabelDefinition,
   type KanbanIssue,
+  type KanbanIntegrationConnection,
+  type KanbanIntegrationProvider,
+  type KanbanIntegrationStatus,
   type KanbanPermissionGrant,
+  type KanbanPullRequestLinkState,
   type KanbanProject,
   type KanbanProjectSettings,
   type KanbanRepositoryContext,
+  type KanbanRepositoryIntegrationState,
   type KanbanRepositoryProvider,
   type KanbanRepositorySettings,
   type KanbanReviewSnapshot,
@@ -198,11 +203,149 @@ const defaultProjectSettings: KanbanProjectSettings = {
   workspaceProvisioning: 'owners-maintainers',
 };
 
+function integrationProviderLabel(provider: KanbanIntegrationProvider): string {
+  return provider === 'azure-repos' ? 'Azure Repos' : 'GitHub';
+}
+
+function buildIntegrationConnection(
+  provider: KanbanIntegrationProvider,
+  input: {
+    readonly status: KanbanIntegrationStatus;
+    readonly accountLabel?: string;
+    readonly connectedAt?: string;
+    readonly guidance: string;
+    readonly failureMessage?: string;
+    readonly missingScopes?: readonly string[];
+    readonly prerequisites: readonly {
+      readonly key: string;
+      readonly label: string;
+      readonly satisfied: boolean;
+      readonly guidance?: string;
+    }[];
+    readonly actions?: Partial<KanbanIntegrationConnection['actions']>;
+  },
+): KanbanIntegrationConnection {
+  const blocked =
+    input.status === 'disconnected' ||
+    input.status === 'expired-auth' ||
+    input.status === 'missing-scopes' ||
+    input.status === 'failing';
+
+  return {
+    provider,
+    label: integrationProviderLabel(provider),
+    status: input.status,
+    accountLabel: input.accountLabel,
+    connectedAt: input.connectedAt,
+    failureMessage: input.failureMessage,
+    missingScopes: input.missingScopes,
+    prerequisites: input.prerequisites,
+    guidance: input.guidance,
+    actions: {
+      canCreatePullRequest: input.actions?.canCreatePullRequest ?? !blocked,
+      canManagePullRequest: input.actions?.canManagePullRequest ?? !blocked,
+      canApproveFromReview: input.actions?.canApproveFromReview ?? !blocked,
+      reason: input.actions?.reason,
+    },
+  };
+}
+
+function buildRepositoryIntegrationState(
+  provider: KanbanIntegrationProvider,
+  input: {
+    readonly status: KanbanIntegrationStatus;
+    readonly linkState: KanbanPullRequestLinkState;
+    readonly guidance: string;
+    readonly failureMessage?: string;
+    readonly missingScopes?: readonly string[];
+    readonly prerequisites: KanbanIntegrationConnection['prerequisites'];
+    readonly actions?: Partial<KanbanRepositoryIntegrationState['actions']>;
+  },
+): KanbanRepositoryIntegrationState {
+  const blocked =
+    input.status === 'disconnected' ||
+    input.status === 'expired-auth' ||
+    input.status === 'missing-scopes' ||
+    input.status === 'failing';
+
+  return {
+    provider,
+    status: input.status,
+    linkState: input.linkState,
+    failureMessage: input.failureMessage,
+    guidance: input.guidance,
+    missingScopes: input.missingScopes,
+    prerequisites: input.prerequisites,
+    actions: {
+      canCreatePullRequest: input.actions?.canCreatePullRequest ?? !blocked,
+      canManagePullRequest: input.actions?.canManagePullRequest ?? !blocked,
+      canApproveFromReview: input.actions?.canApproveFromReview ?? !blocked,
+      reason: input.actions?.reason,
+    },
+  };
+}
+
 const systemActor = {
   kind: 'system' as const,
   id: 'kanban-seed',
   displayName: 'Kanban seed data',
 };
+
+const defaultGithubIntegration = buildIntegrationConnection('github', {
+  status: 'connected',
+  accountLabel: 'a5c-ai',
+  connectedAt: '2026-04-24T00:00:00.000Z',
+  guidance: 'GitHub is ready for repository linking, linked PR state, and in-review approval flows.',
+  prerequisites: [
+    {
+      key: 'github-auth',
+      label: 'Signed in with a repository-capable GitHub account',
+      satisfied: true,
+    },
+    {
+      key: 'github-scopes',
+      label: 'Granted repo, pull request, and checks scopes',
+      satisfied: true,
+    },
+    {
+      key: 'github-default-org',
+      label: 'Selected a default GitHub org/repository context',
+      satisfied: true,
+    },
+  ],
+});
+
+const defaultAzureReposIntegration = buildIntegrationConnection('azure-repos', {
+  status: 'partial-setup',
+  accountLabel: 'a5c-ai / Boards Platform',
+  guidance:
+    'Azure Repos is visible in the kanban setup surface, but repository/project binding still needs to be completed before linked PR actions can be enabled.',
+  prerequisites: [
+    {
+      key: 'azure-auth',
+      label: 'Connected an Azure DevOps organization',
+      satisfied: true,
+    },
+    {
+      key: 'azure-project',
+      label: 'Selected a default Azure DevOps project',
+      satisfied: false,
+      guidance: 'Choose the Azure DevOps project that owns the repo before linking work items.',
+    },
+    {
+      key: 'azure-scopes',
+      label: 'Granted code read/write and pull request scopes',
+      satisfied: false,
+      guidance: 'Grant Code (Read & Write) plus pull request scopes for linked PR creation.',
+    },
+  ],
+  actions: {
+    canCreatePullRequest: false,
+    canManagePullRequest: false,
+    canApproveFromReview: false,
+    reason: 'Azure Repos setup is incomplete.',
+  },
+});
 
 function buildRepositoryId(
   provider: KanbanRepositoryProvider,
@@ -221,6 +364,8 @@ function buildRepositoryUrl(
   switch (provider) {
     case 'github':
       return `https://github.com/${fullName}`;
+    case 'azure-repos':
+      return `https://dev.azure.com/${owner}/_git/${name}`;
     case 'gitlab':
       return `https://gitlab.com/${fullName}`;
     case 'bitbucket':
@@ -485,6 +630,7 @@ const defaultProjects: readonly BacklogSeedProject[] = [
       ),
     ],
     statuses: [],
+    integrations: [defaultGithubIntegration, defaultAzureReposIntegration],
     repositories: [
       {
         id: buildRepositoryId('github', 'a5c-ai', 'babysitter'),
@@ -944,6 +1090,38 @@ const defaultIssues: readonly BacklogSeedIssue[] = [
       reviewStatus: 'pending',
       mergeStatus: 'blocked',
       publishStatus: 'not-ready',
+      integration: buildRepositoryIntegrationState('github', {
+        status: 'missing-scopes',
+        linkState: 'partially-linked',
+        guidance:
+          'The PR is linked, but GitHub write scopes are missing for sync and approval actions. Reconnect GitHub with pull request and checks scopes.',
+        missingScopes: ['pull_requests:write', 'checks:read'],
+        prerequisites: [
+          {
+            key: 'github-auth',
+            label: 'GitHub connection is present',
+            satisfied: true,
+          },
+          {
+            key: 'github-pr-scope',
+            label: 'Pull request write scope is granted',
+            satisfied: false,
+            guidance: 'Reconnect GitHub and grant pull request write scope.',
+          },
+          {
+            key: 'github-checks-scope',
+            label: 'Checks scope is granted for CI linkage',
+            satisfied: false,
+            guidance: 'Grant checks scope so linked status checks can stay current.',
+          },
+        ],
+        actions: {
+          canCreatePullRequest: false,
+          canManagePullRequest: false,
+          canApproveFromReview: false,
+          reason: 'GitHub scopes are incomplete for linked PR actions.',
+        },
+      }),
       ciGates: [
         {
           id: 'ci-lint',
@@ -970,6 +1148,7 @@ const defaultIssues: readonly BacklogSeedIssue[] = [
         branchName: 'feat/kanban-gap-006-pr-lifecycle',
         baseBranch: 'main',
         mergeStatus: 'blocked',
+        linkState: 'partially-linked',
         reviewLinks: [
           {
             id: 'review-design',
@@ -1448,6 +1627,10 @@ export class BacklogQueryService {
       throw new AppError('owner, name, and branchName are required.', 'BAD_REQUEST', 400);
     }
 
+    const integrationConnection =
+      provider === 'github' || provider === 'azure-repos'
+        ? project.integrations.find((candidate) => candidate.provider === provider)
+        : undefined;
     const repositoryId = buildRepositoryId(provider, owner, name);
     const existingRepository = project.repositories.find((candidate) => candidate.id === repositoryId);
     const repository: KanbanRepositoryContext =
@@ -1478,6 +1661,20 @@ export class BacklogQueryService {
             ...linkKanbanIssueRepository(candidate, {
               repositoryId,
               branchName: input.branchName,
+              integration:
+                provider === 'github' || provider === 'azure-repos'
+                  ? buildRepositoryIntegrationState(provider, {
+                      status: integrationConnection?.status ?? 'disconnected',
+                      linkState: 'unlinked',
+                      guidance:
+                        integrationConnection?.guidance ??
+                        `${integrationProviderLabel(provider)} must be connected before linked PR actions are available.`,
+                      failureMessage: integrationConnection?.failureMessage,
+                      missingScopes: integrationConnection?.missingScopes,
+                      prerequisites: integrationConnection?.prerequisites ?? [],
+                      actions: integrationConnection?.actions,
+                    })
+                  : undefined,
             }),
             updatedAt: this.deps.now(),
           }
@@ -1841,32 +2038,62 @@ export class BacklogQueryService {
     if (!repository) {
       throw new AppError(`Repository ${repositoryId} not found on project ${project.id}.`, 'NOT_FOUND', 404);
     }
+    const integration = issue.repositoryLifecycle.integration;
+    if (integration && !integration.actions.canCreatePullRequest) {
+      throw new AppError(
+        integration.actions.reason ?? integration.guidance,
+        'BAD_REQUEST',
+        400,
+      );
+    }
     if (!input.title.trim()) {
       throw new AppError('title is required.', 'BAD_REQUEST', 400);
     }
 
     const number = nextPullRequestNumber(payload.issues);
     const reviewers = parseReviewerList(input.reviewers ?? '');
-    const nextIssues = payload.issues.map((candidate) =>
-      candidate.id === issue.id
-        ? {
-            ...createKanbanIssuePullRequest(candidate, {
-              title: input.title,
-              number,
-              now: this.deps.now(),
-              branchName: candidate.repositoryLifecycle?.branchName ?? `feature/${candidate.key.toLowerCase()}`,
-              baseBranch: repository.settings.baseBranch,
-              url: `${repository.url}/pull/${number}`,
-              reviewLinks: reviewers.map((reviewer) => ({
-                label: reviewer,
-                reviewer,
-                status: 'pending' as const,
-              })),
-            }),
-            updatedAt: this.deps.now(),
-          }
-        : candidate,
-    );
+    const nextIssues = payload.issues.map((candidate) => {
+      if (candidate.id !== issue.id) {
+        return candidate;
+      }
+
+      const nextIssue = createKanbanIssuePullRequest(candidate, {
+        title: input.title,
+        number,
+        now: this.deps.now(),
+        branchName: candidate.repositoryLifecycle?.branchName ?? `feature/${candidate.key.toLowerCase()}`,
+        baseBranch: repository.settings.baseBranch,
+        url: `${repository.url}/pull/${number}`,
+        linkState:
+          candidate.repositoryLifecycle?.integration?.status === 'connected'
+            ? 'linked'
+            : 'partially-linked',
+        reviewLinks: reviewers.map((reviewer) => ({
+          label: reviewer,
+          reviewer,
+          status: 'pending' as const,
+        })),
+      });
+
+      return {
+        ...nextIssue,
+        repositoryLifecycle: nextIssue.repositoryLifecycle
+          ? {
+              ...nextIssue.repositoryLifecycle,
+              integration: nextIssue.repositoryLifecycle.integration
+                ? {
+                    ...nextIssue.repositoryLifecycle.integration,
+                    linkState:
+                      nextIssue.repositoryLifecycle.integration.status === 'connected'
+                        ? 'linked'
+                        : 'partially-linked',
+                  }
+                : nextIssue.repositoryLifecycle.integration,
+            }
+          : nextIssue.repositoryLifecycle,
+        updatedAt: this.deps.now(),
+      };
+    });
 
     return this.persistPayload({
       projects: payload.projects,

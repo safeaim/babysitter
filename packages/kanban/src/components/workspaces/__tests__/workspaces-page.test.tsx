@@ -3,6 +3,8 @@ import { render, screen, setupUser, waitFor, within } from "@/test/test-utils";
 
 import { getWorkspaceOwnershipLabel, loadInventory, runWorkspaceAction, WorkspacesPageContent } from "../workspaces-page";
 
+let workspaceReviewArtifacts: Array<Record<string, unknown>> = [];
+
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href?: string; children?: unknown; [key: string]: unknown }) => (
     <a href={typeof href === "string" ? href : "#"} {...props}>
@@ -15,7 +17,7 @@ vi.mock("@/hooks/use-reviews", () => ({
   useReviews: () => ({
     loading: false,
     error: undefined,
-    artifacts: [],
+    artifacts: workspaceReviewArtifacts,
     queue: [],
     summary: { pendingCount: 0, changesRequestedCount: 0 },
     pendingArtifactId: null,
@@ -27,6 +29,7 @@ describe("workspaces-page helpers", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("fetch", vi.fn());
+    workspaceReviewArtifacts = [];
   });
 
   it("describes session-backed ownership when the gateway is connected", () => {
@@ -280,6 +283,107 @@ describe("workspaces-page helpers", () => {
       expect(screen.getByText("Ready for merge")).toBeInTheDocument();
     });
     expect(screen.getByText(/Continue the workspace through merge readiness/)).toBeInTheDocument();
+  });
+
+  it("renders linked PR guidance for workspace review artifacts with degraded integration", async () => {
+    workspaceReviewArtifacts = [
+      {
+        id: "workspace-review-1",
+        targetType: "workspace",
+        targetId: "/repo/worktrees/task",
+        targetLabel: "task",
+        title: "Workspace review",
+        decision: "pending",
+        queueState: "queued",
+        diff: [],
+        comments: [],
+        updatedAt: "2026-04-24T12:00:00.000Z",
+        integration: {
+          provider: "github",
+          status: "expired-auth",
+          linkState: "partially-linked",
+          guidance: "Reconnect GitHub before linked review actions can continue.",
+          prerequisites: [],
+          actions: {
+            canCreatePullRequest: false,
+            canManagePullRequest: false,
+            canApproveFromReview: false,
+            reason: "GitHub auth expired.",
+          },
+        },
+        linkedPullRequest: {
+          provider: "github",
+          status: "in-review",
+          linkState: "partially-linked",
+          title: "VK-PARITY-43 linked workspace review",
+          number: 612,
+          integrationStatus: "expired-auth",
+          guidance: "The PR is linked but cannot be synchronized until GitHub auth is refreshed.",
+        },
+      },
+    ];
+
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({
+        summary: { total: 1, active: 1, idle: 0, archived: 0, missing: 0 },
+        workspaces: [
+          {
+            path: "/repo/worktrees/task",
+            name: "task",
+            status: "active",
+            missing: false,
+            archivedAt: null,
+            cleanedAt: null,
+            lastActivityAt: "2026-04-24T12:00:00.000Z",
+            git: {
+              root: "/repo/main",
+              commonDir: "/repo/main/.git",
+              trackingBranch: "origin/vk/task",
+              branch: "vk/task",
+              head: "abc123",
+              ahead: 0,
+              behind: 0,
+              dirty: false,
+              uncommittedCount: 0,
+              isWorktree: true,
+              isPrimary: false,
+            },
+            notes: {
+              value: "",
+              updatedAt: null,
+            },
+            links: {
+              editorHref: "vscode://file/repo/worktrees/task",
+            },
+            sessions: { total: 0, active: 0, items: [] },
+            runs: { total: 0, active: 0, items: [] },
+            actions: {
+              canArchive: true,
+              canCleanup: false,
+              canRecover: false,
+              canRebaseStart: false,
+              canRebaseAutoResolve: false,
+              canRebaseOpenInEditor: false,
+              canRebaseMarkResolved: false,
+              canRebaseAbort: false,
+            },
+          },
+        ],
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    render(<WorkspacesPageContent isAuthenticated sessions={[]} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Linked review state")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/GitHub PR #612 is partially linked/)).toBeInTheDocument();
+    expect(screen.getAllByText("expired auth").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Reconnect GitHub before linked review actions can continue/).length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders missing metadata, disconnected runtime, and empty notes states", async () => {

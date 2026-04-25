@@ -90,6 +90,7 @@ export async function POST(request: Request) {
           branchName: body.branchName,
           defaultBranch: typeof body.defaultBranch === 'string' ? body.defaultBranch : undefined,
           provider:
+            body.provider === 'azure-repos' ||
             body.provider === 'gitlab' ||
             body.provider === 'bitbucket' ||
             body.provider === 'local'

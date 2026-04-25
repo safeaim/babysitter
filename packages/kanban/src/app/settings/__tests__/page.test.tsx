@@ -46,6 +46,46 @@ vi.mock("@/hooks/use-backlog", () => ({
           settings: {
             workspaceProvisioning: "owners-maintainers",
           },
+          integrations: [
+            {
+              provider: "github",
+              label: "GitHub",
+              status: "connected",
+              accountLabel: "a5c-ai",
+              guidance: "GitHub is ready for linked PR flows.",
+              prerequisites: [
+                { key: "github-auth", label: "GitHub auth", satisfied: true },
+              ],
+              actions: {
+                canCreatePullRequest: true,
+                canManagePullRequest: true,
+                canApproveFromReview: true,
+              },
+            },
+            {
+              provider: "azure-repos",
+              label: "Azure Repos",
+              status: "partial-setup",
+              accountLabel: "Boards Platform",
+              guidance: "Complete Azure project binding before linked PR actions can be enabled.",
+              missingScopes: ["code:write"],
+              prerequisites: [
+                { key: "azure-auth", label: "Azure auth", satisfied: true },
+                {
+                  key: "azure-project",
+                  label: "Default project selected",
+                  satisfied: false,
+                  guidance: "Pick the project that owns the target repo.",
+                },
+              ],
+              actions: {
+                canCreatePullRequest: false,
+                canManagePullRequest: false,
+                canApproveFromReview: false,
+                reason: "Azure Repos setup is incomplete.",
+              },
+            },
+          ],
           permissions: [
             {
               action: "manage-project-settings",
@@ -141,5 +181,18 @@ describe("SettingsPage", () => {
       ),
     ).toBeInTheDocument();
     expect(within(dispatchSection).getByText("KANBAN-GAP-004")).toBeInTheDocument();
+  });
+
+  it("renders integration setup guidance and blocked action states", () => {
+    render(<SettingsPage />);
+
+    const integrationSection = screen.getByTestId("integration-settings");
+    expect(within(integrationSection).getByText("Repository integrations")).toBeInTheDocument();
+    expect(within(integrationSection).getByText("GitHub")).toBeInTheDocument();
+    expect(within(integrationSection).getByText("Azure Repos")).toBeInTheDocument();
+    expect(within(integrationSection).getByText("partial setup")).toBeInTheDocument();
+    expect(within(integrationSection).getByText("Missing scopes: code:write")).toBeInTheDocument();
+    expect(within(integrationSection).getByText(/Blocked actions: create linked PRs/)).toBeInTheDocument();
+    expect(within(integrationSection).getByText("Pick the project that owns the target repo.")).toBeInTheDocument();
   });
 });

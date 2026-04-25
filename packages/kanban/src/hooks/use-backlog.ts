@@ -271,6 +271,7 @@ export function useBacklog(interval = 15000) {
     name: string;
     branchName: string;
     defaultBranch?: string;
+    provider?: "github" | "azure-repos" | "gitlab" | "bitbucket" | "local";
   }): Promise<void> {
     await mutateBacklog<BacklogOverviewResponse>({ action: "link-repository", ...input }, input.issueId);
   }

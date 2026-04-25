@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import type { KanbanReviewArtifact, KanbanReviewComment, KanbanReviewSummary } from "@a5c-ai/agent-mux-core";
+import type {
+  KanbanLinkedPullRequestSummary,
+  KanbanRepositoryIntegrationState,
+  KanbanReviewArtifact,
+  KanbanReviewComment,
+  KanbanReviewSummary,
+} from "@a5c-ai/agent-mux-core";
 import { AlertTriangle, Archive, FolderGit2, RefreshCw, RotateCcw, Trash2, Wrench } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
@@ -114,6 +120,31 @@ function buildReviewByPath(
   );
 }
 
+function buildArtifactByPath(
+  artifacts: readonly KanbanReviewArtifact[],
+): ReadonlyMap<string, KanbanReviewArtifact> {
+  return new Map(artifacts.map((artifact) => [artifact.targetId, artifact] as const));
+}
+
+function integrationTone(status: KanbanRepositoryIntegrationState["status"]): string {
+  switch (status) {
+    case "connected":
+      return "border-success/20 bg-success/10 text-success";
+    case "partial-setup":
+    case "missing-scopes":
+      return "border-warning/20 bg-warning/10 text-warning";
+    case "expired-auth":
+    case "failing":
+      return "border-error/20 bg-error/10 text-error";
+    default:
+      return "border-border text-foreground-muted";
+  }
+}
+
+function providerLabel(provider: KanbanLinkedPullRequestSummary["provider"]): string {
+  return provider === "azure-repos" ? "Azure Repos" : "GitHub";
+}
+
 export function WorkspacesPageContent(props: {
   isAuthenticated: boolean;
   sessions: WorkspaceSessionSnapshot[];
@@ -187,6 +218,10 @@ export function WorkspacesPageContent(props: {
   };
   const liveReviewByPath = useMemo(
     () => buildReviewByPath(workspaceReviews.artifacts),
+    [workspaceReviews.artifacts],
+  );
+  const liveArtifactByPath = useMemo(
+    () => buildArtifactByPath(workspaceReviews.artifacts),
     [workspaceReviews.artifacts],
   );
 
@@ -375,6 +410,7 @@ export function WorkspacesPageContent(props: {
           empty="No active workspaces are currently attached to sessions or waiting runs."
           workspaces={groups.active}
           reviewByPath={liveReviewByPath}
+          artifactByPath={liveArtifactByPath}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -390,6 +426,7 @@ export function WorkspacesPageContent(props: {
           empty="No idle workspaces are currently tracked."
           workspaces={groups.idle}
           reviewByPath={liveReviewByPath}
+          artifactByPath={liveArtifactByPath}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -405,6 +442,7 @@ export function WorkspacesPageContent(props: {
           empty="No archived workspaces yet."
           workspaces={groups.archived}
           reviewByPath={liveReviewByPath}
+          artifactByPath={liveArtifactByPath}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -420,6 +458,7 @@ export function WorkspacesPageContent(props: {
           empty="No cleaned or missing workspaces need recovery."
           workspaces={groups.missing}
           reviewByPath={liveReviewByPath}
+          artifactByPath={liveArtifactByPath}
           pendingAction={pendingAction}
           onAction={handleAction}
           onOpenInEditor={(workspace, href) =>
@@ -469,6 +508,7 @@ function WorkspaceColumn(props: {
   icon: typeof FolderGit2;
   empty: string;
   workspaces: WorkspaceInventoryItem[];
+  artifactByPath: ReadonlyMap<string, KanbanReviewArtifact>;
   reviewByPath: ReadonlyMap<
     string,
     NonNullable<WorkspaceInventoryItem["review"]>
@@ -515,6 +555,9 @@ function WorkspaceColumn(props: {
             workspace.sessions.items.find((session) => session.status === "active" && session.runtime) ??
             workspace.sessions.items.find((session) => session.runtime);
           const review = props.reviewByPath.get(workspace.path) ?? workspace.review;
+          const reviewArtifact = props.artifactByPath.get(workspace.path);
+          const linkedPullRequest = reviewArtifact?.linkedPullRequest;
+          const integration = reviewArtifact?.integration;
 
           return (
             <article key={workspace.path} className="rounded-2xl border border-border bg-background/70 p-4">
@@ -549,6 +592,11 @@ function WorkspaceColumn(props: {
                     {review ? (
                       <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs text-primary">
                         {review.decision} · {review.openCommentCount} open
+                      </span>
+                    ) : null}
+                    {linkedPullRequest ? (
+                      <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground-muted">
+                        {providerLabel(linkedPullRequest.provider)} PR {linkedPullRequest.linkState === "partially-linked" ? "partially linked" : linkedPullRequest.linkState}
                       </span>
                     ) : null}
                   </div>
@@ -610,6 +658,36 @@ function WorkspaceColumn(props: {
                 {workspace.archivedAt ? ` · archived ${formatTimestamp(workspace.archivedAt)}` : ""}
                 {workspace.cleanedAt ? ` · cleaned ${formatTimestamp(workspace.cleanedAt)}` : ""}
               </p>
+
+              {integration || linkedPullRequest ? (
+                <section className="mt-4 rounded-2xl border border-border bg-card/80 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                        Linked review state
+                      </p>
+                      <h3 className="mt-1 text-sm font-semibold text-foreground">
+                        {linkedPullRequest
+                          ? `${providerLabel(linkedPullRequest.provider)} PR ${
+                              linkedPullRequest.number ? `#${linkedPullRequest.number}` : ""
+                            } ${linkedPullRequest.linkState === "partially-linked" ? "is partially linked" : "is linked"}`
+                          : "Integration prerequisites are affecting linked review state"}
+                      </h3>
+                    </div>
+                    {integration ? (
+                      <span className={cn("rounded-full border px-2 py-0.5 text-xs", integrationTone(integration.status))}>
+                        {integration.status.replace(/-/g, " ")}
+                      </span>
+                    ) : null}
+                  </div>
+                  {linkedPullRequest?.title ? (
+                    <p className="mt-2 text-sm text-foreground">{linkedPullRequest.title}</p>
+                  ) : null}
+                  <p className="mt-2 text-sm leading-6 text-foreground-muted">
+                    {integration?.guidance ?? linkedPullRequest?.guidance ?? "No additional linked review guidance."}
+                  </p>
+                </section>
+              ) : null}
 
               <div className="mt-5">
                 <WorkspaceDetailsSidebar

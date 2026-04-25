@@ -135,6 +135,28 @@ export interface CompilationResult {
   verificationChecklist: string[];
 }
 
+export interface DiffFileDifference {
+  path: string;
+  line: number;
+  compiledLine: string | null;
+  existingLine: string | null;
+}
+
+export interface DiffResult {
+  target: string;
+  sourceDir: string;
+  existingDir: string;
+  compilationStatus: CompilationResult['status'];
+  diagnostics: Diagnostic[];
+  status: 'match' | 'different' | 'error';
+  identical: boolean;
+  differenceCount: number;
+  onlyInCompiled: string[];
+  onlyInExisting: string[];
+  differingFiles: DiffFileDifference[];
+  ignoredExistingFiles: string[];
+}
+
 export interface ValidateResult {
   valid: boolean;
   manifest: A5cPluginManifest | null;

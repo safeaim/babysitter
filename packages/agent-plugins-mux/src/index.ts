@@ -9,4 +9,5 @@ export * from './transform.js';
 export * from './emit.js';
 export * from './verify.js';
 export * from './compiler.js';
+export * from './diff.js';
 export * from './targets/index.js';

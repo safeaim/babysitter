@@ -3,6 +3,7 @@
 
 import * as process from 'process';
 import { compile, compileAll } from './compiler.js';
+import { diffTarget, formatDiffResult } from './diff.js';
 import { validate } from './validate.js';
 import { getAllTargets } from './targets/index.js';
 import type { Diagnostic } from './types.js';
@@ -211,9 +212,35 @@ function runListTargets(parsed: Record<string, string | boolean>) {
   process.exit(0);
 }
 
-function runDiff(_parsed: Record<string, string | boolean>) {
-  console.error('Error: diff command not yet implemented');
-  process.exit(1);
+function runDiff(parsed: Record<string, string | boolean>) {
+  const source = (parsed.source as string) || process.cwd();
+  const target = parsed.target as string;
+  const existing = parsed.existing as string;
+  const jsonOutput = parsed.json as boolean;
+  const verbose = parsed.verbose as boolean;
+
+  if (!target || !existing) {
+    console.error('Error: --target and --existing are required');
+    process.exit(1);
+  }
+
+  if (target === 'all') {
+    console.error('Error: diff currently supports a single target; pass a specific --target name');
+    process.exit(1);
+  }
+
+  const result = diffTarget({ source, target, existing });
+
+  if (jsonOutput) {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    console.log(formatDiffResult(result));
+    if (result.diagnostics.length > 0) {
+      printDiagnostics(result.diagnostics, verbose);
+    }
+  }
+
+  process.exit(result.status === 'match' ? 0 : 1);
 }
 
 function runInit(_parsed: Record<string, string | boolean>) {

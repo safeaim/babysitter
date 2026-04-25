@@ -145,11 +145,9 @@ jobs:
     name: Provider-Gated E2E (Azure OpenAI)
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # This job depends on a live Azure OpenAI endpoint and an LLM completing a
-    # multi-step orchestration.  Failures are often transient (model timeouts,
-    # rate limits, non-deterministic output) so we allow failure to keep the
-    # overall workflow green.
-    continue-on-error: true
+    # This is the required provider-backed full-run signal for the internal
+    # babysitter harness orchestration path. Keep flakier provider suites in
+    # separate quarantined jobs rather than making this critical path advisory.
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     env:
       AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}

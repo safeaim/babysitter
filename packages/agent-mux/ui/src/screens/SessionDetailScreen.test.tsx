@@ -17,9 +17,10 @@ vi.mock('react-native', () => {
     Pressable: ({
       children,
       onPress,
+      accessibilityLabel,
       ...props
-    }: React.ButtonHTMLAttributes<HTMLButtonElement> & { onPress?: () => void }) => (
-      <button type="button" onClick={onPress} {...props}>
+    }: React.ButtonHTMLAttributes<HTMLButtonElement> & { onPress?: () => void; accessibilityLabel?: string }) => (
+      <button type="button" onClick={onPress} aria-label={accessibilityLabel} {...props}>
         {children}
       </button>
     ),
@@ -143,15 +144,15 @@ describe('SessionDetailScreen', () => {
     const user = userEvent.setup();
     render(<SessionDetailScreen sessionId="session-empty" />);
 
-    expect(screen.getByText('No realtime flow has been indexed yet.')).toBeTruthy();
+    expect(screen.getByText('No structured execution flow is available for this session yet.')).toBeTruthy();
 
     await user.click(screen.getByRole('button', { name: 'timeline' }));
-    expect(screen.getByText('No timeline events have been indexed yet.')).toBeTruthy();
+    expect(screen.getByText('No timeline events are available for this session yet.')).toBeTruthy();
 
     await user.click(screen.getByRole('button', { name: 'transcript' }));
-    expect(screen.getByText('No transcript events have been indexed yet.')).toBeTruthy();
+    expect(screen.getByText('No transcript turns are available for this session yet.')).toBeTruthy();
 
     await user.click(screen.getByRole('button', { name: 'files' }));
-    expect(screen.getByText('No file attention has been captured yet.')).toBeTruthy();
+    expect(screen.getByText('File attention will appear here once the session touches the workspace.')).toBeTruthy();
   });
 });

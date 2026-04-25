@@ -56,6 +56,8 @@ export { AgentPicker } from './components/AgentPicker.js';
 export { ModelPicker } from './components/ModelPicker.js';
 export { RunStatusBadge } from './components/RunStatusBadge.js';
 export { ConnectionBanner } from './components/ConnectionBanner.js';
+export { SessionFlowView } from './components/session-flow/SessionFlowView.js';
+export type { SessionFlowViewMode } from './components/session-flow/SessionFlowView.js';
 export { AgentsScreen } from './screens/AgentsScreen.js';
 export { SessionListScreen } from './screens/SessionListScreen.js';
 export { SessionDetailScreen } from './screens/SessionDetailScreen.js';

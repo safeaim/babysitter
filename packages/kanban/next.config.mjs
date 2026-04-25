@@ -1,6 +1,10 @@
 import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
+const packageDir = path.dirname(fileURLToPath(import.meta.url));
+const agentMuxUiSrcDir = path.resolve(packageDir, '../agent-mux/ui/src');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -19,6 +23,22 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react'],
+  },
+  webpack: (config) => {
+    config.resolve = config.resolve ?? {};
+    config.resolve.extensionAlias = {
+      ...(config.resolve.extensionAlias ?? {}),
+      '.js': ['.ts', '.tsx', '.js'],
+      '.mjs': ['.mts', '.mjs'],
+      '.cjs': ['.cts', '.cjs'],
+    };
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      '@a5c-ai/agent-mux-ui$': path.join(agentMuxUiSrcDir, 'index.ts'),
+      '@a5c-ai/agent-mux-ui/gateway$': path.join(agentMuxUiSrcDir, 'gateway.ts'),
+      '@a5c-ai/agent-mux-ui/session-flow$': path.join(agentMuxUiSrcDir, 'session-flow.ts'),
+    };
+    return config;
   },
 };
 

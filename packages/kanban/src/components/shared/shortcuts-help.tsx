@@ -9,7 +9,7 @@ import { useKeyboard } from "@/hooks/use-keyboard";
 interface ShortcutEntry {
   keys: string[];
   description: string;
-  context: "global" | "dashboard" | "run-detail";
+  context: "global" | "dashboard" | "run-detail" | "session-workspace";
 }
 
 const shortcuts: ShortcutEntry[] = [
@@ -29,18 +29,25 @@ const shortcuts: ShortcutEntry[] = [
   { keys: ["3"], description: "Logs tab", context: "run-detail" },
   { keys: ["4"], description: "Data tab", context: "run-detail" },
   { keys: ["5"], description: "Approval tab", context: "run-detail" },
+  { keys: ["Shift", "W"], description: "Toggle workspace sidebar", context: "session-workspace" },
+  { keys: ["Shift", "C"], description: "Toggle conversation panel", context: "session-workspace" },
+  { keys: ["Shift", "X"], description: "Toggle context panel", context: "session-workspace" },
+  { keys: ["Shift", "D"], description: "Toggle details sidebar", context: "session-workspace" },
+  { keys: ["Ctrl/Cmd", "K"], description: "Open workspace command bar", context: "session-workspace" },
 ];
 
 const sectionLabels: Record<string, string> = {
   "global": "Global",
   "dashboard": "Dashboard",
   "run-detail": "Run Detail",
+  "session-workspace": "Session Workspace",
 };
 
 export function ShortcutsHelp() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const isRunDetail = pathname?.startsWith("/runs/") ?? false;
+  const isSessionWorkspace = pathname?.startsWith("/sessions/") ?? false;
 
   useKeyboard([
     { key: "?", action: () => setOpen(true), description: "Show shortcuts help" },
@@ -59,6 +66,7 @@ export function ShortcutsHelp() {
     if (s.context === "global") return true;
     if (s.context === "dashboard" && !isRunDetail) return true;
     if (s.context === "run-detail" && isRunDetail) return true;
+    if (s.context === "session-workspace" && isSessionWorkspace) return true;
     return false;
   });
 

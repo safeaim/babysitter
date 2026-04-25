@@ -1,6 +1,7 @@
 import { test as base } from "@playwright/test";
 import { DashboardPage } from "../pages/dashboard.page";
 import { RunDetailPage } from "../pages/run-detail.page";
+import { SessionWorkspacePage } from "../pages/session-workspace.page";
 
 /**
  * Extended Playwright test fixtures that provide pre-constructed
@@ -17,6 +18,7 @@ import { RunDetailPage } from "../pages/run-detail.page";
 type KanbanFixtures = {
   dashboardPage: DashboardPage;
   runDetailPage: RunDetailPage;
+  sessionWorkspacePage: SessionWorkspacePage;
 };
 
 export const test = base.extend<KanbanFixtures>({
@@ -27,6 +29,10 @@ export const test = base.extend<KanbanFixtures>({
   runDetailPage: async ({ page }, use) => {
     const runDetailPage = new RunDetailPage(page);
     await use(runDetailPage);
+  },
+  sessionWorkspacePage: async ({ page }, use) => {
+    const sessionWorkspacePage = new SessionWorkspacePage(page);
+    await use(sessionWorkspacePage);
   },
 });
 

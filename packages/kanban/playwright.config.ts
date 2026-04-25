@@ -11,6 +11,7 @@ import path from "path";
  */
 
 const fixtureRunsDir = path.resolve(__dirname, "e2e/fixtures/runs");
+const nextBin = path.resolve(__dirname, "../../node_modules/next/dist/bin/next");
 
 // Use a dedicated test port to avoid collisions with a running dev server.
 // The dev server on port 4800 uses real data; the E2E server on 4173 uses fixtures.
@@ -42,7 +43,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: `node node_modules/next/dist/bin/next dev --port ${testPort}`,
+    command: `node ${nextBin} dev --webpack --port ${testPort}`,
     port: testPort,
     reuseExistingServer: false,
     timeout: 120_000,

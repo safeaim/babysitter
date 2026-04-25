@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { GatewayClient, GatewayProvider as UiGatewayProvider, useGateway, type AgentRecord } from "@/lib/agent-mux-ui";
 
 type SavedGatewayAuth = {
@@ -18,6 +18,8 @@ type GatewayAuthContextValue = {
 const STORAGE_KEY = "babysitter.kanban.gateway-auth";
 const SNAPSHOT_POLL_INTERVAL_MS = 15_000;
 const GatewayAuthContext = createContext<GatewayAuthContextValue | null>(null);
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function sanitizeGatewayUrl(url: string): string {
   return url.replace(/\/+$/, "");
@@ -259,6 +261,14 @@ function GatewayBootstrap(props: { gatewayUrl: string; token: string; children: 
 
 export function GatewayProvider(props: { children: React.ReactNode }) {
   const [auth, setAuth] = useState<SavedGatewayAuth | null>(() => readStoredAuth());
+
+  useIsomorphicLayoutEffect(() => {
+    const stored = readStoredAuth();
+    if (!stored) {
+      return;
+    }
+    setAuth((current) => current ?? stored);
+  }, []);
 
   const value = useMemo<GatewayAuthContextValue>(
     () => ({

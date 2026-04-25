@@ -27,10 +27,6 @@ const architectureDoc = read('packages/transport-mux/architecture.md');
 const packageJson = JSON.parse(read('packages/transport-mux/package.json'));
 const packageEntrypoint = read('packages/transport-mux/src/index.ts');
 const launchCommand = read('packages/agent-mux/cli/src/commands/launch.ts');
-const releaseWorkflow = read('.github/workflows/release.yml');
-const stagingWorkflow = read('.github/workflows/staging-publish.yml');
-const legacyPublishWorkflow = read('packages/agent-mux/meta/github/workflows/publish.yml');
-const legacyProxyCiWorkflow = read('packages/agent-mux/meta/github/workflows/amux-proxy-ci.yml');
 
 const legacyPythonTests = countFiles('packages/agent-mux/amux-proxy/tests', '.py');
 const jsContractTests =
@@ -40,35 +36,35 @@ const jsContractTests =
 
 const docsHonestyChecks = [
   {
-    name: 'README marks transport-mux as the active runtime/release owner',
+    name: 'README marks transport-mux as an internal-only placeholder seam',
     ok: containsAll(readmeDoc, [
-      'active runtime and release owner',
-      'transport/proxy surface',
+      'internal-only placeholder seam',
+      'not the active runtime or release owner yet',
     ]),
   },
   {
-    name: 'README archives legacy amux-proxy references explicitly',
+    name: 'README describes workspace-local entrypoints as non-publishable',
     ok: containsAll(readmeDoc, [
-      'Historical references still exist under `packages/agent-mux/amux-proxy`',
-      'archival only',
+      'workspace-local development',
+      'not a published npm deliverable',
     ]),
   },
   {
-    name: 'migration.md says transport-mux owns the active runtime/release surface',
+    name: 'migration.md describes a private placeholder policy',
     ok: containsAll(migrationDoc, [
-      'owns the active transport/proxy runtime and release surface in this repo',
-      '`@a5c-ai/transport-mux`',
+      'private workspace package and placeholder seam',
+      'does not yet own publish, release, or externally installable runtime truth',
     ]),
   },
   {
-    name: 'migration.md keeps legacy amux-proxy assets historical-only',
+    name: 'migration.md requires publish-only metadata to stay absent',
     ok: containsAll(migrationDoc, [
-      'Historical archive: legacy Python tests under `packages/agent-mux/amux-proxy/tests` remain for reference only.',
-      'historical reference material',
+      '`files`, `publishConfig`, and `prepack` must stay absent',
+      'Referenced packaged artifacts must exist locally or be removed from package metadata.',
     ]),
   },
   {
-    name: 'architecture.md places launch/runtime control in transport-mux',
+    name: 'architecture.md still documents the intended launch/runtime seam',
     ok: containsAll(architectureDoc, [
       '`launch.ts` starts the `transport-mux` runtime',
       '`transport-mux` boots the protocol codec and provider adapter implied by that config.',
@@ -82,27 +78,45 @@ const docsHonestyFailures = docsHonestyChecks
 
 const scorecard = [
   {
-    gate: 'Legacy Python contract truth is archived explicitly',
+    gate: 'Legacy Python reference surface stays explicit',
     status:
       legacyPythonTests === 0 ||
-      migrationDoc.includes('Historical archive: legacy Python tests under `packages/agent-mux/amux-proxy/tests` remain for reference only.')
+      migrationDoc.includes('Historical archive: legacy Python tests under `packages/agent-mux/amux-proxy/tests` remain available as reference material for the still-active historical runtime path.')
         ? 'green'
         : 'red',
     evidence: legacyPythonTests > 0
-      ? `${legacyPythonTests} legacy Python tests remain, and migration.md marks them as historical-only reference material`
+      ? `${legacyPythonTests} legacy Python tests remain, and migration.md marks them as reference material rather than packaged output from transport-mux`
       : 'No legacy Python contract tests remain under packages/agent-mux/amux-proxy/tests',
-    retireWhen: 'Legacy tests are either removed entirely or explicitly archived as non-operational reference material.',
+    retireWhen: 'Legacy tests are either removed entirely or explicitly separated from transport-mux package-artifact claims.',
   },
   {
-    gate: 'JS transport-mux validation surface is explicit',
+    gate: 'Private package metadata is coherent',
+    status:
+      packageJson.private === true &&
+      !('files' in packageJson) &&
+      !('publishConfig' in packageJson) &&
+      !('prepack' in (packageJson.scripts ?? {}))
+        ? 'green'
+        : 'red',
+    evidence:
+      packageJson.private === true &&
+      !('files' in packageJson) &&
+      !('publishConfig' in packageJson) &&
+      !('prepack' in (packageJson.scripts ?? {}))
+        ? 'package.json stays private and omits publish-only metadata that would advertise a shippable npm artifact'
+        : 'package.json still advertises pack/publish metadata that conflicts with a private placeholder policy',
+    retireWhen: 'The package is intentionally promoted out of placeholder status and all publish-ready metadata returns in one explicit cutover.',
+  },
+  {
+    gate: 'Workspace seam still builds and tests locally',
     status: packageJson.scripts['scorecard:migration'] && jsContractTests > 0 ? 'green' : 'red',
     evidence: packageJson.scripts['scorecard:migration']
       ? `scorecard:migration script is present and ${jsContractTests} JS test files exist under packages/transport-mux/tests`
       : 'scorecard:migration script is missing from packages/transport-mux/package.json',
-    retireWhen: 'The package keeps publishing its own build/test/scorecard entrypoints as the active runtime owner.',
+    retireWhen: 'Local build/test coverage is no longer needed or is replaced with a different seam-verification flow.',
   },
   {
-    gate: 'Launcher/runtime cutover is complete',
+    gate: 'Launcher/runtime seam remains explicit without over-claiming ownership',
     status:
       launchCommand.includes('@a5c-ai/transport-mux') &&
       packageEntrypoint.includes("export * from './runtime.js';")
@@ -111,41 +125,18 @@ const scorecard = [
     evidence:
       launchCommand.includes('@a5c-ai/transport-mux') &&
       packageEntrypoint.includes("export * from './runtime.js';")
-        ? 'launch.ts imports transport-mux directly and the package entrypoint exports the runtime module'
+        ? 'launch.ts imports transport-mux directly and the package entrypoint exports the local runtime seam'
         : 'launch.ts still bypasses the transport-mux runtime surface or the package entrypoint does not export it',
-    retireWhen: 'launch.ts resolves into the runtime exported by packages/transport-mux instead of an independent proxy path.',
+    retireWhen: 'The local seam is retired or promoted with an explicit runtime-ownership policy change.',
   },
   {
     gate: 'Docs describe the migration seam honestly',
     status: docsHonestyFailures.length === 0 ? 'green' : 'red',
     evidence:
       docsHonestyFailures.length === 0
-        ? 'README.md, architecture.md, and migration.md agree that transport-mux is the active owner and legacy amux-proxy assets are archival only.'
+        ? 'README.md, architecture.md, and migration.md agree that transport-mux is an internal seam today and a future cutover target.'
         : `Docs drift detected: ${docsHonestyFailures.join('; ')}.`,
-    retireWhen: 'Docs state one active owner for runtime, release, and binary truth while keeping legacy references explicitly archived.',
-  },
-  {
-    gate: 'Publish and CI surfaces are converged',
-    status:
-      releaseWorkflow.includes('Publish transport-mux to npm') &&
-      stagingWorkflow.includes('Publish transport-mux to npm (staging tag)') &&
-      legacyPublishWorkflow.includes('Historical archive only')
-        ? 'green'
-        : 'red',
-    evidence:
-      'root release/staging workflows publish @a5c-ai/transport-mux, and the legacy publish workflow is archived as historical only.',
-    retireWhen: 'transport-mux has explicit publish/CI ownership and the legacy publish path is removed or archived.',
-  },
-  {
-    gate: 'Legacy binary/container ownership is retired or archived',
-    status:
-      readmeDoc.includes('ships the `amux-proxy` executable') &&
-      legacyProxyCiWorkflow.includes('Historical archive only')
-        ? 'green'
-        : 'red',
-    evidence:
-      'transport-mux ships the active amux-proxy executable surface, and the legacy amux-proxy CI workflow is archived as historical only.',
-    retireWhen: 'The amux-proxy binary/container path is owned by transport-mux or explicitly documented as historical only.',
+    retireWhen: 'Docs and metadata are updated together when placeholder status changes.',
   },
 ];
 
@@ -159,4 +150,4 @@ for (const item of scorecard) {
   console.log(`| ${item.gate} | ${item.status} | ${item.evidence} | ${item.retireWhen} |`);
 }
 console.log('');
-console.log(`overallCutoverReady=${allGreen ? 'true' : 'false'}`);
+console.log(`overallPolicyAligned=${allGreen ? 'true' : 'false'}`);

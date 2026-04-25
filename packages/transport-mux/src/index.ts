@@ -5,11 +5,11 @@ export * from './runtime.js';
 
 export const TRANSPORT_MUX_RUNTIME = {
   packageName: '@a5c-ai/transport-mux',
-  status: 'active-runtime',
-  publishable: true,
+  status: 'internal-placeholder',
+  publishable: false,
   launcherIntegrated: true,
-  cutoverComplete: true,
-  ownsReleaseSurface: true,
+  cutoverComplete: false,
+  ownsReleaseSurface: false,
   executable: 'amux-proxy',
 } as const;
 

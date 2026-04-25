@@ -19,15 +19,15 @@
   "skills": [
     { "name": "greet", "file": "skills/greet/SKILL.md" }
   ],
+  "agents": "agents/AGENTS.md",
+  "contextFiles": {
+    "gemini": "context/GEMINI.md",
+    "github-copilot": "context/AGENTS.md",
+    "pi": "context/AGENTS.md",
+    "oh-my-pi": "context/AGENTS.md"
+  },
   "include": [
     "versions.json",
     "assets/*"
-  ],
-  "targets": {
-    "gemini": {
-      "extraFiles": {
-        "GEMINI.md": "file:per-harness/gemini/GEMINI.md"
-      }
-    }
-  }
+  ]
 }

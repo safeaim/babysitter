@@ -32,6 +32,7 @@ import {
 
 import {
   generateManifests,
+  copyAgentFiles,
   copyContextFiles,
   copyIncludedFiles,
   generateExtraFiles,
@@ -64,6 +65,10 @@ export function transform(
   // Generate manifests
   const manifestFiles = generateManifests(sourceDir, manifest, targetProfile, diagnostics);
   files.push(...manifestFiles);
+
+  // Copy agent instruction files
+  const agentFiles = copyAgentFiles(sourceDir, manifest, targetProfile, diagnostics);
+  files.push(...agentFiles);
 
   // Copy context files
   const contextFiles = copyContextFiles(sourceDir, manifest, targetProfile, diagnostics);

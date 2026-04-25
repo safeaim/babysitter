@@ -5,6 +5,39 @@ import * as path from 'path';
 import type { A5cPluginManifest, ValidateResult, Diagnostic } from './types.js';
 import { validate as validateSchema } from './schema.js';
 
+function validateReferencedPath(
+  sourceDir: string,
+  relativePath: string,
+  diagnostics: Diagnostic[],
+  options: {
+    messagePrefix: string;
+    component?: string;
+    level?: Diagnostic['level'];
+  }
+): void {
+  const fullPath = path.join(sourceDir, relativePath);
+  if (!fs.existsSync(fullPath)) {
+    diagnostics.push({
+      level: options.level ?? 'error',
+      category: 'validation',
+      message: `${options.messagePrefix}: ${relativePath}`,
+      component: options.component,
+      source: fullPath,
+    });
+    return;
+  }
+
+  if (!fs.statSync(fullPath).isFile()) {
+    diagnostics.push({
+      level: options.level ?? 'error',
+      category: 'validation',
+      message: `${options.messagePrefix} is not a file: ${relativePath}`,
+      component: options.component,
+      source: fullPath,
+    });
+  }
+}
+
 export function validate(sourceDir: string): ValidateResult {
   const diagnostics: Diagnostic[] = [];
 
@@ -93,31 +126,34 @@ export function validate(sourceDir: string): ValidateResult {
   // Verify skill files
   if (manifest.skills) {
     for (const skill of manifest.skills) {
-      const fullPath = path.join(sourceDir, skill.file);
-      if (!fs.existsSync(fullPath)) {
-        diagnostics.push({
-          level: 'error',
-          category: 'validation',
-          message: `Skill file not found: ${skill.file}`,
-          component: `skills.${skill.name}`,
-          source: fullPath,
-        });
-      }
+      validateReferencedPath(sourceDir, skill.file, diagnostics, {
+        messagePrefix: 'Skill file not found',
+        component: `skills.${skill.name}`,
+      });
+    }
+  }
+
+  // Verify agent files
+  if (manifest.agents) {
+    const agentPaths = typeof manifest.agents === 'string'
+      ? [manifest.agents]
+      : manifest.agents;
+
+    for (const [index, agentPath] of agentPaths.entries()) {
+      validateReferencedPath(sourceDir, agentPath, diagnostics, {
+        messagePrefix: 'Agent file not found',
+        component: agentPaths.length === 1 ? 'agents' : `agents.${index}`,
+      });
     }
   }
 
   // Verify context files
   if (manifest.contextFiles) {
     for (const [target, contextPath] of Object.entries(manifest.contextFiles)) {
-      const fullPath = path.join(sourceDir, contextPath);
-      if (!fs.existsSync(fullPath)) {
-        diagnostics.push({
-          level: 'warning',
-          category: 'validation',
-          message: `Context file not found: ${contextPath} (for target ${target})`,
-          source: fullPath,
-        });
-      }
+      validateReferencedPath(sourceDir, contextPath, diagnostics, {
+        messagePrefix: `Context file not found for target ${target}`,
+        component: `contextFiles.${target}`,
+      });
     }
   }
 

@@ -60,6 +60,18 @@ describe('invoke — full CLI pipeline (e2e)', { timeout: 30000 }, () => {
     ];
   }
 
+  function codexInvokeArgs(
+    nativeEventName: string,
+    extraArgs: string[] = [],
+  ): string[] {
+    return [
+      'invoke',
+      '--adapter', 'codex',
+      '--native-event', nativeEventName,
+      ...extraArgs,
+    ];
+  }
+
   it('session-start bootstrap-only creates session file', async () => {
     const sessionId = 'e2e-bootstrap-sess-1';
     const stdinPayload = JSON.stringify({
@@ -649,6 +661,123 @@ describe('invoke — full CLI pipeline (e2e)', { timeout: 30000 }, () => {
     expect(result.exitCode).toBe(0);
     expect(parseOutput(result.stdout)).toEqual({
       continueSession: false,
+    });
+  });
+
+  it('Codex bootstrap-only persists session cwd from adapter-specific normalization', async () => {
+    const sessionId = 'e2e-codex-bootstrap-sess';
+
+    const result = await runCli(
+      codexInvokeArgs('SessionStart', [
+        '--bootstrap-only',
+        '--json',
+      ]),
+      {
+        stdin: JSON.stringify({
+          session_id: sessionId,
+          cwd: '/workspace/codex-from-stdin',
+          model: 'o3',
+          source: 'startup',
+        }),
+        env: {
+          ...baseEnv(),
+          PWD: '/env/fallback-cwd',
+        },
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+
+    const output = JSON.parse(result.stdout.trim());
+    expect(output.status).toBe('bootstrapped');
+    expect(output.sessionId).toBe(sessionId);
+
+    const sessionData = await readSessionFile(sessionDir, sessionId);
+    expect(sessionData).not.toBeNull();
+
+    const session = sessionData!['session'] as Record<string, unknown>;
+    expect(session['adapter']).toBe('codex');
+    expect(session['cwd']).toBe('/workspace/codex-from-stdin');
+  });
+
+  it('Codex invoke uses adapter normalizer and renderer through the real loader path', async () => {
+    const sessionId = 'e2e-codex-loader-path';
+    const handlerCmd = await writeHandlerScript(tmpRoot, 'codex-loader-path-handler', `
+      const chunks = [];
+      process.stdin.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+      process.stdin.on('end', () => {
+        const event = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+        process.stdout.write(JSON.stringify({
+          decision: 'deny',
+          reason: JSON.stringify({
+            phase: event.phase,
+            payload: event.payload,
+            execution: {
+              sessionId: event.execution.sessionId,
+              cwd: event.execution.cwd,
+              model: event.execution.model,
+              source: event.execution.source,
+              toolName: event.execution.toolName,
+              toolCallId: event.execution.toolCallId
+            }
+          }),
+          continueSession: false,
+          suppressOutput: true,
+          additionalContext: 'should-be-dropped',
+          systemMessage: 'should-be-dropped'
+        }));
+      });
+    `);
+
+    const result = await runCli(
+      codexInvokeArgs('PreToolUse', [
+        '--handler', handlerCmd,
+      ]),
+      {
+        stdin: JSON.stringify({
+          session_id: sessionId,
+          cwd: '/workspace/codex-tool',
+          model: 'o3',
+          source: 'user',
+          tool_name: 'bash',
+          tool_call_id: 'codex-tool-123',
+          tool_input: { command: 'npm test' },
+        }),
+        env: {
+          ...baseEnv(),
+          PWD: '/env/fallback-cwd',
+        },
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+
+    const output = parseOutput(result.stdout);
+    expect(output).toEqual({
+      decision: 'deny',
+      reason: expect.any(String),
+    });
+
+    const normalized = JSON.parse(String(output.reason));
+    expect(normalized).toEqual({
+      phase: 'tool.before',
+      payload: {
+        session_id: sessionId,
+        cwd: '/workspace/codex-tool',
+        model: 'o3',
+        source: 'user',
+        tool_name: 'bash',
+        tool_call_id: 'codex-tool-123',
+        tool_input: { command: 'npm test' },
+      },
+      execution: {
+        sessionId,
+        cwd: '/workspace/codex-tool',
+        model: 'o3',
+        source: 'user',
+        toolName: 'bash',
+        toolCallId: 'codex-tool-123',
+      },
     });
   });
 });

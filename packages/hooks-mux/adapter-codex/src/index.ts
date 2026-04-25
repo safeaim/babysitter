@@ -7,6 +7,7 @@ export { CODEX_PHASE_MAPPINGS, findMapping } from './mappings';
 // Normalizer
 export {
   normalizeCodexEvent,
+  normalizeCodexEvent as normalizeForInvoke,
   parseStdin,
   extractSessionId,
   ADAPTER_NAME,
@@ -19,7 +20,11 @@ export type {
 } from './normalizer';
 
 // Renderer
-export { renderCodexOutput, isFieldSupportedForEvent } from './renderer';
+export {
+  renderCodexOutput,
+  renderCodexOutput as renderForInvoke,
+  isFieldSupportedForEvent,
+} from './renderer';
 
 // Session resolver
 export { resolveSessionId, isValidSessionId } from './session-resolver';

@@ -40,7 +40,7 @@ Before we begin, let's verify everything is set up correctly. Open your terminal
 node --version
 
 # Check if Babysitter SDK is installed
-npx @a5c-ai/babysitter-sdk@latest --version
+babysitter --version
 ```
 
 **What you should see:**

@@ -37,8 +37,8 @@ Before starting this tutorial, you should have:
 ### Verify Environment
 
 ```bash
-# Verify Babysitter SDK
-npx @a5c-ai/babysitter-sdk@latest --version
+# Verify Babysitter CLI
+babysitter --version
 ```
 
 ### About Breakpoints

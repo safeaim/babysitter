@@ -273,7 +273,7 @@ Coverage: 92%
 
 | Problem | Solution |
 |---------|----------|
-| "command not found: babysitter" | Run `npm install -g @a5c-ai/babysitter-sdk` |
+| "command not found: babysitter" | Run `npm install -g @a5c-ai/babysitter` |
 | Plugin not appearing | Restart Claude Code after installation |
 
 ---

@@ -1,10 +1,10 @@
 # Babysitter CLI Reference
 
-**Version:** 1.0
-**SDK Version:** 0.0.123+
+**Version:** 1.1
+**CLI/SDK Version:** 5.0.0
 **Last Updated:** 2026-01-25
 
-Complete reference documentation for the Babysitter command-line interface (SDK CLI).
+Complete reference documentation for the core Babysitter command-line interface.
 
 > **Looking for slash commands?** See [Slash Commands Reference](./slash-commands.md) for `/babysitter:call`, `/babysitter:yolo`, and other Claude Code commands.
 
@@ -39,11 +39,16 @@ Complete reference documentation for the Babysitter command-line interface (SDK 
 
 ## Overview
 
-The Babysitter CLI provides deterministic orchestration for event-sourced workflows. It enables run lifecycle management, task introspection, and result posting.
+The Babysitter CLI provides deterministic orchestration for event-sourced workflows. It enables run lifecycle management, task introspection, plugin/profile management, and result posting.
 
 **Binary Names:**
 - `babysitter` (primary)
 - `babysitter-sdk` (alias)
+
+**Package split:**
+- Install `@a5c-ai/babysitter` for the recommended end-user `babysitter` command.
+- Install `@a5c-ai/babysitter-sdk` if you need the SDK/library directly or want the underlying CLI implementation package.
+- Install `@a5c-ai/babysitter-agent` for runtime commands such as `call`, `resume`, `plan`, `start-server`, and `tui`.
 
 **Design Principles:**
 - Deterministic operations (same inputs = same outputs)
@@ -58,20 +63,26 @@ The Babysitter CLI provides deterministic orchestration for event-sourced workfl
 ### Global Installation (Recommended)
 
 ```bash
-npm install -g @a5c-ai/babysitter-sdk@latest
+npm install -g @a5c-ai/babysitter@latest
+```
+
+### Optional Runtime CLI
+
+```bash
+npm install -g @a5c-ai/babysitter-agent@latest
 ```
 
 ### Via npx (No Install)
 
 ```bash
-npx -y @a5c-ai/babysitter-sdk@latest <command>
+npx -y @a5c-ai/babysitter@latest <command>
 ```
 
 ### Verify Installation
 
 ```bash
 babysitter --version
-# Output: 0.0.123
+# Output: 5.0.0
 ```
 
 ### Alias Setup
@@ -81,7 +92,7 @@ babysitter --version
 CLI="babysitter"
 
 # Or for npx usage
-CLI="npx -y @a5c-ai/babysitter-sdk@latest"
+CLI="npx -y @a5c-ai/babysitter@latest"
 ```
 
 ---
@@ -92,15 +103,17 @@ These options are available on all commands:
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--runs-dir <path>` | Override the runs directory | `.` (current directory) |
+| `--runs-dir <path>` | Override the runs directory | `~/.a5c/runs` |
 | `--json` | Output in JSON format | `false` |
 | `--verbose` | Enable verbose logging (paths, resolved options) | `false` |
 | `--dry-run` | Preview changes without applying (where supported) | `false` |
 | `--help`, `-h` | Show agent-facing help (default; covers commands intended for agent/automation use) | - |
-| `--help-human` | Show human-facing help (covers commands intended for interactive human use, e.g. `harness:*`, `session:init`, `mcp:serve`) | - |
+| `--help-human` | Show human-facing help for the core CLI surface (for example `session:*`, `plugin:*`, `harness:*`, `configure`) | - |
 | `--version`, `-v` | Show version number | - |
 
 > The default `--help` (and the usage text printed on a wrong-syntax invocation or a bare command name) lists **agent-facing** commands only — the surface a babysitter skill or hook would call. Run `babysitter --help-human` to see the commands intended for direct human use.
+
+> Runtime/orchestration commands such as `babysitter-agent call`, `resume`, `plan`, `doctor`, `start-server`, and `tui` are part of the optional `@a5c-ai/babysitter-agent` package and are not covered by this reference unless explicitly noted.
 
 ### Path Handling
 

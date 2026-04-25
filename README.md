@@ -3,10 +3,10 @@
 # Babysitter
 > **Enforce obedience on agentic workforces. Manage extremely complex workflows through deterministic, hallucination-free self-orchestration.**
 
-[![npm version](https://img.shields.io/npm/v/@a5c-ai/babysitter-sdk.svg)](https://www.npmjs.com/package/@a5c-ai/babysitter-sdk)
+[![npm version](https://img.shields.io/npm/v/@a5c-ai/babysitter.svg)](https://www.npmjs.com/package/@a5c-ai/babysitter)
 [![CI](https://img.shields.io/github/actions/workflow/status/a5c-ai/babysitter/ci.yml?branch=staging)](https://github.com/a5c-ai/babysitter/actions/workflows/ci.yml)
-[![npm downloads](https://img.shields.io/npm/dm/@a5c-ai/babysitter-sdk?label=downloads)](https://www.npmjs.com/package/@a5c-ai/babysitter-sdk)
-[![Node.js](https://img.shields.io/node/v/@a5c-ai/babysitter-sdk)](https://nodejs.org/)
+[![npm downloads](https://img.shields.io/npm/dm/@a5c-ai/babysitter?label=downloads)](https://www.npmjs.com/package/@a5c-ai/babysitter)
+[![Node.js](https://img.shields.io/node/v/@a5c-ai/babysitter)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub issues](https://img.shields.io/github/issues/a5c-ai/babysitter.svg)](https://github.com/a5c-ai/babysitter/issues)
 [![GitHub stars](https://img.shields.io/github/stars/a5c-ai/babysitter.svg)](https://github.com/a5c-ai/babysitter/stargazers)
@@ -57,6 +57,31 @@ Babysitter enforces obedience to agentic workforces, enabling them to manage ext
 ---
 
 ## Installation
+
+Babysitter has a small package split:
+
+- `@a5c-ai/babysitter` is the recommended end-user install for the main `babysitter` CLI.
+- `@a5c-ai/babysitter-sdk` is the public SDK/library package and the underlying implementation behind the core CLI.
+- `@a5c-ai/babysitter-agent` is the optional runtime CLI for `babysitter-agent call`, `resume`, `start-server`, `tui`, and other orchestration/runtime commands.
+- Harness plugins such as `@a5c-ai/babysitter-codex` or `@a5c-ai/babysitter-cursor` integrate Babysitter into a specific host tool. They do not replace the core CLI packages.
+
+For most users, install the main CLI first:
+
+```bash
+npm install -g @a5c-ai/babysitter
+```
+
+Install the optional runtime CLI if you need headless orchestration, the internal harness, daemon utilities, MCP serving, or the TUI:
+
+```bash
+npm install -g @a5c-ai/babysitter-agent
+```
+
+If you are authoring processes or embedding Babysitter in your own code, add the SDK package to your project:
+
+```bash
+npm install @a5c-ai/babysitter-sdk
+```
 
 Babysitter supports multiple AI coding harnesses. Install the plugin for your harness of choice:
 
@@ -191,7 +216,7 @@ babysitter-agent call --harness internal --process .a5c/processes/my-process.js#
 babysitter-agent call --harness internal --prompt "run lint and tests" --workspace .
 ```
 
-The internal harness uses the SDK's built-in Pi execution engine directly. It supports all capabilities (Programmatic, SessionBinding, StopHook, HeadlessPrompt) and requires no external CLI.
+The internal harness uses the SDK's built-in Pi execution engine directly. It supports all capabilities (Programmatic, SessionBinding, StopHook, HeadlessPrompt) and requires no external AI harness CLI.
 
 During process execution, the internal harness can **delegate tasks to any discovered installed harness** via the invoker. A process running under `--harness internal` can spawn subagent tasks that execute through Claude Code, Codex, Gemini CLI, or any other harness found on the system -- the SDK discovers available harness CLIs at runtime and routes task execution accordingly. This means you can orchestrate a multi-agent workflow from a single headless entry point, with different tasks delegated to whichever harness is best suited for them.
 
@@ -291,7 +316,7 @@ Claude will create an orchestration run, execute tasks step-by-step, handle qual
 
 ## Agent Runtime CLI
 
-Beyond the in-session skill commands (`/babysitter:call`, etc.), Babysitter provides an optional agent runtime CLI package, `@a5c-ai/babysitter-agent`, for orchestration, session management, MCP serving, daemon utilities, and the TUI. The main `babysitter` CLI keeps SDK management plus `harness:install` and `harness:install-plugin`.
+Beyond the in-session skill commands (`/babysitter:call`, etc.), Babysitter provides an optional agent runtime CLI package, `@a5c-ai/babysitter-agent`, for orchestration, session management, MCP serving, daemon utilities, and the TUI. The main `babysitter` CLI comes from `@a5c-ai/babysitter` and is backed by `@a5c-ai/babysitter-sdk`; it keeps the core run/task/session/plugin surfaces plus `harness:install` and `harness:install-plugin`.
 
 ```bash
 npm install -g @a5c-ai/babysitter
@@ -365,6 +390,17 @@ babysitter-agent call \
 ```
 
 It executes processes using the SDK's built-in engine, supports all effect types (tasks, breakpoints, sleeps, parallel dispatch), and produces the same event-sourced journal as any other harness.
+
+### Package Boundaries
+
+| Package | Installs | Use it for |
+|---------|----------|------------|
+| `@a5c-ai/babysitter` | `babysitter` | Recommended human-facing install for the main CLI |
+| `@a5c-ai/babysitter-sdk` | `babysitter`, `babysitter-sdk`, `babysitter-mcp-server` | SDK/library usage and direct access to the core CLI implementation |
+| `@a5c-ai/babysitter-agent` | `babysitter-agent` | Optional runtime/orchestration commands (`call`, `resume`, `plan`, `start-server`, `tui`, `doctor`) |
+| `@a5c-ai/babysitter-<harness>` | Harness-specific installer or plugin binary | Integrating Babysitter into a specific host tool such as Codex, Cursor, Gemini CLI, Pi, or GitHub Copilot |
+
+The repository root `package.json` is workspace metadata for this monorepo. The public packages users install are the scoped packages above.
 
 ---
 
@@ -550,7 +586,7 @@ See [CONTRIBUTING.md](https://github.com/a5c-ai/babysitter/blob/main/CONTRIBUTIN
 - **Discord**: [Join our community](https://discord.gg/dHGkzxf48a) *(GitHub invite link)*
 - **GitHub Issues**: [Report bugs or request features](https://github.com/a5c-ai/babysitter/issues)
 - **GitHub Discussions**: [Ask questions and share ideas](https://github.com/a5c-ai/babysitter/discussions)
-- **npm**: [@a5c-ai/babysitter-sdk](https://www.npmjs.com/package/@a5c-ai/babysitter-sdk)
+- **npm**: [@a5c-ai/babysitter](https://www.npmjs.com/package/@a5c-ai/babysitter)
 
 ### Community Tools
 

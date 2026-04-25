@@ -147,7 +147,7 @@ User Request --> Claude Code --> Babysitter Skill --> SDK CLI
 
 **Step 1: Install SDK and Packages**
 ```bash
-npm install -g @a5c-ai/babysitter-sdk@latest
+npm install -g @a5c-ai/babysitter@latest
 ```
 
 **Step 2: Install Claude Code Plugin**
@@ -166,7 +166,7 @@ claude plugin enable --scope user babysitter@a5c.ai
 
 **Step 4: Verify Installation**
 ```bash
-# Check SDK version
+# Check core CLI version
 babysitter --version
 
 # In Claude Code, verify skill is available
@@ -182,8 +182,8 @@ babysitter --version
 ### 4.3 Keeping Updated
 
 ```bash
-# Update SDK packages
-npm update -g @a5c-ai/babysitter-sdk@latest
+# Update CLI packages
+npm update -g @a5c-ai/babysitter @a5c-ai/babysitter-agent
 
 # Update Claude Code plugin
 claude plugin marketplace update a5c.ai
@@ -425,7 +425,7 @@ Level 5: Expert Use (Ongoing)
 | `Run encountered an error` | Journal or state corruption | Analyze journal, recover from last good state |
 | `Breakpoint not resolving` | Service unreachable or timeout | Check service status, verify network |
 | `ENOENT: no such file or directory` | Missing file in task | Verify paths, check dependencies installed |
-| `Cannot find module '@a5c-ai/babysitter-sdk'` | SDK not installed | Run `npm install -g @a5c-ai/babysitter-sdk` |
+| `Cannot find module '@a5c-ai/babysitter-sdk'` | SDK dependency missing in your project | Run `npm install @a5c-ai/babysitter-sdk` |
 | `Plugin not found: babysitter@a5c.ai` | Plugin not installed in Claude Code | Follow plugin installation steps |
 
 ### 8.5 Performance Pain Points

@@ -112,7 +112,9 @@ Any file produced during a run, stored in the `artifacts/` directory. Common art
 The orchestration framework for Claude Code that enables deterministic, event-sourced workflow management. Babysitter provides structured multi-step workflows with quality gates, human approval checkpoints, and session persistence.
 
 **Components:**
-- SDK (`@a5c-ai/babysitter-sdk`) - Core runtime, CLI
+- Main CLI (`@a5c-ai/babysitter`) - Recommended end-user install for `babysitter`
+- SDK (`@a5c-ai/babysitter-sdk`) - Public SDK/library and core CLI implementation
+- Runtime CLI (`@a5c-ai/babysitter-agent`) - Optional runtime/orchestration commands
 - Plugin (`babysitter@a5c.ai`) - Claude Code integration
 
 **Related:** [SDK](#sdk), [Plugin](#plugin)
@@ -177,7 +179,7 @@ The command-line tool for managing Babysitter runs. Provides commands for run li
 
 **Installation:**
 ```bash
-npm install -g @a5c-ai/babysitter-sdk
+npm install -g @a5c-ai/babysitter
 ```
 
 **Related:** [SDK](#sdk)
@@ -855,7 +857,7 @@ The core Babysitter package providing the orchestration runtime, CLI, and APIs.
 
 **Installation:**
 ```bash
-npm install -g @a5c-ai/babysitter-sdk
+npm install @a5c-ai/babysitter-sdk
 ```
 
 **Components:**

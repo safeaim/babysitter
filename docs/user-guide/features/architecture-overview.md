@@ -274,7 +274,7 @@ For more details on parallel execution, see [Parallel Execution](./parallel-exec
              |
              +-- Parse intent
              +-- Load/create run
-             +--> CLI: npx -y @a5c-ai/babysitter-sdk@latest run:iterate
+             +--> CLI: npx -y @a5c-ai/babysitter@latest run:iterate
                   |
                   +--> SDK Process Engine
                        |

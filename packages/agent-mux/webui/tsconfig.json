@@ -8,9 +8,11 @@
     "emitDeclarationOnly": true,
     "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["react", "react-dom", "vite/client"],
     "allowSyntheticDefaultImports": true
   },
   "include": ["src", "vite.config.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
   "references": [
     { "path": "../ui" }
   ]

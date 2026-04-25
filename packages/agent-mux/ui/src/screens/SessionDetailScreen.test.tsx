@@ -122,7 +122,7 @@ describe('SessionDetailScreen', () => {
     render(<SessionDetailScreen sessionId="session-1" />);
 
     expect(screen.getByText('codex')).toBeTruthy();
-    expect(screen.getByText('run-1')).toBeTruthy();
+    expect(screen.getByText(/run-1/)).toBeTruthy();
     expect(screen.getByText('Read')).toBeTruthy();
 
     await user.click(screen.getByRole('button', { name: 'transcript' }));

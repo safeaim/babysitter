@@ -67,10 +67,6 @@ function evaluateTransportMuxCutover(): boolean {
     "packages/transport-mux/package.json",
     "packages/transport-mux/src/index.ts",
     "packages/agent-mux/cli/src/commands/launch.ts",
-    ".github/workflows/release.yml",
-    ".github/workflows/staging-publish.yml",
-    "packages/agent-mux/meta/github/workflows/publish.yml",
-    "packages/agent-mux/meta/github/workflows/amux-proxy-ci.yml",
   ];
   if (!requiredFiles.every(repoFileExists)) {
     return false;
@@ -80,14 +76,11 @@ function evaluateTransportMuxCutover(): boolean {
   const migrationDoc = readRepoFile("packages/transport-mux/migration.md");
   const architectureDoc = readRepoFile("packages/transport-mux/architecture.md");
   const packageJson = JSON.parse(readRepoFile("packages/transport-mux/package.json")) as {
+    private?: boolean;
     scripts?: Record<string, string>;
   };
   const packageEntrypoint = readRepoFile("packages/transport-mux/src/index.ts");
   const launchCommand = readRepoFile("packages/agent-mux/cli/src/commands/launch.ts");
-  const releaseWorkflow = readRepoFile(".github/workflows/release.yml");
-  const stagingWorkflow = readRepoFile(".github/workflows/staging-publish.yml");
-  const legacyPublishWorkflow = readRepoFile("packages/agent-mux/meta/github/workflows/publish.yml");
-  const legacyProxyCiWorkflow = readRepoFile("packages/agent-mux/meta/github/workflows/amux-proxy-ci.yml");
 
   const legacyPythonTests = countFiles("packages/agent-mux/amux-proxy/tests", ".py");
   const jsContractTests =
@@ -96,12 +89,15 @@ function evaluateTransportMuxCutover(): boolean {
     countFiles("packages/transport-mux/tests/e2e", ".ts");
 
   const docsHonestyChecks = [
-    containsAll(readmeDoc, ["active runtime and release owner", "transport/proxy surface"]),
-    containsAll(readmeDoc, ["Historical references still exist under `packages/agent-mux/amux-proxy`", "archival only"]),
-    containsAll(migrationDoc, ["owns the active transport/proxy runtime and release surface in this repo", "`@a5c-ai/transport-mux`"]),
+    containsAll(readmeDoc, ["internal-only placeholder seam", "not the active runtime or release owner yet"]),
+    containsAll(readmeDoc, ["workspace-local development", "not a published npm deliverable"]),
     containsAll(migrationDoc, [
-      "Historical archive: legacy Python tests under `packages/agent-mux/amux-proxy/tests` remain for reference only.",
-      "historical reference material",
+      "private workspace package and placeholder seam",
+      "does not yet own publish, release, or externally installable runtime truth",
+    ]),
+    containsAll(migrationDoc, [
+      "`files`, `publishConfig`, and `prepack` must stay absent",
+      "Referenced packaged artifacts must exist locally or be removed from package metadata.",
     ]),
     containsAll(architectureDoc, [
       "`launch.ts` starts the `transport-mux` runtime",
@@ -112,15 +108,15 @@ function evaluateTransportMuxCutover(): boolean {
   const scorecard = [
     legacyPythonTests === 0 ||
       migrationDoc.includes(
-        "Historical archive: legacy Python tests under `packages/agent-mux/amux-proxy/tests` remain for reference only.",
+        "Historical archive: legacy Python tests under `packages/agent-mux/amux-proxy/tests` remain available as reference material for the still-active historical runtime path.",
       ),
+    packageJson.private === true &&
+      !("files" in packageJson) &&
+      !("publishConfig" in packageJson) &&
+      !("prepack" in (packageJson.scripts ?? {})),
     Boolean(packageJson.scripts?.["scorecard:migration"]) && jsContractTests > 0,
     launchCommand.includes("@a5c-ai/transport-mux") && packageEntrypoint.includes("export * from './runtime.js';"),
     docsHonestyChecks.every(Boolean),
-    releaseWorkflow.includes("Publish transport-mux to npm") &&
-      stagingWorkflow.includes("Publish transport-mux to npm (staging tag)") &&
-      legacyPublishWorkflow.includes("Historical archive only"),
-    readmeDoc.includes("ships the `amux-proxy` executable") && legacyProxyCiWorkflow.includes("Historical archive only"),
   ];
 
   return scorecard.every(Boolean);

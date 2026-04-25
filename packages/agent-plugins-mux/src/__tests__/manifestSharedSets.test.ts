@@ -4,9 +4,11 @@ import * as path from 'path';
 import { describe, expect, it } from 'vitest';
 import { generateInstallShared } from '../installSharedGenerator.js';
 import { generateExtraFiles } from '../transformEmitters.js';
-import { CODEX_PROFILE } from '../targets/codex';
-import { GITHUB_COPILOT_PROFILE } from '../targets/github-copilot';
+import { requireTargetProfile } from '../targets';
 import type { A5cPluginManifest } from '../types';
+
+const CODEX_PROFILE = requireTargetProfile('codex');
+const GITHUB_COPILOT_PROFILE = requireTargetProfile('github-copilot');
 
 function createManifest(overrides: Partial<A5cPluginManifest> = {}): A5cPluginManifest {
   return {

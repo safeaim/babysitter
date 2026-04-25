@@ -81,6 +81,14 @@ export function getTargetProfile(name: string): TargetProfile | null {
   return descriptor ? toTargetProfile(descriptor) : null;
 }
 
+export function requireTargetProfile(name: string): TargetProfile {
+  const profile = getTargetProfile(name);
+  if (!profile) {
+    throw new Error(`Unknown target profile: ${name}`);
+  }
+  return profile;
+}
+
 export function getAllTargets(): string[] {
   return listPluginTargetDescriptors().map((target) => target.targetId);
 }

@@ -330,7 +330,7 @@ An architectural pattern where all state changes are recorded as immutable event
 
 A methodology focused on rapid task completion. GSD emphasizes pragmatic execution over extensive planning.
 
-**Location:** `plugins/babysitter/skills/babysit/process/gsd/`
+**Location:** `library/methodologies/gsd/`
 
 **Related:** [Methodology](#methodology), [TDD](#tdd-test-driven-development)
 
@@ -540,36 +540,25 @@ A high-level structured approach or pattern for software development. Methodolog
 
 **Key distinction:** Methodology = high-level concept/pattern; Process = low-level code implementation of a methodology.
 
-**You can use ANY methodology and get great results.** Babysitter includes 19+ built-in methodologies - pick the one that fits your project style, or let Babysitter choose automatically based on your request.
+**You can use ANY methodology and get great results.** In this repository snapshot, Babysitter includes 38 methodology directories under `library/methodologies/` - pick the one that fits your project style, or let Babysitter choose automatically based on your request.
 
-**Built-in Methodologies (19+):**
+**Built-in Methodologies (examples from the current library):**
 
 | Methodology | Description | Source |
 |-------------|-------------|--------|
-| **TDD Quality Convergence** | Test-first development with iterative quality improvement | [tdd-quality-convergence.js](../../../plugins/babysitter/skills/babysit/process/tdd-quality-convergence.js) |
-| **GSD (Get Stuff Done)** | Rapid, pragmatic 8-phase execution | [gsd/](../../../plugins/babysitter/skills/babysit/process/gsd/) |
-| **Spec-Kit** | Specification-driven development with governance | [SPEC-KIT.md](../../../plugins/babysitter/skills/babysit/process/SPEC-KIT.md) |
-| **ATDD/TDD** | Acceptance test-driven and test-driven development | [atdd-tdd/](../../../plugins/babysitter/skills/babysit/process/methodologies/atdd-tdd/) |
-| **BDD/Specification by Example** | Behavior-driven development with Gherkin | [bdd-specification-by-example/](../../../plugins/babysitter/skills/babysit/process/methodologies/bdd-specification-by-example/) |
-| **Domain-Driven Design** | Strategic and tactical DDD patterns | [domain-driven-design/](../../../plugins/babysitter/skills/babysit/process/methodologies/domain-driven-design/) |
-| **Feature-Driven Development** | Feature-centric with parking lot tracking | [feature-driven-development/](../../../plugins/babysitter/skills/babysit/process/methodologies/feature-driven-development/) |
-| **Hypothesis-Driven Development** | Experimentation and validation framework | [hypothesis-driven-development/](../../../plugins/babysitter/skills/babysit/process/methodologies/hypothesis-driven-development/) |
-| **Example Mapping** | BDD workshop technique for requirements | [example-mapping/](../../../plugins/babysitter/skills/babysit/process/methodologies/example-mapping/) |
-| **Scrum** | Sprint-based iterative development | [scrum/](../../../plugins/babysitter/skills/babysit/process/methodologies/scrum/) |
-| **Kanban** | Pull-based system with WIP limits | [kanban/](../../../plugins/babysitter/skills/babysit/process/methodologies/kanban/) |
-| **Extreme Programming (XP)** | XP engineering practices (pair programming, TDD) | [extreme-programming/](../../../plugins/babysitter/skills/babysit/process/methodologies/extreme-programming/) |
-| **Shape Up** | 6-week cycle product development | [shape-up/](../../../plugins/babysitter/skills/babysit/process/methodologies/shape-up/) |
-| **Jobs to Be Done** | Outcome-focused development | [jobs-to-be-done/](../../../plugins/babysitter/skills/babysit/process/methodologies/jobs-to-be-done/) |
-| **Impact Mapping** | Goal-to-feature traceability | [impact-mapping/](../../../plugins/babysitter/skills/babysit/process/methodologies/impact-mapping/) |
-| **Event Storming** | Collaborative domain modeling workshop | [event-storming/](../../../plugins/babysitter/skills/babysit/process/methodologies/event-storming/) |
-| **Double Diamond** | Design thinking framework | [double-diamond/](../../../plugins/babysitter/skills/babysit/process/methodologies/double-diamond/) |
-| **V-Model** | Verification and validation phases | [v-model/](../../../plugins/babysitter/skills/babysit/process/methodologies/v-model/) |
-| **Spiral Model** | Risk-driven iterative development | [spiral-model/](../../../plugins/babysitter/skills/babysit/process/methodologies/spiral-model/) |
-| **Waterfall** | Sequential SDLC phases | [waterfall/](../../../plugins/babysitter/skills/babysit/process/methodologies/waterfall/) |
-| **RUP** | Rational Unified Process | [rup/](../../../plugins/babysitter/skills/babysit/process/methodologies/rup/) |
-| **Cleanroom** | Cleanroom software engineering | [cleanroom/](../../../plugins/babysitter/skills/babysit/process/methodologies/cleanroom/) |
+| **TDD Quality Convergence** | Test-first development with iterative quality improvement | [tdd-quality-convergence.js](../../../library/tdd-quality-convergence.js) |
+| **GSD (Get Stuff Done)** | Rapid, pragmatic 8-phase execution | [gsd/](../../../library/methodologies/gsd/README.md) |
+| **Spec-Kit** | Specification-driven development with governance | [spec-kit/](../../../library/methodologies/spec-kit/README.md) |
+| **ATDD/TDD** | Acceptance test-driven and test-driven development | [atdd-tdd/](../../../library/methodologies/atdd-tdd/README.md) |
+| **BDD/Specification by Example** | Behavior-driven development with Gherkin | [bdd-specification-by-example/](../../../library/methodologies/bdd-specification-by-example/README.md) |
+| **Domain-Driven Design** | Strategic and tactical DDD patterns | [domain-driven-design/](../../../library/methodologies/domain-driven-design/README.md) |
+| **Feature-Driven Development** | Feature-centric with parking lot tracking | [feature-driven-development/](../../../library/methodologies/feature-driven-development/README.md) |
+| **Hypothesis-Driven Development** | Experimentation and validation framework | [hypothesis-driven-development/](../../../library/methodologies/hypothesis-driven-development/README.md) |
+| **Example Mapping** | BDD workshop technique for requirements | [example-mapping/](../../../library/methodologies/example-mapping/README.md) |
+| **Scrum** | Sprint-based iterative development | [scrum/](../../../library/methodologies/scrum/README.md) |
+| **Kanban** | Pull-based system with WIP limits | [kanban/](../../../library/methodologies/kanban/README.md) |
 
-Each methodology has one or more [Process](#process) implementations in the codebase. Browse all methodologies at [`plugins/babysitter/skills/babysit/process/methodologies/`](../../../plugins/babysitter/skills/babysit/process/methodologies/).
+Each methodology has one or more [Process](#process) implementations in the codebase. Browse all methodologies at [`library/methodologies/`](../../../library/methodologies/).
 
 **Related:** [Process](#process), [TDD Quality Convergence](#tdd-quality-convergence), [Process Library](../features/process-library.md)
 
@@ -668,13 +657,14 @@ A JavaScript/TypeScript function that is the *low-level code implementation* of 
 
 **Key distinction:** Process = low-level code implementation; [Methodology](#methodology) = high-level concept/pattern that a process implements.
 
-**Babysitter includes 2,000+ ready-to-use processes** organized by domain:
+**Babysitter includes 2,236 JavaScript process files in this repository snapshot** organized across methodologies, shared processes, and specializations.
 
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development** | 680+ (web, mobile, DevOps, AI, security) | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/) |
-| **Business** | 430+ (legal, HR, marketing, finance) | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/) |
-| **Science & Engineering** | 550+ (physics, aerospace, biomedical) | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/) |
+| **Development and technical specializations** | 834 (web, mobile, DevOps, AI, security, and related technical domains) | [Browse →](../../../library/specializations/) |
+| **Business** | 491 (legal, HR, marketing, finance, logistics, and related domains) | [Browse →](../../../library/specializations/domains/business/) |
+| **Science & Engineering** | 551 (physics, aerospace, biomedical, mathematics, and related domains) | [Browse →](../../../library/specializations/domains/science/) |
+| **Social Sciences & Humanities** | 160 (education, healthcare, philosophy, arts, and social-science research) | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |
 
 **Structure:**
 ```javascript

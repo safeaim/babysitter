@@ -228,7 +228,7 @@ This is the core of your plugin. It's a markdown document that an AI agent will 
 
 3. **Be stack-aware.** Provide different instructions for different stacks. The basic-security plugin has separate ESLint rule blocks for React, Express, Python (ruff), and Go (gosec).
 
-4. **Copy from the babysitter library.** Plugins typically copy processes, skills, and agents from `plugins/babysitter/skills/babysit/process/specializations/` into the project's `.a5c/` directories. This seeds the project with domain-specific babysitter capabilities.
+4. **Copy from the babysitter library.** Plugins typically copy processes, skills, and agents from the built-in `library/` tree, such as `library/specializations/` or `library/methodologies/gsd/`, into the project's `.a5c/` directories. This seeds the project with project-local overrides and domain-specific Babysitter capabilities.
 
 5. **Modify project config files.** Plugins routinely edit `.eslintrc`, `tsconfig.json`, `package.json`, `.gitignore`, `CLAUDE.md`, `.claude/settings.json`, and CI/CD pipelines. Use merge semantics (append, don't overwrite) and check for existing content.
 

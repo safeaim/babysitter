@@ -12,7 +12,7 @@
 
 Just like a cooking recipe says "chop vegetables, then cook them, then serve" - a process says "research the codebase, then write tests, then implement, then verify."
 
-**You don't need to write processes to use Babysitter.** The [Process Library](./process-library.md) has 2,000+ pre-built processes ready to use.
+**You don't need to write processes to use Babysitter.** The [Process Library](./process-library.md) is the SDK-managed library under `library/`, with 2,236 JavaScript process files in the current repository snapshot.
 
 **When would you write a process?**
 - You have a specific workflow your team follows
@@ -585,7 +585,7 @@ export async function process(inputs, ctx) {
 - [Breakpoints](./breakpoints.md) - Add human approval gates
 - [Journal System](./journal-system.md) - Understand event sourcing
 - [Best Practices](./best-practices.md) - Patterns for process structure, error handling, idempotency, and testing
-- [Process Library](./process-library.md) - 2,000+ ready-to-use process definitions
+- [Process Library](./process-library.md) - SDK-managed built-in library and current counts
 
 ---
 
@@ -593,7 +593,7 @@ export async function process(inputs, ctx) {
 
 **Don't start from scratch!** Babysitter includes thousands of ready-to-use workflows:
 
-### Methodologies (19+) - Development Approaches
+### Methodologies (38 directories in this repo snapshot) - Development Approaches
 
 High-level approaches you can apply to any project:
 
@@ -601,21 +601,22 @@ High-level approaches you can apply to any project:
 - **GSD (Get Stuff Done)** - Rapid 8-phase execution workflow
 - **Spec-Kit** - Specification-driven with governance
 - **Domain-Driven Design** - Strategic and tactical DDD patterns
-- And 15+ more...
+- And many more under [`library/methodologies/`](../../../library/methodologies/)
 
 **Browse methodologies:**
-- [All 19+ with source code](../reference/glossary.md#methodology)
-- [Methodologies folder](../../../plugins/babysitter/skills/babysit/process/methodologies/)
+- [Methodology overview](../reference/glossary.md#methodology)
+- [Methodologies folder](../../../library/methodologies/)
 
-### Domain Processes (2,000+) - Task-Specific Workflows
+### Domain Processes (2,036 specialization process files in this repo snapshot) - Task-Specific Workflows
 
 Complete process definitions for specific domains:
 
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development** | 680+ | [specializations/](../../../plugins/babysitter/skills/babysit/process/specializations/) |
-| **Business** | 430+ | [domains/business/](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/) |
-| **Science & Engineering** | 550+ | [domains/science/](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/) |
+| **Development and technical specializations** | 834 | [specializations/](../../../library/specializations/) |
+| **Business domains** | 491 | [domains/business/](../../../library/specializations/domains/business/) |
+| **Science & engineering domains** | 551 | [domains/science/](../../../library/specializations/domains/science/) |
+| **Social sciences & humanities** | 160 | [domains/social-sciences-humanities/](../../../library/specializations/domains/social-sciences-humanities/) |
 
 See the full catalog with descriptions in the [Process Library](./process-library.md).
 

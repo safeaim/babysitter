@@ -136,7 +136,7 @@ Deep dives into Babysitter's core capabilities.
 
 | Feature | Description |
 |---------|-------------|
-| [**Process Library**](./features/process-library.md) | **2,000+ pre-built processes** across 30+ categories - web, AI, DevOps, science, business, and more |
+| [**Process Library**](./features/process-library.md) | **2,236 JavaScript process files in this repo snapshot**, plus shared-process and methodology layers under `library/` |
 | [**Two-Loops Architecture**](./features/two-loops-architecture.md) | **Hybrid agentic systems** - symbolic orchestration + agentic harness, guardrails, and evidence-driven completion |
 | [**Quality Convergence**](./features/quality-convergence.md) | **Five quality gate types** (tests, code quality, static analysis, security, performance) with 90-score patterns |
 | [**Best Practices**](./features/best-practices.md) | **Four guardrail layers**, multi-gate validation, workflow design, and team collaboration patterns |

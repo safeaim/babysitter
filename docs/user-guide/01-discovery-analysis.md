@@ -48,7 +48,7 @@ Babysitter is an **event-sourced orchestration framework** for Claude Code that 
 
 1. **Babysitter SDK** (`@a5c-ai/babysitter-sdk`) - Core orchestration runtime, CLI
 2. **Babysitter Plugin** (`babysitter@a5c.ai`) - Claude Code integration
-3. **Process Library** - Built-in methodologies (TDD, Spec-Kit, GSD, etc.)
+3. **Process Library** - SDK-managed built-in library of methodologies, shared processes, and domain specializations
 
 ### 1.4 Architecture Summary
 
@@ -561,7 +561,7 @@ Based on analysis of existing documentation:
 | CLI Spec | `/notes/babysitter_cli_surface_spec.md` | CLI commands and behavior |
 | CLI Examples | `/docs/cli-examples.md` | Usage patterns |
 | Breakpoints README | `/packages/breakpoints/README.md` | Human approval system |
-| Process README | `/plugins/babysitter/skills/babysit/process/README.md` | Methodologies overview |
+| Process Library README | `/library/README.md` | Built-in library overview |
 | SDK Package.json | `/packages/sdk/package.json` | Version, dependencies |
 
 ## Appendix B: Key Metrics for Documentation Success

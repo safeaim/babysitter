@@ -167,12 +167,12 @@ describe('MockProcess', () => {
       expect(result.stdout).toContain('"subtype":"success"');
     });
 
-    it('deny interactions exit non-zero and do not emit a success result', async () => {
+    it('deny interactions exit cleanly and do not emit a success result', async () => {
       const proc = new MockProcess(buildInteractiveScenario('deny'));
       proc.start();
 
       const result = await proc.waitForExit();
-      expect(result.exitCode).toBeGreaterThan(0);
+      expect(result.exitCode).toBe(0);
       expect(result.stderr).toContain('Do you want to allow this tool call?');
       expect(result.stdout).not.toContain('"subtype":"success"');
       expect(result.stdout).toContain('denied');

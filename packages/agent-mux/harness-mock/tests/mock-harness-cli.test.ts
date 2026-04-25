@@ -128,13 +128,13 @@ describe('mock-harness runMockHarness', () => {
     expect(so.text()).toContain('"subtype":"success"');
   });
 
-  it('interactive:deny exits non-zero without a success result', async () => {
+  it('interactive:deny exits cleanly without a success result', async () => {
     const so = collectStream(); const se = collectStream();
     const code = await runMockHarness(
       { stdinEcho: false, list: false, help: false, scenario: 'interactive:deny', delay: 0 },
       { stdout: so.stream, stderr: se.stream },
     );
-    expect(code).toBeGreaterThan(0);
+    expect(code).toBe(0);
     expect(se.text()).toContain('Do you want to allow this tool call?');
     expect(so.text()).not.toContain('"subtype":"success"');
     expect(so.text()).toContain('denied');

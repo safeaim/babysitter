@@ -265,6 +265,10 @@ export class MockProcess extends EventEmitter implements SubprocessMockHandle {
         });
       }
 
+      if (this._stdinBuffer.length > 0) {
+        this._tryResolveInteractionFromInput(this._stdinBuffer);
+      }
+
       return true;
     }
     return false;
@@ -273,7 +277,16 @@ export class MockProcess extends EventEmitter implements SubprocessMockHandle {
   private _acceptInput(data: string): void {
     this._stdinBuffer += data;
     this.emit('stdin', data);
+    this._tryResolveInteractionFromInput(data);
+  }
+
+  private _tryResolveInteractionFromInput(input: string): void {
     if (!this._pendingInteraction || this._pendingInteraction.resolved) {
+      return;
+    }
+
+    const normalizedInput = input.trim();
+    if (normalizedInput.length === 0) {
       return;
     }
 
@@ -281,11 +294,11 @@ export class MockProcess extends EventEmitter implements SubprocessMockHandle {
     const allowPattern = this._toInputPattern(interaction.allowPattern, /^y(?:es)?\s*$/i);
     const denyPattern = this._toInputPattern(interaction.denyPattern, /^n(?:o)?\s*$/i);
 
-    if (allowPattern.test(data.trim())) {
+    if (allowPattern.test(normalizedInput)) {
       this._resolveInteraction('allow');
       return;
     }
-    if (denyPattern.test(data.trim())) {
+    if (denyPattern.test(normalizedInput)) {
       this._resolveInteraction('deny');
     }
   }

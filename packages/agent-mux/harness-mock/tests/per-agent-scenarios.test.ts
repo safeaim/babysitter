@@ -130,11 +130,11 @@ describe('Interaction scenarios', () => {
     expect(scen.interactions?.[0]?.response).toBe('');
   });
 
-  it('deny mode is modeled as a real rejection, not a successful completion', async () => {
+  it('deny mode is modeled as a clean denial, not a successful completion', async () => {
     const proc = new MockProcess(buildInteractiveScenario('deny'));
     proc.start();
     const res = await proc.waitForExit();
-    expect(res.exitCode).toBeGreaterThan(0);
+    expect(res.exitCode).toBe(0);
     expect(res.stdout).not.toContain('"subtype":"success"');
     expect(res.stdout).toContain('denied');
   });

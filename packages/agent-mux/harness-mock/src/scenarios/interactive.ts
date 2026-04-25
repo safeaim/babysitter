@@ -42,7 +42,7 @@ export function buildInteractiveScenario(mode: InteractionMode): HarnessScenario
       output: [
         stdoutChunk(claudeAssistantText('Tool call denied.'), 0),
       ],
-      exitCode: 1,
+      exitCode: 0,
     },
     onTimeout: {
       output: [
@@ -55,7 +55,7 @@ export function buildInteractiveScenario(mode: InteractionMode): HarnessScenario
   const base: HarnessScenario = {
     harness: 'claude-code',
     name: `interactive:${mode}`,
-    process: { exitCode: mode === 'deny' || mode === 'timeout' ? 1 : 0, shutdownDelayMs: 50 },
+    process: { exitCode: mode === 'timeout' ? 1 : 0, shutdownDelayMs: 50 },
     output,
     interactions: [interaction],
   };

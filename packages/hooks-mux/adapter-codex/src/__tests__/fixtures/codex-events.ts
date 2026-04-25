@@ -19,6 +19,12 @@ export const USER_PROMPT_PAYLOAD = {
   cwd: '/home/user/project',
 };
 
+export const SESSION_END_PAYLOAD = {
+  session_id: 'codex-sess-abc123',
+  reason: 'task_complete',
+  summary: 'Session completed successfully',
+};
+
 export const STOP_PAYLOAD = {
   session_id: 'codex-sess-abc123',
   reason: 'task_complete',

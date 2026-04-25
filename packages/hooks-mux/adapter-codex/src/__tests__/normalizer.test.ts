@@ -3,6 +3,7 @@ import { normalizeCodexEvent, parseStdin, extractSessionId } from '../normalizer
 import {
   SESSION_START_PAYLOAD,
   USER_PROMPT_PAYLOAD,
+  SESSION_END_PAYLOAD,
   STOP_PAYLOAD,
   TOOL_BEFORE_PAYLOAD,
   TOOL_AFTER_PAYLOAD,
@@ -102,6 +103,20 @@ describe('normalizeCodexEvent', () => {
     });
   });
 
+  describe('SessionEnd', () => {
+    it('normalizes to session.end phase with lossy support', () => {
+      const event = normalizeCodexEvent('SessionEnd', SESSION_END_PAYLOAD, BASE_ENV);
+      expect(event.phase).toBe('session.end');
+      expect(event.supportLevel).toBe('lossy');
+    });
+
+    it('preserves end-of-session payload fields', () => {
+      const event = normalizeCodexEvent('SessionEnd', SESSION_END_PAYLOAD, BASE_ENV);
+      expect(event.payload['reason']).toBe('task_complete');
+      expect(event.payload['summary']).toBe('Session completed successfully');
+    });
+  });
+
   describe('Stop', () => {
     it('normalizes to turn.stop phase', () => {
       const event = normalizeCodexEvent('Stop', STOP_PAYLOAD, BASE_ENV);
@@ -159,6 +174,16 @@ describe('normalizeCodexEvent', () => {
       const event = normalizeCodexEvent('SessionStart', null, BASE_ENV);
       expect(event.phase).toBe('session.start');
       expect(event.execution.sessionId).toBeNull();
+    });
+
+    it('handles string stdin input for SessionEnd', () => {
+      const event = normalizeCodexEvent(
+        'SessionEnd',
+        JSON.stringify(SESSION_END_PAYLOAD),
+        BASE_ENV,
+      );
+      expect(event.phase).toBe('session.end');
+      expect(event.execution.sessionId).toBe('codex-sess-abc123');
     });
   });
 

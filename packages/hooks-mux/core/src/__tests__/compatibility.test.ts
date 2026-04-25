@@ -1,8 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { normalizeEvent } from '../normalizer/normalize';
-import type { PhaseMapping } from '../types/lifecycle';
 import fs from 'fs';
 import path from 'path';
+import { CLAUDE_PHASE_MAPPINGS } from '../../../adapter-claude/src/mappings';
+import { CODEX_PHASE_MAPPINGS } from '../../../adapter-codex/src/mappings';
+import { GEMINI_PHASE_MAPPINGS } from '../../../adapter-gemini/src/mappings';
+import { COPILOT_PHASE_MAPPINGS } from '../../../adapter-copilot/src/mappings';
 
 /**
  * Shape of the versioned fixture file.
@@ -26,55 +29,11 @@ interface FixtureEvent {
   };
 }
 
-// --- Adapter mappings (inlined here to avoid cross-package imports) ---
-
-const CLAUDE_MAPPINGS: PhaseMapping[] = [
-  { canonicalPhase: 'session.start', nativeHook: 'SessionStart', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'session.end', nativeHook: 'SessionEnd', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'session.compact.before', nativeHook: 'PreCompact', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'turn.user_prompt_submitted', nativeHook: 'UserPromptSubmit', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'tool.before', nativeHook: 'PreToolUse', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'tool' },
-  { canonicalPhase: 'tool.after', nativeHook: 'PostToolUse', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'tool' },
-  { canonicalPhase: 'turn.stop', nativeHook: 'Stop', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'subagent.end', nativeHook: 'SubagentStop', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'subagent' },
-  { canonicalPhase: 'notification', nativeHook: 'Notification', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'notification' },
-];
-
-const CODEX_MAPPINGS: PhaseMapping[] = [
-  { canonicalPhase: 'session.start', nativeHook: 'SessionStart', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'session.end', nativeHook: 'SessionEnd', supportLevel: 'lossy', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'turn.user_prompt_submitted', nativeHook: 'UserPromptSubmit', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'turn.stop', nativeHook: 'Stop', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'tool.before', nativeHook: 'PreToolUse', supportLevel: 'lossy', blockCapability: true, mutationCapability: false, scope: 'tool' },
-  { canonicalPhase: 'tool.after', nativeHook: 'PostToolUse', supportLevel: 'lossy', blockCapability: false, mutationCapability: false, scope: 'tool' },
-];
-
-const GEMINI_MAPPINGS: PhaseMapping[] = [
-  { canonicalPhase: 'session.start', nativeHook: 'SessionStart', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'session.end', nativeHook: 'SessionEnd', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'planner.before_tool_selection', nativeHook: 'BeforeToolSelection', supportLevel: 'native', blockCapability: true, mutationCapability: true, scope: 'planner' },
-  { canonicalPhase: 'model.before_request', nativeHook: 'BeforeModel', supportLevel: 'native', blockCapability: true, mutationCapability: true, scope: 'model' },
-  { canonicalPhase: 'model.after_response', nativeHook: 'AfterModel', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'model' },
-  { canonicalPhase: 'turn.before_agent', nativeHook: 'BeforeAgent', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'turn.after_agent', nativeHook: 'AfterAgent', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'tool.before', nativeHook: 'BeforeTool', supportLevel: 'native', blockCapability: true, mutationCapability: true, scope: 'tool' },
-  { canonicalPhase: 'tool.after', nativeHook: 'AfterTool', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'tool' },
-];
-
-const COPILOT_MAPPINGS: PhaseMapping[] = [
-  { canonicalPhase: 'session.start', nativeHook: 'sessionStart', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'session.end', nativeHook: 'sessionEnd', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'session' },
-  { canonicalPhase: 'turn.user_prompt_submitted', nativeHook: 'userPromptSubmitted', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'turn' },
-  { canonicalPhase: 'tool.before', nativeHook: 'preToolUse', supportLevel: 'native', blockCapability: true, mutationCapability: false, scope: 'tool' },
-  { canonicalPhase: 'tool.after', nativeHook: 'postToolUse', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'tool' },
-  { canonicalPhase: 'turn.error', nativeHook: 'errorOccurred', supportLevel: 'native', blockCapability: false, mutationCapability: false, scope: 'turn' },
-];
-
-const ADAPTER_MAPPINGS_MAP: Record<string, PhaseMapping[]> = {
-  claude: CLAUDE_MAPPINGS,
-  codex: CODEX_MAPPINGS,
-  gemini: GEMINI_MAPPINGS,
-  copilot: COPILOT_MAPPINGS,
+const ADAPTER_MAPPINGS_MAP = {
+  claude: CLAUDE_PHASE_MAPPINGS,
+  codex: CODEX_PHASE_MAPPINGS,
+  gemini: GEMINI_PHASE_MAPPINGS,
+  copilot: COPILOT_PHASE_MAPPINGS,
 };
 
 const FIXTURE_FILES = ['claude-v1.json', 'codex-v1.json', 'gemini-v1.json', 'copilot-v1.json'];

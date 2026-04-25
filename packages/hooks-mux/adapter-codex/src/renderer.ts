@@ -38,9 +38,15 @@ const SESSION_START_FIELDS = new Set([
   'reason',
 ]);
 
+/** Output fields supported on SessionEnd (mostly ignored). */
+const SESSION_END_FIELDS = new Set([
+  'reason',
+]);
+
 /** Map native event names to their supported output field sets. */
 const SUPPORTED_FIELDS_BY_EVENT: Record<string, Set<string>> = {
   SessionStart: SESSION_START_FIELDS,
+  SessionEnd: SESSION_END_FIELDS,
   UserPromptSubmit: USER_PROMPT_SUBMIT_FIELDS,
   Stop: STOP_FIELDS,
   PreToolUse: TOOL_BEFORE_FIELDS,

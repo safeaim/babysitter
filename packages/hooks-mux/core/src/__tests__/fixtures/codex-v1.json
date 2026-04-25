@@ -18,7 +18,23 @@
       "expected": {
         "phase": "session.start",
         "supportLevel": "native",
-        "adapter": "codex"
+        "adapter": "codex",
+        "payloadKeys": ["session_id", "cwd", "model", "source"]
+      }
+    },
+    {
+      "nativeEventName": "SessionEnd",
+      "stdin": {
+        "session_id": "codex-sess-abc123",
+        "reason": "task_complete",
+        "summary": "Session completed successfully"
+      },
+      "env": {},
+      "expected": {
+        "phase": "session.end",
+        "supportLevel": "lossy",
+        "adapter": "codex",
+        "payloadKeys": ["session_id", "reason", "summary"]
       }
     },
     {
@@ -32,7 +48,8 @@
       "expected": {
         "phase": "turn.user_prompt_submitted",
         "supportLevel": "native",
-        "adapter": "codex"
+        "adapter": "codex",
+        "payloadKeys": ["session_id", "prompt", "cwd"]
       }
     },
     {
@@ -46,7 +63,8 @@
       "expected": {
         "phase": "turn.stop",
         "supportLevel": "native",
-        "adapter": "codex"
+        "adapter": "codex",
+        "payloadKeys": ["session_id", "reason", "stop_hook_active"]
       }
     },
     {
@@ -61,7 +79,24 @@
       "expected": {
         "phase": "tool.before",
         "supportLevel": "lossy",
-        "adapter": "codex"
+        "adapter": "codex",
+        "payloadKeys": ["session_id", "tool_name", "tool_call_id", "tool_input"]
+      }
+    },
+    {
+      "nativeEventName": "PostToolUse",
+      "stdin": {
+        "session_id": "codex-sess-abc123",
+        "tool_name": "bash",
+        "tool_call_id": "tc-001",
+        "tool_output": { "exit_code": 0, "stdout": "Tests passed" }
+      },
+      "env": {},
+      "expected": {
+        "phase": "tool.after",
+        "supportLevel": "lossy",
+        "adapter": "codex",
+        "payloadKeys": ["session_id", "tool_name", "tool_call_id", "tool_output"]
       }
     }
   ]

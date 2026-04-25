@@ -23,6 +23,101 @@ function makeMergedResult(overrides: Partial<MergedExecutionResult> = {}): Merge
 }
 
 describe('renderCodexOutput', () => {
+  it('matches the native field matrix for each supported Codex event', () => {
+    const result = makeMergedResult({
+      decision: 'deny',
+      reason: 'blocked by policy',
+      systemMessage: 'Use the safe path',
+      continueSession: false,
+      stopReason: 'iteration limit',
+      suppressOutput: true,
+    });
+
+    expect({
+      SessionStart: renderCodexOutput(result, 'SessionStart'),
+      SessionEnd: renderCodexOutput(result, 'SessionEnd'),
+      UserPromptSubmit: renderCodexOutput(result, 'UserPromptSubmit'),
+      Stop: renderCodexOutput(result, 'Stop'),
+      PreToolUse: renderCodexOutput(result, 'PreToolUse'),
+      PostToolUse: renderCodexOutput(result, 'PostToolUse'),
+    }).toMatchInlineSnapshot(`
+      {
+        "PostToolUse": {
+          "droppedFields": [
+            "decision",
+            "systemMessage",
+            "continueSession",
+            "stopReason",
+          ],
+          "output": {
+            "reason": "blocked by policy",
+            "suppressOutput": true,
+          },
+        },
+        "PreToolUse": {
+          "droppedFields": [
+            "systemMessage",
+            "continueSession",
+            "stopReason",
+            "suppressOutput",
+          ],
+          "output": {
+            "decision": "deny",
+            "reason": "blocked by policy",
+          },
+        },
+        "SessionEnd": {
+          "droppedFields": [
+            "decision",
+            "systemMessage",
+            "continueSession",
+            "stopReason",
+            "suppressOutput",
+          ],
+          "output": {
+            "reason": "blocked by policy",
+          },
+        },
+        "SessionStart": {
+          "droppedFields": [
+            "decision",
+            "systemMessage",
+            "continueSession",
+            "stopReason",
+            "suppressOutput",
+          ],
+          "output": {
+            "reason": "blocked by policy",
+          },
+        },
+        "Stop": {
+          "droppedFields": [
+            "decision",
+            "systemMessage",
+            "suppressOutput",
+          ],
+          "output": {
+            "continueSession": false,
+            "reason": "blocked by policy",
+            "stopReason": "iteration limit",
+          },
+        },
+        "UserPromptSubmit": {
+          "droppedFields": [
+            "continueSession",
+            "stopReason",
+            "suppressOutput",
+          ],
+          "output": {
+            "decision": "deny",
+            "reason": "blocked by policy",
+            "systemMessage": "Use the safe path",
+          },
+        },
+      }
+    `);
+  });
+
   describe('UserPromptSubmit', () => {
     it('includes decision and reason', () => {
       const result = makeMergedResult({
@@ -111,6 +206,21 @@ describe('renderCodexOutput', () => {
     });
   });
 
+  describe('SessionEnd', () => {
+    it('has minimal output (same fail-open shape as SessionStart)', () => {
+      const result = makeMergedResult({
+        decision: 'allow',
+        reason: 'session completed',
+        systemMessage: 'Goodbye',
+      });
+      const { output, droppedFields } = renderCodexOutput(result, 'SessionEnd');
+      expect(output['reason']).toBe('session completed');
+      expect(output['decision']).toBeUndefined();
+      expect(droppedFields).toContain('decision');
+      expect(droppedFields).toContain('systemMessage');
+    });
+  });
+
   describe('unknown event', () => {
     it('drops all non-empty fields', () => {
       const result = makeMergedResult({
@@ -138,6 +248,7 @@ describe('isFieldSupportedForEvent', () => {
   it('returns true for supported fields', () => {
     expect(isFieldSupportedForEvent('decision', 'UserPromptSubmit')).toBe(true);
     expect(isFieldSupportedForEvent('continueSession', 'Stop')).toBe(true);
+    expect(isFieldSupportedForEvent('reason', 'SessionEnd')).toBe(true);
   });
 
   it('returns false for unsupported fields', () => {

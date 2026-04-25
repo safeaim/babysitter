@@ -233,4 +233,53 @@ describe('AgentPanel', () => {
     // Should still render the title
     expect(screen.getByText(task.title)).toBeInTheDocument();
   });
+
+  it('renders linked execution context when provided', () => {
+    const task = createMockTaskDetail({ title: 'Dispatch attempt' });
+    render(
+      <AgentPanel
+        task={task}
+        executionContexts={[
+          {
+            kind: 'dispatch-context-labels',
+            project: { id: 'project-1', key: 'KANBAN', name: 'Kanban' },
+            issue: { id: 'issue-1', key: 'KANBAN-1', title: 'Issue title' },
+            dispatch: {
+              runIds: ['run-1'],
+              sessionIds: ['session-1'],
+              labelIds: ['dispatch-context-label-1'],
+              labels: [
+                {
+                  labelId: 'dispatch-context-label-1',
+                  key: 'tests_first',
+                  label: 'Tests First',
+                  instruction: 'Write tests first.',
+                },
+              ],
+              renderedContext: '- [tests_first] Write tests first.',
+              lastDispatchedAt: '2026-04-24T00:00:00.000Z',
+            },
+            block: [
+              'Execution Context',
+              'Project: KANBAN (Kanban)',
+              'Issue: KANBAN-1 (issue-1)',
+              'Title: Issue title',
+              'Applied Dispatch Context Labels (1):',
+              '- tests_first (dispatch-context-label-1): Tests First',
+              'Run IDs: run-1',
+              'Session IDs: session-1',
+              'Last Dispatched At: 2026-04-24T00:00:00.000Z',
+              'Rendered Dispatch Context:',
+              '- [tests_first] Write tests first.',
+            ].join('\n'),
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('Attempt execution context')).toBeInTheDocument();
+    expect(screen.getByText('Issue title')).toBeInTheDocument();
+    expect(screen.getAllByText(/Tests First/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Rendered block/)).toBeInTheDocument();
+  });
 });

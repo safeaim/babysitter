@@ -106,6 +106,29 @@ export interface KanbanDispatchContextLabelProjection {
   readonly instruction: string;
 }
 
+export interface KanbanExecutionContextEnvelope {
+  readonly kind: 'dispatch-context-labels';
+  readonly project: {
+    readonly id: string;
+    readonly key?: string;
+    readonly name?: string;
+  };
+  readonly issue: {
+    readonly id: string;
+    readonly key: string;
+    readonly title: string;
+  };
+  readonly dispatch: {
+    readonly runIds: readonly string[];
+    readonly sessionIds: readonly string[];
+    readonly labelIds: readonly string[];
+    readonly labels: readonly KanbanDispatchContextLabelProjection[];
+    readonly renderedContext?: string;
+    readonly lastDispatchedAt?: string;
+  };
+  readonly block: string;
+}
+
 export interface KanbanLabel {
   readonly id: string;
   readonly name: string;
@@ -845,6 +868,142 @@ export function renderDispatchContextLabels(
   return projectDispatchContextLabels(definitions, refs)
     .map((projection) => `- [${projection.key}] ${projection.instruction}`)
     .join('\n');
+}
+
+export function renderKanbanExecutionContextBlock(input: {
+  readonly projectId: string;
+  readonly projectKey?: string;
+  readonly projectName?: string;
+  readonly issueId: string;
+  readonly issueKey: string;
+  readonly issueTitle: string;
+  readonly runIds?: readonly string[];
+  readonly sessionIds?: readonly string[];
+  readonly labelIds?: readonly string[];
+  readonly labels?: readonly KanbanDispatchContextLabelProjection[];
+  readonly renderedContext?: string;
+  readonly lastDispatchedAt?: string;
+}): string {
+  const labelIds = Array.from(new Set(input.labelIds ?? []));
+  const labels = input.labels ?? [];
+  const projectSummary = input.projectKey?.trim()
+    ? input.projectName?.trim()
+      ? `${input.projectKey} (${input.projectName})`
+      : input.projectKey
+    : input.projectName?.trim() || input.projectId;
+  const labelSummary = labels.length > 0
+    ? labels.map((label) => `- ${label.key} (${label.labelId}): ${label.label}`).join('\n')
+    : labelIds.length > 0
+      ? labelIds.map((labelId) => `- ${labelId}`).join('\n')
+      : '- none';
+  const renderedContext = input.renderedContext?.trim() || '- none';
+  const runSummary = (input.runIds ?? []).length > 0 ? (input.runIds ?? []).join(', ') : 'none';
+  const sessionSummary = (input.sessionIds ?? []).length > 0 ? (input.sessionIds ?? []).join(', ') : 'none';
+
+  return [
+    'Execution Context',
+    `Project: ${projectSummary}`,
+    `Issue: ${input.issueKey} (${input.issueId})`,
+    `Title: ${input.issueTitle}`,
+    `Applied Dispatch Context Labels (${labelIds.length}):`,
+    labelSummary,
+    `Run IDs: ${runSummary}`,
+    `Session IDs: ${sessionSummary}`,
+    `Last Dispatched At: ${input.lastDispatchedAt ?? 'none'}`,
+    'Rendered Dispatch Context:',
+    renderedContext,
+  ].join('\n');
+}
+
+export function buildKanbanExecutionContextEnvelope(input: {
+  readonly issue: Pick<KanbanIssue, 'id' | 'key' | 'title' | 'projectId' | 'dispatch'>;
+  readonly project?: Pick<KanbanProject, 'id' | 'key' | 'name'>;
+}): KanbanExecutionContextEnvelope | undefined {
+  const labelIds = normalizeKanbanDispatchContextLabelRefs(input.issue.dispatch.contextLabels).map((ref) => ref.labelId);
+  const labels = input.issue.dispatch.contextLabelProjections ?? [];
+  const renderedContext = input.issue.dispatch.renderedContext?.trim() || undefined;
+
+  if (labelIds.length === 0 && labels.length === 0 && !renderedContext) {
+    return undefined;
+  }
+
+  return {
+    kind: 'dispatch-context-labels',
+    project: {
+      id: input.project?.id ?? input.issue.projectId,
+      key: input.project?.key,
+      name: input.project?.name,
+    },
+    issue: {
+      id: input.issue.id,
+      key: input.issue.key,
+      title: input.issue.title,
+    },
+    dispatch: {
+      runIds: Array.from(new Set(input.issue.dispatch.runIds ?? [])),
+      sessionIds: Array.from(new Set(input.issue.dispatch.sessionIds ?? [])),
+      labelIds,
+      labels,
+      renderedContext,
+      lastDispatchedAt: input.issue.dispatch.lastDispatchedAt,
+    },
+    block: renderKanbanExecutionContextBlock({
+      projectId: input.project?.id ?? input.issue.projectId,
+      projectKey: input.project?.key,
+      projectName: input.project?.name,
+      issueId: input.issue.id,
+      issueKey: input.issue.key,
+      issueTitle: input.issue.title,
+      runIds: input.issue.dispatch.runIds,
+      sessionIds: input.issue.dispatch.sessionIds,
+      labelIds,
+      labels,
+      renderedContext,
+      lastDispatchedAt: input.issue.dispatch.lastDispatchedAt,
+    }),
+  };
+}
+
+function findKanbanExecutionContextEnvelopes(
+  snapshot: Pick<KanbanBacklogSnapshot, 'projects' | 'issues'>,
+  matcher: (issue: KanbanIssue) => boolean,
+): KanbanExecutionContextEnvelope[] {
+  const projectsById = new Map(snapshot.projects.map((project) => [project.id, project]));
+  return snapshot.issues
+    .filter(matcher)
+    .map((issue) => buildKanbanExecutionContextEnvelope({ issue, project: projectsById.get(issue.projectId) }))
+    .filter((envelope): envelope is KanbanExecutionContextEnvelope => Boolean(envelope))
+    .sort((left, right) => left.issue.key.localeCompare(right.issue.key) || left.issue.id.localeCompare(right.issue.id));
+}
+
+export function findKanbanExecutionContextEnvelopesForRun(
+  snapshot: Pick<KanbanBacklogSnapshot, 'projects' | 'issues'>,
+  runId: string,
+): KanbanExecutionContextEnvelope[] {
+  const normalizedRunId = runId.trim();
+  if (!normalizedRunId) {
+    return [];
+  }
+
+  return findKanbanExecutionContextEnvelopes(
+    snapshot,
+    (issue) => issue.dispatch.runIds.includes(normalizedRunId),
+  );
+}
+
+export function findKanbanExecutionContextEnvelopesForSession(
+  snapshot: Pick<KanbanBacklogSnapshot, 'projects' | 'issues'>,
+  sessionId: string,
+): KanbanExecutionContextEnvelope[] {
+  const normalizedSessionId = sessionId.trim();
+  if (!normalizedSessionId) {
+    return [];
+  }
+
+  return findKanbanExecutionContextEnvelopes(
+    snapshot,
+    (issue) => issue.dispatch.sessionIds.includes(normalizedSessionId),
+  );
 }
 
 function normalizeKanbanTaskTagScope(

@@ -6,7 +6,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { KindBadge } from "@/components/shared/kind-badge";
 import { TruncatedId } from "@/components/shared/truncated-id";
+import { ExecutionContextPanel } from "@/components/shared/execution-context-panel";
 import type { TaskDetail } from "@/types";
+import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanban";
 
 /** Tiny copy-to-clipboard button (icon only) — magenta hover */
 function CopyButton({ text }: { text: string }) {
@@ -131,7 +133,13 @@ function ResultOutput({ value }: { value: unknown }) {
   );
 }
 
-export function AgentPanel({ task }: { task: TaskDetail | null }) {
+export function AgentPanel({
+  task,
+  executionContexts = [],
+}: {
+  task: TaskDetail | null;
+  executionContexts?: readonly KanbanExecutionContextEnvelope[];
+}) {
   if (!task) return <div className="p-4 text-sm text-foreground-muted">Select a task to view details</div>;
 
   // Try to find agent prompt data from taskDef or inputs
@@ -162,6 +170,14 @@ export function AgentPanel({ task }: { task: TaskDetail | null }) {
   return (
     <ScrollArea className="h-full">
       <div className="space-y-4 p-4">
+        <ExecutionContextPanel
+          contexts={executionContexts}
+          compact
+          title="Attempt execution context"
+          description="This task inherits the linked issue dispatch-context labels through the run association."
+          className="border-border/70 bg-card/70 p-4 shadow-none"
+        />
+
         {/* Header with title, kind, status */}
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-foreground">{String(title)}</h3>

@@ -587,7 +587,6 @@ function stripDerivedDispatchState(
     },
   };
 }
-
 function nextPullRequestNumber(issues: readonly BacklogSeedIssue[]): number {
   return (
     Math.max(
@@ -1403,6 +1402,10 @@ export class BacklogQueryService {
 
     return {
       projects: backlogFile?.projects?.length ? backlogFile.projects : defaultProjects,
+      issues: (backlogFile?.issues?.length ? backlogFile.issues : defaultIssues).map((issue) =>
+        sanitizeStoredIssue(issue, dispatchContextLabels),
+      ),
+      dispatchContextLabels,
       issues: (backlogFile?.issues?.length ? backlogFile.issues : defaultIssues).map((issue) =>
         sanitizeStoredIssue(issue, dispatchContextLabels),
       ),

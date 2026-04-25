@@ -8,15 +8,18 @@ import type {
   KanbanReviewComment,
   KanbanReviewSummary,
 } from "@a5c-ai/agent-mux-core";
+import { findKanbanExecutionContextEnvelopesForSession } from "@a5c-ai/agent-mux-core/kanban";
 import { AlertTriangle, Archive, FolderGit2, RefreshCw, RotateCcw, Trash2, Wrench } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ReviewPanel } from "@/components/review/review-panel";
 import { cn } from "@/lib/cn";
+import { useBacklog } from "@/hooks/use-backlog";
 import { useReviews } from "@/hooks/use-reviews";
 import type { WorkspaceInventoryItem, WorkspaceInventoryResponse, WorkspaceSessionSnapshot } from "@/lib/workspace-lifecycle";
 import { WorkspaceDetailsSidebar, type WorkspaceSidebarFeedback } from "@/components/workspaces/workspace-details-sidebar";
+import { WorkspaceRuntimePanel } from "@/components/workspaces/workspace-runtime-panel";
 
 function formatTimestamp(value: string | null): string {
   if (!value) {
@@ -156,6 +159,7 @@ export function WorkspacesPageContent(props: {
   const [pendingNotePath, setPendingNotePath] = useState<string | null>(null);
   const [feedbackByWorkspacePath, setFeedbackByWorkspacePath] = useState<Record<string, WorkspaceSidebarFeedback | null>>({});
   const [isPending, startTransition] = useTransition();
+  const { snapshot } = useBacklog();
   const workspaceReviews = useReviews({ targetType: "workspace" });
 
   const sessionFingerprint = useMemo(
@@ -224,6 +228,18 @@ export function WorkspacesPageContent(props: {
     () => buildArtifactByPath(workspaceReviews.artifacts),
     [workspaceReviews.artifacts],
   );
+  const executionContextsBySessionId = useMemo(() => {
+    if (!snapshot) {
+      return new Map<string, ReturnType<typeof findKanbanExecutionContextEnvelopesForSession>>();
+    }
+
+    return new Map(
+      props.sessions.map((session) => [
+        session.sessionId,
+        findKanbanExecutionContextEnvelopesForSession(snapshot, session.sessionId),
+      ]),
+    );
+  }, [props.sessions, snapshot]);
 
   function refreshInventory() {
     startTransition(() => {
@@ -689,7 +705,16 @@ function WorkspaceColumn(props: {
                 </section>
               ) : null}
 
-              <div className="mt-5">
+              <div className={cn("mt-5 grid gap-4", runtimeSession?.runtime ? "xl:grid-cols-[minmax(0,1fr)_360px]" : "")}>
+                {runtimeSession?.runtime ? (
+                  <WorkspaceRuntimePanel
+                    className="border-border/70 bg-card/70"
+                    runtime={runtimeSession.runtime}
+                    rebase={workspace.rebase}
+                    sessionId={runtimeSession.sessionId}
+                    executionContexts={executionContextsBySessionId.get(runtimeSession.sessionId) ?? []}
+                  />
+                ) : null}
                 <WorkspaceDetailsSidebar
                   workspace={workspace}
                   runtime={runtimeSession?.runtime}

@@ -5,6 +5,7 @@ import type {
   KanbanCollaboratorRole,
   KanbanIntegrationProvider,
   KanbanRepositoryIntegrationState,
+  KanbanDispatchContextLabelDefinition,
   KanbanIssue,
   KanbanPermissionGrant,
   KanbanProject,
@@ -986,6 +987,128 @@ function IssueCollaborationPanel({
         </div>
       </div>
     </div>
+  );
+}
+
+interface IssueDispatchContextPanelProps {
+  issue: KanbanIssue;
+  dispatchContextLabels: readonly KanbanDispatchContextLabelDefinition[];
+  mutating: boolean;
+  onSave: (input: { issueId: string; dispatchContextLabelIds: string[] }) => Promise<void>;
+}
+
+function IssueDispatchContextPanel({
+  issue,
+  dispatchContextLabels,
+  mutating,
+  onSave,
+}: IssueDispatchContextPanelProps) {
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    issue.dispatch.contextLabels.map((ref) => ref.labelId),
+  );
+
+  useEffect(() => {
+    setSelectedIds(issue.dispatch.contextLabels.map((ref) => ref.labelId));
+  }, [issue.id, issue.dispatch.contextLabels]);
+
+  return (
+    <article
+      className="rounded-2xl border border-border bg-background/80 p-4"
+      data-testid="issue-dispatch-context-panel"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-sm font-semibold text-foreground">Dispatch Context Labels</div>
+          <p className="mt-2 text-sm leading-6 text-foreground-muted">
+            Attach reusable dispatch instructions here. These are not board labels, Task Tags, or
+            default agent settings.
+          </p>
+        </div>
+        <span className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground-muted">
+          {selectedIds.length} attached
+        </span>
+      </div>
+
+      {dispatchContextLabels.length > 0 ? (
+        <form
+          className="mt-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void onSave({
+              issueId: issue.id,
+              dispatchContextLabelIds: selectedIds,
+            });
+          }}
+        >
+          <div className="space-y-2">
+            {dispatchContextLabels.map((contextLabel) => (
+              <label
+                key={contextLabel.id}
+                className="flex items-start gap-3 rounded-2xl border border-border bg-card px-3 py-3 text-sm"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(contextLabel.id)}
+                  onChange={(event) =>
+                    setSelectedIds((current) =>
+                      event.target.checked
+                        ? [...current, contextLabel.id]
+                        : current.filter((id) => id !== contextLabel.id),
+                    )
+                  }
+                  className="mt-1 h-4 w-4 rounded border border-border"
+                />
+                <span className="min-w-0">
+                  <span className="block font-semibold text-foreground">{contextLabel.label}</span>
+                  <span className="block text-xs text-foreground-muted">{contextLabel.key}</span>
+                  {contextLabel.description ? (
+                    <span className="mt-1 block text-xs leading-5 text-foreground-muted">
+                      {contextLabel.description}
+                    </span>
+                  ) : null}
+                </span>
+              </label>
+            ))}
+          </div>
+
+          <button
+            type="submit"
+            disabled={mutating}
+            className="mt-4 inline-flex h-11 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 px-4 text-sm font-semibold text-primary disabled:opacity-50"
+          >
+            Save dispatch context
+          </button>
+        </form>
+      ) : (
+        <div className="mt-4 rounded-2xl border border-dashed border-border p-3 text-sm text-foreground-muted">
+          No reusable Dispatch Context Labels exist yet. Create definitions in Settings first, then
+          attach them here by reference.
+        </div>
+      )}
+
+      {(issue.dispatch.contextLabelProjections ?? []).length > 0 ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {(issue.dispatch.contextLabelProjections ?? []).map((projection) => (
+            <span
+              key={`${issue.id}-${projection.id}`}
+              className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground-muted"
+            >
+              {projection.key}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      {issue.dispatch.renderedContext ? (
+        <pre className="mt-4 whitespace-pre-wrap rounded-2xl border border-border bg-card px-3 py-3 text-xs text-foreground-secondary">
+          {issue.dispatch.renderedContext}
+        </pre>
+      ) : (
+        <div className="mt-4 text-xs text-foreground-muted">
+          No dispatch context is currently rendered for this issue.
+        </div>
+      )}
+    </article>
   );
 }
 
@@ -2242,6 +2365,7 @@ export function BacklogOverview() {
     createIssue,
     updateProjectCollaboration,
     updateIssueCollaboration,
+    updateIssueDispatchContextLabels,
     createSubIssue,
     linkChildIssue,
     updateIssueDetail,
@@ -2684,6 +2808,23 @@ export function BacklogOverview() {
         </div>
       </div>
 
+      {focusedIssue ? (
+        <IssueRelationshipPanel
+          issue={focusedIssue}
+          card={focusedIssueCard}
+          project={primaryProject}
+          issues={snapshot.issues.filter((issue) => issue.projectId === primaryProject.id)}
+          dispatchContextLabels={snapshot.dispatchContextLabels}
+          loading={loading}
+          mutating={mutatingIssueId === focusedIssue.id}
+          mutationError={mutationError}
+          onFocusIssue={setFocusedIssue}
+          onClose={clearFocusedIssue}
+          onSaveDispatchContextLabels={updateIssueDispatchContextLabels}
+          onCreateSubIssue={createSubIssue}
+          onLinkChildIssue={linkChildIssue}
+        />
+      ) : null}
       {targetModelIssue ? (
         <div className="mt-5 rounded-2xl border border-border bg-background p-4">
           <div className="flex flex-wrap items-center gap-3">

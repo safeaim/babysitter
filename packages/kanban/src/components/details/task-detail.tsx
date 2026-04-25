@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTaskDetail } from "@/hooks/use-run-detail";
 import { Loader2, Hand } from "lucide-react";
 import { Kbd } from "@/components/shared/kbd";
+import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanban";
 
 /* -------------------------------------------------------------------------- */
 /*  Loading skeletons for lazy-loaded tab panels                              */
@@ -56,9 +57,18 @@ interface TaskDetailPanelProps {
   onTabChange?: (tab: string) => void;
   runDuration?: number;
   allTasks?: import("@/types").TaskEffect[];
+  executionContexts?: readonly KanbanExecutionContextEnvelope[];
 }
 
-export function TaskDetailPanel({ runId, effectId, activeTab, onTabChange, runDuration, allTasks }: TaskDetailPanelProps) {
+export function TaskDetailPanel({
+  runId,
+  effectId,
+  activeTab,
+  onTabChange,
+  runDuration,
+  allTasks,
+  executionContexts = [],
+}: TaskDetailPanelProps) {
   const { task, loading } = useTaskDetail(runId, effectId);
 
   if (!effectId) {
@@ -104,7 +114,7 @@ export function TaskDetailPanel({ runId, effectId, activeTab, onTabChange, runDu
             />
           </TabsContent>
         )}
-        <TabsContent value="agent"><AgentPanel task={task} /></TabsContent>
+        <TabsContent value="agent"><AgentPanel task={task} executionContexts={executionContexts} /></TabsContent>
         <TabsContent value="timing"><TimingPanel task={task} runDuration={runDuration} allTasks={allTasks} /></TabsContent>
         <TabsContent value="logs"><LogViewer task={task} /></TabsContent>
         <TabsContent value="data"><JsonTree task={task} /></TabsContent>

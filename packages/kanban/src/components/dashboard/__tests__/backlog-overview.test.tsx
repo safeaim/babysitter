@@ -11,6 +11,7 @@ const createPullRequestMock = vi.fn();
 const updateProjectCollaborationMock = vi.fn();
 const updateIssueCollaborationMock = vi.fn();
 const updateIssueDetailMock = vi.fn();
+const updateIssueDispatchContextLabelsMock = vi.fn();
 const createIssueMock = vi.fn();
 const createSubIssueMock = vi.fn();
 const linkChildIssueMock = vi.fn();
@@ -93,6 +94,28 @@ function buildBacklogState() {
           },
         },
       ],
+      dispatchContextLabels: [
+        {
+          id: "dispatch-context-label-1",
+          key: "tests_first",
+          label: "Tests First",
+          description: "Keep verification ahead of implementation.",
+          instruction: "Write or update deterministic verification before editing runtime code.",
+          order: 0,
+          createdAt: "2026-04-24T14:00:00.000Z",
+          updatedAt: "2026-04-24T14:00:00.000Z",
+        },
+        {
+          id: "dispatch-context-label-2",
+          key: "ui_copy_review",
+          label: "UI Copy Review",
+          description: "Ask for a copy pass before final text ships.",
+          instruction: "Review user-facing strings before finalizing the change.",
+          order: 1,
+          createdAt: "2026-04-24T14:00:00.000Z",
+          updatedAt: "2026-04-24T14:00:00.000Z",
+        },
+      ],
       issues: [
         {
           id: "KANBAN-GAP-007",
@@ -120,6 +143,17 @@ function buildBacklogState() {
             blockedReasons: ["child issues still open"],
             runIds: [],
             sessionIds: [],
+            contextLabels: [{ labelId: "dispatch-context-label-1" }],
+            contextLabelProjections: [
+              {
+                id: "dispatch-context-label-1",
+                key: "tests_first",
+                label: "Tests First",
+                description: "Keep verification ahead of implementation.",
+                instruction: "Write or update deterministic verification before editing runtime code.",
+              },
+            ],
+            renderedContext: "- [tests_first] Write or update deterministic verification before editing runtime code.",
           },
           activity: [
             {
@@ -156,6 +190,9 @@ function buildBacklogState() {
             blockedReasons: [],
             runIds: [],
             sessionIds: [],
+            contextLabels: [],
+            contextLabelProjections: [],
+            renderedContext: "",
           },
           activity: [],
         },
@@ -181,6 +218,9 @@ function buildBacklogState() {
             blockedReasons: [],
             runIds: [],
             sessionIds: [],
+            contextLabels: [],
+            contextLabelProjections: [],
+            renderedContext: "",
           },
           activity: [],
         },
@@ -315,6 +355,7 @@ function buildBacklogState() {
     updateProjectCollaboration: updateProjectCollaborationMock,
     updateIssueCollaboration: updateIssueCollaborationMock,
     updateIssueDetail: updateIssueDetailMock,
+    updateIssueDispatchContextLabels: updateIssueDispatchContextLabelsMock,
     createSubIssue: createSubIssueMock,
     linkChildIssue: linkChildIssueMock,
     movingIssueId: null,
@@ -359,6 +400,7 @@ describe("BacklogOverview", () => {
     updateProjectCollaborationMock.mockReset();
     updateIssueCollaborationMock.mockReset();
     updateIssueDetailMock.mockReset();
+    updateIssueDispatchContextLabelsMock.mockReset();
     refreshMock.mockReset();
     backlogState = buildBacklogState();
   });
@@ -495,16 +537,38 @@ describe("BacklogOverview", () => {
 
     render(<BacklogOverview />);
 
+    const dispatchPanel = screen.getByTestId("issue-dispatch-context-panel");
     expect(screen.getByTestId("issue-detail-panel")).toBeInTheDocument();
     expect(screen.getByTestId("issue-description-editor")).toHaveValue(
       "# Current state\n- [ ] Capture parity behavior",
     );
     expect(screen.getByText("parity")).toBeInTheDocument();
     expect(screen.getByTestId("issue-relationship-panel")).toBeInTheDocument();
+    expect(dispatchPanel).toBeInTheDocument();
+    expect(within(dispatchPanel).getByText("Dispatch Context Labels")).toBeInTheDocument();
+    expect(within(dispatchPanel).getAllByText("tests_first").length).toBeGreaterThan(0);
     expect(screen.getByTestId("child-nav-KANBAN-GAP-008")).toBeInTheDocument();
     expect(screen.getByTestId("create-sub-issue-form")).toBeInTheDocument();
     expect(screen.getByTestId("link-child-issue-form")).toBeInTheDocument();
     expect(screen.getByRole("option", { name: /KANBAN-GAP-009/i })).toBeInTheDocument();
+  });
+
+  it("saves dispatch context label attachments from the focused issue panel", async () => {
+    const user = setupUser();
+    searchParams = new URLSearchParams("issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
+
+    render(<BacklogOverview />);
+
+    await user.click(screen.getByRole("checkbox", { name: /ui copy review/i }));
+    await user.click(screen.getByRole("button", { name: "Save dispatch context" }));
+
+    expect(updateIssueDispatchContextLabelsMock).toHaveBeenCalledWith({
+      issueId: "KANBAN-GAP-007",
+      dispatchContextLabelIds: [
+        "dispatch-context-label-1",
+        "dispatch-context-label-2",
+      ],
+    });
   });
 
   it("keeps the issue detail panel beside list view when an issue is opened from list context", () => {

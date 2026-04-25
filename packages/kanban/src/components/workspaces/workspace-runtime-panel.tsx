@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from "react";
 import type { WorkspaceRuntimeDeviceProfile, WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
+import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanban";
 import { ExternalLink, GitBranch, Laptop2, Logs, Radar, Smartphone, TabletSmartphone, TerminalSquare } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExecutionContextPanel } from "@/components/shared/execution-context-panel";
 
 function formatTimestamp(value?: number): string {
   if (!value || !Number.isFinite(value)) {
@@ -55,6 +57,7 @@ export function WorkspaceRuntimePanel(props: {
   rebase?: WorkspaceRuntimeSurface["rebase"];
   sessionId?: string;
   className?: string;
+  executionContexts?: readonly KanbanExecutionContextEnvelope[];
 }) {
   const defaultTab = props.rebase && props.rebase.status === "rebase-conflicts"
     ? "rebase"
@@ -89,6 +92,7 @@ export function WorkspaceRuntimePanel(props: {
           <TabsTrigger value="terminal">Terminal</TabsTrigger>
           <TabsTrigger value="dev-server">Dev server</TabsTrigger>
           <TabsTrigger value="rebase">Rebase</TabsTrigger>
+          <TabsTrigger value="execution-context">Execution context</TabsTrigger>
           <TabsTrigger value="inspect">Inspect</TabsTrigger>
         </TabsList>
 
@@ -303,6 +307,20 @@ export function WorkspaceRuntimePanel(props: {
             </article>
           ) : (
             <EmptyRuntimeState text="No rebase workflow state has been detected for this workspace yet." />
+          )}
+        </TabsContent>
+
+        <TabsContent value="execution-context" className="space-y-4">
+          {props.executionContexts && props.executionContexts.length > 0 ? (
+            <ExecutionContextPanel
+              contexts={props.executionContexts}
+              compact
+              className="border-border/70 bg-card/70 p-4 shadow-none"
+              title="Workspace-linked issue context"
+              description="The workspace runtime inherits dispatch context from the linked issue session."
+            />
+          ) : (
+            <EmptyRuntimeState text="No linked dispatch-context labels have been associated with this workspace session yet." />
           )}
         </TabsContent>
 

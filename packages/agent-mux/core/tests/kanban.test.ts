@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildKanbanExecutionContextEnvelope,
   buildKanbanBoardSnapshot,
   buildKanbanBacklogSnapshot,
   computeKanbanProjectMetrics,
   evaluateKanbanIssueMove,
+  findKanbanExecutionContextEnvelopesForRun,
+  findKanbanExecutionContextEnvelopesForSession,
   normalizeKanbanDispatchContextLabel,
   normalizeKanbanDispatchContextLabelKey,
   normalizeKanbanDispatchContextLabels,
@@ -12,6 +15,7 @@ import {
   normalizeKanbanTaskTag,
   normalizeKanbanTaskTagKey,
   normalizeKanbanTaskTags,
+  renderKanbanExecutionContextBlock,
   renderDispatchContextLabels,
   type KanbanLabel,
   type KanbanDispatchContextLabelDefinition,
@@ -166,6 +170,55 @@ describe('renderDispatchContextLabels', () => {
       [
         '- [tests_first] Write or update tests before implementation changes.',
         '- [preserve_migrations] Do not rewrite historical migration files.',
+      ].join('\n'),
+    );
+  });
+});
+
+describe('renderKanbanExecutionContextBlock', () => {
+  it('renders an explicit execution-context block with stable label ordering', () => {
+    expect(
+      renderKanbanExecutionContextBlock({
+        projectId: 'project-1',
+        projectKey: 'KANBAN',
+        projectName: 'Kanban',
+        issueId: 'issue-1',
+        issueKey: 'KANBAN-1',
+        issueTitle: 'Issue title',
+        runIds: ['run-1'],
+        sessionIds: ['session-1'],
+        labelIds: ['dispatch-context-label-1', 'dispatch-context-label-2'],
+        labels: [
+          {
+            labelId: 'dispatch-context-label-1',
+            key: 'tests_first',
+            label: 'Tests First',
+            instruction: 'Write tests first.',
+          },
+          {
+            labelId: 'dispatch-context-label-2',
+            key: 'preserve_contract',
+            label: 'Preserve Contract',
+            instruction: 'Do not break the published API.',
+          },
+        ],
+        renderedContext: '- [tests_first] Write tests first.\n- [preserve_contract] Do not break the published API.',
+        lastDispatchedAt: '2026-04-24T00:00:00.000Z',
+      }),
+    ).toBe(
+      [
+        'Execution Context',
+        'Project: KANBAN (Kanban)',
+        'Issue: KANBAN-1 (issue-1)',
+        'Title: Issue title',
+        'Applied Dispatch Context Labels (2):',
+        '- tests_first (dispatch-context-label-1): Tests First',
+        '- preserve_contract (dispatch-context-label-2): Preserve Contract',
+        'Run IDs: run-1',
+        'Session IDs: session-1',
+        'Last Dispatched At: 2026-04-24T00:00:00.000Z',
+        'Rendered Dispatch Context:',
+        '- [tests_first] Write tests first.\n- [preserve_contract] Do not break the published API.',
       ].join('\n'),
     );
   });
@@ -339,6 +392,96 @@ describe('normalizeKanbanIssue', () => {
 
     expect(issue.dispatch.readiness).toBe('blocked');
     expect(issue.dispatch.blockedReasons).toContain('waiting on dep-1');
+  });
+});
+
+describe('execution context envelopes', () => {
+  it('builds an inspectable execution-context envelope from issue dispatch state', () => {
+    const envelope = buildKanbanExecutionContextEnvelope({
+      project: {
+        id: 'project-1',
+        key: 'KANBAN',
+        name: 'Kanban',
+      },
+      issue: makeIssue({
+        dispatch: {
+          readiness: 'ready',
+          blockedReasons: [],
+          runIds: ['run-1'],
+          sessionIds: ['session-1'],
+          contextLabels: [{ labelId: 'dispatch-context-label-1' }],
+          contextLabelProjections: [
+            {
+              labelId: 'dispatch-context-label-1',
+              key: 'tests_first',
+              label: 'Tests First',
+              instruction: 'Write or update tests before implementation changes.',
+            },
+          ],
+          renderedContext: '- [tests_first] Write or update tests before implementation changes.',
+          lastDispatchedAt: '2026-04-24T00:00:00.000Z',
+        },
+      }),
+    });
+
+    expect(envelope).toMatchObject({
+      project: { id: 'project-1', key: 'KANBAN', name: 'Kanban' },
+      issue: { id: 'issue-1', key: 'KANBAN-1', title: 'Issue' },
+      dispatch: {
+        runIds: ['run-1'],
+        sessionIds: ['session-1'],
+        labelIds: ['dispatch-context-label-1'],
+      },
+    });
+    expect(envelope?.block).toContain('Applied Dispatch Context Labels (1):');
+    expect(envelope?.block).toContain('Rendered Dispatch Context:');
+  });
+
+  it('finds linked execution-context envelopes by run id and session id', () => {
+    const snapshot = buildKanbanBacklogSnapshot({
+      generatedAt: '2026-04-24T00:00:00.000Z',
+      projects: [
+        {
+          id: 'project-1',
+          key: 'KANBAN',
+          name: 'Kanban',
+          issueIds: [],
+          labels: [],
+          assignees: [],
+          statuses: [],
+        },
+      ],
+      dispatchContextLabels: [
+        makeDispatchContextLabel({
+          id: 'dispatch-context-label-1',
+          key: 'tests_first',
+          label: 'Tests First',
+          instruction: 'Write or update tests before implementation changes.',
+          order: 1,
+        }),
+      ],
+      issues: [
+        makeIssue({
+          id: 'issue-1',
+          key: 'KANBAN-1',
+          dispatch: {
+            readiness: 'ready',
+            blockedReasons: [],
+            runIds: ['run-1'],
+            sessionIds: ['session-1'],
+            contextLabels: [{ labelId: 'dispatch-context-label-1' }],
+            contextLabelProjections: [],
+          },
+        }),
+        makeIssue({
+          id: 'issue-2',
+          key: 'KANBAN-2',
+        }),
+      ],
+    });
+
+    expect(findKanbanExecutionContextEnvelopesForRun(snapshot, 'run-1').map((item) => item.issue.id)).toEqual(['issue-1']);
+    expect(findKanbanExecutionContextEnvelopesForSession(snapshot, 'session-1').map((item) => item.issue.id)).toEqual(['issue-1']);
   });
 });
 

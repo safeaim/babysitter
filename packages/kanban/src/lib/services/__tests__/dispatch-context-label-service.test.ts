@@ -205,6 +205,7 @@ describe("DispatchContextLabelService", () => {
               key: "ui_copy_review",
               label: "UI Copy Review",
               instruction: "Review visible copy.",
+              instruction: "Review visible copy.",
               order: 1,
               createdAt: "2026-04-24T12:00:00.000Z",
               updatedAt: "2026-04-24T12:00:00.000Z",
@@ -215,6 +216,7 @@ describe("DispatchContextLabelService", () => {
               id: "issue-1",
               key: "KANBAN-AUTO-001",
               projectId: "kanban-app",
+              title: "Keep refs in sync",
               title: "Keep refs in sync",
               status: "ready",
               priority: "medium",
@@ -249,6 +251,8 @@ describe("DispatchContextLabelService", () => {
     await service.deleteDispatchContextLabel("dispatch-context-label-1");
 
     const persisted = JSON.parse(await fs.readFile(backlogFilePath, "utf8")) as {
+      issues: Array<{ dispatch?: { contextLabels?: Array<{ labelId: string }> } }>;
+    };
       issues: Array<{ dispatch?: { contextLabels?: Array<{ labelId: string }> } }>;
     };
     expect(persisted.issues[0]?.dispatch?.contextLabels).toEqual([

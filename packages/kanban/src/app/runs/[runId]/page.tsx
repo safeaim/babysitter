@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useRunDetail } from "@/hooks/use-run-detail";
+import { useBacklog } from "@/hooks/use-backlog";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { OutcomeBanner } from "@/components/shared/outcome-banner";
 import { MetricsRow } from "@/components/shared/metrics-row";
@@ -10,6 +11,7 @@ import { useNotificationContext } from "@/components/notifications/notification-
 import { cn } from "@/lib/cn";
 import { Loader2, X, ArrowLeft } from "lucide-react";
 import type { JournalEvent, EffectRequestedPayload } from "@/types";
+import { findKanbanExecutionContextEnvelopesForRun } from "@a5c-ai/agent-mux-core/kanban";
 
 /* -------------------------------------------------------------------------- */
 /*  Loading skeletons for lazy-loaded route panels                            */
@@ -77,6 +79,7 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
   const router = useRouter();
   const searchParams = useSearchParams();
   const { run, loading, error, hasBreakpointWaiting: _hasBreakpointWaiting } = useRunDetail(runId);
+  const { snapshot } = useBacklog();
   const { notifications: _notifications, dismiss: _dismiss, notify: _notify } = useNotificationContext();
   const [selectedEffectId, setSelectedEffectId] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState(false);
@@ -109,6 +112,10 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
     if (!selectedEffectId) return null;
     return tasks.find((t) => t.effectId === selectedEffectId) || null;
   }, [tasks, selectedEffectId]);
+  const executionContexts = useMemo(
+    () => (snapshot ? findKanbanExecutionContextEnvelopesForRun(snapshot, runId) : []),
+    [runId, snapshot],
+  );
 
   useEffect(() => {
     if (!requestedEffectId || !tasks.some((task) => task.effectId === requestedEffectId)) {
@@ -271,6 +278,7 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
               onTabChange={setActiveTab}
               runDuration={run.duration}
               allTasks={run.tasks}
+              executionContexts={executionContexts}
             />
           </div>
         )}

@@ -4,6 +4,7 @@ import { render, screen, setupUser, waitFor, within } from "@/test/test-utils";
 import { getWorkspaceOwnershipLabel, loadInventory, runWorkspaceAction, WorkspacesPageContent } from "../workspaces-page";
 
 let workspaceReviewArtifacts: Array<Record<string, unknown>> = [];
+const mockUseBacklog = vi.fn(() => ({ snapshot: null }));
 
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href?: string; children?: unknown; [key: string]: unknown }) => (
@@ -25,11 +26,16 @@ vi.mock("@/hooks/use-reviews", () => ({
   }),
 }));
 
+vi.mock("@/hooks/use-backlog", () => ({
+  useBacklog: () => mockUseBacklog(),
+}));
+
 describe("workspaces-page helpers", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("fetch", vi.fn());
     workspaceReviewArtifacts = [];
+    mockUseBacklog.mockReturnValue({ snapshot: null });
   });
 
   it("describes session-backed ownership when the gateway is connected", () => {
@@ -447,6 +453,128 @@ describe("workspaces-page helpers", () => {
 
     expect(screen.getByText("Runtime disconnected")).toBeInTheDocument();
     expect(screen.getByText("No workspace notes yet")).toBeInTheDocument();
+  });
+
+  it("renders linked execution context inside the workspace runtime panel", async () => {
+    mockUseBacklog.mockReturnValue({
+      snapshot: {
+        generatedAt: "2026-04-24T00:00:00.000Z",
+        dispatchContextLabels: [],
+        projects: [{ id: "project-1", key: "KANBAN", name: "Kanban", issueIds: ["issue-1"] }],
+        issues: [
+          {
+            id: "issue-1",
+            projectId: "project-1",
+            key: "KANBAN-1",
+            title: "Issue title",
+            dispatch: {
+              readiness: "ready",
+              blockedReasons: [],
+              runIds: ["run-1"],
+              sessionIds: ["session-1"],
+              contextLabels: [{ labelId: "dispatch-context-label-1" }],
+              contextLabelProjections: [
+                {
+                  labelId: "dispatch-context-label-1",
+                  key: "tests_first",
+                  label: "Tests First",
+                  instruction: "Write tests first.",
+                },
+              ],
+              renderedContext: "- [tests_first] Write tests first.",
+              lastDispatchedAt: "2026-04-24T00:00:00.000Z",
+            },
+          },
+        ],
+      },
+    });
+
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({
+        summary: { total: 1, active: 1, idle: 0, archived: 0, missing: 0 },
+        workspaces: [
+          {
+            path: "/repo/worktrees/task",
+            name: "task",
+            status: "active",
+            missing: false,
+            archivedAt: null,
+            cleanedAt: null,
+            lastActivityAt: "2026-04-24T12:00:00.000Z",
+            git: {
+              root: "/repo/main",
+              commonDir: "/repo/main/.git",
+              branch: "vk/task",
+              head: "abc123",
+              dirty: false,
+              isWorktree: true,
+              isPrimary: false,
+            },
+            sessions: {
+              total: 1,
+              active: 1,
+              items: [
+                {
+                  sessionId: "session-1",
+                  agent: "codex",
+                  status: "active",
+                  cwd: "/repo/worktrees/task",
+                  runtime: {
+                    updatedAt: 1,
+                    workspacePath: "/repo/worktrees/task",
+                    preview: {
+                      status: "ready",
+                      primaryUrl: "http://127.0.0.1:3000",
+                      urls: ["http://127.0.0.1:3000"],
+                      deviceProfiles: [],
+                    },
+                    terminal: {
+                      status: "idle",
+                      commands: [],
+                    },
+                    devServer: {
+                      status: "running",
+                      primaryUrl: "http://127.0.0.1:3000",
+                      urls: ["http://127.0.0.1:3000"],
+                      logs: [],
+                    },
+                  },
+                },
+              ],
+            },
+            runs: { total: 0, active: 0, items: [] },
+            actions: {
+              canArchive: true,
+              canCleanup: false,
+              canRecover: false,
+              canRebaseStart: false,
+              canRebaseAutoResolve: false,
+              canRebaseOpenInEditor: false,
+              canRebaseMarkResolved: false,
+              canRebaseAbort: false,
+            },
+          },
+        ],
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    render(
+      <WorkspacesPageContent
+        isAuthenticated
+        sessions={[{ sessionId: "session-1", agent: "codex", status: "active", cwd: "/repo/worktrees/task" }]}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Execution context")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("Workspace-linked issue context")).toBeInTheDocument();
+    expect(screen.getByText("Issue title")).toBeInTheDocument();
+    expect(screen.getByText(/Tests First/)).toBeInTheDocument();
   });
 
   it("surfaces editor action failures inside quick actions", async () => {

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import {
   normalizeKanbanDispatchContextLabel,
+  normalizeKanbanDispatchContextLabelRefs,
   normalizeKanbanDispatchContextLabelKey,
   normalizeKanbanDispatchContextLabels,
   normalizeKanbanDispatchContextLabelRefs,

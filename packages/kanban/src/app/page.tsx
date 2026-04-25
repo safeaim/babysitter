@@ -103,7 +103,7 @@ export default function DashboardPage() {
           </article>
         </section>
 
-        <BacklogOverview />
+        {/* <BacklogOverview /> */}
         <BabysitterOverlayPanel />
 
         {/* Global Search */}
@@ -155,17 +155,17 @@ export default function DashboardPage() {
         )}
 
         {/* Filter pills + sort toggle */}
-        <RunFilterBar
+        {/* <RunFilterBar
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           filterCounts={filterCounts}
           sortMode={sortMode}
           onSortModeToggle={() => setSortMode((prev) => prev === "status" ? "activity" : "status")}
           filteredProjectCount={filteredProjects.length}
-        />
+        /> */}
 
         {/* Project cards content */}
-        <ProjectListView
+        {/* <ProjectListView
           loading={loading}
           error={error}
           filteredProjects={filteredProjects}
@@ -177,7 +177,7 @@ export default function DashboardPage() {
           historyCollapsed={historyCollapsed}
           onHistoryCollapsedChange={setHistoryCollapsed}
           onHideProject={handleHideProject}
-        />
+        /> */}
       </div>
     </div>
   );

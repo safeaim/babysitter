@@ -32,7 +32,7 @@ export async function GET(
     // Ensure watcher and cache are initialized
     await ensureInitialized();
 
-    const { runId } = params;
+    const { runId } = await params;
     if (!isValidId(runId)) {
       return NextResponse.json({ error: "Invalid run ID" }, { status: 400 });
     }

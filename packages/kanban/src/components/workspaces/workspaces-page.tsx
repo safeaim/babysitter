@@ -314,7 +314,7 @@ export function WorkspacesPageContent(props: {
   const [isPending, startTransition] = useTransition();
   const { snapshot } = useBacklog();
   const workspaceReviews = useReviews({ targetType: "workspace" });
-  const selectedWorkspacePath = props.selectedWorkspacePath ?? searchParams.get("workspace")?.trim() || null;
+  const selectedWorkspacePath = props.selectedWorkspacePath ?? (searchParams.get("workspace")?.trim() || null);
 
   const sessionFingerprint = useMemo(
     () =>

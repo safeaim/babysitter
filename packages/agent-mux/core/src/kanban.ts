@@ -129,6 +129,17 @@ export interface KanbanExecutionContextEnvelope {
   readonly block: string;
 }
 
+export interface KanbanDispatchContextExecutionEnvelope {
+  readonly source: 'dispatch-context-labels';
+  readonly appliedLabels: readonly KanbanDispatchContextLabelProjection[];
+  readonly renderedBlock: string;
+  readonly metadata: {
+    readonly labelIds: readonly string[];
+    readonly labelKeys: readonly string[];
+    readonly labelCount: number;
+  };
+}
+
 export interface KanbanLabel {
   readonly id: string;
   readonly name: string;
@@ -233,6 +244,7 @@ export interface KanbanIssueDispatchState {
   readonly sessionIds: readonly string[];
   readonly contextLabels: readonly KanbanDispatchContextLabelRef[];
   readonly contextLabelProjections: readonly KanbanDispatchContextLabelProjection[];
+  readonly executionContext?: KanbanDispatchContextExecutionEnvelope;
   readonly renderedContext?: string;
   readonly lastDispatchedAt?: string;
 }
@@ -964,6 +976,27 @@ export function buildKanbanExecutionContextEnvelope(input: {
   };
 }
 
+export function buildDispatchContextExecutionEnvelope(
+  definitions: readonly KanbanDispatchContextLabelDefinition[],
+  refs: readonly KanbanDispatchContextLabelRef[],
+): KanbanDispatchContextExecutionEnvelope | undefined {
+  const appliedLabels = projectDispatchContextLabels(definitions, refs);
+  if (appliedLabels.length === 0) {
+    return undefined;
+  }
+
+  return {
+    source: 'dispatch-context-labels',
+    appliedLabels,
+    renderedBlock: renderDispatchContextLabels(definitions, refs),
+    metadata: {
+      labelIds: appliedLabels.map((projection) => projection.labelId),
+      labelKeys: appliedLabels.map((projection) => projection.key),
+      labelCount: appliedLabels.length,
+    },
+  };
+}
+
 function findKanbanExecutionContextEnvelopes(
   snapshot: Pick<KanbanBacklogSnapshot, 'projects' | 'issues'>,
   matcher: (issue: KanbanIssue) => boolean,
@@ -1005,7 +1038,6 @@ export function findKanbanExecutionContextEnvelopesForSession(
     (issue) => issue.dispatch.sessionIds.includes(normalizedSessionId),
   );
 }
-
 function normalizeKanbanTaskTagScope(
   scope: Partial<KanbanTaskTagScope> | undefined,
 ): KanbanTaskTagScope | undefined {
@@ -1577,7 +1609,8 @@ export function normalizeKanbanIssue(
   const blockedReasons = resolveBlockedReasons({ ...issue, childIssueIds, decomposition }, issuesById);
   const contextLabels = normalizeKanbanDispatchContextLabelRefs(issue.dispatch?.contextLabels ?? []);
   const contextLabelProjections = projectDispatchContextLabels(dispatchContextLabels, contextLabels);
-  const renderedContext = renderDispatchContextLabels(dispatchContextLabels, contextLabels) || undefined;
+  const executionContext = buildDispatchContextExecutionEnvelope(dispatchContextLabels, contextLabels);
+  const renderedContext = executionContext?.renderedBlock;
 
   return {
     ...issue,
@@ -1595,6 +1628,7 @@ export function normalizeKanbanIssue(
       sessionIds: Array.from(new Set(issue.dispatch?.sessionIds ?? [])),
       contextLabels,
       contextLabelProjections,
+      executionContext,
       renderedContext,
       lastDispatchedAt: issue.dispatch?.lastDispatchedAt,
     },

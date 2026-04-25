@@ -792,6 +792,9 @@ describe("BacklogQueryService", () => {
     expect(
       persisted.issues.find((candidate) => candidate.id === "KANBAN-GAP-007")?.dispatch,
     ).not.toHaveProperty("contextLabelProjections");
+    expect(
+      persisted.issues.find((candidate) => candidate.id === "KANBAN-GAP-007")?.dispatch,
+    ).not.toHaveProperty("executionContext");
   });
 
   it("rejects unknown issue dispatch context label attachments and tolerates stale stored refs", async () => {

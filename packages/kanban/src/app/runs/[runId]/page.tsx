@@ -12,6 +12,7 @@ import { cn } from "@/lib/cn";
 import { Loader2, X, ArrowLeft } from "lucide-react";
 import type { JournalEvent, EffectRequestedPayload } from "@/types";
 import { findKanbanExecutionContextEnvelopesForRun } from "@a5c-ai/agent-mux-core/kanban";
+import { findDispatchContextAuditsByRunId } from "@/lib/dispatch-context-audit";
 
 /* -------------------------------------------------------------------------- */
 /*  Loading skeletons for lazy-loaded route panels                            */
@@ -106,6 +107,7 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
   }, [handleSelectEffect]);
 
   const tasks = useMemo(() => run?.tasks || [], [run?.tasks]);
+  const executionAudits = useMemo(() => findDispatchContextAuditsByRunId(snapshot, runId), [runId, snapshot]);
 
   // Determine if the currently selected task is a waiting breakpoint
   const selectedTask = useMemo(() => {
@@ -278,6 +280,7 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
               onTabChange={setActiveTab}
               runDuration={run.duration}
               allTasks={run.tasks}
+              executionAudits={executionAudits}
               executionContexts={executionContexts}
             />
           </div>

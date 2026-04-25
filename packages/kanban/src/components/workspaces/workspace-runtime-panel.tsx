@@ -6,10 +6,12 @@ import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanb
 import { ExternalLink, GitBranch, Laptop2, Logs, Radar, Smartphone, TabletSmartphone, TerminalSquare } from "lucide-react";
 
 import { cn } from "@/lib/cn";
+import { DispatchContextAuditPanel } from "@/components/shared/dispatch-context-audit-panel";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExecutionContextPanel } from "@/components/shared/execution-context-panel";
+import type { DispatchContextAuditRecord } from "@/lib/dispatch-context-audit";
 
 function formatTimestamp(value?: number): string {
   if (!value || !Number.isFinite(value)) {
@@ -56,6 +58,7 @@ export function WorkspaceRuntimePanel(props: {
   runtime: WorkspaceRuntimeSurface;
   rebase?: WorkspaceRuntimeSurface["rebase"];
   sessionId?: string;
+  audits?: readonly DispatchContextAuditRecord[];
   className?: string;
   executionContexts?: readonly KanbanExecutionContextEnvelope[];
 }) {
@@ -332,6 +335,11 @@ export function WorkspaceRuntimePanel(props: {
             <InspectCard icon={ExternalLink} label="Preview origin" value={props.runtime.preview.primaryUrl ?? "unavailable"} />
             <InspectCard icon={GitBranch} label="Rebase" value={props.rebase?.status ?? "unavailable"} />
           </div>
+          <DispatchContextAuditPanel
+            title="Dispatch audit envelope"
+            audits={props.audits ?? []}
+            emptyText="No dispatch-context label projection is linked to this workspace runtime yet."
+          />
           <article className="rounded-2xl border border-border bg-background/70 p-4 text-sm text-foreground-muted">
             The inspect surface keeps the workspace path, preview origin, terminal activity, and dev-server status
             visible together so the kanban UI can act as the shell while runtime ownership remains in `agent-mux`.

@@ -233,7 +233,6 @@ describe('AgentPanel', () => {
     // Should still render the title
     expect(screen.getByText(task.title)).toBeInTheDocument();
   });
-
   it('renders linked execution context when provided', () => {
     const task = createMockTaskDetail({ title: 'Dispatch attempt' });
     render(
@@ -281,5 +280,45 @@ describe('AgentPanel', () => {
     expect(screen.getByText('Issue title')).toBeInTheDocument();
     expect(screen.getAllByText(/Tests First/).length).toBeGreaterThan(0);
     expect(screen.getByText(/Rendered block/)).toBeInTheDocument();
+  });
+
+  it('renders execution-context audits when provided', () => {
+    const task = createMockTaskDetail({ title: 'Dispatch task' });
+    render(
+      <AgentPanel
+        task={task}
+        executionAudits={[
+          {
+            issueId: 'issue-1',
+            issueKey: 'KANBAN-GAP-007',
+            issueTitle: 'Audit the runtime panel',
+            runIds: ['run-1'],
+            sessionIds: ['session-1'],
+            lastDispatchedAt: '2026-04-25T10:00:00.000Z',
+            executionContext: {
+              source: 'dispatch-context-labels',
+              appliedLabels: [
+                {
+                  labelId: 'dispatch-context-label-tests-first',
+                  key: 'tests_first',
+                  label: 'Tests First',
+                  instruction: 'Write tests first.',
+                },
+              ],
+              renderedBlock: '- [tests_first] Write tests first.',
+              metadata: {
+                labelIds: ['dispatch-context-label-tests-first'],
+                labelKeys: ['tests_first'],
+                labelCount: 1,
+              },
+            },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('Execution context')).toBeInTheDocument();
+    expect(screen.getByText('KANBAN-GAP-007')).toBeInTheDocument();
+    expect(screen.getByText(/Write tests first\./)).toBeInTheDocument();
   });
 });

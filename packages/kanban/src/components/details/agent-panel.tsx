@@ -3,10 +3,12 @@
 import { useState, useCallback } from "react";
 import { Copy, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DispatchContextAuditPanel } from "@/components/shared/dispatch-context-audit-panel";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { KindBadge } from "@/components/shared/kind-badge";
 import { TruncatedId } from "@/components/shared/truncated-id";
 import { ExecutionContextPanel } from "@/components/shared/execution-context-panel";
+import type { DispatchContextAuditRecord } from "@/lib/dispatch-context-audit";
 import type { TaskDetail } from "@/types";
 import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanban";
 
@@ -136,9 +138,11 @@ function ResultOutput({ value }: { value: unknown }) {
 export function AgentPanel({
   task,
   executionContexts = [],
+  executionAudits = [],
 }: {
   task: TaskDetail | null;
   executionContexts?: readonly KanbanExecutionContextEnvelope[];
+  executionAudits?: readonly DispatchContextAuditRecord[];
 }) {
   if (!task) return <div className="p-4 text-sm text-foreground-muted">Select a task to view details</div>;
 
@@ -221,6 +225,12 @@ export function AgentPanel({
 
         {/* Description / inputs summary (when no agent prompt) */}
         {renderDescription(prompt, description)}
+
+        <DispatchContextAuditPanel
+          title="Execution context"
+          audits={executionAudits}
+          emptyText="No dispatch-context label projection is linked to this run yet."
+        />
 
         {/* Result status */}
         {resultStatus != null && (

@@ -35,7 +35,7 @@ export type StoredKanbanProject = Omit<
 
 export type StoredKanbanIssueDispatchState = Omit<
   Partial<KanbanIssue['dispatch']>,
-  'contextLabels' | 'contextLabelProjections' | 'renderedContext'
+  'contextLabels' | 'contextLabelProjections' | 'executionContext' | 'renderedContext'
 > & {
   readonly contextLabels?: readonly KanbanDispatchContextLabelRef[];
 };

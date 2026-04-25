@@ -10,6 +10,7 @@ import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
 import { findKanbanExecutionContextEnvelopesForSession } from "@a5c-ai/agent-mux-core/kanban";
 
 import { RequireGatewayAuth } from "@/components/agent-mux/require-gateway-auth";
+import { DispatchContextAuditPanel } from "@/components/shared/dispatch-context-audit-panel";
 import { SessionObservabilityPanel } from "@/components/sessions/session-observability-panel";
 import { ExecutionContextPanel } from "@/components/shared/execution-context-panel";
 import { TaskTagAutocompleteTextarea } from "@/components/task-tags/task-tag-autocomplete-textarea";
@@ -18,6 +19,7 @@ import { WorkspaceRuntimePanel } from "@/components/workspaces/workspace-runtime
 import { useGatewayFetch } from "@/components/agent-mux/gateway-provider";
 import { useBacklog } from "@/hooks/use-backlog";
 import { useTaskTags } from "@/hooks/use-task-tags";
+import { findDispatchContextAuditsBySessionId } from "@/lib/dispatch-context-audit";
 import { useGateway } from "@/lib/agent-mux-ui";
 
 type TranscriptNode =
@@ -216,6 +218,7 @@ function SessionDetailContent() {
     () => (snapshot ? findKanbanExecutionContextEnvelopesForSession(snapshot, sessionId) : []),
     [sessionId, snapshot],
   );
+  const executionAudits = useMemo(() => findDispatchContextAuditsBySessionId(snapshot, sessionId), [sessionId, snapshot]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -285,6 +288,13 @@ function SessionDetailContent() {
         sessionId={sessionId}
         runs={runs as Array<Record<string, unknown>>}
         eventBuffers={eventBuffers}
+      />
+
+      <DispatchContextAuditPanel
+        title="Execution context"
+        audits={executionAudits}
+        emptyText="No dispatch-context label projection is linked to this session yet."
+        className="rounded-3xl border border-border bg-card p-6 shadow-lg"
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -388,7 +398,14 @@ function SessionDetailContent() {
         </aside>
       </div>
 
-      {runtime ? <WorkspaceRuntimePanel runtime={runtime} sessionId={sessionId} executionContexts={executionContexts} /> : null}
+      {runtime ? (
+        <WorkspaceRuntimePanel
+          runtime={runtime}
+          sessionId={sessionId}
+          executionContexts={executionContexts}
+          audits={executionAudits}
+        />
+      ) : null}
     </div>
   );
 }

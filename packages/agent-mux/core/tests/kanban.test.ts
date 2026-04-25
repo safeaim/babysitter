@@ -17,6 +17,7 @@ import {
   normalizeKanbanTaskTags,
   renderKanbanExecutionContextBlock,
   renderDispatchContextLabels,
+  buildDispatchContextExecutionEnvelope,
   type KanbanLabel,
   type KanbanDispatchContextLabelDefinition,
   type KanbanIssue,
@@ -224,6 +225,59 @@ describe('renderKanbanExecutionContextBlock', () => {
   });
 });
 
+describe('buildDispatchContextExecutionEnvelope', () => {
+  it('returns an explicit metadata envelope for attached labels', () => {
+    const definitions = normalizeKanbanDispatchContextLabels([
+      makeDispatchContextLabel({
+        id: 'dispatch-context-label-2',
+        key: 'preserve_migrations',
+        label: 'Preserve Migrations',
+        instruction: 'Do not rewrite historical migration files.',
+        order: 2,
+      }),
+      makeDispatchContextLabel({
+        id: 'dispatch-context-label-1',
+        key: 'tests_first',
+        label: 'Tests First',
+        instruction: 'Write or update tests before implementation changes.',
+        order: 1,
+      }),
+    ]);
+
+    expect(
+      buildDispatchContextExecutionEnvelope(definitions, [
+        { labelId: 'dispatch-context-label-2' },
+        { labelId: 'dispatch-context-label-1' },
+      ]),
+    ).toEqual({
+      source: 'dispatch-context-labels',
+      appliedLabels: [
+        {
+          labelId: 'dispatch-context-label-1',
+          key: 'tests_first',
+          label: 'Tests First',
+          instruction: 'Write or update tests before implementation changes.',
+        },
+        {
+          labelId: 'dispatch-context-label-2',
+          key: 'preserve_migrations',
+          label: 'Preserve Migrations',
+          instruction: 'Do not rewrite historical migration files.',
+        },
+      ],
+      renderedBlock: [
+        '- [tests_first] Write or update tests before implementation changes.',
+        '- [preserve_migrations] Do not rewrite historical migration files.',
+      ].join('\n'),
+      metadata: {
+        labelIds: ['dispatch-context-label-1', 'dispatch-context-label-2'],
+        labelKeys: ['tests_first', 'preserve_migrations'],
+        labelCount: 2,
+      },
+    });
+  });
+});
+
 describe('normalizeKanbanTaskTag', () => {
   it('normalizes task tags without using label semantics', () => {
     const normalized = normalizeKanbanTaskTag({
@@ -372,6 +426,32 @@ describe('normalizeKanbanIssue', () => {
         instruction: 'Do not rewrite historical migration files.',
       },
     ]);
+    expect(issue.dispatch.executionContext).toEqual({
+      source: 'dispatch-context-labels',
+      appliedLabels: [
+        {
+          labelId: 'dispatch-context-label-1',
+          key: 'tests_first',
+          label: 'Tests First',
+          instruction: 'Write or update tests before implementation changes.',
+        },
+        {
+          labelId: 'dispatch-context-label-2',
+          key: 'preserve_migrations',
+          label: 'Preserve Migrations',
+          instruction: 'Do not rewrite historical migration files.',
+        },
+      ],
+      renderedBlock: [
+        '- [tests_first] Write or update tests before implementation changes.',
+        '- [preserve_migrations] Do not rewrite historical migration files.',
+      ].join('\n'),
+      metadata: {
+        labelIds: ['dispatch-context-label-1', 'dispatch-context-label-2'],
+        labelKeys: ['tests_first', 'preserve_migrations'],
+        labelCount: 2,
+      },
+    });
     expect(issue.dispatch.renderedContext).toBe(
       [
         '- [tests_first] Write or update tests before implementation changes.',

@@ -141,11 +141,22 @@ function resolveRawEventName(
  * Resolve the session ID from explicit flag, env, or stdin payload.
  */
 function resolveSessionId(
+  adapterSessionResolver: ReturnType<typeof loadAdapter>['sessionResolver'],
   explicitSessionId: string | undefined,
   normalizedSessionId: string | null | undefined,
   stdinData: Record<string, unknown> | undefined,
   env: Record<string, string>,
 ): string | null {
+  if (adapterSessionResolver) {
+    const resolved = adapterSessionResolver(stdinData ?? {}, env, explicitSessionId);
+    const adapterSessionId = typeof resolved === 'string'
+      ? resolved
+      : resolved?.sessionId;
+    if (adapterSessionId) {
+      return adapterSessionId;
+    }
+  }
+
   if (explicitSessionId) return explicitSessionId;
   if (env['AGENT_SESSION_ID']) return env['AGENT_SESSION_ID'];
   if (normalizedSessionId) return normalizedSessionId;
@@ -296,7 +307,13 @@ export const invokeCommand: CommandModule<object, InvokeArgs> = {
       });
 
     // 4. Resolve session
-    const sessionId = resolveSessionId(args['session-id'], event.execution.sessionId, stdinData, env);
+    const sessionId = resolveSessionId(
+      loaded.sessionResolver,
+      args['session-id'],
+      event.execution.sessionId,
+      stdinData,
+      env,
+    );
     await logger.debug('session resolved', {
       sessionId,
       explicitSessionId: args['session-id'] ?? null,

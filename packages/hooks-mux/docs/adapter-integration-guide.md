@@ -77,6 +77,26 @@ To initialize session context without running any hook logic:
 }
 ```
 
+Claude also supports the dedicated bootstrap command on `SessionStart`:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "npx -y @a5c-ai/hooks-mux bootstrap --adapter claude"
+      }
+    ]
+  }
+}
+```
+
+When used as a Claude hook command, `bootstrap --adapter claude` reads the same native
+stdin payload as `invoke`, normalizes it as a `SessionStart`, and resolves the session
+through the Claude adapter's native `session_id` resolver. That keeps bootstrap and later
+invoke calls on the same session unless you explicitly override with `--session-id`.
+
 ### Capabilities
 
 | Feature | Support |

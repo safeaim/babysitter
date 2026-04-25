@@ -15,11 +15,48 @@ import {
 } from '@a5c-ai/hooks-mux-core';
 import { loadAdapter } from '../adapter-loader';
 import { createHooksLogger } from '../hooks-logger';
+import { readStdin } from '../stdin';
 
 interface BootstrapArgs {
   adapter: string;
   'session-id'?: string;
   json?: boolean;
+}
+
+function tryParseJson(raw: string): unknown | undefined {
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return undefined;
+  }
+}
+
+function resolveSessionId(
+  adapterSessionResolver: ReturnType<typeof loadAdapter>['sessionResolver'],
+  explicitSessionId: string | undefined,
+  normalizedSessionId: string | null | undefined,
+  stdinData: Record<string, unknown> | undefined,
+  env: Record<string, string>,
+): string | null {
+  if (adapterSessionResolver) {
+    const resolved = adapterSessionResolver(stdinData ?? {}, env, explicitSessionId);
+    const adapterSessionId = typeof resolved === 'string'
+      ? resolved
+      : resolved?.sessionId;
+    if (adapterSessionId) {
+      return adapterSessionId;
+    }
+  }
+
+  if (explicitSessionId) return explicitSessionId;
+  if (env['AGENT_SESSION_ID']) return env['AGENT_SESSION_ID'];
+  if (normalizedSessionId) return normalizedSessionId;
+  if (stdinData && typeof stdinData['session_id'] === 'string') {
+    return stdinData['session_id'] as string;
+  }
+  return null;
 }
 
 export const bootstrapCommand: CommandModule<object, BootstrapArgs> = {
@@ -45,19 +82,33 @@ export const bootstrapCommand: CommandModule<object, BootstrapArgs> = {
     const logger = createHooksLogger('bootstrap');
     const loaded = loadAdapter(args.adapter);
     const env = process.env as Record<string, string>;
+    const rawStdin = await readStdin();
+    const stdinPayload = tryParseJson(rawStdin);
+    const stdinData = (typeof stdinPayload === 'object' && stdinPayload !== null && !Array.isArray(stdinPayload))
+      ? stdinPayload as Record<string, unknown>
+      : undefined;
 
-    // Determine session ID
-    const sessionId = args['session-id']
-      ?? env['AGENT_SESSION_ID']
-      ?? `bootstrap-${Date.now()}`;
+    const rawEventName = loaded.capabilities.name === 'claude'
+      ? 'SessionStart'
+      : 'bootstrap';
 
-    // Normalize a synthetic session.start event for context extraction
-    const event = normalizeEvent({
-      adapter: args.adapter,
-      rawEventName: 'bootstrap',
+    const event = loaded.normalizer
+      ? loaded.normalizer(rawEventName, stdinPayload, env)
+      : normalizeEvent({
+        adapter: args.adapter,
+        rawEventName,
+        stdinPayload,
+        env,
+        adapterMappings: loaded.phaseMappings,
+      });
+
+    const sessionId = resolveSessionId(
+      loaded.sessionResolver,
+      args['session-id'],
+      event.execution.sessionId,
+      stdinData,
       env,
-      adapterMappings: loaded.phaseMappings,
-    });
+    ) ?? `bootstrap-${Date.now()}`;
 
     // Load or create session
     let session = await loadSession(sessionId);

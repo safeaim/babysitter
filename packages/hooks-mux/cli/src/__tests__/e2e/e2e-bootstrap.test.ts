@@ -39,16 +39,21 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
   }
 
   it('bootstrap --adapter claude creates session file with JSON output', async () => {
-    const sessionId = 'e2e-boot-1';
+    const sessionId = 'e2e-boot-native-stdin-1';
+    const stdinPayload = JSON.stringify({
+      session_id: sessionId,
+      source: 'startup',
+      cwd: '/workspace/bootstrap-native',
+    });
 
     const result = await runCli(
       [
         'bootstrap',
         '--adapter', 'claude',
-        '--session-id', sessionId,
         '--json',
       ],
       {
+        stdin: stdinPayload,
         env: baseEnv(),
       },
     );
@@ -67,18 +72,23 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
     expect(session['sessionId']).toBe(sessionId);
     expect(session['adapter']).toBe('claude');
     expect(session['version']).toBe('a5c.hooks.session.v1');
+    expect(session['cwd']).toBe('/workspace/bootstrap-native');
   });
 
   it('bootstrap without --json outputs human-readable message', async () => {
     const sessionId = 'e2e-boot-human';
+    const stdinPayload = JSON.stringify({
+      session_id: sessionId,
+      source: 'startup',
+    });
 
     const result = await runCli(
       [
         'bootstrap',
         '--adapter', 'claude',
-        '--session-id', sessionId,
       ],
       {
+        stdin: stdinPayload,
         env: baseEnv(),
       },
     );
@@ -90,7 +100,7 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
     expect(combinedOutput).toContain('claude');
   });
 
-  it('bootstrap auto-generates session ID when not provided', async () => {
+  it('bootstrap falls back to a synthetic session ID only when no native Claude payload or explicit override is available', async () => {
     const result = await runCli(
       [
         'bootstrap',
@@ -114,21 +124,26 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
     const sessionId = 'e2e-boot-then-invoke';
     const envFilePath = path.join(tmpRoot, 'env-file.txt');
     await fs.promises.writeFile(envFilePath, '', 'utf-8');
+    const bootstrapPayload = JSON.stringify({
+      session_id: sessionId,
+      source: 'startup',
+    });
 
     // Step 1: Bootstrap creates the session
     const bootstrapResult = await runCli(
       [
         'bootstrap',
         '--adapter', 'claude',
-        '--session-id', sessionId,
         '--json',
       ],
       {
+        stdin: bootstrapPayload,
         env: baseEnv(),
       },
     );
 
     expect(bootstrapResult.exitCode).toBe(0);
+    expect(JSON.parse(bootstrapResult.stdout.trim()).sessionId).toBe(sessionId);
 
     // Step 2: Invoke with a handler that adds env to the existing session
     const handlerCmd = await writeHandlerScript(tmpRoot, 'add-env-handler', `
@@ -147,7 +162,6 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
         '--adapter', 'claude',
         '--native-event', 'SessionStart',
         '--handler', handlerCmd,
-        '--session-id', sessionId,
       ],
       {
         stdin: stdinPayload,
@@ -200,16 +214,20 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
 
   it('bootstrap is idempotent — re-bootstrapping loads existing session', async () => {
     const sessionId = 'e2e-boot-idempotent';
+    const stdinPayload = JSON.stringify({
+      session_id: sessionId,
+      source: 'startup',
+    });
 
     // First bootstrap
     await runCli(
       [
         'bootstrap',
         '--adapter', 'claude',
-        '--session-id', sessionId,
         '--json',
       ],
       {
+        stdin: stdinPayload,
         env: baseEnv(),
       },
     );
@@ -223,10 +241,10 @@ describe('bootstrap — session initialization (e2e)', { timeout: 30000 }, () =>
       [
         'bootstrap',
         '--adapter', 'claude',
-        '--session-id', sessionId,
         '--json',
       ],
       {
+        stdin: stdinPayload,
         env: baseEnv(),
       },
     );

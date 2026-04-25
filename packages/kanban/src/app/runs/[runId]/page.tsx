@@ -220,7 +220,7 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
   return (
     <div className="flex flex-col flex-1 bg-background">
       {/* Navigation header with back button */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-background-secondary/40">
+      <div className="flex flex-wrap items-center gap-3 border-b border-border bg-background-secondary/40 px-4 py-2">
         <button
           onClick={() => router.push("/")}
           className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 min-h-[44px] text-xs font-medium text-foreground-muted hover:text-foreground hover:border-primary/50 hover:shadow-neon-glow-primary-ring transition-all duration-200"
@@ -228,14 +228,16 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
           <ArrowLeft className="h-3.5 w-3.5" />
           Dashboard
         </button>
-        <span className="text-xs text-foreground-muted">/</span>
-        <span className="text-xs font-mono text-foreground-secondary">{run.runId.slice(0, 8)}...</span>
-        {run.processId && (
-          <>
-            <span className="text-xs text-foreground-muted">/</span>
-            <span className="text-xs text-foreground-secondary">{run.processId}</span>
-          </>
-        )}
+        <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto text-xs [scrollbar-width:none]">
+          <span className="shrink-0 text-foreground-muted">/</span>
+          <span className="shrink-0 font-mono text-foreground-secondary">{run.runId.slice(0, 8)}...</span>
+          {run.processId && (
+            <>
+              <span className="shrink-0 text-foreground-muted">/</span>
+              <span className="truncate text-foreground-secondary">{run.processId}</span>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Outcome Banner - Top of page */}
@@ -294,14 +296,14 @@ export default function RunDetailPage({ params }: { params: { runId: string } })
             "transition-panel bg-card/50 backdrop-blur-sm overflow-hidden flex flex-col",
             showDetail ? "lg:w-[35%]" : "lg:w-[40%]",
           )}>
-            <div className="flex items-center justify-between gap-3 border-b border-border bg-background-secondary/40 px-3 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background-secondary/40 px-3 py-3">
               <div>
                 <h3 className="text-xs font-medium uppercase tracking-wider text-foreground-muted">Activity</h3>
                 <p className="mt-1 text-xs text-foreground-muted">
                   Keep the event stream open or switch into the reconstructed execution view.
                 </p>
               </div>
-              <div className="flex items-center gap-2 rounded-full border border-border bg-background/80 p-1">
+              <div className="flex flex-wrap items-center gap-2 rounded-full border border-border bg-background/80 p-1">
                 <button
                   type="button"
                   data-testid="run-activity-events-tab"

@@ -60,6 +60,20 @@ describe('ShortcutsHelp', () => {
     expect(screen.queryByText('Focus search')).not.toBeInTheDocument();
   });
 
+  it('on session workspace pages, shows workspace panel shortcuts and hides run-detail shortcuts', () => {
+    mockUsePathname.mockReturnValue('/sessions/sess-layout-parity');
+    render(<ShortcutsHelp />);
+    fireEvent.keyDown(window, { key: '?' });
+
+    expect(screen.getByText('Session Workspace')).toBeInTheDocument();
+    expect(screen.getByText('Toggle workspace sidebar')).toBeInTheDocument();
+    expect(screen.getByText('Toggle conversation panel')).toBeInTheDocument();
+    expect(screen.getByText('Toggle context panel')).toBeInTheDocument();
+    expect(screen.getByText('Toggle details sidebar')).toBeInTheDocument();
+    expect(screen.getByText('Open workspace command bar')).toBeInTheDocument();
+    expect(screen.queryByText('Next item')).not.toBeInTheDocument();
+  });
+
   it('displays keyboard keys when open', () => {
     mockUsePathname.mockReturnValue('/runs/abc-123');
     render(<ShortcutsHelp />);

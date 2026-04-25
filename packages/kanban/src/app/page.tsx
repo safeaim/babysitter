@@ -48,7 +48,7 @@ export default function DashboardPage() {
 
   return (
     <div className="bg-gradient-brand flex-1">
-      <div className="mx-auto max-w-[1600px] px-6 py-6">
+      <div className="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 sm:py-6">
         <section className="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <article className="rounded-3xl border border-border bg-card p-6 shadow-lg">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Unified surface</p>
@@ -155,17 +155,17 @@ export default function DashboardPage() {
         )}
 
         {/* Filter pills + sort toggle */}
-        {/* <RunFilterBar
+        <RunFilterBar
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           filterCounts={filterCounts}
           sortMode={sortMode}
           onSortModeToggle={() => setSortMode((prev) => prev === "status" ? "activity" : "status")}
           filteredProjectCount={filteredProjects.length}
-        /> */}
+        />
 
         {/* Project cards content */}
-        {/* <ProjectListView
+        <ProjectListView
           loading={loading}
           error={error}
           filteredProjects={filteredProjects}
@@ -177,7 +177,7 @@ export default function DashboardPage() {
           historyCollapsed={historyCollapsed}
           onHistoryCollapsedChange={setHistoryCollapsed}
           onHideProject={handleHideProject}
-        /> */}
+        />
       </div>
     </div>
   );

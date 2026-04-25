@@ -534,7 +534,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
   };
 
   return (
-    <div data-testid="workspace-shell" className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-6 px-6 py-6">
+    <div data-testid="workspace-shell" className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6">
       <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -580,13 +580,13 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
           </div>
         </div>
 
-        <div data-testid="workspace-navbar" className="mt-4 flex flex-wrap gap-2 text-xs text-foreground-muted">
+        <div data-testid="workspace-navbar" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-xs text-foreground-muted [scrollbar-width:none]">
           {PANEL_DEFINITIONS.map((panel) => (
-            <span key={panel.key} className="rounded-full border border-border px-3 py-1.5">
+            <span key={panel.key} className="shrink-0 rounded-full border border-border px-3 py-1.5">
               {panel.label}: {panel.shortcut}
             </span>
           ))}
-          <span className="rounded-full border border-border px-3 py-1.5">Command bar: Ctrl/Cmd+K</span>
+          <span className="shrink-0 rounded-full border border-border px-3 py-1.5">Command bar: Ctrl/Cmd+K</span>
         </div>
       </section>
 

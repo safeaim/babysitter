@@ -645,7 +645,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
   };
 
   return (
-    <div data-testid="workspace-shell" className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-6 px-6 py-6">
+    <div data-testid="workspace-shell" className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6">
       <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -709,7 +709,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
         </div>
 
         <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)]">
-          <div className="grid gap-3 md:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
             <div className="rounded-2xl border border-border bg-background/65 p-4">
               <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Status</p>
               <p className="mt-2 text-base font-semibold text-foreground">{props.workspace.status}</p>
@@ -743,7 +743,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
                   </p>
                 ) : null}
               </div>
-              <label className="min-w-[14rem]">
+              <label className="w-full xl:max-w-sm">
                 <span className="sr-only">Select workspace session</span>
                 <select
                   data-testid="workspace-session-select"
@@ -765,15 +765,15 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
           </div>
         </div>
 
-        <div data-testid="workspace-navbar" className="mt-4 flex flex-wrap gap-2 text-xs text-foreground-muted">
+        <div data-testid="workspace-navbar" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-xs text-foreground-muted [scrollbar-width:none]">
           {PANEL_DEFINITIONS.map((panel) => (
-            <span key={panel.key} className="rounded-full border border-border px-3 py-1.5">
+            <span key={panel.key} className="shrink-0 rounded-full border border-border px-3 py-1.5">
               {panel.label}: {panel.shortcut}
             </span>
           ))}
-          <span className="rounded-full border border-border px-3 py-1.5">Command bar: Ctrl/Cmd+K</span>
+          <span className="shrink-0 rounded-full border border-border px-3 py-1.5">Command bar: Ctrl/Cmd+K</span>
           {props.workspace.git.root ? (
-            <Link href={workspaceHref(props.workspace.path)} className="rounded-full border border-border px-3 py-1.5 text-primary">
+            <Link href={workspaceHref(props.workspace.path)} className="shrink-0 rounded-full border border-border px-3 py-1.5 text-primary">
               Canonical workspace link
             </Link>
           ) : null}

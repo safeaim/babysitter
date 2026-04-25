@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LogoWordmark } from "@a5c-ai/compendium";
-import { Bell, Columns3, Github, Moon, Sun, Wifi, WifiOff } from "lucide-react";
+import { Bell, Columns3, Github, Menu, Moon, Settings2, Sun, Wifi, WifiOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useGatewayAuth } from "@/components/agent-mux/gateway-provider";
@@ -33,23 +33,102 @@ export function AppHeader() {
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1600px] items-center gap-4 px-6 py-3">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-sm">
-              <Columns3 className="h-5 w-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <LogoWordmark className="h-5 w-auto" />
-                <span className="text-sm font-semibold tracking-tight">Kanban</span>
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:px-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/" className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-sm">
+                <Columns3 className="h-5 w-5" />
               </div>
-              <div className="text-xs text-foreground-muted">
-                agent-mux sessions + babysitter runs
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <LogoWordmark className="h-5 w-auto max-w-full" />
+                  <span className="text-sm font-semibold tracking-tight">Kanban</span>
+                </div>
+                <div className="truncate text-xs text-foreground-muted">
+                  agent-mux sessions + babysitter runs
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
 
-          <nav className="ml-4 hidden items-center gap-1 md:flex">
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+              <span
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium",
+                  streamConnected
+                    ? "border-success/20 bg-success/10 text-success"
+                    : "border-error/20 bg-error/10 text-error",
+                )}
+                title={streamConnected ? "Live updates connected" : "Live updates disconnected"}
+              >
+                {streamConnected ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
+                {streamConnected ? "Runs live" : "Runs offline"}
+              </span>
+
+              <span
+                className={cn(
+                  "hidden rounded-full border px-3 py-1.5 text-xs font-medium sm:inline-flex",
+                  isAuthenticated
+                    ? "border-info/20 bg-info/10 text-info"
+                    : "border-warning/20 bg-warning/10 text-warning",
+                )}
+              >
+                {isAuthenticated ? "Gateway connected" : "Gateway disconnected"}
+              </span>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                aria-label="Settings"
+                onClick={() => window.dispatchEvent(new CustomEvent("open-settings"))}
+              >
+                <Settings2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </Button>
+
+              <Button
+                onClick={() => setShowNotifications((value) => !value)}
+                className="relative"
+                variant="ghost"
+                size="sm"
+                aria-label="Notifications"
+              >
+                <Bell className="h-4 w-4" />
+                {notifications.length > 0 ? (
+                  <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                    {notifications.length > 9 ? "9+" : notifications.length}
+                  </span>
+                ) : null}
+              </Button>
+
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                size="sm"
+                data-testid="theme-toggle"
+                aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+
+              <a
+                href="https://github.com/a5c-ai/babysitter"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden items-center gap-2 rounded-full border border-border px-3 py-2 text-sm text-foreground-muted transition-colors hover:text-foreground lg:inline-flex"
+              >
+                <Github className="h-4 w-4" />
+                Repo
+              </a>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs text-foreground-muted md:hidden">
+            <Menu className="h-3.5 w-3.5" />
+            <span>Navigation</span>
+          </div>
+
+          <nav className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:mx-0 md:px-0 md:pb-0">
             {APP_HEADER_NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -58,7 +137,7 @@ export function AppHeader() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition-colors",
+                    "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm transition-colors",
                     active
                       ? "border-primary/30 bg-primary/12 text-foreground"
                       : "border-transparent text-foreground-muted hover:border-border hover:bg-background-secondary hover:text-foreground",
@@ -70,66 +149,6 @@ export function AppHeader() {
               );
             })}
           </nav>
-
-          <div className="ml-auto flex items-center gap-2">
-            <span
-              className={cn(
-                "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium",
-                streamConnected
-                  ? "border-success/20 bg-success/10 text-success"
-                  : "border-error/20 bg-error/10 text-error",
-              )}
-              title={streamConnected ? "Babysitter run stream connected" : "Babysitter run stream disconnected"}
-            >
-              {streamConnected ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
-              {streamConnected ? "Runs live" : "Runs offline"}
-            </span>
-
-            <span
-              className={cn(
-                "hidden rounded-full border px-3 py-1.5 text-xs font-medium sm:inline-flex",
-                isAuthenticated
-                  ? "border-info/20 bg-info/10 text-info"
-                  : "border-warning/20 bg-warning/10 text-warning",
-              )}
-            >
-              {isAuthenticated ? "Gateway connected" : "Gateway disconnected"}
-            </span>
-
-            <Button
-              onClick={() => setShowNotifications((value) => !value)}
-              className="relative"
-              variant="ghost"
-              size="sm"
-              aria-label="Notifications"
-            >
-              <Bell className="h-4 w-4" />
-              {notifications.length > 0 ? (
-                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                  {notifications.length > 9 ? "9+" : notifications.length}
-                </span>
-              ) : null}
-            </Button>
-
-            <Button
-              onClick={toggleTheme}
-              variant="ghost"
-              size="sm"
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
-
-            <a
-              href="https://github.com/a5c-ai/babysitter"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden items-center gap-2 rounded-full border border-border px-3 py-2 text-sm text-foreground-muted transition-colors hover:text-foreground lg:inline-flex"
-            >
-              <Github className="h-4 w-4" />
-              Repo
-            </a>
-          </div>
         </div>
       </header>
 

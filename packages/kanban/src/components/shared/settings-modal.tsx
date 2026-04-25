@@ -210,12 +210,12 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
         <Dialog.Content
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
           data-testid="settings-modal"
         >
-          <div className="relative z-50 rounded-lg border border-border bg-card shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+          <div className="relative z-50 flex h-full w-full flex-col border border-border bg-card shadow-xl sm:h-auto sm:max-h-[min(80vh,42rem)] sm:max-w-lg sm:rounded-lg">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="flex items-center justify-between border-b border-border p-4">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4 text-foreground-muted" />
                 <Dialog.Title className="text-sm font-medium text-foreground">Settings</Dialog.Title>
@@ -231,7 +231,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
 
             {/* Body */}
             <Dialog.Description asChild>
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-4 pb-6">
                 {fetchLoading ? (
                   <div className="flex items-center justify-center py-12 text-foreground-muted">
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -372,7 +372,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                           Run Retention
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="text-xs text-foreground-muted">Show runs from the last</span>
                         <input
                           type="number"
@@ -467,11 +467,11 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
 
             {/* Footer */}
             {serverConfig && (
-              <div className="flex items-center justify-between border-t border-border px-4 py-3">
+              <div className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs text-foreground-muted">
                   Config file: <span className="font-mono">~/.a5c/kanban.json</span>
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                   <Button
                     onClick={handleCancel}
                     disabled={saving}

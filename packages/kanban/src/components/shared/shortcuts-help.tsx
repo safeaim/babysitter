@@ -81,9 +81,9 @@ export function ShortcutsHelp() {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
         <Dialog.Content
-          className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-xl p-6 shadow-glass w-full max-w-md"
+          className="fixed inset-x-4 bottom-4 top-4 z-50 flex max-h-[calc(100dvh-2rem)] flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-4 shadow-glass backdrop-blur-xl sm:left-1/2 sm:top-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:p-6"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <Dialog.Title className="text-sm font-medium text-foreground">Keyboard Shortcuts</Dialog.Title>
             <Dialog.Close asChild>
               <button
@@ -93,7 +93,7 @@ export function ShortcutsHelp() {
               </button>
             </Dialog.Close>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto pr-1">
             {Object.entries(sections).map(([context, items]) => (
               <div key={context}>
                 <h3 className="text-xs font-medium text-foreground-muted uppercase tracking-wider mb-2">
@@ -101,9 +101,9 @@ export function ShortcutsHelp() {
                 </h3>
                 <div className="space-y-2">
                   {items.map(({ keys, description }) => (
-                    <div key={description} className="flex items-center justify-between py-1">
+                    <div key={description} className="flex flex-col gap-2 py-1 sm:flex-row sm:items-center sm:justify-between">
                       <span className="text-sm text-foreground-secondary">{description}</span>
-                      <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap items-center gap-1">
                         {keys.map((k) => (
                           <Kbd key={k}>{k}</Kbd>
                         ))}

@@ -54,6 +54,11 @@ function previewHeight(device: WorkspaceRuntimeDeviceProfile): number {
   return 640;
 }
 
+function previewFrameMaxWidth(device: WorkspaceRuntimeDeviceProfile): number {
+  const aspectRatio = device.width / device.height;
+  return Math.min(device.width, 960, Math.round(previewHeight(device) * aspectRatio));
+}
+
 export function WorkspaceRuntimePanel(props: {
   runtime: WorkspaceRuntimeSurface;
   rebase?: WorkspaceRuntimeSurface["rebase"];
@@ -137,20 +142,27 @@ export function WorkspaceRuntimePanel(props: {
           </div>
 
           {props.runtime.preview.primaryUrl ? (
-            <div className="rounded-[28px] border border-border bg-background/70 p-4">
-              <div className="mx-auto rounded-[24px] border border-border bg-card p-3 shadow-sm" style={{ maxWidth: `${Math.min(selectedDevice.width, 960)}px` }}>
+            <div className="rounded-[28px] border border-border bg-background/70 p-3 sm:p-4">
+              <div
+                className="mx-auto w-full rounded-[24px] border border-border bg-card p-2 shadow-sm sm:p-3"
+                style={{ maxWidth: `${previewFrameMaxWidth(selectedDevice)}px` }}
+              >
                 <div className="mb-3 flex items-center justify-between rounded-2xl border border-border bg-background/75 px-4 py-2 text-xs text-foreground-muted">
                   <span>{selectedDevice.label}</span>
                   <span>
                     {selectedDevice.width} x {selectedDevice.height}
                   </span>
                 </div>
-                <iframe
-                  title={`Preview for ${props.runtime.workspacePath ?? "workspace"}`}
-                  src={props.runtime.preview.primaryUrl}
-                  className="w-full rounded-2xl border border-border bg-white"
-                  style={{ height: `${previewHeight(selectedDevice)}px` }}
-                />
+                <div
+                  className="overflow-hidden rounded-2xl border border-border bg-white"
+                  style={{ aspectRatio: `${selectedDevice.width} / ${selectedDevice.height}` }}
+                >
+                  <iframe
+                    title={`Preview for ${props.runtime.workspacePath ?? "workspace"}`}
+                    src={props.runtime.preview.primaryUrl}
+                    className="h-full w-full bg-white"
+                  />
+                </div>
               </div>
             </div>
           ) : (

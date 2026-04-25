@@ -218,6 +218,7 @@ export class BackgroundProcessRegistry {
   /** Kill all processes and clear tracking state. */
   dispose(): void {
     this.killAll();
+    this.processes.clear();
   }
 
   // -------------------------------------------------------------------------

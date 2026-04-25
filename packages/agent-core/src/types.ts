@@ -1,4 +1,5 @@
 import type { TObject } from "@sinclair/typebox";
+import type { BackgroundProcessRegistry } from "./backgroundProcessRegistry";
 import type { DeferredToolRegistry } from "./deferredToolRegistry";
 
 export interface AgentCorePromptResult {
@@ -99,6 +100,8 @@ export interface AgentCoreToolOptions {
   onToolUse?: (toolName: string, params: unknown) => void;
   onBackgroundComplete?: (event: unknown) => void;
   maxBackgroundProcesses?: number;
+  /** Optional externally managed registry. When provided, the caller owns disposal. */
+  backgroundRegistry?: BackgroundProcessRegistry;
   deferredToolRegistry?: DeferredToolRegistry;
 }
 

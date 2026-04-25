@@ -17,7 +17,7 @@ export function createBackgroundTools(options: AgenticToolOptions): CustomToolDe
       }),
       execute: (_toolCallId, params) => {
         const backgroundTaskId = String(params.backgroundTaskId);
-        const record = getBackgroundRegistry(options.maxBackgroundProcesses).get(backgroundTaskId);
+        const record = getBackgroundRegistry(options).get(backgroundTaskId);
         if (!record) {
           return errorResult(`Background task not found: ${backgroundTaskId}`);
         }
@@ -30,7 +30,7 @@ export function createBackgroundTools(options: AgenticToolOptions): CustomToolDe
       description: "List all tracked background tasks with their current status.",
       parameters: Type.Object({}),
       execute: () => jsonResult({
-        tasks: getBackgroundRegistry(options.maxBackgroundProcesses).list(),
+        tasks: getBackgroundRegistry(options).list(),
       }),
     },
   ];

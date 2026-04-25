@@ -4,12 +4,14 @@ import * as path from "node:path";
 import { PassThrough } from "node:stream";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+let backgroundTaskCounter = 0;
+
 vi.mock("node:child_process", () => ({
   spawn: vi.fn(),
 }));
 
 vi.mock("@a5c-ai/babysitter-sdk", () => ({
-  nextUlid: vi.fn(() => "background-task-id"),
+  nextUlid: vi.fn(() => `background-task-id-${++backgroundTaskCounter}`),
   CONFIG_ENV_VARS: {
     RUNS_DIR: "BABYSITTER_RUNS_DIR",
     MAX_ITERATIONS: "BABYSITTER_MAX_ITERATIONS",
@@ -54,6 +56,7 @@ import * as childProcess from "node:child_process";
 
 import {
   createAgentCoreToolDefinitions,
+  disposeAgentCoreToolDefinitions,
   extractTextFromHtml,
   filterByRelevance,
   parseSearchResults,
@@ -68,13 +71,21 @@ function getText(result: Awaited<ReturnType<ReturnType<typeof getTool>["execute"
   return result.content[0]?.text ?? "";
 }
 
-function getTool(name: string, workspace: string, onToolUse?: (toolName: string, params: unknown) => void) {
+function getToolDefinitions(
+  workspace: string,
+  overrides: Partial<Parameters<typeof createAgentCoreToolDefinitions>[0]> = {},
+) {
   const definitions = createAgentCoreToolDefinitions({
     workspace,
     interactive: false,
-    onToolUse,
+    ...overrides,
     deferredToolRegistry: new DeferredToolRegistry(),
   });
+  return definitions;
+}
+
+function getTool(name: string, workspace: string, onToolUse?: (toolName: string, params: unknown) => void) {
+  const definitions = getToolDefinitions(workspace, { onToolUse });
   const tool = definitions.find((definition) => definition.name === name);
   if (!tool) {
     throw new Error(`Tool ${name} not found`);
@@ -102,6 +113,7 @@ function mockSpawnExit(exitCode = 0, stdoutText = "") {
 
 describe("agent-core tools", () => {
   afterEach(() => {
+    backgroundTaskCounter = 0;
     vi.clearAllMocks();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
@@ -267,5 +279,164 @@ describe("agent-core tools", () => {
     expect(getText(result)).toContain("src/alpha.ts: applied");
     expect(getText(result)).toContain("src/beta.ts: applied");
     expect(getText(result)).not.toContain("src/gamma.ts");
+  });
+
+  it("scopes background task state and limits per tool-definition set", async () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-background-scope-"));
+    const sessionOneComplete = vi.fn();
+    const sessionTwoComplete = vi.fn();
+    const spawned: Array<{
+      processHandle: childProcess.ChildProcessWithoutNullStreams & { kill: ReturnType<typeof vi.fn> };
+      stdout: PassThrough;
+      stderr: PassThrough;
+    }> = [];
+
+    vi.mocked(childProcess.spawn).mockImplementation(() => {
+      const processHandle = new PassThrough() as unknown as childProcess.ChildProcessWithoutNullStreams & {
+        kill: ReturnType<typeof vi.fn>;
+      };
+      const stdout = new PassThrough();
+      const stderr = new PassThrough();
+      Object.assign(processHandle, {
+        stdout,
+        stderr,
+        pid: spawned.length + 100,
+        kill: vi.fn(),
+      });
+      spawned.push({ processHandle, stdout, stderr });
+      return processHandle;
+    });
+
+    const sessionOneTools = getToolDefinitions(workspace, {
+      maxBackgroundProcesses: 1,
+      onBackgroundComplete: sessionOneComplete,
+    });
+    const sessionTwoTools = getToolDefinitions(workspace, {
+      maxBackgroundProcesses: 2,
+      onBackgroundComplete: sessionTwoComplete,
+    });
+    const sessionOneBash = sessionOneTools.find((tool) => tool.name === "bash");
+    const sessionOneList = sessionOneTools.find((tool) => tool.name === "background_list");
+    const sessionTwoBash = sessionTwoTools.find((tool) => tool.name === "bash");
+    const sessionTwoList = sessionTwoTools.find((tool) => tool.name === "background_list");
+
+    if (!sessionOneBash || !sessionOneList || !sessionTwoBash || !sessionTwoList) {
+      throw new Error("Expected background tools to be registered");
+    }
+
+    await sessionOneBash.execute("session-one-first", {
+      command: "sleep 1",
+      run_in_background: true,
+      description: "session-one",
+    });
+    await sessionTwoBash.execute("session-two-first", {
+      command: "sleep 1",
+      run_in_background: true,
+      description: "session-two-first",
+    });
+    await sessionTwoBash.execute("session-two-second", {
+      command: "sleep 1",
+      run_in_background: true,
+      description: "session-two-second",
+    });
+
+    await expect(sessionOneBash.execute("session-one-over-limit", {
+      command: "sleep 1",
+      run_in_background: true,
+    })).rejects.toThrow("Max concurrent background processes limit reached (1)");
+
+    const sessionOneTasks = JSON.parse(getText(await sessionOneList.execute("session-one-list", {}))) as {
+      tasks: Array<{ description?: string }>;
+    };
+    const sessionTwoTasks = JSON.parse(getText(await sessionTwoList.execute("session-two-list", {}))) as {
+      tasks: Array<{ description?: string }>;
+    };
+
+    expect(sessionOneTasks.tasks).toHaveLength(1);
+    expect(sessionOneTasks.tasks[0]?.description).toBe("session-one");
+    expect(sessionTwoTasks.tasks).toHaveLength(2);
+    expect(sessionTwoTasks.tasks.map((task) => task.description)).toEqual([
+      "session-two-first",
+      "session-two-second",
+    ]);
+
+    spawned[0]?.stdout.write("first done");
+    spawned[0]?.stdout.end();
+    spawned[0]?.stderr.end();
+    (spawned[0]?.processHandle as unknown as PassThrough).emit("close", 0);
+
+    spawned[1]?.stdout.write("second done");
+    spawned[1]?.stdout.end();
+    spawned[1]?.stderr.end();
+    (spawned[1]?.processHandle as unknown as PassThrough).emit("close", 0);
+
+    spawned[2]?.stdout.write("third done");
+    spawned[2]?.stdout.end();
+    spawned[2]?.stderr.end();
+    (spawned[2]?.processHandle as unknown as PassThrough).emit("close", 0);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(sessionOneComplete).toHaveBeenCalledTimes(1);
+    expect(sessionTwoComplete).toHaveBeenCalledTimes(2);
+  });
+
+  it("releases retained background task state when tool definitions are disposed", async () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-background-dispose-"));
+    const spawned: Array<{
+      processHandle: childProcess.ChildProcessWithoutNullStreams & { kill: ReturnType<typeof vi.fn> };
+      stdout: PassThrough;
+      stderr: PassThrough;
+    }> = [];
+
+    vi.mocked(childProcess.spawn).mockImplementation(() => {
+      const processHandle = new PassThrough() as unknown as childProcess.ChildProcessWithoutNullStreams & {
+        kill: ReturnType<typeof vi.fn>;
+      };
+      const stdout = new PassThrough();
+      const stderr = new PassThrough();
+      Object.assign(processHandle, {
+        stdout,
+        stderr,
+        pid: spawned.length + 200,
+        kill: vi.fn(),
+      });
+      spawned.push({ processHandle, stdout, stderr });
+      return processHandle;
+    });
+
+    const definitions = getToolDefinitions(workspace, { maxBackgroundProcesses: 1 });
+    const bashTool = definitions.find((tool) => tool.name === "bash");
+    const listTool = definitions.find((tool) => tool.name === "background_list");
+
+    if (!bashTool || !listTool) {
+      throw new Error("Expected background tools to be registered");
+    }
+
+    await bashTool.execute("background-first", {
+      command: "sleep 1",
+      run_in_background: true,
+      description: "retained-output",
+    });
+
+    spawned[0]?.stdout.write("captured output");
+    spawned[0]?.stdout.end();
+    spawned[0]?.stderr.end();
+    (spawned[0]?.processHandle as unknown as PassThrough).emit("close", 0);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const beforeDispose = JSON.parse(getText(await listTool.execute("background-list-before-dispose", {}))) as {
+      tasks: Array<{ stdout: string; status: string }>;
+    };
+    expect(beforeDispose.tasks).toHaveLength(1);
+    expect(beforeDispose.tasks[0]?.stdout).toBe("captured output");
+    expect(beforeDispose.tasks[0]?.status).toBe("completed");
+
+    disposeAgentCoreToolDefinitions(definitions);
+
+    const afterDispose = JSON.parse(getText(await listTool.execute("background-list-after-dispose", {}))) as {
+      tasks: unknown[];
+    };
+    expect(afterDispose.tasks).toEqual([]);
   });
 });

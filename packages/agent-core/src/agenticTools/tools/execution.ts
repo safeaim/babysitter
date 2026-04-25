@@ -32,7 +32,7 @@ export function createExecutionTools(options: AgenticToolOptions): CustomToolDef
         const cwd = params.cwd ? resolveSafe(workspace, String(params.cwd)) : workspace;
 
         if (params.run_in_background === true) {
-          const record = getBackgroundRegistry(options.maxBackgroundProcesses).spawn({
+          const record = getBackgroundRegistry(options).spawn({
             command: String(params.command),
             cwd,
             env: (params.env as Record<string, string>) ?? undefined,

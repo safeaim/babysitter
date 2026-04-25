@@ -16,6 +16,7 @@ export {
 } from "./session";
 export {
   createAgentCoreToolDefinitions,
+  disposeAgentCoreToolDefinitions,
   resetRunScopedConfig,
   parseSearchResults,
   stripHtmlTags,

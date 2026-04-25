@@ -33,6 +33,12 @@ Deprecated compatibility fields:
 
 If you still need the PI-era controls above, use the PI wrapper exposed from `@a5c-ai/babysitter-agent` rather than `@a5c-ai/agent-core`.
 
+## Background task lifecycle
+
+Background tasks created through `createAgentCoreToolDefinitions()` are scoped to that returned tool-definition set, not to a module-global singleton. `background_list` and `background_status` only expose tasks started by the same tool-definition array, and `maxBackgroundProcesses` is enforced per scoped registry.
+
+Call `disposeAgentCoreToolDefinitions(definitions)` when the owning run or session ends. That teardown kills any still-running background tasks and releases retained task records, including captured stdout/stderr for completed tasks. If you pass a custom `backgroundRegistry` in the tool options, that registry is caller-owned and you should dispose it yourself.
+
 ## Local Build
 
 From the repo root, run:

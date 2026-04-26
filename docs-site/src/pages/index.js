@@ -4,6 +4,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
+import { homepageStats } from '../generated/processLibraryStats';
 
 const defaultPathways = [
   {
@@ -32,11 +33,7 @@ const defaultPathways = [
   }
 ];
 
-const stats = [
-  { label: 'Docs files', value: '379+' },
-  { label: 'User guide tracks', value: '4' },
-  { label: 'Core modes', value: 'Call, Yolo, Plan, Forever' }
-];
+const stats = homepageStats;
 
 const pillars = [
   {

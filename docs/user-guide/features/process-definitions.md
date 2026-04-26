@@ -12,7 +12,9 @@
 
 Just like a cooking recipe says "chop vegetables, then cook them, then serve" - a process says "research the codebase, then write tests, then implement, then verify."
 
-**You don't need to write processes to use Babysitter.** The [Process Library](./process-library.md) is the SDK-managed library under `library/`, with 2,236 JavaScript process files in the current repository snapshot.
+<!-- process-definitions:lead:start -->
+**You don't need to write processes to use Babysitter.** The [Process Library](./process-library.md) is the SDK-managed library under `library/`, and the current generated snapshot counts 2,236 JavaScript process files in the live repository tree.
+<!-- process-definitions:lead:end -->
 
 **When would you write a process?**
 - You have a specific workflow your team follows
@@ -607,16 +609,18 @@ High-level approaches you can apply to any project:
 - [Methodology overview](../reference/glossary.md#methodology)
 - [Methodologies folder](../../../library/methodologies/)
 
-### Domain Processes (2,036 specialization process files in this repo snapshot) - Task-Specific Workflows
+### Domain Processes - Task-Specific Workflows
 
 Complete process definitions for specific domains:
 
+<!-- process-definitions:domains:start -->
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development and technical specializations** | 834 | [specializations/](../../../library/specializations/) |
-| **Business domains** | 491 | [domains/business/](../../../library/specializations/domains/business/) |
-| **Science & engineering domains** | 551 | [domains/science/](../../../library/specializations/domains/science/) |
-| **Social sciences & humanities** | 160 | [domains/social-sciences-humanities/](../../../library/specializations/domains/social-sciences-humanities/) |
+| **Development and technical specializations** | 835 | [Browse →](../../../library/specializations/) |
+| **Business domains** | 490 | [Browse →](../../../library/specializations/domains/business/) |
+| **Science & engineering domains** | 551 | [Browse →](../../../library/specializations/domains/science/) |
+| **Social sciences & humanities** | 160 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |
+<!-- process-definitions:domains:end -->
 
 See the full catalog with descriptions in the [Process Library](./process-library.md).
 

@@ -1,12 +1,16 @@
 # Process Library
 
-The Babysitter Process Library is the SDK-managed library under [`library/`](../../../library/README.md). In this repository snapshot, it contains **2,236 JavaScript process files**: **148 methodology process files**, **2,036 specialization process files**, and a shared-process layer used to compose larger workflows.
+<!-- process-library:lead:start -->
+The Babysitter Process Library is the SDK-managed library under [`library/`](../../../library/README.md). The current generated snapshot counts **2,236 JavaScript process files**, including **148 methodology files**, **2,036 specialization files**, and **31 shared process files**, plus support assets such as **2,019 skills** and **1,342 agents** discovered in the live tree.
+<!-- process-library:lead:end -->
 
 ---
 
 ## In Plain English
 
-> **Think of the Process Library like a cookbook with 2,236 recipes in this repo snapshot.**
+<!-- process-library:plain-english:start -->
+> **Think of the Process Library like a cookbook with 2,236 recipes in the live repository tree.**
+<!-- process-library:plain-english:end -->
 >
 > Just like how a cookbook has recipes for Italian, Mexican, Japanese, and French cuisine - the Process Library has "recipes" for building web apps, mobile apps, APIs, security audits, and much more.
 >
@@ -132,7 +136,7 @@ Click any link to view the current source location:
 |------|-------------|------|
 | **library/methodologies/** | Methodology families such as Agile, Devin, GSD, Kanban, Spec-Kit, and more | [Browse →](../../../library/methodologies/) |
 | **library/methodologies/gsd/** | Get Shit Done workflows | [Browse →](../../../library/methodologies/gsd/README.md) |
-| **library/specializations/** | Domain-specific processes across 39 top-level specialization directories | [Browse →](../../../library/specializations/) |
+| **library/specializations/** | Domain-specific processes across the specialization tree | [Browse →](../../../library/specializations/) |
 | **library/processes/shared/** | Shared reusable process components | [Browse →](../../../library/processes/shared/README.md) |
 | **library/tdd-quality-convergence.js** | Featured TDD workflow at the library root | [View →](../../../library/tdd-quality-convergence.js) |
 
@@ -178,107 +182,210 @@ Process files follow a consistent naming pattern:
 3. **Check the JSDoc** at the top of each `.js` file for inputs/outputs
 4. **Look at examples/** for sample usage patterns
 
-## Categories Overview
+## Generated Catalog Snapshot
+
+The catalog data in this section is refreshed from the live `library/` tree. The explanatory prose on this page remains hand-written.
+
+<!-- process-library:catalog:start -->
+Snapshot refreshed from the live `library/` tree on 2026-04-26.
+
+- [Current snapshot counts](#current-snapshot-counts)
+- [Methodology families](#methodology-families)
+- [Shared process groups](#shared-process-groups)
+- [Development and technical specializations](#development-and-technical-specializations)
+- [Business domains](#business-domains)
+- [Science domains](#science-domains)
+- [Social sciences and humanities domains](#social-sciences-and-humanities-domains)
+- [Largest specialization categories](#largest-specialization-categories)
 
 ## Current Snapshot Counts
-
-These counts are derived from the current repository state:
 
 | Area | Current Count | Source |
 |------|---------------|--------|
 | **All library `.js` process files** | 2,236 | [`library/`](../../../library/) |
-| **Methodology directories** | 38 | [`library/methodologies/`](../../../library/methodologies/) |
+| **Methodology directories** | 37 | [`library/methodologies/`](../../../library/methodologies/) |
 | **Methodology `.js` process files** | 148 | [`library/methodologies/`](../../../library/methodologies/) |
+| **Shared `.js` process files** | 31 | [`library/processes/shared/`](../../../library/processes/shared/) |
 | **Specialization `.js` process files** | 2,036 | [`library/specializations/`](../../../library/specializations/) |
 | **Top-level specialization directories** | 39 | [`library/specializations/`](../../../library/specializations/) |
-| **Development and technical specialization processes** | 834 | [`library/specializations/`](../../../library/specializations/) |
-| **Business-domain specialization processes** | 491 | [`library/specializations/domains/business/`](../../../library/specializations/domains/business/) |
+| **Development and technical specialization processes** | 835 | [`library/specializations/`](../../../library/specializations/) |
+| **Business-domain specialization processes** | 490 | [`library/specializations/domains/business/`](../../../library/specializations/domains/business/) |
 | **Science-domain specialization processes** | 551 | [`library/specializations/domains/science/`](../../../library/specializations/domains/science/) |
 | **Social-sciences-and-humanities specialization processes** | 160 | [`library/specializations/domains/social-sciences-humanities/`](../../../library/specializations/domains/social-sciences-humanities/) |
+| **Skill definition files** | 2,019 | [`library/`](../../../library/) |
+| **Agent definition files** | 1,342 | [`library/`](../../../library/) |
+| **README files under library** | 1,814 | [`library/`](../../../library/) |
 
-### Development And Technical Specializations (834 process files)
+## Methodology Families
 
-| Category | Processes | Description | Browse |
-|----------|-----------|-------------|--------|
-| **web-development** | 61 | Full-stack web development, frameworks, deployment | [→](../../../library/specializations/web-development/) |
-| **algorithms-optimization** | 45 | Algorithm implementation, performance tuning | [→](../../../library/specializations/algorithms-optimization/) |
-| **ai-agents-conversational** | 43 | LLM applications, RAG, multi-agent systems | [→](../../../library/specializations/ai-agents-conversational/) |
-| **cryptography-blockchain** | 33 | Smart contracts, DeFi, cryptographic protocols | [→](../../../library/specializations/cryptography-blockchain/) |
-| **security-research** | 32 | Penetration testing, vulnerability research | [→](../../../library/specializations/security-research/) |
-| **meta** | 31 | Process creation, validation, and library tooling | [→](../../../library/specializations/meta/) |
-| **robotics-simulation** | 30 | ROS2, simulation, autonomous systems | [→](../../../library/specializations/robotics-simulation/) |
-| **performance-optimization** | 30 | Profiling, optimization, benchmarking | [→](../../../library/specializations/performance-optimization/) |
-| **network-programming** | 30 | Protocols, distributed systems, networking | [→](../../../library/specializations/network-programming/) |
-| **game-development** | 30 | Game engines, mechanics, production | [→](../../../library/specializations/game-development/) |
-| **cli-mcp-development** | 30 | CLI tools, MCP servers, developer tooling | [→](../../../library/specializations/cli-mcp-development/) |
-| **devops-sre-platform** | 29 | CI/CD, infrastructure, observability | [→](../../../library/specializations/devops-sre-platform/) |
-| **mobile-development** | 26 | iOS, Android, React Native, Flutter | [→](../../../library/specializations/mobile-development/) |
-| **embedded-systems** | 26 | Firmware, drivers, real-time systems | [→](../../../library/specializations/embedded-systems/) |
-| **security-compliance** | 26 | Security standards, compliance automation | [→](../../../library/specializations/security-compliance/) |
-| **sdk-platform-development** | 25 | SDKs, APIs, platform engineering | [→](../../../library/specializations/sdk-platform-development/) |
-| **programming-languages** | 25 | Compilers, interpreters, language design | [→](../../../library/specializations/programming-languages/) |
-| **gpu-programming** | 25 | CUDA, compute shaders, parallel processing | [→](../../../library/specializations/gpu-programming/) |
-| **fpga-programming** | 25 | HDL, synthesis, hardware design | [→](../../../library/specializations/fpga-programming/) |
-| **code-migration-modernization** | 25 | Legacy modernization, framework upgrades | [→](../../../library/specializations/code-migration-modernization/) |
-| **desktop-development** | 24 | Electron, native apps, cross-platform | [→](../../../library/specializations/desktop-development/) |
-| **ux-ui-design** | 24 | Design systems, accessibility, prototyping | [→](../../../library/specializations/ux-ui-design/) |
-| **technical-documentation** | 21 | API docs, guides, documentation systems | [→](../../../library/specializations/technical-documentation/) |
-| **software-architecture** | 20 | System design, patterns, architecture reviews | [→](../../../library/specializations/software-architecture/) |
-| **qa-testing-automation** | 20 | Test automation, quality assurance | [→](../../../library/specializations/qa-testing-automation/) |
-| **data-science-ml** | 18 | ML pipelines, model training, MLOps | [→](../../../library/specializations/data-science-ml/) |
-| **data-engineering-analytics** | 18 | Data pipelines, analytics, ETL | [→](../../../library/specializations/data-engineering-analytics/) |
-| **product-management** | 17 | Roadmaps, specifications, product strategy | [→](../../../library/specializations/product-management/) |
+| Methodology | Processes | Browse |
+|----------|-----------|--------|
+| `superpowers` | 15 | [Browse →](../../../library/methodologies/superpowers/) |
+| `gsd` | 14 | [Browse →](../../../library/methodologies/gsd/) |
+| `bmad-method` | 6 | [Browse →](../../../library/methodologies/bmad-method/) |
+| `ccpm` | 6 | [Browse →](../../../library/methodologies/ccpm/) |
+| `maestro` | 6 | [Browse →](../../../library/methodologies/maestro/) |
+| `metaswarm` | 6 | [Browse →](../../../library/methodologies/metaswarm/) |
+| `rpikit` | 6 | [Browse →](../../../library/methodologies/rpikit/) |
+| `cc10x` | 5 | [Browse →](../../../library/methodologies/cc10x/) |
+| `claudekit` | 5 | [Browse →](../../../library/methodologies/claudekit/) |
+| `cog-second-brain` | 5 | [Browse →](../../../library/methodologies/cog-second-brain/) |
+| `everything-claude-code` | 5 | [Browse →](../../../library/methodologies/everything-claude-code/) |
+| `gastown` | 5 | [Browse →](../../../library/methodologies/gastown/) |
+| `pilot-shell` | 5 | [Browse →](../../../library/methodologies/pilot-shell/) |
+| `ruflo` | 5 | [Browse →](../../../library/methodologies/ruflo/) |
+| `automaker` | 4 | [Browse →](../../../library/methodologies/automaker/) |
+| `planning-with-files` | 4 | [Browse →](../../../library/methodologies/planning-with-files/) |
+| `spec-kit` | 4 | [Browse →](../../../library/methodologies/spec-kit/) |
+| `atdd-tdd` | 1 | [Browse →](../../../library/methodologies/atdd-tdd/) |
+| `bdd-specification-by-example` | 1 | [Browse →](../../../library/methodologies/bdd-specification-by-example/) |
+| `cleanroom` | 1 | [Browse →](../../../library/methodologies/cleanroom/) |
+| `domain-driven-design` | 1 | [Browse →](../../../library/methodologies/domain-driven-design/) |
+| `double-diamond` | 1 | [Browse →](../../../library/methodologies/double-diamond/) |
+| `event-storming` | 1 | [Browse →](../../../library/methodologies/event-storming/) |
+| `example-mapping` | 1 | [Browse →](../../../library/methodologies/example-mapping/) |
+| `extreme-programming` | 1 | [Browse →](../../../library/methodologies/extreme-programming/) |
+| `feature-driven-development` | 1 | [Browse →](../../../library/methodologies/feature-driven-development/) |
+| `hypothesis-driven-development` | 1 | [Browse →](../../../library/methodologies/hypothesis-driven-development/) |
+| `impact-mapping` | 1 | [Browse →](../../../library/methodologies/impact-mapping/) |
+| `jobs-to-be-done` | 1 | [Browse →](../../../library/methodologies/jobs-to-be-done/) |
+| `kanban` | 1 | [Browse →](../../../library/methodologies/kanban/) |
+| `process-hardening` | 1 | [Browse →](../../../library/methodologies/process-hardening/) |
+| `rup` | 1 | [Browse →](../../../library/methodologies/rup/) |
+| `scrum` | 1 | [Browse →](../../../library/methodologies/scrum/) |
+| `shape-up` | 1 | [Browse →](../../../library/methodologies/shape-up/) |
+| `spiral-model` | 1 | [Browse →](../../../library/methodologies/spiral-model/) |
+| `v-model` | 1 | [Browse →](../../../library/methodologies/v-model/) |
+| `waterfall` | 1 | [Browse →](../../../library/methodologies/waterfall/) |
 
-### Business Domains (491 process files)
-[Browse all business domains →](../../../library/specializations/domains/business/)
+## Shared Process Groups
 
-| Category | Processes | Description | Browse |
-|----------|-----------|-------------|--------|
-| **knowledge-management** | 36 | Documentation, wikis, knowledge bases | [→](../../../library/specializations/domains/business/knowledge-management/) |
-| **decision-intelligence** | 33 | Decision frameworks, analysis models | [→](../../../library/specializations/domains/business/decision-intelligence/) |
-| **legal** | 28 | Contract analysis, compliance, legal ops | [→](../../../library/specializations/domains/business/legal/) |
-| **operations** | 26 | Business process optimization | [→](../../../library/specializations/domains/business/operations/) |
-| **business-strategy** | 26 | Strategic planning, competitive analysis | [→](../../../library/specializations/domains/business/business-strategy/) |
-| **venture-capital** | 25 | Due diligence, portfolio management | [→](../../../library/specializations/domains/business/venture-capital/) |
-| **supply-chain** | 25 | Logistics, inventory, procurement | [→](../../../library/specializations/domains/business/supply-chain/) |
-| **sales** | 25 | Sales processes, CRM workflows | [→](../../../library/specializations/domains/business/sales/) |
-| **public-relations** | 25 | Communications, media relations | [→](../../../library/specializations/domains/business/public-relations/) |
-| **marketing** | 25 | Campaigns, analytics, content strategy | [→](../../../library/specializations/domains/business/marketing/) |
-| **logistics** | 25 | Distribution, routing, fulfillment | [→](../../../library/specializations/domains/business/logistics/) |
-| **finance-accounting** | 25 | Financial analysis, reporting, auditing | [→](../../../library/specializations/domains/business/finance-accounting/) |
-| **entrepreneurship** | 25 | Startup workflows, business planning | [→](../../../library/specializations/domains/business/entrepreneurship/) |
-| **project-management** | 25 | Project planning, tracking, delivery | [→](../../../library/specializations/domains/business/project-management/) |
-| **human-resources** | 24 | Recruiting, onboarding, HR processes | [→](../../../library/specializations/domains/business/human-resources/) |
-| **digital-marketing** | 23 | SEO, PPC, social media, analytics | [→](../../../library/specializations/domains/business/digital-marketing/) |
-| **customer-experience** | 20 | CX design, feedback loops, journey mapping | [→](../../../library/specializations/domains/business/customer-experience/) |
+| Group | Processes | Browse |
+|----------|-----------|--------|
+| `ci` | 5 | [Browse →](../../../library/processes/shared/ci/) |
+| `communication` | 3 | [Browse →](../../../library/processes/shared/communication/) |
+| `local-dev` | 2 | [Browse →](../../../library/processes/shared/local-dev/) |
+| `analysis` | 1 | [Browse →](../../../library/processes/shared/analysis/) |
+| `release` | 1 | [Browse →](../../../library/processes/shared/release/) |
+| `reporting` | 1 | [Browse →](../../../library/processes/shared/reporting/) |
 
-### Science And Engineering (551 process files)
-[Browse all science domains →](../../../library/specializations/domains/science/)
+## Development and Technical Specializations
 
-| Category | Processes | Description | Browse |
-|----------|-----------|-------------|--------|
-| **scientific-discovery** | 168 | Research methodologies, reasoning patterns | [→](../../../library/specializations/domains/science/scientific-discovery/) |
-| **quantum-computing** | 27 | Quantum algorithms, circuit design | [→](../../../library/specializations/domains/science/quantum-computing/) |
-| **mechanical-engineering** | 26 | CAD, simulation, manufacturing | [→](../../../library/specializations/domains/science/mechanical-engineering/) |
-| **computer-science** | 25 | Theory, algorithms, formal methods | [→](../../../library/specializations/domains/science/computer-science/) |
-| **civil-engineering** | 25 | Structural analysis, infrastructure | [→](../../../library/specializations/domains/science/civil-engineering/) |
-| **chemical-engineering** | 25 | Process design, reaction engineering | [→](../../../library/specializations/domains/science/chemical-engineering/) |
-| **biomedical-engineering** | 25 | Medical devices, biomechanics | [→](../../../library/specializations/domains/science/biomedical-engineering/) |
-| **automotive-engineering** | 25 | Vehicle systems, ADAS, EV | [→](../../../library/specializations/domains/science/automotive-engineering/) |
-| **aerospace-engineering** | 25 | Flight systems, propulsion, avionics | [→](../../../library/specializations/domains/science/aerospace-engineering/) |
-| **physics** | 24 | Simulation, modeling, analysis | [→](../../../library/specializations/domains/science/physics/) |
-| **mathematics** | 24 | Proofs, modeling, computation | [→](../../../library/specializations/domains/science/mathematics/) |
-| **materials-science** | 24 | Material characterization, discovery | [→](../../../library/specializations/domains/science/materials-science/) |
-| **environmental-engineering** | 24 | Environmental modeling, sustainability | [→](../../../library/specializations/domains/science/environmental-engineering/) |
-| **industrial-engineering** | 23 | Process optimization, operations research | [→](../../../library/specializations/domains/science/industrial-engineering/) |
-| **electrical-engineering** | 21 | Circuit design, signal processing | [→](../../../library/specializations/domains/science/electrical-engineering/) |
-| **nanotechnology** | 20 | Nanofabrication, characterization | [→](../../../library/specializations/domains/science/nanotechnology/) |
-| **bioinformatics** | 20 | Genomics, proteomics, computational biology | [→](../../../library/specializations/domains/science/bioinformatics/) |
+| Category | Processes | Browse |
+|----------|-----------|--------|
+| `web-development` | 61 | [Browse →](../../../library/specializations/web-development/) |
+| `algorithms-optimization` | 45 | [Browse →](../../../library/specializations/algorithms-optimization/) |
+| `ai-agents-conversational` | 43 | [Browse →](../../../library/specializations/ai-agents-conversational/) |
+| `cryptography-blockchain` | 33 | [Browse →](../../../library/specializations/cryptography-blockchain/) |
+| `security-research` | 32 | [Browse →](../../../library/specializations/security-research/) |
+| `meta` | 31 | [Browse →](../../../library/specializations/meta/) |
+| `cli-mcp-development` | 30 | [Browse →](../../../library/specializations/cli-mcp-development/) |
+| `game-development` | 30 | [Browse →](../../../library/specializations/game-development/) |
+| `network-programming` | 30 | [Browse →](../../../library/specializations/network-programming/) |
+| `performance-optimization` | 30 | [Browse →](../../../library/specializations/performance-optimization/) |
+| `robotics-simulation` | 30 | [Browse →](../../../library/specializations/robotics-simulation/) |
+| `devops-sre-platform` | 29 | [Browse →](../../../library/specializations/devops-sre-platform/) |
+| `embedded-systems` | 26 | [Browse →](../../../library/specializations/embedded-systems/) |
+| `mobile-development` | 26 | [Browse →](../../../library/specializations/mobile-development/) |
+| `security-compliance` | 26 | [Browse →](../../../library/specializations/security-compliance/) |
+| `code-migration-modernization` | 25 | [Browse →](../../../library/specializations/code-migration-modernization/) |
+| `fpga-programming` | 25 | [Browse →](../../../library/specializations/fpga-programming/) |
+| `gpu-programming` | 25 | [Browse →](../../../library/specializations/gpu-programming/) |
+| `programming-languages` | 25 | [Browse →](../../../library/specializations/programming-languages/) |
+| `sdk-platform-development` | 25 | [Browse →](../../../library/specializations/sdk-platform-development/) |
+| `desktop-development` | 24 | [Browse →](../../../library/specializations/desktop-development/) |
+| `ux-ui-design` | 24 | [Browse →](../../../library/specializations/ux-ui-design/) |
+| `technical-documentation` | 21 | [Browse →](../../../library/specializations/technical-documentation/) |
+| `qa-testing-automation` | 20 | [Browse →](../../../library/specializations/qa-testing-automation/) |
+| `software-architecture` | 20 | [Browse →](../../../library/specializations/software-architecture/) |
+| `collaboration` | 18 | [Browse →](../../../library/specializations/collaboration/) |
+| `data-engineering-analytics` | 18 | [Browse →](../../../library/specializations/data-engineering-analytics/) |
+| `data-science-ml` | 18 | [Browse →](../../../library/specializations/data-science-ml/) |
+| `product-management` | 17 | [Browse →](../../../library/specializations/product-management/) |
+| `media` | 7 | [Browse →](../../../library/specializations/media/) |
+| `observability` | 5 | [Browse →](../../../library/specializations/observability/) |
+| `research` | 5 | [Browse →](../../../library/specializations/research/) |
+| `communication` | 4 | [Browse →](../../../library/specializations/communication/) |
+| `common-utilities` | 3 | [Browse →](../../../library/specializations/common-utilities/) |
+| `authoring` | 2 | [Browse →](../../../library/specializations/authoring/) |
+| `business` | 1 | [Browse →](../../../library/specializations/business/) |
+| `sourcing` | 1 | [Browse →](../../../library/specializations/sourcing/) |
 
-### Social Sciences And Humanities (160 process files)
-[Browse social sciences domains →](../../../library/specializations/domains/social-sciences-humanities/)
+## Business Domains
 
-Processes for research methodologies, analysis frameworks, and academic workflows in social sciences, humanities, and interdisciplinary fields.
+| Category | Processes | Browse |
+|----------|-----------|--------|
+| `knowledge-management` | 36 | [Browse →](../../../library/specializations/domains/business/knowledge-management/) |
+| `decision-intelligence` | 33 | [Browse →](../../../library/specializations/domains/business/decision-intelligence/) |
+| `legal` | 28 | [Browse →](../../../library/specializations/domains/business/legal/) |
+| `business-strategy` | 26 | [Browse →](../../../library/specializations/domains/business/business-strategy/) |
+| `operations` | 26 | [Browse →](../../../library/specializations/domains/business/operations/) |
+| `business-analysis` | 25 | [Browse →](../../../library/specializations/domains/business/business-analysis/) |
+| `entrepreneurship` | 25 | [Browse →](../../../library/specializations/domains/business/entrepreneurship/) |
+| `finance-accounting` | 25 | [Browse →](../../../library/specializations/domains/business/finance-accounting/) |
+| `logistics` | 25 | [Browse →](../../../library/specializations/domains/business/logistics/) |
+| `marketing` | 25 | [Browse →](../../../library/specializations/domains/business/marketing/) |
+| `project-management` | 25 | [Browse →](../../../library/specializations/domains/business/project-management/) |
+| `public-relations` | 25 | [Browse →](../../../library/specializations/domains/business/public-relations/) |
+| `sales` | 25 | [Browse →](../../../library/specializations/domains/business/sales/) |
+| `supply-chain` | 25 | [Browse →](../../../library/specializations/domains/business/supply-chain/) |
+| `venture-capital` | 25 | [Browse →](../../../library/specializations/domains/business/venture-capital/) |
+| `human-resources` | 24 | [Browse →](../../../library/specializations/domains/business/human-resources/) |
+| `digital-marketing` | 23 | [Browse →](../../../library/specializations/domains/business/digital-marketing/) |
+| `business-strategy-advanced` | 22 | [Browse →](../../../library/specializations/domains/business/business-strategy-advanced/) |
+| `customer-experience` | 20 | [Browse →](../../../library/specializations/domains/business/customer-experience/) |
+| `travel` | 2 | [Browse →](../../../library/specializations/domains/business/travel/) |
+
+## Science Domains
+
+| Category | Processes | Browse |
+|----------|-----------|--------|
+| `scientific-discovery` | 168 | [Browse →](../../../library/specializations/domains/science/scientific-discovery/) |
+| `quantum-computing` | 27 | [Browse →](../../../library/specializations/domains/science/quantum-computing/) |
+| `mechanical-engineering` | 26 | [Browse →](../../../library/specializations/domains/science/mechanical-engineering/) |
+| `aerospace-engineering` | 25 | [Browse →](../../../library/specializations/domains/science/aerospace-engineering/) |
+| `automotive-engineering` | 25 | [Browse →](../../../library/specializations/domains/science/automotive-engineering/) |
+| `biomedical-engineering` | 25 | [Browse →](../../../library/specializations/domains/science/biomedical-engineering/) |
+| `chemical-engineering` | 25 | [Browse →](../../../library/specializations/domains/science/chemical-engineering/) |
+| `civil-engineering` | 25 | [Browse →](../../../library/specializations/domains/science/civil-engineering/) |
+| `computer-science` | 25 | [Browse →](../../../library/specializations/domains/science/computer-science/) |
+| `environmental-engineering` | 24 | [Browse →](../../../library/specializations/domains/science/environmental-engineering/) |
+| `materials-science` | 24 | [Browse →](../../../library/specializations/domains/science/materials-science/) |
+| `mathematics` | 24 | [Browse →](../../../library/specializations/domains/science/mathematics/) |
+| `physics` | 24 | [Browse →](../../../library/specializations/domains/science/physics/) |
+| `industrial-engineering` | 23 | [Browse →](../../../library/specializations/domains/science/industrial-engineering/) |
+| `electrical-engineering` | 21 | [Browse →](../../../library/specializations/domains/science/electrical-engineering/) |
+| `bioinformatics` | 20 | [Browse →](../../../library/specializations/domains/science/bioinformatics/) |
+| `nanotechnology` | 20 | [Browse →](../../../library/specializations/domains/science/nanotechnology/) |
+
+## Social Sciences and Humanities Domains
+
+| Category | Processes | Browse |
+|----------|-----------|--------|
+| `arts-culture` | 35 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/arts-culture/) |
+| `philosophy` | 26 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/philosophy/) |
+| `education` | 25 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/education/) |
+| `humanities` | 25 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/humanities/) |
+| `social-sciences` | 25 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/social-sciences/) |
+| `healthcare` | 24 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/healthcare/) |
+
+## Largest Specialization Categories
+
+| Category | Processes | Browse |
+|----------|-----------|--------|
+| `scientific-discovery` | 168 | [Browse →](../../../library/specializations/domains/science/scientific-discovery/) |
+| `web-development` | 61 | [Browse →](../../../library/specializations/web-development/) |
+| `algorithms-optimization` | 45 | [Browse →](../../../library/specializations/algorithms-optimization/) |
+| `ai-agents-conversational` | 43 | [Browse →](../../../library/specializations/ai-agents-conversational/) |
+| `knowledge-management` | 36 | [Browse →](../../../library/specializations/domains/business/knowledge-management/) |
+| `arts-culture` | 35 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/arts-culture/) |
+| `cryptography-blockchain` | 33 | [Browse →](../../../library/specializations/cryptography-blockchain/) |
+| `decision-intelligence` | 33 | [Browse →](../../../library/specializations/domains/business/decision-intelligence/) |
+| `security-research` | 32 | [Browse →](../../../library/specializations/security-research/) |
+| `meta` | 31 | [Browse →](../../../library/specializations/meta/) |
+| `cli-mcp-development` | 30 | [Browse →](../../../library/specializations/cli-mcp-development/) |
+| `game-development` | 30 | [Browse →](../../../library/specializations/game-development/) |
+<!-- process-library:catalog:end -->
 
 ## Example Processes by Category
 
@@ -357,65 +464,6 @@ Processes for research methodologies, analysis frameworks, and academic workflow
 
 Babysitter will find the `nextjs-fullstack-app` process and configure it based on your request.
 
-## Methodologies Reference
-
-The current repository snapshot includes **38 methodology directories** under [`library/methodologies/`](../../../library/methodologies/).
-[Browse all methodologies →](../../../library/methodologies/)
-
-### Core Methodologies
-
-| Methodology | Description | Best For | Source |
-|-------------|-------------|----------|--------|
-| **devin** | Plan -> Code -> Debug -> Deploy with autonomous iteration | Full feature implementation | [View](../../../library/methodologies/devin.js) |
-| **ralph** | Simple iterative loop until task completion | Persistent tasks with unclear scope | [View](../../../library/methodologies/ralph.js) |
-| **plan-and-execute** | Detailed planning phase followed by execution | Complex, well-defined features | [View](../../../library/methodologies/plan-and-execute.js) |
-| **tdd-quality-convergence** | TDD with iterative quality scoring | High-quality, tested code | [View](../../../library/tdd-quality-convergence.js) |
-| **spec-driven-development** | Executable specifications drive implementation | Enterprise, governance-heavy projects | [View](../../../library/methodologies/spec-driven-development.js) |
-
-### Agile and Iterative
-
-| Methodology | Description | Best For | Source |
-|-------------|-------------|----------|--------|
-| **agile** | Sprint-based iterative development | Team-based projects | [View](../../../library/methodologies/agile.js) |
-| **scrum** | Full Scrum implementation with ceremonies | Scrum teams | [View](../../../library/methodologies/scrum/README.md) |
-| **kanban** | Continuous flow with WIP limits | Continuous delivery | [View](../../../library/methodologies/kanban/README.md) |
-| **extreme-programming** | XP practices (pair programming, TDD) | High-quality code | [View](../../../library/methodologies/extreme-programming/README.md) |
-| **feature-driven-development** | Feature-centric development | Large codebases | [View](../../../library/methodologies/feature-driven-development/README.md) |
-
-### Architecture and Design
-
-| Methodology | Description | Best For | Source |
-|-------------|-------------|----------|--------|
-| **top-down** | Architecture-first development | New systems, clear requirements | [View](../../../library/methodologies/top-down.js) |
-| **bottom-up** | Component-first development | Exploratory, uncertain requirements | [View](../../../library/methodologies/bottom-up.js) |
-| **domain-driven-design** | DDD strategic and tactical patterns | Complex business domains | [View](../../../library/methodologies/domain-driven-design/README.md) |
-| **event-storming** | Collaborative domain discovery | Domain modeling | [View](../../../library/methodologies/event-storming/README.md) |
-| **evolutionary** | Incremental architecture evolution | Legacy modernization | [View](../../../library/methodologies/evolutionary.js) |
-
-### Specialized Approaches
-
-| Methodology | Description | Best For | Source |
-|-------------|-------------|----------|--------|
-| **graph-of-thoughts** | Multi-path reasoning exploration | Complex problem solving | [View](../../../library/methodologies/graph-of-thoughts.js) |
-| **adversarial-spec-debates** | Red team/blue team specification | Critical systems | [View](../../../library/methodologies/adversarial-spec-debates.js) |
-| **consensus-and-voting-mechanisms** | Multi-agent consensus building | Distributed decisions | [View](../../../library/methodologies/consensus-and-voting-mechanisms.js) |
-| **state-machine-orchestration** | State-based workflow management | Complex state transitions | [View](../../../library/methodologies/state-machine-orchestration.js) |
-| **build-realtime-remediation** | Real-time error detection and fixing | CI/CD pipelines | [View](../../../library/methodologies/build-realtime-remediation.js) |
-
-### GSD (Get Shit Done) Workflows
-[Browse GSD workflows →](../../../library/methodologies/gsd/README.md)
-
-| Workflow | Purpose | Source |
-|----------|---------|--------|
-| **new-project** | Project initialization with vision capture | [View](../../../library/methodologies/gsd/new-project.js) |
-| **discuss-phase** | Capture implementation preferences | [View](../../../library/methodologies/gsd/discuss-phase.js) |
-| **plan-phase** | Generate verified task plans | [View](../../../library/methodologies/gsd/plan-phase.js) |
-| **execute-phase** | Parallel task execution with commits | [View](../../../library/methodologies/gsd/execute-phase.js) |
-| **verify-work** | User acceptance testing | [View](../../../library/methodologies/gsd/verify-work.js) |
-| **audit-milestone** | Milestone completion verification | [View](../../../library/methodologies/gsd/audit-milestone.js) |
-| **map-codebase** | Brownfield project analysis | [View](../../../library/methodologies/gsd/map-codebase.js) |
-| **iterative-convergence** | Quality-gated development loop | [View](../../../library/methodologies/gsd/iterative-convergence.js) |
-
 ## Customizing Processes
 
 ### Extending an Existing Process
@@ -491,40 +539,6 @@ Most processes accept configuration through inputs:
   ]
 }
 ```
-
-## Quick Reference: All Categories
-
-| Category | Count | Focus Area | Browse |
-|----------|-------|------------|--------|
-| scientific-discovery | 168 | Research reasoning patterns | [→](../../../library/specializations/domains/science/scientific-discovery/) |
-| web-development | 61 | Full-stack web development | [→](../../../library/specializations/web-development/) |
-| algorithms-optimization | 45 | Algorithm implementation | [→](../../../library/specializations/algorithms-optimization/) |
-| ai-agents-conversational | 43 | LLM and agent development | [→](../../../library/specializations/ai-agents-conversational/) |
-| knowledge-management | 36 | Documentation and knowledge systems | [→](../../../library/specializations/domains/business/knowledge-management/) |
-| cryptography-blockchain | 33 | Blockchain and crypto | [→](../../../library/specializations/cryptography-blockchain/) |
-| decision-intelligence | 33 | Decision frameworks | [→](../../../library/specializations/domains/business/decision-intelligence/) |
-| security-research | 32 | Security research and testing | [→](../../../library/specializations/security-research/) |
-| meta | 31 | Process tooling | [→](../../../library/specializations/meta/) |
-| robotics-simulation | 30 | Robotics and simulation | [→](../../../library/specializations/robotics-simulation/) |
-| performance-optimization | 30 | Performance tuning | [→](../../../library/specializations/performance-optimization/) |
-| network-programming | 30 | Network and protocols | [→](../../../library/specializations/network-programming/) |
-| game-development | 30 | Game development | [→](../../../library/specializations/game-development/) |
-| cli-mcp-development | 30 | CLI and MCP tools | [→](../../../library/specializations/cli-mcp-development/) |
-| devops-sre-platform | 29 | DevOps and SRE | [→](../../../library/specializations/devops-sre-platform/) |
-| legal | 28 | Legal operations | [→](../../../library/specializations/domains/business/legal/) |
-| quantum-computing | 27 | Quantum computing | [→](../../../library/specializations/domains/science/quantum-computing/) |
-| mobile-development | 26 | Mobile app development | [→](../../../library/specializations/mobile-development/) |
-| embedded-systems | 26 | Embedded and firmware | [→](../../../library/specializations/embedded-systems/) |
-| security-compliance | 26 | Security compliance | [→](../../../library/specializations/security-compliance/) |
-| mechanical-engineering | 26 | Mechanical engineering | [→](../../../library/specializations/domains/science/mechanical-engineering/) |
-| sdk-platform-development | 25 | SDK development | [→](../../../library/specializations/sdk-platform-development/) |
-| programming-languages | 25 | Language implementation | [→](../../../library/specializations/programming-languages/) |
-| gpu-programming | 25 | GPU and parallel computing | [→](../../../library/specializations/gpu-programming/) |
-| fpga-programming | 25 | FPGA design | [→](../../../library/specializations/fpga-programming/) |
-| code-migration-modernization | 25 | Code modernization | [→](../../../library/specializations/code-migration-modernization/) |
-| ux-ui-design | 24 | UX/UI design | [→](../../../library/specializations/ux-ui-design/) |
-| data-science-ml | 18 | Machine learning | [→](../../../library/specializations/data-science-ml/) |
-| data-engineering-analytics | 18 | Data engineering | [→](../../../library/specializations/data-engineering-analytics/) |
 
 ## Best Practices
 

@@ -1419,16 +1419,18 @@ Not sure which methodology to use? Here's a quick guide:
 - [Methodology overview](../reference/glossary.md#methodology)
 - [Methodologies folder](../../../library/methodologies/)
 
-### Domain Processes (2,036 specialization process files in this repo snapshot) - Ready-to-Use Workflows
+### Domain Processes - Ready-to-Use Workflows
 
 Beyond methodologies, explore the current specialization catalog:
 
+<!-- best-practices:domains:start -->
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development and technical specializations** | 834 (web, mobile, DevOps, AI, security, and related domains) | [Browse →](../../../library/specializations/) |
-| **Business** | 491 (legal, HR, marketing, finance, logistics, and related domains) | [Browse →](../../../library/specializations/domains/business/) |
-| **Science & Engineering** | 551 (physics, aerospace, biomedical, mathematics, and related domains) | [Browse →](../../../library/specializations/domains/science/) |
-| **Social Sciences & Humanities** | 160 (education, healthcare, philosophy, arts, and social-science research) | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |
+| **Development and technical specializations** | 835 | [Browse →](../../../library/specializations/) |
+| **Business domains** | 490 | [Browse →](../../../library/specializations/domains/business/) |
+| **Science & engineering domains** | 551 | [Browse →](../../../library/specializations/domains/science/) |
+| **Social sciences & humanities** | 160 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |
+<!-- best-practices:domains:end -->
 
 See the full catalog in the [Process Library](./process-library.md).
 

@@ -22,6 +22,10 @@ describe('host metadata extraction', () => {
     const r = detectHostHarness({ env: { CODEX_SESSION_ID: 's1', CODEX_RUN_ID: 'r1' }, argv: [] });
     expect(r!.metadata).toEqual({ session_id: 's1', run_id: 'r1' });
   });
+  it('extracts codex session_id from CODEX_THREAD_ID when session_id is otherwise absent', () => {
+    const r = detectHostHarness({ env: { CODEX_THREAD_ID: 'thread-1' }, argv: [] });
+    expect(r!.metadata).toEqual({ session_id: 'thread-1' });
+  });
   it('extracts gemini session_id', () => {
     const r = detectHostHarness({ env: { GEMINI_CLI: '1', GEMINI_SESSION_ID: 'g1' }, argv: [] });
     expect(r!.metadata).toEqual({ session_id: 'g1' });
@@ -77,6 +81,11 @@ describe('detectHostHarness', () => {
 
   it('detects codex via CODEX_SESSION_ID', () => {
     const r = detectHostHarness({ env: { CODEX_SESSION_ID: 's1' }, argv: [] });
+    expect(r!.agent).toBe('codex');
+  });
+
+  it('detects codex via CODEX_THREAD_ID', () => {
+    const r = detectHostHarness({ env: { CODEX_THREAD_ID: 'thread-1' }, argv: [] });
     expect(r!.agent).toBe('codex');
   });
 

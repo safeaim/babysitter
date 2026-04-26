@@ -63,8 +63,28 @@ function createMetadataReader(agent: string): HostMetadataReader {
 }
 
 /** Default per-agent metadata extraction from common env vars. */
-export const DEFAULT_HOST_METADATA: HostMetadataMap = Object.fromEntries(
+const BASE_HOST_METADATA: HostMetadataMap = Object.fromEntries(
   Object.keys(HOST_METADATA_FIELDS).map((agent) => [agent, createMetadataReader(agent)]),
+);
+
+export const DEFAULT_HOST_METADATA: HostMetadataMap = Object.fromEntries(
+  Object.entries(BASE_HOST_METADATA).map(([agent, reader]) => {
+    if (agent !== 'codex') {
+      return [agent, reader];
+    }
+
+    return [agent, (env: NodeJS.ProcessEnv) => {
+      const metadata = { ...(reader(env) ?? {}) };
+      if (
+        (metadata['session_id'] == null || metadata['session_id'] === '')
+        && typeof env['CODEX_THREAD_ID'] === 'string'
+        && env['CODEX_THREAD_ID'].trim().length > 0
+      ) {
+        metadata['session_id'] = env['CODEX_THREAD_ID'];
+      }
+      return metadata;
+    }];
+  }),
 );
 
 /**
@@ -76,6 +96,7 @@ export const DEFAULT_HOST_METADATA: HostMetadataMap = Object.fromEntries(
  */
 export const DEFAULT_HOST_SIGNALS: HostSignalMap = {
   ...getHostSignalMap(),
+  codex: Array.from(new Set([...(getHostSignalMap()['codex'] ?? []), 'CODEX_THREAD_ID'])),
 };
 
 /** Options for `detectHostHarness`. */

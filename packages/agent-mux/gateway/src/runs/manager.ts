@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 
 import type { AgentEvent, FullSession, RunHandle, RunResult, RuntimeHooks, Session, SessionSummary, WorkspaceSessionBinding } from '@a5c-ai/agent-mux-core';
-import { WorkspaceService } from '@a5c-ai/agent-mux-core';
+import { WorkspaceService, detectHostHarness } from '@a5c-ai/agent-mux-core';
 
 import type { GatewayConfig } from '../config.js';
 import { createGatewayRunClient } from '../builtin-adapters.js';
@@ -659,6 +659,7 @@ export class RunManager {
     if (!client.sessions || !client.adapters) {
       return [];
     }
+    const ambientSession = this.getAmbientNativeSessionBinding();
 
     let agents = client.adapters.list().map((entry) => entry.agent);
     if (typeof client.adapters.installed === 'function') {
@@ -689,7 +690,10 @@ export class RunManager {
       sessions.map((session) => ({
         sessionId: session.sessionId,
         agent: session.agent,
-        status: 'inactive' as const,
+        status:
+          ambientSession?.agent === session.agent && ambientSession.sessionId === session.sessionId
+            ? 'active' as const
+            : 'inactive' as const,
         activeRunId: null,
         latestRunId: null,
         createdAt: session.createdAt.getTime(),
@@ -705,6 +709,21 @@ export class RunManager {
         source: 'native' as const,
       })),
     );
+  }
+
+  private getAmbientNativeSessionBinding(): { agent: string; sessionId: string } | null {
+    const detected = detectHostHarness();
+    const sessionId =
+      detected?.metadata && typeof detected.metadata['session_id'] === 'string'
+        ? detected.metadata['session_id'].trim()
+        : '';
+    if (!detected || sessionId.length === 0) {
+      return null;
+    }
+    return {
+      agent: detected.agent,
+      sessionId,
+    };
   }
 
   private async loadSessionContent(agent: string, sessionId: string): Promise<FullSession | null> {

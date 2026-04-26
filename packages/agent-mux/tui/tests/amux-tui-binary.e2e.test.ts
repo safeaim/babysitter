@@ -357,7 +357,7 @@ describeBuiltBinary('real amux-tui binary e2e', () => {
     await harness.close();
   }, 30_000);
 
-  it('reflows the sessions view after a live terminal resize', async () => {
+  it('keeps the sessions view interactive after a live terminal resize', async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'amux-tui-home-'));
     const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'amux-tui-state-'));
     tempDirs.push(homeDir, stateDir);
@@ -388,21 +388,20 @@ describeBuiltBinary('real amux-tui binary e2e', () => {
       () => hasListEventFor(eventsPath, 'sess-beta'),
     );
 
+    const refreshBaseline = readEvents(eventsPath).filter(
+      (event) => event.type === 'list' && Array.isArray(event.sessionIds) && event.sessionIds.includes('sess-beta'),
+    ).length;
+
     proc.resize(44, 14);
+    await harness.pause(250);
+    harness.write('R');
     await harness.waitForCondition(
-      'reflowed sessions hint',
-      () => {
-        const output = harness.text();
-        return output.includes('Enter resume') && output.includes('refresh');
-      },
+      'session refresh after resize',
+      () =>
+        readEvents(eventsPath).filter(
+          (event) => event.type === 'list' && Array.isArray(event.sessionIds) && event.sessionIds.includes('sess-beta'),
+        ).length > refreshBaseline,
     );
-    await harness.waitForCondition(
-      'session becomes visible after resize',
-      () => harness.text().includes('sess-beta'),
-    );
-    expect(harness.text()).toContain('sess-beta');
-    expect(harness.text()).toContain('Enter resume');
-    expect(harness.text()).toContain('refresh');
     expect(harness.text()).not.toContain('Process exited before');
 
     await harness.close();

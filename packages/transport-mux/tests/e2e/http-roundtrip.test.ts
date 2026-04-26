@@ -130,4 +130,40 @@ describe('transport-mux e2e http roundtrip', () => {
 
     expect(tail).toContain('data: [DONE]');
   });
+
+  it('returns the live hono 500 response when the handler throws', async () => {
+    await server.stop();
+    await upstream.stop();
+
+    server = await startProxyServer(
+      createProxyConfig({
+        targetProvider: 'openai',
+        targetModel: 'openai/gpt-4o',
+        exposedTransport: 'openai-chat',
+        authToken: 'test-token',
+        port: 0,
+      }),
+      {
+        async complete() {
+          throw new Error('engine exploded');
+        },
+      },
+    );
+
+    const response = await fetch(`${server.url}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer test-token',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: 'hello' }],
+      }),
+    });
+
+    expect(response.status).toBe(500);
+    expect(response.headers.get('content-type')).toContain('text/plain');
+    await expect(response.text()).resolves.toContain('Internal Server Error');
+  });
 });

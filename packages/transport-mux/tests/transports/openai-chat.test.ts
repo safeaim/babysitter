@@ -114,4 +114,50 @@ describe('openai chat transport', () => {
       error: { message: 'Streaming was requested but is disabled by proxy configuration.' },
     });
   });
+
+  it('returns 501 when the configured completion engine cannot stream', async () => {
+    const app = createTestApp(
+      {
+        targetProvider: 'anthropic',
+        targetModel: 'anthropic/claude',
+        exposedTransport: 'openai-chat',
+      },
+      {
+        async complete(request) {
+          return {
+            id: 'non-streaming-engine',
+            model: request.model,
+            role: 'assistant',
+            text: 'buffered only',
+            finishReason: 'stop',
+            usage: {
+              promptTokens: 10,
+              completionTokens: 5,
+              totalTokens: 15,
+            },
+          };
+        },
+      },
+    );
+
+    const response = await app.request('/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer test-token',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        stream: true,
+        messages: [{ role: 'user', content: 'hello' }],
+      }),
+    });
+
+    expect(response.status).toBe(501);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        message: 'Streaming was requested for openai-chat, but the configured completion engine cannot stream.',
+      },
+    });
+  });
 });

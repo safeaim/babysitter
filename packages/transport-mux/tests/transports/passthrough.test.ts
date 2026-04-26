@@ -79,7 +79,7 @@ describe('passthrough transport', () => {
       apiBase: 'https://override.example.test/openai',
     });
 
-    const response = await app.request('/passthrough/v1/chat/completions?foo=bar', {
+    const response = await app.request('/passthrough/providers/openai/v1/chat/completions?foo=bar&foo=baz&mode=debug', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -92,7 +92,7 @@ describe('passthrough transport', () => {
 
     const [url, init] = fetchMock.mock.calls[0] ?? [];
     const headers = new Headers(init?.headers);
-    expect(String(url)).toBe('https://override.example.test/v1/chat/completions?foo=bar');
+    expect(String(url)).toBe('https://override.example.test/providers/openai/v1/chat/completions?foo=bar&foo=baz&mode=debug');
     expect(headers.get('authorization')).toBe('Bearer gsk-upstream');
     expect(headers.get('x-api-key')).toBeNull();
   });
@@ -128,5 +128,30 @@ describe('passthrough transport', () => {
     expect(String(url)).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent');
     expect(headers.get('x-goog-api-key')).toBe('google-upstream');
     expect(headers.get('authorization')).toBeNull();
+  });
+
+  it('returns 501 when passthrough has no completion engine and no resolvable apiBase', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch');
+
+    const app = createTestApp({
+      targetProvider: 'custom-provider-without-default-base',
+      targetModel: 'custom/model',
+      exposedTransport: 'passthrough',
+    });
+
+    const response = await app.request('/passthrough/v1/chat/completions?foo=bar', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer test-token',
+      },
+      body: JSON.stringify({ model: 'custom/model', messages: [] }),
+    });
+
+    expect(response.status).toBe(501);
+    await expect(response.json()).resolves.toEqual({
+      error: 'No completion engine or apiBase configured.',
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

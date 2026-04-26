@@ -24,6 +24,11 @@ Historical references still exist under `packages/agent-mux/amux-proxy`, and tho
 - package entrypoints and the `amux-proxy` bin exist for workspace-local development, not as a committed external artifact policy
 - the docs capture the protocol/provider split and the remaining cutover boundary
 
+## Placeholder contract notes
+
+- `POST /v1/count_tokens` is intentionally a placeholder seam today: it returns a deterministic estimate from the serialized JSON request body (`ceil(JSON length / 4)`, minimum `1`) instead of provider-native token accounting.
+- `/passthrough/*` is expected to strip only the `/passthrough` prefix, preserve the remaining path and query string, and fail with `501` when no completion engine or resolvable upstream `apiBase` exists.
+
 ## Operator checks
 
 Use these workspace gates when changing the placeholder seam or its migration docs:

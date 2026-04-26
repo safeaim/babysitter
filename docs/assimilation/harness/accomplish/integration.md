@@ -216,7 +216,7 @@ babysitter run:rebuild-state .a5c/runs/<runId>
 babysitter run:repair-journal .a5c/runs/<runId>
 
 # Full diagnostic
-babysitter harness:doctor --run-id <runId>
+babysitter-harness doctor --run-id <runId>
 ```
 
 ### ACCOMPLISH_TASK_ID not set

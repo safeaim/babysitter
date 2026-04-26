@@ -1,3 +1,9 @@
+---
+title: Codex GitHub Actions Setup
+description: Integrate Babysitter orchestration with Codex GitHub Actions workflows.
+last_updated: 2026-04-26
+---
+
 # Using Babysitter with Codex GitHub Actions
 
 This guide explains how to integrate the Babysitter plugin with [OpenAI's Codex GitHub Action](https://github.com/openai/codex-action) for automated orchestration workflows in your CI/CD pipeline.

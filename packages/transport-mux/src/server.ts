@@ -196,21 +196,150 @@ async function createExecutionPlan(
   };
 }
 
+function normalizeProviderId(provider: string): string {
+  return provider.trim().toLowerCase().replace(/[_\s]+/g, '-');
+}
+
+function resolvePassthroughApiBase(config: ProxyConfig, env: NodeJS.ProcessEnv = process.env): string | undefined {
+  if (config.apiBase) {
+    return config.apiBase;
+  }
+
+  const legacyOverride = env.AMUX_PROXY_TARGET_API_BASE?.trim();
+  if (legacyOverride) {
+    return legacyOverride;
+  }
+
+  const provider = normalizeProviderId(config.targetProvider);
+  switch (provider) {
+    case 'anthropic':
+      return 'https://api.anthropic.com';
+    case 'openai':
+      return 'https://api.openai.com';
+    case 'google':
+      return 'https://generativelanguage.googleapis.com';
+    case 'openrouter':
+      return 'https://openrouter.ai/api';
+    case 'groq':
+      return 'https://api.groq.com/openai';
+    case 'fireworks':
+    case 'fireworks-ai':
+      return 'https://api.fireworks.ai/inference';
+    case 'together':
+    case 'together-ai':
+      return 'https://api.together.xyz';
+    case 'deepseek':
+      return 'https://api.deepseek.com';
+    case 'mistral':
+      return 'https://api.mistral.ai';
+    case 'cerebras':
+      return 'https://api.cerebras.ai';
+    case 'sambanova':
+      return 'https://api.sambanova.ai';
+    case 'nvidia-nim':
+      return 'https://integrate.api.nvidia.com';
+    case 'perplexity':
+      return 'https://api.perplexity.ai';
+    case 'cohere':
+      return 'https://api.cohere.com';
+    case 'ollama':
+      return 'http://localhost:11434';
+    case 'local':
+      return 'http://localhost:8080';
+    case 'lmstudio':
+      return 'http://localhost:1234';
+    case 'vllm':
+      return 'http://localhost:8000';
+    default:
+      return undefined;
+  }
+}
+
+function injectPassthroughProviderAuth(
+  config: ProxyConfig,
+  headers: Headers,
+  env: NodeJS.ProcessEnv = process.env,
+): void {
+  const provider = normalizeProviderId(config.targetProvider);
+
+  switch (provider) {
+    case 'anthropic': {
+      const apiKey = env.ANTHROPIC_API_KEY?.trim();
+      if (apiKey) {
+        headers.set('x-api-key', apiKey);
+        headers.set('anthropic-version', '2023-06-01');
+      }
+      return;
+    }
+    case 'google': {
+      const apiKey = env.GOOGLE_API_KEY?.trim() || env.GEMINI_API_KEY?.trim();
+      if (apiKey) {
+        headers.set('x-goog-api-key', apiKey);
+      }
+      return;
+    }
+    case 'openai':
+    case 'openrouter':
+    case 'groq':
+    case 'fireworks':
+    case 'fireworks-ai':
+    case 'together':
+    case 'together-ai':
+    case 'deepseek':
+    case 'mistral':
+    case 'cerebras':
+    case 'sambanova':
+    case 'nvidia-nim':
+    case 'perplexity':
+    case 'cohere':
+    case 'custom': {
+      const envKeysByProvider: Record<string, string[]> = {
+        openai: ['OPENAI_API_KEY'],
+        openrouter: ['OPENROUTER_API_KEY', 'OPENAI_API_KEY'],
+        groq: ['GROQ_API_KEY', 'OPENAI_API_KEY'],
+        fireworks: ['FIREWORKS_API_KEY', 'OPENAI_API_KEY'],
+        'fireworks-ai': ['FIREWORKS_API_KEY', 'OPENAI_API_KEY'],
+        together: ['TOGETHER_API_KEY', 'OPENAI_API_KEY'],
+        'together-ai': ['TOGETHER_API_KEY', 'OPENAI_API_KEY'],
+        deepseek: ['DEEPSEEK_API_KEY', 'OPENAI_API_KEY'],
+        mistral: ['MISTRAL_API_KEY', 'OPENAI_API_KEY'],
+        cerebras: ['CEREBRAS_API_KEY', 'OPENAI_API_KEY'],
+        sambanova: ['SAMBANOVA_API_KEY', 'OPENAI_API_KEY'],
+        'nvidia-nim': ['NVIDIA_API_KEY', 'OPENAI_API_KEY'],
+        perplexity: ['PERPLEXITY_API_KEY', 'OPENAI_API_KEY'],
+        cohere: ['COHERE_API_KEY', 'OPENAI_API_KEY'],
+        custom: ['OPENAI_API_KEY'],
+      };
+      const apiKey = envKeysByProvider[provider]
+        ?.map((envKey) => env[envKey]?.trim())
+        .find(Boolean);
+      if (apiKey) {
+        headers.set('authorization', `Bearer ${apiKey}`);
+      }
+      return;
+    }
+  }
+}
+
 async function proxyUpstream(req: Request, config: ProxyConfig, forwardedPath?: string): Promise<Response> {
-  if (!config.apiBase) {
+  const apiBase = resolvePassthroughApiBase(config);
+  if (!apiBase) {
     return new Response(JSON.stringify({ error: 'No completion engine or apiBase configured.' }), {
       status: 501,
       headers: { 'content-type': 'application/json' },
     });
   }
 
-  const upstreamUrl = new URL(forwardedPath ?? new URL(req.url).pathname, config.apiBase);
-  if (!forwardedPath) {
-    upstreamUrl.search = new URL(req.url).search;
-  }
+  const requestUrl = new URL(req.url);
+  const upstreamUrl = new URL(forwardedPath ?? requestUrl.pathname, apiBase);
+  upstreamUrl.search = requestUrl.search;
 
   const headers = new Headers(req.headers);
   headers.delete('host');
+  headers.delete('x-api-key');
+  headers.delete('authorization');
+
+  injectPassthroughProviderAuth(config, headers);
 
   const init: RequestInit = {
     method: req.method,

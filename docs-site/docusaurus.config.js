@@ -1,4 +1,5 @@
 const { themes } = require('prism-react-renderer');
+const { publishedDocsExcludePatterns } = require('../scripts/docs-qa-config.cjs');
 
 const strictLinkValidation = process.env.DOCS_STRICT_LINKS === '1';
 const strictDocScope = process.env.DOCS_STRICT_SCOPE === '1';
@@ -45,8 +46,7 @@ const config = {
           routeBasePath: 'docs',
           ...(strictDocScope ? { include: strictDocInclude } : {}),
           exclude: [
-            'retrospectives/hagaybar-budget-manager/banking-ux-polish.md',
-            'retrospectives/joe-habu-superbabysitter/subagent-tdd-loop.md'
+            ...publishedDocsExcludePatterns,
           ],
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/a5c-ai/babysitter/tree/staging/',

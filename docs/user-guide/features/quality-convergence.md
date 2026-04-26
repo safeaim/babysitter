@@ -1086,16 +1086,18 @@ Babysitter offers two levels of reusable workflows:
 - [Methodology overview](../reference/glossary.md#methodology)
 - [Methodologies folder](../../../library/methodologies/)
 
-### Domain Processes (2,036 specialization process files in this repo snapshot) - The "What"
+### Domain Processes - The "What"
 
-Beyond methodologies, Babysitter includes the following specialization counts in the current repository snapshot:
+Beyond methodologies, Babysitter includes the following generated specialization snapshot from the live repository tree:
 
+<!-- quality-convergence:domains:start -->
 | Domain | Processes | Examples |
 |--------|-----------|----------|
-| **Development and technical specializations** | 834 | Web APIs, mobile apps, DevOps pipelines, AI, security, and related technical workflows |
-| **Business** | 491 | Legal contracts, HR workflows, marketing campaigns, finance, logistics, and related domains |
-| **Science & Engineering** | 551 | Quantum algorithms, aerospace systems, biomedical devices, mathematics, and related domains |
-| **Social Sciences & Humanities** | 160 | Education, healthcare, arts, philosophy, and social-science research |
+| **Development and technical specializations** | 835 | Web APIs, mobile apps, DevOps pipelines, AI, security, and related technical workflows |
+| **Business domains** | 490 | Legal contracts, HR workflows, marketing campaigns, finance, logistics, and related domains |
+| **Science & engineering domains** | 551 | Quantum algorithms, aerospace systems, biomedical devices, mathematics, and related domains |
+| **Social sciences & humanities** | 160 | Education, healthcare, arts, philosophy, and social-science research |
+<!-- quality-convergence:domains:end -->
 
 **Browse processes:**
 - [Process Library](./process-library.md) - Full catalog with descriptions

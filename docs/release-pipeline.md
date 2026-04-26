@@ -1,3 +1,9 @@
+---
+title: Continuous Release Pipeline
+description: Release ownership, workflow contracts, and guardrails for the Babysitter monorepo publish pipeline.
+last_updated: 2026-04-26
+---
+
 # Continuous Release Pipeline
 
 ## Workflow Overview

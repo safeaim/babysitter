@@ -1,3 +1,9 @@
+---
+title: Testing and Validation Framework
+description: Current proof surfaces, validation commands, and documentation QA gates for V6 work.
+last_updated: 2026-04-26
+---
+
 # Testing and Validation Framework
 
 → [Documentation Index](./README.md) | Previous: [Security Architecture](./security-architecture.md) | Next: [Performance Considerations](./performance-docs.md)

@@ -1,3 +1,9 @@
+---
+title: V6 Implementation Roadmap
+description: Gated roadmap for the smallest validated V6 slice and the phases that follow from it.
+last_updated: 2026-04-26
+---
+
 # V6 Implementation Roadmap
 
 ## Status

@@ -1,3 +1,9 @@
+---
+title: Claude Code GitHub Actions Setup
+description: Integrate Babysitter orchestration with Claude Code GitHub Actions workflows.
+last_updated: 2026-04-26
+---
+
 # Using Babysitter with Claude Code GitHub Actions
 
 This guide explains how to integrate the Babysitter plugin with [Claude Code GitHub Actions](https://github.com/anthropics/claude-code-action) for automated orchestration workflows in your CI/CD pipeline.

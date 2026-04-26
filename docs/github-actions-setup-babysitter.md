@@ -1,3 +1,9 @@
+---
+title: Babysitter GitHub Action Setup
+description: Configure the official Babysitter GitHub Action for harness-agnostic orchestration workflows in GitHub Actions.
+last_updated: 2026-04-26
+---
+
 # Using the Babysitter GitHub Action
 
 This guide explains how to use the official [Babysitter GitHub Action](https://github.com/a5c-ai/babysitter) (`a5c-ai/babysitter@main`) for automated, AI-orchestrated workflows in your CI/CD pipeline.

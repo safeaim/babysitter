@@ -657,14 +657,16 @@ A JavaScript/TypeScript function that is the *low-level code implementation* of 
 
 **Key distinction:** Process = low-level code implementation; [Methodology](#methodology) = high-level concept/pattern that a process implements.
 
-**Babysitter includes 2,236 JavaScript process files in this repository snapshot** organized across methodologies, shared processes, and specializations.
+<!-- glossary:process-library:start -->
+**Babysitter currently exposes 2,236 JavaScript process files in the live repository tree** organized across methodologies, shared processes, and specializations.
 
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development and technical specializations** | 834 (web, mobile, DevOps, AI, security, and related technical domains) | [Browse →](../../../library/specializations/) |
-| **Business** | 491 (legal, HR, marketing, finance, logistics, and related domains) | [Browse →](../../../library/specializations/domains/business/) |
-| **Science & Engineering** | 551 (physics, aerospace, biomedical, mathematics, and related domains) | [Browse →](../../../library/specializations/domains/science/) |
-| **Social Sciences & Humanities** | 160 (education, healthcare, philosophy, arts, and social-science research) | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |
+| **Development and technical specializations** | 835 | [Browse →](../../../library/specializations/) |
+| **Business domains** | 490 | [Browse →](../../../library/specializations/domains/business/) |
+| **Science & engineering domains** | 551 | [Browse →](../../../library/specializations/domains/science/) |
+| **Social sciences & humanities** | 160 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |
+<!-- glossary:process-library:end -->
 
 **Structure:**
 ```javascript

@@ -1,3 +1,9 @@
+---
+title: Babysitter CLI and SDK Examples
+description: End-to-end examples for creating runs, iterating effects, and exercising the Babysitter SDK testing surface.
+last_updated: 2026-04-26
+---
+
 # Babysitter CLI & SDK Examples
 
 This guide walks through a realistic flow that exercises the `babysitter` CLI and the new deterministic test harness exposed from `@a5c-ai/babysitter-sdk/testing`. The examples assume you are standing in the repo root (or a project that already vendored the CLI + SDK) and that `~/.a5c/runs` is the default runs directory. Set `BABYSITTER_RUNS_SCOPE=repo` if you want repo-local `<repo>/.a5c/runs` instead.

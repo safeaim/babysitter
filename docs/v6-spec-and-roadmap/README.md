@@ -1,3 +1,10 @@
+---
+title: V6 Spec and Roadmap
+description: Planning and architecture documents for the current V6 evolution of the Babysitter stack.
+last_updated: 2026-04-26
+category: landing
+---
+
 # a5c.ai V6 Spec And Roadmap
 
 This directory documents a pragmatic V6 evolution for the Babysitter stack. The intent is not to describe the biggest possible modular future. The intent is to define the smallest architecture change that is worth shipping, can be validated against the current repository, and leaves room for later extraction if the seams prove real.

@@ -1,3 +1,9 @@
+---
+title: Workspace Validation Map
+description: Source-of-truth mapping for active workspaces, release-critical surfaces, and their validation workflows.
+last_updated: 2026-04-26
+---
+
 # Workspace Validation Map
 
 This document is the repo-level source of truth for which npm workspaces are active, which ones are release-critical, and which workflow path validates them.

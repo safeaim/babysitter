@@ -579,4 +579,68 @@ describe('gateway end-to-end', () => {
       await gateway.stop();
     }
   });
+
+  it('marks the ambient native harness session as active when it matches a discovered session', async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gateway-native-active-session-'));
+    tempDirs.push(tempDir);
+
+    const previousThreadId = process.env['CODEX_THREAD_ID'];
+    process.env['CODEX_THREAD_ID'] = 'native-codex-session';
+
+    const tokenStore = new MemoryTokenStore();
+    const token = await tokenStore.create({ name: 'native-active-client' });
+    const fakeClient = new FakeGatewayRunClient();
+    fakeClient.nativeSessions.set('codex', [
+      {
+        sessionId: 'native-codex-session',
+        title: 'Ambient codex thread',
+        createdAt: '2026-04-16T10:00:00.000Z',
+        updatedAt: '2026-04-16T10:15:00.000Z',
+        turnCount: 4,
+        messageCount: 9,
+      },
+    ]);
+
+    const gateway = createGateway({
+      host: '127.0.0.1',
+      port: 0,
+      tokenStore,
+      tokenStoreKind: 'memory',
+      client: fakeClient,
+      eventLogDir: tempDir,
+      enableWebui: false,
+    });
+
+    await gateway.start();
+    const baseUrl = `http://127.0.0.1:${gateway.server.address.port}`;
+
+    try {
+      const sessionsResponse = await fetch(`${baseUrl}/api/v1/sessions`, {
+        headers: {
+          authorization: `Bearer ${token.plaintext}`,
+        },
+      });
+      expect(sessionsResponse.status).toBe(200);
+      const sessionsBody = await sessionsResponse.json() as { sessions: Array<Record<string, unknown>> };
+      expect(sessionsBody.sessions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            sessionId: 'native-codex-session',
+            agent: 'codex',
+            status: 'active',
+            activeRunId: null,
+            latestRunId: null,
+            source: 'native',
+          }),
+        ]),
+      );
+    } finally {
+      await gateway.stop();
+      if (previousThreadId === undefined) {
+        delete process.env['CODEX_THREAD_ID'];
+      } else {
+        process.env['CODEX_THREAD_ID'] = previousThreadId;
+      }
+    }
+  });
 });

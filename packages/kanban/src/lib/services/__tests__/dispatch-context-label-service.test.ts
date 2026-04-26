@@ -253,8 +253,6 @@ describe("DispatchContextLabelService", () => {
     const persisted = JSON.parse(await fs.readFile(backlogFilePath, "utf8")) as {
       issues: Array<{ dispatch?: { contextLabels?: Array<{ labelId: string }> } }>;
     };
-      issues: Array<{ dispatch?: { contextLabels?: Array<{ labelId: string }> } }>;
-    };
     expect(persisted.issues[0]?.dispatch?.contextLabels).toEqual([
       { labelId: "dispatch-context-label-2" },
     ]);

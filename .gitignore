@@ -77,6 +77,7 @@ plugins/babysitter-gemini/.babysitter-install-attempted
 .docusaurus/
 *.d.ts.map
 *.ts.map
+*.tsbuildinfo
 
 packages/sdk/**/*.d.ts
 packages/sdk/src/**/*.js

@@ -1,3 +1,10 @@
+---
+title: Babysitter Plugins
+description: Understand the Babysitter plugin system, marketplace model, and how plugin installs reshape projects and workflows.
+last_updated: 2026-04-26
+category: landing
+---
+
 # Babysitter Plugins
 
 ## What Makes This Plugin System Different

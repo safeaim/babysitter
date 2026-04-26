@@ -1,3 +1,9 @@
+---
+title: Gemini CLI GitHub Actions Setup
+description: Integrate Babysitter orchestration with Gemini CLI GitHub Actions workflows.
+last_updated: 2026-04-26
+---
+
 # Using Babysitter with Gemini CLI GitHub Actions
 
 This guide explains how to integrate the Babysitter plugin with [Google's Gemini CLI GitHub Action](https://github.com/google-github-actions/run-gemini-cli) for automated orchestration workflows in your CI/CD pipeline.

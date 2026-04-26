@@ -1,3 +1,10 @@
+---
+title: Agent Mux
+description: Source-of-truth specifications and reference docs for the Agent Mux APIs, adapters, sessions, and CLI surface.
+last_updated: 2026-04-26
+category: landing
+---
+
 # agent-mux docs
 
 This section has three tracks:

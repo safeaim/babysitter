@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { PassThrough } from 'node:stream';
 import { parseArgs, applyOverrides, runMockHarness } from '../src/bin/mock-harness.js';
-import { AGENT_SCENARIOS } from '../src/index.js';
+import { AGENT_SCENARIOS } from '../src/scenarios/index.js';
 
 function collectStream(): { stream: PassThrough; text: () => string } {
   const s = new PassThrough();
@@ -16,8 +16,9 @@ function wait(ms: number): Promise<void> {
 
 describe('mock-harness parseArgs', () => {
   it('parses flags', () => {
-    const a = parseArgs(['--scenario', 'x:y', '--delay', '5', '--stdin-echo', '--exit-code', '7', '--fail-after', '2']);
+    const a = parseArgs(['--scenario', 'x:y', '--agent', 'claude', '--delay', '5', '--stdin-echo', '--exit-code', '7', '--fail-after', '2']);
     expect(a.scenario).toBe('x:y');
+    expect(a.agent).toBe('claude');
     expect(a.delay).toBe(5);
     expect(a.stdinEcho).toBe(true);
     expect(a.exitCode).toBe(7);
@@ -61,6 +62,18 @@ describe('mock-harness runMockHarness', () => {
     expect(so.text()).toContain('claude:basic-text');
   });
 
+  it('--list respects the --agent filter', async () => {
+    const so = collectStream(); const se = collectStream();
+    const code = await runMockHarness(
+      { stdinEcho: false, list: true, help: false, agent: 'claude' },
+      { stdout: so.stream, stderr: se.stream },
+    );
+    expect(code).toBe(0);
+    expect(so.text()).toContain('claude:stream-json');
+    expect(so.text()).not.toContain('codex:exec-turn');
+    expect(so.text()).not.toContain('interactive:yolo');
+  });
+
   it('missing --scenario returns 2', async () => {
     const so = collectStream(); const se = collectStream();
     const code = await runMockHarness(
@@ -90,6 +103,27 @@ describe('mock-harness runMockHarness', () => {
     expect(code).toBe(0);
     expect(so.text()).toContain('"type":"system"');
     expect(so.text()).toContain('"type":"result"');
+  });
+
+  it('--agent resolves bare scenario names within the selected prefix', async () => {
+    const so = collectStream(); const se = collectStream();
+    const code = await runMockHarness(
+      { stdinEcho: false, list: false, help: false, agent: 'claude', scenario: 'stream-json', delay: 0 },
+      { stdout: so.stream, stderr: se.stream },
+    );
+    expect(code).toBe(0);
+    expect(so.text()).toContain('"type":"system"');
+    expect(so.text()).toContain('"type":"result"');
+  });
+
+  it('--agent rejects scenarios outside the selected prefix', async () => {
+    const so = collectStream(); const se = collectStream();
+    const code = await runMockHarness(
+      { stdinEcho: false, list: false, help: false, agent: 'claude', scenario: 'codex:error' },
+      { stdout: so.stream, stderr: se.stream },
+    );
+    expect(code).toBe(2);
+    expect(se.text()).toContain('unknown scenario');
   });
 
   it('stdin-echo pipes stdin back to stdout', async () => {
@@ -159,5 +193,6 @@ describe('mock-harness runMockHarness', () => {
     );
     expect(code).toBe(0);
     expect(se.text()).toContain('mock-harness');
+    expect(se.text()).toContain('--agent <name>');
   });
 });

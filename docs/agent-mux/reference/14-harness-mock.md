@@ -81,6 +81,10 @@ The canonical subprocess registry now lives in `src/scenarios/per-agent.ts`.
 - Canonical profiles cover the adapter parse paths that are actually implemented today.
 - For richer adapters, that includes session lifecycle, message stop, cost, and tool result envelopes.
 - For the lighter JSONL adapters (`cursor`, `pi`, `omp`, `openclaw`, `hermes`), the registry still includes session lifecycle and nonzero-exit process behavior in the mock output, while parser expectations stay limited to the event types their adapters currently normalize.
+- The `mock-harness` CLI can list the whole registry with `--list`, or scope both
+  `--list` and bare `--scenario` names to a single agent prefix with
+  `--agent <name>` (for example, `mock-harness --agent claude --scenario tool-call`
+  resolves `claude:tool-call`).
 
 Representative canonical scenarios:
 

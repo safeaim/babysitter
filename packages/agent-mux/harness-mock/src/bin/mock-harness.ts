@@ -80,14 +80,14 @@ export async function runMockHarness(
     return 0;
   }
   if (args.list) {
-    for (const n of listScenarioNames()) streams.stdout.write(n + '\n');
+    for (const n of listScenarioNames(args.agent)) streams.stdout.write(n + '\n');
     return 0;
   }
   if (!args.scenario) {
     streams.stderr.write('error: --scenario is required (use --list)\n');
     return 2;
   }
-  const resolved = resolveScenario(args.scenario);
+  const resolved = resolveScenario(args.scenario, args.agent);
   if (!resolved) {
     streams.stderr.write(`error: unknown scenario: ${args.scenario}\n`);
     return 2;
@@ -121,16 +121,16 @@ function helpText(): string {
   return [
     'mock-harness — replay a mock agent scenario.',
     '',
-    'Usage: mock-harness --scenario <name> [flags]',
+    'Usage: mock-harness --scenario <name> [--agent <name>] [flags]',
     '',
     'Flags:',
-    '  --scenario <name>   Scenario id (try --list)',
-    '  --agent <name>      Informational; restrict scope to an agent',
+    '  --scenario <name>   Scenario id (try --list); bare names resolve within --agent',
+    '  --agent <name>      Restrict --list and scenario lookup to <name>:*',
     '  --delay <ms>        Override per-chunk delay',
     '  --stdin-echo        Echo stdin back to stdout',
     '  --exit-code <n>     Force process exit code',
     '  --fail-after <n>    Truncate scenario to n chunks and fail',
-    '  --list              List scenario names',
+    '  --list              List scenario names (filtered by --agent)',
     '  -h, --help          Show this help',
     '',
   ].join('\n');

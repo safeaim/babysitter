@@ -45,6 +45,14 @@ Pick one with `--scenario`:
 amux run claude --use-mock-harness --scenario tool-call --prompt "x"
 ```
 
+If you invoke the package binary directly, the same agent scoping is available
+there too:
+
+```bash
+mock-harness --agent claude --list
+mock-harness --agent claude --scenario tool-call
+```
+
 Interactive approval scenarios under `packages/agent-mux/harness-mock` now model real gating semantics rather than timer-only replay:
 
 - `interactive:yolo` auto-approves and then emits the post-approval output.

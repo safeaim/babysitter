@@ -19,9 +19,14 @@ Requires Node.js >= 20.9.0.
 
 ```bash
 mock-harness --list
+mock-harness --agent claude --list
 mock-harness --scenario claude:stream-json
-mock-harness --scenario cursor:error
+mock-harness --agent cursor --scenario error
 ```
+
+`--agent <name>` filters `--list` to `<name>:*` scenarios and lets bare
+`--scenario` values resolve within that prefix. For example,
+`mock-harness --agent cursor --scenario error` resolves `cursor:error`.
 
 ## Programmatic
 

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createStore } from "zustand/vanilla";
 import { render, screen, setupUser, waitFor, within } from "@/test/test-utils";
 
 import {
@@ -13,6 +14,15 @@ import {
 let workspaceReviewArtifacts: Array<Record<string, unknown>> = [];
 const mockUseBacklog = vi.fn(() => ({ snapshot: null }));
 const workspaceReviewActionMock = vi.fn();
+const gatewayStore = createStore(() => ({
+  agents: {
+    items: [],
+    byId: {},
+  },
+  hooks: {
+    byRunId: {},
+  },
+}));
 
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href?: string; children?: unknown; [key: string]: unknown }) => (
@@ -67,6 +77,13 @@ vi.mock("@/hooks/use-reviews", () => ({
 
 vi.mock("@/hooks/use-backlog", () => ({
   useBacklog: () => mockUseBacklog(),
+}));
+
+vi.mock("@/lib/agent-mux-ui", () => ({
+  useGateway: () => ({
+    client: { request: vi.fn() },
+    store: gatewayStore,
+  }),
 }));
 
 vi.mock("@/components/sessions/session-observability-panel", () => ({

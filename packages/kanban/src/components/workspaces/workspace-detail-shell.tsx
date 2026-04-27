@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import type { Attachment } from "@a5c-ai/agent-mux-core";
 import { ChevronLeft, ExternalLink, GripVertical, LayoutDashboard, MessagesSquare, PanelLeft, PanelRight, Search, TerminalSquare, Workflow, X } from "lucide-react";
 
+import { SessionConversationSurface } from "@/components/sessions/session-conversation-surface";
 import { SessionObservabilityPanel } from "@/components/sessions/session-observability-panel";
 import { Button } from "@/components/ui/button";
 import { useKeyboard } from "@/hooks/use-keyboard";
@@ -26,12 +28,6 @@ import type { WorkspaceInventoryItem, WorkspaceSessionSnapshot } from "@/lib/wor
 import { WorkspaceRuntimePanel } from "@/components/workspaces/workspace-runtime-panel";
 import { WorkspaceDetailsSidebar, type WorkspaceSidebarFeedback } from "@/components/workspaces/workspace-details-sidebar";
 
-export type WorkspaceTranscriptNode =
-  | { kind: "user"; text: string; runId: string }
-  | { kind: "assistant"; text: string; runId: string }
-  | { kind: "thinking"; text: string; runId: string }
-  | { kind: "tool"; text: string; runId: string; label: string };
-
 type EventBuffer = {
   events: Array<Record<string, unknown>>;
 };
@@ -49,20 +45,22 @@ type WorkspaceDetailShellProps = {
   activeSession: WorkspaceSessionSnapshot | null;
   runs: Array<Record<string, unknown>>;
   eventBuffers: Record<string, EventBuffer | undefined>;
-  transcript: WorkspaceTranscriptNode[];
   totalCostLabel: string;
   selectedSessionId: string | null;
   onSelectSession: (sessionId: string) => void;
-  prompt: string;
-  sending: boolean;
-  error: string | null;
   pendingAction: string | null;
   notesSaving: boolean;
   reviewArtifact?: KanbanReviewArtifact | null;
   reviewPending: boolean;
   feedback?: WorkspaceSidebarFeedback | null;
-  onPromptChange: (value: string) => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (input: {
+    sessionId: string;
+    prompt: string;
+    agent?: string;
+    model?: string;
+    attachments?: Attachment[];
+    approvalMode?: "yolo" | "prompt" | "deny";
+  }) => Promise<void>;
   onAction: (action: WorkspaceSidebarAction, workspace: WorkspaceInventoryItem) => void;
   onOpenInEditor: (workspace: WorkspaceInventoryItem, href: string | null) => void;
   onSaveNote: (workspace: WorkspaceInventoryItem, note: string) => void;
@@ -477,94 +475,31 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
           title="Session"
           subtitle="Selected session transcript and next-turn input"
         >
-          <div className="flex h-full min-h-0 flex-col">
-            <div className="rounded-2xl border border-border bg-background/65 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <div className="text-xs uppercase tracking-[0.18em] text-foreground-muted">Selected session</div>
-                  <div className="mt-2 text-sm font-medium text-foreground">{activeSessionLabel}</div>
-                </div>
-                <div className="flex flex-wrap gap-2 text-xs text-foreground-muted">
-                  {props.activeSession ? (
-                    <>
-                      <span className={`rounded-full border px-2 py-1 ${statusTone(props.activeSession.status)}`}>
-                        {props.activeSession.status}
-                      </span>
-                      <span className="rounded-full border border-border px-2 py-1">{props.activeSession.agent}</span>
-                      <span className="rounded-full border border-border px-2 py-1">{props.totalCostLabel}</span>
-                    </>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-auto">
-              {props.transcript.map((node, index) => (
-                <article
-                  key={`${node.runId}:${index}`}
-                  className="rounded-2xl border border-border bg-background/65 p-4"
-                >
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-border px-2 py-0.5 text-xs uppercase tracking-[0.18em] text-foreground-muted">
-                      {node.kind}
-                    </span>
-                    {"label" in node ? (
-                      <span className="rounded-full border border-info/20 bg-info/10 px-2 py-0.5 text-xs text-info">
-                        {node.label}
-                      </span>
-                    ) : null}
-                    <Link href={`/runs/${node.runId}`} className="text-xs text-primary">
-                      {node.runId}
-                    </Link>
-                  </div>
-                  <pre className="whitespace-pre-wrap break-words text-sm leading-6 text-foreground-secondary">
-                    {node.text}
-                  </pre>
-                </article>
-              ))}
-              {props.transcript.length === 0 ? (
-                <EmptyWorkspaceState
-                  title="No transcript events"
-                  body={
-                    props.activeSession
-                      ? "The selected session has not published transcript events yet."
-                      : "Select a session from this workspace to inspect transcript activity."
-                  }
-                />
-              ) : null}
-            </div>
-
-            <form onSubmit={props.onSubmit} className="mt-4 grid gap-3 border-t border-border pt-4">
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-foreground">Send another turn</span>
-                <textarea
-                  value={props.prompt}
-                  onChange={(event) => props.onPromptChange(event.target.value)}
-                  rows={5}
-                  disabled={!props.activeSession}
-                  className="min-h-32 rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-                  placeholder={
-                    props.activeSession ? "Continue the selected session..." : "Select a session to continue the conversation."
-                  }
-                />
-              </label>
-              {props.error ? (
-                <div className="rounded-2xl border border-error/20 bg-error-muted px-4 py-3 text-sm text-error">
-                  {props.error}
-                </div>
-              ) : null}
-              <div className="flex flex-wrap gap-3">
-                <Button type="submit" disabled={props.sending || !props.prompt.trim() || !props.activeSession}>
-                  {props.sending ? "Sending..." : "Send turn"}
-                </Button>
-                {props.activeSession ? (
-                  <Button asChild type="button" variant="outline">
-                    <Link href={`/sessions/${props.activeSession.sessionId}`}>Open session</Link>
-                  </Button>
-                ) : null}
-              </div>
-            </form>
-          </div>
+          <SessionConversationSurface
+            sessionId={props.activeSession?.sessionId ?? "no-session"}
+            sessionLabel={activeSessionLabel}
+            sessionAgent={props.activeSession?.agent ?? "unknown"}
+            sessionStatus={props.activeSession?.status ?? "inactive"}
+            sessionModel={null}
+            runs={props.runs}
+            eventBuffers={props.eventBuffers}
+            workspacePath={props.workspace.path}
+            runtime={runtime}
+            disabled={!props.activeSession}
+            emptyStateTitle="No transcript events"
+            emptyStateBody={
+              props.activeSession
+                ? "The selected session has not published transcript, tool, or file attention events yet."
+                : "Select a session from this workspace to inspect transcript activity and continue the conversation."
+            }
+            openSessionHref={props.activeSession ? `/sessions/${props.activeSession.sessionId}` : undefined}
+            placeholder={
+              props.activeSession
+                ? "Continue the selected session..."
+                : "Select a session to continue the conversation."
+            }
+            onSubmit={props.onSubmit}
+          />
         </WorkspacePanelFrame>
       );
     }

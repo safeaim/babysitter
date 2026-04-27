@@ -49,6 +49,8 @@ const sessionStartFrameSchema = z.object({
   agent: z.string().min(1),
   prompt: z.string(),
   model: z.string().optional(),
+  attachments: z.array(z.record(z.string(), z.unknown())).optional(),
+  approvalMode: z.enum(['yolo', 'prompt', 'deny']).optional(),
   sessionId: z.string().optional(),
   runId: z.string().optional(),
 });
@@ -59,6 +61,8 @@ const sessionMessageFrameSchema = z.object({
   prompt: z.string(),
   agent: z.string().optional(),
   model: z.string().optional(),
+  attachments: z.array(z.record(z.string(), z.unknown())).optional(),
+  approvalMode: z.enum(['yolo', 'prompt', 'deny']).optional(),
 });
 
 const pingFrameSchema = z.object({

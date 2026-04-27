@@ -79,6 +79,9 @@ export interface RunnableGatewayAgent {
   sessionControlPlane: 'self-managed' | 'external-host' | 'mcp-mediated';
   supportsInteractiveMode: boolean;
   canResume: boolean;
+  supportsImageInput: boolean;
+  supportsFileAttachments: boolean;
+  approvalModes: Array<'yolo' | 'prompt' | 'deny'>;
 }
 
 type DetectableGatewayClient = GatewayRunClient & {
@@ -92,6 +95,9 @@ type DetectableGatewayClient = GatewayRunClient & {
         sessionControlPlane?: 'self-managed' | 'external-host' | 'mcp-mediated';
         supportsInteractiveMode?: boolean;
         canResume?: boolean;
+        supportsImageInput?: boolean;
+        supportsFileAttachments?: boolean;
+        approvalModes?: Array<'yolo' | 'prompt' | 'deny'>;
       };
     } | undefined;
   };
@@ -108,6 +114,9 @@ export async function listRunnableGatewayAgents(client?: GatewayRunClient): Prom
       sessionControlPlane: 'self-managed',
       supportsInteractiveMode: false,
       canResume: false,
+      supportsImageInput: false,
+      supportsFileAttachments: false,
+      approvalModes: ['prompt'],
     }));
   }
 
@@ -131,6 +140,9 @@ export async function listRunnableGatewayAgents(client?: GatewayRunClient): Prom
       sessionControlPlane: adapter?.capabilities?.sessionControlPlane ?? 'self-managed',
       supportsInteractiveMode: adapter?.capabilities?.supportsInteractiveMode ?? false,
       canResume: adapter?.capabilities?.canResume ?? false,
+      supportsImageInput: adapter?.capabilities?.supportsImageInput ?? false,
+      supportsFileAttachments: adapter?.capabilities?.supportsFileAttachments ?? false,
+      approvalModes: adapter?.capabilities?.approvalModes ?? ['prompt'],
     }];
   });
 
@@ -155,11 +167,14 @@ export async function listRunnableGatewayAgents(client?: GatewayRunClient): Prom
     agent,
     displayName: agent,
     adapterType: 'subprocess',
-    structuredSessionTransport: 'none',
-    sessionControlPlane: 'self-managed',
-    supportsInteractiveMode: false,
-    canResume: false,
-  }));
+      structuredSessionTransport: 'none',
+      sessionControlPlane: 'self-managed',
+      supportsInteractiveMode: false,
+      canResume: false,
+      supportsImageInput: false,
+      supportsFileAttachments: false,
+      approvalModes: ['prompt'],
+    }));
 }
 
 export async function listRunnableGatewayAgentNames(client?: GatewayRunClient): Promise<string[]> {

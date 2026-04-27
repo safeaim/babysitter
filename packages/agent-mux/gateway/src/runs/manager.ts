@@ -1,6 +1,7 @@
 import * as path from 'node:path';
 
 import type {
+  Attachment,
   AgentEvent,
   FullSession,
   RunHandle,
@@ -231,7 +232,7 @@ export class RunManager {
     sessionId: string,
     input: string,
     owner: RunOwner,
-    overrides: Partial<Pick<RunStartInput, 'agent' | 'model'>> = {},
+    overrides: Partial<Pick<RunStartInput, 'agent' | 'model' | 'attachments' | 'approvalMode'>> = {},
   ): Promise<RunEntry | null> {
     const session = await this.getSession(sessionId);
     if (!session) {
@@ -268,6 +269,8 @@ export class RunManager {
         agent: overrides.agent ?? session.agent,
         model: overrides.model,
         prompt: input,
+        attachments: overrides.attachments as Attachment[] | undefined,
+        approvalMode: overrides.approvalMode,
         sessionId,
         cwd: session.cwd ?? session.workspace?.currentPath ?? session.workspace?.workspaceDefaultCwd,
         workspaceId: session.workspaceId ?? session.workspace?.workspaceId,

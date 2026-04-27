@@ -2,6 +2,7 @@ import * as http from 'node:http';
 
 import { Hono } from 'hono';
 import { WebSocketServer } from 'ws';
+import type { Attachment } from '@a5c-ai/agent-mux-core';
 import { resolveWorkspaceDefaultCwd, WorkspaceService } from '@a5c-ai/agent-mux-core';
 
 import { authenticateBearerToken } from './auth/middleware.js';
@@ -69,6 +70,32 @@ function resolveTokenStore(config: GatewayConfig): TokenStore {
   if (config.tokenStore) return config.tokenStore;
   if (config.tokenStoreKind === 'memory') return new MemoryTokenStore();
   return new SqliteTokenStore(config.tokenDbPath);
+}
+
+function sanitizeAttachments(value: unknown): Attachment[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const attachments = value.flatMap((entry) => {
+    if (!entry || typeof entry !== 'object') {
+      return [];
+    }
+    const record = entry as Record<string, unknown>;
+    return [{
+      filePath: typeof record['filePath'] === 'string' ? record['filePath'] : undefined,
+      url: typeof record['url'] === 'string' ? record['url'] : undefined,
+      base64: typeof record['base64'] === 'string' ? record['base64'] : undefined,
+      mimeType: typeof record['mimeType'] === 'string' ? record['mimeType'] : undefined,
+      name: typeof record['name'] === 'string' ? record['name'] : undefined,
+    }];
+  }).filter((attachment) => attachment.filePath || attachment.url || attachment.base64);
+
+  return attachments.length > 0 ? attachments : undefined;
+}
+
+function readApprovalMode(value: unknown): 'yolo' | 'prompt' | 'deny' | undefined {
+  return value === 'yolo' || value === 'prompt' || value === 'deny' ? value : undefined;
 }
 
 export function createGatewayServer(
@@ -296,6 +323,8 @@ export function createGatewayServer(
       {
         agent: typeof body['agent'] === 'string' ? body['agent'] : undefined,
         model: typeof body['model'] === 'string' ? body['model'] : undefined,
+        attachments: sanitizeAttachments(body['attachments']),
+        approvalMode: readApprovalMode(body['approvalMode']),
       },
     );
     if (!run) {
@@ -578,6 +607,8 @@ export function createGatewayServer(
             agent,
             model: typeof rawFrame['model'] === 'string' ? rawFrame['model'] : undefined,
             prompt: typeof rawFrame['prompt'] === 'string' ? rawFrame['prompt'] : '',
+            attachments: sanitizeAttachments(rawFrame['attachments']),
+            approvalMode: readApprovalMode(rawFrame['approvalMode']),
             sessionId: typeof rawFrame['sessionId'] === 'string' ? rawFrame['sessionId'] : undefined,
           },
           {
@@ -605,6 +636,8 @@ export function createGatewayServer(
           {
             agent: typeof rawFrame['agent'] === 'string' ? rawFrame['agent'] : undefined,
             model: typeof rawFrame['model'] === 'string' ? rawFrame['model'] : undefined,
+            attachments: sanitizeAttachments(rawFrame['attachments']),
+            approvalMode: readApprovalMode(rawFrame['approvalMode']),
           },
         );
         if (!run) {

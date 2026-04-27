@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import type { Attachment } from "@a5c-ai/agent-mux-core";
 import type {
   KanbanLinkedPullRequestSummary,
   KanbanRepositoryIntegrationState,
@@ -21,7 +22,7 @@ import { useReviews } from "@/hooks/use-reviews";
 import type { WorkspaceInventoryItem, WorkspaceInventoryResponse, WorkspaceSessionSnapshot } from "@/lib/workspace-lifecycle";
 import { WorkspaceDetailsSidebar, type WorkspaceSidebarFeedback } from "@/components/workspaces/workspace-details-sidebar";
 import { WorkspaceRuntimePanel } from "@/components/workspaces/workspace-runtime-panel";
-import { WorkspaceDetailShell, type WorkspaceTranscriptNode } from "@/components/workspaces/workspace-detail-shell";
+import { WorkspaceDetailShell } from "@/components/workspaces/workspace-detail-shell";
 
 function formatTimestamp(value: string | null): string {
   if (!value) {
@@ -53,110 +54,6 @@ function formatUsd(totalUsd: number | null): string {
     minimumFractionDigits: totalUsd >= 1 ? 2 : 4,
     maximumFractionDigits: 4,
   }).format(totalUsd);
-}
-
-function buildTranscript(
-  runs: Array<Record<string, unknown>>,
-  eventBuffers: Record<string, { events: Record<string, unknown>[] } | undefined>,
-): WorkspaceTranscriptNode[] {
-  const orderedRuns = [...runs].sort((left, right) => Number(left.startedAt ?? 0) - Number(right.startedAt ?? 0));
-  const nodes: WorkspaceTranscriptNode[] = [];
-
-  for (const run of orderedRuns) {
-    const runId = String(run.runId ?? "");
-    const buffer = eventBuffers[runId];
-    if (!buffer) {
-      continue;
-    }
-
-    let currentAssistantText = "";
-    let currentThinkingText = "";
-    const flushAssistant = () => {
-      if (!currentAssistantText) return;
-      nodes.push({ kind: "assistant", text: currentAssistantText, runId });
-      currentAssistantText = "";
-    };
-    const flushThinking = () => {
-      if (!currentThinkingText) return;
-      nodes.push({ kind: "thinking", text: currentThinkingText, runId });
-      currentThinkingText = "";
-    };
-
-    for (const event of buffer.events) {
-      const type = String(event.type ?? "");
-      if (type === "user_message") {
-        flushThinking();
-        flushAssistant();
-        const text = String(event.text ?? "");
-        if (text.length > 0) {
-          nodes.push({ kind: "user", text, runId });
-        }
-        continue;
-      }
-
-      if (type === "thinking_delta") {
-        const delta = String(event.delta ?? "");
-        if (delta.length > 0) {
-          currentThinkingText += delta;
-        }
-        continue;
-      }
-
-      if (type === "thinking_stop") {
-        const finalThinking = String(event.thinking ?? "");
-        if (finalThinking.length > 0) {
-          currentThinkingText = finalThinking;
-        }
-        flushThinking();
-        continue;
-      }
-
-      if (type === "text_delta") {
-        flushThinking();
-        currentAssistantText += String(event.delta ?? "");
-        continue;
-      }
-
-      if (type === "message_stop") {
-        flushThinking();
-        const finalText = String(event.text ?? "");
-        if (finalText.length > 0) {
-          currentAssistantText = finalText;
-        }
-        flushAssistant();
-        continue;
-      }
-
-      flushThinking();
-      flushAssistant();
-
-      if (type === "tool_call_start" || type === "tool_call_ready") {
-        nodes.push({
-          kind: "tool",
-          runId,
-          label: `start ${String(event.toolName ?? "tool")}`,
-          text:
-            type === "tool_call_ready"
-              ? JSON.stringify(event.input ?? {}, null, 2)
-              : String(event.inputAccumulated ?? ""),
-        });
-      }
-
-      if (type === "tool_result" || type === "tool_error") {
-        nodes.push({
-          kind: "tool",
-          runId,
-          label: String(event.toolName ?? "tool"),
-          text: JSON.stringify(event, null, 2),
-        });
-      }
-    }
-
-    flushThinking();
-    flushAssistant();
-  }
-
-  return nodes;
 }
 
 function accumulateEventCost(
@@ -370,7 +267,14 @@ export function WorkspacesPageContent(props: {
   selectedWorkspacePath?: string | null;
   allRuns?: Array<Record<string, unknown>>;
   eventBuffers?: Record<string, { events: Record<string, unknown>[] } | undefined>;
-  onSendPrompt?: (input: { sessionId: string; prompt: string; agent?: string }) => Promise<void>;
+  onSendPrompt?: (input: {
+    sessionId: string;
+    prompt: string;
+    agent?: string;
+    model?: string;
+    attachments?: Attachment[];
+    approvalMode?: "yolo" | "prompt" | "deny";
+  }) => Promise<void>;
   mode?: WorkspaceSurfaceMode;
 }) {
   const searchParams = useSearchParams();
@@ -381,9 +285,6 @@ export function WorkspacesPageContent(props: {
   const [pendingNotePath, setPendingNotePath] = useState<string | null>(null);
   const [feedbackByWorkspacePath, setFeedbackByWorkspacePath] = useState<Record<string, WorkspaceSidebarFeedback | null>>({});
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
-  const [prompt, setPrompt] = useState("");
-  const [sessionPromptError, setSessionPromptError] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { snapshot } = useBacklog();
   const workspaceReviews = useReviews({ targetType: "workspace" });
@@ -532,11 +433,6 @@ export function WorkspacesPageContent(props: {
     });
   }, [workspaceSessions]);
 
-  useEffect(() => {
-    setPrompt("");
-    setSessionPromptError(null);
-  }, [selectedSessionId]);
-
   const activeSession = useMemo(
     () => workspaceSessions.find((session) => session.sessionId === selectedSessionId) ?? null,
     [selectedSessionId, workspaceSessions],
@@ -549,10 +445,6 @@ export function WorkspacesPageContent(props: {
     [props.allRuns, selectedSessionId],
   );
   const selectedEventBuffers = props.eventBuffers ?? {};
-  const transcript = useMemo(
-    () => buildTranscript(selectedRuns, selectedEventBuffers),
-    [selectedEventBuffers, selectedRuns],
-  );
   const selectedRunIds = useMemo(() => selectedRuns.map((run) => String(run.runId ?? "")), [selectedRuns]);
   const totalCost = useMemo(
     () => accumulateEventCost(selectedRunIds, selectedEventBuffers),
@@ -784,27 +676,22 @@ export function WorkspacesPageContent(props: {
     });
   }
 
-  async function handleSessionSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!selectedSessionId || !prompt.trim() || !props.onSendPrompt) {
+  async function handleSessionSubmit(input: {
+    sessionId: string;
+    prompt: string;
+    agent?: string;
+    model?: string;
+    attachments?: Attachment[];
+    approvalMode?: "yolo" | "prompt" | "deny";
+  }) {
+    if (!selectedSessionId || !props.onSendPrompt) {
       return;
     }
-
-    setSending(true);
-    setSessionPromptError(null);
-
-    try {
-      await props.onSendPrompt({
-        sessionId: selectedSessionId,
-        prompt,
-        agent: activeSession?.agent,
-      });
-      setPrompt("");
-    } catch (cause) {
-      setSessionPromptError(cause instanceof Error ? cause.message : String(cause));
-    } finally {
-      setSending(false);
-    }
+    await props.onSendPrompt({
+      ...input,
+      sessionId: selectedSessionId,
+      agent: input.agent ?? activeSession?.agent,
+    });
   }
 
   if (selectedWorkspacePath) {
@@ -847,17 +734,12 @@ export function WorkspacesPageContent(props: {
         activeSession={activeSession}
         runs={selectedRuns}
         eventBuffers={selectedEventBuffers}
-        transcript={transcript}
         totalCostLabel={formatUsd(totalCost)}
         selectedSessionId={selectedSessionId}
         onSelectSession={setSelectedSessionId}
-        prompt={prompt}
-        sending={sending}
-        error={sessionPromptError}
         pendingAction={pendingAction}
         notesSaving={pendingNotePath === selectedWorkspace.path}
         feedback={feedbackByWorkspacePath[selectedWorkspace.path] ?? null}
-        onPromptChange={setPrompt}
         onSubmit={handleSessionSubmit}
         onAction={handleAction}
         onOpenInEditor={(workspace, href) =>

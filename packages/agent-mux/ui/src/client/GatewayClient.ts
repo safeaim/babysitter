@@ -1,6 +1,7 @@
 import { nextBackoffDelay } from './backoff.js';
 import { GatewayClientDisconnectedError, GatewayClientTimeoutError } from './errors.js';
 import { createWebSocket as createBrowserWebSocket, type GatewaySocket } from './transports/ws-browser.js';
+import type { Attachment } from '@a5c-ai/agent-mux-core';
 import type { GatewayFrame, HookRequestFrame, RunEventFrame, SubscribeFrame } from '../protocol/v1.js';
 
 type GatewayClientEventMap = {
@@ -41,6 +42,8 @@ export interface StartSessionInput extends Record<string, unknown> {
   agent: string;
   prompt: string;
   model?: string;
+  attachments?: Attachment[];
+  approvalMode?: 'yolo' | 'prompt' | 'deny';
   sessionId?: string;
   runId?: string;
 }
@@ -50,6 +53,8 @@ export interface SendSessionMessageInput extends Record<string, unknown> {
   prompt: string;
   agent?: string;
   model?: string;
+  attachments?: Attachment[];
+  approvalMode?: 'yolo' | 'prompt' | 'deny';
 }
 
 export class GatewayClient {

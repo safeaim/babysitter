@@ -15,6 +15,9 @@ export interface AgentRecord {
   sessionControlPlane?: 'self-managed' | 'external-host' | 'mcp-mediated';
   supportsInteractiveMode?: boolean;
   canResume?: boolean;
+  supportsImageInput?: boolean;
+  supportsFileAttachments?: boolean;
+  approvalModes?: Array<'yolo' | 'prompt' | 'deny'>;
   [key: string]: unknown;
 }
 

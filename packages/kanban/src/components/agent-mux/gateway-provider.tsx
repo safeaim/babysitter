@@ -198,6 +198,19 @@ function GatewayBootstrap(props: { gatewayUrl: string; token: string; children: 
               ? record.supportsInteractiveMode
               : undefined,
           canResume: typeof record.canResume === "boolean" ? record.canResume : undefined,
+          supportsImageInput:
+            typeof record.supportsImageInput === "boolean" ? record.supportsImageInput : undefined,
+          supportsFileAttachments:
+            typeof record.supportsFileAttachments === "boolean"
+              ? record.supportsFileAttachments
+              : undefined,
+          approvalModes:
+            Array.isArray(record.approvalModes)
+              ? record.approvalModes.filter(
+                  (mode): mode is "yolo" | "prompt" | "deny" =>
+                    mode === "yolo" || mode === "prompt" || mode === "deny",
+                )
+              : undefined,
         },
       ];
     });

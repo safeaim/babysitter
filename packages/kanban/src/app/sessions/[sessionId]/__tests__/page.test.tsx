@@ -68,6 +68,10 @@ vi.mock("@/hooks/use-task-tags", () => ({
 }));
 
 const store = createStore(() => ({
+  agents: {
+    items: [],
+    byId: {},
+  },
   sessions: {
     byId: {
       "session-1": {
@@ -84,6 +88,9 @@ const store = createStore(() => ({
   events: {
     byRunId: {},
   },
+  hooks: {
+    byRunId: {},
+  },
   actions: {
     mergeRun: vi.fn(),
     mergeSession: vi.fn(),
@@ -91,7 +98,10 @@ const store = createStore(() => ({
 }));
 
 vi.mock("@/lib/agent-mux-ui", () => ({
-  useGateway: () => ({ store }),
+  useGateway: () => ({
+    client: { request: vi.fn() },
+    store,
+  }),
 }));
 
 describe("SessionDetailPage", () => {

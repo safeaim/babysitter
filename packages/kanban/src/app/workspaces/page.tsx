@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/react/shallow";
-import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
+import type { Attachment, WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
 
 import { RequireGatewayAuth } from "@/components/agent-mux/require-gateway-auth";
 import { WorkspacesPageContent } from "@/components/workspaces/workspaces-page";
@@ -62,13 +62,23 @@ function WorkspacesContent() {
     [sessions],
   );
 
-  async function handleSendPrompt(input: { sessionId: string; prompt: string; agent?: string }) {
+  async function handleSendPrompt(input: {
+    sessionId: string;
+    prompt: string;
+    agent?: string;
+    model?: string;
+    attachments?: Attachment[];
+    approvalMode?: "yolo" | "prompt" | "deny";
+  }) {
     const response = await fetchGateway(`/api/v1/sessions/${input.sessionId}/messages`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         prompt: input.prompt,
         agent: input.agent,
+        model: input.model,
+        attachments: input.attachments,
+        approvalMode: input.approvalMode,
       }),
     });
 

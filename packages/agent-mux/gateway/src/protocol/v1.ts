@@ -1,3 +1,5 @@
+import type { Attachment } from '@a5c-ai/agent-mux-core';
+
 export type ProtocolVersion = '1';
 
 export interface AuthFrame {
@@ -46,6 +48,8 @@ export interface SessionStartFrame {
   agent: string;
   prompt: string;
   model?: string;
+  attachments?: Attachment[];
+  approvalMode?: 'yolo' | 'prompt' | 'deny';
   sessionId?: string;
   runId?: string;
 }
@@ -56,6 +60,8 @@ export interface SessionMessageFrame {
   prompt: string;
   agent?: string;
   model?: string;
+  attachments?: Attachment[];
+  approvalMode?: 'yolo' | 'prompt' | 'deny';
 }
 
 export interface PingFrame {

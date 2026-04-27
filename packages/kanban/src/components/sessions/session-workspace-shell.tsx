@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import type { Attachment } from "@a5c-ai/agent-mux-core";
 import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
 import { ExternalLink, GripVertical, LayoutDashboard, MessagesSquare, PanelLeft, PanelRight, Search, TerminalSquare, Workflow, X } from "lucide-react";
 
+import { SessionConversationSurface } from "@/components/sessions/session-conversation-surface";
 import { SessionObservabilityPanel } from "@/components/sessions/session-observability-panel";
 import { Button } from "@/components/ui/button";
 import { useKeyboard } from "@/hooks/use-keyboard";
@@ -24,12 +26,6 @@ import {
 } from "@/lib/workspace-layout-state";
 import { WorkspaceRuntimePanel } from "@/components/workspaces/workspace-runtime-panel";
 
-export type SessionTranscriptNode =
-  | { kind: "user"; text: string; runId: string }
-  | { kind: "assistant"; text: string; runId: string }
-  | { kind: "thinking"; text: string; runId: string }
-  | { kind: "tool"; text: string; runId: string; label: string };
-
 type EventBuffer = {
   events: Array<Record<string, unknown>>;
 };
@@ -42,14 +38,17 @@ type SessionWorkspaceShellProps = {
   totalCostLabel: string;
   runs: Array<Record<string, unknown>>;
   eventBuffers: Record<string, EventBuffer | undefined>;
-  transcript: SessionTranscriptNode[];
   workspacePath: string | null;
   runtime?: WorkspaceRuntimeSurface;
-  prompt: string;
-  sending: boolean;
-  error: string | null;
-  onPromptChange: (value: string) => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  sessionModel?: string | null;
+  onSubmit: (input: {
+    sessionId: string;
+    prompt: string;
+    agent?: string;
+    model?: string;
+    attachments?: Attachment[];
+    approvalMode?: "yolo" | "prompt" | "deny";
+  }) => Promise<void>;
 };
 
 type PanelDefinition = {
@@ -420,64 +419,21 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
           title="Conversation"
           subtitle="Transcript plus the next turn"
         >
-          <div className="flex h-full min-h-0 flex-col">
-            <div className="grid min-h-0 flex-1 gap-3 overflow-auto">
-              {props.transcript.map((node, index) => (
-                <article
-                  key={`${node.runId}:${index}`}
-                  className="rounded-2xl border border-border bg-background/65 p-4"
-                >
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-border px-2 py-0.5 text-xs uppercase tracking-[0.18em] text-foreground-muted">
-                      {node.kind}
-                    </span>
-                    {"label" in node ? (
-                      <span className="rounded-full border border-info/20 bg-info/10 px-2 py-0.5 text-xs text-info">
-                        {node.label}
-                      </span>
-                    ) : null}
-                    <Link href={`/runs/${node.runId}`} className="text-xs text-primary">
-                      {node.runId}
-                    </Link>
-                  </div>
-                  <pre className="whitespace-pre-wrap break-words text-sm leading-6 text-foreground-secondary">
-                    {node.text}
-                  </pre>
-                </article>
-              ))}
-              {props.transcript.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-foreground-muted">
-                  No transcript events have been received for this session yet.
-                </div>
-              ) : null}
-            </div>
-
-            <form onSubmit={props.onSubmit} className="mt-4 grid gap-3 border-t border-border pt-4">
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-foreground">Send another turn</span>
-                <textarea
-                  value={props.prompt}
-                  onChange={(event) => props.onPromptChange(event.target.value)}
-                  rows={5}
-                  className="min-h-32 rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40"
-                  placeholder="Continue the session..."
-                />
-              </label>
-              {props.error ? (
-                <div className="rounded-2xl border border-error/20 bg-error-muted px-4 py-3 text-sm text-error">
-                  {props.error}
-                </div>
-              ) : null}
-              <div className="flex flex-wrap gap-3">
-                <Button type="submit" disabled={props.sending || !props.prompt.trim()}>
-                  {props.sending ? "Sending..." : "Send turn"}
-                </Button>
-                <div className="rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
-                  Shift+C toggles this panel
-                </div>
-              </div>
-            </form>
-          </div>
+          <SessionConversationSurface
+            sessionId={props.sessionId}
+            sessionLabel={props.sessionTitle}
+            sessionAgent={props.sessionAgent}
+            sessionStatus={props.sessionStatus}
+            sessionModel={props.sessionModel}
+            runs={props.runs}
+            eventBuffers={props.eventBuffers}
+            workspacePath={props.workspacePath}
+            runtime={props.runtime}
+            emptyStateTitle="No transcript events yet"
+            emptyStateBody="The session shell will start populating transcript, flow, timeline, and file attention views as soon as the gateway publishes run activity."
+            placeholder="Continue the session..."
+            onSubmit={props.onSubmit}
+          />
         </WorkspacePanelFrame>
       );
     }

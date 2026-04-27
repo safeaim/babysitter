@@ -13,6 +13,7 @@ execution shapes:
 - in-process helpers such as `MockProcess`, `WorkspaceSandbox`, `resolveScenario`, and `listScenarioNames`
 - bindable transport mocks via `HttpServerMock`, `WebSocketServerMock`, and the adapter-oriented remote builders
 - programmatic SDK-style mocks and real-harness probe helpers
+- offline probe baseline contracts for drift review
 
 Execution shapes: `subprocess`, `sdk`, `http`, `websocket`.
 
@@ -160,8 +161,57 @@ external client to connect to a scripted HTTP or WebSocket endpoint.
 ## Probe Helpers
 
 `probeHarness` and `probeAllHarnesses` execute real harness binaries. They are
-for drift detection and fixture maintenance, not for pure unit tests. The built-in
-`PROBE_CONFIGS` currently cover `claude-code` and `codex`.
+for drift detection and fixture maintenance, not for pure unit tests.
+
+The built-in `PROBE_CONFIGS` now cover the subprocess harness matrix:
+
+- `claude-code`
+- `codex`
+- `gemini`
+- `copilot`
+- `cursor`
+- `opencode`
+- `pi`
+- `omp`
+- `openclaw`
+- `hermes`
+- `amp`
+- `droid`
+- `qwen`
+
+They also cover the SDK/programmatic targets as fixture-backed contract probes:
+
+- `claude-agent-sdk`
+- `codex-sdk`
+- `pi-sdk`
+
+They also cover the transport-oriented targets:
+
+- `codex-websocket`
+- `opencode-http`
+
+Each probe profile now records:
+
+- `executionType`
+- `outputFormat` and `outputFormatTraits`
+- `supportsStdin` and `stdinSignals`
+- scenario exit codes such as `version`, `help`, `success`, and `error`
+- relevant `environmentVariables`, `fileOperationPatterns`, and `cliPatterns`
+- `availability` and `probeNotes`
+
+Checked-in baseline contracts live at
+`packages/agent-mux/harness-mock/tests/fixtures/probes/baseline-profiles.json`.
+
+CI vs local/manual:
+
+- CI-safe: fixture coverage checks, contract-shape validation, the node-based
+  offline probe tests in `tests/probe-offline.test.ts`, and the offline-only SDK
+  contract profiles for `claude-agent-sdk`, `codex-sdk`, and `pi-sdk`
+- Local/manual: authenticated vendor CLI probes and transport startup probes for
+  binaries that are not expected to exist in CI
+- Offline-only: SDK entries materialize reviewed contract profiles without
+  executing a harness binary, so drift review happens through the checked-in
+  fixture rather than a live probe run
 
 ## Limitations
 
@@ -169,7 +219,7 @@ for drift detection and fixture maintenance, not for pure unit tests. The built-
 - `HttpServerMock`, `WebSocketServerMock`, and `MockServer` bind local ports and
   are therefore heavier than the pure subprocess fixtures.
 - Probe helpers execute real binaries and may require installed harnesses,
-  credentials, and a writable output directory.
+  credentials, transport startup support, and a writable output directory.
 - The package replays scripted behavior; it does not synthesize fresh model output.
 
 ## License

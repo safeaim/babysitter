@@ -623,6 +623,9 @@ export interface HarnessBehaviorProfile {
   /** Harness type. */
   harness: HarnessType;
 
+  /** Execution transport captured by the profile. */
+  executionType: AdapterExecutionType;
+
   /** Version of the harness that was probed. */
   version: string;
 
@@ -635,8 +638,14 @@ export interface HarnessBehaviorProfile {
   /** How the harness formats its output (jsonl, streaming text, etc). */
   outputFormat: string;
 
+  /** Additional traits observed or expected for the output stream. */
+  outputFormatTraits: string[];
+
   /** Whether the harness supports stdin interaction. */
   supportsStdin: boolean;
+
+  /** Prompt/signal markers associated with stdin interaction. */
+  stdinSignals: string[];
 
   /** File operation patterns observed. */
   fileOperationPatterns: string[];
@@ -649,4 +658,10 @@ export interface HarnessBehaviorProfile {
 
   /** CLI argument patterns. */
   cliPatterns: Record<string, string>;
+
+  /** Where this probe is expected to run. */
+  availability: 'ci' | 'ci-or-local' | 'local-manual' | 'offline-only';
+
+  /** Free-form notes for drift reviewers. */
+  probeNotes: string[];
 }

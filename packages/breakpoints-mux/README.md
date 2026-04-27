@@ -4,24 +4,33 @@ Breakpoint routing library, MCP server, and CLI for responder-driven review flow
 
 ## Install
 
+Use the published npm package in consumers. Install it locally in a project or run it directly with `npx`.
+
 ```bash
-npm install @a5c-ai/breakpoints-mux
+npm install --save-dev @a5c-ai/breakpoints-mux
+npx --yes @a5c-ai/breakpoints-mux --help
 ```
 
 ## CLI
 
-The published executable is `breakpoints-mux`.
+The published executable is `breakpoints-mux`. The supported consumer workflow is either:
+
+- run the published package with `npx --yes @a5c-ai/breakpoints-mux ...`
+- install `@a5c-ai/breakpoints-mux` and invoke `breakpoints-mux ...`
 
 ```bash
-npx @a5c-ai/breakpoints-mux --help
-npx @a5c-ai/breakpoints-mux responders list
-npx @a5c-ai/breakpoints-mux server start
+npx --yes @a5c-ai/breakpoints-mux --help
+npx --yes @a5c-ai/breakpoints-mux responders list
+npx --yes @a5c-ai/breakpoints-mux auth login
+npx --yes @a5c-ai/breakpoints-mux server start
 ```
 
-If the package is already installed in your workspace, use the bin directly:
+If the published package is already installed locally or globally, use the bin directly:
 
 ```bash
 breakpoints-mux --help
+breakpoints-mux auth server set https://breakpoints-mux.a5c.ai
+breakpoints-mux auth login
 ```
 
 Current CLI commands:

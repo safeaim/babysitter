@@ -79,10 +79,12 @@ export type KanbanReviewDecision = 'pending' | 'changes-requested' | 'approved';
 export type KanbanReviewQueueState = 'queued' | 'in-review' | 'completed';
 
 export type KanbanDiffLineKind = 'context' | 'add' | 'delete';
+export type KanbanDiffPresentation = 'unified' | 'split';
 
 export type KanbanReviewCommentStatus = 'open' | 'resolved';
 
 export type KanbanReviewCommentSide = 'base' | 'head';
+export type KanbanReviewExecutionTargetKind = 'workspace' | 'session' | 'run';
 
 export type KanbanTaskTagScopeKind = 'global' | 'project' | 'workspace';
 
@@ -438,6 +440,23 @@ export interface KanbanReviewComment {
   readonly feedbackSource?: KanbanReviewFeedbackSource;
 }
 
+export interface KanbanReviewExecutionTarget {
+  readonly id: string;
+  readonly kind: KanbanReviewExecutionTargetKind;
+  readonly label: string;
+  readonly href: string;
+  readonly description?: string;
+  readonly actionLabel?: string;
+}
+
+export interface KanbanReviewSubmission {
+  readonly decision: KanbanReviewDecision;
+  readonly summary?: string;
+  readonly submittedAt: string;
+  readonly executionTargetId?: string;
+  readonly executionTargetLabel?: string;
+}
+
 export interface KanbanReviewSummary {
   readonly decision: KanbanReviewDecision;
   readonly queueState: KanbanReviewQueueState;
@@ -458,6 +477,9 @@ export interface KanbanReviewArtifact {
   readonly queueState: KanbanReviewQueueState;
   readonly diff: readonly KanbanDiffFile[];
   readonly comments: readonly KanbanReviewComment[];
+  readonly preferredPresentation?: KanbanDiffPresentation;
+  readonly executionTargets?: readonly KanbanReviewExecutionTarget[];
+  readonly latestSubmission?: KanbanReviewSubmission;
   readonly integration?: KanbanRepositoryIntegrationState;
   readonly linkedPullRequest?: KanbanLinkedPullRequestSummary;
   readonly updatedAt: string;

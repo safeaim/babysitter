@@ -87,12 +87,23 @@ const artifact = {
       },
     },
   ],
+  executionTargets: [
+    {
+      id: "session-follow-up",
+      kind: "session" as const,
+      label: "Resume linked session",
+      href: "/sessions/session-review-issue",
+      description: "Continue the agent loop from the session surface.",
+      actionLabel: "Open session",
+    },
+  ],
 };
 
 describe("ReviewPanel", () => {
-  it("renders linked PR state and disables review actions when integration scopes are missing", async () => {
+  it("renders linked PR state, supports file navigation, and submits inline review feedback", async () => {
     const onApprove = vi.fn();
     const onRequestChanges = vi.fn();
+    const onSubmitReview = vi.fn();
     const onAddComment = vi.fn();
     const user = setupUser();
 
@@ -128,6 +139,7 @@ describe("ReviewPanel", () => {
         }}
         onApprove={onApprove}
         onRequestChanges={onRequestChanges}
+        onSubmitReview={onSubmitReview}
         onAddComment={onAddComment}
       />,
     );
@@ -140,10 +152,12 @@ describe("ReviewPanel", () => {
     expect(screen.getByText("Merge blocked")).toBeInTheDocument();
     expect(screen.getByText("Build: passing")).toBeInTheDocument();
     expect(screen.getByText("GitHub scopes are incomplete for review actions.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /request changes/i })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /approve/i })).toBeDisabled();
+    expect(screen.getByText("File navigator")).toBeInTheDocument();
 
-    await user.click(screen.getAllByRole("button", { name: /comment/i })[1]!);
+    await user.click(screen.getByTestId("review-file-file-1"));
+    expect(screen.getAllByText("packages/agent-mux/core/src/kanban.ts").length).toBeGreaterThan(0);
+
+    await user.click(screen.getAllByRole("button", { name: /^comment$/i })[0]!);
     await user.type(screen.getByLabelText(/inline review comment/i), "Queue this follow-up for the dashboard badge.");
     await user.click(screen.getByRole("button", { name: /save comment/i }));
 
@@ -156,5 +170,16 @@ describe("ReviewPanel", () => {
         }),
       }),
     );
+
+    await user.type(screen.getByLabelText(/review summary/i), "Ship the queue badges, then resume the linked session.");
+    await user.selectOptions(screen.getByLabelText(/route follow-up to/i), "session-follow-up");
+    await user.click(screen.getByRole("button", { name: /approve review/i }));
+
+    expect(onSubmitReview).toHaveBeenCalledWith({
+      artifactId: artifact.id,
+      decision: "approved",
+      summary: "Ship the queue badges, then resume the linked session.",
+      executionTargetId: "session-follow-up",
+    });
   });
 });

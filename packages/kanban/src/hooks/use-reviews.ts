@@ -12,6 +12,7 @@ import type {
   KanbanPullRequestStatus,
   KanbanReviewArtifact,
   KanbanReviewCommentAnchor,
+  KanbanReviewDecision,
   KanbanReviewFeedbackSource,
   KanbanReviewStatus,
   KanbanReviewSnapshot,
@@ -43,6 +44,13 @@ export async function loadReviews(query: ReviewQuery = {}): Promise<KanbanReview
 }
 
 export async function submitReviewAction(input:
+  | {
+      action: "submit-review";
+      artifactId: string;
+      decision: KanbanReviewDecision;
+      summary?: string;
+      executionTargetId?: string;
+    }
   | { action: "approve"; artifactId: string }
   | { action: "request-changes"; artifactId: string }
   | {
@@ -110,6 +118,13 @@ export function useReviews(query: ReviewQuery = {}, interval = 15000) {
   });
 
   async function actOnReview(input:
+    | {
+        action: "submit-review";
+        artifactId: string;
+        decision: KanbanReviewDecision;
+        summary?: string;
+        executionTargetId?: string;
+      }
     | { action: "approve"; artifactId: string }
     | { action: "request-changes"; artifactId: string }
     | {

@@ -5,6 +5,7 @@ import path from "node:path";
 import {
   summarizeKanbanReviewArtifact,
   type KanbanCiGate,
+  type KanbanDiffPresentation,
   type KanbanIntegrationProvider,
   type KanbanMergeStatus,
   type KanbanPublishStatus,
@@ -12,7 +13,9 @@ import {
   type KanbanReviewArtifact,
   type KanbanReviewComment,
   type KanbanReviewCommentAnchor,
+  type KanbanReviewExecutionTarget,
   type KanbanReviewFeedbackSource,
+  type KanbanReviewDecision,
   type KanbanReviewStatus,
   type KanbanReviewSnapshot,
 } from "@a5c-ai/agent-mux-core/kanban";
@@ -34,6 +37,13 @@ export interface ReviewServiceDeps {
 }
 
 export type ReviewActionInput =
+  | {
+      action: "submit-review";
+      artifactId: string;
+      decision: KanbanReviewDecision;
+      summary?: string;
+      executionTargetId?: string;
+    }
   | {
       action: "approve";
       artifactId: string;
@@ -106,6 +116,10 @@ function cloneCiGates(gates: readonly KanbanCiGate[] | undefined): KanbanCiGate[
   return (gates ?? []).map((gate) => ({ ...gate }));
 }
 
+function cloneExecutionTargets(targets: readonly KanbanReviewExecutionTarget[] | undefined): KanbanReviewExecutionTarget[] {
+  return (targets ?? []).map((target) => ({ ...target }));
+}
+
 function defaultCiGates(provider: string, status: KanbanCiGate["status"]): KanbanCiGate[] {
   return [
     {
@@ -135,6 +149,10 @@ function integrationStatusForArtifact(artifact: KanbanReviewArtifact) {
   return artifact.integration?.status ?? artifact.linkedPullRequest?.integrationStatus ?? "connected";
 }
 
+function defaultPresentationForArtifact(targetType: KanbanReviewArtifact["targetType"]): KanbanDiffPresentation {
+  return targetType === "workspace" ? "split" : "unified";
+}
+
 function buildDefaultArtifacts(workspacePath: string): KanbanReviewArtifact[] {
   return [
     {
@@ -148,7 +166,26 @@ function buildDefaultArtifacts(workspacePath: string): KanbanReviewArtifact[] {
       branch: "vk/kanban-gap-004",
       decision: "pending",
       queueState: "queued",
+      preferredPresentation: defaultPresentationForArtifact("issue"),
       updatedAt: "2026-04-24T12:00:00.000Z",
+      executionTargets: [
+        {
+          id: "issue-run-follow-up",
+          kind: "run",
+          label: "Open linked run task",
+          href: "/runs/run-review-issue?effectId=eff-review-issue",
+          description: "Inspect the originating run task and continue the implementation loop from the review context.",
+          actionLabel: "Open run task",
+        },
+        {
+          id: "issue-session-follow-up",
+          kind: "session",
+          label: "Resume linked session",
+          href: "/sessions/session-review-issue",
+          description: "Return to the session that produced this review artifact and post the follow-up there.",
+          actionLabel: "Open session",
+        },
+      ],
       diff: [
         {
           id: "issue-diff-core",
@@ -227,7 +264,34 @@ function buildDefaultArtifacts(workspacePath: string): KanbanReviewArtifact[] {
       branch: path.basename(workspacePath),
       decision: "changes-requested",
       queueState: "in-review",
+      preferredPresentation: defaultPresentationForArtifact("workspace"),
       updatedAt: "2026-04-24T12:05:00.000Z",
+      executionTargets: [
+        {
+          id: "workspace-open",
+          kind: "workspace",
+          label: "Open workspace",
+          href: `/workspaces?workspace=${encodeURIComponent(workspacePath)}`,
+          description: "Jump back into the workspace detail view with preview, runtime, and editor affordances.",
+          actionLabel: "Open workspace",
+        },
+        {
+          id: "workspace-session-follow-up",
+          kind: "session",
+          label: "Continue linked session",
+          href: "/sessions/session-review-workspace",
+          description: "Resume the session that owns this worktree and apply the requested changes from review.",
+          actionLabel: "Open session",
+        },
+        {
+          id: "workspace-run-follow-up",
+          kind: "run",
+          label: "Inspect linked run",
+          href: "/runs/run-review-workspace?effectId=eff-review-workspace",
+          description: "Open the run/effect that produced the current review handoff for direct follow-through.",
+          actionLabel: "Open run",
+        },
+      ],
       integration: {
         provider: "github",
         status: "connected",
@@ -441,6 +505,8 @@ export class ReviewService {
         ...artifact,
         comments: [...artifact.comments],
         diff: [...artifact.diff],
+        executionTargets: cloneExecutionTargets(artifact.executionTargets),
+        latestSubmission: artifact.latestSubmission ? { ...artifact.latestSubmission } : undefined,
         linkedPullRequest: artifact.linkedPullRequest
           ? {
               ...artifact.linkedPullRequest,
@@ -472,12 +538,32 @@ export class ReviewService {
     const artifact = artifacts[index]!;
 
     let updatedArtifact: KanbanReviewArtifact;
-    if (input.action === "approve") {
+    if (input.action === "submit-review") {
+      const target = artifact.executionTargets?.find((candidate) => candidate.id === input.executionTargetId);
+      const summary = input.summary?.trim();
+      updatedArtifact = {
+        ...artifact,
+        decision: input.decision,
+        queueState: input.decision === "approved" ? "completed" : "in-review",
+        updatedAt: now,
+        latestSubmission: {
+          decision: input.decision,
+          summary: summary || undefined,
+          submittedAt: now,
+          executionTargetId: target?.id,
+          executionTargetLabel: target?.label,
+        },
+      };
+    } else if (input.action === "approve") {
       updatedArtifact = {
         ...artifact,
         decision: "approved",
         queueState: "completed",
         updatedAt: now,
+        latestSubmission: {
+          decision: "approved",
+          submittedAt: now,
+        },
       };
     } else if (input.action === "request-changes") {
       updatedArtifact = {
@@ -485,6 +571,10 @@ export class ReviewService {
         decision: "changes-requested",
         queueState: "in-review",
         updatedAt: now,
+        latestSubmission: {
+          decision: "changes-requested",
+          submittedAt: now,
+        },
       };
     } else if (input.action === "add-comment") {
       const body = input.body.trim();
@@ -505,7 +595,7 @@ export class ReviewService {
             createdAt: now,
             authorName: input.authorName,
             feedbackSource: input.feedbackSource,
-          }),
+            }),
         ],
       };
     } else {

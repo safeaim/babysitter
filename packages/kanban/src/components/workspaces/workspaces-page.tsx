@@ -1020,6 +1020,9 @@ export function WorkspacesPageContent(props: {
         onRequestChanges={(artifactId) =>
           workspaceReviews.actOnReview({ action: "request-changes", artifactId }).then(() => refreshInventory())
         }
+        onSubmitReview={(input) =>
+          workspaceReviews.actOnReview({ action: "submit-review", ...input }).then(() => refreshInventory())
+        }
         onAddComment={(input) =>
           workspaceReviews.actOnReview({ action: "add-comment", ...input }).then(() => refreshInventory())
         }

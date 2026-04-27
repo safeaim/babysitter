@@ -5288,6 +5288,9 @@ export function BacklogOverview({
           onRequestChanges={(artifactId) =>
             issueReviews.actOnReview({ action: "request-changes", artifactId }).then(() => refresh())
           }
+          onSubmitReview={(input) =>
+            issueReviews.actOnReview({ action: "submit-review", ...input }).then(() => refresh())
+          }
           onAddComment={(input) =>
             issueReviews.actOnReview({ action: "add-comment", ...input }).then(() => refresh())
           }

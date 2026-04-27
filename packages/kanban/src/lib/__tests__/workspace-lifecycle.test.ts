@@ -158,6 +158,51 @@ describe("WorkspaceLifecycleService", () => {
     expect(result.workspaces[0]?.actions.canRebaseStart).toBe(true);
   });
 
+  it("persists pin and unpin actions in the workspace registry", async () => {
+    let registry = JSON.stringify({
+      version: 1,
+      workspaces: {
+        [repoPath("repo", "worktrees", "task")]: {
+          path: repoPath("repo", "worktrees", "task"),
+          gitRoot: repoPath("repo", "main"),
+          commonDir: repoPath("repo", "common", ".git"),
+          branch: "vk/task",
+        },
+      },
+    });
+
+    const deps = createDeps({
+      readFile: vi.fn(async () => registry),
+      writeFile: vi.fn(async (_path, contents) => {
+        registry = String(contents);
+      }),
+    });
+
+    const service = new WorkspaceLifecycleService(deps);
+
+    await service.applyAction({
+      action: "pin",
+      workspacePath: repoPath("repo", "worktrees", "task"),
+      sessions: [],
+    });
+
+    let inventory = await service.listWorkspaces();
+    expect(inventory.workspaces[0]?.pinnedAt).toBe("2026-04-24T12:00:00.000Z");
+    expect(inventory.workspaces[0]?.actions.canPin).toBe(false);
+    expect(inventory.workspaces[0]?.actions.canUnpin).toBe(true);
+
+    await service.applyAction({
+      action: "unpin",
+      workspacePath: repoPath("repo", "worktrees", "task"),
+      sessions: [],
+    });
+
+    inventory = await service.listWorkspaces();
+    expect(inventory.workspaces[0]?.pinnedAt).toBeNull();
+    expect(inventory.workspaces[0]?.actions.canPin).toBe(true);
+    expect(inventory.workspaces[0]?.actions.canUnpin).toBe(false);
+  });
+
   it("attaches linked issue associations to workspace inventory entries", async () => {
     const service = new WorkspaceLifecycleService(createDeps());
     const result = await service.listWorkspaces({

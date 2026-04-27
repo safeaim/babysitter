@@ -11,13 +11,15 @@ import type {
   KanbanReviewSummary,
 } from "@a5c-ai/agent-mux-core";
 import { findKanbanExecutionContextEnvelopesForSession } from "@a5c-ai/agent-mux-core/kanban";
-import { AlertTriangle, Archive, FolderGit2, RefreshCw, RotateCcw, Trash2, Wrench } from "lucide-react";
+import { AlertTriangle, Archive, FolderGit2, Pin, PinOff, RefreshCw, RotateCcw, Search, Trash2, Wrench } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReviewPanel } from "@/components/review/review-panel";
 import { cn } from "@/lib/cn";
 import { useBacklog } from "@/hooks/use-backlog";
+import { usePersistedState } from "@/hooks/use-persisted-state";
 import { useReviews } from "@/hooks/use-reviews";
 import type { WorkspaceInventoryItem, WorkspaceInventoryResponse, WorkspaceSessionSnapshot } from "@/lib/workspace-lifecycle";
 import { WorkspaceDetailsSidebar, type WorkspaceSidebarFeedback } from "@/components/workspaces/workspace-details-sidebar";
@@ -44,6 +46,12 @@ function workspaceDetailHref(value: string): string {
 }
 
 type WorkspaceSurfaceMode = "full" | "attention";
+type WorkspaceListLayoutMode = "grouped" | "flat";
+
+type WorkspaceSidebarBadge = {
+  label: string;
+  className: string;
+};
 
 function formatUsd(totalUsd: number | null): string {
   if (totalUsd == null || !Number.isFinite(totalUsd)) {
@@ -124,6 +132,49 @@ function ownershipSummary(workspace: WorkspaceInventoryItem): string | null {
   return null;
 }
 
+function normalizeSearchValue(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function searchableWorkspaceText(workspace: WorkspaceInventoryItem): string {
+  return [
+    workspace.name,
+    workspace.path,
+    workspace.git.branch ?? "",
+    workspace.git.root ?? "",
+    ownershipSummary(workspace) ?? "",
+    ...(workspace.issues ?? []).flatMap((issue) => [issue.issueKey, issue.issueTitle, issue.projectKey, issue.projectName]),
+  ].join("\n").toLowerCase();
+}
+
+function matchesWorkspaceSearch(workspace: WorkspaceInventoryItem, term: string): boolean {
+  if (!term) {
+    return true;
+  }
+  return searchableWorkspaceText(workspace).includes(term);
+}
+
+function workspaceSortRank(status: WorkspaceInventoryItem["status"]): number {
+  if (status === "active") return 0;
+  if (status === "idle") return 1;
+  if (status === "archived") return 2;
+  return 3;
+}
+
+function sortWorkspaceSidebarItems(workspaces: WorkspaceInventoryItem[]): WorkspaceInventoryItem[] {
+  return [...workspaces].sort((left, right) => {
+    const pinDiff = Number(Boolean(right.pinnedAt)) - Number(Boolean(left.pinnedAt));
+    if (pinDiff !== 0) {
+      return pinDiff;
+    }
+    const statusDiff = workspaceSortRank(left.status) - workspaceSortRank(right.status);
+    if (statusDiff !== 0) {
+      return statusDiff;
+    }
+    return left.path.localeCompare(right.path);
+  });
+}
+
 export async function loadInventory(sessions: WorkspaceSessionSnapshot[]): Promise<WorkspaceInventoryResponse> {
   const response = await fetch("/api/workspaces", {
     method: "POST",
@@ -140,6 +191,8 @@ export async function loadInventory(sessions: WorkspaceSessionSnapshot[]): Promi
 
 export async function runWorkspaceAction(
   action:
+    | "pin"
+    | "unpin"
     | "archive"
     | "cleanup"
     | "recover"
@@ -260,6 +313,70 @@ export function workspaceNeedsAttention(workspace: WorkspaceInventoryItem): bool
   return getWorkspaceAttentionReasons(workspace).length > 0;
 }
 
+function workspaceSidebarBadges(
+  workspace: WorkspaceInventoryItem,
+  runtimeSession: WorkspaceInventoryItem["sessions"]["items"][number] | null,
+  linkedPullRequest: KanbanLinkedPullRequestSummary | undefined,
+): WorkspaceSidebarBadge[] {
+  const badges: WorkspaceSidebarBadge[] = [];
+  const isRunning = workspace.status === "active" || workspace.sessions.active > 0 || workspace.runs.active > 0;
+
+  badges.push({
+    label:
+      workspace.status === "missing"
+        ? "Missing"
+        : workspace.status === "archived"
+          ? "Archived"
+          : isRunning
+            ? "Running"
+            : "Idle",
+    className:
+      workspace.status === "missing"
+        ? "border-error/20 bg-error/10 text-error"
+        : workspace.status === "archived"
+          ? "border-warning/20 bg-warning/10 text-warning"
+          : isRunning
+            ? "border-success/20 bg-success/10 text-success"
+            : "border-border text-foreground-muted",
+  });
+
+  if (workspaceNeedsAttention(workspace)) {
+    badges.push({
+      label: "Needs attention",
+      className: "border-warning/20 bg-warning/10 text-warning",
+    });
+  }
+
+  if (workspace.pinnedAt) {
+    badges.push({
+      label: "Pinned",
+      className: "border-primary/20 bg-primary/10 text-primary",
+    });
+  }
+
+  const devServerStatus = runtimeSession?.runtime?.devServer.status;
+  if (devServerStatus) {
+    badges.push({
+      label: `Dev server ${devServerStatus.replace(/-/g, " ")}`,
+      className:
+        devServerStatus === "running" || devServerStatus === "ready"
+          ? "border-success/20 bg-success/10 text-success"
+          : devServerStatus === "failed" || devServerStatus === "error"
+            ? "border-error/20 bg-error/10 text-error"
+            : "border-border text-foreground-muted",
+    });
+  }
+
+  if (linkedPullRequest) {
+    badges.push({
+      label: `PR ${linkedPullRequest.status.replace(/-/g, " ")}`,
+      className: cn("border px-2 py-0.5 text-xs", lifecycleTone(linkedPullRequest.status)),
+    });
+  }
+
+  return badges;
+}
+
 function workspaceAttentionRank(workspace: WorkspaceInventoryItem): number {
   if (workspace.status === "missing" || workspace.rebase?.status === "rebase-conflicts") {
     return 0;
@@ -322,6 +439,8 @@ export function WorkspacesPageContent(props: {
   const [pendingNotePath, setPendingNotePath] = useState<string | null>(null);
   const [feedbackByWorkspacePath, setFeedbackByWorkspacePath] = useState<Record<string, WorkspaceSidebarFeedback | null>>({});
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [layoutMode, setLayoutMode] = usePersistedState<WorkspaceListLayoutMode>("workspace-sidebar.layout-mode", "grouped");
+  const [searchTerm, setSearchTerm] = usePersistedState("workspace-sidebar.search", "");
   const [isPending, startTransition] = useTransition();
   const { snapshot } = useBacklog();
   const workspaceReviews = useReviews({ targetType: "workspace" });
@@ -393,12 +512,22 @@ export function WorkspacesPageContent(props: {
       })),
     [inventory?.workspaces, liveReviewByPath],
   );
-  const groups = useMemo(() => ({
-    active: workspaces.filter((workspace) => workspace.status === "active"),
-    idle: workspaces.filter((workspace) => workspace.status === "idle"),
-    archived: workspaces.filter((workspace) => workspace.status === "archived"),
-    missing: workspaces.filter((workspace) => workspace.status === "missing"),
-  }), [workspaces]);
+  const normalizedSearchTerm = useMemo(() => normalizeSearchValue(searchTerm), [searchTerm]);
+  const filteredWorkspaces = useMemo(
+    () => sortWorkspaceSidebarItems(workspaces.filter((workspace) => matchesWorkspaceSearch(workspace, normalizedSearchTerm))),
+    [normalizedSearchTerm, workspaces],
+  );
+  const filteredGroups = useMemo(() => ({
+    pinned: filteredWorkspaces.filter((workspace) => Boolean(workspace.pinnedAt)),
+    active: filteredWorkspaces.filter((workspace) => workspace.status === "active" && !workspace.pinnedAt),
+    idle: filteredWorkspaces.filter((workspace) => workspace.status === "idle" && !workspace.pinnedAt),
+    archived: filteredWorkspaces.filter((workspace) => workspace.status === "archived" && !workspace.pinnedAt),
+    missing: filteredWorkspaces.filter((workspace) => workspace.status === "missing" && !workspace.pinnedAt),
+  }), [filteredWorkspaces]);
+  const hiddenWorkspaceCount = workspaces.length - filteredWorkspaces.length;
+  const sidebarEmptyMessage = normalizedSearchTerm
+    ? `No workspaces match "${searchTerm}". Clear the search or adjust the layout to widen the sidebar.`
+    : "No workspaces are currently tracked in the sidebar.";
   const attentionWorkspaces = useMemo(
     () => [...workspaces].filter(workspaceNeedsAttention).sort(compareAttentionWorkspaces),
     [workspaces],
@@ -551,6 +680,8 @@ export function WorkspacesPageContent(props: {
 
   function handleAction(
     action:
+      | "pin"
+      | "unpin"
       | "archive"
       | "cleanup"
       | "recover"
@@ -918,92 +1049,176 @@ export function WorkspacesPageContent(props: {
         </section>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <WorkspaceColumn
-          title="Active workspaces"
-          icon={FolderGit2}
-          empty="No active workspaces are currently attached to sessions or waiting runs."
-          workspaces={groups.active}
-          reviewByPath={liveReviewByPath}
-          artifactByPath={liveArtifactByPath}
-          executionContextsBySessionId={executionContextsBySessionId}
-          pendingAction={pendingAction}
-          onAction={handleAction}
-          onOpenInEditor={(workspace, href) =>
-            openEditorForWorkspace(workspace, href, `Opened ${workspace.path} in the configured editor.`)
-          }
-          onSaveNote={handleNoteSave}
-          pendingNotePath={pendingNotePath}
-          feedbackByWorkspacePath={feedbackByWorkspacePath}
-          selectedWorkspacePath={selectedWorkspacePath}
-          reviewPendingArtifactId={workspaceReviews.pendingArtifactId}
-          onCreatePullRequest={handleCreatePullRequest}
-          onLinkPullRequest={handleLinkPullRequest}
-        />
-        <WorkspaceColumn
-          title="Idle workspaces"
-          icon={Wrench}
-          empty="No idle workspaces are currently tracked."
-          workspaces={groups.idle}
-          reviewByPath={liveReviewByPath}
-          artifactByPath={liveArtifactByPath}
-          executionContextsBySessionId={executionContextsBySessionId}
-          pendingAction={pendingAction}
-          onAction={handleAction}
-          onOpenInEditor={(workspace, href) =>
-            openEditorForWorkspace(workspace, href, `Opened ${workspace.path} in the configured editor.`)
-          }
-          onSaveNote={handleNoteSave}
-          pendingNotePath={pendingNotePath}
-          feedbackByWorkspacePath={feedbackByWorkspacePath}
-          selectedWorkspacePath={selectedWorkspacePath}
-          reviewPendingArtifactId={workspaceReviews.pendingArtifactId}
-          onCreatePullRequest={handleCreatePullRequest}
-          onLinkPullRequest={handleLinkPullRequest}
-        />
-        <WorkspaceColumn
-          title="Archived workspaces"
-          icon={Archive}
-          empty="No archived workspaces yet."
-          workspaces={groups.archived}
-          reviewByPath={liveReviewByPath}
-          artifactByPath={liveArtifactByPath}
-          executionContextsBySessionId={executionContextsBySessionId}
-          pendingAction={pendingAction}
-          onAction={handleAction}
-          onOpenInEditor={(workspace, href) =>
-            openEditorForWorkspace(workspace, href, `Opened ${workspace.path} in the configured editor.`)
-          }
-          onSaveNote={handleNoteSave}
-          pendingNotePath={pendingNotePath}
-          feedbackByWorkspacePath={feedbackByWorkspacePath}
-          selectedWorkspacePath={selectedWorkspacePath}
-          reviewPendingArtifactId={workspaceReviews.pendingArtifactId}
-          onCreatePullRequest={handleCreatePullRequest}
-          onLinkPullRequest={handleLinkPullRequest}
-        />
-        <WorkspaceColumn
-          title="Recovery queue"
-          icon={AlertTriangle}
-          empty="No cleaned or missing workspaces need recovery."
-          workspaces={groups.missing}
-          reviewByPath={liveReviewByPath}
-          artifactByPath={liveArtifactByPath}
-          executionContextsBySessionId={executionContextsBySessionId}
-          pendingAction={pendingAction}
-          onAction={handleAction}
-          onOpenInEditor={(workspace, href) =>
-            openEditorForWorkspace(workspace, href, `Opened ${workspace.path} in the configured editor.`)
-          }
-          onSaveNote={handleNoteSave}
-          pendingNotePath={pendingNotePath}
-          feedbackByWorkspacePath={feedbackByWorkspacePath}
-          selectedWorkspacePath={selectedWorkspacePath}
-          reviewPendingArtifactId={workspaceReviews.pendingArtifactId}
-          onCreatePullRequest={handleCreatePullRequest}
-          onLinkPullRequest={handleLinkPullRequest}
-        />
-      </div>
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-lg" data-testid="workspace-sidebar-surface">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Workspace sidebar</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Search, group, pin, and triage workspaces</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
+              The sidebar keeps mixed workspace state visible: pinned rows, runtime and dev-server status, linked PR state,
+              archive and recovery actions, and search-driven filtering without hiding what changed.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant={layoutMode === "grouped" ? "primary" : "outline"}
+              size="sm"
+              onClick={() => setLayoutMode("grouped")}
+              aria-pressed={layoutMode === "grouped"}
+            >
+              Grouped
+            </Button>
+            <Button
+              type="button"
+              variant={layoutMode === "flat" ? "primary" : "outline"}
+              size="sm"
+              onClick={() => setLayoutMode("flat")}
+              aria-pressed={layoutMode === "flat"}
+            >
+              Flat
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <label className="relative min-w-[260px] flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
+            <input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search workspaces, branches, issues, or ownership"
+              aria-label="Workspace search"
+              className="h-11 w-full rounded-2xl border border-border bg-background pl-10 pr-3 text-sm outline-none transition focus:border-primary/40"
+            />
+          </label>
+          <span className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground-muted">
+            {filteredWorkspaces.length} visible
+          </span>
+          <span className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground-muted">
+            {filteredGroups.pinned.length} pinned
+          </span>
+          <span className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground-muted">
+            {attentionWorkspaces.length} need attention
+          </span>
+          {hiddenWorkspaceCount > 0 ? (
+            <span className="rounded-full border border-warning/20 bg-warning/10 px-3 py-1.5 text-sm text-warning">
+              {hiddenWorkspaceCount} hidden by search
+            </span>
+          ) : null}
+        </div>
+
+        {loading && workspaces.length === 0 ? (
+          <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4 text-sm text-foreground-muted">
+            Loading workspace sidebar…
+          </div>
+        ) : null}
+
+        {!loading && filteredWorkspaces.length === 0 ? (
+          <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4 text-sm text-foreground-muted">
+            {sidebarEmptyMessage}
+          </div>
+        ) : null}
+
+        {!loading && filteredWorkspaces.length > 0 ? (
+          <div className="mt-5 space-y-4">
+            {layoutMode === "flat" ? (
+              <WorkspaceColumn
+                title="Workspace list"
+                icon={FolderGit2}
+                empty={sidebarEmptyMessage}
+                workspaces={filteredWorkspaces}
+                reviewByPath={liveReviewByPath}
+                artifactByPath={liveArtifactByPath}
+                executionContextsBySessionId={executionContextsBySessionId}
+                pendingAction={pendingAction}
+                onAction={handleAction}
+                onOpenInEditor={(workspace, href) =>
+                  openEditorForWorkspace(workspace, href, `Opened ${workspace.path} in the configured editor.`)
+                }
+                onSaveNote={handleNoteSave}
+                pendingNotePath={pendingNotePath}
+                feedbackByWorkspacePath={feedbackByWorkspacePath}
+                selectedWorkspacePath={selectedWorkspacePath}
+                reviewPendingArtifactId={workspaceReviews.pendingArtifactId}
+                onCreatePullRequest={handleCreatePullRequest}
+                onLinkPullRequest={handleLinkPullRequest}
+                highlightReasons
+              />
+            ) : (
+              <Accordion
+                type="multiple"
+                defaultValue={["pinned", "active", "idle", "archived", "missing"]}
+                className="space-y-4"
+              >
+                {filteredGroups.pinned.length > 0 ? (
+                  <AccordionItem value="pinned" className="rounded-3xl border border-border bg-background/50 px-4">
+                    <AccordionTrigger className="rounded-2xl px-2">Pinned workspaces ({filteredGroups.pinned.length})</AccordionTrigger>
+                    <AccordionContent className="border-0 px-0 pt-0">
+                      <WorkspaceColumn
+                        title="Pinned workspaces"
+                        icon={Pin}
+                        empty="No pinned workspaces match the current sidebar filters."
+                        workspaces={filteredGroups.pinned}
+                        reviewByPath={liveReviewByPath}
+                        artifactByPath={liveArtifactByPath}
+                        executionContextsBySessionId={executionContextsBySessionId}
+                        pendingAction={pendingAction}
+                        onAction={handleAction}
+                        onOpenInEditor={(workspace, href) =>
+                          openEditorForWorkspace(workspace, href, `Opened ${workspace.path} in the configured editor.`)
+                        }
+                        onSaveNote={handleNoteSave}
+                        pendingNotePath={pendingNotePath}
+                        feedbackByWorkspacePath={feedbackByWorkspacePath}
+                        selectedWorkspacePath={selectedWorkspacePath}
+                        reviewPendingArtifactId={workspaceReviews.pendingArtifactId}
+                        onCreatePullRequest={handleCreatePullRequest}
+                        onLinkPullRequest={handleLinkPullRequest}
+                        highlightReasons
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                ) : null}
+                {[
+                  { key: "active", title: "Active workspaces", icon: FolderGit2, empty: "No active workspaces are currently visible.", workspaces: filteredGroups.active },
+                  { key: "idle", title: "Idle workspaces", icon: Wrench, empty: "No idle workspaces are currently visible.", workspaces: filteredGroups.idle },
+                  { key: "archived", title: "Archived workspaces", icon: Archive, empty: "No archived workspaces are currently visible.", workspaces: filteredGroups.archived },
+                  { key: "missing", title: "Recovery queue", icon: AlertTriangle, empty: "No missing workspaces are currently visible.", workspaces: filteredGroups.missing },
+                ].map((group) => (
+                  <AccordionItem key={group.key} value={group.key} className="rounded-3xl border border-border bg-background/50 px-4">
+                    <AccordionTrigger className="rounded-2xl px-2">{group.title} ({group.workspaces.length})</AccordionTrigger>
+                    <AccordionContent className="border-0 px-0 pt-0">
+                      <WorkspaceColumn
+                        title={group.title}
+                        icon={group.icon}
+                        empty={group.empty}
+                        workspaces={group.workspaces}
+                        reviewByPath={liveReviewByPath}
+                        artifactByPath={liveArtifactByPath}
+                        executionContextsBySessionId={executionContextsBySessionId}
+                        pendingAction={pendingAction}
+                        onAction={handleAction}
+                        onOpenInEditor={(workspace, href) =>
+                          openEditorForWorkspace(workspace, href, `Opened ${workspace.path} in the configured editor.`)
+                        }
+                        onSaveNote={handleNoteSave}
+                        pendingNotePath={pendingNotePath}
+                        feedbackByWorkspacePath={feedbackByWorkspacePath}
+                        selectedWorkspacePath={selectedWorkspacePath}
+                        reviewPendingArtifactId={workspaceReviews.pendingArtifactId}
+                        onCreatePullRequest={handleCreatePullRequest}
+                        onLinkPullRequest={handleLinkPullRequest}
+                        highlightReasons
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
+          </div>
+        ) : null}
+      </section>
 
       <ReviewPanel
         title="Workspace diff and approval handoff"
@@ -1058,6 +1273,8 @@ function WorkspaceColumn(props: {
   pendingAction: string | null;
   onAction: (
     action:
+      | "pin"
+      | "unpin"
       | "archive"
       | "cleanup"
       | "recover"
@@ -1116,6 +1333,8 @@ function WorkspaceColumn(props: {
       <div className="mt-4 grid gap-4">
         {props.workspaces.map((workspace) => {
           const attentionReasons = props.highlightReasons ? getWorkspaceAttentionReasons(workspace) : [];
+          const pinKey = `pin:${workspace.path}`;
+          const unpinKey = `unpin:${workspace.path}`;
           const archiveKey = `archive:${workspace.path}`;
           const cleanupKey = `cleanup:${workspace.path}`;
           const recoverKey = `recover:${workspace.path}`;
@@ -1126,6 +1345,7 @@ function WorkspaceColumn(props: {
           const reviewArtifact = props.artifactByPath.get(workspace.path);
           const linkedPullRequest = reviewArtifact?.linkedPullRequest;
           const integration = reviewArtifact?.integration;
+          const statusBadges = workspaceSidebarBadges(workspace, runtimeSession ?? null, linkedPullRequest);
           const isSelected = props.selectedWorkspacePath === workspace.path;
 
           return (
@@ -1141,20 +1361,11 @@ function WorkspaceColumn(props: {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <strong className="text-base">{workspace.name}</strong>
-                    <span
-                      className={cn(
-                        "rounded-full border px-2 py-0.5 text-xs",
-                        workspace.status === "active"
-                          ? "border-success/20 bg-success/10 text-success"
-                          : workspace.status === "archived"
-                            ? "border-warning/20 bg-warning/10 text-warning"
-                            : workspace.status === "missing"
-                              ? "border-error/20 bg-error/10 text-error"
-                              : "border-border text-foreground-muted",
-                      )}
-                    >
-                      {workspace.status}
-                    </span>
+                    {statusBadges.map((badge) => (
+                      <span key={`${workspace.path}:${badge.label}`} className={cn("rounded-full border px-2 py-0.5 text-xs", badge.className)}>
+                        {badge.label}
+                      </span>
+                    ))}
                     {workspace.git.branch ? (
                       <span className="rounded-full border border-info/20 bg-info/10 px-2 py-0.5 text-xs text-info">
                         {workspace.git.branch}
@@ -1172,7 +1383,7 @@ function WorkspaceColumn(props: {
                     ) : null}
                     {linkedPullRequest ? (
                       <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground-muted">
-                        {providerLabel(linkedPullRequest.provider)} PR {linkedPullRequest.linkState === "partially-linked" ? "partially linked" : linkedPullRequest.linkState}
+                        {providerLabel(linkedPullRequest.provider)} PR {linkedPullRequest.status.replace(/-/g, " ")}
                       </span>
                     ) : null}
                   </div>
@@ -1199,6 +1410,19 @@ function WorkspaceColumn(props: {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => props.onAction(workspace.pinnedAt ? "unpin" : "pin", workspace)}
+                    disabled={
+                      workspace.pinnedAt
+                        ? !workspace.actions.canUnpin || props.pendingAction === unpinKey
+                        : !workspace.actions.canPin || props.pendingAction === pinKey
+                    }
+                  >
+                    {workspace.pinnedAt ? <PinOff className="mr-2 h-4 w-4" /> : <Pin className="mr-2 h-4 w-4" />}
+                    {workspace.pinnedAt ? "Unpin" : "Pin"}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

@@ -135,6 +135,8 @@ export async function POST(request: Request) {
 
     if (
       body.action === "provision" ||
+      body.action === "pin" ||
+      body.action === "unpin" ||
       body.action === "archive" ||
       body.action === "cleanup" ||
       body.action === "recover" ||

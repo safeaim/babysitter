@@ -761,6 +761,8 @@ export interface KanbanIssueWorkspaceLinkInput {
 export type KanbanWorkspaceStatus = 'active' | 'idle' | 'archived' | 'missing';
 
 export type KanbanWorkspaceAction =
+  | 'pin'
+  | 'unpin'
   | 'archive'
   | 'cleanup'
   | 'recover'
@@ -865,6 +867,8 @@ export interface KanbanWorkspaceRunCollection {
 }
 
 export interface KanbanWorkspaceActionAvailability {
+  readonly canPin?: boolean;
+  readonly canUnpin?: boolean;
   readonly canArchive: boolean;
   readonly canCleanup: boolean;
   readonly canRecover: boolean;
@@ -879,6 +883,7 @@ export interface KanbanWorkspaceSummary {
   readonly path: string;
   readonly name: string;
   readonly status: KanbanWorkspaceStatus;
+  readonly pinnedAt?: string | null;
   readonly missing: boolean;
   readonly archivedAt: string | null;
   readonly cleanedAt: string | null;

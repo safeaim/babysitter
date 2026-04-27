@@ -71,6 +71,7 @@ interface WorkspaceRegistryEntry {
   commonDir?: string | null;
   trackingBranch?: string | null;
   branch?: string | null;
+  pinnedAt?: string | null;
   archivedAt?: string | null;
   cleanedAt?: string | null;
   notes?: string | null;
@@ -106,6 +107,7 @@ interface MutableWorkspaceRecord {
   isWorktree: boolean;
   isPrimary: boolean;
   missing: boolean;
+  pinnedAt: string | null;
   archivedAt: string | null;
   cleanedAt: string | null;
   notes: string;
@@ -510,6 +512,7 @@ function ensureWorkspaceRecord(
     isWorktree: false,
     isPrimary: false,
     missing: false,
+    pinnedAt: null,
     archivedAt: null,
     cleanedAt: null,
     notes: "",
@@ -671,6 +674,7 @@ export class WorkspaceLifecycleService {
       record.commonDir = entry.commonDir ?? record.commonDir;
       record.trackingBranch = entry.trackingBranch ?? record.trackingBranch;
       record.branch = entry.branch ?? record.branch;
+      record.pinnedAt = entry.pinnedAt ?? null;
       record.archivedAt = entry.archivedAt ?? null;
       record.cleanedAt = entry.cleanedAt ?? null;
       record.notes = entry.notes ?? "";
@@ -828,6 +832,7 @@ export class WorkspaceLifecycleService {
           path: record.path,
           name: record.name,
           status,
+          pinnedAt: record.pinnedAt,
           missing: record.missing,
           archivedAt: record.archivedAt,
           cleanedAt: record.cleanedAt,
@@ -864,6 +869,8 @@ export class WorkspaceLifecycleService {
           },
           rebase,
           actions: {
+            canPin: !record.missing && !record.pinnedAt,
+            canUnpin: !record.missing && Boolean(record.pinnedAt),
             canArchive: !record.missing,
             canCleanup:
               Boolean(record.archivedAt) &&
@@ -886,6 +893,10 @@ export class WorkspaceLifecycleService {
         };
       })
       .sort((left, right) => {
+        const pinDiff = Number(Boolean(right.pinnedAt)) - Number(Boolean(left.pinnedAt));
+        if (pinDiff !== 0) {
+          return pinDiff;
+        }
         const rank = (status: WorkspaceStatus): number => {
           if (status === "active") return 0;
           if (status === "idle") return 1;
@@ -943,6 +954,7 @@ export class WorkspaceLifecycleService {
         commonDir: cluster.commonDir,
         branch: repo?.branch ?? requestedBranchName,
         trackingBranch: null,
+        pinnedAt: registry.workspaces[workspacePath]?.pinnedAt ?? null,
         archivedAt: created.archivedAt,
         cleanedAt: created.cleanedAt,
         notes: registry.workspaces[workspacePath]?.notes ?? "",
@@ -998,6 +1010,7 @@ export class WorkspaceLifecycleService {
       commonDir: cluster.commonDir,
       branch: branchName,
       trackingBranch: null,
+      pinnedAt: null,
       archivedAt: null,
       cleanedAt: null,
       notes: "",
@@ -1046,6 +1059,7 @@ export class WorkspaceLifecycleService {
       commonDir: workspace?.git.commonDir ?? null,
       trackingBranch: workspace?.git.trackingBranch ?? null,
       branch: workspace?.git.branch ?? null,
+      pinnedAt: workspace?.pinnedAt ?? null,
       archivedAt: workspace?.archivedAt ?? null,
       cleanedAt: workspace?.cleanedAt ?? null,
       notes: workspace?.notes.value ?? "",
@@ -1079,6 +1093,7 @@ export class WorkspaceLifecycleService {
             commonDir: entry.commonDir,
             trackingBranch: entry.trackingBranch,
             branch: updated.repos[0]?.branch ?? entry.branch,
+            pinnedAt: entry.pinnedAt,
             archivedAt: updated.archivedAt,
             cleanedAt: updated.cleanedAt,
             notes: entry.notes,
@@ -1106,6 +1121,18 @@ export class WorkspaceLifecycleService {
       } catch {
         // Fall back to the legacy kanban-local lifecycle when the shared workspace service cannot handle the action.
       }
+    }
+
+    if (input.action === "pin" || input.action === "unpin") {
+      entry.pinnedAt = input.action === "pin" ? now : null;
+      registry.workspaces[workspacePath] = entry;
+      await writeRegistry(this.deps, registry);
+      return {
+        ok: true,
+        workspacePath,
+        action: input.action,
+        message: input.action === "pin" ? `Pinned ${workspacePath}.` : `Unpinned ${workspacePath}.`,
+      };
     }
 
     if (input.action === "archive") {

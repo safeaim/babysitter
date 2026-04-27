@@ -35,9 +35,9 @@ describe('help-view', () => {
     const compact = f.replace(/\s+/g, ' ');
     expect(f).toContain('Keybindings');
     expect(f).toContain('open prompt input');
-    expect(f).toContain('1-7, 9');
+    expect(f).toContain('1-9');
     expect(compact).toContain(
-      '1-7, 9 switch to numeric view (1 chat, 2 sessions, 3 cost, 4 adapters, 5 models, 6 profiles, 7 plugins, 9 help)',
+      '1-9 switch to numeric view (1 chat, 2 sessions, 3 cost, 4 adapters, 5 models, 6 profiles, 7 plugins, 8 kanban, 9 help)',
     );
     expect(f).toContain('open logs / observability view');
     expect(f).toContain('claude-code');

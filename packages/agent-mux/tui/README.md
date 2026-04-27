@@ -20,18 +20,22 @@ agent-mux prerequisites built in dependency order and its tests executed from
 the repo root. Use `npm run build:local --workspace=@a5c-ai/agent-mux-tui`
 when you only want the package-local TypeScript compile.
 
-## Planned kanban/workspaces surface
+## Kanban/workspaces surface
 
-The package now carries planning artifacts for a proposed `kanban` and
-`workspaces` expansion of the TUI surface.
+The package now ships a first-phase `kanban` view and still carries planning
+artifacts for the broader `workspaces` expansion of the TUI surface.
+
+- Runtime today: `kanban` view (list-first issue browsing, issue detail,
+  keyboard-driven backlog actions through an injected control plane)
+- Still planned: dedicated `workspaces` view
 
 - Spec: [`specs/kanban-workspaces-spec.md`](specs/kanban-workspaces-spec.md)
 - Backlog decomposition: [`specs/kanban-workspaces-subtasks.md`](specs/kanban-workspaces-subtasks.md)
 - Cross-package design note:
   [`../../docs/agent-mux/archive/design/20-tui-kanban-workspaces.md`](../../docs/agent-mux/archive/design/20-tui-kanban-workspaces.md)
 
-These documents are proposal-stage material only. They do not mean the runtime
-surface exists yet.
+The planning documents remain proposal-stage material for the unfinished
+`workspaces` half of the feature.
 
 ## Writing a plugin
 
@@ -108,6 +112,7 @@ current working directory.
 | `5` | models     | model registry per adapter                    |
 | `6` | profiles   | run-options profiles                          |
 | `7` | plugins    | native plugins per adapter                    |
+| `8` | kanban     | backlog/board browsing + issue actions        |
 | `9` | help       | keybindings + tips                            |
 | `0` | mcp        | registered MCP servers                        |
 | `-` | doctor     | capability matrix / diagnostics               |

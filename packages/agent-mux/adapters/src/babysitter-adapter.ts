@@ -28,7 +28,7 @@ import { BaseAgentAdapter } from './base-adapter.js';
 export class BabysitterAdapter extends BaseAgentAdapter {
   readonly agent = 'babysitter' as const;
   readonly displayName = 'Babysitter';
-  readonly cliCommand = 'babysitter';
+  readonly cliCommand = 'babysitter-agent';
   readonly minVersion = '0.1.0';
   readonly hostEnvSignals = ['BABYSITTER_SESSION_ID', 'AGENT_SESSION_ID'] as const;
 
@@ -86,7 +86,7 @@ export class BabysitterAdapter extends BaseAgentAdapter {
     ],
     authFiles: [],
     installMethods: [
-      { platform: 'all', type: 'npm', command: 'npm install -g @a5c-ai/babysitter' },
+      { platform: 'all', type: 'npm', command: 'npm install -g @a5c-ai/babysitter-agent' },
     ],
   };
 
@@ -110,50 +110,39 @@ export class BabysitterAdapter extends BaseAgentAdapter {
 
   buildSpawnArgs(options: RunOptions): SpawnArgs {
     const args: string[] = [];
+    const harness = options.env?.['BABYSITTER_HARNESS'] || 'claude-code';
+    const prompt = this.normalizePrompt(options.prompt);
+    const sessionId = this.resolveSessionId(options);
 
-    // Core command: harness:invoke for single-shot, harness:call for orchestrated
     if (options.maxTurns && options.maxTurns > 1) {
-      args.push('harness:call');
+      args.push('create-run');
+      args.push('--harness', harness);
+      args.push('--prompt', prompt);
+      if (options.maxTurns) {
+        args.push('--max-iterations', String(options.maxTurns));
+      }
     } else {
-      args.push('harness:invoke');
+      args.push('invoke', harness);
+      args.push('--prompt', prompt);
     }
 
-    // Harness selection
-    const harness = options.env?.['BABYSITTER_HARNESS'] || 'claude-code';
-    args.push('--harness', harness);
-
-    // Prompt
-    const prompt = this.normalizePrompt(options.prompt);
-    args.push('--prompt', prompt);
-
-    // Workspace
     if (options.cwd) {
       args.push('--workspace', options.cwd);
     }
 
-    // Model
     if (options.model) {
       args.push('--model', options.model);
     }
 
-    // Session / run-id
-    const sessionId = this.resolveSessionId(options);
     if (sessionId) {
       args.push('--run-id', sessionId);
     }
 
-    // Non-interactive
     if (options.nonInteractive || options.approvalMode === 'yolo') {
       args.push('--non-interactive');
     }
 
-    // Max iterations
-    if (options.maxTurns) {
-      args.push('--max-iterations', String(options.maxTurns));
-    }
-
-    // JSON output for structured event parsing
-    args.push('--json');
+    args.push('--output-format', 'amux-events');
 
     const timeout = options.timeout || 120000;
 
@@ -323,12 +312,12 @@ export class BabysitterAdapter extends BaseAgentAdapter {
       agent: 'babysitter',
       providerName: 'Babysitter',
       steps: [
-        { step: 1, description: 'Install babysitter SDK', command: 'npm i -g @a5c-ai/babysitter' },
-        { step: 2, description: 'Configure the underlying harness auth (e.g., Claude, Codex)', command: 'babysitter harness:discover' },
+        { step: 1, description: 'Install babysitter agent CLI', command: 'npm i -g @a5c-ai/babysitter-agent' },
+        { step: 2, description: 'Configure the underlying harness auth (e.g., Claude, Codex)', command: 'babysitter-agent discover' },
       ],
       envVars: [],
       documentationUrls: ['https://github.com/a5c-ai/babysitter'],
-      verifyCommand: 'babysitter --version',
+      verifyCommand: 'babysitter-agent version',
     };
   }
 

@@ -35,13 +35,23 @@
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
-      }
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "default": "./dist/index.js"
     },
     "./kanban": {
       "import": {
         "types": "./dist/kanban.d.ts",
         "default": "./dist/kanban.js"
-      }
+      },
+      "require": {
+        "types": "./dist/kanban.d.ts",
+        "default": "./dist/kanban.js"
+      },
+      "default": "./dist/kanban.js"
     }
   },
   "files": [

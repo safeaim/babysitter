@@ -41,7 +41,7 @@ describe('BabysitterAdapter', () => {
     });
 
     it('has correct CLI command', () => {
-      expect(adapter.cliCommand).toBe('babysitter');
+      expect(adapter.cliCommand).toBe('babysitter-agent');
     });
   });
 
@@ -103,23 +103,23 @@ describe('BabysitterAdapter', () => {
   });
 
   describe('buildSpawnArgs', () => {
-    it('builds basic spawn args with harness:invoke for single turn', () => {
+    it('builds basic spawn args with invoke for single turn', () => {
       const result = adapter.buildSpawnArgs({
         agent: 'babysitter',
         prompt: 'Fix the bug',
         nonInteractive: true,
       });
 
-      expect(result.command).toBe('babysitter');
-      expect(result.args).toContain('harness:invoke');
-      expect(result.args).toContain('--json');
+      expect(result.command).toBe('babysitter-agent');
+      expect(result.args).toContain('invoke');
+      expect(result.args).toContain('claude-code');
+      expect(result.args).toContain('--output-format');
+      expect(result.args).toContain('amux-events');
       expect(result.args).toContain('--prompt');
       expect(result.args).toContain('Fix the bug');
-      expect(result.args).toContain('--harness');
-      expect(result.args).toContain('claude-code');
     });
 
-    it('uses harness:call for multi-turn', () => {
+    it('uses create-run for multi-turn', () => {
       const result = adapter.buildSpawnArgs({
         agent: 'babysitter',
         prompt: 'Fix the bug',
@@ -127,8 +127,10 @@ describe('BabysitterAdapter', () => {
         maxTurns: 5,
       });
 
-      expect(result.args).toContain('harness:call');
-      expect(result.args).not.toContain('harness:invoke');
+      expect(result.args).toContain('create-run');
+      expect(result.args).not.toContain('invoke');
+      expect(result.args).toContain('--harness');
+      expect(result.args).toContain('claude-code');
       expect(result.args).toContain('--max-iterations');
       expect(result.args).toContain('5');
     });
@@ -221,7 +223,7 @@ describe('BabysitterAdapter', () => {
       expect(result.env?.['AGENT_SESSION_ID']).toBe('sess-123');
     });
 
-    it('uses custom harness from env', () => {
+    it('uses custom harness from env for invoke', () => {
       const result = adapter.buildSpawnArgs({
         agent: 'babysitter',
         prompt: 'Test',
@@ -229,6 +231,20 @@ describe('BabysitterAdapter', () => {
         env: { BABYSITTER_HARNESS: 'codex' },
       });
 
+      expect(result.args).toContain('invoke');
+      expect(result.args).toContain('codex');
+    });
+
+    it('uses custom harness from env for create-run', () => {
+      const result = adapter.buildSpawnArgs({
+        agent: 'babysitter',
+        prompt: 'Test',
+        nonInteractive: true,
+        maxTurns: 5,
+        env: { BABYSITTER_HARNESS: 'codex' },
+      });
+
+      expect(result.args).toContain('create-run');
       expect(result.args).toContain('--harness');
       expect(result.args).toContain('codex');
     });

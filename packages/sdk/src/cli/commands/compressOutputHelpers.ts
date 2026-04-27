@@ -91,14 +91,29 @@ function compactStatus(status: string): string {
   const staged: string[] = [];
   const unstaged: string[] = [];
   const untracked: string[] = [];
+  let section: "staged" | "unstaged" | "untracked" | null = null;
   for (const line of lines) {
     if (!line.trim() || line.startsWith("On branch") || line.startsWith("HEAD")) continue;
+    if (line.startsWith("Changes to be committed")) {
+      section = "staged";
+      continue;
+    }
+    if (line.startsWith("Changes not staged for commit")) {
+      section = "unstaged";
+      continue;
+    }
+    if (line.startsWith("Untracked files")) {
+      section = "untracked";
+      continue;
+    }
     if (line.startsWith("\t")) {
       const name = line.trim();
-      if (line.includes("new file:") || line.includes("modified:") || line.includes("deleted:")) {
+      if (section === "staged") {
         staged.push(name);
-      } else {
+      } else if (section === "unstaged") {
         unstaged.push(name);
+      } else if (section === "untracked") {
+        untracked.push(name);
       }
     } else if (line.startsWith("?? ")) {
       untracked.push(line.slice(3));

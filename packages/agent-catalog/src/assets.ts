@@ -33,6 +33,32 @@ function resolveExportedAssetPath(relativeAssetPath: string): string | undefined
   }
 }
 
+function resolvePackageRootCandidates(): string[] {
+  const candidates = new Set<string>();
+
+  try {
+    candidates.add(path.dirname(require.resolve(`${PACKAGE_NAME}/package.json`)));
+  } catch {
+    // Ignore packaged/bundled environments that do not expose package.json.
+  }
+
+  candidates.add(PACKAGE_ROOT);
+
+  let currentDir = process.cwd();
+  while (true) {
+    candidates.add(path.join(currentDir, "packages", "agent-catalog"));
+    candidates.add(path.join(currentDir, "agent-catalog"));
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+    currentDir = parentDir;
+  }
+
+  return [...candidates];
+}
+
 export function resolveCatalogAssetPath(relativeAssetPath: string): string {
   const normalized = normalizeAssetPath(relativeAssetPath);
   const exportedPath = resolveExportedAssetPath(normalized);
@@ -40,9 +66,11 @@ export function resolveCatalogAssetPath(relativeAssetPath: string): string {
     return exportedPath;
   }
 
-  const localPath = path.join(PACKAGE_ROOT, normalized);
-  if (fs.existsSync(localPath)) {
-    return localPath;
+  for (const packageRoot of resolvePackageRootCandidates()) {
+    const localPath = path.join(packageRoot, normalized);
+    if (fs.existsSync(localPath)) {
+      return localPath;
+    }
   }
 
   throw new Error(`Asset "${relativeAssetPath}" is unavailable for ${PACKAGE_NAME}.`);

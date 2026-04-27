@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# process-library-catalog
 
-## Getting Started
+`process-library-catalog` is the internal-only Next.js application under `packages/catalog`. It renders the Babysitter catalog UI and the catalog-facing API routes that exercise graph-backed discovery data inside this monorepo.
 
-First, run the development server:
+This workspace is active and supported for monorepo development, but it is **not** a public npm package and it is **not** owned by the central `release.yml` or `staging-publish.yml` publish workflows. Its lifecycle contract is enforced through workspace CI instead.
+
+## Ownership policy
+
+- The package stays `private: true` and should be treated as an internal operator/developer surface.
+- Central release and staging workflows intentionally exclude this workspace from publish automation.
+- If the package is ever promoted into a public deploy or release target, update the package metadata, workflow ownership, and release documentation in the same change.
+
+## CI contract
+
+The release-equivalent quality gate for this workspace is:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run ci:test --workspace=process-library-catalog
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+That contract runs the package-local build, test, lint, and type-check surfaces that define support for `packages/catalog`.
+It also rebuilds the internal `@a5c-ai/agent-catalog` dependency first so the catalog app is validated against the same graph-backed data contract it consumes in production monorepo development.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`npm run format:check --workspace=process-library-catalog` remains available as a package-local hygiene command, but it is not yet part of the central CI contract because the workspace still carries broad pre-existing formatting debt outside the scope of this ownership change.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Development
 
-## Learn More
+Run the app locally from the monorepo root:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev --workspace=process-library-catalog
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The package uses the root Vitest config for its API contract tests and relies on workspace-local dependencies supplied by the monorepo install.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scope
 
-## Deploy on Vercel
+- Next.js app routes under `src/app`
+- Catalog API handlers and contract tests under `src/app/api`
+- Shared UI components, markdown rendering, and dashboard components under `src/components`
+- SQLite-backed indexing/parsing helpers under `src/lib`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Changes that affect the catalog UI, its API contracts, or its indexing layer should keep the CI contract above green.

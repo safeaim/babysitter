@@ -4,7 +4,7 @@ import {
   getCatalogDiscoverySnapshot,
   getCatalogDomainByName,
   getCatalogProcessById,
-  getCatalogSkillByName,
+  getCatalogSkillBySlug,
   getCatalogSpecializationByName,
   listCatalogDomains,
   listCatalogProcesses,
@@ -69,6 +69,7 @@ describe("catalog api agent-catalog integration contract", () => {
       name: result.name,
       description: result.description,
       path: result.path,
+      slug: result.slug,
       score: result.score,
     }));
 
@@ -88,6 +89,7 @@ describe("catalog api agent-catalog integration contract", () => {
       .filter((entry) => entry.domainName === skill!.domainName)
       .map((entry) => ({
         id: entry.id,
+        slug: entry.slug,
         name: entry.name,
         description: entry.description,
         filePath: entry.filePath,
@@ -120,8 +122,8 @@ describe("catalog api agent-catalog integration contract", () => {
       meta: paginationMeta(filtered.length, expectedList.length, 0, expectedList.length),
     });
 
-    const detailResponse = await getSkillDetail(new NextRequest(`http://localhost/api/skills/${skill!.name}`), {
-      params: Promise.resolve({ slug: skill!.name }),
+    const detailResponse = await getSkillDetail(new NextRequest(`http://localhost/api/skills/${skill!.slug}`), {
+      params: Promise.resolve({ slug: skill!.slug }),
     });
     const detailBody = await readJson<{ success: boolean; data: Record<string, unknown> }>(detailResponse);
 
@@ -130,6 +132,7 @@ describe("catalog api agent-catalog integration contract", () => {
       success: true,
       data: {
         id: skill!.id,
+        slug: skill!.slug,
         name: skill!.name,
         description: skill!.description,
         filePath: skill!.filePath,
@@ -141,8 +144,8 @@ describe("catalog api agent-catalog integration contract", () => {
         allowedTools: skill!.allowedTools,
         createdAt: skill!.createdAt,
         updatedAt: skill!.updatedAt,
-        content: getCatalogSkillByName(skill!.name)!.content,
-        frontmatter: getCatalogSkillByName(skill!.name)!.frontmatter,
+        content: getCatalogSkillBySlug(skill!.slug)!.content,
+        frontmatter: getCatalogSkillBySlug(skill!.slug)!.frontmatter,
       },
     });
   });
@@ -375,7 +378,13 @@ describe("catalog api agent-catalog integration contract", () => {
     ];
     const recentActivity = [
       ...snapshot.agents.map((agent) => ({ type: "agent", id: agent.id, name: agent.name, updatedAt: agent.updatedAt })),
-      ...snapshot.skills.map((skill) => ({ type: "skill", id: skill.id, name: skill.name, updatedAt: skill.updatedAt })),
+      ...snapshot.skills.map((skill) => ({
+        type: "skill",
+        id: skill.id,
+        name: skill.name,
+        slug: skill.slug,
+        updatedAt: skill.updatedAt,
+      })),
       ...snapshot.processes.map((process) => ({
         type: "process",
         id: process.id,

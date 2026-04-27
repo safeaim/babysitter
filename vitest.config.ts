@@ -14,7 +14,16 @@ export default {
     },
   },
   test: {
-    include: ['packages/*/src/**/*.test.{ts,tsx}', 'packages/*/tests/**/*.test.{ts,tsx}', 'packages/agent-mux/*/src/**/*.test.{ts,tsx}', 'packages/agent-mux/*/tests/**/*.test.{ts,tsx}'],
+    include: [
+      'packages/*/src/**/*.test.{ts,tsx}',
+      'packages/*/src/**/*.contract.test.{ts,tsx}',
+      'packages/*/tests/**/*.test.{ts,tsx}',
+      'packages/*/tests/**/*.contract.test.{ts,tsx}',
+      'packages/agent-mux/*/src/**/*.test.{ts,tsx}',
+      'packages/agent-mux/*/src/**/*.contract.test.{ts,tsx}',
+      'packages/agent-mux/*/tests/**/*.test.{ts,tsx}',
+      'packages/agent-mux/*/tests/**/*.contract.test.{ts,tsx}',
+    ],
     setupFiles: ['vitest.setup.ts'],
     environment: 'node',
     coverage: {
@@ -22,6 +31,7 @@ export default {
       include: ['packages/*/src/**/*.ts', 'packages/agent-mux/*/src/**/*.ts'],
       exclude: [
         'packages/*/src/**/*.test.ts',
+        'packages/*/src/**/*.contract.test.ts',
         '**/index.ts',
       ],
       reporter: ['text', 'json-summary', 'html'],

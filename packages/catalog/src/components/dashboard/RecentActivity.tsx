@@ -18,6 +18,7 @@ export interface ActivityItem {
   type: EntityType;
   id: number;
   name: string;
+  slug?: string;
   updatedAt: string;
   action?: "created" | "updated" | "deleted";
 }

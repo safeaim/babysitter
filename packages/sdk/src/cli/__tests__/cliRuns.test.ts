@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import path from "path";
 import os from "os";
 import { promises as fs } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { createBabysitterCli } from "../main";
 import { readRunMetadata } from "../../storage/runFiles";
 import { DEFAULT_LAYOUT_VERSION, getStateFile } from "../../storage/paths";
@@ -16,6 +17,7 @@ import {
   __setAncestorResolverForTests,
   getSessionMarkerPath,
 } from "../../utils/sessionMarker";
+import { validateProcessEntrypoint } from "../main/runSupport";
 
 const realReadRunMetadata = readRunMetadata;
 
@@ -284,6 +286,73 @@ describe("babysitter run:create CLI", () => {
     expect(journal[0].data.prompt).toBe("Build a REST API with user authentication");
   });
 
+  it("validates entry modules that import the SDK by preparing a local fallback dependency", async () => {
+    const entryDir = path.join(runsRoot, "external-process");
+    const entryFile = path.join(entryDir, "process.mjs");
+    const fallbackSdkDir = await writeFakeSdkPackage(path.join(runsRoot, "fallback-sdk"), "fallback");
+    await fs.mkdir(entryDir, { recursive: true });
+    await fs.writeFile(
+      entryFile,
+      [
+        'import { __marker } from "@a5c-ai/babysitter-sdk";',
+        "export const sdkMarker = __marker;",
+        'export async function process() { return "ok"; }',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    await expect(
+      validateProcessEntrypoint(entryFile, "process", {
+        resolveSdkPackageDir: () => fallbackSdkDir,
+      }),
+    ).resolves.toBeUndefined();
+
+    await expect(fs.realpath(path.join(entryDir, "node_modules", "@a5c-ai", "babysitter-sdk"))).resolves.toBe(
+      fallbackSdkDir,
+    );
+
+    const loaded = await import(`${pathToFileURL(entryFile).href}?marker=fallback`);
+    expect(loaded.sdkMarker).toBe("fallback");
+  });
+
+  it("prefers an existing project-local SDK dependency over the fallback link", async () => {
+    const projectRoot = path.join(runsRoot, "project-local");
+    const entryDir = path.join(projectRoot, "processes");
+    const entryFile = path.join(entryDir, "process.mjs");
+    const localSdkDir = await writeFakeSdkPackage(
+      path.join(projectRoot, "node_modules", "@a5c-ai", "babysitter-sdk"),
+      "local",
+      true,
+    );
+    const fallbackSdkDir = await writeFakeSdkPackage(path.join(runsRoot, "fallback-sdk-local"), "fallback");
+    await fs.mkdir(entryDir, { recursive: true });
+    await fs.writeFile(
+      entryFile,
+      [
+        'import { __marker } from "@a5c-ai/babysitter-sdk";',
+        "export const sdkMarker = __marker;",
+        'export async function process() { return "ok"; }',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    await expect(
+      validateProcessEntrypoint(entryFile, "process", {
+        resolveSdkPackageDir: () => fallbackSdkDir,
+      }),
+    ).resolves.toBeUndefined();
+
+    await expect(
+      fs.access(path.join(entryDir, "node_modules", "@a5c-ai", "babysitter-sdk")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+
+    const loaded = await import(`${pathToFileURL(entryFile).href}?marker=local`);
+    expect(loaded.sdkMarker).toBe("local");
+    await expect(fs.realpath(localSdkDir)).resolves.toBe(localSdkDir);
+  });
+
   it("persists --harness in run.json and stamps it on journal events", async () => {
     const entryFile = await writeEntrypoint("processes/harnessed.mjs", `export async function process() {\n  return "harnessed";\n}\n`);
 
@@ -351,6 +420,26 @@ describe("babysitter run:create CLI", () => {
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
     await fs.writeFile(absolutePath, contents, "utf8");
     return absolutePath;
+  }
+
+  async function writeFakeSdkPackage(packageRoot: string, marker: string, absolute = false) {
+    const resolvedRoot = absolute ? packageRoot : path.resolve(packageRoot);
+    await fs.mkdir(path.join(resolvedRoot, "dist"), { recursive: true });
+    await fs.writeFile(
+      path.join(resolvedRoot, "package.json"),
+      JSON.stringify({
+        name: "@a5c-ai/babysitter-sdk",
+        type: "commonjs",
+        main: "dist/index.js",
+      }, null, 2),
+      "utf8",
+    );
+    await fs.writeFile(
+      path.join(resolvedRoot, "dist", "index.js"),
+      `exports.__marker = ${JSON.stringify(marker)};\nexports.defineTask = function defineTask() { return null; };\n`,
+      "utf8",
+    );
+    return resolvedRoot;
   }
 
   async function expectSingleRunDir(): Promise<string> {

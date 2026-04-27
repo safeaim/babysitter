@@ -1,4 +1,5 @@
-import { promises as fs } from "node:fs";
+import { promises as fs, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { collapseDoubledA5cRuns, resolveRunDir } from "./args";
@@ -16,6 +17,13 @@ type ActionSummary = {
 
 type ModuleExports = Record<string, unknown>;
 type ArtifactCandidate = { absolute: string; relative: string; outsideRun: boolean };
+type LocalSdkDependencyOptions = {
+  createRequireFn?: typeof createRequire;
+  resolveSdkPackageDir?: () => string;
+  fsImpl?: Pick<typeof fs, "access" | "mkdir" | "symlink">;
+};
+
+const SDK_PACKAGE_SPECIFIER = "@a5c-ai/babysitter-sdk/package.json";
 
 const dynamicImportModule: (specifier: string) => Promise<ModuleExports> = (() => {
   if (process.env.VITEST) {
@@ -210,14 +218,93 @@ function listModuleExports(mod: ModuleExports): string {
   return keys.length > 0 ? keys.join(", ") : "(none)";
 }
 
-export async function validateProcessEntrypoint(importPath: string, exportName?: string): Promise<void> {
+function resolveSelfSdkPackageDir(): string {
+  let currentDir = __dirname;
+  while (true) {
+    const packageJsonPath = path.join(currentDir, "package.json");
+    try {
+      const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8")) as { name?: string };
+      if (pkg.name === "@a5c-ai/babysitter-sdk") {
+        return currentDir;
+      }
+    } catch {
+      // Keep walking upward.
+    }
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+    currentDir = parentDir;
+  }
+  throw new Error("Unable to resolve the current @a5c-ai/babysitter-sdk package root");
+}
+
+function defaultResolveSdkPackageDir(): string {
+  try {
+    return path.dirname(require.resolve(SDK_PACKAGE_SPECIFIER));
+  } catch {
+    return resolveSelfSdkPackageDir();
+  }
+}
+
+export async function ensureProcessLocalSdkDependency(
+  importPath: string,
+  options: LocalSdkDependencyOptions = {},
+): Promise<void> {
+  const resolvedPath = path.isAbsolute(importPath) ? importPath : resolveInputPath(importPath);
+  const processDir = path.dirname(resolvedPath);
+  const processRequire = (options.createRequireFn ?? createRequire)(path.join(processDir, "__babysitter_process__.cjs"));
+  try {
+    processRequire.resolve(SDK_PACKAGE_SPECIFIER);
+    return;
+  } catch {
+    // Fall through to a local fallback dependency.
+  }
+
+  const fsImpl = options.fsImpl ?? fs;
+  const targetSdkDir = path.join(processDir, "node_modules", "@a5c-ai", "babysitter-sdk");
+  try {
+    await fsImpl.access(targetSdkDir);
+    return;
+  } catch {
+    // Create below.
+  }
+
+  await fsImpl.mkdir(path.dirname(targetSdkDir), { recursive: true });
+  try {
+    await fsImpl.symlink(
+      (options.resolveSdkPackageDir ?? defaultResolveSdkPackageDir)(),
+      targetSdkDir,
+      process.platform === "win32" ? "junction" : "dir",
+    );
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException | undefined)?.code;
+    if (code !== "EEXIST") {
+      throw error;
+    }
+  }
+}
+
+export async function validateProcessEntrypoint(
+  importPath: string,
+  exportName?: string,
+  options: LocalSdkDependencyOptions = {},
+): Promise<void> {
   const resolvedPath = path.isAbsolute(importPath) ? importPath : resolveInputPath(importPath);
   try {
     await fs.access(resolvedPath);
   } catch (error) {
     throw new Error(
       `Process entry file not found: ${resolvedPath}. ` +
-        `Ensure the path is correct and points to a valid JS/TS module.`
+      `Ensure the path is correct and points to a valid JS/TS module.`
+    );
+  }
+
+  try {
+    await ensureProcessLocalSdkDependency(resolvedPath, options);
+  } catch (error) {
+    throw new Error(
+      `Failed to prepare project-local SDK dependency for ${resolvedPath}: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 

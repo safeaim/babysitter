@@ -1,246 +1,170 @@
 # Setup Guide
 
-Complete instructions for installing, building, and configuring the Breakpoints Mux system.
+This guide covers the current packaged surface for `@a5c-ai/breakpoints-mux`.
 
 ## Prerequisites
 
-- **Node.js 22+** -- Required. The project uses modern ES module syntax and Node.js APIs that require version 22 or later. Check your version with `node --version`.
-- **npm** -- Comes bundled with Node.js.
+- Node.js 22+
+- npm
 
-## Installation
+## Install
 
-Clone or obtain the repository, then install all workspace dependencies from the root:
+From the published package:
 
 ```bash
-cd breakpointsMux
+npm install @a5c-ai/breakpoints-mux
+```
+
+From the monorepo root while working on this package:
+
+```bash
 npm install
+npm run build --workspace=@a5c-ai/breakpoints-mux
 ```
 
-This installs dependencies for all five packages (`shared`, `sdk`, `server`, `cli`, `mcp-tool`) via npm workspaces.
+## Package Topology
 
-## Building
+`packages/breakpoints-mux/` is a single workspace package. The published tarball contains only:
 
-The project uses TypeScript 5.7+ with project references. Build all packages at once:
+- `dist/`
+- `responder/`
+- `README.md`
+
+The repository also keeps source docs in `docs/`, `skills/`, and `specs/`, but those folders are not published files.
+
+Published subpath exports:
+
+- `.`
+- `./backends`
+- `./proven`
+- `./mcp`
+- `./harness`
+- `./auth`
+- `./config`
+
+Source layout:
+
+- CLI source: `src/cli/index.ts`, `src/cli/program.ts`, `src/cli/commands/*`
+- MCP source: `src/mcp/index.ts`, `src/mcp/server.ts`, `src/mcp/http-transport.ts`, `src/mcp/tools/*`
+
+## Build, Test, and Typecheck
+
+Run these from the monorepo root:
 
 ```bash
-npm run build
-# or equivalently:
-npx tsc --build
+npm run build --workspace=@a5c-ai/breakpoints-mux
+npm run typecheck --workspace=@a5c-ai/breakpoints-mux
+npm run test --workspace=@a5c-ai/breakpoints-mux
+npm run test:packaged-surface-parity --workspace=@a5c-ai/breakpoints-mux
 ```
 
-This compiles the `@a5c-ai/breakpoints-mux` package (types, SDK, CLI, MCP tools, auth).
+## CLI Setup
 
-To clean build artifacts:
+The bin name is `breakpoints-mux`.
 
 ```bash
-npm run clean
+breakpoints-mux --help
+breakpoints-mux responders list
+breakpoints-mux responders show security-responder
 ```
 
-## Running Tests
+Global CLI options:
 
-The test suite uses Vitest. Run all 325 tests across all packages:
+- `--server-url <url>`
+- `--auth-token <token>`
+- `--json`
+- `--responder-dir <path>`
+- `--repo-root <path>`
+- `--config-root <path>`
 
-```bash
-npm test
-```
+Responder profiles are resolved from `.a5c/responder/` by default. You can override that resolution with `--responder-dir`, `--repo-root`, or `--config-root`.
 
-Watch mode for development:
+## MCP Server Setup
 
-```bash
-npm run test:watch
-```
+`breakpoints-mux server start` launches the packaged MCP server over stdio. That is the supported CLI entrypoint for editor and agent integrations.
 
-Type-check without emitting JS:
-
-```bash
-npm run typecheck
-```
-
-## Server Setup
-
-### Starting the server
-
-Using the CLI:
-
-```bash
-bmux server start
-```
-
-Or directly with Node:
-
-```bash
-node packages/server/dist/index.js
-```
-
-The server starts on port **3847** by default. Override with the `-p` flag or `PORT` environment variable:
-
-```bash
-bmux server start -p 4000
-# or
-PORT=4000 node packages/server/dist/index.js
-```
-
-### Verifying the server
-
-```bash
-curl http://localhost:3847/api/v1/health
-```
-
-Expected response:
+Using the published package:
 
 ```json
 {
-  "status": "ok",
-  "timestamp": "2026-03-10T12:00:00.000Z",
-  "questionCount": 0
+  "mcpServers": {
+    "breakpoints-mux": {
+      "command": "npx",
+      "args": ["-y", "@a5c-ai/breakpoints-mux", "server", "start"]
+    }
+  }
 }
 ```
 
-### Server features
-
-- **In-memory question store** -- Questions are stored in memory. Restarting the server clears all data.
-- **SSE push notifications** -- Clients can subscribe to `/api/v1/questions/:id/events` for real-time answer notifications.
-- **Automatic expiration sweep** -- A background task periodically marks expired questions (past their `expiresAt` timestamp).
-- **CORS enabled** -- All origins are allowed by default.
-- **Request logging** -- Every request is logged to stdout with timestamp, method, and URL.
-
-## Responder Profile Creation
-
-### Directory structure
-
-Responder profiles are stored as JSON files in `.a5c/responder/`:
-
-```
-.a5c/
-  responder/
-    schema.json              # JSON Schema for profile validation
-    frontend-responder.json  # Example: frontend responder
-    backend-responder.json   # Example: backend responder
-    devops-responder.json    # Example: DevOps responder
-```
-
-### Creating a new profile
-
-1. Choose an ID (lowercase slug, e.g., `security-responder`).
-2. Create `.a5c/responder/security-responder.json`:
-
-```json
-{
-  "id": "security-responder",
-  "name": "Sam Rivera",
-  "title": "Application Security Engineer",
-  "domains": ["security"],
-  "tags": ["oauth-2.0", "jwt", "owasp", "encryption", "penetration-testing"],
-  "availability": true,
-  "responseTimeSla": 1800000
-}
-```
-
-3. Verify the profile loads correctly:
-
-```bash
-bmux responders show security-responder
-```
-
-### Profile schema reference
-
-The full JSON Schema is at `.a5c/responder/schema.json`. Required fields:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Must match the filename (without `.json`). |
-| `name` | string | Display name. |
-| `title` | string | Professional title. |
-| `domains` | array | High-level responder domains. |
-| `tags` | array | Matching keywords, technologies, or specialties. |
-| `availability` | boolean | Whether the responder is currently accepting questions. |
-| `responseTimeSla` | number | Expected max response time in milliseconds. |
-
-Optional fields:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `publicKeyFingerprint` | string | Optional fingerprint for provenance-aware responder flows. |
-
-## Claude Code Plugin Installation
-
-To make the MCP tools available to Claude Code, add the tool server to your Claude Code MCP configuration.
-
-### Option 1: Project-level configuration
-
-Add to your project's `.claude/mcp.json` (or equivalent):
+Using a local monorepo checkout after building the package:
 
 ```json
 {
   "mcpServers": {
     "breakpoints-mux": {
       "command": "node",
-      "args": ["packages/mcp-tool/dist/index.js"]
+      "args": ["packages/breakpoints-mux/dist/cli/index.js", "server", "start"]
     }
   }
 }
 ```
 
-### Option 2: With environment overrides
+`server start` respects the package CLI globals, so local integrations can also pass `--responder-dir`, `--repo-root`, and `--config-root` when responder discovery needs to point at a specific checkout.
 
-If the server runs on a non-default URL:
+The package also exports HTTP MCP helpers from `@a5c-ai/breakpoints-mux/mcp`, but HTTP transport is a programmatic API surface, not a separate CLI package or command.
 
-```json
-{
-  "mcpServers": {
-    "breakpoints-mux": {
-      "command": "node",
-      "args": ["packages/mcp-tool/dist/index.js"],
-      "env": {
-        "BPX_SERVER_URL": "http://localhost:4000/api/v1",
-        "BPX_TIMEOUT_MS": "600000"
-      }
-    }
-  }
-}
+## Registered MCP Tools
+
+The stdio server currently registers these eight tools:
+
+| Tool | Current parameters |
+| --- | --- |
+| `ask_breakpoint` | `question`, `context`, `markdown`, `codeSnippets`, `fileReferences`, `tags`, `domain`, `urgency`, `interactionKind`, `targetResponders`, `routingStrategy`, `timeout`, `breakpointId`, `backend`, `breakpointsDir`, `proven` |
+| `check_breakpoint_status` | `breakpointId`, `backend`, `breakpointsDir` |
+| `list_breakpoints` | `responderId`, `backend`, `breakpointsDir` |
+| `answer_breakpoint` | `breakpointId`, `text`, `approved`, `responderId`, `responderName`, `confidence`, `references`, `sign`, `keyFingerprint`, `backend`, `breakpointsDir` |
+| `verify_breakpoint_answer` | `breakpointId`, `backend`, `breakpointsDir` |
+| `list_responders` | `domain`, `tags`, `backend`, `breakpointsDir` |
+| `claim_breakpoint` | `breakpointId`, `responderId`, `backend`, `breakpointsDir` |
+| `poll_breakpoints` | `responderId`, `waitSeconds`, `backend`, `breakpointsDir` |
+
+## Configuration
+
+CLI and MCP clients resolve connection settings in this order:
+
+- `--server-url`
+- `BMUX_SERVER_URL`
+- `SERVER_URL`
+- `~/.breakpoints-mux/config.json`
+- default server URL baked into the client
+
+Bearer tokens resolve in this order:
+
+- `--auth-token`
+- `BMUX_AUTH_TOKEN`
+- `AUTH_TOKEN`
+- `~/.breakpoints-mux/config.json`
+- `~/.breakpoints-mux/auth.json`
+
+Shared auth commands:
+
+```bash
+breakpoints-mux auth status
+breakpoints-mux auth server set https://breakpoints-mux.example.com
+breakpoints-mux auth token set <token>
 ```
 
-### Verifying the tools are available
+## Responder Bootstrap
 
-Once configured, Claude Code should expose four tools:
+Create responder profiles under `.a5c/responder/<responderId>.json`, then validate them with:
 
-| Tool | Description |
-|------|-------------|
-| `submit_breakpoint` | Route questions to domain responders and wait for answers. |
-| `list_responders` | List available responders and their declared domains and tags. |
-| `check_breakpoint_status` | Check status of a previously submitted question. |
-| `cancel_breakpoint` | Cancel a question that is no longer needed. |
+```bash
+breakpoints-mux responders show <responderId>
+```
 
-## Configuration Options
+Use these CLI commands once profiles exist:
 
-### Environment variables
-
-All configuration can be set via environment variables. These are read by both the CLI and the MCP tool.
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `BPX_SERVER_URL` | Base URL of the BMUX server (including `/api/v1` path) | `http://localhost:3847/api/v1` |
-| `SERVER_URL` | Alias for `BPX_SERVER_URL` | -- |
-| `BPX_TIMEOUT_MS` | Default timeout for waiting for answers, in milliseconds | `1800000` (30 minutes) |
-| `PORT` | Port the server listens on (server package only) | `3847` |
-
-### CLI global options
-
-These apply to all `bmux` subcommands:
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--server-url <url>` | Server URL (without `/api/v1` -- the CLI appends it) | `http://localhost:3847` |
-| `--json` | Output in JSON format for scripting | `false` |
-| `--responder-dir <path>` | Directory containing responder profiles | `.a5c/responder` |
-
-### Constants
-
-Defined in `@a5c-ai/breakpoints-mux`:
-
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `DEFAULT_PORT` | `3847` | Default server port |
-| `DEFAULT_TIMEOUT_MS` | `1800000` | Default question timeout (30 min) |
-| `DEFAULT_POLL_INTERVAL_MS` | `5000` | Default polling interval (5 sec) |
-| `API_BASE_PATH` | `/api/v1` | Base path for all API endpoints |
+```bash
+breakpoints-mux breakpoints pending --responder <responderId>
+breakpoints-mux responder-loop --responder <responderId> --once
+```

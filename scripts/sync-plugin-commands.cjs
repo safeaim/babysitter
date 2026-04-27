@@ -60,7 +60,19 @@ function normalizeTarget(targetName) {
   return [normalized];
 }
 
+function ensureCompilerBuilt() {
+  if (fs.existsSync(COMPILER_CLI)) return;
+  const catalogPkg = path.join(REPO_ROOT, 'packages', 'agent-catalog');
+  const catalogDist = path.join(catalogPkg, 'dist', 'index.js');
+  if (!fs.existsSync(catalogDist)) {
+    spawnSync('npm', ['run', 'build'], { cwd: catalogPkg, stdio: 'inherit' });
+  }
+  spawnSync('npm', ['run', 'build'], { cwd: COMPILER_PKG, stdio: 'inherit' });
+}
+
 function compileTargets(outputDir, targets) {
+  ensureCompilerBuilt();
+
   if (fs.existsSync(COMPILER_CLI)) {
     runOrExit(process.execPath, [
       COMPILER_CLI,

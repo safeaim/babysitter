@@ -1,10 +1,10 @@
-# Plugin Ecosystem Governance
+# Plugin Ecosystem Lifecycle
 
 → [Documentation Index](README.md) | Previous: [Package Specifications](package-specs.md) | Next: [Security Architecture](security-architecture.md)
 
 ## Normative V6 Support Surface
 
-Before the broader governance material below, the current V6 position is:
+The current V6 plugin position is:
 
 - metaplugins are higher-order capability abstractions over plugin and hook surfaces,
 - on legacy non-Babysitter agents, `@a5c-ai/agent-plugins-mux` is the compiler and distribution path for the concrete plugin outputs those metaplugins need,
@@ -13,140 +13,160 @@ Before the broader governance material below, the current V6 position is:
 
 V6 does not require a future standalone meta-plugin host package before those use cases can be documented or shipped. The current install surface remains per-harness plugin bundles compiled from a unified source, while the metaplugin remains the capability-level abstraction above those bundles.
 
-## Plugin Lifecycle Management
+## Current Plugin Reality
 
-### Development Phase
+For the current repository, "plugin ecosystem" means the concrete lifecycle that already exists:
 
-**Plugin Template System**: Standardized project templates with security best practices and testing frameworks → [Testing Framework](testing-framework.md)
+- unified plugin source trees with `plugin.json`, `versions.json`, and referenced files,
+- compiler validation and per-target emission through `@a5c-ai/agent-plugins-mux`,
+- git-backed marketplaces indexed by `marketplace.json`,
+- explicit CLI install, configure, update, uninstall, and registry commands,
+- compatibility checks grounded in manifests, generated outputs, and migration files.
 
-**Development Guidelines**: Comprehensive documentation covering API usage, security requirements, and performance expectations
+This document is intentionally about those implementation surfaces. It is not a marketplace-governance charter.
 
-**Local Development Tools**: Debugging tools, hot-reload capabilities, and development environment setup automation
+## Authoring Surface
 
-### Validation and Quality Assurance
+### Unified Plugin Sources
 
-Numeric coverage thresholds are package-scoped governance requirements, not a repo-wide default. Any package that claims a threshold must encode and enforce it in that package's own test configuration and CI job.
+The cross-harness authoring surface is a unified plugin directory. At minimum, the compiler expects:
 
-**Automated Testing Requirements**: Mandatory unit tests, integration tests, and security validation, with any numeric coverage threshold declared and enforced in the package's own test config and CI job
+- `plugin.json` as the canonical manifest,
+- `versions.json` with required SDK version data,
+- referenced hook, command, skill, agent, and context files that exist on disk.
 
-**Code Quality Standards**: Static analysis, dependency vulnerability scanning, and code style enforcement
+The compiler validation step checks schema validity and verifies that referenced files actually exist. That makes manifest accuracy and file layout part of the executable contract, not documentation-only guidance.
 
-**Performance Benchmarking**: Memory usage limits, execution time constraints, and resource consumption validation → [Performance Considerations](performance-docs.md)
+### Package-Level Plugin Surfaces
 
-### Security Review Process
+The SDK-facing plugin package surface is instruction-oriented:
 
-**Static Security Analysis**: Automated scanning for common vulnerabilities and security anti-patterns
+- `install.md`, `configure.md`, and `uninstall.md` carry the agent-readable lifecycle instructions,
+- optional `install-process.js`, `configure-process.js`, and `uninstall-process.js` can automate those lifecycle stages,
+- `migrations/` contains version-to-version update steps,
+- `process/` can carry packaged process definitions.
 
-**Dynamic Security Testing**: Runtime security validation including sandbox escape testing and privilege escalation detection
+This is the practical boundary current users interact with. Plugin packages are not described by certification state, revenue policy, or moderation workflow. They are described by manifests, instruction files, optional process files, and migration artifacts.
 
-**Manual Security Review**: Expert review for complex plugins or those requesting elevated privileges
+## Validation And Compilation
 
-**Cryptographic Validation**: Review of encryption usage, key management, and secure communication patterns → [Security Architecture](security-architecture.md)
+### Validation Rules
 
-## Plugin Marketplace Standards
+Current validation is compiler- and package-oriented:
 
-### Publication Requirements
+- validate the unified `plugin.json` schema,
+- require `versions.json` and its SDK version field,
+- verify referenced hook handlers, command files, skill files, agent files, and context files,
+- reject duplicate skill names and other manifest errors.
 
-**Plugin Manifest Validation**: Comprehensive metadata including capabilities, dependencies, and compatibility requirements
+Those checks are the current quality gate. They establish whether a plugin source tree is structurally valid enough to compile or ship.
 
-**Documentation Standards**: User guides, API documentation, configuration references, and troubleshooting guides
+### Compilation Outputs
 
-**Versioning and Compatibility**: Semantic versioning compliance with clear compatibility matrices
+`@a5c-ai/agent-plugins-mux` is the current compiler for harness-specific plugin outputs. The public surface is:
 
-**License Compliance**: Open source license verification and commercial licensing framework support
+- `compile` to emit target plugin bundles,
+- `validate` to check a unified plugin directory without writing outputs,
+- `init` to scaffold a valid unified source tree,
+- `list-targets` to expose the supported target registry.
 
-### Quality Certification Process
+For V6 planning, compatibility claims should be tied to those emitted bundles and the manifests that drive them. If compiler behavior changes, the check is whether real generated outputs and target metadata still line up, not whether an imagined ecosystem policy still sounds plausible.
 
-**Functional Certification**: Comprehensive testing of plugin functionality against documented specifications
+## Marketplace And Install Lifecycle
 
-**Security Certification**: Validation against security standards with different trust levels (sandbox, elevated, system)
+### Marketplace Discovery
 
-**Performance Certification**: Validation of resource usage claims and performance characteristics
+Current marketplaces are git repositories with a `marketplace.json` manifest. The SDK:
 
-**Compliance Certification**: Industry-specific compliance validation (SOC 2, GDPR, HIPAA, etc.)
+- clones marketplaces locally,
+- resolves the active manifest path,
+- lists available plugin packages from manifest entries,
+- resolves package paths relative to the manifest location.
 
-### Marketplace Governance
+That is the present discovery model. The repo does not currently evidence a first-party moderation, certification, takedown, or dispute-resolution system layered over that marketplace format.
 
-**Content Moderation**: Automated and manual review processes for inappropriate or malicious content
+### Install And Configure
 
-**Dispute Resolution**: Clear procedures for handling conflicts between developers, users, and platform policies
+Current lifecycle commands are explicit and deterministic at the SDK layer:
 
-**Takedown Procedures**: Rapid response capabilities for security incidents or policy violations
+- `plugin:add-marketplace`
+- `plugin:update-marketplace`
+- `plugin:list-plugins`
+- `plugin:install`
+- `plugin:configure`
+- `plugin:uninstall`
+- `plugin:list-installed`
+- `plugin:update-registry`
+- `plugin:remove-from-registry`
 
-**Revenue Sharing**: Transparent revenue sharing model for commercial plugins and certification services
+`plugin:install` resolves the package from the marketplace, reads `install.md`, and returns any optional `install-process.js`. `plugin:configure` and `plugin:uninstall` do the same for their respective lifecycle files. The AI agent performs the package instructions; the SDK handles resolution, manifest reading, and registry operations.
 
-## Plugin Versioning and Dependency Management
+### Registry Tracking
 
-### Version Strategy Framework
+Installed state is tracked in `plugin-registry.json`, scoped globally or per project. The registry records which plugins are installed, which marketplace they came from, and which version is active.
 
-**Semantic Versioning Enforcement**: Automated validation of version number compliance with breaking change indicators
+That registry is the current operational record. It is the concrete answer to "what is installed now?" and "what version is this project on?".
 
-**Backward Compatibility Guarantees**: Clear compatibility windows with deprecation timelines and migration guidance
+## Updates, Compatibility, And Rollback Boundaries
 
-**API Versioning**: Multiple API version support with graceful degradation and compatibility shims
+### Update Behavior
 
-### Dependency Resolution
+Plugin updates are currently explicit. `plugin:update`:
 
-**Dependency Graph Validation**: Automated detection of circular dependencies and version conflicts
+- reads the installed version from the registry,
+- resolves the target version from the marketplace manifest,
+- computes the shortest migration chain through `migrations/`,
+- returns the ordered migration instructions or process files needed for the upgrade.
 
-**Security Dependency Scanning**: Continuous monitoring of plugin dependencies for security vulnerabilities
+This is the current compatibility mechanism: manifest metadata plus migration files. The system does not currently promise universal automatic updates or platform-wide automatic rollback.
 
-**Automatic Updates**: Configurable automatic updating of non-breaking changes with manual approval for major versions
+### Compatibility Source Of Truth
 
-**Rollback Capabilities**: Automatic rollback mechanisms for failed updates or compatibility issues
+Compatibility claims should be grounded in:
 
-## Plugin Monitoring and Health Assessment
+- plugin manifests,
+- marketplace metadata,
+- compiler-emitted target outputs,
+- package instruction files,
+- migration chains that actually exist.
 
-### Runtime Monitoring Framework
+If a compatibility matrix or requirement is documented, it should be derivable from one of those artifacts.
 
-**Performance Metrics Collection**: CPU usage, memory consumption, I/O operations, and execution time tracking
+### Rollback Boundaries
 
-**Error Rate Monitoring**: Automatic detection of plugin failures, crashes, and error patterns
+Current rollback behavior is package- and operator-defined, not platform-governance-defined. In practice that means:
 
-**Resource Usage Analysis**: Real-time monitoring of plugin resource consumption with alerting thresholds
+- uninstall instructions can remove plugin-managed state,
+- reconfiguration can move a project to a supported setup,
+- migration design can preserve forward or backward movement where authors explicitly provide it.
 
-**User Experience Metrics**: Plugin load times, response times, and user satisfaction tracking
+There is no repo evidence for a universal automatic rollback service supervising all plugins.
 
-### Health Assessment Procedures
+## Out Of Scope For Current V6 Docs
 
-**Automated Health Checks**: Regular validation of plugin functionality with synthetic transaction testing
+The following ideas may become future product or platform concerns, but they are not current plugin-ecosystem guarantees and should not be written as if they already exist:
 
-**Performance Degradation Detection**: Machine learning-based detection of performance regression patterns
+- certification programs or trust tiers beyond concrete manifest validation,
+- compliance attestations such as SOC 2, GDPR, or HIPAA validation pipelines,
+- dispute resolution, takedown programs, or marketplace moderation operations,
+- revenue sharing or paid marketplace settlement mechanics,
+- ML-based performance-regression detection for installed plugins,
+- automatic mitigation or automatic rollback services,
+- developer certification or support-tier programs.
 
-**Security Posture Monitoring**: Continuous security validation with threat intelligence integration
+Those topics require separate implementation evidence and decision records before they become normative.
 
-**Compliance Monitoring**: Ongoing validation of regulatory compliance requirements
+## Documentation Rule
 
-### Incident Response and Recovery
+When V6 documents describe the plugin ecosystem, prefer:
 
-**Automatic Incident Detection**: Real-time detection of plugin security incidents, performance issues, or failures
+- manifests over aspirational policy,
+- install and update flows over marketplace mythology,
+- compiler validation over certification language,
+- generated outputs over abstract ecosystem diagrams.
 
-**Incident Classification**: Severity-based classification with appropriate response procedures
-
-**Automatic Mitigation**: Immediate plugin isolation, session protection, and user notification systems
-
-**Post-Incident Analysis**: Comprehensive incident analysis with prevention strategy development
-
-## Plugin Developer Certification and Support
-
-### Developer Certification Program
-
-**Security Training Certification**: Comprehensive security awareness and secure coding practice certification
-
-**Platform Proficiency Certification**: Deep understanding of platform capabilities, limitations, and best practices
-
-**Ongoing Education Requirements**: Mandatory continuing education on security updates, platform changes, and industry best practices
-
-### Developer Support Framework
-
-**Technical Support Tiers**: Multi-tier support system from community forums to dedicated technical support
-
-**Documentation and Resources**: Comprehensive developer portal with tutorials, examples, and troubleshooting guides
-
-**Community Engagement**: Developer forums, regular webinars, and feedback channels for platform improvements
-
-**Plugin Analytics**: Detailed analytics on plugin usage, performance, and user engagement patterns
+That keeps the plugin story aligned with the repo's executable surfaces and makes the compiler, manifests, and package lifecycle easier to reason about.
 
 ---
 
-**Related Documents**: [Package Specifications](package-specs.md) | [Security Architecture](security-architecture.md) | [Testing Framework](testing-framework.md)
+**Related Documents**: [Package Specifications](package-specs.md) | [Security Architecture](security-architecture.md) | [Testing Framework](testing-framework.md) | [Plugins Overview](../plugins.md)

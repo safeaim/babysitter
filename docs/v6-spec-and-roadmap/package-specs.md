@@ -53,9 +53,11 @@ This document defines package responsibilities for the current V6 stage. It inte
 - Role: real integration and packaging boundaries
 - Responsibilities:
 - harness-specific hooks, commands, skills, manifests, and packaging outputs.
+- install, configure, uninstall, update, and registry flows as exposed through current SDK plugin commands.
 - Constraints:
 - plugin manifests are a practical source of truth for compatibility,
 - compiler changes must be checked against actual generated plugin metadata, not just intended schema.
+- marketplace or governance claims must not exceed the install/update/manifest behavior evidenced by the repo.
 
 ## 2. Candidate Boundaries
 
@@ -148,6 +150,7 @@ The following spec patterns are explicitly rejected for the current V6 stage:
 
 - multi-page invented API blocks for packages that do not exist,
 - broad claims of plugin isolation or governance enforcement without implementation evidence,
+- marketplace-governance promises such as certification, revenue sharing, dispute handling, takedown programs, or automatic rollback without executable support,
 - describing metaplugins as unavailable until a future standalone package exists,
 - equating metaplugins with `agent-plugins-mux` or with any single concrete unified plugin bundle,
 - dependency graphs that imply committed packages without migration sequencing,

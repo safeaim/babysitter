@@ -151,23 +151,6 @@ interface SessionManager {
   ): Promise<SessionDiff>;
 
   /**
-   * Watch a session for live updates.
-   *
-   * Returns an async iterable that emits AgentEvent objects as new content
-   * is appended to the session file. Uses filesystem watching (fs.watch) for
-   * file-based sessions and polling for SQLite-based sessions.
-   *
-   * Terminates when the session file is deleted, the consumer breaks from
-   * the iterator, or the session_end event is detected.
-   *
-   * @param agent - The agent that owns the session.
-   * @param sessionId - The native session ID.
-   * @returns An async iterable of AgentEvent objects.
-   * @throws AgentMuxError with code 'SESSION_NOT_FOUND' if no session exists.
-   */
-  watch(agent: AgentName, sessionId: string): AsyncIterable<AgentEvent>;
-
-  /**
    * Map a native agent session ID to a unified cross-agent ID.
    *
    * The unified ID format is deterministic: `<agent>:<nativeSessionId>`.
@@ -202,7 +185,6 @@ interface SessionManager {
 | `totalCost()` | Reads cost records from sessions + run index | `CostSummary` | -- |
 | `export()` | Parses and serializes session | `string` | `SESSION_NOT_FOUND` |
 | `diff()` | Parses both sessions and compares | `SessionDiff` | `SESSION_NOT_FOUND` |
-| `watch()` | Filesystem watch / poll | `AsyncIterable<AgentEvent>` | `SESSION_NOT_FOUND` |
 | `resolveUnifiedId()` | Pure (no I/O) | `string` | -- |
 | `resolveNativeId()` | Pure (no I/O) | `{ agent, nativeSessionId } \| null` | -- |
 
@@ -929,31 +911,23 @@ console.log(d.stats); // { removals: 0, additions: 3, modifications: 1, unchange
 5. Produces the `operations` array and `stats` summary.
 6. Works across agents: comparing a Claude session against a Codex session is valid and produces meaningful diffs on the normalized message structure.
 
-### 6.7 watch()
+### 6.7 Live Watching
 
-```typescript
-for await (const event of mux.sessions.watch('claude', 'abc123')) {
-  if (event.type === 'text_delta') {
-    process.stdout.write(event.delta);
-  }
-  if (event.type === 'session_end') {
-    break;
-  }
-}
-```
+Live session watching is **not** part of the public `SessionManager` API.
 
-**Behavior:**
+Earlier drafts and placeholder code attempted to expose `watch(agent, sessionId)` as an
+`AsyncIterable<AgentEvent>`, but the implementation could not provide truthful cross-adapter
+semantics. In particular, persisted session files do not expose a generic mapping from file
+growth to:
 
-1. Resolves the session file path via the adapter.
-2. Records the current file size / last row ID as the starting offset.
-3. **For file-based agents (JSONL, JSON):** Uses `fs.watch()` on the session file. On change events, reads new bytes from the recorded offset, parses new lines, and emits `AgentEvent` objects via the adapter's `parseEvent()` method.
-4. **For SQLite agents (cursor, opencode, hermes):** Polls at a 2-second interval, querying for rows with IDs or timestamps greater than the last-seen value.
-5. Emits events through the `AsyncIterable` interface.
-6. Terminates when:
-   - The session file is deleted (emits an `error` event, then returns).
-   - A `session_end` event is detected.
-   - The consumer breaks from the for-await-of loop (cleanup runs, watchers are closed).
-7. Cleanup: file watchers and poll intervals are cleared when the iterator is returned or thrown.
+1. a real `runId`
+2. adapter-accurate `AgentEvent` types
+3. meaningful `text_delta.delta` / `text_delta.accumulated` payloads
+
+`SessionManager` therefore remains a read-only inspection surface: `list()`, `get()`,
+`search()`, `totalCost()`, `export()`, `diff()`, `resolveUnifiedId()`, and `resolveNativeId()`.
+Any future live-watch feature must be specified as a separate adapter capability with explicit
+event semantics instead of reusing `AgentEvent` opportunistically.
 
 ### 6.8 resolveUnifiedId()
 
@@ -996,10 +970,6 @@ amux sessions list <agent> [options]
 amux sessions show <agent> <session-id>
   --format               json | jsonl | markdown (default: markdown)
 
-amux sessions tail <agent> [session-id]
-  # Streams live events from the most recent (or specified) session.
-  # Internally calls watch().
-
 amux sessions search <query> [--agent <a>] [--since] [--until]
   --limit                Max results (default: 50)
   --json                 Output as JSON array
@@ -1037,8 +1007,8 @@ amux cost report
 
 | Error Code | Thrown By | Description |
 |---|---|---|
-| `AGENT_NOT_FOUND` | `list()`, `get()`, `export()`, `diff()`, `watch()` | The specified agent name does not match any registered adapter. (`search()` does not throw this -- when `query.agent` is omitted, all agents are searched; when `query.agent` is set to an unknown agent, `search()` returns an empty array rather than throwing.) |
-| `SESSION_NOT_FOUND` | `get()`, `export()`, `diff()`, `watch()` | No session with the given ID exists in the agent's session storage. |
+| `AGENT_NOT_FOUND` | `list()`, `get()`, `export()`, `diff()` | The specified agent name does not match any registered adapter. (`search()` does not throw this -- when `query.agent` is omitted, all agents are searched; when `query.agent` is set to an unknown agent, `search()` returns an empty array rather than throwing.) |
+| `SESSION_NOT_FOUND` | `get()`, `export()`, `diff()` | No session with the given ID exists in the agent's session storage. |
 | `PARSE_ERROR` | `get()`, `export()`, `diff()` | The session file exists but cannot be parsed (corrupt data, schema mismatch, incompatible format version). |
 
 ### 8.2 Graceful Degradation
@@ -1046,7 +1016,6 @@ amux cost report
 - `list()` returns an empty array (not an error) when the agent's session directory does not exist (agent installed but never used).
 - `search()` silently skips agents whose session storage is not detectable when searching across all agents.
 - `totalCost()` returns zero-valued aggregates when no matching sessions are found.
-- `watch()` emits an `error` event and terminates if the underlying file watcher encounters an OS-level error (permission denied, file system not supported).
 
 ---
 
@@ -1141,6 +1110,6 @@ All types defined or referenced in this specification:
 - **`search(query)`** performs a full-text scan across sessions with structured filters.
 - **`export(agent, sessionId, format)`** accepts `'json' | 'jsonl' | 'markdown'`. JSONL emits one `SessionMessage` per line; markdown renders a human-readable transcript.
 - **`diff(agentA, idA, agentB, idB)`** returns a `SessionDiff` of message-level insertions, deletions, and updates.
-- **`watch(agent, sessionId)`** is an `AsyncIterable<AgentEvent>` implemented in `packages/core/src/session-watch.ts` using `fs.watch(dir, { recursive: true })` with tail-reading to emit deltas as the harness writes them.
+- **Live watching is intentionally not public.** The earlier placeholder `watch()` API was removed because it could not provide truthful cross-adapter `AgentEvent` semantics.
 
 Session files are written atomically by adapters via the tmp-then-rename helper in `packages/adapters/src/session-fs.ts`.

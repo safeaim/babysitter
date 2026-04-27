@@ -740,7 +740,6 @@ interface SessionManager {
   totalCost(options?: CostAggregationOptions): Promise<CostSummary>
   export(agent: AgentName, sessionId: string, format: 'json' | 'jsonl' | 'markdown'): Promise<string>
   diff(a: { agent: AgentName; sessionId: string }, b: { agent: AgentName; sessionId: string }): Promise<SessionDiff>
-  watch(agent: AgentName, sessionId: string): AsyncIterable<AgentEvent>
   resolveUnifiedId(agent: AgentName, nativeSessionId: string): string
   resolveNativeId(unifiedId: string): { agent: AgentName; nativeSessionId: string } | null
 }
@@ -1045,7 +1044,6 @@ amux sessions list <agent> [options]
 amux sessions show <agent> <session-id>
   --format         json | jsonl | markdown
 
-amux sessions tail <agent> [session-id]
 amux sessions search <query> [--agent <a>] [--since] [--until]
 amux sessions export <agent> <session-id> [--format]
 amux sessions diff <agent>:<id> <agent>:<id>

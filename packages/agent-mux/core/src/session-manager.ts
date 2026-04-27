@@ -11,10 +11,8 @@ import * as path from 'node:path';
 import { createComponentLogger } from '@a5c-ai/agent-mux-observability';
 
 import type { AgentName } from './types.js';
-import type { AgentEvent } from './events.js';
 import type { AdapterRegistry } from './adapter-registry.js';
 import { AgentMuxError } from './errors.js';
-import { watchSession } from './session-watch.js';
 import {
   buildSummary,
   canFastListByDate,
@@ -77,9 +75,6 @@ export interface SessionManager {
     a: { agent: AgentName; sessionId: string },
     b: { agent: AgentName; sessionId: string },
   ): Promise<SessionDiff>;
-
-  /** Watch a session for live updates. */
-  watch(agent: AgentName, sessionId: string): AsyncIterable<AgentEvent>;
 
   /** Map a native session ID to a unified cross-agent ID. */
   resolveUnifiedId(agent: AgentName, nativeSessionId: string): string;
@@ -453,12 +448,6 @@ export class SessionManagerImpl implements SessionManager {
     };
   }
 
-  // -- watch() -----------------------------------------------------------------
-
-  async *watch(agent: AgentName, sessionId: string): AsyncIterable<AgentEvent> {
-    const adapter = this._getAdapter(agent);
-    yield* watchSession(adapter, agent, sessionId);
-  }
   // -- resolveUnifiedId() ------------------------------------------------------
 
   resolveUnifiedId(agent: AgentName, nativeSessionId: string): string {

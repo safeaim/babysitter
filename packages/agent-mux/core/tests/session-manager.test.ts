@@ -450,25 +450,12 @@ describe('SessionManagerImpl', () => {
     });
   });
 
-  // ── watch() ─────────────────────────────────────────────────────────
+  // ── public surface ──────────────────────────────────────────────────
 
-  describe('watch()', () => {
-    it('throws AGENT_NOT_FOUND for unknown agent', async () => {
-      const iter = manager.watch('nonexistent', 'x');
-      // The async generator should throw on first next() call
-      const iterator = iter[Symbol.asyncIterator]();
-      await expect(iterator.next()).rejects.toMatchObject({
-        code: 'AGENT_NOT_FOUND',
-      });
-    });
-
-    it('terminates immediately for registered agent with no watch events', async () => {
-      registry.register(mockAdapter('claude', []));
-      const events: unknown[] = [];
-      for await (const event of manager.watch('claude', 'x')) {
-        events.push(event);
-      }
-      expect(events).toEqual([]);
+  describe('public surface', () => {
+    it('does not expose watch()', () => {
+      expect('watch' in manager).toBe(false);
+      expect((manager as Record<string, unknown>).watch).toBeUndefined();
     });
   });
 });

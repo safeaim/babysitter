@@ -70,13 +70,8 @@ run and adapters that key on cwd will scope their sessions accordingly.
 
 ## Watching sessions
 
-`SessionManager.watchSessions()` emits events whenever a new session file is
-written or an existing one grows — useful for live dashboards:
+Live session watching is not currently exposed on `SessionManager`.
 
-```ts
-const unwatch = await client.sessions.watchSessions({ agent: 'claude' }, (evt) => {
-  console.log(evt.kind, evt.session.sessionId);
-});
-// later
-unwatch();
-```
+Earlier tutorial drafts mentioned `watchSessions()`, but no truthful cross-adapter contract is
+available yet. Use `list()`, `get()`, `search()`, `export()`, and `diff()` for read-only session
+inspection.

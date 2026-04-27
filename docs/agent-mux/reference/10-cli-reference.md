@@ -971,7 +971,6 @@ Read-only access to agent session data. The CLI delegates to `SessionManager` (s
 ```
 amux sessions list <agent> [flags...]
 amux sessions show <agent> <session-id> [flags...]
-amux sessions tail <agent> [session-id] [flags...]
 amux sessions search <query> [flags...]
 amux sessions export <agent> <session-id> [flags...]
 amux sessions diff <agent>:<id> <agent>:<id> [flags...]
@@ -1022,16 +1021,11 @@ Display the full content of a session.
 
 ### 12.4 `amux sessions tail <agent> [session-id]`
 
-Watch a session for live updates. If `session-id` is omitted, tails the most recent session for the agent.
+This command is not part of the current public CLI surface.
 
-**Behavior:** Uses `mux.sessions.watch()` to stream `AgentEvent` objects. In human mode, prints events as formatted text. In JSONL mode (`--json`), prints one event per line.
-
-The tail terminates when:
-- The session ends (`session_end` event).
-- The user presses Ctrl+C (SIGINT).
-- The session file is deleted.
-
-**API mapping:** `mux.sessions.watch('claude', 'abc123')` returns `AsyncIterable<AgentEvent>`.
+`@a5c-ai/agent-mux-core` does not currently expose a truthful live session-watch API. Earlier
+drafts described `mux.sessions.watch()`, but that contract was removed rather than shipping
+synthetic `AgentEvent` payloads derived from arbitrary session-file changes.
 
 ### 12.5 `amux sessions search <query>`
 
@@ -1836,7 +1830,6 @@ Quick reference of all commands and their SDK method mappings.
 | `amux mcp` | `uninstall` | `mux.mcp.uninstall()` |
 | `amux sessions` | `list` | `mux.sessions.list()` |
 | `amux sessions` | `show` | `mux.sessions.export()` |
-| `amux sessions` | `tail` | `mux.sessions.watch()` |
 | `amux sessions` | `search` | `mux.sessions.search()` |
 | `amux sessions` | `export` | `mux.sessions.export()` |
 | `amux sessions` | `diff` | `mux.sessions.diff()` |

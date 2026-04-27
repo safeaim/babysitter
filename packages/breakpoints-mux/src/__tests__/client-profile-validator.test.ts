@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { fileURLToPath } from "node:url";
 import {
   validateProfile,
   validateProfileFile,
@@ -31,6 +32,9 @@ function makeValidProfile(overrides: Partial<ResponderProfile> = {}): ResponderP
 // ────────────────────────────────────────────────────────────────────────────
 
 let tmpDir: string;
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const packageRoot = path.resolve(currentDir, "../..");
+const packagedResponderDir = path.join(packageRoot, "responder");
 
 async function createTmpDir(): Promise<string> {
   return fs.mkdtemp(path.join(os.tmpdir(), "profile-validator-test-"));
@@ -245,6 +249,28 @@ describe("ProfileValidator", () => {
 
       expect(result.results).toHaveLength(2);
       expect(result.results.every((r) => r.valid)).toBe(true);
+    });
+
+    it("validates the packaged responder examples exactly as shipped", async () => {
+      const result = await validateAllProfiles(packagedResponderDir);
+
+      expect(result.valid).toBe(true);
+      expect(result.totalProfiles).toBe(3);
+      expect(result.invalidProfiles).toBe(0);
+      expect(result.results.map((entry) => entry.profile?.id).sort()).toEqual([
+        "backend-responder",
+        "devops-responder",
+        "frontend-responder",
+      ]);
+    });
+  });
+
+  describe("packaging metadata", () => {
+    it("ships the responder examples in package.json", async () => {
+      const raw = await fs.readFile(path.join(packageRoot, "package.json"), "utf-8");
+      const packageJson = JSON.parse(raw) as { files?: string[] };
+
+      expect(packageJson.files).toContain("responder");
     });
   });
 });

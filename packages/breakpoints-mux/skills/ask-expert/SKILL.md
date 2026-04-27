@@ -14,7 +14,7 @@ Do NOT use this tool for questions you can confidently answer yourself from cont
 
 ## Before Asking
 
-1. **Survey available experts first.** Run `list_responders` or inspect the `.a5c/expert/` directory to see who is available and what domains they cover.
+1. **Survey available responders first.** Run `list_responders` or inspect the `.a5c/responder/` directory to see who is available and what domains they cover.
 2. **Check if the question truly needs an expert.** If you can answer with high confidence from existing code, docs, or general knowledge, do so directly.
 3. **Gather context.** Before asking, collect relevant code snippets, file paths, error messages, and constraints that the expert will need.
 
@@ -23,7 +23,7 @@ Do NOT use this tool for questions you can confidently answer yourself from cont
 - **Be specific.** Instead of "How should we handle errors?", ask "Should our REST API return RFC 7807 Problem Details or a custom error envelope, given we have both internal and public consumers?"
 - **Include context.** Provide the `context` field with what you already know, what you've tried, and what constraints exist.
 - **Tag expertise areas.** Use `requiredExpertise` to help match the right expert (e.g., `["typescript", "react"]`).
-- **Specify target experts** when you know exactly who should answer (use their expert IDs from the profiles).
+- **Specify target responders** when you know exactly who should answer (use their responder IDs from the profiles).
 
 ## Routing Strategy Guidance
 

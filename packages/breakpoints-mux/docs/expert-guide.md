@@ -1,45 +1,28 @@
-# Expert Guide
+# Responder Guide
 
-This guide is for domain experts who receive and answer questions through the Breakpoints Pro system.
+This guide is for domain responders who receive and answer questions through the Breakpoints Mux system.
 
 ## Overview
 
 When an AI agent encounters a question that requires specialized knowledge, it routes that question to you through the BMUX server. You receive the question, review it, and submit your answer. The agent then relays your answer back to the user.
 
-## Setting Up Your Expert Profile
+## Setting Up Your Responder Profile
 
-Expert profiles are JSON files stored in the `.a5c/expert/` directory at the root of the project. Each expert gets one file named `<your-id>.json`.
+Responder profiles are JSON files stored in the `.a5c/responder/` directory at the root of the project. Each responder gets one file named `<your-id>.json`.
 
 ### Creating your profile
 
-Create a file at `.a5c/expert/your-id.json`:
+Create a file at `.a5c/responder/your-id.json`:
 
 ```json
 {
   "id": "your-id",
   "name": "Your Full Name",
   "title": "Your Job Title",
-  "expertiseAreas": [
-    {
-      "domain": "backend",
-      "topics": ["Node.js", "Express", "PostgreSQL", "API design"],
-      "keywords": ["server", "database", "REST", "authentication"],
-      "proficiency": 4
-    },
-    {
-      "domain": "security",
-      "topics": ["OAuth", "JWT", "encryption"],
-      "keywords": ["auth", "token", "vulnerability"],
-      "proficiency": 3
-    }
-  ],
+  "domains": ["backend", "security"],
+  "tags": ["nodejs", "postgresql", "api-design", "oauth", "jwt", "auth"],
   "availability": true,
-  "responseTimeSla": 1800000,
-  "sessionConfig": {
-    "timezone": "America/New_York",
-    "schedule": "weekdays 10-18",
-    "maxConcurrentQuestions": 3
-  }
+  "responseTimeSla": 1800000
 }
 ```
 
@@ -47,30 +30,24 @@ Create a file at `.a5c/expert/your-id.json`:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | string | Yes | Unique identifier for your profile. Use a short, lowercase slug (e.g., `backend-expert`, `jane-security`). Must match the filename without `.json`. |
+| `id` | string | Yes | Unique identifier for your profile. Use a short, lowercase slug (e.g., `backend-responder`, `jane-security`). Must match the filename without `.json`. |
 | `name` | string | Yes | Your display name, shown to agents and in answers. |
 | `title` | string | Yes | Your professional title or role (e.g., "Senior Backend Engineer"). |
-| `expertiseAreas` | array | Yes | One or more areas of expertise (see below). |
+| `domains` | array | Yes | One or more high-level domains you cover (for example `backend`, `security`, `devops`). |
+| `tags` | array | Yes | Keywords, tools, or specialties the matcher can use for finer-grained routing. |
 | `availability` | boolean | Yes | Set to `true` when you are available to answer questions. Set to `false` when on leave or unavailable. |
 | `responseTimeSla` | number | Yes | Your expected maximum response time in milliseconds. `1800000` = 30 minutes. The system uses this for timeout calculations. |
-| `sessionConfig` | object | No | Optional configuration for your sessions (timezone, schedule, concurrency limits, or any custom key-value pairs). |
+| `publicKeyFingerprint` | string | No | Optional fingerprint used for provenance-aware responder flows. |
 
-### Expertise areas
+### Domains and tags
 
-Each entry in `expertiseAreas` describes one domain you cover:
+`domains` should contain the broad areas you cover, while `tags` should list technologies, keywords, or specialties that help the matcher route questions more precisely.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `domain` | string | High-level domain name: `frontend`, `backend`, `devops`, `security`, `data`, etc. |
-| `topics` | string[] | Specific technologies or subjects you know well. These are used for matching. |
-| `keywords` | string[] | Additional search terms the matcher uses to connect questions to your expertise. |
-| `proficiency` | integer (1-5) | Self-assessed proficiency level. 1 = basic familiarity, 5 = deep expert. The matcher weights higher-proficiency experts more heavily. |
-
-**Tip:** Be accurate with your proficiency ratings. Overrating yourself means you will receive questions you cannot answer well. Underrating means relevant questions may be routed to someone else.
+**Tip:** Keep `domains` broad and stable, and put the more specific terms in `tags`. For example, `domains: ["backend"]` and `tags: ["nodejs", "postgresql", "api-design"]`.
 
 ### Validating your profile
 
-The profile must conform to the JSON schema at `.a5c/expert/schema.json`. You can validate it with the CLI:
+The profile must conform to the JSON schema at `.a5c/responder/schema.json`. You can validate it with the CLI:
 
 ```bash
 bmux responders show your-id
@@ -80,9 +57,9 @@ If the profile is valid, this prints your profile details. If it has errors, you
 
 ## Receiving Questions
 
-### Using the expert polling loop
+### Using the responder polling loop
 
-The simplest way to receive questions is to run the expert loop:
+The simplest way to receive questions is to run the responder loop:
 
 ```bash
 bmux responder-loop -e your-id
@@ -94,7 +71,7 @@ Options:
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `-e, --expert <id>` | Your expert ID (required) | -- |
+| `-e, --expert <id>` | Your responder ID (required) | -- |
 | `-i, --interval <seconds>` | Polling interval | `30` |
 | `--once` | Check once and exit | `false` |
 
@@ -127,7 +104,7 @@ bmux breakpoints answer <questionId> \
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `-e, --expert <id>` | Your expert ID (required) | -- |
+| `-e, --expert <id>` | Your responder ID (required) | -- |
 | `-a, --answer <text>` | Your answer text (required) | -- |
 | `--confidence <0-100>` | How confident you are in this answer | `80` |
 
@@ -162,7 +139,7 @@ curl -X POST http://localhost:3847/api/v1/questions/<questionId>/answers \
 
 ## Using from Within Claude Code
 
-If you are an expert who also uses Claude Code, you can answer questions through the agent itself. The workflow:
+If you are a responder who also uses Claude Code, you can answer questions through the agent itself. The workflow:
 
 1. The agent detects you have pending questions (via `list_responders` or `check_breakpoint_status`).
 2. You review the question in your Claude Code session.
@@ -176,9 +153,9 @@ Understanding the question lifecycle helps you know when to act:
 
 | Status | Meaning |
 |--------|---------|
-| `pending` | Question submitted but not yet routed to specific experts. |
+| `pending` | Question submitted but not yet routed to specific responders. |
 | `routed` | Question has been routed to you (and possibly others). **This is when you should act.** |
-| `claimed` | An expert has claimed the question (indicates they are working on it). |
+| `claimed` | A responder has claimed the question (indicates they are working on it). |
 | `answered` | One or more answers have been submitted. |
 | `completed` | The asking agent has accepted an answer. No further action needed. |
 | `expired` | The question timed out without an answer. |
@@ -194,4 +171,4 @@ When you are unavailable (on leave, in meetings, etc.), update your profile:
 }
 ```
 
-The matcher will skip unavailable experts when routing questions. Remember to set it back to `true` when you return.
+The matcher will skip unavailable responders when routing questions. Remember to set it back to `true` when you return.

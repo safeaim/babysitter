@@ -104,39 +104,33 @@ Expected response:
 - **CORS enabled** -- All origins are allowed by default.
 - **Request logging** -- Every request is logged to stdout with timestamp, method, and URL.
 
-## Expert Profile Creation
+## Responder Profile Creation
 
 ### Directory structure
 
-Expert profiles are stored as JSON files in `.a5c/expert/`:
+Responder profiles are stored as JSON files in `.a5c/responder/`:
 
 ```
 .a5c/
-  expert/
+  responder/
     schema.json              # JSON Schema for profile validation
-    frontend-expert.json     # Example: frontend expert
-    backend-expert.json      # Example: backend expert
-    devops-expert.json       # Example: DevOps expert
+    frontend-responder.json  # Example: frontend responder
+    backend-responder.json   # Example: backend responder
+    devops-responder.json    # Example: DevOps responder
 ```
 
 ### Creating a new profile
 
-1. Choose an ID (lowercase slug, e.g., `security-expert`).
-2. Create `.a5c/expert/security-expert.json`:
+1. Choose an ID (lowercase slug, e.g., `security-responder`).
+2. Create `.a5c/responder/security-responder.json`:
 
 ```json
 {
-  "id": "security-expert",
+  "id": "security-responder",
   "name": "Sam Rivera",
   "title": "Application Security Engineer",
-  "expertiseAreas": [
-    {
-      "domain": "security",
-      "topics": ["OAuth 2.0", "JWT", "OWASP", "encryption", "penetration testing"],
-      "keywords": ["auth", "vulnerability", "CVE", "token", "certificate"],
-      "proficiency": 5
-    }
-  ],
+  "domains": ["security"],
+  "tags": ["oauth-2.0", "jwt", "owasp", "encryption", "penetration-testing"],
   "availability": true,
   "responseTimeSla": 1800000
 }
@@ -145,27 +139,28 @@ Expert profiles are stored as JSON files in `.a5c/expert/`:
 3. Verify the profile loads correctly:
 
 ```bash
-bmux responders show security-expert
+bmux responders show security-responder
 ```
 
 ### Profile schema reference
 
-The full JSON Schema is at `.a5c/expert/schema.json`. Required fields:
+The full JSON Schema is at `.a5c/responder/schema.json`. Required fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | string | Must match the filename (without `.json`). |
 | `name` | string | Display name. |
 | `title` | string | Professional title. |
-| `expertiseAreas` | array | At least one expertise area with `domain`, `topics`, `keywords`, and `proficiency` (1-5). |
-| `availability` | boolean | Whether the expert is currently accepting questions. |
+| `domains` | array | High-level responder domains. |
+| `tags` | array | Matching keywords, technologies, or specialties. |
+| `availability` | boolean | Whether the responder is currently accepting questions. |
 | `responseTimeSla` | number | Expected max response time in milliseconds. |
 
 Optional fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `sessionConfig` | object | Arbitrary key-value pairs (timezone, schedule, concurrency limits). |
+| `publicKeyFingerprint` | string | Optional fingerprint for provenance-aware responder flows. |
 
 ## Claude Code Plugin Installation
 
@@ -188,7 +183,7 @@ Add to your project's `.claude/mcp.json` (or equivalent):
 
 ### Option 2: With environment overrides
 
-If the server runs on a non-default URL or the expert directory is elsewhere:
+If the server runs on a non-default URL:
 
 ```json
 {
@@ -198,7 +193,6 @@ If the server runs on a non-default URL or the expert directory is elsewhere:
       "args": ["packages/mcp-tool/dist/index.js"],
       "env": {
         "BPX_SERVER_URL": "http://localhost:4000/api/v1",
-        "BPX_EXPERT_DIR": "/path/to/experts",
         "BPX_TIMEOUT_MS": "600000"
       }
     }
@@ -212,8 +206,8 @@ Once configured, Claude Code should expose four tools:
 
 | Tool | Description |
 |------|-------------|
-| `submit_breakpoint` | Route questions to domain experts and wait for answers. |
-| `list_responders` | List available experts and their expertise areas. |
+| `submit_breakpoint` | Route questions to domain responders and wait for answers. |
+| `list_responders` | List available responders and their declared domains and tags. |
 | `check_breakpoint_status` | Check status of a previously submitted question. |
 | `cancel_breakpoint` | Cancel a question that is no longer needed. |
 
@@ -227,8 +221,6 @@ All configuration can be set via environment variables. These are read by both t
 |----------|-------------|---------|
 | `BPX_SERVER_URL` | Base URL of the BMUX server (including `/api/v1` path) | `http://localhost:3847/api/v1` |
 | `SERVER_URL` | Alias for `BPX_SERVER_URL` | -- |
-| `BPX_EXPERT_DIR` | Path to the directory containing expert profile JSON files | `.a5c/expert` |
-| `EXPERT_DIR` | Alias for `BPX_EXPERT_DIR` | -- |
 | `BPX_TIMEOUT_MS` | Default timeout for waiting for answers, in milliseconds | `1800000` (30 minutes) |
 | `PORT` | Port the server listens on (server package only) | `3847` |
 
@@ -240,7 +232,7 @@ These apply to all `bmux` subcommands:
 |--------|-------------|---------|
 | `--server-url <url>` | Server URL (without `/api/v1` -- the CLI appends it) | `http://localhost:3847` |
 | `--json` | Output in JSON format for scripting | `false` |
-| `--expert-dir <path>` | Directory containing expert profiles | `.a5c/expert` |
+| `--responder-dir <path>` | Directory containing responder profiles | `.a5c/responder` |
 
 ### Constants
 

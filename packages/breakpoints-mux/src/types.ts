@@ -114,7 +114,7 @@ export const ResponderProfileSchema = z.object({
   availability: z.boolean(),
   responseTimeSla: z.number().positive(),
   publicKeyFingerprint: z.string().optional(),
-});
+}).strict();
 export type ResponderProfile = z.infer<typeof ResponderProfileSchema>;
 
 // ── BreakpointAnswer ─────────────────────────────────────────────────────

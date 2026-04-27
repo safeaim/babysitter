@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { ResponderProfile, BreakpointContext } from "../types.js";
 import { ResponderMatcher } from "../client/responder-matcher.js";
 
@@ -34,6 +36,11 @@ function makeContext(overrides: Partial<BreakpointContext> = {}): BreakpointCont
 // ────────────────────────────────────────────────────────────────────────────
 
 describe("ResponderMatcher", () => {
+  const packagedResponderDir = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "../../responder",
+  );
+
   // ── Constructor ──────────────────────────────────────────────────────────
 
   describe("constructor", () => {
@@ -69,6 +76,20 @@ describe("ResponderMatcher", () => {
 
       expect(returned).toHaveLength(1);
       expect(returned).not.toBe(responders); // Different reference
+    });
+  });
+
+  describe("loadResponders()", () => {
+    it("loads the packaged responder examples exactly as shipped", async () => {
+      const matcher = new ResponderMatcher(packagedResponderDir);
+
+      const responders = await matcher.loadResponders();
+
+      expect(responders.map((responder) => responder.id).sort()).toEqual([
+        "backend-responder",
+        "devops-responder",
+        "frontend-responder",
+      ]);
     });
   });
 

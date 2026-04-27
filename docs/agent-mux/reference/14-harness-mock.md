@@ -1,134 +1,145 @@
 # Harness Mock
 
-**Specification v1.0** | `@a5c-ai/agent-mux-harness-mock`
+Canonical package documentation lives in `packages/agent-mux/harness-mock/README.md`.
+This page is the repository reference mirror for `@a5c-ai/agent-mux-harness-mock`
+and should stay aligned with that README and the exported surface from
+`packages/agent-mux/harness-mock/src/index.ts`.
 
----
+## Package Location
 
-## 1. Purpose
+- Package path: `packages/agent-mux/harness-mock/`
+- NPM package: `@a5c-ai/agent-mux-harness-mock`
+- CLI binary: `mock-harness`
 
-`@a5c-ai/agent-mux-harness-mock` is a test-only package that simulates harness CLIs without requiring real binaries, API keys, or network. It provides:
+## CLI
 
-- A `MockProcess` that drives stdout/stderr/stdin and exit codes per scenario.
-- A `WorkspaceSandbox` isolated-filesystem helper for applying `FileOperation` sequences.
-- A catalog of adapter-faithful `HarnessScenario` fixtures for every supported subprocess harness profile: `claude`, `codex`, `gemini`, `copilot`, `cursor`, `opencode`, `pi`, `omp`, `openclaw`, `hermes`, `amp`, `droid`, and `qwen`.
-- A parser-backed subprocess matrix (`SUBPROCESS_SCENARIO_EXPECTATIONS`) that records which normalized `AgentEvent` types and exit codes each canonical scenario must produce through the real adapters.
-- A `probe` utility for recording a `HarnessBehaviorProfile` from a real harness invocation (used to keep scenarios honest).
+```bash
+mock-harness --list
+mock-harness --agent claude --list
+mock-harness --scenario claude:stream-json
+mock-harness --agent cursor --scenario error
+```
 
-Source: `packages/harness-mock/src/`.
+`--agent <name>` scopes `--list` to `<name>:*` scenarios and lets bare
+`--scenario` values resolve within that prefix. For example,
+`mock-harness --agent cursor --scenario error` resolves `cursor:error`.
 
-## 2. Public API
+## What It Exports
+
+The public entrypoint re-exports these surface areas:
+
+- subprocess simulation and registries from `mock-process`, `scenarios`, and `types`
+- workspace and probe helpers from `workspace` and `probe`
+- bindable transport mocks from `http-mock` and `websocket-mock`
+- SDK/remote mock factories and grouped registries from `mocks/index`
+
+The current must-know exports are:
+
+- `MockProcess`, `WorkspaceSandbox`
+- `AGENT_SCENARIOS`, `SUBPROCESS_HARNESS_PROFILES`, `SUBPROCESS_SCENARIO_EXPECTATIONS`
+- `resolveScenario`, `listScenarioNames`
+- `HttpServerMock`, `WebSocketServerMock`
+- `createProgrammaticMockBuilder`, `createRemoteMockBuilder`, `createScriptableTransportBuilder`
+- `ClaudeAgentSdkMock`, `CodexSdkMock`, `PiSdkMock`
+- `OpenCodeHttpMock`, `CodexWebSocketMock`
+- `AdapterMockFactory`, `adapterMocks`, `mockScenarios`
+- `probeHarness`, `probeAllHarnesses`, `compareProfiles`, `PROBE_CONFIGS`
+
+## Supported Harnesses And Transports
+
+### Subprocess harness profiles
+
+`SUBPROCESS_HARNESS_PROFILES` currently covers:
+
+- `claude`
+- `codex`
+- `gemini`
+- `copilot`
+- `cursor`
+- `opencode`
+- `pi`
+- `omp`
+- `openclaw`
+- `hermes`
+- `amp`
+- `droid`
+- `qwen`
+
+Each profile maps to canonical scenario names and parser-backed expectations in
+`SUBPROCESS_SCENARIO_EXPECTATIONS`.
+
+### Non-subprocess adapters
+
+The package also ships public fixtures for these adapter identities:
+
+- SDK/programmatic: `claude-agent-sdk`, `codex-sdk`, `pi-sdk`
+- HTTP transport: `opencode-http`
+- WebSocket transport: `codex-websocket`
+
+Execution shapes documented by the package are `subprocess`, `sdk`, `http`, and
+`websocket`.
+
+## Usage Patterns
+
+### Validate a subprocess parser path
 
 ```ts
 import {
-  MockProcess,
-  WorkspaceSandbox,
   AGENT_SCENARIOS,
-  SUBPROCESS_HARNESS_PROFILES,
+  MockProcess,
   SUBPROCESS_SCENARIO_EXPECTATIONS,
-  probeHarness,
-  probeAllHarnesses,
-  compareProfiles,
-  PROBE_CONFIGS,
 } from '@a5c-ai/agent-mux-harness-mock';
 
-import type {
-  HarnessType,
-  FileOperation,
-  ProcessBehavior,
-  OutputChunk,
-  StdinInteraction,
-  MockEvent,
-  HarnessScenario,
-  MockHarnessHandle,
-  HarnessBehaviorProfile,
-  WorkspaceOptions,
-  ProbeConfig,
-  ProbeResult,
-  ProfileDiff,
-} from '@a5c-ai/agent-mux-harness-mock';
+const scenario = AGENT_SCENARIOS['opencode:tool-call'];
+const proc = new MockProcess(scenario);
+
+proc.start();
+const result = await proc.waitForExit();
+
+console.log(result.exitCode);
+console.log(SUBPROCESS_SCENARIO_EXPECTATIONS['opencode:tool-call']);
 ```
 
-## 3. Core types
-
-- `HarnessType` — includes subprocess harnesses (`'claude-code' | 'codex' | 'gemini' | 'amp' | 'copilot' | 'cursor' | 'droid' | 'opencode' | 'pi' | 'omp' | 'openclaw' | 'hermes' | 'qwen'`) plus legacy / remote / SDK mock identities.
-- `HarnessScenario` — fully declarative spec including `output: OutputChunk[]`, `process`, optional `interactions`, optional `fileOperations`, and optional mock transport/runtime metadata.
-- `OutputChunk` — `{ stream: 'stdout' | 'stderr'; data: string; delayMs?: number }`.
-- `FileOperation` — `create | modify | delete | rename` with `path`, `content?`, and `newPath?` (for rename).
-- `HarnessBehaviorProfile` — capture of a real probe: startup timing, output stream format, exit codes seen.
-- `SUBPROCESS_HARNESS_PROFILES` — public registry of canonical subprocess harness profiles and their scenario names.
-- `SUBPROCESS_SCENARIO_EXPECTATIONS` — public registry of parser-backed expectations for each canonical subprocess scenario.
-
-## 4. `MockProcess`
-
-Instantiated from a scenario. Exposes a `ChildProcess`-compatible handle (stdout/stderr/stdin, exit code promise) that `spawn-runner.ts` can consume directly when the spawn function is overridden in tests.
-
-## 5. `WorkspaceSandbox`
-
-A temp-directory sandbox under `os.tmpdir()/amux-workspace-*`. Methods:
-
-- `writeFile(relativePath, content)`
-- `readFile(relativePath) -> string`
-- `exists(relativePath) -> boolean`
-- `list(relativePath?) -> string[]`
-- `applyOperations(ops: FileOperation[])` — executes `create`, `modify`, `delete`, `rename` in order.
-- `dispose()` — removes the sandbox. Post-dispose writes throw.
-
-## 6. Subprocess matrix
-
-The canonical subprocess registry now lives in `src/scenarios/per-agent.ts`.
-
-- Every supported subprocess harness profile has explicit named scenarios rather than anonymous count-based placeholders.
-- Canonical profiles cover the adapter parse paths that are actually implemented today.
-- For richer adapters, that includes session lifecycle, message stop, cost, and tool result envelopes.
-- For the lighter JSONL adapters (`cursor`, `pi`, `omp`, `openclaw`, `hermes`), the registry still includes session lifecycle and nonzero-exit process behavior in the mock output, while parser expectations stay limited to the event types their adapters currently normalize.
-- The `mock-harness` CLI can list the whole registry with `--list`, or scope both
-  `--list` and bare `--scenario` names to a single agent prefix with
-  `--agent <name>` (for example, `mock-harness --agent claude --scenario tool-call`
-  resolves `claude:tool-call`).
-
-Representative canonical scenarios:
-
-- `claude:stream-json`, `claude:tool-call`, `claude:error`
-- `codex:exec-turn`, `codex:code-generation`, `codex:error`
-- `cursor:session-text`, `cursor:tool-call`, `cursor:error`
-- `pi:session-text`, `pi:tool-call`, `pi:error`
-- `omp:session-text`, `omp:tool-call`, `omp:error`
-- `openclaw:session-text`, `openclaw:tool-call`, `openclaw:error`
-- `hermes:session-text`, `hermes:tool-call`, `hermes:error`
-
-Legacy aliases such as `cursor:basic-text` and `pi:basic-text` remain resolvable for compatibility, but new docs and tests should prefer the canonical names exported by `SUBPROCESS_HARNESS_PROFILES`.
-
-## 7. Probe tools
-
-- `probeHarness(config: ProbeConfig): Promise<ProbeResult>` — runs a real harness, captures stdout/stderr, timing, and exit code, and returns a `HarnessBehaviorProfile`.
-- `probeAllHarnesses(cfgs)` — batch form.
-- `compareProfiles(a, b): ProfileDiff` — structural diff between two profiles (for drift detection).
-- `PROBE_CONFIGS` — canonical configs for the built-in harnesses.
-
-Probes write `profile.json` + `result.json` into the configured output directory so they can be checked into tests or replayed offline.
-
-## 8. Usage pattern
+### Build SDK or transport fixtures
 
 ```ts
 import {
-  MockProcess,
-  WorkspaceSandbox,
-  AGENT_SCENARIOS,
-  SUBPROCESS_SCENARIO_EXPECTATIONS,
+  ClaudeAgentSdkMock,
+  OpenCodeHttpMock,
+  adapterMocks,
+  createProgrammaticMockBuilder,
+  createRemoteMockBuilder,
 } from '@a5c-ai/agent-mux-harness-mock';
 
-const sandbox = new WorkspaceSandbox();
-const proc = new MockProcess(AGENT_SCENARIOS['opencode:tool-call']);
+const presetSdk = ClaudeAgentSdkMock.basicSuccess();
+const presetRemote = OpenCodeHttpMock.basicSuccess();
 
-// Feed proc.stdout into the adapter's parseEvent to verify the event stream,
-// then apply the scenario's fileOperations into the sandbox to check that the
-// reported file changes match what the mock "wrote".
-const expectation = SUBPROCESS_SCENARIO_EXPECTATIONS['opencode:tool-call'];
-sandbox.applyOperations(AGENT_SCENARIOS['opencode:tool-call'].fileOperations ?? []);
-sandbox.dispose();
+const customSdk = createProgrammaticMockBuilder()
+  .name('custom-sdk')
+  .addTextStream('hello')
+  .build();
+
+const customRemote = createRemoteMockBuilder()
+  .name('custom-remote')
+  .addEvents([{ type: 'text_delta', data: { delta: 'hello' }, delayMs: 5 }])
+  .build();
+
+void presetSdk;
+void presetRemote;
+void customSdk;
+void customRemote;
+void adapterMocks;
 ```
 
-## 9. Not in scope
+### Bind a real local transport
 
-- The mock does not talk to a real LLM and does not synthesize new output — it replays the scripted `OutputChunk[]`.
-- It does not spawn a subprocess unless `probe*` is used; `MockProcess` is an in-process emitter.
+Use `HttpServerMock`, `WebSocketServerMock`, or the higher-level `MockServer`
+when a client under test needs to connect over the network rather than consume
+an in-process event emitter.
+
+## Limitations
+
+- `MockProcess` replays scripted output in-process. It does not execute a real harness binary.
+- `HttpServerMock`, `WebSocketServerMock`, and `MockServer` bind local ports and are heavier than pure fixture replay.
+- Probe helpers such as `probeHarness` and `probeAllHarnesses` execute real harness binaries and are intended for drift checks, not hermetic unit tests.
+- The package documents the current exported surface from `packages/agent-mux/harness-mock/`; older v1-era source-path references are obsolete.

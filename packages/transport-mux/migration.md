@@ -78,6 +78,9 @@ The cutover is not complete. Keep the assertions below true until it is.
 
 - legacy `amux-proxy` package/container surfaces are either kept as the clearer operational reference or explicitly marked historical.
 - operators are not asked to infer that the container, package, and launcher truth already converged here when they have not.
+- legacy ops endpoints are an explicit retained surface during convergence: `transport-mux` keeps `GET /metrics` and `GET /cache/stats` instead of silently dropping them at cutover.
+- until `transport-mux` owns a real response cache, `/cache/stats` must continue returning `{ "enabled": false }` explicitly so operators can distinguish "no cache implementation" from "missing endpoint".
+- `/metrics` must continue exposing local request/error/token counters. Engine-backed requests contribute normalized token usage; passthrough requests contribute request/error counts even when upstream token usage cannot be normalized.
 
 ## Historical references that remain
 
@@ -87,7 +90,7 @@ The cutover is not complete. Keep the assertions below true until it is.
 
 ## Done criteria
 
-Treat this migration item as complete only while the package stays private, the package docs and metadata remain aligned, missing packaged-artifact references stay removed or satisfied, and legacy references remain explicit.
+Treat this migration item as complete only while the package stays private, the package docs and metadata remain aligned, missing packaged-artifact references stay removed or satisfied, legacy references remain explicit, and the retained ops endpoints stay documented and covered by tests.
 
 ## Main risk
 

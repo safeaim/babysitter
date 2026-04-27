@@ -224,9 +224,18 @@ The server contract should continue to mount the following routes.
 
 - `GET /health`
 - `GET /v1/models`
+- `GET /metrics`
+- `GET /cache/stats`
 - `POST /v1/count_tokens`
 
 `GET /v1/models` is already expected by tests to expose the configured target model through an OpenAI-style `data` array where `data[0].id === targetModel`.
+
+`GET /metrics` and `GET /cache/stats` are retained as part of the cutover contract rather than silently dropped. The current JS runtime must preserve the legacy route shapes:
+
+- `/metrics` returns in-process request/error/token counters with the historical keys: `total_input_tokens`, `total_output_tokens`, `total_requests`, `total_errors`, `uptime_seconds`, and `avg_tokens_per_request`.
+- `/cache/stats` returns legacy cache visibility. Until `transport-mux` owns a real response cache, the route returns `{ "enabled": false }` explicitly instead of disappearing.
+- For engine-backed completions, `/metrics` records normalized usage from the completion result or terminal stream event.
+- For passthrough responses, `/metrics` still records successful request counts and error counts, but token totals remain `0` because upstream provider usage is not normalized at the proxy boundary today.
 
 ### Protocol routes
 
@@ -253,7 +262,7 @@ Owned by the protocol/server boundary:
 - `x-api-key` is accepted
 - `Authorization: Bearer ...` is accepted
 - missing or wrong token returns `401`
-- `/health` and `/v1/models` remain unauthenticated for startup/discovery checks
+- `/health`, `/v1/models`, `/metrics`, and `/cache/stats` remain unauthenticated for startup/discovery and operator checks
 
 ### Upstream provider auth
 

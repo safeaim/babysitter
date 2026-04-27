@@ -29,6 +29,42 @@ interface CompletionExecutionPlan {
   streamRequested: boolean;
 }
 
+class MetricsTracker {
+  private totalInputTokens = 0;
+  private totalOutputTokens = 0;
+  private totalRequests = 0;
+  private totalErrors = 0;
+  private readonly startedAt = Date.now();
+
+  record(inputTokens: number, outputTokens: number): void {
+    this.totalInputTokens += inputTokens;
+    this.totalOutputTokens += outputTokens;
+    this.totalRequests += 1;
+  }
+
+  recordRequest(): void {
+    this.totalRequests += 1;
+  }
+
+  recordError(): void {
+    this.totalErrors += 1;
+  }
+
+  toJSON() {
+    const uptimeSeconds = Math.max(0, (Date.now() - this.startedAt) / 1000);
+    return {
+      total_input_tokens: this.totalInputTokens,
+      total_output_tokens: this.totalOutputTokens,
+      total_requests: this.totalRequests,
+      total_errors: this.totalErrors,
+      uptime_seconds: Math.round(uptimeSeconds * 10) / 10,
+      avg_tokens_per_request: Math.round(
+        ((this.totalInputTokens + this.totalOutputTokens) / Math.max(this.totalRequests, 1)) * 10,
+      ) / 10,
+    };
+  }
+}
+
 function isAuthorized(req: Request, authToken?: string): boolean {
   if (!authToken) {
     return true;
@@ -619,11 +655,63 @@ function renderStreamResponse(
   }
 }
 
+function trackCompletionStream(
+  stream: AsyncIterable<CompletionStreamEvent>,
+  metrics: MetricsTracker,
+): AsyncIterable<CompletionStreamEvent> {
+  return {
+    async *[Symbol.asyncIterator]() {
+      let recorded = false;
+
+      try {
+        for await (const event of stream) {
+          if (event.type === 'done') {
+            if (event.usage) {
+              metrics.record(event.usage.promptTokens, event.usage.completionTokens);
+            } else {
+              metrics.recordRequest();
+            }
+            recorded = true;
+          }
+
+          yield event;
+        }
+
+        if (!recorded) {
+          metrics.recordRequest();
+        }
+      } catch (error) {
+        metrics.recordError();
+        throw error;
+      }
+    },
+  };
+}
+
+function trackCompletionOutcome(
+  result: CompletionResult | Response,
+  metrics: MetricsTracker,
+  options: { countSuccessResponse?: boolean } = {},
+): CompletionResult | Response {
+  if (result instanceof Response) {
+    if (result.status >= 400) {
+      metrics.recordError();
+    } else if (options.countSuccessResponse) {
+      metrics.recordRequest();
+    }
+    return result;
+  }
+
+  metrics.record(result.usage.promptTokens, result.usage.completionTokens);
+  return result;
+}
+
 async function resolveCompletion(
   req: Request,
   config: ProxyConfig,
   completionEngine: CompletionEngine | undefined,
   plan: CompletionExecutionPlan,
+  metrics: MetricsTracker,
   options: { forceStreaming?: boolean } = {},
 ): Promise<CompletionResult | Response> {
   if (plan.streamRequested) {
@@ -643,7 +731,11 @@ async function resolveCompletion(
       );
     }
 
-    return renderStreamResponse(config.exposedTransport, completionEngine.stream(plan.request), config);
+    return renderStreamResponse(
+      config.exposedTransport,
+      trackCompletionStream(completionEngine.stream(plan.request), metrics),
+      config,
+    );
   }
 
   if (!completionEngine) {
@@ -750,9 +842,20 @@ function countTokensPayload(body: Record<string, unknown>) {
 
 export function createTransportMuxApp({ config, completionEngine }: CreateTransportMuxAppOptions) {
   const app = new Hono();
+  const metrics = new MetricsTracker();
+
+  app.onError((error, c) => {
+    metrics.recordError();
+    return c.json({ error: { message: error instanceof Error ? error.message : String(error) } }, 500);
+  });
 
   app.use('*', async (c, next) => {
-    if (c.req.path === '/health' || c.req.path === '/v1/models') {
+    if (
+      c.req.path === '/health'
+      || c.req.path === '/v1/models'
+      || c.req.path === '/metrics'
+      || c.req.path === '/cache/stats'
+    ) {
       await next();
       return;
     }
@@ -773,6 +876,10 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
     }),
   );
 
+  app.get('/metrics', (c) => c.json(metrics.toJSON()));
+
+  app.get('/cache/stats', (c) => c.json({ enabled: false }));
+
   app.post('/v1/count_tokens', async (c) => {
     const body = await readJsonBody(c.req.raw);
     return c.json(countTokensPayload(body));
@@ -784,7 +891,11 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       return plan;
     }
     plan.request.model = config.targetModel;
-    const result = await resolveCompletion(c.req.raw, config, completionEngine, plan);
+    const result = trackCompletionOutcome(
+      await resolveCompletion(c.req.raw, config, completionEngine, plan, metrics),
+      metrics,
+      { countSuccessResponse: !plan.streamRequested || !completionEngine },
+    );
     if (result instanceof Response) {
       return result;
     }
@@ -797,7 +908,11 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       return plan;
     }
     plan.request.model = config.targetModel;
-    const result = await resolveCompletion(c.req.raw, config, completionEngine, plan);
+    const result = trackCompletionOutcome(
+      await resolveCompletion(c.req.raw, config, completionEngine, plan, metrics),
+      metrics,
+      { countSuccessResponse: !plan.streamRequested || !completionEngine },
+    );
     if (result instanceof Response) {
       return result;
     }
@@ -810,7 +925,11 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       return plan;
     }
     plan.request.model = config.targetModel;
-    const result = await resolveCompletion(c.req.raw, config, completionEngine, plan);
+    const result = trackCompletionOutcome(
+      await resolveCompletion(c.req.raw, config, completionEngine, plan, metrics),
+      metrics,
+      { countSuccessResponse: !plan.streamRequested || !completionEngine },
+    );
     if (result instanceof Response) {
       return result;
     }
@@ -824,7 +943,11 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       return plan;
     }
     plan.request.model = config.targetModel;
-    const result = await resolveCompletion(c.req.raw, config, completionEngine, plan, { forceStreaming });
+    const result = trackCompletionOutcome(
+      await resolveCompletion(c.req.raw, config, completionEngine, plan, metrics, { forceStreaming }),
+      metrics,
+      { countSuccessResponse: !plan.streamRequested || !completionEngine },
+    );
     if (result instanceof Response) {
       return result;
     }
@@ -837,7 +960,11 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       return plan;
     }
     plan.request.model = config.targetModel;
-    const result = await resolveCompletion(c.req.raw, config, completionEngine, plan);
+    const result = trackCompletionOutcome(
+      await resolveCompletion(c.req.raw, config, completionEngine, plan, metrics),
+      metrics,
+      { countSuccessResponse: !plan.streamRequested || !completionEngine },
+    );
     if (result instanceof Response) {
       return result;
     }
@@ -850,7 +977,11 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       return plan;
     }
     plan.request.model = config.targetModel;
-    const result = await resolveCompletion(c.req.raw, config, completionEngine, plan);
+    const result = trackCompletionOutcome(
+      await resolveCompletion(c.req.raw, config, completionEngine, plan, metrics),
+      metrics,
+      { countSuccessResponse: !plan.streamRequested || !completionEngine },
+    );
     if (result instanceof Response) {
       return result;
     }
@@ -863,7 +994,11 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       return plan;
     }
     plan.request.model = config.targetModel;
-    const result = await resolveCompletion(c.req.raw, config, completionEngine, plan);
+    const result = trackCompletionOutcome(
+      await resolveCompletion(c.req.raw, config, completionEngine, plan, metrics),
+      metrics,
+      { countSuccessResponse: !plan.streamRequested || !completionEngine },
+    );
     if (result instanceof Response) {
       return result;
     }
@@ -872,7 +1007,9 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
 
   app.all('/passthrough/*', async (c) => {
     const forwardedPath = c.req.path.replace(/^\/passthrough/, '') || '/';
-    return proxyUpstream(c.req.raw, config, forwardedPath);
+    return trackCompletionOutcome(await proxyUpstream(c.req.raw, config, forwardedPath), metrics, {
+      countSuccessResponse: true,
+    });
   });
 
   return app;

@@ -34,6 +34,20 @@ describe('transport-mux server', () => {
     expect(getRoutePaths(app)).toContain('/v1/models');
   });
 
+  it('mounts legacy ops endpoints', () => {
+    const app = createTransportMuxApp({
+      config: createProxyConfig({
+        targetProvider: 'openai',
+        targetModel: 'openai/gpt-4o',
+        exposedTransport: 'openai-chat',
+        authToken: 't',
+      }),
+    });
+
+    expect(getRoutePaths(app)).toContain('/metrics');
+    expect(getRoutePaths(app)).toContain('/cache/stats');
+  });
+
   it('mounts anthropic transport', () => {
     const app = createTransportMuxApp({
       config: createProxyConfig({
@@ -162,6 +176,122 @@ describe('transport-mux server', () => {
     await expect(response.json()).resolves.toEqual({
       input_tokens: 1,
       total_tokens: 1,
+    });
+  });
+
+  it('exposes unauthenticated legacy ops endpoint payloads', async () => {
+    const app = createTransportMuxApp({
+      config: createProxyConfig({
+        targetProvider: 'openai',
+        targetModel: 'openai/gpt-4o',
+        exposedTransport: 'anthropic',
+        authToken: 't',
+      }),
+    });
+
+    const metricsResponse = await app.request('/metrics');
+    const cacheResponse = await app.request('/cache/stats');
+
+    expect(metricsResponse.status).toBe(200);
+    await expect(metricsResponse.json()).resolves.toMatchObject({
+      total_input_tokens: 0,
+      total_output_tokens: 0,
+      total_requests: 0,
+      total_errors: 0,
+      avg_tokens_per_request: 0,
+    });
+
+    expect(cacheResponse.status).toBe(200);
+    await expect(cacheResponse.json()).resolves.toEqual({ enabled: false });
+  });
+
+  it('tracks usage in /metrics for engine-backed completions', async () => {
+    const app = createTransportMuxApp({
+      config: createProxyConfig({
+        targetProvider: 'openai',
+        targetModel: 'openai/gpt-4o',
+        exposedTransport: 'openai-chat',
+        authToken: 't',
+      }),
+      completionEngine: {
+        async complete() {
+          return {
+            id: 'cmpl_123',
+            model: 'openai/gpt-4o',
+            role: 'assistant',
+            text: 'hello',
+            finishReason: 'stop',
+            usage: {
+              promptTokens: 11,
+              completionTokens: 7,
+              totalTokens: 18,
+            },
+          };
+        },
+      },
+    });
+
+    const completionResponse = await app.request('/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': 't',
+      },
+      body: JSON.stringify({
+        model: 'ignored-by-server',
+        messages: [{ role: 'user', content: 'hello' }],
+      }),
+    });
+
+    expect(completionResponse.status).toBe(200);
+
+    const metricsResponse = await app.request('/metrics');
+    expect(metricsResponse.status).toBe(200);
+    await expect(metricsResponse.json()).resolves.toMatchObject({
+      total_input_tokens: 11,
+      total_output_tokens: 7,
+      total_requests: 1,
+      total_errors: 0,
+      avg_tokens_per_request: 18,
+    });
+  });
+
+  it('tracks completion failures in /metrics', async () => {
+    const app = createTransportMuxApp({
+      config: createProxyConfig({
+        targetProvider: 'openai',
+        targetModel: 'openai/gpt-4o',
+        exposedTransport: 'openai-chat',
+        authToken: 't',
+      }),
+      completionEngine: {
+        async complete() {
+          throw new Error('boom');
+        },
+      },
+    });
+
+    const completionResponse = await app.request('/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer t',
+      },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'hello' }],
+      }),
+    });
+
+    expect(completionResponse.status).toBe(500);
+
+    const metricsResponse = await app.request('/metrics');
+    expect(metricsResponse.status).toBe(200);
+    await expect(metricsResponse.json()).resolves.toMatchObject({
+      total_input_tokens: 0,
+      total_output_tokens: 0,
+      total_requests: 0,
+      total_errors: 1,
+      avg_tokens_per_request: 0,
     });
   });
 });

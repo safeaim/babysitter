@@ -79,6 +79,7 @@ The cutover is not complete. Keep the assertions below true until it is.
 - legacy `amux-proxy` package/container surfaces are either kept as the clearer operational reference or explicitly marked historical.
 - operators are not asked to infer that the container, package, and launcher truth already converged here when they have not.
 - legacy ops endpoints are an explicit retained surface during convergence: `transport-mux` keeps `GET /metrics` and `GET /cache/stats` instead of silently dropping them at cutover.
+- `POST /v1/count_tokens` is also an explicit convergence surface: it should use provider-backed counting and the `{ "count": number }` response contract instead of placeholder local heuristics.
 - until `transport-mux` owns a real response cache, `/cache/stats` must continue returning `{ "enabled": false }` explicitly so operators can distinguish "no cache implementation" from "missing endpoint".
 - `/metrics` must continue exposing local request/error/token counters. Engine-backed requests contribute normalized token usage; passthrough requests contribute request/error counts even when upstream token usage cannot be normalized.
 

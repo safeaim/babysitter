@@ -13,6 +13,7 @@ import type {
   CreateTransportMuxAppOptions,
   ProxyConfig,
   RunningProxyServer,
+  TokenCountResult,
 } from './types.js';
 
 const STREAMING_TRANSPORTS = new Set<ProxyConfig['exposedTransport']>([
@@ -157,6 +158,18 @@ async function readJsonBody(req: Request): Promise<Record<string, unknown>> {
     return body as Record<string, unknown>;
   } catch {
     return {};
+  }
+}
+
+async function readStrictJsonBody(req: Request): Promise<Record<string, unknown> | Response> {
+  try {
+    const body: unknown = await req.json();
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return createErrorResponse('Request body must be a JSON object.');
+    }
+    return body as Record<string, unknown>;
+  } catch {
+    return createErrorResponse('Request body must be valid JSON.');
   }
 }
 
@@ -831,13 +844,26 @@ function bedrockResponse(result: CompletionResult) {
   };
 }
 
-function countTokensPayload(body: Record<string, unknown>) {
-  const text = JSON.stringify(body);
-  const totalTokens = Math.max(1, Math.ceil(text.length / 4));
-  return {
-    input_tokens: totalTokens,
-    total_tokens: totalTokens,
-  };
+async function resolveTokenCount(
+  body: Record<string, unknown>,
+  config: ProxyConfig,
+  completionEngine: CompletionEngine | undefined,
+): Promise<TokenCountResult | Response> {
+  if (!completionEngine?.countTokens) {
+    return createErrorResponse(
+      `Token counting is not supported for provider ${config.targetProvider}.`,
+      501,
+    );
+  }
+
+  const request = buildCompletionRequest(body, config.exposedTransport, false);
+  request.model = config.targetModel;
+
+  try {
+    return await completionEngine.countTokens(request);
+  } catch (error) {
+    return createErrorResponse(error instanceof Error ? error.message : String(error));
+  }
 }
 
 export function createTransportMuxApp({ config, completionEngine }: CreateTransportMuxAppOptions) {
@@ -881,8 +907,17 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
   app.get('/cache/stats', (c) => c.json({ enabled: false }));
 
   app.post('/v1/count_tokens', async (c) => {
-    const body = await readJsonBody(c.req.raw);
-    return c.json(countTokensPayload(body));
+    const body = await readStrictJsonBody(c.req.raw);
+    if (body instanceof Response) {
+      return body;
+    }
+
+    const result = await resolveTokenCount(body, config, completionEngine);
+    if (result instanceof Response) {
+      return result;
+    }
+
+    return c.json(result);
   });
 
   app.post('/v1/messages', async (c) => {

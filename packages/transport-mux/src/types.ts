@@ -52,6 +52,10 @@ export interface CompletionResult {
   usage: CompletionUsage;
 }
 
+export interface TokenCountResult {
+  count: number;
+}
+
 export interface CompletionTextDeltaEvent {
   type: 'text-delta';
   text: string;
@@ -68,6 +72,7 @@ export type CompletionStreamEvent = CompletionTextDeltaEvent | CompletionDoneEve
 export interface CompletionEngine {
   complete(request: CompletionRequest): Promise<CompletionResult>;
   stream?(request: CompletionRequest): AsyncIterable<CompletionStreamEvent>;
+  countTokens?(request: CompletionRequest): Promise<TokenCountResult>;
 }
 
 export interface CreateTransportMuxAppOptions {

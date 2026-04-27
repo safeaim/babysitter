@@ -32,7 +32,7 @@ Historical references still exist under `packages/agent-mux/amux-proxy`, and tho
 
 ## Placeholder contract notes
 
-- `POST /v1/count_tokens` is intentionally a placeholder seam today: it returns a deterministic estimate from the serialized JSON request body (`ceil(JSON length / 4)`, minimum `1`) instead of provider-native token accounting.
+- `POST /v1/count_tokens` now delegates to provider-aware token counting through the runtime completion engine and returns `{ "count": number }`, matching the legacy `amux-proxy` cutover target instead of a local JSON-length heuristic. Invalid JSON and provider/request failures return explicit error responses, and providers without token-count support return `501`.
 - `GET /metrics` and `GET /cache/stats` are retained for cutover parity with the legacy proxy. `/metrics` exposes in-process request/error/token counters; `/cache/stats` returns `{ "enabled": false }` until this package owns a real cache implementation.
 - `/passthrough/*` is expected to strip only the `/passthrough` prefix, preserve the remaining path and query string, and fail with `501` when no completion engine or resolvable upstream `apiBase` exists.
 

@@ -230,6 +230,8 @@ The server contract should continue to mount the following routes.
 
 `GET /v1/models` is already expected by tests to expose the configured target model through an OpenAI-style `data` array where `data[0].id === targetModel`.
 
+`POST /v1/count_tokens` should delegate to the provider/runtime token-counting seam, not synthesize a JSON-length estimate in the protocol layer. The cutover contract is the legacy `amux-proxy` response shape `{ count }`. Invalid JSON and provider/request failures should surface as explicit error responses, and providers that do not implement token counting should return a clear unsupported response instead of a fabricated estimate.
+
 `GET /metrics` and `GET /cache/stats` are retained as part of the cutover contract rather than silently dropped. The current JS runtime must preserve the legacy route shapes:
 
 - `/metrics` returns in-process request/error/token counters with the historical keys: `total_input_tokens`, `total_output_tokens`, `total_requests`, `total_errors`, `uptime_seconds`, and `avg_tokens_per_request`.

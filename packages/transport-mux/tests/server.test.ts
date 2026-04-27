@@ -122,7 +122,8 @@ describe('transport-mux server', () => {
     expect(getRoutePaths(app)).toContain('/v1/count_tokens');
   });
 
-  it('returns placeholder count_tokens estimates from the serialized request body', async () => {
+  it('delegates /v1/count_tokens to provider-aware token counting and returns { count }', async () => {
+    const requests: Array<{ model: string; transport: string; messages: Array<{ role: string; content: string }> }> = [];
     const app = createTransportMuxApp({
       config: createProxyConfig({
         targetProvider: 'openai',
@@ -130,12 +131,24 @@ describe('transport-mux server', () => {
         exposedTransport: 'anthropic',
         authToken: 't',
       }),
+      completionEngine: {
+        async complete() {
+          throw new Error('not used');
+        },
+        async countTokens(request) {
+          requests.push({
+            model: request.model,
+            transport: request.transport,
+            messages: request.messages,
+          });
+          return { count: 17 };
+        },
+      },
     });
     const body = {
-      model: 'gpt-4o',
+      model: 'ignored-by-server',
       messages: [{ role: 'user', content: 'count these tokens' }],
     };
-    const expectedTokens = Math.max(1, Math.ceil(JSON.stringify(body).length / 4));
 
     const response = await app.request('/v1/count_tokens', {
       method: 'POST',
@@ -147,13 +160,50 @@ describe('transport-mux server', () => {
     });
 
     expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ count: 17 });
+    expect(requests).toEqual([
+      {
+        model: 'openai/gpt-4o',
+        transport: 'anthropic',
+        messages: [{ role: 'user', content: 'count these tokens' }],
+      },
+    ]);
+  });
+
+  it('returns 400 when /v1/count_tokens receives invalid json', async () => {
+    const app = createTransportMuxApp({
+      config: createProxyConfig({
+        targetProvider: 'openai',
+        targetModel: 'openai/gpt-4o',
+        exposedTransport: 'anthropic',
+        authToken: 't',
+      }),
+      completionEngine: {
+        async complete() {
+          throw new Error('not used');
+        },
+        async countTokens() {
+          throw new Error('not used');
+        },
+      },
+    });
+
+    const response = await app.request('/v1/count_tokens', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer t',
+      },
+      body: '{not-json',
+    });
+
+    expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({
-      input_tokens: expectedTokens,
-      total_tokens: expectedTokens,
+      error: { message: 'Request body must be valid JSON.' },
     });
   });
 
-  it('returns the minimum placeholder count_tokens payload when the request body is not valid json', async () => {
+  it('returns 501 when provider-backed token counting is unavailable', async () => {
     const app = createTransportMuxApp({
       config: createProxyConfig({
         targetProvider: 'openai',
@@ -167,15 +217,51 @@ describe('transport-mux server', () => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        authorization: 'Bearer t',
+        'x-api-key': 't',
       },
-      body: '{not-json',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'count these tokens' }],
+      }),
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(501);
     await expect(response.json()).resolves.toEqual({
-      input_tokens: 1,
-      total_tokens: 1,
+      error: { message: 'Token counting is not supported for provider openai.' },
+    });
+  });
+
+  it('returns 400 when provider-backed token counting fails', async () => {
+    const app = createTransportMuxApp({
+      config: createProxyConfig({
+        targetProvider: 'openai',
+        targetModel: 'openai/gpt-4o',
+        exposedTransport: 'anthropic',
+        authToken: 't',
+      }),
+      completionEngine: {
+        async complete() {
+          throw new Error('not used');
+        },
+        async countTokens() {
+          throw new Error('provider rejected token count request');
+        },
+      },
+    });
+
+    const response = await app.request('/v1/count_tokens', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer t',
+      },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'count these tokens' }],
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: { message: 'provider rejected token count request' },
     });
   });
 

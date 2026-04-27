@@ -1,6 +1,6 @@
 # Core Types, Client, and Package Identity
 
-**Specification v1.0** | `@a5c-ai/agent-mux`
+**Specification v1.0** | `@a5c-ai/agent-mux-core`
 
 ---
 
@@ -11,20 +11,25 @@
 | Field | Value |
 |---|---|
 | npm scope | `@a5c-ai` |
-| Core package | `@a5c-ai/agent-mux` |
+| Core runtime package | `@a5c-ai/agent-mux-core` |
+| Convenience meta-package | `@a5c-ai/agent-mux` |
 | CLI binary | `amux` |
 | Language | TypeScript, strict mode |
 | Runtime | Node.js 20.9.0 or later (first LTS release of v20) |
-| Module system | ESM (with CJS compatibility shim) |
+| Module system | ESM package (`"type": "module"`); `import`, `require`, and `default` export-map conditions all resolve to the same ESM build |
 | License | MIT |
+| Canonical package doc | `packages/agent-mux/core/README.md` |
+| Reference mirror | `docs/agent-mux/reference/01-core-types-and-client.md` |
 
 ### 1.2 Package Structure
 
-The project is split into four packages (scope Section 24). Consumers choose the granularity they need.
+The package family is split across several published packages in the babysitter
+monorepo. Consumers choose the granularity they need, but the current runtime
+dependency story must match the published package graph.
 
-| Package | Purpose | Dependencies |
+| Package | Purpose | Runtime dependencies |
 |---|---|---|
-| `@a5c-ai/agent-mux-core` | `AgentMuxClient`, `RunHandle`, all type definitions, stream engine | None (zero runtime deps beyond Node built-ins) |
+| `@a5c-ai/agent-mux-core` | `AgentMuxClient`, normalized events, type definitions, provider/hook/workspace helpers, and stream/runtime primitives | `@a5c-ai/agent-catalog`, `@a5c-ai/agent-mux-observability` |
 | `@a5c-ai/agent-mux-adapters` | All built-in adapter implementations (claude, codex, gemini, copilot, cursor, opencode, pi, omp, openclaw, hermes) | `@a5c-ai/agent-mux-core` |
 | `@a5c-ai/agent-mux-cli` | CLI binary (`amux`) | `@a5c-ai/agent-mux-core`, `@a5c-ai/agent-mux-adapters` |
 | `@a5c-ai/agent-mux` | Convenience meta-package: re-exports core + adapters + cli | All three above |
@@ -32,7 +37,10 @@ The project is split into four packages (scope Section 24). Consumers choose the
 ### 1.3 Installation
 
 ```bash
-# SDK only (no CLI)
+# Core runtime only
+npm install @a5c-ai/agent-mux-core
+
+# SDK/runtime with built-in adapters
 npm install @a5c-ai/agent-mux-core @a5c-ai/agent-mux-adapters
 
 # SDK + CLI (everything)
@@ -41,6 +49,25 @@ npm install @a5c-ai/agent-mux
 # Zero-install CLI via npx
 npx @a5c-ai/agent-mux
 ```
+
+Import the package as ESM:
+
+```typescript
+import { createClient } from '@a5c-ai/agent-mux-core';
+import { classifyTool } from '@a5c-ai/agent-mux-core/browser';
+import { buildKanbanProjectBoard } from '@a5c-ai/agent-mux-core/kanban';
+```
+
+There is no separate CommonJS build. CommonJS callers should use dynamic import
+(`await import('@a5c-ai/agent-mux-core')`) rather than assuming a CJS shim.
+
+The core package's two runtime dependencies are intentional parts of the current
+architecture:
+
+- `@a5c-ai/agent-catalog` supplies the harness image catalog plus host-detection
+  rules and metadata used by invocation and host helpers.
+- `@a5c-ai/agent-mux-observability` supplies the structured logging and telemetry
+  primitives used by the client, auth/session flows, and run-handle implementation.
 
 ### 1.4 Supported Agents
 

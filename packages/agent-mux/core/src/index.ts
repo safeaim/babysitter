@@ -1,8 +1,8 @@
 /**
  * @a5c-ai/agent-mux-core
  *
- * Core types, client, and stream engine for agent-mux.
- * Zero runtime dependencies beyond Node built-ins.
+ * Core runtime, types, and utilities for agent-mux.
+ * Runtime deps: @a5c-ai/agent-catalog and @a5c-ai/agent-mux-observability.
  */
 
 // Types

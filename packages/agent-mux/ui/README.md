@@ -54,8 +54,9 @@ Intended audience and boundary:
 ## Validation
 
 ```bash
-npm run build --workspace=@a5c-ai/agent-mux-ui
-npm run test --workspace=@a5c-ai/agent-mux-ui
+npm run build:realtime --workspace=@a5c-ai/agent-mux-ui
+npm run test:realtime --workspace=@a5c-ai/agent-mux-ui
+npm run verify:release --workspace=@a5c-ai/agent-mux-ui
 npm run verify:metadata
 npm pack --json --dry-run --workspace=@a5c-ai/agent-mux-ui
 ```

@@ -50,6 +50,18 @@ public enum ProtocolVersion: String, Codable {
   case v1 = "1"
 }
 
+public enum SessionStartFrameApprovalMode: String, Codable {
+  case yolo = "yolo"
+  case prompt = "prompt"
+  case deny = "deny"
+}
+
+public enum SessionMessageFrameApprovalMode: String, Codable {
+  case yolo = "yolo"
+  case prompt = "prompt"
+  case deny = "deny"
+}
+
 public enum HookDecisionFrameDecision: String, Codable {
   case allow = "allow"
   case deny = "deny"
@@ -106,6 +118,8 @@ public struct SessionStartFrame: Codable {
   public let agent: String
   public let prompt: String
   public let model: String?
+  public let attachments: [Attachment]?
+  public let approvalMode: SessionStartFrameApprovalMode?
   public let sessionId: String?
   public let runId: String?
 }
@@ -116,6 +130,8 @@ public struct SessionMessageFrame: Codable {
   public let prompt: String
   public let agent: String?
   public let model: String?
+  public let attachments: [Attachment]?
+  public let approvalMode: SessionMessageFrameApprovalMode?
 }
 
 public struct PingFrame: Codable {

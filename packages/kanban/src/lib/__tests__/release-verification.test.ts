@@ -17,9 +17,12 @@ const baseManifest = {
   },
   scripts: {
     build: 'npm run build --workspace=@a5c-ai/agent-catalog && npm run build --workspace=@a5c-ai/agent-mux-observability && npm run build --workspace=@a5c-ai/agent-mux-core && npm run build --workspace=@a5c-ai/agent-mux-ui && next build',
+    'build:realtime': 'npm run build && npm run build:cli',
     'build:cli':
       "node -e \"const esbuild=require('esbuild');const v=require('./package.json').version;esbuild.buildSync({entryPoints:['src/cli.ts'],bundle:true,platform:'node',target:'node18',outfile:'dist/cli.js',external:['next'],define:{'__CLI_VERSION__':JSON.stringify(v)}});esbuild.buildSync({entryPoints:['src/mcp/cli.ts'],bundle:true,platform:'node',target:'node18',outfile:'dist/mcp-server.js',banner:{js:'#!/usr/bin/env node'},external:['@a5c-ai/agent-mux-core','@a5c-ai/agent-mux-core/kanban'],define:{'__KANBAN_MCP_VERSION__':JSON.stringify(v)}})\"",
     prepublishOnly: 'npm run build && npm run build:cli && npm run verify:release',
+    'test:realtime':
+      'npm run build --workspace=@a5c-ai/agent-catalog && npm run build --workspace=@a5c-ai/agent-mux-observability && npm run build --workspace=@a5c-ai/agent-mux-core && npm run build --workspace=@a5c-ai/agent-mux-ui && vitest run "src/components/sessions/__tests__/session-observability-panel.test.tsx" "src/components/runs/__tests__/run-realtime-execution-panel.test.tsx" "src/app/runs/[runId]/__tests__/page.test.tsx" "src/lib/__tests__/release-verification.test.ts"',
     'test:dispatch-context-labels':
       'npm run build --workspace=@a5c-ai/agent-catalog && npm run build --workspace=@a5c-ai/agent-mux-observability && npm run build --workspace=@a5c-ai/agent-mux-core && vitest run src/lib/services/__tests__/dispatch-context-label-service.test.ts src/lib/services/__tests__/backlog-query-service.test.ts src/hooks/__tests__/use-backlog.test.ts src/app/settings/__tests__/page.test.tsx src/lib/__tests__/release-verification.test.ts',
   },
@@ -122,6 +125,24 @@ describe('verifyKanbanRelease', () => {
     });
   });
 
+  it('fails when build:realtime stops pairing the app build with build:cli', () => {
+    withPackageRoot((packageRoot) => {
+      expect(() =>
+        verifyKanbanRelease({
+          packageRoot,
+          manifest: {
+            ...baseManifest,
+            scripts: {
+              ...baseManifest.scripts,
+              'build:realtime': 'npm run build',
+            },
+          },
+          packEntries: basePackEntries,
+        })
+      ).toThrow(/build:realtime/);
+    });
+  });
+
   it('fails when build regresses to the monorepo-wide helper', () => {
     withPackageRoot((packageRoot) => {
       expect(() =>
@@ -215,6 +236,24 @@ describe('verifyKanbanRelease', () => {
           packEntries: basePackEntries,
         })
       ).toThrow(/test:dispatch-context-labels/);
+    });
+  });
+
+  it('fails when the package-local realtime verification suite is removed', () => {
+    withPackageRoot((packageRoot) => {
+      const manifest = {
+        ...baseManifest,
+        scripts: { ...baseManifest.scripts },
+      } as Record<string, unknown>;
+      delete (manifest.scripts as Record<string, string>)['test:realtime'];
+
+      expect(() =>
+        verifyKanbanRelease({
+          packageRoot,
+          manifest,
+          packEntries: basePackEntries,
+        })
+      ).toThrow(/test:realtime/);
     });
   });
 

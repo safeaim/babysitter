@@ -91,8 +91,20 @@ export function verifyKanbanRelease({ packageRoot, manifest, packEntries }) {
     'packages/kanban/package.json build:cli must build both the kanban CLI and the kanban MCP server binaries'
   );
   expect(
+    scripts['build:realtime'] === 'npm run build && npm run build:cli',
+    'packages/kanban/package.json build:realtime must build the realtime UI surface and its packaged CLI artifacts together'
+  );
+  expect(
     scripts.prepublishOnly === 'npm run build && npm run build:cli && npm run verify:release',
     'packages/kanban/package.json prepublishOnly must build the package and run verify:release'
+  );
+  expect(
+    typeof scripts['test:realtime'] === 'string' &&
+      scripts['test:realtime'].includes('session-observability-panel.test.tsx') &&
+      scripts['test:realtime'].includes('run-realtime-execution-panel.test.tsx') &&
+      scripts['test:realtime'].includes('src/app/runs/[runId]/__tests__/page.test.tsx') &&
+      scripts['test:realtime'].includes('release-verification.test.ts'),
+    'packages/kanban/package.json test:realtime must keep the session, run, and release-surface realtime verification suite together'
   );
   expect(
     typeof scripts['test:dispatch-context-labels'] === 'string' &&

@@ -7,13 +7,12 @@ import type { Attachment, WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core
 import type {
   AgentFlowLane,
   AgentFlowSegment,
-  AgentRecord,
-  HookRequestRecord,
   SessionFlowFileRecord,
   SessionFlowTimelineItem,
   SessionTranscriptNode,
-} from "@a5c-ai/agent-mux-ui";
-import { accumulateEventCost, buildSessionFlowModel } from "@a5c-ai/agent-mux-ui";
+} from "@a5c-ai/agent-mux-ui/session-flow";
+import { accumulateEventCost, buildSessionFlowModel, type HookRequestRecord } from "@a5c-ai/agent-mux-ui/session-flow";
+import type { AgentRecord } from "@a5c-ai/agent-mux-ui/gateway";
 import { AlertTriangle, Bot, FileImage, FileStack, Files, Hammer, LoaderCircle, MessagesSquare, PlayCircle, RefreshCw, ShieldCheck, Sparkles, WandSparkles } from "lucide-react";
 
 import { ProgressBar } from "@/components/shared/progress-bar";

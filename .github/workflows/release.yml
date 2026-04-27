@@ -102,6 +102,21 @@ jobs:
           set -euo pipefail
           npm run test:agent-mux 2>&1 | tee artifacts/logs/agent-mux-tests.log
 
+      - name: Build realtime flow surfaces
+        run: |
+          set -euo pipefail
+          npm run build:realtime-flow 2>&1 | tee artifacts/logs/realtime-flow-build.log
+
+      - name: Realtime flow tests
+        run: |
+          set -euo pipefail
+          npm run test:realtime-flow 2>&1 | tee artifacts/logs/realtime-flow-tests.log
+
+      - name: Realtime flow release verification
+        run: |
+          set -euo pipefail
+          npm run verify:realtime-flow-release 2>&1 | tee artifacts/logs/realtime-flow-release.log
+
       - name: Validate transport-mux runtime owner
         run: |
           set -euo pipefail
@@ -275,6 +290,7 @@ jobs:
           npm run build:kanban
           npm run build:cli --workspace=@a5c-ai/kanban
           npm run verify:release --workspace=@a5c-ai/kanban
+          npm run test:realtime --workspace=@a5c-ai/kanban
           npm run test:dispatch-context-labels --workspace=@a5c-ai/kanban
           npm run test:kanban
 
@@ -303,6 +319,21 @@ jobs:
         run: |
           set -euo pipefail
           npm run test:agent-mux
+
+      - name: Build realtime flow surfaces
+        run: |
+          set -euo pipefail
+          npm run build:realtime-flow
+
+      - name: Realtime flow tests
+        run: |
+          set -euo pipefail
+          npm run test:realtime-flow
+
+      - name: Realtime flow release verification
+        run: |
+          set -euo pipefail
+          npm run verify:realtime-flow-release
 
       - name: Build transport-mux runtime
         run: |

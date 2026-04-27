@@ -150,6 +150,7 @@ Use the existing release checks to confirm the documented surface still matches 
 ```bash
 npm run build --workspace=@a5c-ai/kanban
 npm run build:cli --workspace=@a5c-ai/kanban
+npm run test:realtime --workspace=@a5c-ai/kanban
 npm run verify:release --workspace=@a5c-ai/kanban
 npm run verify:metadata
 npm pack --json --dry-run --workspace=@a5c-ai/kanban

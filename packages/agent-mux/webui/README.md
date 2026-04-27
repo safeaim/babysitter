@@ -37,7 +37,10 @@ That view is implemented on top of the shared `@a5c-ai/agent-mux-ui/session-flow
 ## Validation
 
 ```bash
-npm run build --workspace=@a5c-ai/agent-mux-webui
+npm run build:realtime --workspace=@a5c-ai/agent-mux-webui
+npm run test --workspace=@a5c-ai/agent-mux-webui
+npm run test:realtime --workspace=@a5c-ai/agent-mux-webui
+npm run verify:release --workspace=@a5c-ai/agent-mux-webui
 npm run verify:metadata
 npm pack --json --dry-run --workspace=@a5c-ai/agent-mux-webui
 ```

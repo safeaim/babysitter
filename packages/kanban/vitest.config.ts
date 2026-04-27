@@ -16,6 +16,7 @@ const agentMuxCore = path.resolve(__dirname, '../agent-mux/core/src/index.ts');
 const agentMuxCoreKanban = path.resolve(__dirname, '../agent-mux/core/src/kanban.ts');
 const agentMuxObservability = path.resolve(__dirname, '../agent-mux/observability/src/index.ts');
 const agentMuxUiSessionFlow = path.resolve(__dirname, '../agent-mux/ui/src/session-flow.ts');
+const reactNativeShim = path.resolve(__dirname, '../../test-shims/react-native.ts');
 
 export default defineConfig({
   oxc: {
@@ -68,6 +69,8 @@ export default defineConfig({
       'react-dom': localReactDom,
       'react-dom/client': path.join(localReactDom, 'client'),
       'react-dom/test-utils': path.join(localReactDom, 'test-utils'),
+      'react-native': reactNativeShim,
+      'react-native$': reactNativeShim,
     },
   },
 });

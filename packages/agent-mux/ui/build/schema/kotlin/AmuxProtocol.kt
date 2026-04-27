@@ -12,6 +12,20 @@ enum class ProtocolVersion {
 }
 
 @Serializable
+enum class SessionStartFrameApprovalMode {
+  @SerialName("yolo") YOLO,
+  @SerialName("prompt") PROMPT,
+  @SerialName("deny") DENY
+}
+
+@Serializable
+enum class SessionMessageFrameApprovalMode {
+  @SerialName("yolo") YOLO,
+  @SerialName("prompt") PROMPT,
+  @SerialName("deny") DENY
+}
+
+@Serializable
 enum class HookDecisionFrameDecision {
   @SerialName("allow") ALLOW,
   @SerialName("deny") DENY
@@ -86,6 +100,8 @@ data class SessionStartFrame(
   val agent: String,
   val prompt: String,
   val model: String? = null,
+  val attachments: List<Attachment>? = null,
+  val approvalMode: SessionStartFrameApprovalMode? = null,
   val sessionId: String? = null,
   val runId: String? = null
 ) : ClientFrame
@@ -96,7 +112,9 @@ data class SessionMessageFrame(
   val sessionId: String,
   val prompt: String,
   val agent: String? = null,
-  val model: String? = null
+  val model: String? = null,
+  val attachments: List<Attachment>? = null,
+  val approvalMode: SessionMessageFrameApprovalMode? = null
 ) : ClientFrame
 
 @Serializable

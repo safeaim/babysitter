@@ -14,12 +14,22 @@ vi.mock("next/navigation", () => ({
   useParams: () => ({ sessionId: "session-1" }),
 }));
 
+vi.mock("@a5c-ai/agent-mux-ui/session-flow", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@a5c-ai/agent-mux-ui/session-flow")>();
+  return {
+    ...actual,
+    accumulateEventCost: () => ({ totalUsd: null, inputTokens: 0, outputTokens: 0, thinkingTokens: 0 }),
+  };
+});
+
 vi.mock("@a5c-ai/compendium", () => ({
   Button: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...props}>{children}</button>
   ),
   Textarea: (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => <textarea {...props} />,
 }));
+
+vi.mock("lucide-react", async (importOriginal) => await importOriginal());
 
 vi.mock("@/components/agent-mux/require-gateway-auth", () => ({
   RequireGatewayAuth: ({ children }: { children: unknown }) => <>{children}</>,

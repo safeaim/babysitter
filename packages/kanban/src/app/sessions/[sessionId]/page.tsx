@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import type { Attachment, WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
-import { accumulateEventCost } from "@a5c-ai/agent-mux-ui";
+import { accumulateEventCost } from "@a5c-ai/agent-mux-ui/session-flow";
 
 import { RequireGatewayAuth } from "@/components/agent-mux/require-gateway-auth";
 import { useGatewayFetch } from "@/components/agent-mux/gateway-provider";

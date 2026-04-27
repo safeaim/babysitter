@@ -220,7 +220,8 @@ function listModuleExports(mod: ModuleExports): string {
 
 function resolveSelfSdkPackageDir(): string {
   let currentDir = __dirname;
-  while (true) {
+  let reachedRoot = false;
+  while (!reachedRoot) {
     const packageJsonPath = path.join(currentDir, "package.json");
     try {
       const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8")) as { name?: string };
@@ -231,10 +232,10 @@ function resolveSelfSdkPackageDir(): string {
       // Keep walking upward.
     }
     const parentDir = path.dirname(currentDir);
-    if (parentDir === currentDir) {
-      break;
+    reachedRoot = parentDir === currentDir;
+    if (!reachedRoot) {
+      currentDir = parentDir;
     }
-    currentDir = parentDir;
   }
   throw new Error("Unable to resolve the current @a5c-ai/babysitter-sdk package root");
 }

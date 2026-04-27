@@ -4,6 +4,7 @@ import { projectRunFlow } from './projector.js';
 import type {
   AgentFlowLane,
   SessionFlowEventBuffer,
+  SessionFlowFileRecord,
   SessionFlowModel,
   SessionFlowRunInput,
   SessionFlowTimelineItem,
@@ -23,6 +24,59 @@ export function buildAgentFlowLanes(
   eventBuffers: Record<string, SessionFlowEventBuffer>,
 ): AgentFlowLane[] {
   return buildSessionFlowModel(runs, eventBuffers).lanes;
+}
+
+export function buildSessionTimelineFromTranscript(
+  transcript: SessionTranscriptNode[],
+): SessionFlowTimelineItem[] {
+  return transcript.map((node) => ({
+    id: `${node.id}:timeline`,
+    runId: node.runId,
+    laneKey: node.runId,
+    kind: node.kind,
+    title: node.label,
+    detail: node.text,
+    timestamp: node.timestamp,
+    status: node.status ?? 'complete',
+    filePaths: node.filePaths,
+  }));
+}
+
+export function buildSessionFilesFromTranscript(
+  transcript: SessionTranscriptNode[],
+): SessionFlowFileRecord[] {
+  const files = new Map<string, SessionFlowFileRecord>();
+  for (const node of transcript) {
+    for (const path of node.filePaths) {
+      const existing = files.get(path) ?? {
+        path,
+        reads: 0,
+        writes: 0,
+        touches: 0,
+        lastEventAt: null,
+        runIds: [],
+        tools: [],
+      };
+      existing.touches += 1;
+      if (!existing.runIds.includes(node.runId)) {
+        existing.runIds.push(node.runId);
+      }
+      if (node.kind === 'tool' && !existing.tools.includes(node.label)) {
+        existing.tools.push(node.label);
+      }
+      if (typeof node.timestamp === 'number') {
+        existing.lastEventAt = Math.max(existing.lastEventAt ?? 0, node.timestamp) || null;
+      }
+      files.set(path, existing);
+    }
+  }
+
+  return Array.from(files.values()).sort((left, right) => {
+    if (left.touches !== right.touches) {
+      return right.touches - left.touches;
+    }
+    return (right.lastEventAt ?? 0) - (left.lastEventAt ?? 0);
+  });
 }
 
 export function buildSessionFlowModel(

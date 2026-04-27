@@ -1,7 +1,13 @@
 export { adaptSessionFlowEvent, adaptSessionFlowEvents, adaptSessionFlowRun } from './session-flow/adapters.js';
 export { accumulateEventCost } from './session-flow/cost.js';
 export { buildNativeAgentFlowLane, buildNativeTranscript } from './session-flow/native.js';
-export { buildAgentFlowLanes, buildSessionFlowModel, buildSessionTranscript } from './session-flow/model.js';
+export {
+  buildAgentFlowLanes,
+  buildSessionFilesFromTranscript,
+  buildSessionFlowModel,
+  buildSessionTimelineFromTranscript,
+  buildSessionTranscript,
+} from './session-flow/model.js';
 export { projectRunFlow } from './session-flow/projector.js';
 
 export type {

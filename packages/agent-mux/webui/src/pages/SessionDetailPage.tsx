@@ -3,19 +3,20 @@ import { useParams, useSearchParams } from 'react-router-dom-v6';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { useGateway } from '@a5c-ai/agent-mux-ui';
-import type { WorkspaceRuntimeSurface } from '@a5c-ai/agent-mux-core';
-import { Button, Field, Tabs, Textarea, type TabItem } from '@a5c-ai/compendium';
-
-import { useGatewayFetch } from '../providers/GatewayProvider.js';
 import {
   accumulateEventCost,
   buildNativeAgentFlowLane,
   buildNativeTranscript,
+  buildSessionFilesFromTranscript,
   buildSessionFlowModel,
+  buildSessionTimelineFromTranscript,
   type NativeSessionMessage,
   type SessionCost,
-  type SessionTranscriptNode,
-} from './SessionDetailFlow.js';
+} from '@a5c-ai/agent-mux-ui/session-flow';
+import type { WorkspaceRuntimeSurface } from '@a5c-ai/agent-mux-core';
+import { Button, Field, Tabs, Textarea, type TabItem } from '@a5c-ai/compendium';
+
+import { useGatewayFetch } from '../providers/GatewayProvider.js';
 
 type SessionControlPlane = 'self-managed' | 'external-host' | 'mcp-mediated';
 type AgentFlowViewMode = 'transcript' | 'agent-flow' | 'timeline' | 'files';
@@ -102,46 +103,6 @@ function formatControlPlane(controlPlane: SessionControlPlane): string {
     default:
       return 'agent-mux managed';
   }
-}
-
-function buildTimelineFromTranscript(transcript: SessionTranscriptNode[]) {
-  return transcript.map((node) => ({
-    id: `${node.id}:timeline`,
-    runId: node.runId,
-    laneKey: node.runId,
-    kind:
-      node.kind === 'tool' || node.kind === 'system' || node.kind === 'branch' || node.kind === 'error'
-        ? node.kind
-        : node.kind,
-    title: node.label,
-    detail: node.text,
-    timestamp: node.timestamp,
-    status: node.status ?? 'complete',
-    filePaths: node.filePaths,
-  }));
-}
-
-function buildFilesFromTranscript(transcript: SessionTranscriptNode[]) {
-  const files = new Map<string, { path: string; touches: number; runIds: Set<string> }>();
-  for (const node of transcript) {
-    for (const path of node.filePaths) {
-      const record = files.get(path) ?? { path, touches: 0, runIds: new Set<string>() };
-      record.touches += 1;
-      record.runIds.add(node.runId);
-      files.set(path, record);
-    }
-  }
-  return Array.from(files.values())
-    .sort((left, right) => right.touches - left.touches)
-    .map((record) => ({
-      path: record.path,
-      reads: record.touches,
-      writes: 0,
-      touches: record.touches,
-      lastEventAt: null,
-      runIds: Array.from(record.runIds),
-      tools: [],
-    }));
 }
 
 function resolveInitialView(searchParams: URLSearchParams): AgentFlowViewMode {
@@ -385,8 +346,10 @@ export function SessionDetailPage(): JSX.Element {
     status === 'active'
       ? (eventFlowModel.transcript.length > 0 ? eventFlowModel.transcript : nativeTranscript)
       : (nativeTranscript.length > 0 ? nativeTranscript : eventFlowModel.transcript);
-  const timeline = eventFlowModel.timeline.length > 0 ? eventFlowModel.timeline : buildTimelineFromTranscript(transcript);
-  const files = eventFlowModel.files.length > 0 ? eventFlowModel.files : buildFilesFromTranscript(transcript);
+  const timeline =
+    eventFlowModel.timeline.length > 0 ? eventFlowModel.timeline : buildSessionTimelineFromTranscript(transcript);
+  const files =
+    eventFlowModel.files.length > 0 ? eventFlowModel.files : buildSessionFilesFromTranscript(transcript);
   const eventCost = useMemo(
     () => accumulateEventCost(runs.map((run) => String(run.runId ?? '')), eventBuffers),
     [eventBuffers, runs],

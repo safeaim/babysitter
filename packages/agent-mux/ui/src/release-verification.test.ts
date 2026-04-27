@@ -20,6 +20,7 @@ const baseManifest = {
   },
   scripts: {
     'build:realtime': 'npm run build --workspace=@a5c-ai/agent-catalog && npm run build --workspace=@a5c-ai/agent-mux-core && npm run build',
+    test: 'vitest run --root ../../.. --config vitest.config.ts packages/agent-mux/ui',
     'test:realtime':
       'vitest run --root ../../.. --config vitest.config.ts "packages/agent-mux/ui/src/session-flow*.test.ts" "packages/agent-mux/ui/src/screens/SessionDetailScreen.test.tsx" "packages/agent-mux/ui/src/release-verification.test.ts"',
     'verify:release': 'node ./scripts/verify-release.mjs',
@@ -98,6 +99,24 @@ describe('verifyAgentMuxUiRelease', () => {
           packEntries: basePackEntries,
         })
       ).toThrow(/test:realtime/);
+    });
+  });
+
+  it('fails when the package-local test script stops targeting the ui package', () => {
+    withPackageRoot((packageRoot) => {
+      expect(() =>
+        verifyAgentMuxUiRelease({
+          packageRoot,
+          manifest: {
+            ...baseManifest,
+            scripts: {
+              ...baseManifest.scripts,
+              test: 'vitest run --root ../../.. --config vitest.config.ts "packages/agent-mux/ui/src/**/*.test.ts"',
+            },
+          },
+          packEntries: basePackEntries,
+        })
+      ).toThrow(/package-local Vitest filter/);
     });
   });
 

@@ -6,6 +6,8 @@ export { selectVisibleEventNodes, selectPendingHookRequests, selectCostTotals } 
 export {
   buildSessionTranscript,
   buildAgentFlowLanes,
+  buildSessionTimelineFromTranscript,
+  buildSessionFilesFromTranscript,
   buildSessionFlowModel,
   buildNativeTranscript,
   buildNativeAgentFlowLane,

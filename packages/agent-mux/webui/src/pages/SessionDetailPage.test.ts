@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildAgentFlowLanes, buildNativeAgentFlowLane } from './SessionDetailFlow.js';
+import { buildAgentFlowLanes, buildNativeAgentFlowLane } from '@a5c-ai/agent-mux-ui/session-flow';
 
 describe('buildAgentFlowLanes', () => {
   it('groups streamed transcript and tool events into flow segments', () => {

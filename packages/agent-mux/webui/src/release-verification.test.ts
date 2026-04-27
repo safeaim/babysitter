@@ -12,7 +12,7 @@ const baseManifest = {
   },
   scripts: {
     'build:realtime': 'npm run build --workspace=@a5c-ai/agent-catalog && npm run build --workspace=@a5c-ai/agent-mux-core && npm run build --workspace=@a5c-ai/agent-mux-ui && npm run build',
-    test: 'vitest run --root ../../.. --config vitest.config.ts "packages/agent-mux/webui/src/**/*.test.ts" "packages/agent-mux/webui/src/**/*.test.tsx" "packages/agent-mux/webui/tests/**/*.test.ts" "packages/agent-mux/webui/tests/**/*.test.tsx"',
+    test: 'vitest run --root ../../.. --config vitest.config.ts packages/agent-mux/webui',
     'test:realtime':
       'vitest run --root ../../.. --config vitest.config.ts "packages/agent-mux/webui/src/pages/SessionDetailPage.test.ts" "packages/agent-mux/webui/src/pages/SessionDetailPage.route.test.tsx" "packages/agent-mux/webui/src/release-verification.test.ts"',
     'verify:release': 'node ./scripts/verify-release.mjs',
@@ -77,7 +77,25 @@ describe('verifyAgentMuxWebuiRelease', () => {
           manifest,
           packEntries: basePackEntries,
         })
-      ).toThrow(/test script/);
+      ).toThrow(/package-local Vitest filter/);
+    });
+  });
+
+  it('fails when the package-local test script stops targeting the webui package', () => {
+    withPackageRoot((packageRoot) => {
+      expect(() =>
+        verifyAgentMuxWebuiRelease({
+          packageRoot,
+          manifest: {
+            ...baseManifest,
+            scripts: {
+              ...baseManifest.scripts,
+              test: 'vitest run --root ../../.. --config vitest.config.ts "packages/agent-mux/webui/src/**/*.test.ts"',
+            },
+          },
+          packEntries: basePackEntries,
+        })
+      ).toThrow(/package-local Vitest filter/);
     });
   });
 

@@ -34,6 +34,14 @@ The packaged app now includes a session-detail realtime view that reconstructs e
 
 That view is implemented on top of the shared `@a5c-ai/agent-mux-ui/session-flow` export, but this package itself remains an application bundle rather than a reusable API package.
 
+This package is also the consumer-validation surface for the shared realtime session-flow API. Its session-detail code is expected to import the public `@a5c-ai/agent-mux-ui/session-flow` seam directly rather than rely on package-local shims.
+
+Setup boundary:
+
+- `@a5c-ai/agent-mux-ui` provides the shared client, hooks, and session-flow primitives.
+- `@a5c-ai/agent-mux-webui` owns browser routing, app layout, browser-only deep links, and CSS.
+- Browser styling remains app-local here; the app imports `@a5c-ai/compendium/css` plus its own `src/styles/global.css`.
+
 ## Validation
 
 ```bash

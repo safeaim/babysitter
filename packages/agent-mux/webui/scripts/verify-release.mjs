@@ -50,8 +50,8 @@ export function verifyAgentMuxWebuiRelease({ packageRoot, manifest, packEntries 
     'packages/agent-mux/webui/package.json build:realtime must remain the package-local realtime build entrypoint'
   );
   expect(
-    typeof scripts.test === 'string',
-    'packages/agent-mux/webui/package.json must define a direct package-local test script'
+    scripts.test === 'vitest run --root ../../.. --config vitest.config.ts packages/agent-mux/webui',
+    'packages/agent-mux/webui/package.json test must keep the package-local Vitest filter stable'
   );
   expect(
     typeof scripts['test:realtime'] === 'string' &&

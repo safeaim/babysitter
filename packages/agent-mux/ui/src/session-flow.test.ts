@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildSessionFlowModel } from './session-flow.js';
+import {
+  buildSessionFilesFromTranscript,
+  buildSessionFlowModel,
+  buildSessionTimelineFromTranscript,
+} from './session-flow.js';
 
 describe('buildSessionFlowModel', () => {
   it('projects lanes, transcript, timeline, and file attention from live events', () => {
@@ -80,5 +84,71 @@ describe('buildSessionFlowModel', () => {
       status: 'running',
       title: 'Write',
     });
+  });
+});
+
+describe('transcript-derived fallback helpers', () => {
+  it('projects a timeline directly from transcript nodes', () => {
+    const timeline = buildSessionTimelineFromTranscript([
+      {
+        id: 'node-1',
+        kind: 'tool',
+        label: 'Write',
+        text: 'Updated src/app.tsx',
+        runId: 'run-1',
+        timestamp: 1_000,
+        status: 'running',
+        filePaths: ['src/app.tsx'],
+      },
+    ]);
+
+    expect(timeline).toEqual([
+      {
+        id: 'node-1:timeline',
+        kind: 'tool',
+        title: 'Write',
+        detail: 'Updated src/app.tsx',
+        runId: 'run-1',
+        laneKey: 'run-1',
+        timestamp: 1_000,
+        status: 'running',
+        filePaths: ['src/app.tsx'],
+      },
+    ]);
+  });
+
+  it('derives file attention from transcript nodes without consumer-local helpers', () => {
+    const files = buildSessionFilesFromTranscript([
+      {
+        id: 'node-1',
+        kind: 'tool',
+        label: 'Read',
+        text: 'Looked at src/app.tsx',
+        runId: 'run-1',
+        timestamp: 100,
+        filePaths: ['src/app.tsx'],
+      },
+      {
+        id: 'node-2',
+        kind: 'tool',
+        label: 'Write',
+        text: 'Patched src/app.tsx',
+        runId: 'run-2',
+        timestamp: 200,
+        filePaths: ['src/app.tsx'],
+      },
+    ]);
+
+    expect(files).toEqual([
+      {
+        path: 'src/app.tsx',
+        reads: 0,
+        writes: 0,
+        touches: 2,
+        lastEventAt: 200,
+        runIds: ['run-1', 'run-2'],
+        tools: ['Read', 'Write'],
+      },
+    ]);
   });
 });

@@ -50,6 +50,10 @@ export function verifyAgentMuxUiRelease({ packageRoot, manifest, packEntries }) 
     'packages/agent-mux/ui/package.json build:realtime must remain a package-local realtime build entrypoint'
   );
   expect(
+    scripts.test === 'vitest run --root ../../.. --config vitest.config.ts packages/agent-mux/ui',
+    'packages/agent-mux/ui/package.json test must keep the package-local Vitest filter stable'
+  );
+  expect(
     typeof scripts['test:realtime'] === 'string' &&
       scripts['test:realtime'].includes('packages/agent-mux/ui/src/session-flow*.test.ts') &&
       scripts['test:realtime'].includes('packages/agent-mux/ui/src/screens/SessionDetailScreen.test.tsx') &&

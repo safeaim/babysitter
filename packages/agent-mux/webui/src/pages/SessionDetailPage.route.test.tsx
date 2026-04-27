@@ -12,6 +12,8 @@ const mockFetchGateway = vi.fn();
 const mockBuildSessionFlowModel = vi.fn();
 const mockBuildNativeTranscript = vi.fn();
 const mockBuildNativeAgentFlowLane = vi.fn();
+const mockBuildSessionTimelineFromTranscript = vi.fn();
+const mockBuildSessionFilesFromTranscript = vi.fn();
 const mockAccumulateEventCost = vi.fn();
 
 vi.mock('react-router-dom-v6', () => ({
@@ -27,10 +29,12 @@ vi.mock('../providers/GatewayProvider.js', () => ({
   useGatewayFetch: () => mockFetchGateway,
 }));
 
-vi.mock('./SessionDetailFlow.js', () => ({
+vi.mock('@a5c-ai/agent-mux-ui/session-flow', () => ({
   buildSessionFlowModel: (...args: unknown[]) => mockBuildSessionFlowModel(...args),
   buildNativeTranscript: (...args: unknown[]) => mockBuildNativeTranscript(...args),
   buildNativeAgentFlowLane: (...args: unknown[]) => mockBuildNativeAgentFlowLane(...args),
+  buildSessionTimelineFromTranscript: (...args: unknown[]) => mockBuildSessionTimelineFromTranscript(...args),
+  buildSessionFilesFromTranscript: (...args: unknown[]) => mockBuildSessionFilesFromTranscript(...args),
   accumulateEventCost: (...args: unknown[]) => mockAccumulateEventCost(...args),
 }));
 
@@ -144,6 +148,8 @@ describe('SessionDetailPage realtime routing', () => {
     mockBuildSessionFlowModel.mockReset();
     mockBuildNativeTranscript.mockReset();
     mockBuildNativeAgentFlowLane.mockReset();
+    mockBuildSessionTimelineFromTranscript.mockReset();
+    mockBuildSessionFilesFromTranscript.mockReset();
     mockAccumulateEventCost.mockReset();
     mockAccumulateEventCost.mockReturnValue({ totalUsd: 0.25, inputTokens: 10, outputTokens: 5 });
   });
@@ -190,6 +196,30 @@ describe('SessionDetailPage realtime routing', () => {
         timestamp: 1_100,
         status: 'running',
         filePaths: ['src/native.ts'],
+      },
+    ]);
+    mockBuildSessionTimelineFromTranscript.mockReturnValue([
+      {
+        id: 'native-transcript-1:timeline',
+        runId: 'run-1',
+        laneKey: 'run-1',
+        kind: 'tool',
+        title: 'Write',
+        detail: 'Native tool still running',
+        timestamp: 1_100,
+        status: 'running',
+        filePaths: ['src/native.ts'],
+      },
+    ]);
+    mockBuildSessionFilesFromTranscript.mockReturnValue([
+      {
+        path: 'src/native.ts',
+        reads: 0,
+        writes: 0,
+        touches: 1,
+        lastEventAt: 1_100,
+        runIds: ['run-1'],
+        tools: ['Write'],
       },
     ]);
     mockBuildNativeAgentFlowLane.mockReturnValue({
@@ -324,6 +354,30 @@ describe('SessionDetailPage realtime routing', () => {
         filePaths: ['src/native.ts'],
       },
     ]);
+    mockBuildSessionTimelineFromTranscript.mockReturnValue([
+      {
+        id: 'native-transcript-1:timeline',
+        runId: 'run-1',
+        laneKey: 'run-1',
+        kind: 'assistant',
+        title: 'Assistant',
+        detail: 'Native fallback should stay hidden',
+        timestamp: 1_200,
+        status: 'complete',
+        filePaths: ['src/native.ts'],
+      },
+    ]);
+    mockBuildSessionFilesFromTranscript.mockReturnValue([
+      {
+        path: 'src/native.ts',
+        reads: 0,
+        writes: 0,
+        touches: 1,
+        lastEventAt: 1_200,
+        runIds: ['run-1'],
+        tools: [],
+      },
+    ]);
     mockBuildNativeAgentFlowLane.mockReturnValue({
       runId: 'run-1',
       laneKey: 'run-1',
@@ -367,6 +421,8 @@ describe('SessionDetailPage realtime routing', () => {
         mockFetchGateway.mock.calls.some(([path]) => String(path).endsWith('/full')),
       ).toBe(false);
     });
+    expect(mockBuildSessionTimelineFromTranscript).not.toHaveBeenCalled();
+    expect(mockBuildSessionFilesFromTranscript).not.toHaveBeenCalled();
   });
 
   it('renders actionable deep links for realtime flow, transcript, timeline, and files', async () => {

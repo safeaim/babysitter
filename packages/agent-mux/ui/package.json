@@ -65,10 +65,11 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run codegen && tsc --build && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
+    "build": "npm run clean && npm run codegen && tsc --build && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
     "build:realtime": "npm run build --workspace=@a5c-ai/agent-catalog && npm run build --workspace=@a5c-ai/agent-mux-core && npm run build",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
     "codegen": "tsx src/codegen/swift-types.ts && tsx src/codegen/kotlin-types.ts",
-    "test": "vitest run --root ../../.. --config vitest.config.ts \"packages/agent-mux/ui/tests/**/*.test.ts\" \"packages/agent-mux/ui/tests/**/*.test.tsx\" \"packages/agent-mux/ui/src/**/*.test.ts\" \"packages/agent-mux/ui/src/**/*.test.tsx\"",
+    "test": "vitest run --root ../../.. --config vitest.config.ts packages/agent-mux/ui",
     "test:realtime": "vitest run --root ../../.. --config vitest.config.ts \"packages/agent-mux/ui/src/session-flow*.test.ts\" \"packages/agent-mux/ui/src/screens/SessionDetailScreen.test.tsx\" \"packages/agent-mux/ui/src/release-verification.test.ts\"",
     "verify:release": "node ./scripts/verify-release.mjs",
     "prepublishOnly": "npm run build:realtime && npm run test:realtime && npm run verify:release"

@@ -327,6 +327,32 @@ describe('kanban-view', () => {
     expect(calls).toContainEqual({ type: 'view:switch', id: 'session-detail' });
   });
 
+  it('opens the linked workspace view from the selected issue', async () => {
+    const View = extractView();
+    const controlPlane = {
+      loadOverview: vi.fn(async () => makeOverview()),
+      listWorkspaces: vi.fn(async () => makeInventory()),
+    } as never;
+    const client = {
+      adapters: { list: () => [] },
+      sessions: { list: vi.fn(async () => []) },
+    } as never;
+    const stream = new EventStream();
+    const emit = vi.fn();
+    const { stdin, rerender } = render(
+      <View client={client} kanban={controlPlane} active={true} eventStream={stream} emit={emit} />,
+    );
+    await flush();
+    rerender(<View client={client} kanban={controlPlane} active={true} eventStream={stream} emit={emit} />);
+    stdin.write('w');
+    await flush();
+    expect(emit.mock.calls.map((call) => call[0])).toContainEqual({
+      type: 'workspace:select',
+      workspacePath: '/tmp/aca-398',
+      viewId: 'workspaces',
+    });
+  });
+
   it('explains when no kanban control plane is injected', () => {
     const View = extractView();
     const stream = new EventStream();

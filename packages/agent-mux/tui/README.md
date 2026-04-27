@@ -26,9 +26,11 @@ The package now ships first-phase `kanban` and `workspaces` views backed by the
 shared kanban/workspace control plane.
 
 - Runtime today: `kanban` view (list-first issue browsing, issue detail,
-  keyboard-driven backlog actions through an injected control plane)
+  keyboard-driven backlog actions through an injected control plane, and linked
+  workspace/session handoff)
 - Runtime today: `workspaces` view (workspace inventory, linked issue/session/run
-  context, and lifecycle actions routed through the injected control plane)
+  context, lifecycle actions routed through the injected control plane, and
+  issue/session handoff back into the rest of the TUI)
 
 - Spec: [`specs/kanban-workspaces-spec.md`](specs/kanban-workspaces-spec.md)
 - Backlog decomposition: [`specs/kanban-workspaces-subtasks.md`](specs/kanban-workspaces-subtasks.md)
@@ -125,8 +127,14 @@ current working directory.
 | `G` | agents     | installed sub-agents (d: delete, r: refresh)  |
 | `H` | hooks      | registered hooks (d: remove, r: refresh)      |
 
-Global: `p` prompt, `/` filter, `:` / Ctrl-K palette, `m` model picker,
-`P` profile picker, `i` interrupt, `y`/`n` approval, `q` quit.
+Global: chat composer auto-focuses in `chat`; `Esc` temporarily dismisses it;
+`/` filter, `:` / Ctrl-K palette, `m` model picker, `N` agent picker, `P`
+profile picker, `i` interrupt, `y`/`n` approval, `q` quit.
+
+Inside `kanban`, press `w` to jump to the linked workspace for the selected
+issue. Inside `workspaces`, press `g` to jump back to the linked issue. If you
+open `session-detail` from either view, `b`/`Esc` returns to the originating
+surface instead of always falling back to `sessions`.
 
 ## Logs / Observability View
 

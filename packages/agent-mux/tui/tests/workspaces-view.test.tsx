@@ -288,6 +288,31 @@ describe('workspaces-view', () => {
     expect(emit).toHaveBeenCalledWith({ type: 'view:switch', id: 'session-detail' });
   });
 
+  it('opens the linked issue in kanban mode', async () => {
+    const View = extractView();
+    const client = makeClient();
+    const controlPlane = {
+      listWorkspaces: vi.fn(async () => makeInventory()),
+    };
+    const stream = new EventStream();
+    const emit = vi.fn();
+    const { stdin, rerender } = render(
+      <View client={client} kanban={controlPlane} active={true} eventStream={stream} emit={emit} />,
+    );
+
+    await flush();
+    rerender(<View client={client} kanban={controlPlane} active={true} eventStream={stream} emit={emit} />);
+
+    stdin.write('g');
+    await flush();
+
+    expect(emit).toHaveBeenCalledWith({
+      type: 'issue:select',
+      issueId: 'issue-1',
+      viewId: 'kanban',
+    });
+  });
+
   it('explains when no kanban control plane is injected', () => {
     const View = extractView();
     const stream = new EventStream();

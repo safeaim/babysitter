@@ -73,10 +73,14 @@ describe('builtin TUI view contract', () => {
   it('documents the same built-in view hotkeys in the package README', () => {
     const readmePath = path.resolve(__dirname, '..', 'README.md');
     const readme = fs.readFileSync(readmePath, 'utf8');
+    const compact = readme.replace(/\s+/g, ' ');
 
     expect(sortContractRows(parseReadmeViewRows(readme))).toEqual(
       expectedHotkeyViews.map(({ hotkey, id }) => ({ hotkey, id })),
     );
     expect(readme).not.toContain('| `8` | runs');
+    expect(compact).toContain('`N` agent picker');
+    expect(compact).not.toContain('Global: `p` prompt');
+    expect(compact).toContain('Inside `kanban`, press `w` to jump to the linked workspace');
   });
 });

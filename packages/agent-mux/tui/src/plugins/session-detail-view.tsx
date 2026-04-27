@@ -23,7 +23,7 @@ export function SessionDetailView({
   active,
   selection,
   emit,
-  eventStream,
+  returnViewId,
   viewport,
 }: TuiViewProps) {
   const [state, setState] = useState<DetailState>({ loading: !!selection });
@@ -77,31 +77,16 @@ export function SessionDetailView({
     }
   }
 
-  async function doWatch() {
-    if (!selection) return;
-    emit({ type: 'status', message: `Watching ${selection.agent}/${selection.sessionId}…` });
-    emit({ type: 'view:switch', id: 'chat' });
-    try {
-      for await (const ev of client.sessions.watch(selection.agent as never, selection.sessionId)) {
-        eventStream.push(ev);
-      }
-      emit({ type: 'status', message: 'Watch ended.' });
-    } catch (e) {
-      emit({ type: 'status', message: `Watch error: ${(e as Error).message}` });
-    }
-  }
-
   useInput(
     (input, key) => {
       if (!selection) return;
       if (input === 'e') void doExport('json');
       else if (input === 'm') void doExport('markdown');
-      else if (input === 'w') void doWatch();
       else if (input === 'r') {
         emit({ type: 'session:select', agent: selection.agent, sessionId: selection.sessionId });
         emit({ type: 'view:switch', id: 'chat' });
       } else if (key.escape || input === 'b') {
-        emit({ type: 'view:switch', id: 'sessions' });
+        emit({ type: 'view:switch', id: returnViewId ?? 'sessions' });
       }
     },
     { isActive: active },
@@ -116,9 +101,10 @@ export function SessionDetailView({
   const sessionId = compact
     ? truncateMiddle(d.sessionId, Math.max(12, viewport?.contentWidth ?? 40))
     : d.sessionId;
+  const backLabel = returnViewId && returnViewId !== 'sessions' ? `back to ${returnViewId}` : 'back';
   const actionLines = compact
-    ? ['e json · m markdown · w watch', 'r resume · b/Esc back']
-    : ['e: export json · m: export markdown · w: watch · r: resume · b/Esc: back'];
+    ? ['e json · m markdown', `r resume · b/Esc ${backLabel}`]
+    : [`e: export json · m: export markdown · r: resume · b/Esc: ${backLabel}`];
   return (
     <Box flexDirection="column">
       {compact ? (

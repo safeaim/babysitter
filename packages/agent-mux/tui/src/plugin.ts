@@ -36,6 +36,12 @@ export interface TuiViewProps {
   filter?: string;
   /** Optional session selection routed by emit(session:detail). */
   selection?: { agent: string; sessionId: string };
+  /** Optional issue selection routed by emit(issue:select). */
+  issueSelection?: { issueId: string; projectId?: string };
+  /** Optional workspace selection routed by emit(workspace:select). */
+  workspaceSelection?: { workspacePath: string };
+  /** Optional return target for detail surfaces such as session-detail. */
+  returnViewId?: string;
   /** Sessions currently backed by an amux-managed run (keyed `${agent}:${sessionId}`). */
   activeSessions?: ReadonlySet<string>;
 }
@@ -58,6 +64,8 @@ export type TuiInternalEvent =
   | { type: 'run:attach'; handle: RunHandle }
   | { type: 'status'; message: string }
   | { type: 'event'; event: AgentEvent }
+  | { type: 'issue:select'; issueId: string; projectId?: string; viewId?: string }
+  | { type: 'workspace:select'; workspacePath: string; viewId?: string }
   | { type: 'session:select'; agent: string; sessionId: string }
   | { type: 'session:detail'; agent: string; sessionId: string }
   | { type: 'session:diff'; agent: string; sessionId: string };

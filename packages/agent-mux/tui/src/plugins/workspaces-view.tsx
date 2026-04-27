@@ -129,6 +129,7 @@ export function WorkspacesView({
   emit,
   filter,
   activeSessions,
+  workspaceSelection,
   viewport,
 }: TuiViewProps) {
   const [loaded, setLoaded] = useState<LoadedState | null>(null);
@@ -167,6 +168,14 @@ export function WorkspacesView({
     if (!active) return;
     void loadData({ workspacePath });
   }, [active, activeSessions, kanban, refreshTick]);
+
+  useEffect(() => {
+    if (!active || !workspaceSelection) return;
+    if (workspaceSelection.workspacePath === workspacePath) {
+      return;
+    }
+    void loadData({ workspacePath: workspaceSelection.workspacePath });
+  }, [active, workspacePath, workspaceSelection]);
 
   const filteredWorkspaces = useMemo(() => {
     const workspaces = loaded?.inventory.workspaces ?? [];
@@ -230,6 +239,20 @@ export function WorkspacesView({
     }
     emit({ type: 'session:select', agent: session.agent, sessionId: session.sessionId });
     emit({ type: 'view:switch', id: 'chat' });
+  }
+
+  function jumpToIssue() {
+    if (!workspace) return;
+    const linkedIssue = workspace.issues?.[0];
+    if (!linkedIssue) {
+      emit({ type: 'status', message: 'Selected workspace has no linked issue.' });
+      return;
+    }
+    emit({
+      type: 'issue:select',
+      issueId: linkedIssue.issueId,
+      viewId: 'kanban',
+    });
   }
 
   useInput(
@@ -364,6 +387,10 @@ export function WorkspacesView({
         jumpToSession('detail');
         return;
       }
+      if (input === 'g') {
+        jumpToIssue();
+        return;
+      }
       if (input === 'c') {
         jumpToSession('chat');
       }
@@ -409,7 +436,7 @@ export function WorkspacesView({
     ? composer.kind === 'confirm'
       ? 'Enter confirm · Esc cancel'
       : 'Type notes · Enter save · Esc cancel'
-    : '↑/↓ navigate · s/Enter session · c chat · n notes · a archive · x cleanup · v recover · b/z/o/M/A rebase · R refresh';
+    : '↑/↓ navigate · s/Enter session · c chat · g issue · n notes · a archive · x cleanup · v recover · b/z/o/M/A rebase · R refresh';
 
   return (
     <Box flexDirection="column">

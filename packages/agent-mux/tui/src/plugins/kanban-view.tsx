@@ -93,6 +93,7 @@ export function KanbanView({
   active,
   emit,
   filter,
+  issueSelection,
   viewport,
 }: TuiViewProps) {
   const [loaded, setLoaded] = useState<LoadedState | null>(null);
@@ -140,6 +141,17 @@ export function KanbanView({
     if (!active) return;
     void loadData({ projectId, issueId });
   }, [active, kanban, refreshTick]);
+
+  useEffect(() => {
+    if (!active || !issueSelection) return;
+    if (issueSelection.issueId === issueId && (!issueSelection.projectId || issueSelection.projectId === projectId)) {
+      return;
+    }
+    void loadData({
+      projectId: issueSelection.projectId ?? projectId,
+      issueId: issueSelection.issueId,
+    });
+  }, [active, issueId, issueSelection, projectId]);
 
   const project = useMemo(() => {
     if (!loaded || !projectId) return null;
@@ -310,6 +322,16 @@ export function KanbanView({
     emit({ type: 'view:switch', id: 'chat' });
   }
 
+  function jumpToWorkspace() {
+    if (!issue) return;
+    const workspacePath = issue.workspaceLinks?.[0]?.workspacePath;
+    if (!workspacePath) {
+      emit({ type: 'status', message: 'Selected issue has no linked workspace.' });
+      return;
+    }
+    emit({ type: 'workspace:select', workspacePath, viewId: 'workspaces' });
+  }
+
   useInput(
     (input, key) => {
       if (!active) return;
@@ -442,6 +464,10 @@ export function KanbanView({
         void provisionWorkspace();
         return;
       }
+      if (input === 'w') {
+        jumpToWorkspace();
+        return;
+      }
       if (input === 's' || key.return) {
         void jumpToSession('detail');
         return;
@@ -479,7 +505,7 @@ export function KanbanView({
     ? composer.kind === 'move'
       ? '←/→ choose target · Enter confirm · Esc cancel'
       : 'Type value · Enter confirm · Esc cancel'
-    : '↑/↓ navigate · [ ] project · a add · u update · m move · p provision · l link workspace · s/Enter session · c chat · R refresh';
+    : '↑/↓ navigate · [ ] project · a add · u update · m move · p provision · l link workspace · w workspace · s/Enter session · c chat · R refresh';
 
   return (
     <Box flexDirection="column">

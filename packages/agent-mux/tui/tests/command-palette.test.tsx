@@ -40,6 +40,30 @@ describe('CommandPalette', () => {
     expect(onPick.mock.calls[0]![0]!.id).toBe('view:cost');
   });
 
+  it('matches ids and hotkeys in addition to labels', async () => {
+    const onPick = vi.fn();
+    const onCancel = vi.fn();
+    const byHotkey = render(
+      <CommandPalette views={views} commands={cmds} onPick={onPick} onCancel={onCancel} />,
+    );
+    byHotkey.rerender(<CommandPalette views={views} commands={cmds} onPick={onPick} onCancel={onCancel} />);
+    byHotkey.stdin.write('view:sessions');
+    await flush();
+    byHotkey.rerender(<CommandPalette views={views} commands={cmds} onPick={onPick} onCancel={onCancel} />);
+    expect(byHotkey.lastFrame() ?? '').toContain('Sessions');
+    expect(byHotkey.lastFrame() ?? '').not.toContain('Cost');
+
+    const byId = render(
+      <CommandPalette views={views} commands={cmds} onPick={onPick} onCancel={onCancel} />,
+    );
+    byId.rerender(<CommandPalette views={views} commands={cmds} onPick={onPick} onCancel={onCancel} />);
+    byId.stdin.write('hotkey r');
+    await flush();
+    byId.rerender(<CommandPalette views={views} commands={cmds} onPick={onPick} onCancel={onCancel} />);
+    expect(byId.lastFrame() ?? '').toContain('Reload');
+    expect(byId.lastFrame() ?? '').not.toContain('Chat');
+  });
+
   it('Esc cancels', async () => {
     const onPick = vi.fn();
     const onCancel = vi.fn();

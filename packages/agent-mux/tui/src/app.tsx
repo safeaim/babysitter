@@ -157,6 +157,13 @@ export function App({
   const [selection, setSelection] = useState<{ agent: string; sessionId: string } | undefined>(
     undefined,
   );
+  const [issueSelection, setIssueSelection] = useState<{ issueId: string; projectId?: string } | undefined>(
+    undefined,
+  );
+  const [workspaceSelection, setWorkspaceSelection] = useState<{ workspacePath: string } | undefined>(
+    undefined,
+  );
+  const [returnViewId, setReturnViewId] = useState<string>('sessions');
   const [modelPickerMode, setModelPickerMode] = useState<boolean>(false);
   const [currentModel, setCurrentModel] = useState<ModelOption | undefined>(undefined);
   const [agentPickerMode, setAgentPickerMode] = useState<boolean>(false);
@@ -190,6 +197,7 @@ export function App({
     deny: 'magenta',
   };
   const [execMode, setExecMode] = useState<ExecMode>('normal');
+  const activeViewIdRef = React.useRef<string>(initialViewId);
   function cycleExecMode() {
     setExecMode((m) => {
       const i = EXEC_MODES.indexOf(m);
@@ -220,19 +228,7 @@ export function App({
       client,
       r,
       (ev) => {
-        if (ev.type === 'status') setStatus(ev.message);
-        if (ev.type === 'view:switch') setActiveId(ev.id);
-        if (ev.type === 'session:select') {
-          setPendingResume({ agent: ev.agent, sessionId: ev.sessionId });
-          setStatus(`Resuming ${ev.agent}/${ev.sessionId} — type to send next message`);
-          void loadSessionTranscript(ev.agent, ev.sessionId);
-        }
-        if (ev.type === 'session:detail') {
-          setSelection({ agent: ev.agent, sessionId: ev.sessionId });
-        }
-        if (ev.type === 'session:diff') {
-          void handleSessionDiff(ev.agent, ev.sessionId);
-        }
+        void handleInternalEvent(ev, activeViewIdRef.current);
       },
       s,
       kanban,
@@ -244,6 +240,7 @@ export function App({
   }, [client, plugins]);
 
   const active = registry.views.find((v) => v.id === activeId) ?? registry.views[0];
+  activeViewIdRef.current = active?.id ?? activeId;
 
   useInput((input, key) => {
     if (promptMode || filterMode || paletteMode || modelPickerMode || profilePickerMode || agentPickerMode) return; // child input owns keys while open
@@ -330,10 +327,7 @@ export function App({
           registerEventRenderer: () => {},
           registerCommand: () => {},
           registerPromptHandler: () => {},
-          emit: (e) => {
-            if (e.type === 'status') setStatus(e.message);
-            if (e.type === 'event') stream.push(e.event);
-          },
+          emit: (e) => void handleInternalEvent(e, activeViewIdRef.current),
         });
       }
     }
@@ -380,19 +374,53 @@ export function App({
   const ActiveView = active?.component;
 
   const viewEmit = (ev: Parameters<TuiViewProps['emit']>[0]) => {
-    if (ev.type === 'status') setStatus(ev.message);
-    else if (ev.type === 'view:switch') setActiveId(ev.id);
-    else if (ev.type === 'session:select') {
+    void handleInternalEvent(ev, active?.id);
+  };
+
+  async function handleInternalEvent(
+    ev: Parameters<TuiViewProps['emit']>[0],
+    sourceViewId?: string,
+  ) {
+    if (ev.type === 'status') {
+      setStatus(ev.message);
+      return;
+    }
+    if (ev.type === 'event') {
+      stream.push(ev.event);
+      return;
+    }
+    if (ev.type === 'view:switch') {
+      setActiveId(ev.id);
+      return;
+    }
+    if (ev.type === 'issue:select') {
+      setIssueSelection({ issueId: ev.issueId, projectId: ev.projectId });
+      setActiveId(ev.viewId ?? 'kanban');
+      return;
+    }
+    if (ev.type === 'workspace:select') {
+      setWorkspaceSelection({ workspacePath: ev.workspacePath });
+      setActiveId(ev.viewId ?? 'workspaces');
+      return;
+    }
+    if (ev.type === 'session:select') {
       setPendingResume({ agent: ev.agent, sessionId: ev.sessionId });
       setStatus(`Resuming ${ev.agent}/${ev.sessionId} — type to send next message`);
-      void loadSessionTranscript(ev.agent, ev.sessionId);
+      await loadSessionTranscript(ev.agent, ev.sessionId);
       setActiveId('chat');
-    } else if (ev.type === 'session:detail') {
+      return;
+    }
+    if (ev.type === 'session:detail') {
+      const nextReturnViewId =
+        sourceViewId && sourceViewId !== 'session-detail' ? sourceViewId : activeViewIdRef.current;
       setSelection({ agent: ev.agent, sessionId: ev.sessionId });
-    } else if (ev.type === 'session:diff') {
-      void handleSessionDiff(ev.agent, ev.sessionId);
-    } else if (ev.type === 'event') stream.push(ev.event);
-  };
+      setReturnViewId(nextReturnViewId && nextReturnViewId !== 'session-detail' ? nextReturnViewId : 'sessions');
+      return;
+    }
+    if (ev.type === 'session:diff') {
+      await handleSessionDiff(ev.agent, ev.sessionId);
+    }
+  }
 
   async function loadSessionTranscript(agent: string, sessionId: string) {
     try {
@@ -660,6 +688,9 @@ export function App({
             viewport={viewport}
             filter={filter || undefined}
             selection={selection}
+            issueSelection={issueSelection}
+            workspaceSelection={workspaceSelection}
+            returnViewId={returnViewId}
             activeSessions={activeSessions}
           />
         ) : (
@@ -751,10 +782,7 @@ export function App({
                   registerEventRenderer: () => {},
                   registerCommand: () => {},
                   registerPromptHandler: () => {},
-                  emit: (e) => {
-                    if (e.type === 'status') setStatus(e.message);
-                    if (e.type === 'event') stream.push(e.event);
-                  },
+                  emit: (e) => void handleInternalEvent(e, activeViewIdRef.current),
                 });
               }
             }

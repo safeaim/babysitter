@@ -25,7 +25,7 @@ function buildActions(views: TuiView[], commands: TuiCommand[]): PaletteAction[]
     actions.push({
       id: 'view:' + v.id,
       label: 'view: ' + v.title,
-      hint: v.hotkey ? `hotkey ${v.hotkey}` : undefined,
+      hint: [v.id, v.hotkey ? `hotkey ${v.hotkey}` : null].filter(Boolean).join(' · '),
       run: () => {},
     });
   }
@@ -33,7 +33,7 @@ function buildActions(views: TuiView[], commands: TuiCommand[]): PaletteAction[]
     actions.push({
       id: 'cmd:' + c.id,
       label: 'cmd: ' + c.label,
-      hint: `hotkey ${c.hotkey}`,
+      hint: [c.id, `hotkey ${c.hotkey}`].join(' · '),
       run: () => {},
     });
   }
@@ -52,7 +52,12 @@ export function CommandPalette({
   const [cursor, setCursor] = useState(0);
   const all = buildActions(views, commands);
   const filtered = query
-    ? all.filter((a) => a.label.toLowerCase().includes(query.toLowerCase()))
+    ? all.filter((a) =>
+        [a.id, a.label, a.hint ?? '']
+          .join(' ')
+          .toLowerCase()
+          .includes(query.toLowerCase()),
+      )
     : all;
   const visible = filtered.slice(0, Math.max(1, maxItems));
   const rowWidth = Math.max(12, width - 6);

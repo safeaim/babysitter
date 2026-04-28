@@ -10,12 +10,6 @@ Babysitter SDK CLI and the shared `~/.a5c` process-library state. The
 installer registers the plugin bundle and materializes the active skills and
 hooks so Cursor can execute Babysitter commands and hook scripts directly.
 
-<!-- docs-status:start -->
-> Status: Public harness plugin package.
-> Canonical docs home: [Package and Plugin Docs Map](../../docs/package-and-plugin-map.md).
-> This README is the canonical Cursor plugin install/runtime contract; use [Plugins Overview](../../docs/plugins.md) for the repo-wide plugin index.
-<!-- docs-status:end -->
-
 ## Prerequisites
 
 - **Node.js 22+**
@@ -135,17 +129,6 @@ plugins/babysitter-cursor/
 
 The plugin declares lifecycle hooks in `hooks/hooks-cursor.json` using the version 1
 format. Hook event names use camelCase (e.g., `sessionStart`, `stop`).
-
-### `hook:run` Support Status
-
-The packaged Cursor plugin smoke-tests the hook commands it actually installs:
-
-- `sessionStart` -> `babysitter hook:run --harness unified --hook-type session-start`
-- `stop` -> `babysitter hook:run --harness unified --hook-type stop`
-
-The repo also contains a `cursor` SDK adapter, but CI coverage for this package
-is defined by the proxied unified hook commands above because those are the
-commands the installed plugin wrappers execute.
 
 ```json
 {

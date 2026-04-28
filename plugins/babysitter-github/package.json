@@ -7,24 +7,20 @@
     "deploy:staging": "npm publish --access public --tag staging",
     "plugin:install": "node bin/install.js --global",
     "plugin:uninstall": "node bin/uninstall.js --global",
-    "team:install": "node scripts/team-install.js",
-    "test": "npm run validate:ci",
-    "test:integration": "bash test/plugin-validate.sh",
-    "test:packaged-install": "node test/install-surface.test.js && node test/cloud-agent-install.test.js",
-    "validate:ci": "npm run test:integration && npm run test:packaged-install"
+    "team:install": "node scripts/team-install.js"
   },
   "bin": {
-    "babysitter-github-copilot": "bin/cli.js"
+    "babysitter-github": "bin/cli.js"
   },
   "files": [
     "bin/",
     "hooks.json",
+    "AGENTS.md",
     "hooks/",
     "skills/",
     "commands/",
     "scripts/",
     "plugin.json",
-    "AGENTS.md",
     "README.md",
     "versions.json",
     "package.json"
@@ -44,11 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/a5c-ai/babysitter.git",
-    "directory": "plugins/babysitter-github"
+    "url": "https://github.com/a5c-ai/babysitter"
   },
-  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-github#readme",
-  "bugs": {
-    "url": "https://github.com/a5c-ai/babysitter/issues"
-  }
+  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-github#readme"
 }

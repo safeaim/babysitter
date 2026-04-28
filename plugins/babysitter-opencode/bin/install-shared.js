@@ -13,7 +13,7 @@ function getUserHome() {
 }
 
 function getHarnessHome() {
-  return path.join(os.homedir(), '.opencode');
+  return path.join(os.homedir(), ".opencode");
 }
 
 function getHomePluginRoot(scope) {
@@ -593,20 +593,20 @@ module.exports = {
   runCli,
   ensureGlobalProcessLibrary,
   PLUGIN_BUNDLE_ENTRIES,
-  HOOK_SCRIPT_NAMES,
+  copyRecursive,
+  copyPluginBundle,
   DEFAULT_MARKETPLACE,
+  normalizeMarketplaceSourcePath,
+  normalizeMarketplaceName,
+  ensureMarketplaceEntry,
+  removeMarketplaceEntry,
+  HOOK_SCRIPT_NAMES,
   getOpenCodeHome,
   getHomePluginRoot,
   getHomeMarketplacePath,
-  copyRecursive,
-  copyPluginBundle,
   writeIndexJs,
   mergeHooksConfig,
   removeManagedHooks,
-  normalizeMarketplaceName,
-  normalizeMarketplaceSourcePath,
-  ensureMarketplaceEntry,
-  removeMarketplaceEntry,
   getAccomplishDataDir,
   isAccomplishInstalled,
   getAccomplishOpenCodeHome,

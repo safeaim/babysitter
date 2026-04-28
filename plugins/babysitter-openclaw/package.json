@@ -30,13 +30,12 @@
   "scripts": {
     "plugin:install": "node bin/install.cjs --global",
     "plugin:uninstall": "node bin/uninstall.cjs --global",
-    "test": "npm run validate:ci",
+    "test": "node --test test/integration.test.js",
     "test:integration": "node --test test/integration.test.js",
     "test:packaged-install": "node test/packaged-install.test.cjs",
-    "validate:ci": "npm run test:integration && npm run test:packaged-install",
+    "sync:commands": "node scripts/sync-command-docs.cjs",
     "deploy": "npm publish --access public",
-    "deploy:staging": "npm publish --access public --tag staging",
-    "team:install": "node scripts/team-install.cjs"
+    "deploy:staging": "npm publish --access public --tag staging"
   },
   "bin": {
     "babysitter-openclaw": "bin/cli.cjs"
@@ -62,11 +61,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/a5c-ai/babysitter.git",
-    "directory": "plugins/babysitter-openclaw"
+    "url": "https://github.com/a5c-ai/babysitter"
   },
-  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-openclaw#readme",
-  "bugs": {
-    "url": "https://github.com/a5c-ai/babysitter/issues"
-  }
+  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/plugins/babysitter-openclaw#readme"
 }

@@ -13,7 +13,7 @@ function getUserHome() {
 }
 
 function getHarnessHome() {
-  return path.join(os.homedir(), '.copilot');
+  return path.join(os.homedir(), ".copilot");
 }
 
 function getHomePluginRoot(scope) {
@@ -454,70 +454,6 @@ function installManagedHooks(packageRoot, copilotHome) {
   mergeManagedHooksConfig(packageRoot, copilotHome);
 }
 
-function filterManagedHookEntries(eventHooks) {
-  if (!Array.isArray(eventHooks)) {
-    return [];
-  }
-  const allScriptNames = [...LEGACY_HOOK_SCRIPT_NAMES, ...HOOK_SCRIPT_NAMES];
-
-  return eventHooks
-    .map((entry) => {
-      if (!entry || typeof entry !== 'object') {
-        return null;
-      }
-
-      if (Array.isArray(entry.hooks)) {
-        const keptHooks = entry.hooks.filter((hook) => {
-          const command = String(hook && hook.command || '');
-          return !allScriptNames.some((name) => command.includes(name));
-        });
-        return keptHooks.length > 0 ? { ...entry, hooks: keptHooks } : null;
-      }
-
-      const bash = String(entry.bash || entry.command || '');
-      const ps = String(entry.powershell || '');
-      return allScriptNames.some((name) => bash.includes(name) || ps.includes(name))
-        ? null
-        : entry;
-    })
-    .filter(Boolean);
-}
-
-function removeManagedHooks(copilotHome) {
-  for (const hookName of [...LEGACY_HOOK_SCRIPT_NAMES, ...HOOK_SCRIPT_NAMES]) {
-    fs.rmSync(path.join(copilotHome, 'hooks', hookName), { force: true });
-  }
-
-  const hooksConfigPath = path.join(copilotHome, 'hooks.json');
-  if (!fs.existsSync(hooksConfigPath)) {
-    return;
-  }
-  let hooksConfig;
-  try {
-    hooksConfig = readJson(hooksConfigPath);
-  } catch {
-    return;
-  }
-  if (!hooksConfig.hooks || typeof hooksConfig.hooks !== 'object') {
-    return;
-  }
-
-  for (const eventName of ['SessionStart', 'UserPromptSubmit', 'Stop', 'sessionStart', 'sessionEnd', 'userPromptSubmitted']) {
-    const filteredEntries = filterManagedHookEntries(hooksConfig.hooks[eventName]);
-    if (filteredEntries.length > 0) {
-      hooksConfig.hooks[eventName] = filteredEntries;
-    } else {
-      delete hooksConfig.hooks[eventName];
-    }
-  }
-
-  if (Object.keys(hooksConfig.hooks).length === 0) {
-    fs.rmSync(hooksConfigPath, { force: true });
-  } else {
-    writeJson(hooksConfigPath, hooksConfig);
-  }
-}
-
 function removeLegacyHooks(copilotHome) {
   for (const hookName of LEGACY_HOOK_SCRIPT_NAMES) {
     fs.rmSync(path.join(copilotHome, 'hooks', hookName), { force: true });
@@ -562,7 +498,7 @@ function removeLegacyHooks(copilotHome) {
 }
 
 function installCopilotSurface(packageRoot, copilotHome) {
-  removeManagedHooks(copilotHome);
+  removeLegacyHooks(copilotHome);
   installManagedSkills(packageRoot, copilotHome);
   installManagedHooks(packageRoot, copilotHome);
 }
@@ -895,10 +831,19 @@ module.exports = {
   resolveCliCommand,
   runCli,
   ensureGlobalProcessLibrary,
+  PLUGIN_BUNDLE_ENTRIES,
+  copyRecursive,
+  copyPluginBundle,
+  DEFAULT_MARKETPLACE,
+  normalizeMarketplaceSourcePath,
+  ensureMarketplaceEntry,
+  removeMarketplaceEntry,
+  installManagedSkills,
+  mergeManagedHooksConfig,
+  installManagedHooks,
+  warnWindowsHooks,
   LEGACY_HOOK_SCRIPT_NAMES,
   HOOK_SCRIPT_NAMES,
-  DEFAULT_MARKETPLACE,
-  PLUGIN_BUNDLE_ENTRIES,
   CLOUD_AGENT_BUNDLE_ENTRIES,
   MANAGED_BLOCK_START,
   MANAGED_BLOCK_END,
@@ -913,11 +858,6 @@ module.exports = {
   rewriteCloudSkill,
   registerCopilotPlugin,
   deregisterCopilotPlugin,
-  installManagedSkills,
-  mergeManagedHooksConfig,
-  installManagedHooks,
-  filterManagedHookEntries,
-  removeManagedHooks,
   removeLegacyHooks,
   installCopilotSurface,
   renderCloudAgentAgentsBlock,
@@ -928,12 +868,6 @@ module.exports = {
   installCloudAgentInstructions,
   installCloudAgentSetupSteps,
   installCloudAgentSurface,
-  normalizeMarketplaceSourcePath,
-  ensureMarketplaceEntry,
-  removeMarketplaceEntry,
-  warnWindowsHooks,
-  copyPluginBundle,
-  copyRecursive,
   harnessCliRoute,
   harnessInstall,
 };

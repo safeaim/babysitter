@@ -13,7 +13,7 @@ function getUserHome() {
 }
 
 function getHarnessHome() {
-  return path.join(os.homedir(), '.openclaw');
+  return path.join(os.homedir(), ".openclaw");
 }
 
 function getHomePluginRoot(scope) {

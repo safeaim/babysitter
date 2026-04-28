@@ -13,7 +13,7 @@ function getUserHome() {
 }
 
 function getHarnessHome() {
-  return path.join(os.homedir(), '.cursor');
+  return path.join(os.homedir(), ".cursor");
 }
 
 function getHomePluginRoot(scope) {
@@ -489,22 +489,22 @@ module.exports = {
   resolveCliCommand,
   runCli,
   ensureGlobalProcessLibrary,
-  HOOK_SCRIPT_NAMES,
-  DEFAULT_MARKETPLACE,
-  MANAGED_HOOKS_CONFIG_PATHS,
   PLUGIN_BUNDLE_ENTRIES,
-  getCursorHome,
-  getHomePluginRoot,
-  getHomeMarketplacePath,
   copyRecursive,
   copyPluginBundle,
+  DEFAULT_MARKETPLACE,
   normalizeMarketplaceSourcePath,
   normalizeMarketplaceName,
   ensureMarketplaceEntry,
   removeMarketplaceEntry,
-  getManagedHooksConfigPath,
   mergeManagedHooksConfig,
+  warnWindowsHooks,
+  HOOK_SCRIPT_NAMES,
+  MANAGED_HOOKS_CONFIG_PATHS,
+  getCursorHome,
+  getHomePluginRoot,
+  getHomeMarketplacePath,
+  getManagedHooksConfigPath,
   removeManagedHooks,
   installCursorSurface,
-  warnWindowsHooks,
 };

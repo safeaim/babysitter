@@ -11,12 +11,6 @@ This package provides full Babysitter integration through OpenClaw's programmati
 
 The SDK (`@a5c-ai/babysitter-sdk`) remains the single source of truth for orchestration, runs, tasks, replay, and state. This plugin is a thin adapter layer.
 
-<!-- docs-status:start -->
-> Status: Public harness plugin package.
-> Canonical docs home: [Package and Plugin Docs Map](../../docs/package-and-plugin-map.md).
-> This README is the canonical OpenClaw plugin contract; use [Plugins Overview](../../docs/plugins.md) for the repo-wide plugin index.
-<!-- docs-status:end -->
-
 ## Installation
 
 ### Primary: Babysitter Harness Install
@@ -31,10 +25,9 @@ This installs the `@a5c-ai/babysitter-openclaw` npm package and registers it wit
 
 ```bash
 npm install -g @a5c-ai/babysitter-openclaw
-babysitter-openclaw install --global
 ```
 
-To install into a specific workspace:
+The `postinstall` script registers the plugin globally. To install into a specific workspace:
 
 ```bash
 npx @a5c-ai/babysitter-openclaw install --workspace /path/to/repo
@@ -49,7 +42,6 @@ babysitter harness:discover --json
 ### Removal
 
 ```bash
-babysitter-openclaw uninstall
 npm uninstall -g @a5c-ai/babysitter-openclaw
 ```
 
@@ -248,8 +240,8 @@ plugins/babysitter-openclaw/
 |-- commands/                 # Mirrored command documentation (markdown)
 |-- bin/
 |   |-- cli.cjs               # Standalone CLI entrypoint
-|   |-- install.cjs           # Global install helper
-|   `-- uninstall.cjs         # Global uninstall helper
+|   |-- install.cjs           # Global postinstall script
+|   `-- uninstall.cjs         # Global preuninstall script
 `-- scripts/
     |-- setup.sh              # Setup helper
     `-- sync-command-docs.cjs # Regenerate mirrored command docs

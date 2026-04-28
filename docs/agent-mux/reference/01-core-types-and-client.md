@@ -56,6 +56,7 @@ Import the package as ESM:
 import { createClient } from '@a5c-ai/agent-mux-core';
 import { classifyTool } from '@a5c-ai/agent-mux-core/browser';
 import { buildKanbanProjectBoard } from '@a5c-ai/agent-mux-core/kanban';
+import type { AutomationRule } from '@a5c-ai/agent-mux-core/automation';
 ```
 
 There is no separate CommonJS build. CommonJS callers should use dynamic import
@@ -68,6 +69,17 @@ architecture:
   rules and metadata used by invocation and host helpers.
 - `@a5c-ai/agent-mux-observability` supplies the structured logging and telemetry
   primitives used by the client, auth/session flows, and run-handle implementation.
+
+The documented public subpath surface is:
+
+- `@a5c-ai/agent-mux-core`
+- `@a5c-ai/agent-mux-core/browser`
+- `@a5c-ai/agent-mux-core/kanban`
+- `@a5c-ai/agent-mux-core/automation`
+
+Package release verification should keep these subpaths aligned with the
+published `dist/index.*`, `dist/browser.*`, `dist/kanban.*`, and
+`dist/automation.*` artifacts.
 
 ### 1.4 Supported Agents
 

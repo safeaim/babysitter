@@ -86,8 +86,9 @@
   },
   "scripts": {
     "build": "tsc --build && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
-    "prepublishOnly": "npm run build",
-    "test": "vitest run --config ../../../vitest.config.ts \"tests/**/*.test.ts\" \"tests/**/*.test.tsx\" \"src/**/*.test.ts\" \"src/**/*.test.tsx\""
+    "test": "vitest run --root ../../.. --config vitest.config.ts packages/agent-mux/core",
+    "verify:release": "node ./scripts/verify-release.mjs",
+    "prepublishOnly": "npm run build && npm run test && npm run verify:release"
   },
   "dependencies": {
     "@a5c-ai/agent-catalog": "*",

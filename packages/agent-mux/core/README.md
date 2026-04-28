@@ -13,6 +13,7 @@ should match this file for package identity, runtime dependencies, and import gu
   services, and atomic filesystem helpers
 - `@a5c-ai/agent-mux-core/browser` for browser-safe type exports plus `classifyTool`
 - `@a5c-ai/agent-mux-core/kanban` for kanban/project/workspace planning types and helpers
+- `@a5c-ai/agent-mux-core/automation` for automation rule, trigger, routing, and execution record types
 
 ## Install
 
@@ -51,6 +52,7 @@ const client = createClient();
 ```ts
 import { classifyTool, type AgentEvent } from '@a5c-ai/agent-mux-core/browser';
 import { buildKanbanProjectBoard } from '@a5c-ai/agent-mux-core/kanban';
+import { type AutomationRule } from '@a5c-ai/agent-mux-core/automation';
 ```
 
 The public surface is grouped around:
@@ -61,6 +63,30 @@ The public surface is grouped around:
 - plugin contracts such as `PluginInfo`, `PluginListing`, and `PluginBrowseOptions`
 - workspace, merge, and filesystem helpers such as `WorkspaceService`,
   `resolveRunOptions`, and `writeFileAtomic`
+
+The supported public import seams are:
+
+- `@a5c-ai/agent-mux-core`
+- `@a5c-ai/agent-mux-core/browser`
+- `@a5c-ai/agent-mux-core/kanban`
+- `@a5c-ai/agent-mux-core/automation`
+
+## Release Verification
+
+Use the package-local release checks to confirm the documented export map still
+matches the packed package surface:
+
+```bash
+npm run build --workspace=@a5c-ai/agent-mux-core
+npm run test --workspace=@a5c-ai/agent-mux-core
+npm run verify:release --workspace=@a5c-ai/agent-mux-core
+npm pack --json --dry-run --workspace=@a5c-ai/agent-mux-core
+```
+
+Release reviewers should be able to confirm from this README that the package
+intentionally publishes the root, `browser`, `kanban`, and `automation`
+subpaths and that all of them remain backed by `dist/*.js` and `dist/*.d.ts`
+artifacts.
 
 ## Docs
 

@@ -124,7 +124,17 @@ jobs:
         run: |
           set -euo pipefail
           npm run build:sdk 2>&1 | tee artifacts/mux-logs/sdk-prereqs-build.log
-          node scripts/agent-mux-build.cjs build packages/agent-mux/sdk 2>&1 | tee artifacts/mux-logs/agent-mux-test-prereqs-build.log
+          for workspace in \
+            @a5c-ai/agent-mux-observability \
+            @a5c-ai/agent-mux-core \
+            @a5c-ai/agent-mux-adapters \
+            @a5c-ai/agent-mux-gateway \
+            @a5c-ai/transport-mux \
+            @a5c-ai/agent-mux-cli \
+            @a5c-ai/agent-mux
+          do
+            npm run build --workspace="$workspace"
+          done 2>&1 | tee artifacts/mux-logs/agent-mux-test-prereqs-build.log
 
       - name: Hooks-proxy unit tests
         run: |
@@ -142,13 +152,23 @@ jobs:
           node scripts/agent-mux-build.cjs test packages/agent-mux/cli 2>&1 | tee artifacts/mux-logs/agent-mux-cli-tests.log
           node scripts/agent-mux-build.cjs test packages/agent-mux/sdk 2>&1 | tee artifacts/mux-logs/agent-mux-sdk-tests.log
 
-      - name: Build and verify agent-mux release artifacts
+      - name: Build and verify non-realtime agent-mux release artifacts
         run: |
           set -euo pipefail
-          node scripts/agent-mux-build.cjs build packages/agent-mux/tui 2>&1 | tee artifacts/mux-logs/agent-mux-release-build.log
+          for workspace in \
+            @a5c-ai/agent-catalog \
+            @a5c-ai/agent-mux-observability \
+            @a5c-ai/agent-mux-core \
+            @a5c-ai/agent-mux-adapters \
+            @a5c-ai/agent-mux-gateway \
+            @a5c-ai/transport-mux \
+            @a5c-ai/agent-mux-cli \
+            @a5c-ai/agent-mux \
+            @a5c-ai/agent-mux-tui
+          do
+            npm run build --workspace="$workspace"
+          done 2>&1 | tee artifacts/mux-logs/agent-mux-release-build.log
           npm run verify:release --workspace=@a5c-ai/agent-mux-core 2>&1 | tee artifacts/mux-logs/agent-mux-core-release.log
-          npm run verify:release --workspace=@a5c-ai/agent-mux-ui 2>&1 | tee artifacts/mux-logs/agent-mux-ui-release.log
-          npm run verify:release --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/mux-logs/agent-mux-webui-release.log
           npm run verify:release --workspace=@a5c-ai/agent-mux-tui 2>&1 | tee artifacts/mux-logs/agent-mux-tui-release.log
 
       - name: Validate transport-mux runtime owner
@@ -592,10 +612,8 @@ jobs:
               'packages/agent-mux/tui/package.json',
               'packages/agent-mux/tv-androidtv-app/package.json',
               'packages/agent-mux/tv-appletv-app/package.json',
-              'packages/agent-mux/ui/package.json',
               'packages/agent-mux/watch-watchos-app/package.json',
               'packages/agent-mux/watch-wearos-app/package.json',
-              'packages/agent-mux/webui/package.json',
               'packages/transport-mux/package.json'
             ];
             for (const pkgPath of agentMuxPackagePaths) {
@@ -603,7 +621,7 @@ jobs:
               pkg.version = '${STAGING_VERSION_AGENT_MUX}';
               for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies', 'devDependencies']) {
                 if (!pkg[field]) continue;
-                for (const depName of ['@a5c-ai/agent-mux', '@a5c-ai/agent-mux-adapters', '@a5c-ai/agent-mux-cli', '@a5c-ai/agent-mux-core', '@a5c-ai/agent-mux-gateway', '@a5c-ai/agent-mux-observability', '@a5c-ai/agent-mux-ui', '@a5c-ai/transport-mux']) {
+                for (const depName of ['@a5c-ai/agent-mux', '@a5c-ai/agent-mux-adapters', '@a5c-ai/agent-mux-cli', '@a5c-ai/agent-mux-core', '@a5c-ai/agent-mux-gateway', '@a5c-ai/agent-mux-observability', '@a5c-ai/transport-mux']) {
                   if (pkg[field][depName]) {
                     pkg[field][depName] = pkg[field][depName].startsWith('^')
                       ? '^${STAGING_VERSION_AGENT_MUX}'
@@ -769,8 +787,6 @@ jobs:
               ['@a5c-ai/agent-mux-observability', agentMuxVersion],
               ['@a5c-ai/agent-mux-sdk', agentMuxVersion],
               ['@a5c-ai/agent-mux-tui', agentMuxVersion],
-              ['@a5c-ai/agent-mux-ui', agentMuxVersion],
-              ['@a5c-ai/agent-mux-webui', agentMuxVersion],
               ['@a5c-ai/transport-mux', agentMuxVersion]
             ]);
             const fields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
@@ -883,7 +899,7 @@ jobs:
             build: npm run build:hooks-mux
             publish: npm publish --workspace=@a5c-ai/hooks-mux-core --access public --tag staging
           - name: agent-mux-observability
-            build: npm run build:agent-mux
+            build: npm run build --workspace=@a5c-ai/agent-mux-observability
             publish: npm publish --workspace=@a5c-ai/agent-mux-observability --access public --tag staging
     steps:
       - name: Download staging publish workspace
@@ -980,7 +996,9 @@ jobs:
         run: |
           set -euo pipefail
           npm run build:hooks-mux
-          npm run build:agent-mux
+          npm run build --workspace=@a5c-ai/agent-catalog
+          npm run build --workspace=@a5c-ai/agent-mux-observability
+          npm run build --workspace=@a5c-ai/agent-mux-core
 
       - name: Publish package
         env:
@@ -999,12 +1017,28 @@ jobs:
       matrix:
         include:
           - name: agent-mux-adapters
+            build: |
+              set -euo pipefail
+              npm run build --workspace=@a5c-ai/agent-catalog
+              npm run build --workspace=@a5c-ai/agent-mux-observability
+              npm run build --workspace=@a5c-ai/agent-mux-core
+              npm run build --workspace=@a5c-ai/agent-mux-adapters
             publish: npm publish --workspace=@a5c-ai/agent-mux-adapters --access public --tag staging
           - name: agent-mux-harness-mock
+            build: |
+              set -euo pipefail
+              npm run build --workspace=@a5c-ai/agent-catalog
+              npm run build --workspace=@a5c-ai/agent-mux-observability
+              npm run build --workspace=@a5c-ai/agent-mux-core
+              npm run build --workspace=@a5c-ai/agent-mux-harness-mock
             publish: npm publish --workspace=@a5c-ai/agent-mux-harness-mock --access public --tag staging
-          - name: agent-mux-ui
-            publish: npm publish --workspace=@a5c-ai/agent-mux-ui --access public --tag staging
           - name: transport-mux
+            build: |
+              set -euo pipefail
+              npm run build --workspace=@a5c-ai/agent-catalog
+              npm run build --workspace=@a5c-ai/agent-mux-observability
+              npm run build --workspace=@a5c-ai/agent-mux-core
+              npm run build --workspace=@a5c-ai/transport-mux
             publish: npm publish --workspace=@a5c-ai/transport-mux --access public --tag staging
     steps:
       - name: Download staging publish workspace
@@ -1031,11 +1065,8 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Build agent-mux leaf workspaces
-        run: |
-          set -euo pipefail
-          npm run build:agent-mux
-          npm run build --workspace=@a5c-ai/transport-mux
+      - name: Build package workspace
+        run: ${{ matrix.build }}
 
       - name: Publish package
         env:
@@ -1054,9 +1085,14 @@ jobs:
       matrix:
         include:
           - name: agent-mux-gateway
+            build: |
+              set -euo pipefail
+              npm run build --workspace=@a5c-ai/agent-catalog
+              npm run build --workspace=@a5c-ai/agent-mux-observability
+              npm run build --workspace=@a5c-ai/agent-mux-core
+              npm run build --workspace=@a5c-ai/agent-mux-adapters
+              npm run build --workspace=@a5c-ai/agent-mux-gateway
             publish: npm publish --workspace=@a5c-ai/agent-mux-gateway --access public --tag staging
-          - name: agent-mux-webui
-            publish: npm publish --workspace=@a5c-ai/agent-mux-webui --access public --tag staging
     steps:
       - name: Download staging publish workspace
         uses: actions/download-artifact@v4
@@ -1082,8 +1118,8 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Build agent-mux gateway workspaces
-        run: npm run build:agent-mux
+      - name: Build package workspace
+        run: ${{ matrix.build }}
 
       - name: Publish package
         env:
@@ -1123,7 +1159,19 @@ jobs:
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux CLI workspace
-        run: npm run build:agent-mux
+        run: |
+          set -euo pipefail
+          for workspace in \
+            @a5c-ai/agent-catalog \
+            @a5c-ai/agent-mux-observability \
+            @a5c-ai/agent-mux-core \
+            @a5c-ai/agent-mux-adapters \
+            @a5c-ai/agent-mux-gateway \
+            @a5c-ai/transport-mux \
+            @a5c-ai/agent-mux-cli
+          do
+            npm run build --workspace="$workspace"
+          done
 
       - name: Publish agent-mux CLI
         env:
@@ -1163,7 +1211,20 @@ jobs:
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux root workspace
-        run: npm run build:agent-mux
+        run: |
+          set -euo pipefail
+          for workspace in \
+            @a5c-ai/agent-catalog \
+            @a5c-ai/agent-mux-observability \
+            @a5c-ai/agent-mux-core \
+            @a5c-ai/agent-mux-adapters \
+            @a5c-ai/agent-mux-gateway \
+            @a5c-ai/transport-mux \
+            @a5c-ai/agent-mux-cli \
+            @a5c-ai/agent-mux
+          do
+            npm run build --workspace="$workspace"
+          done
 
       - name: Publish agent-mux root
         env:
@@ -1203,7 +1264,21 @@ jobs:
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux TUI workspace
-        run: npm run build:agent-mux
+        run: |
+          set -euo pipefail
+          for workspace in \
+            @a5c-ai/agent-catalog \
+            @a5c-ai/agent-mux-observability \
+            @a5c-ai/agent-mux-core \
+            @a5c-ai/agent-mux-adapters \
+            @a5c-ai/agent-mux-gateway \
+            @a5c-ai/transport-mux \
+            @a5c-ai/agent-mux-cli \
+            @a5c-ai/agent-mux \
+            @a5c-ai/agent-mux-tui
+          do
+            npm run build --workspace="$workspace"
+          done
 
       - name: Publish agent-mux TUI
         env:

@@ -49,7 +49,7 @@ beforeAll(() => {
   prepareArtifactDir();
   buildImage(ROOT);
   startContainer();
-}, 300_000);
+}, 900_000);
 
 afterAll(() => {
   if (!HAS_PROVIDER) return;

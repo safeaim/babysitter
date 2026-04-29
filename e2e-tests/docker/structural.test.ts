@@ -13,7 +13,7 @@ const ROOT = path.resolve(__dirname, "../..");
 beforeAll(() => {
   buildImage(ROOT);
   startContainer();
-}, 300_000); // 5 min for Docker build
+}, 900_000); // 15 min for Docker build
 
 afterAll(() => {
   stopContainer();

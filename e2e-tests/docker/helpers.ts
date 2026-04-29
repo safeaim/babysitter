@@ -4,6 +4,7 @@ import path from "path";
 
 export const IMAGE = "babysitter-e2e:test";
 export const CONTAINER = "babysitter-e2e-container";
+export const BUILD_IMAGE_TIMEOUT_MS = 900_000;
 
 // Read plugin version from plugin.json (single source of truth)
 const pluginJsonPath = path.resolve(__dirname, "../../plugins/babysitter/plugin.json");
@@ -88,7 +89,7 @@ export function dockerExecStdinSafe(
 /** Build the Docker image. */
 export function buildImage(contextDir: string): void {
   exec(`docker build -t ${IMAGE} --load ${contextDir}`, {
-    timeout: 300_000,
+    timeout: BUILD_IMAGE_TIMEOUT_MS,
     stdio: ["pipe", "pipe", "pipe"],
   });
 }

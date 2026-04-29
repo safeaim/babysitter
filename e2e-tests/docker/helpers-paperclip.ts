@@ -11,6 +11,7 @@ import path from "path";
 export const PAPERCLIP_IMAGE = "babysitter-paperclip-e2e:test";
 export const PAPERCLIP_CONTAINER = "babysitter-paperclip-e2e-container";
 export const PAPERCLIP_PLUGIN_DIR = "/app/plugins/babysitter-paperclip";
+export const PAPERCLIP_BUILD_TIMEOUT_MS = 900_000;
 
 const DEFAULT_OPTS: ExecSyncOptions = {
   encoding: "utf-8" as BufferEncoding,
@@ -57,7 +58,7 @@ export function buildPaperclipImage(contextDir: string): void {
   );
   exec(
     `docker build -t ${PAPERCLIP_IMAGE} -f ${dockerfile} --load ${contextDir}`,
-    { timeout: 300_000 }
+    { timeout: PAPERCLIP_BUILD_TIMEOUT_MS }
   );
 }
 

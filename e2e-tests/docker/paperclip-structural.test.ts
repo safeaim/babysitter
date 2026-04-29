@@ -22,7 +22,7 @@ const ROOT = path.resolve(__dirname, "../..");
 beforeAll(() => {
   buildPaperclipImage(ROOT);
   startPaperclipContainer();
-}, 300_000);
+}, 900_000);
 
 afterAll(() => {
   stopPaperclipContainer();

@@ -34,7 +34,7 @@ const ROOT = path.resolve(__dirname, "../..");
 beforeAll(() => {
   buildImage(ROOT);
   startContainer();
-}, 300_000);
+}, 900_000);
 
 afterAll(() => {
   stopContainer();

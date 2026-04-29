@@ -15,7 +15,7 @@ beforeAll(() => {
   buildImage(ROOT);
   startContainer();
   createMockHarness("", MOCK_HARNESS_NAME, "mock harness output", 0);
-}, 300_000);
+}, 900_000);
 
 afterAll(() => {
   cleanupMockHarnesses("", MOCK_HARNESS_NAME);

@@ -43,7 +43,7 @@ const NP = "export NODE_PATH=$(npm root -g) &&";
 beforeAll(() => {
   buildImage(ROOT);
   startContainer();
-}, 300_000);
+}, 900_000);
 
 afterAll(() => {
   stopContainer();

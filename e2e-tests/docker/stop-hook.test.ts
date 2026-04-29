@@ -22,7 +22,7 @@ beforeAll(() => {
   buildImage(ROOT);
   startContainer();
   dockerExec(`mkdir -p ${STATE_DIR} ${LOG_DIR} ${TEST_RUNS_DIR}`);
-}, 300_000);
+}, 900_000);
 
 afterAll(() => {
   stopContainer();

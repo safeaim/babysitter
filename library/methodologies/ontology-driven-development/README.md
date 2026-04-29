@@ -23,15 +23,24 @@ The process combines forward construction phases with backward debt-driven valid
 
 ### Knowledge Graph Structure
 
-The methodology constructs a multi-layered, encyclopedic knowledge graph:
+The methodology constructs a comprehensive, strategically-aligned knowledge graph:
 
-- **Problem Ontology**: Domain concepts, entities, relationships, constraints, business rules
+- **Problem Ontology**: Domain concepts, entities, relationships, business rules, stakeholder context
 - **Solution Ontology**: System concepts, components, interfaces, behaviors, patterns
+- **Product Ontology**: Features, user flows, product specifications, page layouts, component hierarchies
+- **Design Ontology**: UI components, visual elements, interactions, responsive behavior, design systems
+- **Goals Ontology**: Business goals, user goals, technical goals, success criteria, KPIs
+- **Needs Ontology**: Functional needs, non-functional needs, emotional needs, accessibility requirements
+- **Constraints Ontology**: Technical constraints, business constraints, regulatory constraints, design limitations
 - **External Ontology**: Third-party systems, standards, dependencies, environment, integrations
-- **Feature Graph**: User stories, acceptance criteria, interaction patterns, workflows
-- **Pattern Graph**: Architectural patterns, design patterns, implementation patterns
-- **Process Graph**: Development processes, quality gates, delivery mechanisms
-- **Knowledge Graph**: Concepts, definitions, examples, relationships for encyclopedia generation
+- **Process Ontology**: Development processes, quality gates, delivery mechanisms, governance
+- **Traceability Graph**: Goal-to-feature mappings, need-to-solution relationships, constraint-to-design decisions
+
+**Strategic Alignment Features:**
+- Every feature traces back to specific goals and user needs
+- Every design decision respects relevant constraints
+- All generated artifacts include strategic rationale
+- Complete goal-needs-constraints alignment validation
 
 ## Process Workflow
 
@@ -207,6 +216,64 @@ const debtResult = await orchestrate({
 - `artifacts/odd/ADVERSARIAL_REVIEW.md` - Peer review findings
 - `artifacts/odd/debt-tracking.json` - Technical debt metrics
 - `artifacts/odd/gap-resolution.json` - Gap resolution tracking
+
+## Strategic Product Specifications
+
+The enhanced ontology generates product specifications that include strategic context:
+
+### Goal-Driven Feature Development
+```markdown
+## Feature: Patient Appointment Scheduling
+
+### Strategic Context
+- **Business Goal**: Reduce Administrative Burden (30% reduction in staff time)
+- **User Goal**: Seamless Care Experience (book appointments without frustration)
+- **Success Metrics**: 40% reduction in phone calls, 90% user satisfaction
+
+### User Needs Addressed
+- **Functional**: Schedule, reschedule, cancel appointments with appropriate providers
+- **Non-functional**: Mobile-responsive, accessible (WCAG 2.1 AA), fast response (<3s)
+- **Emotional**: Reduce anxiety through clear interface and predictable interactions
+
+### Constraint Compliance
+- **Regulatory**: HIPAA-compliant data handling with audit trails
+- **Technical**: Epic EHR integration within rate limits
+- **Business**: Budget-conscious implementation using existing authentication
+
+### Design Rationale
+Every design decision includes rationale linking back to goals, needs, and constraints.
+Page layouts optimized for both patient anxiety reduction and clinical workflow efficiency.
+```
+
+### Traceability Matrix Generation
+```markdown
+| Feature | Business Goal | User Need | Constraint | Design Decision |
+|---------|---------------|-----------|------------|-----------------|
+| Mobile Login | Improve Engagement | Convenient Access | ADA Compliance | Large touch targets, screen reader support |
+| Lab Results View | Take Control of Health | View Medical Records | HIPAA Privacy | Encrypted transmission, role-based access |
+| Secure Messaging | Care Coordination | Communicate with Care Team | Clinical Workflow | Urgent alert system, provider notification rules |
+```
+
+### Constraint-Aware UI Specifications
+```markdown
+## UI Component: Patient Dashboard
+
+### User Needs Alignment
+- **Trust & Confidence**: Security indicators visible, data source attribution
+- **Empowerment**: Clear navigation, progress indicators, educational content
+- **Reduced Anxiety**: Calm color palette, supportive messaging
+
+### Constraint Satisfaction
+- **HIPAA Compliance**: No PHI in URLs, session timeouts, audit logging
+- **ADA Compliance**: Alt text for images, keyboard navigation, focus indicators
+- **Legacy Browser Support**: Progressive enhancement, graceful degradation
+- **Clinical Workflow**: Quick access patterns for time-pressured healthcare staff
+
+### Design System Elements
+- Colors: Healthcare brand palette with accessibility contrast ratios
+- Typography: Legible fonts supporting medical terminology
+- Spacing: Touch-friendly targets meeting accessibility guidelines
+```
 
 ## Encyclopedic Knowledge Graph
 

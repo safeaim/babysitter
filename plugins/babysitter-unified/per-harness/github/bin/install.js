@@ -65,6 +65,15 @@ function main() {
   try {
     shared.copyPluginBundle(PACKAGE_ROOT, pluginRoot);
     shared.ensureMarketplaceEntry(marketplacePath, pluginRoot);
+    if (typeof shared.registerCopilotPlugin === 'function') {
+      shared.registerCopilotPlugin(pluginRoot);
+    }
+    if (typeof shared.installCopilotSurface === 'function' && typeof shared.getCopilotHome === 'function') {
+      shared.installCopilotSurface(PACKAGE_ROOT, shared.getCopilotHome());
+    }
+    if (typeof shared.warnWindowsHooks === 'function') {
+      shared.warnWindowsHooks();
+    }
     if (typeof shared.harnessInstall === 'function') {
       shared.harnessInstall(PACKAGE_ROOT, pluginRoot);
     }

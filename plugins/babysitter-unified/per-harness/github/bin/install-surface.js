@@ -280,6 +280,13 @@ function removeLegacyHooks(copilotHome) {
     const eventHooks = Array.isArray(hooksConfig.hooks[eventName]) ? hooksConfig.hooks[eventName] : [];
     const filteredMatchers = eventHooks
       .map((matcher) => {
+        const directBash = String(matcher?.bash || matcher?.command || '');
+        const directPs = String(matcher?.powershell || '');
+        const hasDirectHook = directBash.length > 0 || directPs.length > 0;
+        const directIsLegacy = LEGACY_HOOK_SCRIPT_NAMES.some((name) => directBash.includes(name) || directPs.includes(name));
+        if (hasDirectHook) {
+          return directIsLegacy ? null : matcher;
+        }
         const hooks = Array.isArray(matcher.hooks) ? matcher.hooks : [];
         const keptHooks = hooks.filter((hook) => {
           const command = String(hook.command || '');

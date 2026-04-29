@@ -120,6 +120,11 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts/mux-logs
 
+      - name: Build SDK prerequisites
+        run: |
+          set -euo pipefail
+          npm run build:sdk 2>&1 | tee artifacts/mux-logs/sdk-prereqs-build.log
+
       - name: Hooks-proxy unit tests
         run: |
           set -euo pipefail
@@ -229,6 +234,11 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts/observer-compiler-logs
 
+      - name: Build compiler prerequisites
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-catalog 2>&1 | tee artifacts/observer-compiler-logs/agent-catalog-build.log
+
       - name: Build and test agent-plugins-mux
         run: |
           set -euo pipefail
@@ -262,30 +272,39 @@ jobs:
           - slug: babysitter-codex
             command: npm test --prefix plugins/babysitter-codex
             log: babysitter-codex-tests.log
+            needs_sdk: true
           - slug: babysitter-github
             command: bash plugins/babysitter-github/test/plugin-validate.sh
             log: babysitter-github-validate.log
+            needs_sdk: true
           - slug: babysitter-cursor
             command: bash plugins/babysitter-cursor/test/plugin-validate.sh
             log: babysitter-cursor-validate.log
+            needs_sdk: true
           - slug: babysitter-gemini
-            command: npm test --prefix plugins/babysitter-gemini
-            log: babysitter-gemini-tests.log
+            command: node plugins/babysitter-gemini/test/integration.test.js
+            log: babysitter-gemini-integration.log
+            needs_sdk: false
           - slug: babysitter-pi
             command: npm test --prefix plugins/babysitter-pi
             log: babysitter-pi-tests.log
+            needs_sdk: false
           - slug: babysitter-omp
             command: npm test --prefix plugins/babysitter-omp
             log: babysitter-omp-tests.log
+            needs_sdk: false
           - slug: babysitter-opencode
             command: npm test --prefix plugins/babysitter-opencode
             log: babysitter-opencode-tests.log
+            needs_sdk: false
           - slug: babysitter-openclaw
             command: npm test --prefix plugins/babysitter-openclaw
             log: babysitter-openclaw-tests.log
+            needs_sdk: false
           - slug: babysitter-paperclip
             command: npm test --prefix plugins/babysitter-paperclip
             log: babysitter-paperclip-tests.log
+            needs_sdk: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -308,6 +327,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts/plugin-logs
+
+      - name: Build local SDK prerequisites
+        if: ${{ matrix.needs_sdk }}
+        run: |
+          set -euo pipefail
+          npm run build:sdk 2>&1 | tee "artifacts/plugin-logs/${{ matrix.slug }}-sdk-prereqs.log"
 
       - name: Run plugin validation
         run: |

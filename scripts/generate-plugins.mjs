@@ -26,6 +26,10 @@ function getArg(flag) {
 const distCli = join(COMPILER_PKG, 'dist/cli.js');
 if (!existsSync(distCli)) {
   console.log('[generate] Building agent-plugins-mux compiler...');
+  execSync('npm run build --workspace=@a5c-ai/agent-catalog', {
+    cwd: ROOT,
+    stdio: 'inherit',
+  });
   execSync('npm run build --workspace=@a5c-ai/agent-plugins-mux', {
     cwd: ROOT,
     stdio: 'inherit',

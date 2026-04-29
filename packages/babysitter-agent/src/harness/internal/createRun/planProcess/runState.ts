@@ -1,7 +1,8 @@
 import * as path from "node:path";
+import { existsSync, readFileSync } from "node:fs";
 import { WorkspaceService } from "@a5c-ai/agent-mux-core";
 import { getAdapterByName } from "../../../";
-import { createRun } from "@a5c-ai/babysitter-sdk";
+import { createRun, getSessionMarkerPath, readSessionMarker } from "@a5c-ai/babysitter-sdk";
 import { updateSessionContext } from "../../../../session/context";
 import {
   BabysitterRuntimeError,
@@ -26,6 +27,17 @@ type EnsureRunAndMaybeBindArgs = {
   requireBoundSession?: boolean;
 };
 
+function resolveWorktreeRepoAlias(context: Awaited<ReturnType<WorkspaceService["resolveSessionContext"]>>): string | undefined {
+  const repoPath = context?.repo?.sourcePath ?? context?.repo?.targetPath;
+  if (repoPath) {
+    const basename = path.basename(repoPath);
+    if (basename) {
+      return basename;
+    }
+  }
+  return context?.repo?.alias;
+}
+
 async function resolveSessionWorktreeContext(workspace: string) {
   const currentPath = path.resolve(workspace);
   const fallback = {
@@ -42,12 +54,27 @@ async function resolveSessionWorktreeContext(workspace: string) {
       workspacePath: context.repo?.targetPath ?? context.workspaceDefaultCwd ?? context.workspaceRootPath,
       currentPath: context.currentPath ?? currentPath,
       mode: context.repo?.mode ?? context.workspaceMode,
-      repoAlias: context.repo?.alias,
+      repoAlias: resolveWorktreeRepoAlias(context),
       branch: context.repo?.branch,
     };
   } catch {
     return fallback;
   }
+}
+
+function resolveCurrentSessionContextId(harness: string, boundSessionId: string): string {
+  const harnessPid = Number.parseInt(process.env.BABYSITTER_HARNESS_PID ?? "", 10);
+  if (Number.isFinite(harnessPid) && harnessPid > 0) {
+    const markerPath = getSessionMarkerPath(harness, harnessPid);
+    if (existsSync(markerPath)) {
+      const markerSessionId = readFileSync(markerPath, "utf8").trim();
+      if (markerSessionId) {
+        return markerSessionId;
+      }
+    }
+  }
+
+  return readSessionMarker(harness) ?? boundSessionId;
 }
 
 export async function ensureRunAndMaybeBindFromProcessDefinition(
@@ -141,7 +168,8 @@ export async function ensureRunAndMaybeBindFromProcessDefinition(
   }
   if (stateDir && args.workspace) {
     const worktree = await resolveSessionWorktreeContext(args.workspace);
-    await updateSessionContext(stateDir, sessionId, {
+    const sessionContextId = resolveCurrentSessionContextId(args.selectedHarnessName, sessionId);
+    await updateSessionContext(stateDir, sessionContextId, {
       worktree,
     });
   }

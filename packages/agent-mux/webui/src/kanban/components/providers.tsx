@@ -1,4 +1,5 @@
 "use client";
+import { ToastProvider } from "@a5c-ai/compendium";
 import { GatewayProvider } from "@/components/agent-mux/gateway-provider";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
@@ -10,18 +11,20 @@ import { AppFooter } from "@/components/shared/app-footer";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <GatewayProvider>
-        <NotificationProvider>
-          <EventStreamProvider>
-            <div className="flex flex-col min-h-screen">
-              <AppHeader />
-              <main id="main-content" className="flex-1 flex flex-col">{children}</main>
-              <AppFooter />
-            </div>
-            <ShortcutsHelp />
-          </EventStreamProvider>
-        </NotificationProvider>
-      </GatewayProvider>
+      <ToastProvider>
+        <GatewayProvider>
+          <NotificationProvider>
+            <EventStreamProvider>
+              <div className="flex flex-col min-h-screen">
+                <AppHeader />
+                <main id="main-content" className="flex-1 flex flex-col">{children}</main>
+                <AppFooter />
+              </div>
+              <ShortcutsHelp />
+            </EventStreamProvider>
+          </NotificationProvider>
+        </GatewayProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

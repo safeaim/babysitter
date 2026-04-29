@@ -3,6 +3,15 @@ import { NotificationProvider, useNotificationContext, STABILIZATION_WINDOW_MS }
 import type { DigestResponse, RunDigest } from '@/types';
 import React from 'react';
 
+// Mock compendium useToasts
+const mockPush = vi.fn();
+vi.mock('@a5c-ai/compendium', () => ({
+  useToasts: () => ({
+    push: mockPush,
+    close: vi.fn(),
+  }),
+}));
+
 // Mock hooks used by NotificationProvider
 const mockNotify = vi.fn();
 const mockDismiss = vi.fn();
@@ -31,16 +40,11 @@ vi.mock('@/hooks/use-polling', () => ({
   }),
 }));
 
-// Mock ToastStack to avoid next/navigation dependency
-vi.mock('../toast-stack', () => ({
-  ToastStack: ({ notifications, onDismiss: _onDismiss }: { notifications: unknown[]; onDismiss: (id: string) => void }) =>
-    React.createElement('div', { 'data-testid': 'toast-stack' }, `toasts: ${(notifications as unknown[]).length}`),
-}));
-
 describe('NotificationProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDigestData = null;
+    mockPush.mockClear();
   });
 
   // -----------------------------------------------------------------------
@@ -58,16 +62,30 @@ describe('NotificationProvider', () => {
   });
 
   // -----------------------------------------------------------------------
-  // Renders ToastStack
+  // Pushes toasts via compendium useToasts
   // -----------------------------------------------------------------------
-  it('renders the ToastStack component', () => {
+  it('pushes toasts via compendium useToasts when notify is called', () => {
+    function Consumer() {
+      const { notify } = useNotificationContext();
+      return (
+        <button onClick={() => notify('Test', 'Body', 'warning')}>
+          Notify
+        </button>
+      );
+    }
+
     render(
       <NotificationProvider>
-        <span>child</span>
+        <Consumer />
       </NotificationProvider>,
     );
 
-    expect(screen.getByTestId('toast-stack')).toBeInTheDocument();
+    screen.getByText('Notify').click();
+
+    expect(mockNotify).toHaveBeenCalledWith('Test', 'Body', 'warning', undefined);
+    expect(mockPush).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Test', message: 'Body', kind: 'warn' }),
+    );
   });
 
   // -----------------------------------------------------------------------

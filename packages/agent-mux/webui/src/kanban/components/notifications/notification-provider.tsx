@@ -1,13 +1,22 @@
 "use client";
-import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from "react";
+import { useToasts } from "@a5c-ai/compendium";
+import type { ToastOptions } from "@a5c-ai/compendium";
 import {
   useNotifications,
   type AppNotification,
 } from "@/hooks/use-notifications";
-import { ToastStack } from "./toast-stack";
 import { usePolling } from "@/hooks/use-polling";
 import { formatShortId } from "@/lib/utils";
 import type { DigestResponse } from "@/types";
+
+/** Map internal notification types to compendium toast kinds. */
+const TOAST_KIND_MAP: Record<AppNotification["type"], ToastOptions["kind"]> = {
+  success: "success",
+  error: "error",
+  warning: "warn",
+  info: "info",
+};
 
 interface NotificationContextValue {
   notify: (
@@ -48,12 +57,32 @@ export const STABILIZATION_WINDOW_MS = 10_000; // 10 seconds
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const { notifications, notify, dismiss, requestPermission, permission } =
     useNotifications();
+  const { push } = useToasts();
   const { data: digest } = usePolling<DigestResponse>("/api/digest", {
     interval: 3000,
   });
   // Permanent watermark: tracks highest-seen state per run across all polls
   const watermarkRef = useRef<Map<string, RunWatermark>>(new Map());
   const mountedAtRef = useRef(Date.now());
+
+  // Wrapper that adds to the notification panel state AND shows a compendium toast
+  const notifyWithToast = useCallback(
+    (
+      title: string,
+      body: string,
+      type: AppNotification["type"] = "info",
+      options?: { href?: string; persistent?: boolean },
+    ) => {
+      notify(title, body, type, options);
+      push({
+        title,
+        message: body,
+        kind: TOAST_KIND_MAP[type],
+        duration: options?.persistent ? 0 : undefined,
+      });
+    },
+    [notify, push],
+  );
 
   useEffect(() => {
     if (!digest) return;
@@ -93,7 +122,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           notifiedFailed: run.status === "failed",
           notifiedWaiting: run.status === "waiting",
         });
-        notify(
+        notifyWithToast(
           "New Run Started",
           `${formatShortId(run.runId, 4)} started`,
           "info",
@@ -105,7 +134,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       // Run completed — only notify once ever
       if (run.status === "completed" && !wm.notifiedCompleted) {
         wm.notifiedCompleted = true;
-        notify(
+        notifyWithToast(
           "Run Completed",
           `${formatShortId(run.runId, 4)} finished successfully`,
           "success",
@@ -116,7 +145,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       // Run failed — only notify once ever
       if (run.status === "failed" && !wm.notifiedFailed) {
         wm.notifiedFailed = true;
-        notify(
+        notifyWithToast(
           "Run Failed",
           `${formatShortId(run.runId, 4)} failed`,
           "error",
@@ -136,7 +165,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       if (run.status === "waiting" && !wm.notifiedWaiting) {
         wm.notifiedWaiting = true;
         const breakpointTitle = run.breakpointQuestion || "Review required";
-        notify(
+        notifyWithToast(
           `Run ${formatShortId(run.runId, 4)} needs attention`,
           breakpointTitle,
           "warning",
@@ -151,7 +180,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
       // Breakpoint resolved — pending count dropped to zero
       if (wm.pendingBreakpoints > 0 && (run.pendingBreakpoints === 0 || run.pendingBreakpoints === undefined)) {
-        notify(
+        notifyWithToast(
           "Breakpoint Resolved",
           `Breakpoint in ${formatShortId(run.runId, 4)} was approved`,
           "success",
@@ -162,14 +191,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
       wm.status = run.status;
     }
-  }, [digest, notify]);
+  }, [digest, notifyWithToast]);
 
   return (
     <NotificationContext.Provider
-      value={{ notify, requestPermission, permission, notifications, dismiss }}
+      value={{ notify: notifyWithToast, requestPermission, permission, notifications, dismiss }}
     >
       {children}
-      <ToastStack notifications={notifications} onDismiss={dismiss} />
     </NotificationContext.Provider>
   );
 }

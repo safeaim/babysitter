@@ -14,9 +14,9 @@ const packages = [
   'packages/agent-mux/gateway',
   'packages/transport-mux',
   'packages/agent-mux/cli',
-  'packages/agent-mux/webui',
   'packages/agent-mux/sdk',
   'packages/agent-mux/tui',
+  'packages/agent-mux/webui',
 ];
 
 function parseCliArgs(argv = process.argv.slice(2)) {

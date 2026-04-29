@@ -58,6 +58,7 @@ describe('scripts/agent-mux-build.cjs', () => {
   it('builds prerequisites in package order before the targeted TUI package', () => {
     const repoRoot = createFixtureRepo();
     const commands: Array<{ command: string; cwd: string }> = [];
+    const expectedPackages = packages.slice(0, packages.indexOf('packages/agent-mux/tui') + 1);
 
     const exitCode = run(['build', 'packages/agent-mux/tui'], {
       repoRoot,
@@ -71,8 +72,10 @@ describe('scripts/agent-mux-build.cjs', () => {
     expect(exitCode).toBe(0);
     expect(packages[0]).toBe('packages/agent-catalog');
     expect(packages.indexOf('packages/agent-catalog')).toBeLessThan(packages.indexOf('packages/agent-mux/core'));
-    expect(commands).toHaveLength(packages.length);
-    expect(commands.map(({ cwd }) => path.relative(repoRoot, cwd).split(path.sep).join('/'))).toEqual(packages);
+    expect(packages.indexOf('packages/agent-mux/sdk')).toBeLessThan(packages.indexOf('packages/agent-mux/tui'));
+    expect(packages.indexOf('packages/agent-mux/webui')).toBeGreaterThan(packages.indexOf('packages/agent-mux/tui'));
+    expect(commands).toHaveLength(expectedPackages.length);
+    expect(commands.map(({ cwd }) => path.relative(repoRoot, cwd).split(path.sep).join('/'))).toEqual(expectedPackages);
     expect(commands.slice(0, -1).every(({ command }) => command === 'npm run build')).toBe(true);
     expect(commands.at(-1)).toEqual({
       command: 'npm run build:local',

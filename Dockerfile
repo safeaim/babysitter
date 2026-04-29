@@ -57,11 +57,8 @@ RUN npm install --include=dev
 # Copy the rest of the application
 COPY . .
 
-# Build the SDK and agent runtime packages
-RUN npm run build:sdk && \
-    npm run build:agent-mux && \
-    npm run build --workspace=@a5c-ai/agent-core && \
-    npm run build --workspace=@a5c-ai/babysitter-agent
+# Build the SDK and runtime-only agent graph
+RUN npm run build:runtime
 
 # Clean up dev dependencies after build
 ENV NODE_ENV=production

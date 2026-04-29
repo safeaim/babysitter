@@ -42,10 +42,7 @@ RUN npm install --include=dev
 
 COPY . .
 
-RUN npm run build:sdk && \
-    npm run build:agent-mux && \
-    npm run build --workspace=@a5c-ai/agent-core && \
-    npm run build --workspace=@a5c-ai/babysitter-agent
+RUN npm run build:runtime
 
 RUN mkdir -p /workspace && chown -R codex:codex /app /home/codex /workspace
 

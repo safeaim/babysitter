@@ -21,6 +21,7 @@ export default defineConfig({
       '@': path.join(rootDir, 'src', 'kanban'),
       'react-native': path.resolve(rootDir, '..', '..', '..', 'node_modules', 'react-native-web'),
       'react-native$': path.resolve(rootDir, '..', '..', '..', 'node_modules', 'react-native-web'),
+      'next/dynamic': path.join(rootDir, 'src', 'kanban-shims', 'next-dynamic.tsx'),
       'next/link': path.join(rootDir, 'src', 'kanban-shims', 'next-link.tsx'),
       'next/navigation': path.join(rootDir, 'src', 'kanban-shims', 'next-navigation.ts'),
       '@webui': path.join(rootDir, 'src'),

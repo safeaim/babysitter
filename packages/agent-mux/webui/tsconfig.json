@@ -20,12 +20,13 @@
       "@a5c-ai/agent-mux-ui/gateway": ["../ui/src/gateway.ts"],
       "@a5c-ai/agent-mux-ui/session-flow": ["../ui/src/session-flow.ts"],
       "@/*": ["src/kanban/*"],
+      "next/dynamic": ["src/kanban-shims/next-dynamic.tsx"],
       "next/link": ["src/kanban-shims/next-link.tsx"],
       "next/navigation": ["src/kanban-shims/next-navigation.ts"]
     }
   },
   "include": ["src", "vite.config.ts"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/test/**"],
   "references": [
     { "path": "../ui" }
   ]

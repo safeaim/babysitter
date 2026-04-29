@@ -258,8 +258,9 @@ function installManagedHooks(packageRoot, copilotHome) {
   mergeManagedHooksConfig(packageRoot, copilotHome);
 }
 
-function removeLegacyHooks(copilotHome) {
-  for (const hookName of LEGACY_HOOK_SCRIPT_NAMES) {
+function removeManagedHooks(copilotHome) {
+  const managedHookNames = [...LEGACY_HOOK_SCRIPT_NAMES, ...HOOK_SCRIPT_NAMES];
+  for (const hookName of managedHookNames) {
     fs.rmSync(path.join(copilotHome, 'hooks', hookName), { force: true });
   }
 
@@ -283,14 +284,14 @@ function removeLegacyHooks(copilotHome) {
         const directBash = String(matcher?.bash || matcher?.command || '');
         const directPs = String(matcher?.powershell || '');
         const hasDirectHook = directBash.length > 0 || directPs.length > 0;
-        const directIsLegacy = LEGACY_HOOK_SCRIPT_NAMES.some((name) => directBash.includes(name) || directPs.includes(name));
+        const directIsManaged = managedHookNames.some((name) => directBash.includes(name) || directPs.includes(name));
         if (hasDirectHook) {
-          return directIsLegacy ? null : matcher;
+          return directIsManaged ? null : matcher;
         }
         const hooks = Array.isArray(matcher.hooks) ? matcher.hooks : [];
         const keptHooks = hooks.filter((hook) => {
           const command = String(hook.command || '');
-          return !LEGACY_HOOK_SCRIPT_NAMES.some((name) => command.includes(name));
+          return !managedHookNames.some((name) => command.includes(name));
         });
         return keptHooks.length > 0 ? { ...matcher, hooks: keptHooks } : null;
       })
@@ -309,10 +310,12 @@ function removeLegacyHooks(copilotHome) {
 }
 
 function installCopilotSurface(packageRoot, copilotHome) {
-  removeLegacyHooks(copilotHome);
+  removeManagedHooks(copilotHome);
   installManagedSkills(packageRoot, copilotHome);
   installManagedHooks(packageRoot, copilotHome);
 }
+
+const removeLegacyHooks = removeManagedHooks;
 
 function renderCloudAgentAgentsBlock() {
   return [

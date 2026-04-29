@@ -130,20 +130,28 @@ jobs:
           set -euo pipefail
           npm run test:hooks-mux 2>&1 | tee artifacts/mux-logs/hooks-mux-tests.log
 
-      - name: agent-mux tests
+      - name: agent-mux package tests
         run: |
           set -euo pipefail
-          npm run test:agent-mux 2>&1 | tee artifacts/mux-logs/agent-mux-tests.log
+          node scripts/agent-mux-build.cjs test packages/agent-mux/observability 2>&1 | tee artifacts/mux-logs/agent-mux-observability-tests.log
+          node scripts/agent-mux-build.cjs test packages/agent-mux/core 2>&1 | tee artifacts/mux-logs/agent-mux-core-tests.log
+          node scripts/agent-mux-build.cjs test packages/agent-mux/adapters 2>&1 | tee artifacts/mux-logs/agent-mux-adapters-tests.log
+          node scripts/agent-mux-build.cjs test packages/agent-mux/harness-mock 2>&1 | tee artifacts/mux-logs/agent-mux-harness-mock-tests.log
+          node scripts/agent-mux-build.cjs test packages/agent-mux/gateway 2>&1 | tee artifacts/mux-logs/agent-mux-gateway-tests.log
+          node scripts/agent-mux-build.cjs test packages/agent-mux/cli 2>&1 | tee artifacts/mux-logs/agent-mux-cli-tests.log
+          node scripts/agent-mux-build.cjs test packages/agent-mux/sdk 2>&1 | tee artifacts/mux-logs/agent-mux-sdk-tests.log
 
-      - name: agent-mux-tui release verification
+      - name: Build and verify agent-mux release artifacts
         run: |
           set -euo pipefail
-          npm run verify:release --workspace=@a5c-ai/agent-mux-tui 2>&1 | tee artifacts/mux-logs/agent-mux-tui-release.log
-
-      - name: agent-mux-core release verification
-        run: |
-          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-mux-core 2>&1 | tee artifacts/mux-logs/agent-mux-core-build.log
           npm run verify:release --workspace=@a5c-ai/agent-mux-core 2>&1 | tee artifacts/mux-logs/agent-mux-core-release.log
+          npm run build --workspace=@a5c-ai/agent-mux-ui 2>&1 | tee artifacts/mux-logs/agent-mux-ui-build.log
+          npm run verify:release --workspace=@a5c-ai/agent-mux-ui 2>&1 | tee artifacts/mux-logs/agent-mux-ui-release.log
+          npm run build --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/mux-logs/agent-mux-webui-build.log
+          npm run verify:release --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/mux-logs/agent-mux-webui-release.log
+          npm run build --workspace=@a5c-ai/agent-mux-tui 2>&1 | tee artifacts/mux-logs/agent-mux-tui-build.log
+          npm run verify:release --workspace=@a5c-ai/agent-mux-tui 2>&1 | tee artifacts/mux-logs/agent-mux-tui-release.log
 
       - name: Validate transport-mux runtime owner
         run: |

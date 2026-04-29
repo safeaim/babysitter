@@ -266,7 +266,7 @@
         "replaceManagedMarkdownBlock", "writeManagedMarkdown",
         "readSdkVersion", "toLowerHyphenName", "rewriteCloudSkill",
         "registerCopilotPlugin", "deregisterCopilotPlugin",
-        "removeLegacyHooks", "installCopilotSurface",
+        "removeLegacyHooks", "removeManagedHooks", "installCopilotSurface",
         "renderCloudAgentAgentsBlock", "renderCloudAgentCopilotInstructionsBlock",
         "renderCloudAgentSetupWorkflow", "installCloudAgentBundle",
         "installCloudAgentSkills", "installCloudAgentInstructions",

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom-v6';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom-v6';
 import { useGateway } from '@a5c-ai/agent-mux-ui';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
@@ -56,7 +56,7 @@ function RequireAuth(props: { children: React.ReactNode }): JSX.Element {
   return <>{props.children}</>;
 }
 
-function AppChrome(): JSX.Element {
+function AppShell(): JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
   const { store } = useGateway();
@@ -94,11 +94,11 @@ function AppChrome(): JSX.Element {
   React.useEffect(() => bindGlobalHotkeys({ openPalette: () => setPaletteOpen(true) }), []);
 
   return (
-    <div className="webui-shell">
+    <div className="app-shell">
       <Sidebar />
-      <div className="webui-main">
+      <div className="app-main">
         <TopBar pathname={location.pathname} onOpenPalette={() => setPaletteOpen(true)} />
-        <div className="webui-page">
+        <main className="app-content">
           <Routes>
             <Route path="/" element={<Navigate to="/projects" replace />} />
             <Route path="/agents" element={<AgentsPage />} />
@@ -130,20 +130,9 @@ function AppChrome(): JSX.Element {
             <Route path="/legacy-inbox" element={<HookInboxPage />} />
             <Route path="/legacy-settings" element={<SettingsPage />} />
           </Routes>
-        </div>
+        </main>
       </div>
       <CommandPalette actions={actions} open={paletteOpen} onClose={() => setPaletteOpen(false)} />
-      <nav className="webui-rail">
-        <NavLink to="/projects">Projects</NavLink>
-        <NavLink to="/runs">Runs</NavLink>
-        <NavLink to="/agents">Agents</NavLink>
-        <NavLink to="/sessions">Sessions</NavLink>
-        <NavLink to="/sessions/new">New Session</NavLink>
-        <NavLink to="/workspaces">Workspaces</NavLink>
-        <NavLink to="/inbox">Inbox</NavLink>
-        <NavLink to="/automations">Automations</NavLink>
-        <NavLink to="/settings">Settings</NavLink>
-      </nav>
     </div>
   );
 }
@@ -156,7 +145,7 @@ export function AppRouter(): JSX.Element {
         path="*"
         element={
           <RequireAuth>
-            <AppChrome />
+            <AppShell />
           </RequireAuth>
         }
       />

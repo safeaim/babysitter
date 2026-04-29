@@ -734,39 +734,114 @@ jobs:
             fi
           fi
 
-      - name: Prepare plugin and metapackage manifests for staging publish
+      - name: Prepare workspace manifests for staging publish
         run: |
           set -euo pipefail
           node -e "
             const fs = require('fs');
+            const path = require('path');
             const sdkVersion = '${{ steps.version.outputs.staging_version_sdk }}';
-            const pluginPackagePaths = [
-              'plugins/babysitter-codex/package.json',
-              'plugins/babysitter-github/package.json',
-              'plugins/babysitter-cursor/package.json',
-              'plugins/babysitter-gemini/package.json',
-              'plugins/babysitter-pi/package.json',
-              'plugins/babysitter-omp/package.json',
-              'plugins/babysitter-opencode/package.json',
-              'plugins/babysitter-openclaw/package.json',
-              'plugins/babysitter-paperclip/package.json'
-            ];
-            for (const pkgPath of pluginPackagePaths) {
-              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-              pkg.dependencies = pkg.dependencies || {};
-              pkg.dependencies['@a5c-ai/babysitter-sdk'] = sdkVersion;
-              fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+            const unifiedVersion = '${{ steps.version.outputs.staging_version_unified }}';
+            const agentMuxVersion = '${{ steps.version.outputs.staging_version_agent_mux }}';
+            const versionByPackageName = new Map([
+              ['@a5c-ai/babysitter', sdkVersion],
+              ['@a5c-ai/babysitter-observer-dashboard', sdkVersion],
+              ['@a5c-ai/babysitter-sdk', sdkVersion],
+              ['@a5c-ai/cloud', sdkVersion],
+              ['@a5c-ai/hooks-mux-core', sdkVersion],
+              ['@a5c-ai/hooks-mux-cli', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-claude', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-codex', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-gemini', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-copilot', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-cursor', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-pi', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-oh-my-pi', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-opencode', sdkVersion],
+              ['@a5c-ai/hooks-mux-adapter-openclaw', sdkVersion],
+              ['@a5c-ai/agent-plugins-mux', unifiedVersion],
+              ['@a5c-ai/agent-mux', agentMuxVersion],
+              ['@a5c-ai/agent-mux-adapters', agentMuxVersion],
+              ['@a5c-ai/agent-mux-cli', agentMuxVersion],
+              ['@a5c-ai/agent-mux-core', agentMuxVersion],
+              ['@a5c-ai/agent-mux-gateway', agentMuxVersion],
+              ['@a5c-ai/agent-mux-harness-mock', agentMuxVersion],
+              ['@a5c-ai/agent-mux-observability', agentMuxVersion],
+              ['@a5c-ai/agent-mux-sdk', agentMuxVersion],
+              ['@a5c-ai/agent-mux-tui', agentMuxVersion],
+              ['@a5c-ai/agent-mux-ui', agentMuxVersion],
+              ['@a5c-ai/agent-mux-webui', agentMuxVersion],
+              ['@a5c-ai/transport-mux', agentMuxVersion]
+            ]);
+            const fields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
+            const roots = ['packages', 'plugins'];
+            const skipDirs = new Set(['.git', 'node_modules', 'dist', 'build', 'coverage', 'artifacts']);
+            const packageJsonPaths = new Set();
+
+            function collectPackageJsons(dir) {
+              if (!fs.existsSync(dir)) {
+                return;
+              }
+              for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                const fullPath = path.join(dir, entry.name);
+                if (entry.isDirectory()) {
+                  if (!skipDirs.has(entry.name)) {
+                    collectPackageJsons(fullPath);
+                  }
+                  continue;
+                }
+                if (entry.isFile() && entry.name === 'package.json') {
+                  packageJsonPaths.add(fullPath);
+                }
+              }
             }
+
+            packageJsonPaths.add('package.json');
+            for (const rootDir of roots) {
+              collectPackageJsons(rootDir);
+            }
+
+            function rewriteInternalDependencyVersion(currentValue, nextVersion) {
+              if (typeof currentValue !== 'string') {
+                return nextVersion;
+              }
+              if (currentValue.startsWith('workspace:^') || currentValue.startsWith('^')) {
+                return '^' + nextVersion;
+              }
+              if (currentValue.startsWith('workspace:~') || currentValue.startsWith('~')) {
+                return '~' + nextVersion;
+              }
+              return nextVersion;
+            }
+
+            for (const pkgPath of packageJsonPaths) {
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+              let changed = false;
+              for (const field of fields) {
+                if (!pkg[field]) continue;
+                for (const [depName, nextVersion] of versionByPackageName) {
+                  if (!pkg[field][depName]) continue;
+                  const rewrittenVersion = rewriteInternalDependencyVersion(pkg[field][depName], nextVersion);
+                  if (pkg[field][depName] === rewrittenVersion) continue;
+                  pkg[field][depName] = rewrittenVersion;
+                  changed = true;
+                }
+              }
+              if (changed) {
+                fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+              }
+            }
+
             const geminiVersionsPath = 'plugins/babysitter-gemini/versions.json';
             const geminiVersions = JSON.parse(fs.readFileSync(geminiVersionsPath, 'utf8'));
             geminiVersions.extensionVersion = '${{ steps.version.outputs.staging_version_gemini }}';
             fs.writeFileSync(geminiVersionsPath, JSON.stringify(geminiVersions, null, 2) + '\n');
-            const metaPkgPath = 'packages/babysitter/package.json';
-            const metaPkg = JSON.parse(fs.readFileSync(metaPkgPath, 'utf8'));
-            metaPkg.dependencies = metaPkg.dependencies || {};
-            metaPkg.dependencies['@a5c-ai/babysitter-sdk'] = metaPkg.version;
-            fs.writeFileSync(metaPkgPath, JSON.stringify(metaPkg, null, 2) + '\n');
           "
+
+      - name: Refresh staging publish lockfile
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts --workspaces --include-workspace-root
 
       - name: Bundle staging publish workspace
         run: |

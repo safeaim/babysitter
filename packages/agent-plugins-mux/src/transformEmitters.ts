@@ -299,10 +299,15 @@ export function generateManifests(
       dependencies: { [sdkCfg.package]: manifest.version },
     };
     if (isEsm) pkgJson.type = 'module';
-    if (manifest.repository) pkgJson.repository = manifest.repository;
     if (manifest.repository) {
-      const repoUrl = typeof manifest.repository === 'string' ? manifest.repository : manifest.repository.url;
-      pkgJson.homepage = `${repoUrl}/tree/main/plugins/${npmPkg.split('/').pop()}#readme`;
+      let repoUrl = typeof manifest.repository === 'string' ? manifest.repository : manifest.repository.url;
+      if (!repoUrl.startsWith('git+')) repoUrl = `git+${repoUrl}`;
+      if (!repoUrl.endsWith('.git')) repoUrl = `${repoUrl}.git`;
+      const directory = `plugins/${npmPkg.split('/').pop()}`;
+      const baseUrl = repoUrl.replace(/\.git$/, '').replace(/^git\+/, '');
+      pkgJson.repository = { type: 'git', url: repoUrl, directory };
+      pkgJson.homepage = `${baseUrl}/tree/main/${directory}#readme`;
+      pkgJson.bugs = { url: `${baseUrl}/issues` };
     }
     if (targetProfile.adapterFamily === 'programmatic') {
       const peerPkg = packageMetadata.peerDependencyPackage;

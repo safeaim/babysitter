@@ -13,6 +13,44 @@ type ResolvedManifest = A5cPluginManifest & {
   npmPackageName?: string;
 };
 
+function buildNpmRepository(
+  manifest: A5cPluginManifest,
+  npmPackageName: string,
+): Record<string, unknown> | undefined {
+  if (!manifest.repository) return undefined;
+  let url = typeof manifest.repository === 'string'
+    ? manifest.repository
+    : manifest.repository.url;
+  if (!url.startsWith('git+')) url = `git+${url}`;
+  if (!url.endsWith('.git')) url = `${url}.git`;
+  const directory = `plugins/${npmPackageName.split('/').pop()}`;
+  return { type: 'git', url, directory };
+}
+
+function buildNpmHomepage(
+  manifest: A5cPluginManifest,
+  npmPackageName: string,
+): string | undefined {
+  if (!manifest.repository) return undefined;
+  const url = typeof manifest.repository === 'string'
+    ? manifest.repository
+    : manifest.repository.url;
+  const base = url.replace(/\.git$/, '').replace(/^git\+/, '');
+  const directory = `plugins/${npmPackageName.split('/').pop()}`;
+  return `${base}/tree/main/${directory}#readme`;
+}
+
+function buildNpmBugs(
+  manifest: A5cPluginManifest,
+): Record<string, string> | undefined {
+  if (!manifest.repository) return undefined;
+  const url = typeof manifest.repository === 'string'
+    ? manifest.repository
+    : manifest.repository.url;
+  const base = url.replace(/\.git$/, '').replace(/^git\+/, '');
+  return { url: `${base}/issues` };
+}
+
 type TargetName = Pick<TargetProfile, 'name'>;
 
 function normalizeAuthorObject(manifest: A5cPluginManifest): { name: string; email?: string } {
@@ -96,9 +134,10 @@ export function generateCodexManifest(manifest: ResolvedManifest): string {
     publishConfig: { access: 'public' },
   };
 
-  if (manifest.repository) {
-    packageJson.repository = manifest.repository;
-  }
+  const pkgName = resolveTargetNpmPackageName(manifest, target);
+  packageJson.repository = buildNpmRepository(manifest, pkgName);
+  packageJson.homepage = buildNpmHomepage(manifest, pkgName);
+  packageJson.bugs = buildNpmBugs(manifest);
 
   return JSON.stringify(packageJson, null, 2) + '\n';
 }
@@ -229,9 +268,10 @@ export function generatePiManifest(manifest: ResolvedManifest): string {
     publishConfig: { access: 'public' },
   };
 
-  if (manifest.repository) {
-    packageJson.repository = manifest.repository;
-  }
+  const piPkgName = resolveTargetNpmPackageName(manifest, target);
+  packageJson.repository = buildNpmRepository(manifest, piPkgName);
+  packageJson.homepage = buildNpmHomepage(manifest, piPkgName);
+  packageJson.bugs = buildNpmBugs(manifest);
 
   return JSON.stringify(packageJson, null, 2) + '\n';
 }
@@ -274,9 +314,10 @@ export function generateOhMyPiManifest(manifest: ResolvedManifest): string {
     publishConfig: { access: 'public' },
   };
 
-  if (manifest.repository) {
-    packageJson.repository = manifest.repository;
-  }
+  const ompPkgName = resolveTargetNpmPackageName(manifest, target);
+  packageJson.repository = buildNpmRepository(manifest, ompPkgName);
+  packageJson.homepage = buildNpmHomepage(manifest, ompPkgName);
+  packageJson.bugs = buildNpmBugs(manifest);
 
   return JSON.stringify(packageJson, null, 2) + '\n';
 }
@@ -358,11 +399,10 @@ export function generateOpenClawPackageManifest(manifest: ResolvedManifest): str
     publishConfig: { access: 'public' },
   };
 
-  if (manifest.repository) {
-    packageJson.repository = manifest.repository;
-    const repoUrl = typeof manifest.repository === 'string' ? manifest.repository : manifest.repository.url;
-    packageJson.homepage = `${repoUrl}/tree/main/plugins/${packageName.split('/').pop()}#readme`;
-  }
+  const clawPkgName = resolveTargetNpmPackageName(manifest, target);
+  packageJson.repository = buildNpmRepository(manifest, clawPkgName);
+  packageJson.homepage = buildNpmHomepage(manifest, clawPkgName);
+  packageJson.bugs = buildNpmBugs(manifest);
 
   return JSON.stringify(packageJson, null, 2) + '\n';
 }

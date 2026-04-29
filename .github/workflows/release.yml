@@ -142,11 +142,21 @@ jobs:
           npm run coverage:cloud 2>&1 | tee artifacts/logs/cloud-coverage.log
           npm run verify:cloud-release 2>&1 | tee artifacts/logs/cloud-release.log
 
+      - name: Build compiler prerequisites
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-catalog 2>&1 | tee artifacts/logs/agent-catalog-build.log
+
       - name: Build and test agent-plugins-mux
         run: |
           set -euo pipefail
           npm run build --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/logs/agent-plugins-mux-build.log
           npm run test --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/logs/agent-plugins-mux-tests.log
+
+      - name: Validate canonical Claude plugin bundle
+        run: |
+          set -euo pipefail
+          node packages/agent-plugins-mux/dist/cli.js diff --target claude-code --source plugins/babysitter-unified --existing plugins/babysitter 2>&1 | tee artifacts/logs/babysitter-claude-diff.log
 
       - name: Build and test observer-dashboard
         run: |
@@ -360,6 +370,36 @@ jobs:
           npm run test:cloud
           npm run verify:cloud-release
 
+      - name: Prepare plugin and metapackage manifests for publish
+        run: |
+          set -euo pipefail
+          node -e "
+            const fs = require('fs');
+            const sdkVersion = '${{ steps.bump.outputs.version }}';
+            const pluginPackagePaths = [
+              'plugins/babysitter-codex/package.json',
+              'plugins/babysitter-github/package.json',
+              'plugins/babysitter-cursor/package.json',
+              'plugins/babysitter-gemini/package.json',
+              'plugins/babysitter-pi/package.json',
+              'plugins/babysitter-omp/package.json',
+              'plugins/babysitter-opencode/package.json',
+              'plugins/babysitter-openclaw/package.json',
+              'plugins/babysitter-paperclip/package.json'
+            ];
+            for (const pkgPath of pluginPackagePaths) {
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+              pkg.dependencies = pkg.dependencies || {};
+              pkg.dependencies['@a5c-ai/babysitter-sdk'] = sdkVersion;
+              fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+            }
+            const metaPkgPath = 'packages/babysitter/package.json';
+            const metaPkg = JSON.parse(fs.readFileSync(metaPkgPath, 'utf8'));
+            metaPkg.dependencies = metaPkg.dependencies || {};
+            metaPkg.dependencies['@a5c-ai/babysitter-sdk'] = metaPkg.version;
+            fs.writeFileSync(metaPkgPath, JSON.stringify(metaPkg, null, 2) + '\n');
+          "
+
       - name: Pack npm artifacts
         run: |
           set -euo pipefail
@@ -401,57 +441,72 @@ jobs:
           fi
           (cd artifacts/release && sha256sum *.tgz > artifacts.sha256)
 
-      - name: Publish SDK to npm
+      - name: Publish foundation, hooks, and agent-mux packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          npm publish --workspace=@a5c-ai/babysitter-sdk --access public
-
-      - name: Publish agent-plugins-mux to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm publish --workspace=@a5c-ai/agent-plugins-mux --access public
-
-      - name: Publish observer-dashboard to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm publish --workspace=@a5c-ai/babysitter-observer-dashboard --access public
-
-      - name: Publish cloud to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm publish --workspace=@a5c-ai/cloud --access public
-
-      - name: Publish breakpoints-mux to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm publish --workspace=@a5c-ai/breakpoints-mux --access public
-
-      - name: Publish agent-mux packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          for pkg in @a5c-ai/agent-mux-observability @a5c-ai/agent-mux-core @a5c-ai/agent-mux-adapters @a5c-ai/agent-mux-harness-mock @a5c-ai/agent-mux-ui @a5c-ai/agent-mux-gateway @a5c-ai/agent-mux-cli @a5c-ai/agent-mux-webui @a5c-ai/agent-mux @a5c-ai/agent-mux-tui; do
-            echo "Publishing $pkg..."
-            npm publish --workspace=$pkg --access public
-          done
-
-      - name: Publish transport-mux to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm publish --workspace=@a5c-ai/transport-mux --access public
+          run_batch() {
+            local batch_name="$1"
+            shift
+            local -a pids=()
+            local -a labels=()
+            echo "::group::$batch_name"
+            while (($#)); do
+              local label="$1"
+              local cmd="$2"
+              shift 2
+              echo "Starting $label"
+              bash -lc "set -euo pipefail; $cmd" &
+              pids+=($!)
+              labels+=("$label")
+            done
+            local failed=0
+            for idx in "${!pids[@]}"; do
+              if ! wait "${pids[$idx]}"; then
+                echo "::error::${labels[$idx]} failed in ${batch_name}"
+                failed=1
+              fi
+            done
+            echo "::endgroup::"
+            if [[ $failed -ne 0 ]]; then
+              return 1
+            fi
+          }
+          run_batch "foundation publishes" \
+            "agent-plugins-mux" "npm publish --workspace=@a5c-ai/agent-plugins-mux --access public" \
+            "observer-dashboard" "npm publish --workspace=@a5c-ai/babysitter-observer-dashboard --access public" \
+            "cloud" "npm publish --workspace=@a5c-ai/cloud --access public" \
+            "breakpoints-mux" "npm publish --workspace=@a5c-ai/breakpoints-mux --access public" \
+            "hooks-mux-core" "npm publish --workspace=@a5c-ai/hooks-mux-core --access public" \
+            "agent-mux-observability" "npm publish --workspace=@a5c-ai/agent-mux-observability --access public"
+          run_batch "hooks and agent-mux core publishes" \
+            "agent-mux-core" "npm publish --workspace=@a5c-ai/agent-mux-core --access public" \
+            "hooks-mux-cli" "npm publish --workspace=@a5c-ai/hooks-mux-cli --access public" \
+            "hooks-mux-adapter-claude" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-claude --access public" \
+            "hooks-mux-adapter-codex" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-codex --access public" \
+            "hooks-mux-adapter-gemini" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-gemini --access public" \
+            "hooks-mux-adapter-copilot" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-copilot --access public" \
+            "hooks-mux-adapter-cursor" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-cursor --access public" \
+            "hooks-mux-adapter-pi" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-pi --access public" \
+            "hooks-mux-adapter-oh-my-pi" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-oh-my-pi --access public" \
+            "hooks-mux-adapter-opencode" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-opencode --access public" \
+            "hooks-mux-adapter-openclaw" "npm publish --workspace=@a5c-ai/hooks-mux-adapter-openclaw --access public"
+          run_batch "agent-mux leaf publishes" \
+            "agent-mux-adapters" "npm publish --workspace=@a5c-ai/agent-mux-adapters --access public" \
+            "agent-mux-harness-mock" "npm publish --workspace=@a5c-ai/agent-mux-harness-mock --access public" \
+            "agent-mux-ui" "npm publish --workspace=@a5c-ai/agent-mux-ui --access public" \
+            "transport-mux" "npm publish --workspace=@a5c-ai/transport-mux --access public"
+          run_batch "agent-mux gateway surfaces" \
+            "agent-mux-gateway" "npm publish --workspace=@a5c-ai/agent-mux-gateway --access public" \
+            "agent-mux-webui" "npm publish --workspace=@a5c-ai/agent-mux-webui --access public"
+          run_batch "agent-mux cli" \
+            "agent-mux-cli" "npm publish --workspace=@a5c-ai/agent-mux-cli --access public"
+          run_batch "agent-mux root" \
+            "agent-mux" "npm publish --workspace=@a5c-ai/agent-mux --access public"
+          run_batch "sdk and agent-mux tui" \
+            "babysitter-sdk" "npm publish --workspace=@a5c-ai/babysitter-sdk --access public" \
+            "agent-mux-tui" "npm publish --workspace=@a5c-ai/agent-mux-tui --access public"
 
       - name: Run cloud production deploy hook
         if: ${{ vars.A5C_CLOUD_PROD_DEPLOY_ENABLED == 'true' }}
@@ -472,206 +527,48 @@ jobs:
           set -euo pipefail
           npm run deploy:cloud:prod
 
-      - name: Inject SDK dependency into codex package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-codex/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-codex package to npm
+      - name: Publish harness plugins
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-codex
-
-      - name: Inject SDK dependency into github package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-github/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-github package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-github
-
-      - name: Inject SDK dependency into cursor package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-cursor/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-cursor package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-cursor
-
-      - name: Inject SDK dependency into gemini package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-gemini/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-gemini package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-gemini
-
-      - name: Inject SDK dependency into pi package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-pi/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-pi package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-pi
-
-      - name: Inject SDK dependency into omp package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-omp/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-omp package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-omp
-
-      - name: Inject SDK dependency into opencode package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-opencode/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-opencode package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-opencode
-
-      - name: Inject SDK dependency into openclaw package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-openclaw/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-openclaw package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-openclaw
-
-      - name: Inject SDK dependency into paperclip package for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'plugins/babysitter-paperclip/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = '${{ steps.bump.outputs.version }}';
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-          "
-
-      - name: Publish babysitter-paperclip package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm run deploy
-        working-directory: plugins/babysitter-paperclip
-
-      - name: Publish hooks-mux packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          for pkg in @a5c-ai/hooks-mux-core @a5c-ai/hooks-mux-cli @a5c-ai/hooks-mux-adapter-claude @a5c-ai/hooks-mux-adapter-codex @a5c-ai/hooks-mux-adapter-gemini @a5c-ai/hooks-mux-adapter-copilot @a5c-ai/hooks-mux-adapter-cursor @a5c-ai/hooks-mux-adapter-pi @a5c-ai/hooks-mux-adapter-oh-my-pi @a5c-ai/hooks-mux-adapter-opencode @a5c-ai/hooks-mux-adapter-openclaw; do
-            echo "Publishing $pkg..."
-            npm publish --workspace=$pkg --access public
-          done
-
-      - name: Inject SDK dependency into metapackage for publish
-        run: |
-          set -euo pipefail
-          node -e "
-            const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('packages/babysitter/package.json', 'utf8'));
-            pkg.dependencies = pkg.dependencies || {};
-            pkg.dependencies['@a5c-ai/babysitter-sdk'] = pkg.version;
-            fs.writeFileSync('packages/babysitter/package.json', JSON.stringify(pkg, null, 2) + '\n');
-          "
+          run_batch() {
+            local batch_name="$1"
+            shift
+            local -a pids=()
+            local -a labels=()
+            echo "::group::$batch_name"
+            while (($#)); do
+              local label="$1"
+              local cmd="$2"
+              shift 2
+              echo "Starting $label"
+              bash -lc "set -euo pipefail; $cmd" &
+              pids+=($!)
+              labels+=("$label")
+            done
+            local failed=0
+            for idx in "${!pids[@]}"; do
+              if ! wait "${pids[$idx]}"; then
+                echo "::error::${labels[$idx]} failed in ${batch_name}"
+                failed=1
+              fi
+            done
+            echo "::endgroup::"
+            if [[ $failed -ne 0 ]]; then
+              return 1
+            fi
+          }
+          run_batch "harness plugin publishes" \
+            "babysitter-codex" "cd plugins/babysitter-codex && npm run deploy" \
+            "babysitter-github" "cd plugins/babysitter-github && npm run deploy" \
+            "babysitter-cursor" "cd plugins/babysitter-cursor && npm run deploy" \
+            "babysitter-gemini" "cd plugins/babysitter-gemini && npm run deploy" \
+            "babysitter-pi" "cd plugins/babysitter-pi && npm run deploy" \
+            "babysitter-omp" "cd plugins/babysitter-omp && npm run deploy" \
+            "babysitter-opencode" "cd plugins/babysitter-opencode && npm run deploy" \
+            "babysitter-openclaw" "cd plugins/babysitter-openclaw && npm run deploy" \
+            "babysitter-paperclip" "cd plugins/babysitter-paperclip && npm run deploy"
 
       - name: Publish babysitter metapackage to npm
         env:

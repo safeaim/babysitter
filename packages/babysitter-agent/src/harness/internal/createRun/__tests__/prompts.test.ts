@@ -81,6 +81,7 @@ describe("harnessPrompts", () => {
     expect(prompt).toContain("Default for reasoning tasks");
     expect(prompt).toContain("await ctx.task(");
     expect(prompt).toContain("DefinedTask created via `defineTask(...)`");
+    expect(prompt).toContain("use `inputs.json` for task inputs");
     expect(prompt).toContain("do not reference Node's global process object as `process.*`");
     expect(prompt).toContain("do not assume `ctx.workspaceDir` or `ctx.cwd` exists");
     expect(prompt).toContain("import.meta.url");
@@ -94,6 +95,7 @@ describe("harnessPrompts", () => {
     expect(prompt).toContain("Follow the babysit workflow directly");
     expect(prompt).toContain("AskUserQuestion, task, and skill are common tools in this phase");
     expect(prompt).toContain("built-in coding tools");
+    expect(prompt).toContain("Never drive the orchestration loop through raw `babysitter` CLI commands inside `bash`");
     expect(prompt).toContain("respect task-level harness metadata");
     expect(prompt).toContain("Shell and legacy node effects are first-class pending effects");
     expect(prompt).toContain("For delegated or fresh-context work, prefer `task`");

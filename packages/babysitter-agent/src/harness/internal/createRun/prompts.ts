@@ -2,9 +2,10 @@ import type { HarnessDiscoveryResult } from "../../types";
 import {
   createPiContext,
   composeProcessCreatePrompt,
-  composeOrchestrationPrompt,
   resolveActiveProcessLibrary,
   getDefaultProcessLibrarySpec,
+  renderBreakpointHandling,
+  renderResultsPosting,
 } from "@a5c-ai/babysitter-sdk";
 
 export interface HarnessPromptContext {
@@ -159,6 +160,7 @@ export async function buildProcessDefinitionSystemPrompt(
     "- The process must orchestrate the work through babysitter tasks instead of doing the main implementation directly in `process(inputs, ctx)`.",
     "- Define at least one task with `defineTask(...)`, and invoke tasks from `process(inputs, ctx)` via `await ctx.task(...)`.",
     "- Any task passed to `ctx.task(...)` must be a DefinedTask created via `defineTask(...)`; never pass plain object task definitions or ad-hoc task objects.",
+    "- When defining task IO paths, use `inputs.json` for task inputs and `result.json` for task outputs. Do not emit `input.json`.",
     "- Inside that named `process(inputs, ctx)` export, do not reference Node's global process object as `process.*`; use `globalThis.process` or an imported alias like `nodeProcess` instead.",
     "- If the process needs the workspace root, do not assume `ctx.workspaceDir` or `ctx.cwd` exists in runtime context. Resolve it from the module location using `import.meta.url`, for example with `path.dirname(fileURLToPath(import.meta.url))`.",
     "- Keep the generated module syntactically valid ESM. If you embed HTML/CSS/JS asset contents inside the process source, do not use raw nested template literals; prefer arrays joined with \"\\n\", String.raw, or escaped inner backticks and \\${...} sequences.",
@@ -260,7 +262,10 @@ export function buildOrchestrationSystemPrompt(
   preferAgentOnlyTasks?: boolean | undefined,
 ): string {
   const piCtx = createPiContext({ interactive });
-  const composedInstructions = composeOrchestrationPrompt(piCtx);
+  const sharedGuidance = [
+    renderBreakpointHandling(piCtx),
+    renderResultsPosting(piCtx),
+  ].filter((section) => section.trim().length > 0).join("\n\n---\n\n");
 
   return [
     "You are the babysitter-agent create-run PhaseOrchestration agent.",
@@ -272,6 +277,8 @@ export function buildOrchestrationSystemPrompt(
     "- You have your built-in coding tools (bash/read/write/edit/search) plus the custom babysitter tools below. Use them to do the orchestration work itself.",
     "- AskUserQuestion, task, and skill are common tools in this phase. In interactive mode, use AskUserQuestion instead of asking the user in plain text.",
     "- Work in bounded turns. In each turn, call babysitter_run_iterate at most once unless the prompt explicitly tells you otherwise.",
+    "- Never drive the orchestration loop through raw `babysitter` CLI commands inside `bash`. Use the custom babysitter tools (`babysitter_run_iterate`, `babysitter_task_post_result`, `babysitter_finish_orchestration`) for loop control.",
+    "- `bash` is only for actual workspace commands and requested shell effects. It is not a substitute for babysitter loop-control tools.",
     "- Do not rely on a hidden host-side effect executor. Perform or dispatch each effect intentionally based on the effect payload you received from babysitter_run_iterate.",
     "- Shell and legacy node effects are first-class pending effects. Do not skip them, narrate them, or assume the host will run them for you.",
     preferAgentOnlyTasks
@@ -289,9 +296,9 @@ export function buildOrchestrationSystemPrompt(
     "",
     "--- Shared Orchestration Instructions ---",
     "",
-    composedInstructions,
+    sharedGuidance,
     "",
-    "This phase is the bound orchestration phase. Preserve the hook-style loop semantics by always continuing through the babysitter tools.",
+    "This phase is the bound internal orchestration phase. External stop-hook and raw CLI loop instructions do not control this session; keep the loop inside the custom babysitter tools exposed here.",
     ...formatSharedContext(context),
   ].join("\n");
 }

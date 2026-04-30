@@ -14,6 +14,8 @@ import {
   __setAncestorResolverForTests,
   getSessionMarkerPath,
 } from "@a5c-ai/babysitter-sdk";
+import * as taskStore from "../../../../tasks";
+import * as resumeState from "../resumeState";
 
 // ── Mocks ─────────────────────────────────────────────────────────────
 
@@ -3552,6 +3554,165 @@ describe("handleHarnessCreateRun", () => {
         prompt: Mock;
       };
       expect(orchestrationSession.prompt).toHaveBeenCalledTimes(1);
+    });
+
+    it("syncs on-disk progress after a raw CLI orchestration turn and auto-advances without stalling", async () => {
+      const runDir = "/tmp/runs/run-raw-cli-sync";
+      const assessRunSpy = vi.spyOn(resumeState, "assessRun");
+      const listTasksSpy = vi.spyOn(taskStore, "listTasks");
+      const readTaskSpy = vi.spyOn(taskStore, "readTask");
+      try {
+        (discoverHarnesses as Mock).mockResolvedValue([
+          makeDiscoveryResult({ name: "pi" }),
+        ]);
+        (createRun as Mock).mockResolvedValue({
+          runId: "run-raw-cli-sync",
+          runDir,
+          metadata: {},
+        });
+        (orchestrateIteration as Mock).mockResolvedValue({
+          status: "completed",
+          output: "done",
+        });
+
+        assessRunSpy
+          .mockResolvedValueOnce({
+            run: {
+              runId: "run-raw-cli-sync",
+              runDir,
+              processId: "proc-1",
+              createdAt: "2026-05-01T00:00:00.000Z",
+              status: "created",
+              pendingEffects: {},
+              totalEffects: 0,
+              resolvedEffects: 0,
+              entrypoint: { importPath: "/tmp/process.mjs" },
+            },
+            journalLength: 1,
+            lastEvent: {
+              type: "RUN_CREATED",
+              recordedAt: "2026-05-01T00:00:00.000Z",
+            },
+          })
+          .mockResolvedValueOnce({
+            run: {
+              runId: "run-raw-cli-sync",
+              runDir,
+              processId: "proc-1",
+              createdAt: "2026-05-01T00:00:00.000Z",
+              status: "in-progress",
+              pendingEffects: {},
+              totalEffects: 1,
+              resolvedEffects: 1,
+              entrypoint: { importPath: "/tmp/process.mjs" },
+            },
+            journalLength: 3,
+            lastEvent: {
+              type: "EFFECT_RESOLVED",
+              recordedAt: "2026-05-01T00:00:02.000Z",
+            },
+          })
+          .mockResolvedValueOnce({
+            run: {
+              runId: "run-raw-cli-sync",
+              runDir,
+              processId: "proc-1",
+              createdAt: "2026-05-01T00:00:00.000Z",
+              status: "in-progress",
+              pendingEffects: {},
+              totalEffects: 1,
+              resolvedEffects: 1,
+              entrypoint: { importPath: "/tmp/process.mjs" },
+            },
+            journalLength: 3,
+            lastEvent: {
+              type: "EFFECT_RESOLVED",
+              recordedAt: "2026-05-01T00:00:02.000Z",
+            },
+          })
+          .mockResolvedValueOnce({
+            run: {
+              runId: "run-raw-cli-sync",
+              runDir,
+              processId: "proc-1",
+              createdAt: "2026-05-01T00:00:00.000Z",
+              status: "completed",
+              pendingEffects: {},
+              totalEffects: 1,
+              resolvedEffects: 1,
+              entrypoint: { importPath: "/tmp/process.mjs" },
+            },
+            journalLength: 4,
+            lastEvent: {
+              type: "RUN_COMPLETED",
+              recordedAt: "2026-05-01T00:00:03.000Z",
+            },
+          });
+        listTasksSpy.mockResolvedValue([]);
+        readTaskSpy.mockResolvedValue({
+          effectId: "unused",
+          taskId: "unused",
+          runId: "run-raw-cli-sync",
+          requestedAt: "2026-05-01T00:00:01.000Z",
+          completedAt: undefined,
+          startedAt: undefined,
+          kind: "agent",
+          title: "Unused",
+          labels: [],
+          status: "requested",
+          definition: {
+            kind: "agent",
+            title: "Unused",
+          },
+        } as Awaited<ReturnType<typeof taskStore.readTask>>);
+
+        const executeBash = vi.fn(async () => ({
+          output: "raw babysitter cli invoked",
+          exitCode: 0,
+          cancelled: false,
+        }));
+        vi.mocked(createAgentCoreSession).mockImplementationOnce(() => ({
+          initialize: vi.fn().mockResolvedValue(undefined),
+          subscribe: vi.fn(() => () => {}),
+          dispose: vi.fn(),
+          executeBash,
+          get sessionId() {
+            return "mock-session-id-raw-cli-sync";
+          },
+          get isInitialized() {
+            return true;
+          },
+          prompt: vi.fn(async () => {
+            await executeBash("babysitter run:iterate /tmp/runs/run-raw-cli-sync");
+            await executeBash("babysitter task:post /tmp/runs/run-raw-cli-sync eff-1 --status ok");
+            return {
+              success: true,
+              output: "handled via raw babysitter CLI",
+              exitCode: 0,
+              duration: 1,
+            };
+          }),
+        }) as ReturnType<typeof createAgentCoreSession>);
+
+        const code = await handleHarnessCreateRun({
+          processPath: "/tmp/p.js",
+          runsDir: "/tmp/runs",
+          json: false,
+          verbose: false,
+          interactive: false,
+        });
+
+        expect(code).toBe(0);
+        expect(orchestrateIteration).toHaveBeenCalledTimes(1);
+        expect(executeBash).toHaveBeenCalledWith(
+          "babysitter run:iterate /tmp/runs/run-raw-cli-sync",
+        );
+        expect(listTasksSpy).toHaveBeenCalledTimes(3);
+      } finally {
+        assessRunSpy.mockRestore();
+        listTasksSpy.mockRestore();
+        readTaskSpy.mockRestore();
+      }
     });
 
     it("invokes an explicit task metadata harness for node-kind effects", async () => {

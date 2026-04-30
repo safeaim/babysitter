@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import type { EffectAction } from "@a5c-ai/babysitter-sdk";
 import {
   BabysitterRuntimeError,
   DIM,
@@ -28,8 +29,10 @@ import {
 import { readProcessFileFingerprint } from "./effects";
 import { createOrchestrationTools } from "./internalTools";
 import { ensureRunAndMaybeBindFromProcessDefinition } from "../planProcess/runState";
+import { assessRun } from "../resumeState";
 import type { OrchestrationProgressSnapshot, RunOrchestrationPhaseArgs } from "./types";
 import { subscribeVerbosePiEvents } from "./verbose";
+import { listTasks, readTask } from "../../../../tasks";
 
 export async function runInternalOrchestrationPhase(
   args: RunOrchestrationPhaseArgs,
@@ -95,6 +98,73 @@ export async function runInternalOrchestrationPhase(
     return Object.keys(after).some((key) =>
       after[key as keyof OrchestrationProgressSnapshot]
       !== before[key as keyof OrchestrationProgressSnapshot]);
+  };
+
+  const syncStateFromRunArtifacts = async (): Promise<{
+    runStatus: string | null;
+    synchronized: boolean;
+  }> => {
+    if (!state.runDir) {
+      return { runStatus: null, synchronized: false };
+    }
+    const before = captureProgressSnapshot();
+    const assessed = await assessRun(state.runDir).catch(() => null);
+    if (!assessed) {
+      return { runStatus: null, synchronized: false };
+    }
+
+    const pendingTasks = await listTasks(state.runDir, { status: "requested" }).catch(() => []);
+    state.runId = assessed.run.runId;
+    state.pendingActions.clear();
+    for (const task of pendingTasks) {
+      const detail = await readTask(state.runDir, task.effectId).catch(() => null);
+      if (!detail) {
+        continue;
+      }
+      const definition = detail.definition as Record<string, unknown>;
+      const io = typeof definition.io === "object" && definition.io !== null
+        ? definition.io as Record<string, unknown>
+        : undefined;
+      const action: EffectAction = {
+        effectId: task.effectId,
+        invocationKey: String(definition.invocationKey ?? task.effectId),
+        kind: task.kind,
+        label: task.title,
+        labels: task.labels,
+        taskDef: detail.definition as unknown as EffectAction["taskDef"],
+        taskId: task.taskId,
+        stepId: typeof definition.stepId === "string" ? definition.stepId : undefined,
+        taskDefRef: `tasks/${task.effectId}/task.json`,
+        inputsRef: typeof io?.inputJsonPath === "string" ? String(io.inputJsonPath) : undefined,
+        requestedAt: task.requestedAt,
+      };
+      state.pendingActions.set(task.effectId, action);
+    }
+
+    if (assessed.run.status === "completed") {
+      state.lastIterationResult = { status: "completed", output: undefined };
+    } else if (assessed.run.status === "failed") {
+      state.lastIterationResult = {
+        status: "failed",
+        error: { message: "Run failed" },
+      };
+    } else if (state.pendingActions.size > 0) {
+      state.lastIterationResult = {
+        status: "waiting",
+        nextActions: Array.from(state.pendingActions.values()),
+      };
+    }
+
+    const synchronized = orchestrationStateAdvanced(before);
+    if (synchronized) {
+      writeVerboseData("phaseOrchestration synced run state", {
+        runStatus: assessed.run.status,
+        pendingEffects: Array.from(state.pendingActions.keys()),
+        journalLength: assessed.journalLength,
+        lastEvent: assessed.lastEvent,
+      });
+    }
+    return { runStatus: assessed.run.status, synchronized };
   };
 
   const { mergedTools, iterateTool, finishTool, invokeTool } = createOrchestrationTools({
@@ -248,14 +318,17 @@ export async function runInternalOrchestrationPhase(
     let consecutiveStalls = 0;
     let consecutiveProcessErrorStalls = 0;
     while (state.iteration < args.maxIterations) {
+      const observed = await syncStateFromRunArtifacts();
       const terminal = ensureTerminalResult();
       if (terminal !== null) {
         break;
       }
       if (
-        state.lastIterationResult?.status === "waiting"
-        && state.pendingActions.size === 0
-        && state.iteration > 0
+        (
+          state.lastIterationResult?.status === "waiting"
+          && state.pendingActions.size === 0
+        )
+        || observed.runStatus === "in-progress"
       ) {
         writeVerbose(
           "[phaseOrchestration host] all pending effects were posted; auto-advancing the run",
@@ -308,6 +381,9 @@ export async function runInternalOrchestrationPhase(
 
       if (ensureTerminalResult() !== null) {
         break;
+      }
+      if (!orchestrationStateAdvanced(progressBeforeTurn)) {
+        await syncStateFromRunArtifacts();
       }
       if (orchestrationStateAdvanced(progressBeforeTurn)) {
         consecutiveTimeouts = 0;

@@ -3799,6 +3799,147 @@ describe("handleHarnessCreateRun", () => {
       }
     });
 
+    it("removes stray sibling run directories created during an internal orchestration turn", async () => {
+      const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "harness-create-run-stray-runs-"));
+      tempDirs.push(workspace);
+      const runsDir = path.join(workspace, ".a5c", "runs");
+      const runId = "run-stray-sibling-cleanup";
+      const runDir = path.join(runsDir, runId);
+      const strayDir = path.join(runsDir, "TESTCOPY");
+      const assessRunSpy = vi.spyOn(resumeState, "assessRun");
+      const listTasksSpy = vi.spyOn(taskStore, "listTasks");
+      const readTaskSpy = vi.spyOn(taskStore, "readTask");
+      try {
+        await fs.mkdir(runDir, { recursive: true });
+        (discoverHarnesses as Mock).mockResolvedValue([
+          makeDiscoveryResult({ name: "pi" }),
+        ]);
+        (createRun as Mock).mockResolvedValue({
+          runId,
+          runDir,
+          metadata: {},
+        });
+        (orchestrateIteration as Mock).mockResolvedValue({
+          status: "completed",
+          output: "done",
+        });
+
+        assessRunSpy
+          .mockResolvedValueOnce({
+            run: {
+              runId,
+              runDir,
+              processId: "proc-1",
+              createdAt: "2026-05-01T00:00:00.000Z",
+              status: "in-progress",
+              pendingEffects: {},
+              totalEffects: 1,
+              resolvedEffects: 0,
+              entrypoint: { importPath: "/tmp/process.mjs" },
+            },
+            journalLength: 2,
+            lastEvent: {
+              type: "EFFECT_REQUESTED",
+              recordedAt: "2026-05-01T00:00:01.000Z",
+            },
+          })
+          .mockResolvedValueOnce({
+            run: {
+              runId,
+              runDir,
+              processId: "proc-1",
+              createdAt: "2026-05-01T00:00:00.000Z",
+              status: "completed",
+              pendingEffects: {},
+              totalEffects: 1,
+              resolvedEffects: 1,
+              entrypoint: { importPath: "/tmp/process.mjs" },
+            },
+            journalLength: 3,
+            lastEvent: {
+              type: "RUN_COMPLETED",
+              recordedAt: "2026-05-01T00:00:02.000Z",
+            },
+          });
+        listTasksSpy
+          .mockResolvedValueOnce([
+            {
+              effectId: "eff-1",
+              taskId: "task-1",
+              requestedAt: "2026-05-01T00:00:01.000Z",
+              kind: "agent",
+              title: "Implement the requested work",
+              labels: [],
+              status: "requested",
+            },
+          ] as Awaited<ReturnType<typeof taskStore.listTasks>>)
+          .mockResolvedValueOnce([]);
+        readTaskSpy.mockResolvedValue({
+          effectId: "eff-1",
+          taskId: "task-1",
+          runId,
+          requestedAt: "2026-05-01T00:00:01.000Z",
+          completedAt: undefined,
+          startedAt: undefined,
+          kind: "agent",
+          title: "Implement the requested work",
+          labels: [],
+          status: "requested",
+          definition: {
+            kind: "agent",
+            title: "Implement the requested work",
+            io: {
+              inputJsonPath: "tasks/eff-1/inputs.json",
+              outputJsonPath: "tasks/eff-1/result.json",
+            },
+          },
+        } as Awaited<ReturnType<typeof taskStore.readTask>>);
+
+        vi.mocked(createAgentCoreSession).mockImplementationOnce(() => ({
+          initialize: vi.fn().mockResolvedValue(undefined),
+          subscribe: vi.fn(() => () => {}),
+          dispose: vi.fn(),
+          executeBash: vi.fn(async () => ({
+            output: "",
+            exitCode: 0,
+            cancelled: false,
+          })),
+          get sessionId() {
+            return "mock-session-id-stray-run";
+          },
+          get isInitialized() {
+            return true;
+          },
+          prompt: vi.fn(async () => {
+            await fs.mkdir(strayDir, { recursive: true });
+            return {
+              success: true,
+              output: "created stray run dir",
+              exitCode: 0,
+              duration: 1,
+            };
+          }),
+        }) as ReturnType<typeof createAgentCoreSession>);
+
+        const code = await handleHarnessCreateRun({
+          processPath: "/tmp/p.js",
+          workspace,
+          runsDir,
+          json: false,
+          verbose: false,
+          interactive: false,
+        });
+
+        expect(code).toBe(0);
+        expect(existsSync(strayDir)).toBe(false);
+        expect(existsSync(runDir)).toBe(true);
+      } finally {
+        assessRunSpy.mockRestore();
+        listTasksSpy.mockRestore();
+        readTaskSpy.mockRestore();
+      }
+    });
+
     it("invokes an explicit task metadata harness for node-kind effects", async () => {
       (discoverHarnesses as Mock).mockResolvedValue([
         makeDiscoveryResult({ name: "pi" }),

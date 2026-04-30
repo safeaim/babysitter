@@ -278,10 +278,12 @@ export function buildOrchestrationSystemPrompt(
     "- AskUserQuestion, task, and skill are common tools in this phase. In interactive mode, use AskUserQuestion instead of asking the user in plain text.",
     "- Work in bounded turns. In each turn, call babysitter_run_iterate at most once unless the prompt explicitly tells you otherwise.",
     "- Never drive the orchestration loop through raw `babysitter` CLI commands inside `bash`. Use the custom babysitter tools (`babysitter_run_iterate`, `babysitter_task_post_result`, `babysitter_finish_orchestration`) for loop control.",
+    "- Never import or call babysitter SDK/runtime helpers such as `orchestrateIteration`, `commitEffectResult`, or `readTaskResult` from ad-hoc `bash`/`node` scripts. Use the exposed custom babysitter tools instead.",
     "- `bash` is only for actual workspace commands and requested shell effects. It is not a substitute for babysitter loop-control tools.",
     "- Do not implement the user's requested workspace deliverable directly before the bound run yields pending effects or a terminal result. First drive the run through `babysitter_run_iterate`.",
     "- Do not rely on a hidden host-side effect executor. Perform or dispatch each effect intentionally based on the effect payload you received from babysitter_run_iterate.",
     "- Shell and legacy node effects are first-class pending effects. Do not skip them, narrate them, or assume the host will run them for you.",
+    "- Do not create, copy, rename, delete, or hand-edit sibling run directories/files inside `.a5c/runs/` (for example debug clones like `TESTCOPY`). The bound run storage is owned by the host and may only be mutated through the custom babysitter tools.",
     preferAgentOnlyTasks
       ? "- Prefer wrapped `agent`, `skill`, and delegated-task resolution paths. Treat `shell` effects as exceptional compatibility cases, not the normal plan shape for `/babysitter:call` flows."
       : "- Whenever a shell effect is requested, execute it through `bash` or another intentional worker path, then post the outcome yourself.",
@@ -393,6 +395,7 @@ export function buildOrchestrationTurnPrompt(args: {
     lines.push("Handling rules:");
     lines.push("- For `shell` effects, execute the requested command intentionally with `bash`, capture the outcome, then call babysitter_task_post_result with explicit status/stdout/stderr/value fields.");
     lines.push("- For legacy `node`, `agent`, or `orchestrator_task` effects, use `task` for delegated fresh-context execution, `skill` for agentic skill-guided execution, or the available coding tools directly, then call babysitter_task_post_result yourself.");
+    lines.push("- Never debug by cloning or editing `.a5c/runs/*` entries directly. Do not create ad-hoc copies like `TESTCOPY`; keep the bound run storage untouched except through the custom babysitter tools.");
     lines.push("- If a delegated worker or tool call exposes a `timeout`, set a generous value for substantive work and retry with a longer timeout or narrower scope before giving up.");
     lines.push("- For `breakpoint` effects, use AskUserQuestion in interactive mode with explicit approval options or choose the best option non-interactively, then post the result.");
   } else {

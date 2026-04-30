@@ -1,3 +1,4 @@
+import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import type { EffectAction } from "@a5c-ai/babysitter-sdk";
 import {
@@ -98,6 +99,55 @@ export async function runInternalOrchestrationPhase(
     return Object.keys(after).some((key) =>
       after[key as keyof OrchestrationProgressSnapshot]
       !== before[key as keyof OrchestrationProgressSnapshot]);
+  };
+  const protectedRunEntries = new Set<string>();
+  const snapshotProtectedRunEntries = async (): Promise<void> => {
+    if (!args.runsDir) {
+      return;
+    }
+    let entries: string[] = [];
+    try {
+      entries = await fs.readdir(args.runsDir);
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      protectedRunEntries.add(entry);
+    }
+  };
+  const cleanupUnexpectedRunSiblings = async (): Promise<void> => {
+    if (!args.runsDir || !state.runId) {
+      return;
+    }
+    let entries: string[] = [];
+    try {
+      entries = await fs.readdir(args.runsDir);
+    } catch {
+      return;
+    }
+    const removed: string[] = [];
+    for (const entry of entries) {
+      if (entry === state.runId || protectedRunEntries.has(entry)) {
+        continue;
+      }
+      try {
+        const target = path.join(args.runsDir, entry);
+        const stat = await fs.stat(target);
+        if (!stat.isDirectory()) {
+          continue;
+        }
+        await fs.rm(target, { recursive: true, force: true });
+        removed.push(entry);
+      } catch {
+        // Best-effort cleanup only; don't derail the orchestration loop.
+      }
+    }
+    if (removed.length > 0) {
+      writeVerboseData("phaseOrchestration host cleaned stray run dirs", {
+        runId: state.runId,
+        removed,
+      });
+    }
   };
 
   const syncStateFromRunArtifacts = async (): Promise<{
@@ -313,6 +363,7 @@ export async function runInternalOrchestrationPhase(
         { category: ErrorCategory.Runtime },
       );
     }
+    await snapshotProtectedRunEntries();
 
     let consecutiveTimeouts = 0;
     let consecutiveStalls = 0;
@@ -382,6 +433,7 @@ export async function runInternalOrchestrationPhase(
         continue;
       }
 
+      await cleanupUnexpectedRunSiblings();
       if (ensureTerminalResult() !== null) {
         break;
       }

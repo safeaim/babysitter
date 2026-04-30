@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { HarnessCapability } from "../../../types";
 import {
   buildOrchestrationSystemPrompt,
+  buildOrchestrationTurnPrompt,
   buildProcessDefinitionSystemPrompt,
   buildProcessDefinitionUserPrompt,
   type HarnessPromptContext,
@@ -154,5 +155,28 @@ describe("harnessPrompts", () => {
     expect(prompt).toContain("Treat `shell` effects as exceptional compatibility cases");
     expect(prompt).toContain("`agent`, `skill`, and delegated-task resolution paths");
     expect(prompt).toContain("should not emit breakpoint effects");
+  });
+
+  test("PhaseOrchestration turn prompt forces a follow-up iterate after pending effects are posted", () => {
+    const prompt = buildOrchestrationTurnPrompt({
+      processPath: "/tmp/process.js",
+      userPrompt: "create a game",
+      maxIterations: 5,
+      currentIteration: 1,
+      runId: "run-1",
+      runDir: "/tmp/runs/run-1",
+      lastStatus: "waiting",
+      pendingEffects: [
+        {
+          effectId: "eff-1",
+          kind: "agent",
+          title: "Implement the game",
+          harness: "pi",
+        },
+      ],
+    });
+
+    expect(prompt).toContain("Call babysitter_run_iterate exactly once after the last post");
+    expect(prompt).toContain("Do not use `task:list`, plain narration, or a completion claim as a substitute");
   });
 });

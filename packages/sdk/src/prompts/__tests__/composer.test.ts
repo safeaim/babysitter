@@ -266,6 +266,13 @@ describe('composeOrchestrationPrompt', () => {
     expect(output).toContain('STOP after every phase');
   });
 
+  it('uses inputs.json in task IO examples', () => {
+    const output = renderTaskExamples(createClaudeCodeContext());
+    const taskKinds = renderTaskKinds(createClaudeCodeContext());
+    expect(output).toContain('tasks/${taskCtx.effectId}/inputs.json');
+    expect(taskKinds).toContain('tasks/${taskCtx.effectId}/inputs.json');
+  });
+
   it('does NOT contain interview phase', () => {
     const output = composeOrchestrationPrompt(createClaudeCodeContext());
     expect(output).not.toContain('#### Interview phase');

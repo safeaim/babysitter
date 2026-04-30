@@ -3467,6 +3467,93 @@ describe("handleHarnessCreateRun", () => {
       );
     });
 
+    it("auto-advances the run after pending effects are posted even when the agent stops early", async () => {
+      (discoverHarnesses as Mock).mockResolvedValue([
+        makeDiscoveryResult({ name: "pi" }),
+      ]);
+      (createRun as Mock).mockResolvedValue({
+        runId: "run-1",
+        runDir: "/tmp/runs/run-1",
+        metadata: {},
+      });
+
+      const waitingResult: IterationResult = {
+        status: "waiting",
+        nextActions: [
+          {
+            effectId: "eff-1",
+            invocationKey: "key-1",
+            kind: "agent",
+            taskDef: { kind: "agent", title: "Do work" },
+          },
+        ],
+      };
+      const completedResult: IterationResult = {
+        status: "completed",
+        output: "done",
+      };
+      (orchestrateIteration as Mock)
+        .mockResolvedValueOnce(waitingResult)
+        .mockResolvedValueOnce(completedResult);
+      (commitEffectResult as Mock).mockResolvedValue({});
+
+      vi.mocked(createAgentCoreSession).mockImplementationOnce((options?: { customTools?: Array<Record<string, unknown>> }) => {
+        const tools = options?.customTools ?? [];
+        const runIterate = getCompatTool(tools, "babysitter_run_iterate") as {
+          execute?: (toolCallId: string, params: Record<string, unknown>) => Promise<{ details?: unknown }>;
+        } | undefined;
+        const taskPost = getCompatTool(tools, "babysitter_task_post_result") as {
+          execute?: (toolCallId: string, params: Record<string, unknown>) => Promise<{ details?: unknown }>;
+        } | undefined;
+
+        return {
+          initialize: vi.fn().mockResolvedValue(undefined),
+          subscribe: vi.fn(() => () => {}),
+          dispose: vi.fn(),
+          executeBash: vi.fn(async () => ({
+            output: "ok",
+            exitCode: 0,
+            cancelled: false,
+          })),
+          get sessionId() {
+            return "mock-session-id-auto-advance";
+          },
+          get isInitialized() {
+            return true;
+          },
+          prompt: vi.fn(async () => {
+            const iter1 = await runIterate?.execute?.("tool-iterate-1", {});
+            const details = iter1?.details as { nextActions?: Array<{ effectId?: string }> } | undefined;
+            const effectId = details?.nextActions?.[0]?.effectId;
+            if (effectId) {
+              await taskPost?.execute?.("tool-post", {
+                effectId,
+                status: "ok",
+                valueText: "done",
+                stdout: "done",
+              });
+            }
+            return { success: true, output: "posted pending result", exitCode: 0, duration: 1 };
+          }),
+        } as ReturnType<typeof createAgentCoreSession>;
+      });
+
+      const code = await handleHarnessCreateRun({
+        processPath: "/tmp/p.js",
+        runsDir: "/tmp/runs",
+        json: false,
+        verbose: false,
+        interactive: false,
+      });
+
+      expect(code).toBe(0);
+      expect(orchestrateIteration).toHaveBeenCalledTimes(2);
+      const orchestrationSession = vi.mocked(createAgentCoreSession).mock.results[0]?.value as {
+        prompt: Mock;
+      };
+      expect(orchestrationSession.prompt).toHaveBeenCalledTimes(1);
+    });
+
     it("invokes an explicit task metadata harness for node-kind effects", async () => {
       (discoverHarnesses as Mock).mockResolvedValue([
         makeDiscoveryResult({ name: "pi" }),

@@ -379,7 +379,9 @@ export function buildOrchestrationTurnPrompt(args: {
       lines.push(`- ${parts.join(" | ")}`);
     }
     lines.push("");
-    lines.push("Resolve every listed pending effect and post its result in this turn. Do not call babysitter_run_iterate again after posting them.");
+    lines.push("Resolve every listed pending effect and post its result in this turn.");
+    lines.push("After every listed effect is posted, the run must be advanced out of waiting before it can complete. Call babysitter_run_iterate exactly once after the last post if you are the one driving the loop.");
+    lines.push("Do not use `task:list`, plain narration, or a completion claim as a substitute for that follow-up babysitter_run_iterate call.");
     lines.push("Handling rules:");
     lines.push("- For `shell` effects, execute the requested command intentionally with `bash`, capture the outcome, then call babysitter_task_post_result with explicit status/stdout/stderr/value fields.");
     lines.push("- For legacy `node`, `agent`, or `orchestrator_task` effects, use `task` for delegated fresh-context execution, `skill` for agentic skill-guided execution, or the available coding tools directly, then call babysitter_task_post_result yourself.");

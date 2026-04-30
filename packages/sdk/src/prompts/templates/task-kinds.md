@@ -99,7 +99,7 @@ defineTask('my-task', (args, taskCtx) => ({
     outputSchema: { type: 'object', required: ['result'] }
   },
   io: {
-    inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+    inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
     outputJsonPath: `tasks/${taskCtx.effectId}/result.json`
   }
 }));

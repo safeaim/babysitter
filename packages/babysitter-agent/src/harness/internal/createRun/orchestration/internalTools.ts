@@ -48,6 +48,7 @@ export function createOrchestrationTools(args: {
   writeVerboseData: OrchestrationWriteVerboseData;
 }): {
   mergedTools: unknown[];
+  iterateTool: OrchestrationNamedTool | undefined;
   finishTool: OrchestrationNamedTool | undefined;
   invokeTool: (
     tool: OrchestrationNamedTool | undefined,
@@ -111,9 +112,11 @@ export function createOrchestrationTools(args: {
     args.writeVerbose,
   );
   const tools = mergedTools as OrchestrationNamedTool[];
+  const iterateTool = tools.find((tool) => tool.name === "babysitter_run_iterate");
   const finishTool = tools.find((tool) => tool.name === "babysitter_finish_orchestration");
   return {
     mergedTools,
+    iterateTool,
     finishTool,
     invokeTool: async (
       tool: OrchestrationNamedTool | undefined,

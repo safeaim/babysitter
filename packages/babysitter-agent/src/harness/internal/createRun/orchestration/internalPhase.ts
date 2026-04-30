@@ -97,7 +97,7 @@ export async function runInternalOrchestrationPhase(
       !== before[key as keyof OrchestrationProgressSnapshot]);
   };
 
-  const { mergedTools, finishTool, invokeTool } = createOrchestrationTools({
+  const { mergedTools, iterateTool, finishTool, invokeTool } = createOrchestrationTools({
     phaseArgs: args,
     state,
     describePendingActions,
@@ -251,6 +251,23 @@ export async function runInternalOrchestrationPhase(
       const terminal = ensureTerminalResult();
       if (terminal !== null) {
         break;
+      }
+      if (
+        state.lastIterationResult?.status === "waiting"
+        && state.pendingActions.size === 0
+        && state.iteration > 0
+      ) {
+        writeVerbose(
+          "[phaseOrchestration host] all pending effects were posted; auto-advancing the run",
+        );
+        await invokeTool(iterateTool, "babysitter_run_iterate");
+        if (ensureTerminalResult() !== null) {
+          break;
+        }
+        consecutiveTimeouts = 0;
+        consecutiveStalls = 0;
+        consecutiveProcessErrorStalls = 0;
+        continue;
       }
       const progressBeforeTurn = captureProgressSnapshot();
       try {

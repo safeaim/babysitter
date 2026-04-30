@@ -31,7 +31,7 @@ export const agentTask = defineTask('agent-scorer', (args, taskCtx) => ({
   },
 
   io: {
-    inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+    inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
     outputJsonPath: `tasks/${taskCtx.effectId}/output.json`
   }
 }));
@@ -54,7 +54,7 @@ export const grepCheckTask = defineTask('grep-integration-check', (args, taskCtx
     timeout: 10000
   },
   io: {
-    inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+    inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
     outputJsonPath: `tasks/${taskCtx.effectId}/output.json`
   }
 }));
@@ -74,7 +74,7 @@ export const verificationGateTask = defineTask('verification-gate', (args, taskC
     timeout: 300000
   },
   io: {
-    inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+    inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
     outputJsonPath: `tasks/${taskCtx.effectId}/output.json`
   }
 }));
@@ -103,7 +103,7 @@ export const readSpecTask = defineTask('read-spec', (args, taskCtx) => ({
     timeout: 5000,
   },
   io: {
-    inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+    inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
     outputJsonPath: `tasks/${taskCtx.effectId}/output.json`,
   },
 }));
@@ -141,7 +141,7 @@ export const authorTestsFromSpecTask = defineTask(
       },
     },
     io: {
-      inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+      inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
       outputJsonPath: `tasks/${taskCtx.effectId}/output.json`,
     },
   }),
@@ -178,7 +178,7 @@ export const verifyAgainstSpecTask = defineTask(
       },
     },
     io: {
-      inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+      inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
       outputJsonPath: `tasks/${taskCtx.effectId}/output.json`,
     },
   }),
@@ -222,7 +222,7 @@ export const skillTask = defineTask('analyzer-skill', (args, taskCtx) => ({
   },
 
   io: {
-    inputJsonPath: `tasks/${taskCtx.effectId}/input.json`,
+    inputJsonPath: `tasks/${taskCtx.effectId}/inputs.json`,
     outputJsonPath: `tasks/${taskCtx.effectId}/output.json`
   }
 }));

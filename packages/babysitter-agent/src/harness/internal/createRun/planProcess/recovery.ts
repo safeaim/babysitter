@@ -43,6 +43,48 @@ function extractProcessDefinitionCodeBlock(text: string): string | null {
   return fallback;
 }
 
+function extractProcessDefinitionHeredoc(text: string): string | null {
+  const heredocPattern = /<<-?\s*['"]?([A-Za-z_][A-Za-z0-9_]*)['"]?\r?\n([\s\S]*?)\r?\n\1\b/g;
+  let match: RegExpExecArray | null;
+  let fallback: string | null = null;
+
+  while ((match = heredocPattern.exec(text)) !== null) {
+    const candidate = match[2]?.trim();
+    if (!candidate) {
+      continue;
+    }
+    if (looksLikeProcessDefinitionSource(candidate)) {
+      return candidate;
+    }
+    fallback ??= candidate;
+  }
+
+  return fallback;
+}
+
+function looksLikeStandaloneProcessDefinitionSource(source: string): boolean {
+  const normalized = source.trim();
+  if (!looksLikeProcessDefinitionSource(normalized)) {
+    return false;
+  }
+
+  const suspiciousTranscriptMarkers = [
+    "to=bash",
+    "to=read",
+    "to=write",
+    "to=edit",
+    "\"stdout\":",
+    "\"stderr\":",
+    "\"exitCode\":",
+    "[phase",
+  ];
+  if (suspiciousTranscriptMarkers.some((marker) => normalized.includes(marker))) {
+    return false;
+  }
+
+  return /^(?:#!.*\r?\n)?(?:\s*\/\*\*[\s\S]*?\*\/\s*)?(?:import\s|const\s+\w+\s*=\s*defineTask\(|export\s+async\s+function\s+process\b|async\s+function\s+process\b)/.test(normalized);
+}
+
 export function buildPhaseConversationSummary(outputs: string[]): string {
   const trimmedOutputs = outputs
     .map((output) => output.replace(/\s+/g, " ").trim())
@@ -105,7 +147,22 @@ async function recoverProcessDefinitionFromOutputs(args: {
   }
 
   for (const output of args.outputs) {
-    if (!looksLikeProcessDefinitionSource(output)) {
+    const extracted = extractProcessDefinitionHeredoc(output);
+    if (!extracted || !looksLikeProcessDefinitionSource(extracted)) {
+      continue;
+    }
+    const recoveredName = `recovered-process-${Date.now()}.mjs`;
+    const recoveredPath = path.join(resolvedDir, recoveredName);
+    await fs.mkdir(resolvedDir, { recursive: true });
+    await fs.writeFile(recoveredPath, extracted, "utf8");
+    return {
+      processPath: recoveredPath,
+      summary: "Recovered process-definition output by extracting a heredoc-written JavaScript module from the agent transcript.",
+    };
+  }
+
+  for (const output of args.outputs) {
+    if (!looksLikeStandaloneProcessDefinitionSource(output)) {
       continue;
     }
     const recoveredName = `recovered-process-${Date.now()}.mjs`;

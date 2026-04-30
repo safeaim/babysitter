@@ -1564,6 +1564,97 @@ describe("handleHarnessCreateRun", () => {
       expect(source).toContain("export async function process");
     });
 
+    it("recovers a valid process module from a heredoc-heavy agent transcript instead of writing the raw transcript", async () => {
+      const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "session-create-planProcess-heredoc-transcript-"));
+      tempDirs.push(workspace);
+
+      (discoverHarnesses as Mock).mockResolvedValue([
+        makeDiscoveryResult({ name: "pi" }),
+      ]);
+      (createRun as Mock).mockResolvedValue({
+        runId: "run-heredoc-transcript-recovery",
+        runDir: path.join(workspace, ".a5c", "runs", "run-heredoc-transcript-recovery"),
+        metadata: {},
+      });
+      (orchestrateIteration as Mock).mockResolvedValue({
+        status: "completed",
+        output: "done",
+      });
+
+      let promptCount = 0;
+      vi.mocked(createAgentCoreSession).mockImplementationOnce(() => ({
+        initialize: vi.fn().mockResolvedValue(undefined),
+        subscribe: vi.fn(() => () => {}),
+        dispose: vi.fn(),
+        executeBash: vi.fn(async () => ({
+          output: "",
+          exitCode: 0,
+          cancelled: false,
+        })),
+        abort: vi.fn().mockResolvedValue(undefined),
+        get sessionId() {
+          return "mock-session-id-planProcess-heredoc-transcript";
+        },
+        get isInitialized() {
+          return true;
+        },
+        get isStreaming() {
+          return false;
+        },
+        prompt: vi.fn(async () => {
+          promptCount += 1;
+          if (promptCount === 1) {
+            return {
+              success: true,
+              output: "Intent analyzed.",
+              exitCode: 0,
+              duration: 1,
+            };
+          }
+
+          if (promptCount === 2) {
+            return {
+              success: true,
+              output: [
+                "I inspected the workspace and I'm writing the process now. to=bash code",
+                `"command":"cd ${workspace} && mkdir -p .a5c/processes && cat > .a5c/processes/minimal-browser-game.mjs <<'EOF'`,
+                buildMinimalAgentProcessSource(),
+                "EOF\"",
+              ].join("\n"),
+              exitCode: 0,
+              duration: 1,
+            };
+          }
+
+          return {
+            success: true,
+            output: "The process file was already written in the previous step.",
+            exitCode: 0,
+            duration: 1,
+          };
+        }),
+      }));
+
+      const code = await handleHarnessCreateRun({
+        prompt: "create a game",
+        workspace,
+        runsDir: path.join(workspace, ".a5c", "runs"),
+        json: false,
+        verbose: false,
+        interactive: false,
+      });
+
+      expect(code).toBe(0);
+      expect(promptCount).toBe(3);
+      const generatedPath = path.join(workspace, ".a5c", "processes");
+      const processFiles = (await fs.readdir(generatedPath)).filter((entry) => /\.m?js$/.test(entry));
+      expect(processFiles.length).toBeGreaterThan(0);
+      const source = await fs.readFile(path.join(generatedPath, processFiles[0]!), "utf8");
+      expect(source).toContain("export async function process");
+      expect(source).not.toContain("to=bash");
+      expect(source).not.toContain("\"stdout\":");
+    });
+
     it("rejects a default-exported process and repairs it to a named process export", async () => {
       const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "session-create-planProcess-default-export-"));
       tempDirs.push(workspace);

@@ -1,10 +1,12 @@
+# syntax=docker/dockerfile:1.7
+
 # Babysitter Docker Image
 # Runs Claude Code with the babysitter plugin pre-installed
 #
 # Build: docker build -t babysitter .
 # Run: docker run -it -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY -e PROMPT="your task" babysitter
 
-FROM node:20-bookworm
+FROM node:22-bookworm
 
 LABEL maintainer="a5c.ai"
 LABEL description="Claude Code with Babysitter SDK and plugin for orchestrating complex workflows"
@@ -21,14 +23,22 @@ RUN apt-get update && apt-get install -y \
 RUN groupadd -r claude && useradd -r -g claude -m -d /home/claude claude
 
 # Set environment variables
-ENV HOME=/home/claude
+ENV HOME=/home/claude \
+    NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_FUND=false \
+    NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_FACTOR=2 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 \
+    NPM_CONFIG_PREFER_OFFLINE=true
 
 # Configure npm global prefix for non-root user so hooks can install packages
 RUN mkdir -p /home/claude/.local && \
     echo "prefix=/home/claude/.local" > /home/claude/.npmrc
 
 # Install Claude Code globally
-RUN npm install -g @anthropic-ai/claude-code
+RUN --mount=type=cache,target=/root/.npm \
+    npm install -g @anthropic-ai/claude-code --cache=/root/.npm
 
 # Create workspace and app directories
 WORKDIR /app
@@ -51,8 +61,9 @@ COPY packages/agent-mux/webui/package.json ./packages/agent-mux/webui/
 COPY packages/agent-mux/tui/package.json ./packages/agent-mux/tui/
 COPY third_party/webpackbar ./third_party/webpackbar
 
-# Install all dependencies (including dev for build)
-RUN npm install --include=dev
+# Install all dependencies (including dev for build) from the committed lockfile.
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --include=dev --cache=/root/.npm
 
 # Copy the rest of the application
 COPY . .
@@ -64,7 +75,8 @@ RUN npm run build:runtime
 ENV NODE_ENV=production
 
 # Install the SDK and agent runtime packages globally
-RUN npm install -g ./packages/sdk ./packages/agent-core ./packages/babysitter-agent
+RUN --mount=type=cache,target=/root/.npm \
+    npm install -g ./packages/sdk ./packages/agent-core ./packages/babysitter-agent --cache=/root/.npm
 
 # Read plugin version from plugin.json (single source of truth)
 RUN PLUGIN_VERSION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('plugins/babysitter/plugin.json','utf8')).version)") && \

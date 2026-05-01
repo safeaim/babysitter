@@ -2,7 +2,7 @@
  * @process methodologies/ontology-driven-development
  * @description Enhanced Ontology-Driven Development - Robust methodology for complex enterprise scenarios with advanced complexity management, stakeholder alignment, and quality assurance
  * @inputs { projectName: string, domainDescription?: string, ontologyScope?: string, projectComplexity?: string, stakeholderContext?: string, domainType?: string, riskProfile?: string }
- * @outputs { success: boolean, schema: object, knowledgeGraph: object, generators: object, documentation: object, testing: object, sdk: object, interfaces: object, governance: object, riskMitigation: object, metadata: object }
+ * @outputs { success: boolean, schema: object, knowledgeGraph: object, generators: object, documentation: object, testing: object, sdk: object, interfaces: object, governance: object, riskMitigation: object, dynamicConvergenceManager: object, processResilienceFramework: object, multiLevelLearning: object, processEvolutionContext: object, evidenceBasedModelingFramework: object, comprehensiveValidationFramework: object, reinforcementLearningFramework: object, metadata: object }
  *
  * @example
  * const result = await orchestrate('methodologies/ontology-driven-development', {
@@ -23,6 +23,59 @@
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';
+
+// Helper functions for evidence quality assessment
+function calculateAverageEvidenceQuality(framework) {
+  const qualityMetrics = framework.evidenceValidation?.evidenceQuality || {};
+  const qualityScores = Object.values(qualityMetrics).filter(score => typeof score === 'number');
+  return qualityScores.length > 0 ? qualityScores.reduce((sum, score) => sum + score, 0) / qualityScores.length : 0;
+}
+
+function calculateAverageCredibilityScore(framework) {
+  const credibilityMetrics = framework.evidenceValidation?.sourceCredibility || {};
+  const credibilityScores = Object.values(credibilityMetrics).filter(score => typeof score === 'number');
+  return credibilityScores.length > 0 ? credibilityScores.reduce((sum, score) => sum + score, 0) / credibilityScores.length : 0;
+}
+
+function calculateEvidenceValidationCoverage(framework) {
+  const totalClaims = Object.keys(framework.evidenceTracing?.claimToEvidenceMap || {}).length;
+  const validatedClaims = Object.values(framework.evidenceTracing?.claimToEvidenceMap || {}).filter(evidence => evidence && evidence.length > 0).length;
+  return totalClaims > 0 ? (validatedClaims / totalClaims) * 100 : 0;
+}
+
+function calculateValidationCoverage(validationFramework) {
+  const schemaValidationCount = validationFramework.schemaValidation?.formalValidation?.length || 0;
+  const generatorValidationCount = Object.keys(validationFramework.generatorValidation?.outputQualityAssessment || {}).length;
+  const encyclopediaValidationCount = Object.keys(validationFramework.encyclopediaValidation?.completenessValidation || {}).length;
+  const crossSystemValidationCount = validationFramework.crossSystemValidation?.integrationValidation?.length || 0;
+  const totalValidations = schemaValidationCount + generatorValidationCount + encyclopediaValidationCount + crossSystemValidationCount;
+  return totalValidations; // Return total validation coverage count
+}
+
+function calculateLearningVelocity(reinforcementFramework) {
+  const cycles = reinforcementFramework.selfValidationCycles?.schemaValidationCycles?.length || 0;
+  const improvements = reinforcementFramework.selfResearch?.improvementDiscovery?.length || 0;
+  return cycles > 0 ? improvements / cycles : 0;
+}
+
+function calculateAdaptationEffectiveness(reinforcementFramework) {
+  const adaptations = reinforcementFramework.adaptiveEvolution?.schemaEvolutionHistory?.length || 0;
+  const successfulAdaptations = reinforcementFramework.adaptiveEvolution?.schemaEvolutionHistory?.filter(
+    adaptation => adaptation.qualityImprovement > 0
+  )?.length || 0;
+  return adaptations > 0 ? (successfulAdaptations / adaptations) * 100 : 0;
+}
+
+function calculateSelfImprovementScore(reinforcementFramework) {
+  const validationCycles = (reinforcementFramework.selfValidationCycles?.schemaValidationCycles?.length || 0) +
+                          (reinforcementFramework.selfValidationCycles?.ontologyValidationCycles?.length || 0);
+  const discoveries = reinforcementFramework.selfResearch?.improvementDiscovery?.length || 0;
+  const adaptations = (reinforcementFramework.adaptiveEvolution?.schemaEvolutionHistory?.length || 0) +
+                      (reinforcementFramework.adaptiveEvolution?.ontologyEvolutionHistory?.length || 0);
+
+  // Self-improvement score based on learning cycles, discoveries, and successful adaptations
+  return validationCycles > 0 ? ((discoveries + adaptations) / validationCycles) * 10 : 0;
+}
 
 /**
  * Enhanced Ontology-Driven Development Process
@@ -116,14 +169,245 @@ export async function process(inputs, ctx) {
       stakeholderAlignment: {},
       riskMitigation: {},
       complexityMetrics: {},
-      businessValueMetrics: {}
+      businessValueMetrics: {},
+      // Enhanced process learning and adaptation
+      processLearnings: [],
+      crossPhaseInsights: {},
+      adaptiveQualityTargets: {},
+      methodologyEvolution: [],
+      convergencePatterns: {},
+      phaseEffectiveness: {},
+      learningTransfer: {},
+      processOptimizations: []
     }
+  };
+
+  // Initialize adaptive quality management system
+  let adaptiveQualityManager = {
+    baseTargetQuality: targetQuality,
+    currentPhaseTargets: {},
+    qualityEvolution: [],
+    convergenceHistory: [],
+    adaptationReasons: []
   };
 
   const artifacts = [];
 
   ctx.log?.('info', `Starting Enhanced Ontology-Driven Development for "${projectName}"`);
   ctx.log?.('info', `Configuration: ${ontologyScope} scope, ${projectComplexity} complexity, ${stakeholderContext} stakeholders, ${domainType} domain, ${riskProfile} risk`);
+
+  // Initialize advanced process intelligence and adaptation framework
+  let processEvolutionContext = {
+    phaseSequence: ['world-ontology', 'problem-ontology', 'solution-ontology', 'integrated-ontology', 'empirical-validation', 'retrospective-optimization', 'perfect-graph', 'comprehensive-validation', 'stress-testing', 'collaborative-refinement'],
+    currentPhaseIndex: 0,
+    adaptiveInsights: [],
+    crossPhaseConnections: new Map(),
+    processEfficiencyMetrics: {},
+    learningMomentum: 0.0,
+    // Enhanced process intelligence
+    processPatterns: {
+      successPatterns: [],
+      failurePatterns: [],
+      efficiencyPatterns: [],
+      stakeholderEngagementPatterns: [],
+      convergencePatterns: [],
+      innovationPatterns: []
+    },
+    contextualAdaptations: {
+      domainSpecificLearnings: {},
+      complexityLevelAdaptations: {},
+      stakeholderTypeOptimizations: {},
+      culturalContextAdaptations: {}
+    },
+    processIntelligence: {
+      decisionQuality: [],
+      predictionAccuracy: [],
+      adaptationEffectiveness: [],
+      learningVelocity: [],
+      processInnovations: []
+    },
+    cognitiveLoadManagement: {
+      stakeholderCapacityTracking: {},
+      informationFlowOptimization: [],
+      complexityReductionStrategies: [],
+      focusOptimization: []
+    },
+    emotionalIntelligence: {
+      stakeholderSentiment: {},
+      motivationPatterns: {},
+      frustrationIndicators: {},
+      engagementOptimization: []
+    }
+  };
+
+  // Initialize multi-level learning framework
+  let multiLevelLearning = {
+    tacticalLearning: [], // What specific actions work
+    strategicLearning: [], // What approaches work
+    methodologicalLearning: [], // What process patterns work
+    metaLearning: [], // What learning approaches work
+    paradigmLearning: [] // What fundamental assumptions work
+  };
+
+  // Initialize dynamic convergence management system
+  let dynamicConvergenceManager = {
+    convergenceCriteria: {
+      qualityStability: { threshold: 0.02, windowSize: 3 }, // Quality improvement < 2% over 3 iterations
+      evidenceThreshold: { minimum: 0.85, trend: 'increasing' }, // Evidence confidence > 85% and increasing
+      stakeholderConsensus: { minimum: 0.80, volatility: 0.05 }, // Stakeholder agreement > 80% with low volatility
+      emergentInsights: { diminishingReturns: 0.15 }, // New insights per iteration < 15%
+      resourceEfficiency: { effortToValueRatio: 2.0 }, // Effort to value ratio threshold
+      riskStabilization: { volatility: 0.10 } // Risk assessment volatility < 10%
+    },
+    adaptiveLearningAcceleration: {
+      accelerationTriggers: [], // Conditions that warrant faster iteration
+      decelerationTriggers: [], // Conditions that warrant slower, more careful iteration
+      emergencyStops: [], // Critical conditions that require immediate human intervention
+      adaptiveScheduling: {} // Dynamic timing adjustments
+    },
+    convergenceHistory: [],
+    emergentBehaviors: [],
+    convergenceVelocity: 0.0
+  };
+
+  // Initialize process resilience framework
+  let processResilienceFramework = {
+    failureScenarios: {
+      knownFailurePatterns: [], // Documented failure modes from past projects
+      edgeCaseScenarios: [], // Boundary conditions that could cause issues
+      cascadingFailures: [], // How failures in one area affect others
+      recoveryStrategies: {} // Specific recovery approaches for each failure type
+    },
+    adaptiveContingencies: {
+      contingencyTriggers: [], // Conditions that activate contingency plans
+      dynamicFallbacks: {}, // Alternative approaches when primary methods fail
+      processRerouting: {}, // How to redirect process flow around failures
+      emergencyProtocols: [] // Critical situation handling
+    },
+    resilienceMonitoring: {
+      systemHealthIndicators: [], // Metrics that indicate process health
+      earlyWarningSignals: [], // Leading indicators of potential issues
+      stressTestResults: [], // How the process performs under various stress conditions
+      adaptabilityMetrics: {} // How well the process adapts to unexpected situations
+    },
+    failsafeOperations: {
+      gracefulDegradation: {}, // How to maintain partial functionality during issues
+      rollbackProcedures: {}, // How to safely revert to previous state
+      isolationProtocols: {}, // How to contain failures to specific areas
+      recoveryValidation: {} // How to verify successful recovery
+    }
+  };
+
+  // Initialize comprehensive evidence-based modeling framework
+  let evidenceBasedModelingFramework = {
+    evidenceCollection: {
+      primarySources: [], // Direct research, interviews, observations
+      secondarySources: [], // Academic papers, industry reports, documentation
+      empiricalEvidence: [], // Data analysis, measurements, experiments
+      codeEvidence: [], // Implementation examples, repositories, technical specifications
+      onlineEvidence: [], // Web sources, forums, community knowledge
+      expertValidation: [] // Expert review and validation of claims
+    },
+    evidenceValidation: {
+      sourceCredibility: {}, // Credibility scores for different source types
+      evidenceQuality: {}, // Quality assessment using standardized criteria
+      conflictResolution: [], // How to handle conflicting evidence
+      uncertaintyQuantification: {}, // Confidence levels and uncertainty bounds
+      biasAssessment: {} // Identification and mitigation of various biases
+    },
+    evidenceTracing: {
+      claimToEvidenceMap: {}, // Map every claim to supporting evidence
+      evidenceChains: [], // Chains of evidence for complex claims
+      evidenceVersioning: {}, // Track evidence updates and changes over time
+      provenanceTracking: {}, // Complete audit trail for all evidence
+      crossValidation: {} // Evidence validation from multiple independent sources
+    },
+    evidenceIntegration: {
+      synthesisProtocols: [], // How to combine evidence from multiple sources
+      strengthOfEvidence: {}, // GRADE-style evidence strength assessment
+      evidenceGaps: [], // Identified gaps in evidence coverage
+      researchNeeds: [], // Areas requiring additional evidence collection
+      evidenceBasedConfidence: {} // Overall confidence based on evidence strength
+    },
+    evidenceManagement: {
+      citationStandards: {}, // Standardized citation and attribution protocols
+      evidenceRepository: {}, // Organized storage and retrieval of evidence
+      updateProtocols: [], // Procedures for evidence updates and maintenance
+      qualityControl: {}, // Evidence quality assurance processes
+      accessibilityStandards: {} // Making evidence accessible to stakeholders
+    }
+  };
+
+  // Initialize comprehensive validation framework
+  let comprehensiveValidationFramework = {
+    schemaValidation: {
+      formalValidation: [], // Logical consistency, completeness, soundness
+      empiricalValidation: [], // Real-world testing and verification
+      crossValidation: [], // Validation against multiple independent sources
+      adversarialValidation: [], // Systematic challenge and stress testing
+      continuousValidation: [] // Ongoing validation as schema evolves
+    },
+    generatorValidation: {
+      outputQualityAssessment: {}, // Quality metrics for generated artifacts
+      conformanceValidation: {}, // Conformance to schema and requirements
+      usabilityValidation: {}, // End-user validation and feedback
+      performanceValidation: {}, // Performance and scalability testing
+      evolutionValidation: {} // Validation of generator adaptation over time
+    },
+    encyclopediaValidation: {
+      completenessValidation: {}, // Coverage assessment against domain scope
+      accuracyValidation: {}, // Fact-checking and verification protocols
+      consistencyValidation: {}, // Internal consistency and contradiction detection
+      usabilityValidation: {}, // User experience and accessibility testing
+      maintenanceValidation: {} // Validation of update and maintenance processes
+    },
+    crossSystemValidation: {
+      integrationValidation: [], // Validation across system boundaries
+      holisticValidation: [], // Whole-system validation and emergent properties
+      stakeholderValidation: [], // Multi-stakeholder validation consensus
+      realWorldValidation: [], // Validation against real-world implementation
+      temporalValidation: [] // Validation over time and changing conditions
+    }
+  };
+
+  // Initialize reinforcement learning adaptation framework
+  let reinforcementLearningFramework = {
+    selfValidationCycles: {
+      schemaValidationCycles: [], // Iterative schema self-validation and improvement
+      ontologyValidationCycles: [], // Full ontology self-validation loops
+      validationResultAnalysis: {}, // Analysis of validation results for learning
+      adaptationTriggers: [], // Conditions that trigger schema/ontology adaptation
+      learningMetrics: {} // Metrics tracking learning and improvement over time
+    },
+    adaptiveEvolution: {
+      schemaEvolutionHistory: [], // Complete history of schema changes and rationale
+      ontologyEvolutionHistory: [], // Complete history of ontology adaptations
+      evolutionPatterns: {}, // Patterns in how the schema/ontology evolves
+      adaptationStrategies: [], // Strategies for different types of adaptations
+      evolutionPrediction: {} // Predictive models for future evolution needs
+    },
+    selfResearch: {
+      researchQuestions: [], // Questions the process generates about itself
+      selfExperiments: [], // Experiments the process conducts on its own outputs
+      hypothesisGeneration: [], // Hypotheses about improvements and optimizations
+      selfEvaluation: {}, // Self-assessment of process performance and quality
+      improvementDiscovery: [] // Discoveries of potential improvements
+    },
+    feedbackIntegration: {
+      validationFeedbackLoops: {}, // How validation results feed back into process improvement
+      stakeholderFeedbackIntegration: [], // Integration of stakeholder feedback for adaptation
+      performanceFeedbackAnalysis: {}, // Analysis of performance metrics for optimization
+      errorAnalysisAndLearning: {}, // Learning from errors and failures
+      successPatternAnalysis: {} // Analysis of success patterns for replication
+    },
+    adaptiveControl: {
+      dynamicParameterAdjustment: {}, // Real-time adjustment of process parameters
+      contextualAdaptation: [], // Adaptation based on changing context and requirements
+      emergentBehaviorHarnessing: [], // Leveraging positive emergent behaviors
+      preventiveAdaptation: [], // Proactive adaptation to prevent potential issues
+      optimizationOpportunities: {} // Identification and exploitation of optimization opportunities
+    }
+  };
 
   // ============================================================================
   // PHASE 0: WORLD ONTOLOGY & DOMAIN RESEARCH
@@ -143,7 +427,8 @@ export async function process(inputs, ctx) {
           ontologyScope,
           domainType,
           stakeholderContext,
-          researchDepth: 'comprehensive'
+          researchDepth: 'comprehensive',
+          evidenceFramework: evidenceBasedModelingFramework
         },
         qualityDimensions: ['domain_accuracy', 'world_model_completeness', 'stakeholder_coverage', 'external_system_mapping'],
         targetQuality,
@@ -157,6 +442,25 @@ export async function process(inputs, ctx) {
     results.metadata.qualityScores['world-ontology'] = worldOntologyResult.qualityMetrics;
     results.metadata.totalIterations += worldOntologyResult.iterations;
     artifacts.push(...(worldOntologyResult.artifacts || []));
+
+    // Evidence validation for world ontology phase
+    ctx.log?.('info', 'Validating evidence for world ontology phase...');
+    const worldEvidenceValidation = await ctx.task(evidenceValidationManagementTask, {
+      projectName,
+      phaseResult: results.worldOntology,
+      evidenceFramework: evidenceBasedModelingFramework,
+      phaseName: 'world-ontology',
+      validationDepth: 'comprehensive',
+      stakeholderContext
+    });
+
+    // Update evidence framework with validation results
+    evidenceBasedModelingFramework.evidenceCollection.primarySources.push(...(worldEvidenceValidation.validatedEvidence?.primarySources || []));
+    evidenceBasedModelingFramework.evidenceValidation.sourceCredibility = { ...evidenceBasedModelingFramework.evidenceValidation.sourceCredibility, ...worldEvidenceValidation.sourceCredibilityAnalysis };
+    evidenceBasedModelingFramework.evidenceTracing.claimToEvidenceMap = { ...evidenceBasedModelingFramework.evidenceTracing.claimToEvidenceMap, ...worldEvidenceValidation.validatedEvidence?.claimMapping };
+    evidenceBasedModelingFramework.evidenceIntegration.evidenceGaps.push(...worldEvidenceValidation.evidenceGaps);
+
+    artifacts.push(...(worldEvidenceValidation.artifacts || []));
 
     await ctx.breakpoint({
       question: `World ontology research complete. Domain coverage: ${worldOntologyResult.result?.domainCoverage?.percentage}%, Key entities: ${worldOntologyResult.result?.keyEntities?.length}, External systems: ${worldOntologyResult.result?.externalSystems?.length}. Proceed to problem space analysis?`,
@@ -176,6 +480,52 @@ export async function process(inputs, ctx) {
         ]
       }
     });
+  }
+
+  // Meta-learning after Phase 0: World Ontology
+  if (phase === 'full' && results.worldOntology) {
+    // Advanced multi-dimensional learning analysis
+    const worldOntologyLearnings = await executeAdvancedMetaLearningAnalysis(ctx, 'world-ontology', {
+      phaseResult: results.worldOntology,
+      processContext: processEvolutionContext,
+      adaptiveQualityManager,
+      allResults: results,
+      multiLevelLearning
+    });
+
+    // Process intelligence validation and contingency analysis
+    const processValidation = await executeProcessValidation(ctx, {
+      phaseName: 'world-ontology',
+      phaseResult: results.worldOntology,
+      processDecisions: worldOntologyLearnings.processDecisions,
+      processContext: processEvolutionContext,
+      contingencyTriggers: worldOntologyLearnings.contingencyTriggers
+    });
+
+    // Cognitive load and stakeholder optimization
+    const cognitiveOptimization = await optimizeCognitiveLoad(ctx, {
+      phaseName: 'world-ontology',
+      stakeholderFeedback: results.worldOntology.stakeholderFeedback,
+      complexityMetrics: results.worldOntology.complexityMetrics,
+      processContext: processEvolutionContext
+    });
+
+    // Apply comprehensive learnings and optimizations
+    adaptiveQualityManager = worldOntologyLearnings.updatedQualityManager;
+    processEvolutionContext.adaptiveInsights.push(worldOntologyLearnings.insights);
+    processEvolutionContext = processValidation.updatedProcessContext;
+    multiLevelLearning = worldOntologyLearnings.updatedMultiLevelLearning;
+    processEvolutionContext.currentPhaseIndex = 1;
+
+    // Update cognitive load management
+    processEvolutionContext.cognitiveLoadManagement = cognitiveOptimization.optimizedCognitiveManagement;
+
+    results.metadata.processLearnings.push(worldOntologyLearnings);
+    results.metadata.processValidations = results.metadata.processValidations || [];
+    results.metadata.processValidations.push(processValidation);
+    artifacts.push(...(worldOntologyLearnings.artifacts || []));
+    artifacts.push(...(processValidation.artifacts || []));
+    artifacts.push(...(cognitiveOptimization.artifacts || []));
   }
 
   // ============================================================================
@@ -229,6 +579,44 @@ export async function process(inputs, ctx) {
         ]
       }
     });
+  }
+
+  // Meta-learning after Phase 1: Problem Space Ontology
+  if (phase === 'full' && results.problemOntology) {
+    const problemOntologyLearnings = await executeMetaLearningAnalysis(ctx, 'problem-ontology', {
+      phaseResult: results.problemOntology,
+      processContext: processEvolutionContext,
+      adaptiveQualityManager,
+      allResults: results,
+      previousPhaseLearnings: results.metadata.processLearnings
+    });
+
+    adaptiveQualityManager = problemOntologyLearnings.updatedQualityManager;
+    processEvolutionContext.adaptiveInsights.push(problemOntologyLearnings.insights);
+    processEvolutionContext.currentPhaseIndex = 2;
+
+    // Apply cross-phase learning transfer with breakthrough detection
+    await applyCrossPhaseOptimizations(ctx, results, problemOntologyLearnings.crossPhaseInsights);
+
+    // Process innovation and breakthrough opportunity analysis
+    const innovationAnalysis = await detectProcessInnovationOpportunities(ctx, {
+      currentPhase: 'problem-ontology',
+      phaseResults: [results.worldOntology, results.problemOntology],
+      processLearnings: results.metadata.processLearnings,
+      processContext: processEvolutionContext,
+      multiLevelLearning
+    });
+
+    // Update process intelligence with innovation insights
+    if (innovationAnalysis.breakthroughOpportunities.length > 0) {
+      processEvolutionContext.processIntelligence.processInnovations.push(innovationAnalysis);
+    }
+
+    results.metadata.processLearnings.push(problemOntologyLearnings);
+    results.metadata.innovationAnalyses = results.metadata.innovationAnalyses || [];
+    results.metadata.innovationAnalyses.push(innovationAnalysis);
+    artifacts.push(...(problemOntologyLearnings.artifacts || []));
+    artifacts.push(...(innovationAnalysis.artifacts || []));
   }
 
   // ============================================================================
@@ -813,32 +1201,154 @@ export async function process(inputs, ctx) {
   // REMAINING PHASES (ABBREVIATED FOR SPACE)
   // ============================================================================
 
-  // Phase 3: Adaptive Generator Creation
+  // Phase 3: Adaptive Generator Creation with Comprehensive Validation
   if (phase === 'full' || phase === 'generators') {
+    ctx.log?.('info', 'Phase 3: Adaptive generator creation with comprehensive validation...');
+
     const phaseResult = await executeIterativePhase(ctx, 'generators', {
       mainTask: createAdaptiveGeneratorsTask,
-      taskInputs: { projectName, knowledgeGraph: results.knowledgeGraph, domainType, projectComplexity, targetQuality },
-      qualityDimensions: ['functionality', 'adaptability', 'performance', 'maintainability'],
+      taskInputs: {
+        projectName,
+        knowledgeGraph: results.knowledgeGraph,
+        currentSchema: results.schema,
+        domainType,
+        projectComplexity,
+        targetQuality,
+        evidenceFramework: evidenceBasedModelingFramework,
+        validationFramework: comprehensiveValidationFramework
+      },
+      qualityDimensions: ['functionality', 'adaptability', 'performance', 'maintainability', 'validation_coverage'],
       targetQuality, maxIterations: maxIterationsPerPhase, phaseName: 'Adaptive Generator Creation'
     });
+
+    // Comprehensive generator validation
+    const generatorValidation = await ctx.task(comprehensiveGeneratorValidationTask, {
+      projectName,
+      generators: phaseResult.result,
+      knowledgeGraph: results.knowledgeGraph,
+      schema: results.schema,
+      validationFramework: comprehensiveValidationFramework,
+      evidenceFramework: evidenceBasedModelingFramework,
+      stakeholderContext,
+      domainType
+    });
+
+    // Update validation framework with generator validation results
+    comprehensiveValidationFramework.generatorValidation.outputQualityAssessment = generatorValidation.qualityAssessment;
+    comprehensiveValidationFramework.generatorValidation.conformanceValidation = generatorValidation.conformanceResults;
+    comprehensiveValidationFramework.generatorValidation.usabilityValidation = generatorValidation.usabilityResults;
+    comprehensiveValidationFramework.generatorValidation.performanceValidation = generatorValidation.performanceResults;
+
     results.generators = phaseResult.result;
+    results.generatorValidation = generatorValidation;
     results.metadata.phaseIterations['generators'] = phaseResult.iterations;
     results.metadata.qualityScores['generators'] = phaseResult.qualityMetrics;
     artifacts.push(...(phaseResult.artifacts || []));
+    artifacts.push(...(generatorValidation.artifacts || []));
+
+    await ctx.breakpoint({
+      question: `Generator creation and validation complete. Generators created: ${phaseResult.result?.generatorCount || 0}, Validation score: ${generatorValidation.overallValidationScore}%, Performance rating: ${generatorValidation.performanceRating}/10. Proceed to documentation?`,
+      title: 'Generator Validation Review',
+      context: {
+        runId: ctx.runId,
+        data: {
+          generatorCount: phaseResult.result?.generatorCount || 0,
+          validationScore: generatorValidation.overallValidationScore,
+          performanceRating: generatorValidation.performanceRating,
+          conformanceIssues: generatorValidation.conformanceResults?.issuesFound || 0,
+          usabilityScore: generatorValidation.usabilityResults?.score || 0
+        },
+        files: [
+          { path: 'artifacts/odd/GENERATOR_VALIDATION_REPORT.md', format: 'markdown', label: 'Generator Validation' },
+          { path: 'artifacts/odd/GENERATOR_PERFORMANCE_ANALYSIS.md', format: 'markdown', label: 'Performance Analysis' },
+          { path: 'artifacts/odd/GENERATOR_CONFORMANCE_TESTING.md', format: 'markdown', label: 'Conformance Testing' }
+        ]
+      }
+    });
   }
 
-  // Phase 4: Strategic Documentation & Wiki
+  // Phase 4: Strategic Documentation & Encyclopedia with Validation
   if (phase === 'full' || phase === 'documentation') {
+    ctx.log?.('info', 'Phase 4: Strategic documentation and encyclopedia creation with validation...');
+
     const phaseResult = await executeIterativePhase(ctx, 'documentation', {
       mainTask: generateStrategicDocumentationTask,
-      taskInputs: { projectName, knowledgeGraph: results.knowledgeGraph, generators: results.generators, stakeholderContext, targetQuality },
-      qualityDimensions: ['completeness', 'clarity', 'stakeholder_alignment', 'strategic_coherence'],
-      targetQuality, maxIterations: maxIterationsPerPhase, phaseName: 'Strategic Documentation & Wiki'
+      taskInputs: {
+        projectName,
+        knowledgeGraph: results.knowledgeGraph,
+        currentSchema: results.schema,
+        generators: results.generators,
+        stakeholderContext,
+        targetQuality,
+        evidenceFramework: evidenceBasedModelingFramework,
+        validationFramework: comprehensiveValidationFramework,
+        ontologyScope
+      },
+      qualityDimensions: ['completeness', 'clarity', 'stakeholder_alignment', 'strategic_coherence', 'encyclopedia_quality'],
+      targetQuality, maxIterations: maxIterationsPerPhase, phaseName: 'Strategic Documentation & Encyclopedia'
     });
+
+    // Comprehensive encyclopedia validation
+    const encyclopediaValidation = await ctx.task(encyclopediaValidationTask, {
+      projectName,
+      documentation: phaseResult.result,
+      knowledgeGraph: results.knowledgeGraph,
+      schema: results.schema,
+      evidenceFramework: evidenceBasedModelingFramework,
+      validationFramework: comprehensiveValidationFramework,
+      ontologyScope,
+      stakeholderContext,
+      domainType
+    });
+
+    // Cross-system validation of generators, documentation, and ontology
+    const crossSystemValidation = await ctx.task(crossSystemValidationTask, {
+      projectName,
+      generators: results.generators,
+      documentation: phaseResult.result,
+      knowledgeGraph: results.knowledgeGraph,
+      schema: results.schema,
+      evidenceFramework: evidenceBasedModelingFramework,
+      validationFramework: comprehensiveValidationFramework,
+      allResults: results
+    });
+
+    // Update validation framework with results
+    comprehensiveValidationFramework.encyclopediaValidation.completenessValidation = encyclopediaValidation.completenessResults;
+    comprehensiveValidationFramework.encyclopediaValidation.accuracyValidation = encyclopediaValidation.accuracyResults;
+    comprehensiveValidationFramework.encyclopediaValidation.consistencyValidation = encyclopediaValidation.consistencyResults;
+    comprehensiveValidationFramework.crossSystemValidation.integrationValidation.push(crossSystemValidation.integrationResults);
+    comprehensiveValidationFramework.crossSystemValidation.holisticValidation.push(crossSystemValidation.holisticResults);
+
     results.documentation = phaseResult.result;
+    results.encyclopediaValidation = encyclopediaValidation;
+    results.crossSystemValidation = crossSystemValidation;
     results.metadata.phaseIterations['documentation'] = phaseResult.iterations;
     results.metadata.qualityScores['documentation'] = phaseResult.qualityMetrics;
     artifacts.push(...(phaseResult.artifacts || []));
+    artifacts.push(...(encyclopediaValidation.artifacts || []));
+    artifacts.push(...(crossSystemValidation.artifacts || []));
+
+    await ctx.breakpoint({
+      question: `Documentation and encyclopedia validation complete. Encyclopedia coverage: ${encyclopediaValidation.coverageScore}%, Accuracy score: ${encyclopediaValidation.accuracyScore}%, Cross-system integration: ${crossSystemValidation.integrationScore}%. Proceed to testing phases?`,
+      title: 'Encyclopedia & Cross-System Validation Review',
+      context: {
+        runId: ctx.runId,
+        data: {
+          encyclopediaCoverage: encyclopediaValidation.coverageScore,
+          accuracyScore: encyclopediaValidation.accuracyScore,
+          consistencyScore: encyclopediaValidation.consistencyScore,
+          crossSystemIntegration: crossSystemValidation.integrationScore,
+          holisticQuality: crossSystemValidation.holisticScore,
+          validationIssues: encyclopediaValidation.issuesFound?.length || 0
+        },
+        files: [
+          { path: 'artifacts/odd/ENCYCLOPEDIA_VALIDATION_REPORT.md', format: 'markdown', label: 'Encyclopedia Validation' },
+          { path: 'artifacts/odd/CROSS_SYSTEM_VALIDATION.md', format: 'markdown', label: 'Cross-System Validation' },
+          { path: 'artifacts/odd/DOCUMENTATION_QUALITY_ANALYSIS.md', format: 'markdown', label: 'Documentation Quality' }
+        ]
+      }
+    });
   }
 
   // Phase 5: Multi-Level Testing & Quality
@@ -931,6 +1441,281 @@ export async function process(inputs, ctx) {
 
     results.riskMitigation = riskMitigationResult;
     artifacts.push(...(riskMitigationResult.artifacts || []));
+  }
+
+  // ============================================================================
+  // REINFORCEMENT LEARNING ADAPTATION CYCLES
+  // ============================================================================
+
+  ctx.log?.('info', 'Executing reinforcement learning adaptation cycles...');
+
+  // Schema self-validation and adaptive evolution cycle
+  let schemaAdaptationIteration = 0;
+  const maxSchemaAdaptationIterations = 3;
+  let significantSchemaImprovementPotential = true;
+
+  while (significantSchemaImprovementPotential && schemaAdaptationIteration < maxSchemaAdaptationIterations) {
+    schemaAdaptationIteration++;
+    ctx.log?.('info', `Schema adaptation cycle ${schemaAdaptationIteration}/${maxSchemaAdaptationIterations}`);
+
+    // Self-validation and research on current schema
+    const schemaValidationCycle = await ctx.task(schemaValidationResearchTask, {
+      projectName,
+      currentSchema: results.schema,
+      allResults: results,
+      evidenceFramework: evidenceBasedModelingFramework,
+      validationFramework: comprehensiveValidationFramework,
+      reinforcementLearningFramework,
+      adaptationIteration: schemaAdaptationIteration,
+      stakeholderContext,
+      domainType
+    });
+
+    // Analyze validation results for adaptation opportunities
+    const adaptationAnalysis = await ctx.task(adaptationOpportunityAnalysisTask, {
+      projectName,
+      validationResults: schemaValidationCycle,
+      currentSchema: results.schema,
+      adaptationHistory: reinforcementLearningFramework.adaptiveEvolution.schemaEvolutionHistory,
+      evidenceFramework: evidenceBasedModelingFramework,
+      qualityTargets: { targetQuality }
+    });
+
+    // Update frameworks with learning results
+    reinforcementLearningFramework.selfValidationCycles.schemaValidationCycles.push(schemaValidationCycle);
+    reinforcementLearningFramework.selfResearch.selfEvaluation[`schema-cycle-${schemaAdaptationIteration}`] = adaptationAnalysis.selfAssessment;
+
+    // Check if significant improvement potential exists
+    significantSchemaImprovementPotential = adaptationAnalysis.significantImprovementPotential;
+
+    if (adaptationAnalysis.adaptationRecommended) {
+      ctx.log?.('info', `Significant schema improvement potential detected. Implementing adaptations...`);
+
+      // Execute schema adaptation based on validation learning
+      const schemaAdaptation = await ctx.task(schemaAdaptationTask, {
+        projectName,
+        currentSchema: results.schema,
+        adaptationOpportunities: adaptationAnalysis.opportunities,
+        validationResults: schemaValidationCycle,
+        evidenceFramework: evidenceBasedModelingFramework,
+        stakeholderContext,
+        adaptationStrategy: adaptationAnalysis.recommendedStrategy
+      });
+
+      // Update schema with adaptations
+      results.schema = schemaAdaptation.adaptedSchema;
+      reinforcementLearningFramework.adaptiveEvolution.schemaEvolutionHistory.push(schemaAdaptation.evolutionRecord);
+
+      artifacts.push(...(schemaAdaptation.artifacts || []));
+
+      await ctx.breakpoint({
+        question: `Schema adaptation cycle ${schemaAdaptationIteration} complete. Schema improvements: ${schemaAdaptation.improvements?.length || 0}. Quality improvement: ${schemaAdaptation.qualityImprovement}%. Continue with ontology adaptation cycle?`,
+        title: 'Schema Adaptation Review',
+        context: {
+          runId: ctx.runId,
+          data: {
+            adaptationIteration: schemaAdaptationIteration,
+            improvements: schemaAdaptation.improvements?.length || 0,
+            qualityImprovement: schemaAdaptation.qualityImprovement,
+            significantPotentialRemaining: adaptationAnalysis.significantImprovementPotential,
+            nextRecommendations: adaptationAnalysis.futureOpportunities
+          },
+          files: [
+            { path: 'artifacts/odd/SCHEMA_ADAPTATION_REPORT.md', format: 'markdown', label: 'Schema Adaptation' },
+            { path: 'artifacts/odd/VALIDATION_RESEARCH_RESULTS.md', format: 'markdown', label: 'Validation Research' },
+            { path: 'artifacts/odd/ADAPTATION_ANALYSIS.md', format: 'markdown', label: 'Adaptation Analysis' }
+          ]
+        }
+      });
+    } else {
+      ctx.log?.('info', 'No significant schema improvement potential detected. Proceeding to ontology validation.');
+    }
+  }
+
+  // Full ontology validation and adaptive evolution cycle
+  let ontologyAdaptationIteration = 0;
+  const maxOntologyAdaptationIterations = 5;
+  let significantOntologyImprovementPotential = true;
+
+  while (significantOntologyImprovementPotential && ontologyAdaptationIteration < maxOntologyAdaptationIterations) {
+    ontologyAdaptationIteration++;
+    ctx.log?.('info', `Ontology adaptation cycle ${ontologyAdaptationIteration}/${maxOntologyAdaptationIterations}`);
+
+    // Comprehensive ontology self-validation and research
+    const ontologyValidationCycle = await ctx.task(ontologyValidationResearchTask, {
+      projectName,
+      currentOntology: results.knowledgeGraph,
+      currentSchema: results.schema,
+      allResults: results,
+      evidenceFramework: evidenceBasedModelingFramework,
+      validationFramework: comprehensiveValidationFramework,
+      reinforcementLearningFramework,
+      adaptationIteration: ontologyAdaptationIteration,
+      stakeholderContext,
+      domainType,
+      ontologyScope
+    });
+
+    // Analyze ontology validation for adaptation opportunities
+    const ontologyAdaptationAnalysis = await ctx.task(ontologyAdaptationAnalysisTask, {
+      projectName,
+      validationResults: ontologyValidationCycle,
+      currentOntology: results.knowledgeGraph,
+      currentSchema: results.schema,
+      adaptationHistory: reinforcementLearningFramework.adaptiveEvolution.ontologyEvolutionHistory,
+      evidenceFramework: evidenceBasedModelingFramework,
+      qualityTargets: { targetQuality },
+      allowSchemaChanges: true // Critical: Allow schema changes even late in process
+    });
+
+    // Update learning frameworks
+    reinforcementLearningFramework.selfValidationCycles.ontologyValidationCycles.push(ontologyValidationCycle);
+    reinforcementLearningFramework.selfResearch.improvementDiscovery.push(...ontologyAdaptationAnalysis.discoveredImprovements);
+
+    significantOntologyImprovementPotential = ontologyAdaptationAnalysis.significantImprovementPotential;
+
+    if (ontologyAdaptationAnalysis.adaptationRecommended) {
+      ctx.log?.('info', `Significant ontology improvement potential detected. Implementing comprehensive adaptations...`);
+
+      // Execute comprehensive ontology adaptation (including schema changes if needed)
+      const ontologyAdaptation = await ctx.task(comprehensiveOntologyAdaptationTask, {
+        projectName,
+        currentOntology: results.knowledgeGraph,
+        currentSchema: results.schema,
+        adaptationOpportunities: ontologyAdaptationAnalysis.opportunities,
+        validationResults: ontologyValidationCycle,
+        evidenceFramework: evidenceBasedModelingFramework,
+        stakeholderContext,
+        adaptationStrategy: ontologyAdaptationAnalysis.recommendedStrategy,
+        allowSchemaEvolution: true,
+        qualityTargets: { targetQuality }
+      });
+
+      // Update both ontology and schema if changes were made
+      results.knowledgeGraph = ontologyAdaptation.adaptedOntology;
+      if (ontologyAdaptation.schemaChanges) {
+        results.schema = ontologyAdaptation.adaptedSchema;
+        reinforcementLearningFramework.adaptiveEvolution.schemaEvolutionHistory.push(ontologyAdaptation.schemaEvolutionRecord);
+      }
+      reinforcementLearningFramework.adaptiveEvolution.ontologyEvolutionHistory.push(ontologyAdaptation.ontologyEvolutionRecord);
+
+      artifacts.push(...(ontologyAdaptation.artifacts || []));
+
+      await ctx.breakpoint({
+        question: `Ontology adaptation cycle ${ontologyAdaptationIteration} complete. Ontology improvements: ${ontologyAdaptation.ontologyImprovements?.length || 0}. Schema changes: ${ontologyAdaptation.schemaChanges ? 'Yes' : 'No'}. Quality improvement: ${ontologyAdaptation.qualityImprovement}%. Continue adaptation or proceed?`,
+        title: 'Ontology Adaptation Review',
+        context: {
+          runId: ctx.runId,
+          data: {
+            adaptationIteration: ontologyAdaptationIteration,
+            ontologyImprovements: ontologyAdaptation.ontologyImprovements?.length || 0,
+            schemaChanged: ontologyAdaptation.schemaChanges,
+            qualityImprovement: ontologyAdaptation.qualityImprovement,
+            significantPotentialRemaining: ontologyAdaptationAnalysis.significantImprovementPotential,
+            discoveredPatterns: ontologyAdaptationAnalysis.discoveredPatterns?.length || 0
+          },
+          files: [
+            { path: 'artifacts/odd/ONTOLOGY_ADAPTATION_REPORT.md', format: 'markdown', label: 'Ontology Adaptation' },
+            { path: 'artifacts/odd/ONTOLOGY_VALIDATION_RESEARCH.md', format: 'markdown', label: 'Ontology Validation' },
+            { path: 'artifacts/odd/COMPREHENSIVE_ADAPTATION_ANALYSIS.md', format: 'markdown', label: 'Adaptation Analysis' }
+          ]
+        }
+      });
+    }
+  }
+
+  // Update metadata with reinforcement learning results
+  results.metadata.schemaAdaptationCycles = schemaAdaptationIteration;
+  results.metadata.ontologyAdaptationCycles = ontologyAdaptationIteration;
+  results.metadata.totalAdaptations = reinforcementLearningFramework.adaptiveEvolution.schemaEvolutionHistory.length + reinforcementLearningFramework.adaptiveEvolution.ontologyEvolutionHistory.length;
+
+  // ============================================================================
+  // DYNAMIC CONVERGENCE ANALYSIS & ADAPTIVE PROCESS OPTIMIZATION
+  // ============================================================================
+
+  ctx.log?.('info', 'Analyzing dynamic convergence patterns and process resilience...');
+
+  // Analyze convergence patterns across all phases
+  const convergenceAnalysis = await ctx.task(dynamicConvergenceAnalysisTask, {
+    projectName,
+    allResults: results,
+    convergenceManager: dynamicConvergenceManager,
+    processContext: processEvolutionContext,
+    multiLevelLearning,
+    phaseQualityHistory: results.metadata.qualityScores,
+    stakeholderFeedback: results.metadata.stakeholderAlignment
+  });
+
+  dynamicConvergenceManager.convergenceHistory.push(convergenceAnalysis);
+  dynamicConvergenceManager.convergenceVelocity = convergenceAnalysis.convergenceVelocity;
+
+  // Evaluate process resilience and adaptation needs
+  const resilienceAnalysis = await ctx.task(processResilienceAnalysisTask, {
+    projectName,
+    allResults: results,
+    resilienceFramework: processResilienceFramework,
+    processContext: processEvolutionContext,
+    convergenceAnalysis,
+    riskProfile,
+    projectComplexity
+  });
+
+  processResilienceFramework.resilienceMonitoring.systemHealthIndicators.push(resilienceAnalysis.healthIndicators);
+  processResilienceFramework.failureScenarios.edgeCaseScenarios.push(...resilienceAnalysis.identifiedEdgeCases);
+
+  // Implement adaptive optimizations based on convergence analysis
+  if (convergenceAnalysis.adaptiveOptimizationsNeeded) {
+    ctx.log?.('info', 'Implementing adaptive process optimizations...');
+
+    const adaptiveOptimizations = await ctx.task(adaptiveProcessOptimizationTask, {
+      projectName,
+      allResults: results,
+      convergenceAnalysis,
+      resilienceAnalysis,
+      processContext: processEvolutionContext,
+      optimizationTargets: convergenceAnalysis.optimizationTargets
+    });
+
+    // Apply dynamic adjustments to remaining process execution
+    processEvolutionContext.adaptiveInsights.push(adaptiveOptimizations.processAdjustments);
+    adaptiveQualityManager.adaptationReasons.push(adaptiveOptimizations.qualityAdjustments);
+
+    artifacts.push(...(adaptiveOptimizations.artifacts || []));
+  }
+
+  // Check for emergent behaviors and breakthrough indicators
+  const emergentBehaviorAnalysis = await ctx.task(emergentBehaviorDetectionTask, {
+    projectName,
+    allResults: results,
+    processContext: processEvolutionContext,
+    convergenceHistory: dynamicConvergenceManager.convergenceHistory,
+    multiLevelLearning,
+    innovationPatterns: processEvolutionContext.processPatterns.innovationPatterns
+  });
+
+  dynamicConvergenceManager.emergentBehaviors.push(...emergentBehaviorAnalysis.detectedBehaviors);
+
+  if (emergentBehaviorAnalysis.breakthroughIndicators.length > 0) {
+    ctx.log?.('info', `Detected ${emergentBehaviorAnalysis.breakthroughIndicators.length} potential breakthrough opportunities`);
+
+    await ctx.breakpoint({
+      question: `Emergent behavior analysis detected potential breakthrough opportunities. Review findings and decide whether to pursue breakthrough exploration or continue with current approach?`,
+      title: 'Breakthrough Opportunity Detection',
+      context: {
+        runId: ctx.runId,
+        data: {
+          breakthroughIndicators: emergentBehaviorAnalysis.breakthroughIndicators,
+          emergentBehaviors: emergentBehaviorAnalysis.detectedBehaviors,
+          convergenceVelocity: dynamicConvergenceManager.convergenceVelocity,
+          recommendedActions: emergentBehaviorAnalysis.recommendedActions
+        },
+        files: [
+          { path: 'artifacts/odd/CONVERGENCE_ANALYSIS.md', format: 'markdown', label: 'Convergence Analysis' },
+          { path: 'artifacts/odd/RESILIENCE_ANALYSIS.md', format: 'markdown', label: 'Resilience Analysis' },
+          { path: 'artifacts/odd/EMERGENT_BEHAVIOR_REPORT.md', format: 'markdown', label: 'Emergent Behavior Analysis' }
+        ]
+      }
+    });
   }
 
   // ============================================================================
@@ -1093,15 +1878,289 @@ export async function process(inputs, ctx) {
   return {
     success: results.metadata.overallQuality >= targetQuality * 0.8,
     ...results,
+    // Enhanced process intelligence frameworks
+    dynamicConvergenceManager,
+    processResilienceFramework,
+    multiLevelLearning,
+    processEvolutionContext,
+    // Evidence-based modeling framework
+    evidenceBasedModelingFramework,
+    // Comprehensive validation framework
+    comprehensiveValidationFramework,
+    // Reinforcement learning framework
+    reinforcementLearningFramework,
     artifacts,
     metadata: {
       ...results.metadata,
       completedPhases: phase === 'full' ? 10 : 1,
       totalArtifacts: artifacts.length,
       qualityAchieved: results.metadata.overallQuality >= targetQuality,
-      enhancementLevel: 'enterprise'
+      enhancementLevel: 'enterprise',
+      // Enhanced process intelligence metrics
+      convergenceVelocity: dynamicConvergenceManager.convergenceVelocity,
+      emergentBehaviors: dynamicConvergenceManager.emergentBehaviors.length,
+      processResilienceScore: processResilienceFramework.resilienceMonitoring?.systemHealthIndicators?.length || 0,
+      adaptiveOptimizations: processEvolutionContext.adaptiveInsights.length,
+      breakthroughOpportunities: dynamicConvergenceManager.emergentBehaviors.filter(b => b.significance === 'breakthrough').length,
+      processInnovations: processEvolutionContext.processIntelligence.processInnovations.length,
+      cognitiveOptimization: processEvolutionContext.cognitiveLoadManagement.complexityReductionStrategies.length,
+      multiLevelLearningDepth: Object.keys(multiLevelLearning).reduce((sum, key) => sum + multiLevelLearning[key].length, 0),
+      // Evidence-based modeling metrics
+      evidenceCollectionCount: evidenceBasedModelingFramework.evidenceCollection.primarySources.length + evidenceBasedModelingFramework.evidenceCollection.secondarySources.length,
+      evidenceQualityScore: calculateAverageEvidenceQuality(evidenceBasedModelingFramework),
+      sourceCredibilityScore: calculateAverageCredibilityScore(evidenceBasedModelingFramework),
+      evidenceGapsIdentified: evidenceBasedModelingFramework.evidenceIntegration.evidenceGaps.length,
+      biasesIdentifiedAndMitigated: Object.keys(evidenceBasedModelingFramework.evidenceValidation.biasAssessment).length,
+      evidenceValidationCoverage: calculateEvidenceValidationCoverage(evidenceBasedModelingFramework),
+    // Validation framework metrics
+    validationCoverageScore: calculateValidationCoverage(comprehensiveValidationFramework),
+    generatorValidationScore: results.generatorValidation?.overallValidationScore || 0,
+    encyclopediaValidationScore: results.encyclopediaValidation?.coverageScore || 0,
+    crossSystemIntegrationScore: results.crossSystemValidation?.integrationScore || 0,
+    // Reinforcement learning metrics
+    adaptationCyclesCompleted: results.metadata.schemaAdaptationCycles + results.metadata.ontologyAdaptationCycles,
+    learningVelocity: calculateLearningVelocity(reinforcementLearningFramework),
+    adaptationEffectiveness: calculateAdaptationEffectiveness(reinforcementLearningFramework),
+    selfImprovementScore: calculateSelfImprovementScore(reinforcementLearningFramework)
     }
   };
+}
+
+// ============================================================================
+// META-LEARNING & PROCESS ADAPTATION FRAMEWORK
+// ============================================================================
+
+/**
+ * Execute advanced multi-dimensional meta-learning analysis after each phase
+ * Captures insights across tactical, strategic, methodological, and paradigmatic levels
+ */
+async function executeAdvancedMetaLearningAnalysis(ctx, phaseName, config) {
+  const {
+    phaseResult,
+    processContext,
+    adaptiveQualityManager,
+    allResults,
+    multiLevelLearning,
+    previousPhaseLearnings = []
+  } = config;
+
+  ctx.log?.('info', `Advanced meta-learning analysis for ${phaseName}...`);
+
+  // Multi-dimensional learning analysis
+  const advancedMetaLearning = await ctx.task(advancedMetaLearningTask, {
+    phaseName,
+    phaseResult,
+    processContext,
+    adaptiveQualityManager,
+    allResults,
+    multiLevelLearning,
+    previousPhaseLearnings
+  });
+
+  // Process pattern recognition and intelligence enhancement
+  const patternRecognition = await ctx.task(processPatternRecognitionTask, {
+    phaseName,
+    phaseResult,
+    processContext,
+    historicalPatterns: processContext.processPatterns,
+    learningHistory: previousPhaseLearnings
+  });
+
+  // Contextual adaptation analysis
+  const contextualAdaptation = await ctx.task(contextualAdaptationTask, {
+    phaseName,
+    phaseResult,
+    processContext,
+    domainType: allResults.domainType,
+    stakeholderContext: allResults.stakeholderContext,
+    projectComplexity: allResults.projectComplexity
+  });
+
+  return {
+    insights: advancedMetaLearning,
+    processDecisions: advancedMetaLearning.processDecisions,
+    contingencyTriggers: advancedMetaLearning.contingencyTriggers,
+    updatedQualityManager: advancedMetaLearning.updatedQualityManager,
+    updatedMultiLevelLearning: advancedMetaLearning.updatedMultiLevelLearning,
+    crossPhaseInsights: advancedMetaLearning.crossPhaseInsights,
+    recognizedPatterns: patternRecognition.recognizedPatterns,
+    contextualOptimizations: contextualAdaptation.optimizations,
+    artifacts: [
+      ...(advancedMetaLearning.artifacts || []),
+      ...(patternRecognition.artifacts || []),
+      ...(contextualAdaptation.artifacts || [])
+    ]
+  };
+}
+
+/**
+ * Execute process validation and contingency analysis
+ * Validates process decisions and activates contingencies when needed
+ */
+async function executeProcessValidation(ctx, config) {
+  const {
+    phaseName,
+    phaseResult,
+    processDecisions,
+    processContext,
+    contingencyTriggers
+  } = config;
+
+  ctx.log?.('info', `Process validation for ${phaseName}...`);
+
+  const processValidation = await ctx.task(processValidationTask, {
+    phaseName,
+    phaseResult,
+    processDecisions,
+    processContext,
+    contingencyTriggers
+  });
+
+  return {
+    validationResults: processValidation.validationResults,
+    contingencyActions: processValidation.contingencyActions,
+    updatedProcessContext: processValidation.updatedProcessContext,
+    processQualityScore: processValidation.processQualityScore,
+    artifacts: processValidation.artifacts || []
+  };
+}
+
+/**
+ * Optimize cognitive load and stakeholder experience
+ * Manages complexity and enhances stakeholder engagement
+ */
+async function optimizeCognitiveLoad(ctx, config) {
+  const {
+    phaseName,
+    stakeholderFeedback,
+    complexityMetrics,
+    processContext
+  } = config;
+
+  const cognitiveOptimization = await ctx.task(cognitiveLoadOptimizationTask, {
+    phaseName,
+    stakeholderFeedback,
+    complexityMetrics,
+    processContext,
+    currentCognitiveManagement: processContext.cognitiveLoadManagement
+  });
+
+  return {
+    optimizedCognitiveManagement: cognitiveOptimization.optimizedManagement,
+    stakeholderExperienceImprovements: cognitiveOptimization.experienceImprovements,
+    complexityReductionStrategies: cognitiveOptimization.complexityReductions,
+    artifacts: cognitiveOptimization.artifacts || []
+  };
+}
+
+/**
+ * Detect process innovation opportunities and breakthrough potential
+ * Identifies when fundamental process shifts or innovations are possible
+ */
+async function detectProcessInnovationOpportunities(ctx, config) {
+  const {
+    currentPhase,
+    phaseResults,
+    processLearnings,
+    processContext,
+    multiLevelLearning
+  } = config;
+
+  const innovationDetection = await ctx.task(processInnovationDetectionTask, {
+    currentPhase,
+    phaseResults,
+    processLearnings,
+    processContext,
+    multiLevelLearning,
+    innovationPatterns: processContext.processPatterns.innovationPatterns
+  });
+
+  return {
+    breakthroughOpportunities: innovationDetection.breakthroughOpportunities,
+    processInnovations: innovationDetection.processInnovations,
+    paradigmShiftIndicators: innovationDetection.paradigmShiftIndicators,
+    innovationRecommendations: innovationDetection.recommendations,
+    artifacts: innovationDetection.artifacts || []
+  };
+}
+
+/**
+ * Apply cross-phase optimizations based on learnings
+ */
+async function applyCrossPhaseOptimizations(ctx, results, crossPhaseInsights) {
+  if (crossPhaseInsights && crossPhaseInsights.length > 0) {
+    ctx.log?.('info', 'Applying cross-phase optimizations...');
+
+    const optimizationResult = await ctx.task(crossPhaseOptimizationTask, {
+      crossPhaseInsights,
+      currentResults: results,
+      optimizationType: 'learning-transfer'
+    });
+
+    // Update results based on cross-phase optimizations
+    if (optimizationResult.optimizedResults) {
+      Object.assign(results, optimizationResult.optimizedResults);
+    }
+
+    return optimizationResult;
+  }
+  return null;
+}
+
+/**
+ * Determine adaptive quality target based on process learnings and context
+ */
+async function determineAdaptiveQualityTarget(ctx, phaseId, config) {
+  const {
+    baseTarget,
+    adaptiveQualityManager,
+    processContext,
+    previousPhaseLearnings
+  } = config;
+
+  const adaptiveTargetResult = await ctx.task(adaptiveTargetDeterminationTask, {
+    phaseId,
+    baseTarget,
+    adaptiveQualityManager,
+    processContext,
+    previousPhaseLearnings
+  });
+
+  return adaptiveTargetResult.adaptiveTarget;
+}
+
+/**
+ * Progressive quality evolution based on process learning
+ */
+async function evolveQualityTargets(ctx, adaptiveQualityManager, phaseResults, processLearnings) {
+  const qualityEvolution = await ctx.task(qualityEvolutionTask, {
+    currentQualityManager: adaptiveQualityManager,
+    phaseResults,
+    processLearnings,
+    evolutionStrategy: 'progressive-improvement'
+  });
+
+  return qualityEvolution.evolvedQualityTargets;
+}
+
+/**
+ * Evaluate and potentially resequence phases based on process learnings
+ */
+async function evaluatePhaseSequenceOptimization(ctx, processContext, allResults, upcomingPhases) {
+  if (processContext.adaptiveInsights.length >= 2) {
+    const sequenceOptimization = await ctx.task(phaseSequenceOptimizationTask, {
+      currentSequence: processContext.phaseSequence,
+      adaptiveInsights: processContext.adaptiveInsights,
+      allResults,
+      upcomingPhases,
+      processEfficiency: processContext.processEfficiencyMetrics
+    });
+
+    if (sequenceOptimization.recommendSequenceChange) {
+      return sequenceOptimization.optimizedSequence;
+    }
+  }
+  return null;
 }
 
 // ============================================================================
@@ -1109,8 +2168,8 @@ export async function process(inputs, ctx) {
 // ============================================================================
 
 /**
- * Execute individual phase with internal iterative convergence
- * Each phase iterates internally until it converges its own deliverables
+ * Execute individual phase with internal iterative convergence and adaptive optimization
+ * Each phase iterates internally until it converges its own deliverables with progressive quality enhancement
  */
 async function executeIterativePhase(ctx, phaseId, config) {
   const {
@@ -1119,10 +2178,13 @@ async function executeIterativePhase(ctx, phaseId, config) {
     qualityDimensions,
     targetQuality,
     maxIterations,
-    phaseName
+    phaseName,
+    adaptiveQualityManager,
+    processContext,
+    previousPhaseLearnings = []
   } = config;
 
-  ctx.log?.('info', `Starting iterative convergence for ${phaseName}`);
+  ctx.log?.('info', `Starting adaptive iterative convergence for ${phaseName}`);
 
   let iteration = 0;
   let converged = false;
@@ -1130,13 +2192,23 @@ async function executeIterativePhase(ctx, phaseId, config) {
   let qualityHistory = [];
   let artifacts = [];
 
-  // Initial gap identification - what needs to be achieved in this phase
-  const initialGaps = await ctx.task(phaseGapIdentificationTask, {
+  // Determine adaptive quality target based on process learnings
+  const adaptiveTarget = await determineAdaptiveQualityTarget(ctx, phaseId, {
+    baseTarget: targetQuality,
+    adaptiveQualityManager,
+    processContext,
+    previousPhaseLearnings
+  });
+
+  // Enhanced gap identification with cross-phase learning integration
+  const initialGaps = await ctx.task(adaptiveGapIdentificationTask, {
     phase: phaseId,
     phaseName,
     qualityDimensions,
-    targetQuality,
-    context: taskInputs
+    targetQuality: adaptiveTarget,
+    context: taskInputs,
+    previousPhaseLearnings,
+    crossPhaseInsights: processContext.adaptiveInsights
   });
 
   artifacts.push(...(initialGaps.artifacts || []));
@@ -1525,6 +2597,7 @@ const worldOntologyResearchTask = defineTask({
     domainType: { type: 'string', default: 'general' },
     stakeholderContext: { type: 'string', default: 'multi-team' },
     researchDepth: { type: 'string', default: 'comprehensive' },
+    evidenceFramework: { type: 'object', default: {} },
     iteration: { type: 'number', default: 0 },
     previousResult: { type: 'object', default: null },
     identifiedGaps: { type: 'array', default: [] }
@@ -1541,6 +2614,17 @@ const worldOntologyResearchTask = defineTask({
     technologyEcosystem: { type: 'object' },
     researchSources: { type: 'array' },
     knowledgeGaps: { type: 'array' },
+    // Evidence-based modeling outputs
+    evidenceDatabase: { type: 'object' }, // Complete evidence collection with sources and quality scores
+    claimEvidenceMapping: { type: 'object' }, // Map every claim to supporting evidence
+    sourceCredibilityAnalysis: { type: 'object' }, // Credibility assessment for all sources
+    evidenceQualityMetrics: { type: 'object' }, // Overall evidence quality scores and statistics
+    evidenceGaps: { type: 'array' }, // Identified gaps in evidence coverage
+    conflictingEvidence: { type: 'array' }, // Areas where sources conflict and resolution approaches
+    evidenceValidationResults: { type: 'object' }, // Results of evidence triangulation and validation
+    biasAssessment: { type: 'object' }, // Identified biases and mitigation strategies
+    evidenceUpdateRequirements: { type: 'array' }, // Evidence that needs regular updating
+    stakeholderEvidenceAccess: { type: 'object' }, // How stakeholders can verify evidence
     artifacts: { type: 'array' }
   },
 
@@ -1554,6 +2638,73 @@ const worldOntologyResearchTask = defineTask({
         role: 'world-ontology-researcher',
         goal: `Build comprehensive world model and domain ontology for ${inputs.projectName}`,
         instructions: [
+          '=== EVIDENCE-BASED WORLD MODELING FRAMEWORK ===',
+          'CRITICAL REQUIREMENT: Every external fact, claim, or assertion MUST include specific, traceable evidence with quality assessment.',
+
+          '=== COMPREHENSIVE EVIDENCE COLLECTION PROTOCOL ===',
+          '**MANDATORY: For EVERY external fact in the ontology, provide:**',
+          '1. PRIMARY SOURCE CITATION with specific page/section references',
+          '2. EVIDENCE QUALITY SCORE (1-10) with justification',
+          '3. SOURCE CREDIBILITY ASSESSMENT (authority, independence, methodology)',
+          '4. ALTERNATIVE SOURCE CONFIRMATION (minimum 2 independent sources for critical claims)',
+          '5. UNCERTAINTY QUANTIFICATION (confidence intervals, limitations)',
+          '6. BIAS ASSESSMENT (potential conflicts of interest, methodological biases)',
+          '7. CURRENCY CHECK (how recent is the evidence, update frequency)',
+          '8. ACCESSIBILITY VERIFICATION (can stakeholders verify these sources)',
+
+          '=== EVIDENCE SOURCE CATEGORIES ===',
+          '**PRIMARY SOURCES** (Highest Credibility):',
+          '- Peer-reviewed academic research with methodology transparency',
+          '- Official industry standards and specifications (ISO, IEEE, etc.)',
+          '- Government regulatory documents and official statistics',
+          '- Direct stakeholder interviews and surveys',
+          '- Original research data and experimental results',
+          '- Technical documentation from authoritative implementers',
+
+          '**SECONDARY SOURCES** (Moderate Credibility, Require Validation):',
+          '- Industry analyst reports (Gartner, Forrester, etc.) with methodology',
+          '- Professional association white papers and position statements',
+          '- Vendor-neutral technical conference presentations',
+          '- Established industry media with editorial standards',
+          '- Case studies from reputable organizations',
+          '- Synthesis documents that cite primary sources',
+
+          '**CODE AND IMPLEMENTATION EVIDENCE**:',
+          '- Open source repositories with active maintenance and good documentation',
+          '- Technical specifications implemented in production systems',
+          '- API documentation with version history and change logs',
+          '- Configuration examples from validated implementations',
+          '- Performance benchmarks with methodology transparency',
+          '- Security analysis and audit reports',
+
+          '=== EVIDENCE VALIDATION METHODOLOGY ===',
+          '**SOURCE TRIANGULATION**:',
+          '- For critical claims: Minimum 3 independent, high-quality sources',
+          '- For important claims: Minimum 2 independent sources',
+          '- For supporting details: 1 high-quality source or 2 moderate sources',
+          '- For controversial claims: Additional expert validation required',
+
+          '**QUALITY ASSESSMENT CRITERIA**:',
+          '- AUTHORITY: Author/organization expertise and recognition in domain',
+          '- METHODOLOGY: Research/analysis methodology transparency and rigor',
+          '- INDEPENDENCE: Freedom from conflicts of interest',
+          '- CURRENCY: Recency and ongoing relevance of information',
+          '- CONSISTENCY: Alignment with other credible sources',
+          '- VERIFIABILITY: Ability for others to access and verify sources',
+
+          '**BIAS IDENTIFICATION AND MITIGATION**:',
+          '- COMMERCIAL BIAS: Identify vendor/commercial interests affecting claims',
+          '- CONFIRMATION BIAS: Actively seek disconfirming evidence',
+          '- RECENCY BIAS: Balance recent trends with historical perspective',
+          '- AVAILABILITY BIAS: Don\'t overweight easily accessible information',
+          '- AUTHORITY BIAS: Validate claims even from respected sources',
+
+          '=== EVIDENCE DOCUMENTATION STANDARDS ===',
+          '**CITATION FORMAT**: Author/Organization. "Title". Source, Date. [Evidence Quality: X/10] [Confidence: High/Medium/Low]',
+          '**EVIDENCE CHAIN**: For complex claims, document logical evidence chains from sources to conclusions',
+          '**CONFLICT RESOLUTION**: When sources conflict, document why certain sources were prioritized',
+          '**VERIFICATION PATH**: Provide clear instructions for stakeholders to verify critical evidence',
+
           '=== SYSTEMATIC CRITICAL THINKING FRAMEWORK ===',
           'Apply rigorous agent-based analysis using the DEEP-CARE framework:',
           'D - DEPTH ANALYSIS: What fundamental concepts need deeper investigation?',
@@ -1723,7 +2874,8 @@ const worldOntologyResearchTask = defineTask({
           stakeholderContext: inputs.stakeholderContext,
           iteration: inputs.iteration,
           previousResult: inputs.previousResult,
-          identifiedGaps: inputs.identifiedGaps
+          identifiedGaps: inputs.identifiedGaps,
+          evidenceFramework: inputs.evidenceFramework
         }
       },
       io: {
@@ -5386,7 +6538,2821 @@ const evolutionaryTemporalFrameworkTask = defineTask({
         inputJsonPath: `tasks/${effectId}/input.json`,
         outputJsonPath: `tasks/${effectId}/result.json`
       },
-      labels: ['evolutionary-framework', 'temporal-cognition', 'generational-learning', 'future-adaptation']
+      labels: ['collaborative-refinement', 'stakeholder-integration', 'process-completion', 'final-optimization']
+    };
+  }
+});
+
+/**
+ * Task: Meta-Learning Analysis
+ * Purpose: Extract insights and learnings from each phase to improve subsequent phases
+ */
+const metaLearningAnalysisTask = defineTask({
+  name: 'meta-learning-analysis',
+  description: 'Analyze phase results to extract learnings and improve subsequent phases',
+
+  inputs: {
+    phaseName: { type: 'string', required: true },
+    phaseResult: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    adaptiveQualityManager: { type: 'object', required: true },
+    allResults: { type: 'object', required: true },
+    previousPhaseLearnings: { type: 'array', default: [] }
+  },
+
+  outputs: {
+    phaseEffectiveness: { type: 'object' },
+    learningInsights: { type: 'array' },
+    processOptimizations: { type: 'array' },
+    crossPhaseInsights: { type: 'array' },
+    qualityAdjustmentRecommendations: { type: 'object' },
+    methodologyEvolution: { type: 'object' },
+    convergencePatterns: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Meta-Learning Analysis: ${inputs.phaseName}`,
+      agent: {
+        role: 'process-learning-analyst',
+        goal: `Extract meta-learnings from ${inputs.phaseName} phase to optimize subsequent phases`,
+        instructions: [
+          '=== COMPREHENSIVE PHASE EFFECTIVENESS ANALYSIS ===',
+          'Analyze phase performance across multiple dimensions:',
+          '- EFFICIENCY ANALYSIS: How efficiently did this phase achieve its objectives?',
+          '- QUALITY TRAJECTORY: How did quality evolve throughout phase iterations?',
+          '- CONVERGENCE PATTERNS: What patterns led to convergence or divergence?',
+          '- RESOURCE UTILIZATION: How effectively were time and effort utilized?',
+          '- STAKEHOLDER SATISFACTION: How well did phase outcomes meet stakeholder needs?',
+
+          '=== DEEP LEARNING EXTRACTION ===',
+          '1. METHODOLOGICAL INSIGHTS',
+          '   - Which approaches proved most effective in this phase?',
+          '   - What methodological adjustments would improve efficiency?',
+          '   - Which validation techniques provided the most value?',
+          '   - How did iterative convergence perform in this phase?',
+          '   - What patterns of analysis led to breakthrough insights?',
+
+          '2. KNOWLEDGE TRANSFER OPPORTUNITIES',
+          '   - What insights from this phase could benefit previous phases?',
+          '   - How could this phase\'s learnings optimize future phases?',
+          '   - Which discoveries could be applied across the entire process?',
+          '   - What domain-specific insights have broader applicability?',
+          '   - How can iteration patterns be transferred between phases?',
+
+          '3. PROCESS OPTIMIZATION IDENTIFICATION',
+          '   - Where were there inefficiencies or redundancies in this phase?',
+          '   - What additional analysis would have accelerated convergence?',
+          '   - Which quality gates were most/least effective?',
+          '   - How could stakeholder engagement be optimized?',
+          '   - What sequence changes would improve overall flow?',
+
+          '=== CROSS-PHASE INTEGRATION ANALYSIS ===',
+          '1. BACKWARD INTEGRATION OPPORTUNITIES',
+          '   - How do insights from this phase reveal gaps in previous phases?',
+          '   - What would we do differently in earlier phases with current knowledge?',
+          '   - Which previous phase assumptions proved incorrect?',
+          '   - How can earlier phase results be enhanced retroactively?',
+          '   - What feedback loops would strengthen previous work?',
+
+          '2. FORWARD INTEGRATION PLANNING',
+          '   - How should subsequent phases be adapted based on current learnings?',
+          '   - What new requirements or priorities have emerged for future phases?',
+          '   - Which phase sequence adjustments would optimize overall outcomes?',
+          '   - How can current insights pre-optimize future phase starting points?',
+          '   - What risk mitigation strategies should be applied to future phases?',
+
+          '=== ADAPTIVE QUALITY MANAGEMENT ===',
+          '1. QUALITY TARGET EVOLUTION',
+          '   - Are current quality targets optimal given phase learnings?',
+          '   - Should quality thresholds be adjusted for remaining phases?',
+          '   - Which quality dimensions proved most critical in this phase?',
+          '   - How should quality assessment criteria evolve based on insights?',
+          '   - What quality trade-offs became apparent and how should they guide future phases?',
+
+          '2. CONVERGENCE CRITERIA OPTIMIZATION',
+          '   - How effective were convergence criteria in this phase?',
+          '   - Should convergence thresholds be adjusted for future phases?',
+          '   - Which convergence indicators proved most reliable?',
+          '   - How can convergence assessment be accelerated without quality loss?',
+          '   - What early convergence warning signs should be monitored?',
+
+          '=== PROCESS EVOLUTION RECOMMENDATIONS ===',
+          '1. IMMEDIATE PROCESS ADJUSTMENTS',
+          '   - What changes should be applied to the next phase execution?',
+          '   - Which process parameters need adjustment based on learnings?',
+          '   - How should stakeholder engagement be modified for subsequent phases?',
+          '   - What additional validation steps would improve quality?',
+          '   - Which efficiency improvements can be immediately implemented?',
+
+          '2. LONG-TERM METHODOLOGY EVOLUTION',
+          '   - How should the overall methodology evolve based on this phase?',
+          '   - Which process innovations emerged that should be systematized?',
+          '   - What fundamental assumptions about the process were challenged?',
+          '   - How can the process become more adaptive and self-improving?',
+          '   - What measurement improvements would enhance future meta-learning?',
+
+          '=== SYSTEMATIC PATTERN RECOGNITION ===',
+          'Identify patterns that can improve the overall methodology:',
+          '- SUCCESS PATTERNS: What combinations of factors led to best outcomes?',
+          '- FAILURE PATTERNS: What patterns consistently led to suboptimal results?',
+          '- EFFICIENCY PATTERNS: What approaches consistently delivered results faster?',
+          '- QUALITY PATTERNS: What practices consistently improved output quality?',
+          '- ENGAGEMENT PATTERNS: What stakeholder engagement approaches worked best?',
+          '- CONVERGENCE PATTERNS: What factors most reliably led to phase convergence?'
+        ],
+        context: {
+          phaseName: inputs.phaseName,
+          phaseResult: inputs.phaseResult,
+          processContext: inputs.processContext,
+          adaptiveQualityManager: inputs.adaptiveQualityManager,
+          allResults: inputs.allResults,
+          previousPhaseLearnings: inputs.previousPhaseLearnings
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['meta-learning', 'process-optimization', 'adaptive-improvement', 'cross-phase-integration']
+    };
+  }
+});
+
+/**
+ * Task: Adaptive Quality Adjustment
+ * Purpose: Adjust quality targets and criteria based on process learnings
+ */
+const adaptiveQualityAdjustmentTask = defineTask({
+  name: 'adaptive-quality-adjustment',
+  description: 'Adapt quality management approach based on phase learnings and process effectiveness',
+
+  inputs: {
+    phaseName: { type: 'string', required: true },
+    phaseResult: { type: 'object', required: true },
+    metaLearnings: { type: 'object', required: true },
+    currentQualityManager: { type: 'object', required: true },
+    processEfficiency: { type: 'object', required: true }
+  },
+
+  outputs: {
+    updatedManager: { type: 'object' },
+    qualityAdjustments: { type: 'array' },
+    processOptimizations: { type: 'array' },
+    convergenceCriteriaUpdates: { type: 'object' },
+    adaptationRationale: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Adaptive Quality Adjustment: ${inputs.phaseName}`,
+      agent: {
+        role: 'adaptive-quality-manager',
+        goal: `Optimize quality management approach based on learnings from ${inputs.phaseName}`,
+        instructions: [
+          'Analyze phase learnings to optimize quality management for subsequent phases',
+          'Adjust quality targets based on achieved vs. expected outcomes',
+          'Optimize convergence criteria based on observed convergence patterns',
+          'Update quality assessment weightings based on effectiveness learnings',
+          'Adapt stakeholder validation approaches based on engagement insights',
+          'Optimize iteration strategies based on efficiency and quality patterns',
+          'Balance quality perfectionism with practical delivery constraints',
+          'Ensure quality adjustments maintain overall methodology coherence'
+        ],
+        context: {
+          phaseName: inputs.phaseName,
+          phaseResult: inputs.phaseResult,
+          metaLearnings: inputs.metaLearnings,
+          currentQualityManager: inputs.currentQualityManager,
+          processEfficiency: inputs.processEfficiency
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['adaptive-quality', 'quality-optimization', 'process-improvement']
+    };
+  }
+});
+
+/**
+ * Task: Cross-Phase Optimization
+ * Purpose: Apply learning insights across multiple phases for holistic optimization
+ */
+const crossPhaseOptimizationTask = defineTask({
+  name: 'cross-phase-optimization',
+  description: 'Apply cross-phase insights to optimize multiple phases simultaneously',
+
+  inputs: {
+    crossPhaseInsights: { type: 'array', required: true },
+    currentResults: { type: 'object', required: true },
+    optimizationType: { type: 'string', default: 'learning-transfer' }
+  },
+
+  outputs: {
+    optimizedResults: { type: 'object' },
+    crossPhaseImprovements: { type: 'array' },
+    integrationRecommendations: { type: 'array' },
+    synergiesIdentified: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Cross-Phase Optimization: ${inputs.optimizationType}`,
+      agent: {
+        role: 'cross-phase-optimizer',
+        goal: 'Optimize multiple phases simultaneously using cross-phase insights',
+        instructions: [
+          'Identify optimization opportunities that span multiple phases',
+          'Apply insights from later phases to improve earlier phase results',
+          'Create synergistic improvements that benefit the overall methodology',
+          'Optimize information flow and knowledge transfer between phases',
+          'Enhance overall process coherence and integration',
+          'Balance local phase optimization with global process optimization'
+        ],
+        context: {
+          crossPhaseInsights: inputs.crossPhaseInsights,
+          currentResults: inputs.currentResults,
+          optimizationType: inputs.optimizationType
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['cross-phase-optimization', 'holistic-improvement', 'process-integration']
+    };
+  }
+});
+
+/**
+ * Task: Quality Evolution
+ * Purpose: Evolve quality targets and criteria based on progressive learning
+ */
+const qualityEvolutionTask = defineTask({
+  name: 'quality-evolution',
+  description: 'Evolve quality management approach based on cumulative process learnings',
+
+  inputs: {
+    currentQualityManager: { type: 'object', required: true },
+    phaseResults: { type: 'object', required: true },
+    processLearnings: { type: 'array', required: true },
+    evolutionStrategy: { type: 'string', default: 'progressive-improvement' }
+  },
+
+  outputs: {
+    evolvedQualityTargets: { type: 'object' },
+    qualityEvolutionPlan: { type: 'object' },
+    convergenceOptimizations: { type: 'array' },
+    adaptationStrategy: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Quality Evolution: ${inputs.evolutionStrategy}`,
+      agent: {
+        role: 'quality-evolution-specialist',
+        goal: 'Evolve quality management approach based on cumulative learnings',
+        instructions: [
+          'Analyze cumulative learnings to identify quality management evolution opportunities',
+          'Progressively enhance quality targets based on demonstrated capabilities',
+          'Optimize quality assessment criteria based on effectiveness learnings',
+          'Evolve convergence strategies based on observed patterns',
+          'Balance quality ambition with practical achievability',
+          'Ensure quality evolution maintains methodology coherence and effectiveness'
+        ],
+        context: {
+          currentQualityManager: inputs.currentQualityManager,
+          phaseResults: inputs.phaseResults,
+          processLearnings: inputs.processLearnings,
+          evolutionStrategy: inputs.evolutionStrategy
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['quality-evolution', 'progressive-improvement', 'adaptive-standards']
+    };
+  }
+});
+
+/**
+ * Task: Adaptive Target Determination
+ * Purpose: Determine optimal quality targets based on process learning and context
+ */
+const adaptiveTargetDeterminationTask = defineTask({
+  name: 'adaptive-target-determination',
+  description: 'Determine adaptive quality targets based on process learnings and phase context',
+
+  inputs: {
+    phaseId: { type: 'string', required: true },
+    baseTarget: { type: 'number', required: true },
+    adaptiveQualityManager: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    previousPhaseLearnings: { type: 'array', default: [] }
+  },
+
+  outputs: {
+    adaptiveTarget: { type: 'number' },
+    adaptationReasoning: { type: 'object' },
+    qualityDimensionWeights: { type: 'object' },
+    convergenceCriteria: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Adaptive Target Determination: ${inputs.phaseId}`,
+      agent: {
+        role: 'adaptive-target-specialist',
+        goal: `Determine optimal quality target for ${inputs.phaseId} based on process learnings`,
+        instructions: [
+          '=== ADAPTIVE TARGET OPTIMIZATION ===',
+          'Determine optimal quality target based on:',
+          '- LEARNING MOMENTUM: How effectively is the process learning and improving?',
+          '- PHASE CRITICALITY: How critical is this phase to overall success?',
+          '- RESOURCE AVAILABILITY: What time and effort constraints exist?',
+          '- STAKEHOLDER EXPECTATIONS: What quality levels do stakeholders require?',
+          '- PROCESS MATURITY: How mature and reliable are the current processes?',
+
+          '=== CONTEXTUAL ADAPTATION ANALYSIS ===',
+          '1. PROCESS LEARNING ASSESSMENT',
+          '   - How effectively have previous phases learned and improved?',
+          '   - What quality improvement trajectory has been demonstrated?',
+          '   - Which approaches have proven most effective for quality achievement?',
+          '   - How reliable are current convergence patterns?',
+          '   - What is the demonstrated capacity for quality achievement?',
+
+          '2. PHASE-SPECIFIC OPTIMIZATION',
+          '   - What are the unique quality requirements for this phase?',
+          '   - Which quality dimensions are most critical for this phase?',
+          '   - How does this phase contribute to overall methodology success?',
+          '   - What quality risks are specific to this phase?',
+          '   - How can quality targets motivate optimal performance?',
+
+          '3. RESOURCE AND CONSTRAINT ANALYSIS',
+          '   - What time and resource constraints affect quality achievement?',
+          '   - How should quality targets balance ambition with achievability?',
+          '   - What trade-offs between quality dimensions are appropriate?',
+          '   - How can quality targets optimize overall process efficiency?',
+          '   - What contingency adjustments should be prepared?',
+
+          '=== PROGRESSIVE QUALITY ENHANCEMENT ===',
+          'Implement progressive quality improvement:',
+          '- CAPABILITY BUILDING: Set targets that stretch demonstrated capabilities',
+          '- LEARNING ACCELERATION: Use quality targets to accelerate learning',
+          '- MOTIVATION OPTIMIZATION: Set targets that maintain engagement and motivation',
+          '- RISK MANAGEMENT: Avoid quality targets that create excessive risk',
+          '- STAKEHOLDER ALIGNMENT: Ensure targets meet stakeholder expectations',
+
+          'Provide specific adaptive target with clear reasoning and adaptation strategy.'
+        ],
+        context: {
+          phaseId: inputs.phaseId,
+          baseTarget: inputs.baseTarget,
+          adaptiveQualityManager: inputs.adaptiveQualityManager,
+          processContext: inputs.processContext,
+          previousPhaseLearnings: inputs.previousPhaseLearnings
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['adaptive-targeting', 'quality-optimization', 'process-learning']
+    };
+  }
+});
+
+/**
+ * Task: Adaptive Gap Identification
+ * Purpose: Identify phase gaps with cross-phase learning integration
+ */
+const adaptiveGapIdentificationTask = defineTask({
+  name: 'adaptive-gap-identification',
+  description: 'Enhanced gap identification with cross-phase learning integration',
+
+  inputs: {
+    phase: { type: 'string', required: true },
+    phaseName: { type: 'string', required: true },
+    qualityDimensions: { type: 'array', required: true },
+    targetQuality: { type: 'number', required: true },
+    context: { type: 'object', required: true },
+    previousPhaseLearnings: { type: 'array', default: [] },
+    crossPhaseInsights: { type: 'array', default: [] }
+  },
+
+  outputs: {
+    gaps: { type: 'array' },
+    expectedOutcomes: { type: 'object' },
+    successCriteria: { type: 'array' },
+    qualityTargets: { type: 'object' },
+    learningIntegration: { type: 'object' },
+    adaptiveStrategies: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Adaptive Gap Identification: ${inputs.phaseName}`,
+      agent: {
+        role: 'adaptive-gap-analyst',
+        goal: `Identify gaps for ${inputs.phaseName} with cross-phase learning integration`,
+        instructions: [
+          '=== ENHANCED GAP IDENTIFICATION WITH LEARNING INTEGRATION ===',
+          'Identify gaps while integrating learnings from previous phases:',
+          '- STANDARD GAP ANALYSIS: Traditional gap identification for this phase',
+          '- LEARNING-INFORMED GAPS: Gaps revealed by insights from previous phases',
+          '- CROSS-PHASE OPTIMIZATION: Opportunities to address gaps from multiple phases',
+          '- ADAPTIVE STRATEGY GAPS: Gaps in adaptive and learning capabilities',
+          '- PROCESS IMPROVEMENT GAPS: Opportunities to improve the methodology itself',
+
+          '=== LEARNING-ENHANCED GAP ANALYSIS ===',
+          '1. TRADITIONAL GAP IDENTIFICATION',
+          '   - What outcomes must this phase deliver?',
+          '   - What capabilities are required but currently missing?',
+          '   - Which quality dimensions need development?',
+          '   - What stakeholder expectations must be met?',
+          '   - What constraints must be addressed?',
+
+          '2. LEARNING-INFORMED GAP DISCOVERY',
+          '   - What gaps do previous phase learnings reveal for this phase?',
+          '   - Which assumptions from earlier phases proved incorrect?',
+          '   - What new requirements emerged from previous phase insights?',
+          '   - How do cross-phase patterns suggest different gap priorities?',
+          '   - What preventive gaps can be identified based on previous challenges?',
+
+          '3. ADAPTIVE CAPACITY GAPS',
+          '   - What adaptive capabilities does this phase need?',
+          '   - How can this phase contribute to overall process learning?',
+          '   - What learning opportunities might be missed without proper setup?',
+          '   - How can this phase optimize future phases through its design?',
+          '   - What measurement and feedback capabilities are needed?',
+
+          '=== SOPHISTICATED SUCCESS CRITERIA DEVELOPMENT ===',
+          'Develop success criteria that integrate process learning:',
+          '- OUTCOME SUCCESS: Traditional deliverable and quality criteria',
+          '- LEARNING SUCCESS: Criteria for learning and insight generation',
+          '- ADAPTIVE SUCCESS: Criteria for process improvement and adaptation',
+          '- INTEGRATION SUCCESS: Criteria for cross-phase optimization',
+          '- EFFICIENCY SUCCESS: Criteria for resource and time optimization',
+
+          'Ensure gap identification leverages all available learning while maintaining phase focus.'
+        ],
+        context: {
+          phase: inputs.phase,
+          phaseName: inputs.phaseName,
+          qualityDimensions: inputs.qualityDimensions,
+          targetQuality: inputs.targetQuality,
+          projectContext: inputs.context,
+          previousPhaseLearnings: inputs.previousPhaseLearnings,
+          crossPhaseInsights: inputs.crossPhaseInsights
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['adaptive-gap-identification', 'learning-integration', 'cross-phase-optimization']
+    };
+  }
+});
+
+/**
+ * Task: Phase Sequence Optimization
+ * Purpose: Evaluate and optimize phase sequencing based on process learnings
+ */
+const phaseSequenceOptimizationTask = defineTask({
+  name: 'phase-sequence-optimization',
+  description: 'Evaluate and optimize phase sequence based on adaptive learnings',
+
+  inputs: {
+    currentSequence: { type: 'array', required: true },
+    adaptiveInsights: { type: 'array', required: true },
+    allResults: { type: 'object', required: true },
+    upcomingPhases: { type: 'array', required: true },
+    processEfficiency: { type: 'object', required: true }
+  },
+
+  outputs: {
+    recommendSequenceChange: { type: 'boolean' },
+    optimizedSequence: { type: 'array' },
+    sequenceRationale: { type: 'object' },
+    riskAssessment: { type: 'object' },
+    expectedBenefits: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Phase Sequence Optimization`,
+      agent: {
+        role: 'sequence-optimization-specialist',
+        goal: 'Evaluate whether phase sequence should be modified based on process learnings',
+        instructions: [
+          '=== SEQUENCE OPTIMIZATION ANALYSIS ===',
+          'Evaluate whether current phase sequence is optimal:',
+          '- DEPENDENCY ANALYSIS: Which phases have hard vs. soft dependencies?',
+          '- LEARNING ACCELERATION: Could resequencing accelerate learning?',
+          '- EFFICIENCY OPTIMIZATION: Would resequencing improve overall efficiency?',
+          '- RISK MITIGATION: Could resequencing reduce project risks?',
+          '- STAKEHOLDER VALUE: Would resequencing deliver value sooner?',
+
+          '=== ADAPTIVE RESEQUENCING EVALUATION ===',
+          '1. DEPENDENCY FLEXIBILITY ASSESSMENT',
+          '   - Which phase dependencies are absolute vs. preferred?',
+          '   - What phases could be executed in parallel or different order?',
+          '   - Which phases would benefit from insights from other phases?',
+          '   - How would resequencing affect information flow and quality?',
+          '   - What new dependencies would resequencing create?',
+
+          '2. LEARNING AND EFFICIENCY ANALYSIS',
+          '   - Would different sequencing accelerate overall learning?',
+          '   - Could parallel execution of some phases improve efficiency?',
+          '   - Would resequencing reduce overall iteration requirements?',
+          '   - How would resequencing affect stakeholder engagement timing?',
+          '   - Would different sequencing better match resource availability?',
+
+          '3. RISK-BENEFIT ASSESSMENT',
+          '   - What risks does the current sequence create?',
+          '   - What risks would resequencing introduce?',
+          '   - Would resequencing reduce or increase overall project risk?',
+          '   - How would resequencing affect quality outcomes?',
+          '   - What contingencies are needed for sequence changes?',
+
+          'Only recommend sequence changes if benefits clearly outweigh risks and complexity.',
+          'Provide detailed rationale for any recommended changes.',
+          'Consider both immediate and long-term effects of sequence optimization.'
+        ],
+        context: {
+          currentSequence: inputs.currentSequence,
+          adaptiveInsights: inputs.adaptiveInsights,
+          allResults: inputs.allResults,
+          upcomingPhases: inputs.upcomingPhases,
+          processEfficiency: inputs.processEfficiency
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['sequence-optimization', 'process-efficiency', 'adaptive-methodology']
+    };
+  }
+});
+
+/**
+ * Task: Advanced Meta-Learning Analysis
+ * Purpose: Multi-dimensional learning across tactical, strategic, methodological levels
+ */
+const advancedMetaLearningTask = defineTask({
+  name: 'advanced-meta-learning',
+  description: 'Multi-dimensional meta-learning analysis across multiple abstraction levels',
+
+  inputs: {
+    phaseName: { type: 'string', required: true },
+    phaseResult: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    adaptiveQualityManager: { type: 'object', required: true },
+    allResults: { type: 'object', required: true },
+    multiLevelLearning: { type: 'object', required: true },
+    previousPhaseLearnings: { type: 'array', default: [] }
+  },
+
+  outputs: {
+    tacticalLearnings: { type: 'array' },
+    strategicLearnings: { type: 'array' },
+    methodologicalLearnings: { type: 'array' },
+    metaLearnings: { type: 'array' },
+    paradigmLearnings: { type: 'array' },
+    processDecisions: { type: 'array' },
+    contingencyTriggers: { type: 'array' },
+    updatedQualityManager: { type: 'object' },
+    updatedMultiLevelLearning: { type: 'object' },
+    crossPhaseInsights: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Advanced Meta-Learning: ${inputs.phaseName}`,
+      agent: {
+        role: 'advanced-meta-learning-specialist',
+        goal: `Extract multi-dimensional learnings from ${inputs.phaseName} across all abstraction levels`,
+        instructions: [
+          '=== MULTI-DIMENSIONAL LEARNING EXTRACTION ===',
+          'Extract learnings across five levels of abstraction:',
+          '- TACTICAL LEARNING: What specific actions, techniques, and approaches worked?',
+          '- STRATEGIC LEARNING: What high-level approaches and methodologies were effective?',
+          '- METHODOLOGICAL LEARNING: What process patterns and frameworks proved valuable?',
+          '- META-LEARNING: What learning approaches and knowledge acquisition methods worked?',
+          '- PARADIGM LEARNING: What fundamental assumptions and worldviews were validated or challenged?',
+
+          '=== TACTICAL LEARNING ANALYSIS ===',
+          '1. SPECIFIC ACTION EFFECTIVENESS',
+          '   - Which specific analysis techniques yielded the best insights?',
+          '   - What validation approaches caught the most important issues?',
+          '   - Which stakeholder engagement tactics were most effective?',
+          '   - What iteration strategies led to fastest convergence?',
+          '   - Which quality assessment methods provided most value?',
+
+          '2. TECHNIQUE OPTIMIZATION INSIGHTS',
+          '   - How can effective techniques be refined or enhanced?',
+          '   - What combinations of techniques created synergistic effects?',
+          '   - Which techniques showed diminishing returns and why?',
+          '   - What contextual factors influenced technique effectiveness?',
+          '   - How can technique selection be optimized for future phases?',
+
+          '=== STRATEGIC LEARNING ANALYSIS ===',
+          '1. APPROACH EFFECTIVENESS ASSESSMENT',
+          '   - Which high-level approaches achieved objectives most efficiently?',
+          '   - What strategic decisions had the greatest positive impact?',
+          '   - Which approaches showed unexpected benefits or drawbacks?',
+          '   - How did strategic choices interact with tactical execution?',
+          '   - What strategic adaptations emerged during phase execution?',
+
+          '2. STRATEGIC PATTERN RECOGNITION',
+          '   - What strategic patterns led to breakthrough insights?',
+          '   - Which strategic frameworks proved most adaptable?',
+          '   - How did strategic choices influence stakeholder engagement?',
+          '   - What strategic trade-offs provided optimal value?',
+          '   - Which strategic principles transferred across contexts?',
+
+          '=== METHODOLOGICAL LEARNING ANALYSIS ===',
+          '1. PROCESS PATTERN EFFECTIVENESS',
+          '   - Which process structures facilitated best outcomes?',
+          '   - What methodological frameworks showed superior adaptability?',
+          '   - Which process innovations emerged during execution?',
+          '   - How did methodology choices affect quality and efficiency?',
+          '   - What methodological principles proved universally valuable?',
+
+          '2. PROCESS INTELLIGENCE DEVELOPMENT',
+          '   - How can the process become more self-aware and adaptive?',
+          '   - What process measurement and feedback mechanisms work best?',
+          '   - Which process decision-making approaches proved most effective?',
+          '   - How can process learning be accelerated and systematized?',
+          '   - What process innovation opportunities were identified?',
+
+          '=== META-LEARNING ANALYSIS ===',
+          '1. LEARNING APPROACH EFFECTIVENESS',
+          '   - Which learning strategies produced the most valuable insights?',
+          '   - What knowledge acquisition methods proved most efficient?',
+          '   - How can learning transfer between phases be optimized?',
+          '   - Which reflection and analysis approaches yielded best results?',
+          '   - What learning measurement approaches proved most useful?',
+
+          '2. KNOWLEDGE CREATION AND SYNTHESIS',
+          '   - How can knowledge creation be accelerated and enhanced?',
+          '   - What synthesis approaches produced breakthrough insights?',
+          '   - Which knowledge representation methods proved most effective?',
+          '   - How can tacit knowledge be better captured and transferred?',
+          '   - What innovation in learning approaches should be explored?',
+
+          '=== PARADIGM LEARNING ANALYSIS ===',
+          '1. FUNDAMENTAL ASSUMPTION VALIDATION',
+          '   - Which core assumptions about the domain were validated or challenged?',
+          '   - What worldview shifts emerged from phase insights?',
+          '   - Which fundamental principles proved more or less important than expected?',
+          '   - How did reality challenge or confirm theoretical frameworks?',
+          '   - What paradigm shifts would improve overall approach?',
+
+          '2. TRANSFORMATIONAL INSIGHT IDENTIFICATION',
+          '   - What insights could fundamentally change how we approach similar problems?',
+          '   - Which discoveries have broader implications beyond this project?',
+          '   - What new possibilities were revealed through this phase?',
+          '   - How could these insights transform the entire methodology?',
+          '   - What paradigm innovations should be systematized and scaled?',
+
+          '=== PROCESS DECISION ANALYSIS & CONTINGENCY IDENTIFICATION ===',
+          'Analyze process decisions and identify contingency triggers:',
+          '- DECISION QUALITY ASSESSMENT: How effective were process decisions?',
+          '- DECISION PATTERN RECOGNITION: What decision patterns led to best outcomes?',
+          '- CONTINGENCY TRIGGER IDENTIFICATION: When should alternative approaches be triggered?',
+          '- ADAPTIVE DECISION FRAMEWORKS: How can decision-making become more adaptive?',
+          '- RISK-AWARE PROCESS DESIGN: How can process decisions better manage risk?',
+
+          'Ensure learnings are specific, actionable, and transferable to future phases and projects.'
+        ],
+        context: {
+          phaseName: inputs.phaseName,
+          phaseResult: inputs.phaseResult,
+          processContext: inputs.processContext,
+          adaptiveQualityManager: inputs.adaptiveQualityManager,
+          allResults: inputs.allResults,
+          multiLevelLearning: inputs.multiLevelLearning,
+          previousPhaseLearnings: inputs.previousPhaseLearnings
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['advanced-meta-learning', 'multi-level-analysis', 'paradigm-learning', 'process-intelligence']
+    };
+  }
+});
+
+/**
+ * Task: Process Pattern Recognition
+ * Purpose: Recognize and learn from patterns in process execution and effectiveness
+ */
+const processPatternRecognitionTask = defineTask({
+  name: 'process-pattern-recognition',
+  description: 'Recognize patterns in process execution to enhance future effectiveness',
+
+  inputs: {
+    phaseName: { type: 'string', required: true },
+    phaseResult: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    historicalPatterns: { type: 'object', required: true },
+    learningHistory: { type: 'array', required: true }
+  },
+
+  outputs: {
+    recognizedPatterns: { type: 'object' },
+    patternClassification: { type: 'object' },
+    patternEffectiveness: { type: 'object' },
+    patternPredictions: { type: 'array' },
+    patternRecommendations: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Process Pattern Recognition: ${inputs.phaseName}`,
+      agent: {
+        role: 'process-pattern-analyst',
+        goal: `Recognize and analyze process execution patterns for ${inputs.phaseName}`,
+        instructions: [
+          '=== COMPREHENSIVE PATTERN RECOGNITION ===',
+          'Identify patterns across multiple dimensions:',
+          '- SUCCESS PATTERNS: What combinations of factors consistently lead to excellent outcomes?',
+          '- FAILURE PATTERNS: What warning signs and factor combinations predict poor outcomes?',
+          '- EFFICIENCY PATTERNS: What approaches consistently deliver results faster?',
+          '- QUALITY PATTERNS: What practices consistently improve output quality?',
+          '- STAKEHOLDER ENGAGEMENT PATTERNS: What engagement approaches work best?',
+          '- CONVERGENCE PATTERNS: What factors reliably lead to phase convergence?',
+
+          '=== PATTERN ANALYSIS METHODOLOGY ===',
+          '1. HISTORICAL PATTERN CORRELATION',
+          '   - Compare current phase patterns with historical execution patterns',
+          '   - Identify recurring themes and consistent relationships',
+          '   - Analyze pattern variations across different contexts and domains',
+          '   - Recognize both obvious and subtle pattern indicators',
+          '   - Validate pattern recognition against actual outcomes',
+
+          '2. PREDICTIVE PATTERN MODELING',
+          '   - Use recognized patterns to predict likely future outcomes',
+          '   - Identify early warning indicators for potential problems',
+          '   - Predict optimal approaches based on pattern matching',
+          '   - Forecast resource requirements and timeline implications',
+          '   - Model pattern sensitivity to contextual variations',
+
+          '3. PATTERN EFFECTIVENESS ASSESSMENT',
+          '   - Evaluate the reliability and predictive power of recognized patterns',
+          '   - Assess pattern transferability across different contexts',
+          '   - Measure pattern consistency and variation tolerances',
+          '   - Identify conditions that strengthen or weaken pattern effectiveness',
+          '   - Validate pattern usefulness for decision-making',
+
+          '=== PATTERN-BASED OPTIMIZATION RECOMMENDATIONS ===',
+          '1. IMMEDIATE APPLICATION OPPORTUNITIES',
+          '   - How can recognized patterns optimize remaining phases?',
+          '   - What pattern-based adjustments should be made immediately?',
+          '   - Which successful patterns should be reinforced and expanded?',
+          '   - What failure patterns should be actively avoided?',
+          '   - How can efficiency patterns be systematically applied?',
+
+          '2. STRATEGIC PATTERN INTEGRATION',
+          '   - How can patterns be integrated into standard process frameworks?',
+          '   - What pattern-based decision trees should be developed?',
+          '   - Which patterns should be encoded into process guidance?',
+          '   - How can pattern recognition become more automated and systematic?',
+          '   - What pattern monitoring and early warning systems should be implemented?',
+
+          'Focus on actionable patterns with clear predictive value and transferable insights.'
+        ],
+        context: {
+          phaseName: inputs.phaseName,
+          phaseResult: inputs.phaseResult,
+          processContext: inputs.processContext,
+          historicalPatterns: inputs.historicalPatterns,
+          learningHistory: inputs.learningHistory
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['pattern-recognition', 'predictive-analysis', 'process-optimization', 'effectiveness-enhancement']
+    };
+  }
+});
+
+/**
+ * Task: Process Innovation Detection
+ * Purpose: Detect breakthrough opportunities and process innovation potential
+ */
+const processInnovationDetectionTask = defineTask({
+  name: 'process-innovation-detection',
+  description: 'Detect opportunities for process innovation and breakthrough discoveries',
+
+  inputs: {
+    currentPhase: { type: 'string', required: true },
+    phaseResults: { type: 'array', required: true },
+    processLearnings: { type: 'array', required: true },
+    processContext: { type: 'object', required: true },
+    multiLevelLearning: { type: 'object', required: true },
+    innovationPatterns: { type: 'array', default: [] }
+  },
+
+  outputs: {
+    breakthroughOpportunities: { type: 'array' },
+    processInnovations: { type: 'array' },
+    paradigmShiftIndicators: { type: 'array' },
+    innovationRecommendations: { type: 'array' },
+    creativityTriggers: { type: 'array' },
+    unexploredDirections: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Process Innovation Detection: ${inputs.currentPhase}`,
+      agent: {
+        role: 'innovation-detection-specialist',
+        goal: `Detect breakthrough opportunities and process innovations from ${inputs.currentPhase}`,
+        instructions: [
+          '=== BREAKTHROUGH OPPORTUNITY DETECTION ===',
+          'Identify opportunities for fundamental improvements:',
+          '- EFFICIENCY BREAKTHROUGHS: Ways to dramatically improve process efficiency',
+          '- QUALITY BREAKTHROUGHS: Approaches that could step-change quality outcomes',
+          '- INNOVATION BREAKTHROUGHS: Novel approaches with transformational potential',
+          '- INTEGRATION BREAKTHROUGHS: Ways to dramatically improve phase integration',
+          '- STAKEHOLDER BREAKTHROUGHS: Approaches that could transform stakeholder experience',
+
+          '=== PROCESS INNOVATION IDENTIFICATION ===',
+          '1. NOVEL APPROACH DISCOVERY',
+          '   - What completely new approaches emerged during this phase?',
+          '   - Which unexpected combinations of techniques showed promise?',
+          '   - What innovative solutions were developed for unique challenges?',
+          '   - Which creative departures from standard methodology proved valuable?',
+          '   - What serendipitous discoveries could be systematized?',
+
+          '2. CREATIVE SYNTHESIS OPPORTUNITIES',
+          '   - How can insights from different phases be creatively combined?',
+          '   - What novel frameworks could emerge from current learnings?',
+          '   - Which interdisciplinary approaches could enhance the process?',
+          '   - How can external innovations be adapted to this methodology?',
+          '   - What creative analogies or metaphors could inspire new approaches?',
+
+          '=== PARADIGM SHIFT DETECTION ===',
+          '1. FUNDAMENTAL ASSUMPTION CHALLENGES',
+          '   - What basic assumptions about the process are being challenged?',
+          '   - Which traditional approaches are showing limitations?',
+          '   - What new possibilities are emerging that weren\'t previously considered?',
+          '   - How might the entire framework be reconceptualized?',
+          '   - What paradigm shifts in related fields could be applied here?',
+
+          '2. TRANSFORMATIONAL POTENTIAL ASSESSMENT',
+          '   - Which innovations have potential to transform the entire methodology?',
+          '   - What discoveries could change how similar problems are approached?',
+          '   - Which insights have implications beyond this specific project?',
+          '   - How could current innovations inspire new research directions?',
+          '   - What new fields of inquiry could emerge from these insights?',
+
+          '=== CREATIVITY AND EXPLORATION ENHANCEMENT ===',
+          '1. CREATIVITY TRIGGER IDENTIFICATION',
+          '   - What conditions and approaches triggered the most creative insights?',
+          '   - Which environmental factors enhanced innovative thinking?',
+          '   - What collaboration patterns produced breakthrough ideas?',
+          '   - Which questioning techniques revealed new possibilities?',
+          '   - How can creativity be systematically enhanced in future phases?',
+
+          '2. UNEXPLORED DIRECTION MAPPING',
+          '   - What promising directions haven\'t been fully explored?',
+          '   - Which "what if" scenarios could lead to breakthrough insights?',
+          '   - What adjacent possibilities could be investigated?',
+          '   - Which unconventional approaches might yield surprising results?',
+          '   - What experiments could be designed to test innovative hypotheses?',
+
+          'Focus on identifying innovations with high impact potential and practical implementability.'
+        ],
+        context: {
+          currentPhase: inputs.currentPhase,
+          phaseResults: inputs.phaseResults,
+          processLearnings: inputs.processLearnings,
+          processContext: inputs.processContext,
+          multiLevelLearning: inputs.multiLevelLearning,
+          innovationPatterns: inputs.innovationPatterns
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['innovation-detection', 'breakthrough-identification', 'creative-synthesis', 'paradigm-analysis']
+    };
+  }
+});
+
+/**
+ * Task: Dynamic Convergence Analysis
+ * Purpose: Analyze convergence patterns and determine optimal stopping criteria dynamically
+ */
+const dynamicConvergenceAnalysisTask = defineTask({
+  name: 'dynamic-convergence-analysis',
+  description: 'Advanced analysis of convergence patterns with dynamic optimization of stopping criteria',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    allResults: { type: 'object', required: true },
+    convergenceManager: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    multiLevelLearning: { type: 'object', required: true },
+    phaseQualityHistory: { type: 'object', required: true },
+    stakeholderFeedback: { type: 'object', default: {} }
+  },
+
+  outputs: {
+    convergenceVelocity: { type: 'number' },
+    stabilityMetrics: { type: 'object' },
+    adaptiveOptimizationsNeeded: { type: 'boolean' },
+    optimizationTargets: { type: 'array' },
+    convergenceConfidence: { type: 'number' },
+    learningEfficiencyMetrics: { type: 'object' },
+    emergentPatterns: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Dynamic Convergence Analysis: ${inputs.projectName}`,
+      agent: {
+        role: 'convergence-analysis-specialist',
+        goal: `Analyze convergence patterns and optimize stopping criteria for ${inputs.projectName}`,
+        instructions: [
+          '=== SOPHISTICATED CONVERGENCE ANALYSIS FRAMEWORK ===',
+          'Apply advanced convergence analysis methodology:',
+
+          '=== QUALITY STABILITY ANALYSIS ===',
+          '1. QUALITY TRAJECTORY MODELING',
+          '   - Analyze quality improvement patterns across all phases',
+          '   - Calculate rate of quality change and acceleration/deceleration',
+          '   - Identify quality plateaus and diminishing returns patterns',
+          '   - Model quality trajectory predictions for future iterations',
+          '   - Assess quality stability using statistical trend analysis',
+
+          '2. MULTI-DIMENSIONAL CONVERGENCE METRICS',
+          '   - Technical convergence: consistency, completeness, performance metrics',
+          '   - Stakeholder convergence: consensus levels, satisfaction stability',
+          '   - Business value convergence: ROI stability, goal achievement rates',
+          '   - Process convergence: efficiency metrics, learning velocity',
+          '   - Risk convergence: risk assessment stability, mitigation effectiveness',
+
+          '=== ADAPTIVE OPTIMIZATION IDENTIFICATION ===',
+          '1. EFFICIENCY OPTIMIZATION OPPORTUNITIES',
+          '   - Identify phases or activities with unexpectedly low efficiency',
+          '   - Detect resource allocation imbalances affecting convergence',
+          '   - Find bottlenecks that could be dynamically addressed',
+          '   - Discover parallel processing opportunities for faster convergence',
+          '   - Analyze stakeholder engagement patterns for optimization',
+
+          '2. LEARNING ACCELERATION TRIGGERS',
+          '   - Identify conditions where learning velocity could be increased',
+          '   - Detect when additional domain expertise injection would accelerate convergence',
+          '   - Find opportunities for cross-phase learning transfer',
+          '   - Discover when iterative frequency should be adjusted',
+          '   - Analyze when breakthrough approaches might be more effective than incremental improvement',
+
+          '=== EMERGENT PATTERN RECOGNITION ===',
+          '1. CROSS-PHASE EMERGENCE DETECTION',
+          '   - Identify unexpected connections between seemingly unrelated phases',
+          '   - Detect emergent properties arising from phase interactions',
+          '   - Find novel solution patterns that emerged during the process',
+          '   - Discover unanticipated stakeholder dynamics affecting convergence',
+          '   - Analyze emergent quality dimensions not originally anticipated',
+
+          '2. CONVERGENCE VELOCITY ANALYSIS',
+          '   - Calculate overall convergence velocity across multiple dimensions',
+          '   - Identify factors that accelerate or decelerate convergence',
+          '   - Predict optimal continuation vs. stopping points',
+          '   - Assess convergence confidence levels',
+          '   - Model risk-adjusted convergence optimization',
+
+          '=== DYNAMIC STOPPING CRITERIA OPTIMIZATION ===',
+          '1. CONTEXT-AWARE CRITERIA ADJUSTMENT',
+          '   - Adapt convergence criteria based on project complexity and stakeholder context',
+          '   - Adjust quality thresholds based on business value and risk profiles',
+          '   - Dynamically modify iteration limits based on learning velocity',
+          '   - Personalize stopping criteria for different stakeholder groups',
+          '   - Balance thoroughness with time and resource constraints',
+
+          '2. PREDICTIVE CONVERGENCE MODELING',
+          '   - Predict number of additional iterations needed for target quality',
+          '   - Estimate probability of achieving target quality within resource constraints',
+          '   - Model trade-offs between quality targets and resource investment',
+          '   - Forecast stakeholder satisfaction convergence patterns',
+          '   - Predict business value optimization points',
+
+          '=== COMPREHENSIVE ASSESSMENT FRAMEWORK ===',
+          'Provide detailed analysis including:',
+          '- QUANTITATIVE METRICS: Convergence velocity, stability indices, confidence levels',
+          '- QUALITATIVE PATTERNS: Emergent behaviors, unexpected insights, breakthrough indicators',
+          '- OPTIMIZATION RECOMMENDATIONS: Specific actions to accelerate convergence',
+          '- PREDICTIVE INSIGHTS: Forecasts for completion, quality achievement, resource needs',
+          '- RISK ASSESSMENTS: Convergence failure risks, quality degradation risks',
+          '- STAKEHOLDER IMPACT: How convergence patterns affect different stakeholder groups',
+
+          'Focus on actionable insights that can dynamically improve the remaining process execution.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          allResults: inputs.allResults,
+          convergenceManager: inputs.convergenceManager,
+          processContext: inputs.processContext,
+          multiLevelLearning: inputs.multiLevelLearning,
+          phaseQualityHistory: inputs.phaseQualityHistory,
+          stakeholderFeedback: inputs.stakeholderFeedback
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['convergence-analysis', 'dynamic-optimization', 'pattern-recognition', 'predictive-modeling']
+    };
+  }
+});
+
+/**
+ * Task: Process Resilience Analysis
+ * Purpose: Analyze process resilience and identify potential failure scenarios with mitigation strategies
+ */
+const processResilienceAnalysisTask = defineTask({
+  name: 'process-resilience-analysis',
+  description: 'Comprehensive analysis of process resilience, failure scenarios, and adaptive contingencies',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    allResults: { type: 'object', required: true },
+    resilienceFramework: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    convergenceAnalysis: { type: 'object', required: true },
+    riskProfile: { type: 'string', default: 'moderate' },
+    projectComplexity: { type: 'string', default: 'moderate' }
+  },
+
+  outputs: {
+    healthIndicators: { type: 'array' },
+    identifiedEdgeCases: { type: 'array' },
+    failureScenarios: { type: 'array' },
+    contingencyPlans: { type: 'object' },
+    resilienceScore: { type: 'number' },
+    adaptabilityMetrics: { type: 'object' },
+    earlyWarningSignals: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Process Resilience Analysis: ${inputs.projectName}`,
+      agent: {
+        role: 'resilience-analysis-specialist',
+        goal: `Analyze process resilience and failure scenarios for ${inputs.projectName}`,
+        instructions: [
+          '=== COMPREHENSIVE RESILIENCE ANALYSIS FRAMEWORK ===',
+          'Apply systematic resilience analysis methodology:',
+
+          '=== FAILURE SCENARIO IDENTIFICATION ===',
+          '1. SYSTEMATIC FAILURE MODE ANALYSIS',
+          '   - Analyze historical failure patterns from similar projects',
+          '   - Identify potential single points of failure in the process',
+          '   - Model cascading failure scenarios where one issue triggers others',
+          '   - Assess failure probability and impact for each identified scenario',
+          '   - Categorize failures by severity, likelihood, and recovery difficulty',
+
+          '2. EDGE CASE VULNERABILITY ASSESSMENT',
+          '   - Identify boundary conditions that could cause process breakdown',
+          '   - Analyze stakeholder extremes (very engaged vs. completely disengaged)',
+          '   - Model resource constraint scenarios (time, budget, expertise shortages)',
+          '   - Assess technical edge cases (data quality issues, system limitations)',
+          '   - Evaluate domain-specific vulnerabilities based on complexity and risk profile',
+
+          '=== ADAPTABILITY AND RECOVERY ANALYSIS ===',
+          '1. ADAPTIVE CAPACITY EVALUATION',
+          '   - Assess process flexibility in responding to unexpected challenges',
+          '   - Analyze stakeholder adaptability and change tolerance',
+          '   - Evaluate available fallback options for each phase',
+          '   - Assess cross-training and expertise redundancy',
+          '   - Analyze decision-making agility and escalation pathways',
+
+          '2. RECOVERY STRATEGY DESIGN',
+          '   - Design specific recovery procedures for each major failure scenario',
+          '   - Create rollback procedures for reverting to stable states',
+          '   - Design isolation protocols to contain failures to specific areas',
+          '   - Develop rapid diagnosis procedures for identifying failure root causes',
+          '   - Create stakeholder communication protocols during failure recovery',
+
+          '=== EARLY WARNING SYSTEM DESIGN ===',
+          '1. LEADING INDICATOR IDENTIFICATION',
+          '   - Identify metrics that provide early warning of potential issues',
+          '   - Design automated monitoring for critical process health indicators',
+          '   - Create stakeholder sentiment monitoring for engagement issues',
+          '   - Develop quality degradation detection systems',
+          '   - Design resource constraint early warning systems',
+
+          '2. PREDICTIVE FAILURE ANALYSIS',
+          '   - Use convergence patterns to predict where failures are most likely',
+          '   - Analyze historical data to identify failure precursors',
+          '   - Model failure probability based on current process state',
+          '   - Design intervention triggers for proactive failure prevention',
+          '   - Create escalation protocols for different warning levels',
+
+          '=== RESILIENCE ENHANCEMENT STRATEGIES ===',
+          '1. PROCESS HARDENING RECOMMENDATIONS',
+          '   - Identify process modifications to increase failure resistance',
+          '   - Design redundancy mechanisms for critical process elements',
+          '   - Create graceful degradation strategies for partial functionality',
+          '   - Develop modular process design for easier failure isolation',
+          '   - Design stress testing protocols for ongoing resilience validation',
+
+          '2. ADAPTIVE IMPROVEMENT MECHANISMS',
+          '   - Design learning loops from near-failures and recovery events',
+          '   - Create process evolution mechanisms based on failure analysis',
+          '   - Develop stakeholder feedback integration for resilience improvement',
+          '   - Design organizational learning capture from resilience events',
+          '   - Create continuous improvement processes for resilience enhancement',
+
+          '=== COMPREHENSIVE RESILIENCE SCORING ===',
+          'Evaluate resilience across multiple dimensions:',
+          '- FAILURE RESISTANCE: How well the process prevents failures',
+          '- FAILURE DETECTION: How quickly failures are identified',
+          '- RECOVERY SPEED: How rapidly normal operation is restored',
+          '- LEARNING INTEGRATION: How well lessons from failures are incorporated',
+          '- STAKEHOLDER RESILIENCE: How well stakeholders handle process disruptions',
+          '- ADAPTIVE CAPACITY: How well the process adjusts to unexpected conditions',
+
+          '=== CONTEXT-SPECIFIC ANALYSIS ===',
+          'Tailor analysis based on project characteristics:',
+          `- Risk Profile: ${inputs.riskProfile} - adjust failure scenario prioritization`,
+          `- Project Complexity: ${inputs.projectComplexity} - adjust edge case analysis depth`,
+          '- Stakeholder Context: Consider multi-organizational vs. single-team resilience needs',
+          '- Domain Type: Apply domain-specific failure patterns and resilience strategies',
+          '- Convergence State: Consider how current convergence affects resilience needs',
+
+          'Provide actionable resilience recommendations with specific implementation guidance.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          allResults: inputs.allResults,
+          resilienceFramework: inputs.resilienceFramework,
+          processContext: inputs.processContext,
+          convergenceAnalysis: inputs.convergenceAnalysis,
+          riskProfile: inputs.riskProfile,
+          projectComplexity: inputs.projectComplexity
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['resilience-analysis', 'failure-scenarios', 'contingency-planning', 'risk-mitigation']
+    };
+  }
+});
+
+/**
+ * Task: Adaptive Process Optimization
+ * Purpose: Implement dynamic process optimizations based on convergence and resilience analysis
+ */
+const adaptiveProcessOptimizationTask = defineTask({
+  name: 'adaptive-process-optimization',
+  description: 'Dynamic optimization of process parameters and approaches based on real-time analysis',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    allResults: { type: 'object', required: true },
+    convergenceAnalysis: { type: 'object', required: true },
+    resilienceAnalysis: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    optimizationTargets: { type: 'array', required: true }
+  },
+
+  outputs: {
+    processAdjustments: { type: 'object' },
+    qualityAdjustments: { type: 'object' },
+    stakeholderEngagementOptimizations: { type: 'array' },
+    resourceAllocationOptimizations: { type: 'array' },
+    riskMitigationEnhancements: { type: 'array' },
+    learningAccelerationStrategies: { type: 'array' },
+    optimizationEffectiveness: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Adaptive Process Optimization: ${inputs.projectName}`,
+      agent: {
+        role: 'adaptive-optimization-specialist',
+        goal: `Implement dynamic process optimizations for ${inputs.projectName}`,
+        instructions: [
+          '=== ADAPTIVE OPTIMIZATION FRAMEWORK ===',
+          'Implement sophisticated process optimizations:',
+
+          '=== DYNAMIC PARAMETER ADJUSTMENT ===',
+          '1. ITERATION TIMING OPTIMIZATION',
+          '   - Adjust iteration frequency based on learning velocity',
+          '   - Optimize stakeholder engagement timing for maximum effectiveness',
+          '   - Dynamic adjustment of convergence thresholds based on quality trends',
+          '   - Adaptive resource allocation timing for optimal impact',
+          '   - Real-time adjustment of parallel vs. sequential processing',
+
+          '2. QUALITY THRESHOLD ADAPTATION',
+          '   - Dynamically adjust quality targets based on achieved progress',
+          '   - Adapt quality criteria based on stakeholder feedback patterns',
+          '   - Optimize quality vs. speed trade-offs based on business value',
+          '   - Adjust multi-dimensional quality weighting based on project priorities',
+          '   - Dynamic calibration of quality measurement sensitivity',
+
+          '=== STAKEHOLDER ENGAGEMENT OPTIMIZATION ===',
+          '1. ENGAGEMENT PATTERN OPTIMIZATION',
+          '   - Optimize stakeholder interaction frequency and intensity',
+          '   - Adapt communication methods based on stakeholder preferences and effectiveness',
+          '   - Dynamic adjustment of stakeholder group composition and involvement',
+          '   - Optimize timing of critical stakeholder decisions',
+          '   - Adaptive stakeholder workload management to prevent fatigue',
+
+          '2. CONSENSUS BUILDING ACCELERATION',
+          '   - Implement targeted interventions for stakeholder alignment issues',
+          '   - Optimize facilitation approaches based on stakeholder dynamics',
+          '   - Dynamic conflict resolution strategy selection',
+          '   - Accelerated consensus protocols for time-critical decisions',
+          '   - Adaptive stakeholder influence mapping and engagement strategies',
+
+          '=== LEARNING AND KNOWLEDGE OPTIMIZATION ===',
+          '1. LEARNING VELOCITY ENHANCEMENT',
+          '   - Implement targeted knowledge injection strategies',
+          '   - Optimize cross-phase learning transfer mechanisms',
+          '   - Dynamic expert consultation scheduling for maximum impact',
+          '   - Accelerated validation protocols for high-confidence insights',
+          '   - Adaptive depth vs. breadth optimization for knowledge exploration',
+
+          '2. KNOWLEDGE INTEGRATION ACCELERATION',
+          '   - Optimize knowledge synthesis approaches for faster integration',
+          '   - Dynamic prioritization of knowledge gaps for targeted research',
+          '   - Accelerated pattern recognition through enhanced analytical approaches',
+          '   - Optimized documentation strategies for knowledge capture and retrieval',
+          '   - Adaptive knowledge sharing mechanisms between stakeholder groups',
+
+          '=== RESOURCE ALLOCATION OPTIMIZATION ===',
+          '1. DYNAMIC RESOURCE REALLOCATION',
+          '   - Reallocate effort to phases showing highest return on investment',
+          '   - Optimize expertise allocation based on current bottlenecks',
+          '   - Dynamic time allocation adjustment based on progress patterns',
+          '   - Adaptive technology resource allocation for maximum efficiency',
+          '   - Optimize cross-functional team composition based on emerging needs',
+
+          '2. EFFICIENCY BOTTLENECK RESOLUTION',
+          '   - Implement targeted interventions for identified process bottlenecks',
+          '   - Optimize parallel processing opportunities to accelerate delivery',
+          '   - Dynamic workflow redesign for improved efficiency',
+          '   - Adaptive automation of repetitive analysis tasks',
+          '   - Optimize decision-making pathways to reduce delays',
+
+          '=== RISK MITIGATION ENHANCEMENT ===',
+          '1. PROACTIVE RISK INTERVENTION',
+          '   - Implement early intervention strategies for identified risks',
+          '   - Dynamic risk monitoring intensity based on risk probability',
+          '   - Adaptive contingency plan activation based on warning signals',
+          '   - Optimize risk communication strategies to stakeholders',
+          '   - Dynamic risk tolerance adjustment based on project progress',
+
+          '2. RESILIENCE BUILDING OPTIMIZATION',
+          '   - Implement targeted resilience enhancements for vulnerable areas',
+          '   - Optimize backup strategy deployment based on failure probability',
+          '   - Dynamic redundancy creation for critical process elements',
+          '   - Adaptive stress testing intensity based on risk profile changes',
+          '   - Optimize recovery protocol effectiveness through targeted improvements',
+
+          '=== OPTIMIZATION EFFECTIVENESS MEASUREMENT ===',
+          'Track optimization impact across key dimensions:',
+          '- EFFICIENCY GAINS: Measurable improvements in process efficiency',
+          '- QUALITY IMPROVEMENTS: Enhanced quality outcomes from optimizations',
+          '- STAKEHOLDER SATISFACTION: Improved stakeholder experience and engagement',
+          '- RISK REDUCTION: Decreased probability and impact of identified risks',
+          '- LEARNING ACCELERATION: Faster knowledge acquisition and integration',
+          '- CONVERGENCE VELOCITY: Improved rate of progress toward targets',
+
+          'Provide specific, implementable optimization recommendations with clear success metrics.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          allResults: inputs.allResults,
+          convergenceAnalysis: inputs.convergenceAnalysis,
+          resilienceAnalysis: inputs.resilienceAnalysis,
+          processContext: inputs.processContext,
+          optimizationTargets: inputs.optimizationTargets
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['adaptive-optimization', 'dynamic-adjustment', 'efficiency-enhancement', 'performance-optimization']
+    };
+  }
+});
+
+/**
+ * Task: Emergent Behavior Detection
+ * Purpose: Detect and analyze emergent behaviors and breakthrough opportunities during process execution
+ */
+const emergentBehaviorDetectionTask = defineTask({
+  name: 'emergent-behavior-detection',
+  description: 'Advanced detection and analysis of emergent behaviors and breakthrough opportunities',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    allResults: { type: 'object', required: true },
+    processContext: { type: 'object', required: true },
+    convergenceHistory: { type: 'array', required: true },
+    multiLevelLearning: { type: 'object', required: true },
+    innovationPatterns: { type: 'array', default: [] }
+  },
+
+  outputs: {
+    detectedBehaviors: { type: 'array' },
+    breakthroughIndicators: { type: 'array' },
+    emergentPatterns: { type: 'array' },
+    unexpectedSynergies: { type: 'array' },
+    paradigmShiftSignals: { type: 'array' },
+    recommendedActions: { type: 'array' },
+    explorationOpportunities: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Emergent Behavior Detection: ${inputs.projectName}`,
+      agent: {
+        role: 'emergent-behavior-detection-specialist',
+        goal: `Detect emergent behaviors and breakthrough opportunities in ${inputs.projectName}`,
+        instructions: [
+          '=== EMERGENT BEHAVIOR DETECTION FRAMEWORK ===',
+          'Apply systematic emergence detection methodology:',
+
+          '=== UNEXPECTED SYNERGY IDENTIFICATION ===',
+          '1. CROSS-PHASE EMERGENT PROPERTIES',
+          '   - Identify unexpected beneficial interactions between different phases',
+          '   - Detect emergent capabilities not present in individual phases',
+          '   - Analyze compound effects that exceed expected linear combinations',
+          '   - Identify emergent quality dimensions not originally anticipated',
+          '   - Detect unexpected stakeholder collaboration patterns',
+
+          '2. KNOWLEDGE SYNTHESIS EMERGENCE',
+          '   - Identify novel insights arising from knowledge integration',
+          '   - Detect emergent understanding transcending individual domain knowledge',
+          '   - Analyze unexpected connections between disparate knowledge areas',
+          '   - Identify emergent patterns in stakeholder mental models',
+          '   - Detect novel problem-solution relationships emerging from the process',
+
+          '=== BREAKTHROUGH OPPORTUNITY DETECTION ===',
+          '1. INNOVATION BREAKTHROUGH SIGNALS',
+          '   - Identify moments where creative solutions emerged unexpectedly',
+          '   - Detect when stakeholder insights led to fundamental shifts in approach',
+          '   - Analyze instances where constraints led to innovative workarounds',
+          '   - Identify breakthrough moments in stakeholder consensus building',
+          '   - Detect when adversarial review triggered transformational insights',
+
+          '2. PARADIGM SHIFT IDENTIFICATION',
+          '   - Identify when fundamental assumptions about the domain were challenged',
+          '   - Detect shifts in how stakeholders conceptualize the problem space',
+          '   - Analyze moments where the solution approach fundamentally changed',
+          '   - Identify emergent new frameworks for understanding the domain',
+          '   - Detect when the process itself evolved beyond original methodology',
+
+          '=== PATTERN EMERGENCE ANALYSIS ===',
+          '1. NOVEL PATTERN RECOGNITION',
+          '   - Identify completely new patterns not seen in historical projects',
+          '   - Detect unique combinations of existing patterns creating new behaviors',
+          '   - Analyze patterns specific to this project\'s unique characteristics',
+          '   - Identify emergent best practices arising from this specific context',
+          '   - Detect novel failure patterns and their unexpected resolutions',
+
+          '2. EVOLUTIONARY PATTERN DEVELOPMENT',
+          '   - Analyze how patterns evolved and adapted during process execution',
+          '   - Identify pattern mutations that led to improved outcomes',
+          '   - Detect pattern convergence creating new stable configurations',
+          '   - Analyze pattern resilience and adaptation under stress conditions',
+          '   - Identify pattern scalability beyond original context',
+
+          '=== UNEXPECTED STAKEHOLDER DYNAMICS ===',
+          '1. EMERGENT COLLABORATION PATTERNS',
+          '   - Identify unexpected stakeholder alliances and partnerships',
+          '   - Detect emergent leadership patterns not present in formal structure',
+          '   - Analyze unexpected knowledge transfer pathways between stakeholders',
+          '   - Identify emergent communication patterns improving consensus',
+          '   - Detect unexpected stakeholder capacity emergence under pressure',
+
+          '2. CONSENSUS EMERGENCE PHENOMENA',
+          '   - Analyze moments where consensus emerged despite initial disagreement',
+          '   - Identify tipping points where stakeholder alignment accelerated',
+          '   - Detect emergent shared understanding transcending individual perspectives',
+          '   - Analyze unexpected conflict resolution through creative synthesis',
+          '   - Identify emergent stakeholder motivation patterns',
+
+          '=== METHODOLOGY EVOLUTION DETECTION ===',
+          '1. PROCESS ADAPTATION EMERGENCE',
+          '   - Identify ways the methodology adapted beyond original design',
+          '   - Detect emergent process optimizations discovered during execution',
+          '   - Analyze unexpected integration of different methodological approaches',
+          '   - Identify emergent quality criteria not originally considered',
+          '   - Detect process resilience mechanisms that evolved organically',
+
+          '2. META-LEARNING BREAKTHROUGH IDENTIFICATION',
+          '   - Identify moments where learning about learning created breakthroughs',
+          '   - Detect emergent meta-cognitive strategies improving process effectiveness',
+          '   - Analyze unexpected learning transfer between different abstraction levels',
+          '   - Identify emergent feedback loops accelerating overall progress',
+          '   - Detect breakthrough moments in process intelligence development',
+
+          '=== EXPLORATION OPPORTUNITY IDENTIFICATION ===',
+          '1. UNEXPLORED POTENTIAL ANALYSIS',
+          '   - Identify promising directions that emerged but weren\'t fully explored',
+          '   - Detect potential applications of emergent insights to other domains',
+          '   - Analyze scalability potential of emergent patterns and behaviors',
+          '   - Identify research opportunities arising from unexpected discoveries',
+          '   - Detect potential for methodology generalization beyond current context',
+
+          '2. INNOVATION AMPLIFICATION OPPORTUNITIES',
+          '   - Identify ways to systematically reproduce successful emergent behaviors',
+          '   - Detect opportunities to accelerate similar emergence in future projects',
+          '   - Analyze potential for creating favorable conditions for breakthrough emergence',
+          '   - Identify ways to scale emergent innovations across larger contexts',
+          '   - Detect opportunities for methodology innovation based on emergent insights',
+
+          '=== COMPREHENSIVE EMERGENCE ASSESSMENT ===',
+          'Provide detailed analysis of emergent phenomena:',
+          '- EMERGENCE SIGNIFICANCE: Impact and importance of detected behaviors',
+          '- REPRODUCIBILITY ANALYSIS: Whether emergent behaviors can be systematically reproduced',
+          '- SCALABILITY POTENTIAL: How emergent behaviors could be applied more broadly',
+          '- INNOVATION IMPLICATIONS: How emergence changes understanding of the domain',
+          '- METHODOLOGY IMPACT: How emergence should influence future methodology design',
+          '- BREAKTHROUGH POTENTIAL: Which emergent behaviors indicate breakthrough opportunities',
+
+          'Focus on identifying actionable emergence that can enhance current and future projects.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          allResults: inputs.allResults,
+          processContext: inputs.processContext,
+          convergenceHistory: inputs.convergenceHistory,
+          multiLevelLearning: inputs.multiLevelLearning,
+          innovationPatterns: inputs.innovationPatterns
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['emergent-behavior', 'breakthrough-detection', 'pattern-emergence', 'innovation-discovery']
+    };
+  }
+});
+
+/**
+ * Task: Evidence-Based Validation and Management
+ * Purpose: Comprehensive validation and management of evidence supporting all ontology claims
+ */
+const evidenceValidationManagementTask = defineTask({
+  name: 'evidence-validation-management',
+  description: 'Comprehensive validation, quality assessment, and management of evidence supporting ontology claims',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    phaseResult: { type: 'object', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    phaseName: { type: 'string', required: true },
+    claimsToValidate: { type: 'array', default: [] },
+    validationDepth: { type: 'string', default: 'comprehensive' },
+    stakeholderContext: { type: 'string', default: 'multi-team' }
+  },
+
+  outputs: {
+    validatedEvidence: { type: 'object' },
+    evidenceQualityReport: { type: 'object' },
+    sourceCredibilityAnalysis: { type: 'object' },
+    evidenceGaps: { type: 'array' },
+    conflictResolution: { type: 'array' },
+    biasAssessment: { type: 'object' },
+    confidenceLevels: { type: 'object' },
+    updatedEvidenceFramework: { type: 'object' },
+    stakeholderVerificationGuides: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Evidence Validation & Management: ${inputs.phaseName} - ${inputs.projectName}`,
+      agent: {
+        role: 'evidence-validation-specialist',
+        goal: `Validate and manage evidence supporting ${inputs.phaseName} phase claims for ${inputs.projectName}`,
+        instructions: [
+          '=== COMPREHENSIVE EVIDENCE VALIDATION FRAMEWORK ===',
+          'Apply systematic evidence validation methodology with rigorous quality assessment.',
+
+          '=== SOURCE CREDIBILITY ASSESSMENT ===',
+          '**AUTHORITY VALIDATION**:',
+          '- Verify author/organization expertise and domain recognition',
+          '- Check institutional affiliations and credentials',
+          '- Assess track record of accuracy and reliability',
+          '- Evaluate peer recognition and citation patterns',
+          '- Document any conflicts of interest or biases',
+
+          '**METHODOLOGICAL RIGOR ASSESSMENT**:',
+          '- Evaluate research methodology transparency and quality',
+          '- Assess sample sizes, controls, and statistical validity',
+          '- Check for proper peer review and publication standards',
+          '- Validate data collection and analysis procedures',
+          '- Assess reproducibility and replication potential',
+
+          '**INDEPENDENCE AND OBJECTIVITY**:',
+          '- Identify funding sources and potential conflicts',
+          '- Assess commercial or political motivations',
+          '- Evaluate independence from interested parties',
+          '- Check for disclosure of limitations and uncertainties',
+          '- Assess balanced consideration of alternative viewpoints',
+
+          '=== MULTI-SOURCE TRIANGULATION ===',
+          '**CROSS-VALIDATION PROTOCOL**:',
+          '- For critical claims: Require minimum 3 independent, high-quality sources',
+          '- For important claims: Require minimum 2 independent sources',
+          '- For supporting details: Require 1 high-quality source',
+          '- For controversial claims: Require additional expert validation',
+          '- Document validation methodology and decision criteria',
+
+          '**CONSISTENCY ANALYSIS**:',
+          '- Compare findings across multiple independent sources',
+          '- Identify areas of consensus and disagreement',
+          '- Analyze reasons for discrepancies when they exist',
+          '- Assess whether differences are methodological or substantive',
+          '- Document confidence levels based on source agreement',
+
+          '=== EVIDENCE QUALITY SCORING ===',
+          '**COMPREHENSIVE QUALITY METRICS (1-10 scale)**:',
+          '- SOURCE AUTHORITY (expertise, recognition, credentials): Weight 25%',
+          '- METHODOLOGICAL RIGOR (transparency, validity, controls): Weight 25%',
+          '- INDEPENDENCE (objectivity, conflict-free, unbiased): Weight 20%',
+          '- CURRENCY (recency, ongoing relevance, updates): Weight 15%',
+          '- VERIFIABILITY (accessible, reproducible, traceable): Weight 15%',
+
+          '**EVIDENCE STRENGTH CLASSIFICATION**:',
+          '- STRONG EVIDENCE (8-10): High confidence, multiple high-quality sources',
+          '- MODERATE EVIDENCE (6-7): Reasonable confidence, good sources with minor limitations',
+          '- WEAK EVIDENCE (4-5): Limited confidence, few sources or methodological concerns',
+          '- INSUFFICIENT EVIDENCE (1-3): Very low confidence, poor sources or major gaps',
+
+          '=== BIAS IDENTIFICATION AND MITIGATION ===',
+          '**SYSTEMATIC BIAS ASSESSMENT**:',
+          '- SELECTION BIAS: Are we selecting sources that confirm preconceptions?',
+          '- CONFIRMATION BIAS: Are we interpreting ambiguous evidence favorably?',
+          '- AVAILABILITY BIAS: Are we overweighting easily accessible sources?',
+          '- AUTHORITY BIAS: Are we accepting claims without validation due to source prestige?',
+          '- RECENCY BIAS: Are we overweighting recent information vs. historical patterns?',
+          '- COMMERCIAL BIAS: Are commercial interests influencing source claims?',
+
+          '**BIAS MITIGATION STRATEGIES**:',
+          '- Actively seek disconfirming evidence and alternative interpretations',
+          '- Use systematic search strategies rather than convenience sampling',
+          '- Apply consistent evaluation criteria across all sources',
+          '- Engage independent validators to check assessment bias',
+          '- Document potential biases and mitigation efforts taken',
+
+          '=== CONFLICT RESOLUTION METHODOLOGY ===',
+          '**EVIDENCE CONFLICT ANALYSIS**:',
+          '- Identify specific points of disagreement between sources',
+          '- Analyze methodological differences that might explain conflicts',
+          '- Assess temporal factors (different time periods, changing conditions)',
+          '- Evaluate scope differences (different populations, contexts, definitions)',
+          '- Consider cultural or geographic factors affecting findings',
+
+          '**CONFLICT RESOLUTION STRATEGIES**:',
+          '- METHODOLOGICAL SUPERIORITY: Prioritize sources with stronger methodology',
+          '- TEMPORAL RELEVANCE: Weight more recent evidence when conditions have changed',
+          '- SCOPE ALIGNMENT: Prioritize sources most relevant to specific context',
+          '- EXPERT ADJUDICATION: Engage domain experts to resolve complex conflicts',
+          '- UNCERTAINTY ACKNOWLEDGMENT: Document unresolved conflicts with confidence bounds',
+
+          '=== CONFIDENCE LEVEL QUANTIFICATION ===',
+          '**CONFIDENCE INTERVAL ESTIMATION**:',
+          '- Provide specific confidence levels (e.g., 85% confident in claim X)',
+          '- Document basis for confidence assessment (source quality, consistency, scope)',
+          '- Identify factors that would increase or decrease confidence',
+          '- Provide uncertainty bounds for quantitative claims',
+          '- Distinguish between statistical confidence and epistemic uncertainty',
+
+          '**UNCERTAINTY COMMUNICATION**:',
+          '- Use clear, standardized language for uncertainty levels',
+          '- Provide specific uncertainty quantification where possible',
+          '- Explain practical implications of uncertainty levels',
+          '- Identify decision points where uncertainty levels matter',
+          '- Create stakeholder-accessible uncertainty summaries',
+
+          '=== EVIDENCE GAP IDENTIFICATION ===',
+          '**SYSTEMATIC GAP ANALYSIS**:',
+          '- Map ontology claims against available evidence',
+          '- Identify claims with insufficient evidence support',
+          '- Assess criticality of evidence gaps for decision-making',
+          '- Prioritize gaps based on impact and feasibility of filling',
+          '- Document research needed to address priority gaps',
+
+          '**GAP FILLING STRATEGIES**:',
+          '- PRIMARY RESEARCH: Areas requiring original data collection',
+          '- EXPERT CONSULTATION: Topics needing specialist input',
+          '- LITERATURE SEARCH: Systematic search for overlooked sources',
+          '- STAKEHOLDER INPUT: Areas where practitioner knowledge is crucial',
+          '- EMPIRICAL VALIDATION: Claims requiring experimental verification',
+
+          '=== STAKEHOLDER VERIFICATION GUIDES ===',
+          '**ACCESSIBILITY ASSESSMENT**:',
+          '- Evaluate whether stakeholders can access primary sources',
+          '- Identify paywalls, technical barriers, or language issues',
+          '- Create alternative access strategies for critical evidence',
+          '- Provide source summaries for inaccessible materials',
+          '- Design verification pathways appropriate for different stakeholder types',
+
+          '**VERIFICATION PROTOCOL DESIGN**:',
+          '- Create step-by-step verification guides for key claims',
+          '- Provide specific source locations and access instructions',
+          '- Design simplified verification methods for non-experts',
+          '- Include cross-reference strategies for additional validation',
+          '- Create escalation procedures when verification questions arise',
+
+          '=== COMPREHENSIVE EVIDENCE DOCUMENTATION ===',
+          '**EVIDENCE REPOSITORY STRUCTURE**:',
+          '- Complete source catalog with full bibliographic information',
+          '- Evidence quality scores and assessment justifications',
+          '- Cross-reference mapping between claims and supporting evidence',
+          '- Conflict documentation and resolution explanations',
+          '- Bias assessment results and mitigation strategies implemented',
+
+          '**AUDIT TRAIL REQUIREMENTS**:',
+          '- Document all evidence evaluation decisions and criteria',
+          '- Maintain version control for evidence updates and changes',
+          '- Track source credibility changes over time',
+          '- Record stakeholder verification activities and results',
+          '- Preserve original sources and assessment contexts',
+
+          'Provide detailed, actionable evidence validation results with clear stakeholder verification pathways.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          phaseResult: inputs.phaseResult,
+          evidenceFramework: inputs.evidenceFramework,
+          phaseName: inputs.phaseName,
+          claimsToValidate: inputs.claimsToValidate,
+          validationDepth: inputs.validationDepth,
+          stakeholderContext: inputs.stakeholderContext
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['evidence-validation', 'source-credibility', 'bias-assessment', 'quality-control']
+    };
+  }
+});
+
+/**
+ * Task: Schema Validation and Research
+ * Purpose: Self-validation and research on current schema for adaptive improvement
+ */
+const schemaValidationResearchTask = defineTask({
+  name: 'schema-validation-research',
+  description: 'Comprehensive self-validation and research on current schema for adaptive improvement',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    currentSchema: { type: 'object', required: true },
+    allResults: { type: 'object', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    validationFramework: { type: 'object', required: true },
+    reinforcementLearningFramework: { type: 'object', required: true },
+    adaptationIteration: { type: 'number', default: 1 },
+    stakeholderContext: { type: 'string', default: 'multi-team' },
+    domainType: { type: 'string', default: 'general' }
+  },
+
+  outputs: {
+    validationResults: { type: 'object' },
+    researchFindings: { type: 'object' },
+    improvementOpportunities: { type: 'array' },
+    qualityAssessment: { type: 'object' },
+    consistencyAnalysis: { type: 'object' },
+    completenessGaps: { type: 'array' },
+    performanceAnalysis: { type: 'object' },
+    usabilityFeedback: { type: 'object' },
+    evolutionRecommendations: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Schema Validation Research: ${inputs.projectName} (Cycle ${inputs.adaptationIteration})`,
+      agent: {
+        role: 'schema-validation-researcher',
+        goal: `Conduct comprehensive self-validation and research on current schema for ${inputs.projectName}`,
+        instructions: [
+          '=== REINFORCEMENT LEARNING SCHEMA VALIDATION FRAMEWORK ===',
+          'Apply systematic self-validation and research methodology for adaptive schema improvement.',
+
+          '=== COMPREHENSIVE SCHEMA SELF-ANALYSIS ===',
+          '**LOGICAL CONSISTENCY VALIDATION**:',
+          '- Apply formal logic checking for internal consistency',
+          '- Identify logical contradictions, circular dependencies, ambiguities',
+          '- Validate inference rules and logical relationships',
+          '- Check for completeness of logical coverage',
+          '- Assess soundness of ontological commitments',
+
+          '**EMPIRICAL VALIDATION RESEARCH**:',
+          '- Research real-world implementations of similar schemas',
+          '- Validate schema against actual domain data and use cases',
+          '- Test schema expressiveness with concrete examples',
+          '- Identify gaps between schema and real-world complexity',
+          '- Validate schema scalability with realistic data volumes',
+
+          '**CROSS-VALIDATION AGAINST STANDARDS**:',
+          '- Compare with established industry standards and frameworks',
+          '- Validate against domain-specific ontology best practices',
+          '- Check alignment with relevant ISO, IEEE, W3C standards',
+          '- Assess compatibility with existing enterprise systems',
+          '- Validate interoperability with standard protocols',
+
+          '=== ADVERSARIAL SCHEMA TESTING ===',
+          '**SYSTEMATIC CHALLENGE METHODOLOGY**:',
+          '- Design adversarial test cases to stress-test schema limits',
+          '- Generate edge cases and boundary condition scenarios',
+          '- Test schema robustness under various failure conditions',
+          '- Challenge fundamental assumptions underlying schema design',
+          '- Identify potential misuse or misinterpretation scenarios',
+
+          '**ALTERNATIVE DESIGN EXPLORATION**:',
+          '- Research alternative schema design approaches',
+          '- Explore different ontological frameworks for same domain',
+          '- Investigate emerging patterns and innovations in schema design',
+          '- Assess trade-offs between different design choices',
+          '- Identify opportunities for paradigmatic improvements',
+
+          '=== PERFORMANCE AND SCALABILITY ANALYSIS ===',
+          '**COMPUTATIONAL PERFORMANCE RESEARCH**:',
+          '- Analyze query complexity and performance implications',
+          '- Research computational complexity of inference operations',
+          '- Assess memory and storage requirements for schema implementation',
+          '- Validate performance scalability with growing data',
+          '- Identify performance bottlenecks and optimization opportunities',
+
+          '**MAINTENANCE AND EVOLUTION ANALYSIS**:',
+          '- Assess schema maintainability and update complexity',
+          '- Research schema versioning and backward compatibility',
+          '- Analyze impact of potential future changes',
+          '- Evaluate schema flexibility for emerging requirements',
+          '- Assess long-term sustainability of current design',
+
+          '=== STAKEHOLDER AND USABILITY VALIDATION ===',
+          '**COMPREHENSIVE USABILITY RESEARCH**:',
+          '- Research user experience with similar schemas',
+          '- Validate schema comprehensibility for different stakeholder types',
+          '- Assess learnability and cognitive load for schema users',
+          '- Research accessibility and inclusive design considerations',
+          '- Validate schema utility for actual user workflows',
+
+          '**STAKEHOLDER VALUE VALIDATION**:',
+          '- Research business value delivery of current schema design',
+          '- Validate alignment with stakeholder goals and requirements',
+          '- Assess schema support for decision-making processes',
+          '- Research integration impact on stakeholder workflows',
+          '- Validate schema contributions to organizational objectives',
+
+          '=== IMPROVEMENT OPPORTUNITY IDENTIFICATION ===',
+          '**SYSTEMATIC GAP ANALYSIS**:',
+          '- Identify coverage gaps in domain representation',
+          '- Assess precision gaps in concept definitions',
+          '- Find expressiveness gaps for complex domain scenarios',
+          '- Identify integration gaps with external systems',
+          '- Assess governance gaps in schema management',
+
+          '**INNOVATION OPPORTUNITY RESEARCH**:',
+          '- Research emerging technologies applicable to schema enhancement',
+          '- Identify opportunities for AI/ML integration in schema design',
+          '- Explore semantic web and linked data enhancement possibilities',
+          '- Research automation opportunities for schema validation',
+          '- Identify opportunities for dynamic schema adaptation',
+
+          '=== EVIDENCE-BASED VALIDATION METHODOLOGY ===',
+          '**RESEARCH EVIDENCE INTEGRATION**:',
+          '- Systematically collect evidence supporting current schema design',
+          '- Research counter-evidence and alternative approaches',
+          '- Validate schema decisions against empirical research',
+          '- Assess strength of evidence for schema design choices',
+          '- Identify evidence gaps requiring additional research',
+
+          '**VALIDATION CONFIDENCE ASSESSMENT**:',
+          '- Quantify confidence levels for different schema components',
+          '- Assess uncertainty and risk in current schema design',
+          '- Identify high-confidence vs. speculative schema elements',
+          '- Provide uncertainty bounds for schema validation claims',
+          '- Document assumptions requiring empirical validation',
+
+          'Provide detailed validation results with specific improvement recommendations and confidence assessments.',
+
+          `Context: Adaptation iteration ${inputs.adaptationIteration} for ${inputs.domainType} domain`
+        ],
+        context: {
+          projectName: inputs.projectName,
+          currentSchema: inputs.currentSchema,
+          allResults: inputs.allResults,
+          evidenceFramework: inputs.evidenceFramework,
+          validationFramework: inputs.validationFramework,
+          reinforcementLearningFramework: inputs.reinforcementLearningFramework,
+          adaptationIteration: inputs.adaptationIteration,
+          stakeholderContext: inputs.stakeholderContext,
+          domainType: inputs.domainType
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['schema-validation', 'self-research', 'adaptive-improvement', 'reinforcement-learning']
+    };
+  }
+});
+
+/**
+ * Task: Adaptation Opportunity Analysis
+ * Purpose: Analyze validation results to identify and prioritize adaptation opportunities
+ */
+const adaptationOpportunityAnalysisTask = defineTask({
+  name: 'adaptation-opportunity-analysis',
+  description: 'Analyze validation results to identify and prioritize schema/ontology adaptation opportunities',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    validationResults: { type: 'object', required: true },
+    currentSchema: { type: 'object', required: true },
+    adaptationHistory: { type: 'array', default: [] },
+    evidenceFramework: { type: 'object', required: true },
+    qualityTargets: { type: 'object', required: true }
+  },
+
+  outputs: {
+    significantImprovementPotential: { type: 'boolean' },
+    adaptationRecommended: { type: 'boolean' },
+    opportunities: { type: 'array' },
+    recommendedStrategy: { type: 'object' },
+    selfAssessment: { type: 'object' },
+    futureOpportunities: { type: 'array' },
+    riskAnalysis: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Adaptation Opportunity Analysis: ${inputs.projectName}`,
+      agent: {
+        role: 'adaptation-opportunity-analyst',
+        goal: `Analyze validation results and identify adaptation opportunities for ${inputs.projectName}`,
+        instructions: [
+          '=== COMPREHENSIVE OPPORTUNITY ANALYSIS FRAMEWORK ===',
+          'Systematically analyze validation results to identify high-impact adaptation opportunities.',
+
+          '=== IMPROVEMENT POTENTIAL ASSESSMENT ===',
+          '**QUANTITATIVE IMPACT ANALYSIS**:',
+          '- Calculate potential quality improvements for each identified opportunity',
+          '- Assess business value impact of different adaptation scenarios',
+          '- Quantify risk reduction potential from addressing validation issues',
+          '- Estimate performance improvements from optimization opportunities',
+          '- Calculate stakeholder satisfaction improvements from usability enhancements',
+
+          '**SIGNIFICANCE THRESHOLD EVALUATION**:',
+          '- Apply significance thresholds for different types of improvements',
+          '- Consider cumulative impact of multiple small improvements',
+          '- Assess strategic importance beyond immediate quality gains',
+          '- Evaluate long-term benefits vs. short-term implementation costs',
+          '- Consider network effects and cascading improvement potential',
+
+          '=== ADAPTATION STRATEGY SELECTION ===',
+          '**STRATEGY EVALUATION CRITERIA**:',
+          '- IMPACT: Magnitude of potential improvement',
+          '- FEASIBILITY: Technical and organizational implementation difficulty',
+          '- RISK: Potential negative consequences of adaptation',
+          '- TIMELINE: Speed of implementation and benefit realization',
+          '- SUSTAINABILITY: Long-term maintenance and evolution requirements',
+
+          '**ADAPTIVE STRATEGY OPTIONS**:',
+          '- INCREMENTAL ENHANCEMENT: Small improvements within current framework',
+          '- STRUCTURAL REFINEMENT: Moderate changes to schema/ontology structure',
+          '- PARADIGMATIC EVOLUTION: Fundamental approach or framework changes',
+          '- REVOLUTIONARY REDESIGN: Complete rethinking of schema/ontology design',
+          '- HYBRID ADAPTATION: Combination of different adaptation approaches',
+
+          '=== SELF-ASSESSMENT AND META-LEARNING ===',
+          '**PROCESS SELF-EVALUATION**:',
+          '- Assess quality of own validation and analysis processes',
+          '- Identify biases in opportunity identification and evaluation',
+          '- Evaluate accuracy of previous adaptation predictions',
+          '- Assess completeness of current analysis framework',
+          '- Identify gaps in analytical methodology',
+
+          '**LEARNING INTEGRATION**:',
+          '- Learn from patterns in adaptation history',
+          '- Identify successful adaptation strategies from past cycles',
+          '- Learn from unsuccessful or suboptimal adaptations',
+          '- Integrate stakeholder feedback on adaptation effectiveness',
+          '- Evolve analysis methodology based on accumulated experience',
+
+          '=== RISK-BENEFIT OPTIMIZATION ===',
+          '**COMPREHENSIVE RISK ANALYSIS**:',
+          '- Technical risks: Implementation complexity, performance impact, compatibility issues',
+          '- Business risks: Stakeholder disruption, timeline impact, resource requirements',
+          '- Organizational risks: Change management challenges, skill requirements, adoption barriers',
+          '- Strategic risks: Alignment with long-term goals, future flexibility, competitive impact',
+
+          '**OPTIMIZATION METHODOLOGY**:',
+          '- Multi-objective optimization balancing improvement potential and implementation risk',
+          '- Portfolio approach considering interactions between multiple adaptations',
+          '- Sensitivity analysis for different risk tolerance levels',
+          '- Scenario planning for different implementation approaches',
+          '- Contingency planning for adaptation failures or unexpected outcomes',
+
+          'Provide clear recommendations with detailed justification and confidence levels.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          validationResults: inputs.validationResults,
+          currentSchema: inputs.currentSchema,
+          adaptationHistory: inputs.adaptationHistory,
+          evidenceFramework: inputs.evidenceFramework,
+          qualityTargets: inputs.qualityTargets
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['adaptation-analysis', 'opportunity-assessment', 'strategy-selection', 'risk-analysis']
+    };
+  }
+});
+
+/**
+ * Task: Schema Adaptation
+ * Purpose: Execute schema adaptations based on validation learning
+ */
+const schemaAdaptationTask = defineTask({
+  name: 'schema-adaptation',
+  description: 'Execute schema adaptations based on validation learning and opportunity analysis',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    currentSchema: { type: 'object', required: true },
+    adaptationOpportunities: { type: 'array', required: true },
+    validationResults: { type: 'object', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    stakeholderContext: { type: 'string', default: 'multi-team' },
+    adaptationStrategy: { type: 'object', required: true }
+  },
+
+  outputs: {
+    adaptedSchema: { type: 'object' },
+    improvements: { type: 'array' },
+    qualityImprovement: { type: 'number' },
+    evolutionRecord: { type: 'object' },
+    validationResults: { type: 'object' },
+    stakeholderImpactAnalysis: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Schema Adaptation: ${inputs.projectName}`,
+      agent: {
+        role: 'schema-adaptation-specialist',
+        goal: `Execute systematic schema adaptations for ${inputs.projectName}`,
+        instructions: [
+          '=== SYSTEMATIC SCHEMA ADAPTATION FRAMEWORK ===',
+          'Execute evidence-based schema adaptations with comprehensive validation and impact analysis.',
+
+          '=== ADAPTATION IMPLEMENTATION METHODOLOGY ===',
+          '**STRUCTURED ADAPTATION PROCESS**:',
+          '1. BASELINE ESTABLISHMENT: Document current schema state and quality metrics',
+          '2. ADAPTATION DESIGN: Design specific schema modifications addressing identified opportunities',
+          '3. IMPACT ANALYSIS: Analyze potential impacts on existing ontology and stakeholders',
+          '4. VALIDATION PLANNING: Design validation approach for adapted schema',
+          '5. IMPLEMENTATION: Execute schema modifications with version control',
+          '6. VALIDATION EXECUTION: Validate adapted schema against requirements',
+          '7. QUALITY MEASUREMENT: Measure quality improvements from adaptations',
+          '8. STAKEHOLDER REVIEW: Assess stakeholder impact and satisfaction',
+
+          '=== EVIDENCE-BASED ADAPTATION DESIGN ===',
+          '**RESEARCH-INFORMED MODIFICATIONS**:',
+          '- Base all adaptations on validated research and evidence',
+          '- Maintain complete traceability from evidence to adaptation decisions',
+          '- Document rationale for each modification with supporting evidence',
+          '- Consider alternative adaptation approaches with evidence comparison',
+          '- Validate adaptation decisions against domain expertise and standards',
+
+          '**SYSTEMATIC MODIFICATION PLANNING**:',
+          '- Plan adaptations to minimize disruption while maximizing improvement',
+          '- Consider dependencies between different schema modifications',
+          '- Design backward compatibility strategies where required',
+          '- Plan migration pathways for existing ontology content',
+          '- Design rollback strategies for problematic adaptations',
+
+          '=== COMPREHENSIVE VALIDATION OF ADAPTATIONS ===',
+          '**MULTI-LEVEL VALIDATION APPROACH**:',
+          '- FORMAL VALIDATION: Logical consistency, completeness, soundness checking',
+          '- EMPIRICAL VALIDATION: Testing with real-world data and use cases',
+          '- PERFORMANCE VALIDATION: Computational performance and scalability testing',
+          '- USABILITY VALIDATION: Stakeholder comprehensibility and utility assessment',
+          '- INTEGRATION VALIDATION: Compatibility with existing systems and processes',
+
+          '**COMPARATIVE QUALITY ASSESSMENT**:',
+          '- Compare adapted schema quality against baseline measurements',
+          '- Measure improvements in coverage, precision, consistency, usability',
+          '- Assess performance improvements in query execution and reasoning',
+          '- Evaluate stakeholder satisfaction improvements',
+          '- Quantify business value enhancements from adaptations',
+
+          '=== STAKEHOLDER IMPACT MANAGEMENT ===',
+          '**COMPREHENSIVE IMPACT ANALYSIS**:',
+          '- Analyze impact on different stakeholder groups and workflows',
+          '- Assess training and adaptation requirements for stakeholders',
+          '- Evaluate impact on existing tools and integrations',
+          '- Consider organizational change management requirements',
+          '- Plan communication and rollout strategies for adaptations',
+
+          '**STAKEHOLDER ENGAGEMENT STRATEGY**:',
+          '- Design stakeholder review and feedback collection processes',
+          '- Create stakeholder-specific adaptation summaries and benefits',
+          '- Plan training and support for stakeholders adapting to changes',
+          '- Establish feedback channels for ongoing adaptation refinement',
+          '- Design stakeholder validation and acceptance criteria',
+
+          '=== EVOLUTION DOCUMENTATION AND LEARNING ===',
+          '**COMPREHENSIVE EVOLUTION RECORDS**:',
+          '- Document complete adaptation process with decisions and rationale',
+          '- Record lessons learned and best practices from adaptation process',
+          '- Capture stakeholder feedback and adaptation effectiveness',
+          '- Document successful and unsuccessful adaptation strategies',
+          '- Create reusable patterns and guidelines for future adaptations',
+
+          '**CONTINUOUS LEARNING INTEGRATION**:',
+          '- Extract generalizable insights from specific adaptations',
+          '- Identify adaptation patterns that can be systematized',
+          '- Learn from adaptation failures and near-misses',
+          '- Update adaptation methodology based on experience',
+          '- Build knowledge base of effective adaptation strategies',
+
+          'Execute adaptations systematically with comprehensive documentation and stakeholder consideration.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          currentSchema: inputs.currentSchema,
+          adaptationOpportunities: inputs.adaptationOpportunities,
+          validationResults: inputs.validationResults,
+          evidenceFramework: inputs.evidenceFramework,
+          stakeholderContext: inputs.stakeholderContext,
+          adaptationStrategy: inputs.adaptationStrategy
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['schema-adaptation', 'systematic-improvement', 'validation', 'evolution']
+    };
+  }
+});
+
+/**
+ * Task: Ontology Validation and Research
+ * Purpose: Comprehensive self-validation and research on full ontology for adaptive improvement
+ */
+const ontologyValidationResearchTask = defineTask({
+  name: 'ontology-validation-research',
+  description: 'Comprehensive self-validation and research on full ontology for adaptive improvement',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    currentOntology: { type: 'object', required: true },
+    currentSchema: { type: 'object', required: true },
+    allResults: { type: 'object', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    validationFramework: { type: 'object', required: true },
+    reinforcementLearningFramework: { type: 'object', required: true },
+    adaptationIteration: { type: 'number', default: 1 },
+    stakeholderContext: { type: 'string', default: 'multi-team' },
+    domainType: { type: 'string', default: 'general' },
+    ontologyScope: { type: 'string', default: 'comprehensive' }
+  },
+
+  outputs: {
+    validationResults: { type: 'object' },
+    researchFindings: { type: 'object' },
+    improvementOpportunities: { type: 'array' },
+    qualityAssessment: { type: 'object' },
+    consistencyAnalysis: { type: 'object' },
+    completenessGaps: { type: 'array' },
+    usabilityAnalysis: { type: 'object' },
+    performanceAnalysis: { type: 'object' },
+    stakeholderFeedback: { type: 'object' },
+    evolutionRecommendations: { type: 'array' },
+    schemaAdequacyAssessment: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Ontology Validation Research: ${inputs.projectName} (Cycle ${inputs.adaptationIteration})`,
+      agent: {
+        role: 'ontology-validation-researcher',
+        goal: `Conduct comprehensive self-validation and research on full ontology for ${inputs.projectName}`,
+        instructions: [
+          '=== COMPREHENSIVE ONTOLOGY VALIDATION FRAMEWORK ===',
+          'Apply systematic self-validation and research methodology for adaptive ontology improvement.',
+
+          '=== HOLISTIC ONTOLOGY ANALYSIS ===',
+          '**COMPREHENSIVE COVERAGE VALIDATION**:',
+          '- Validate ontology coverage against domain scope requirements',
+          '- Identify gaps in concept coverage, relationship modeling, and attribute representation',
+          '- Assess depth and breadth of domain representation',
+          '- Validate coverage of edge cases and domain boundaries',
+          '- Check coverage of stakeholder-specific domain aspects',
+
+          '**INTERNAL CONSISTENCY VALIDATION**:',
+          '- Check for logical contradictions within the ontology',
+          '- Validate consistency of concept definitions and relationships',
+          '- Identify circular definitions and ambiguous concept boundaries',
+          '- Validate consistency of attribute assignments and constraints',
+          '- Check for inconsistent inheritance and specialization relationships',
+
+          '**EMPIRICAL ADEQUACY TESTING**:',
+          '- Test ontology against real-world domain instances and data',
+          '- Validate ontology expressiveness for actual domain scenarios',
+          '- Test ontology utility for stakeholder decision-making processes',
+          '- Validate ontology support for actual business workflows',
+          '- Assess ontology accuracy against domain expert knowledge',
+
+          '=== SCHEMA-ONTOLOGY ALIGNMENT VALIDATION ===',
+          '**SCHEMA ADEQUACY ASSESSMENT**:',
+          '- Validate schema adequacy for current ontology content',
+          '- Identify ontology aspects inadequately supported by schema',
+          '- Assess schema constraints that limit ontology expressiveness',
+          '- Identify opportunities for schema evolution to better support ontology',
+          '- Validate schema-ontology alignment for future growth scenarios',
+
+          '**BIDIRECTIONAL CONSISTENCY CHECKING**:',
+          '- Ensure ontology conforms to schema constraints and specifications',
+          '- Validate that schema supports ontology modeling requirements',
+          '- Check for ontology content that exceeds schema capabilities',
+          '- Identify schema features unused by current ontology',
+          '- Assess evolution compatibility between schema and ontology',
+
+          '=== PERFORMANCE AND SCALABILITY VALIDATION ===',
+          '**COMPUTATIONAL PERFORMANCE ANALYSIS**:',
+          '- Validate query performance across different ontology access patterns',
+          '- Assess reasoning and inference performance with current ontology size',
+          '- Test scalability with projected ontology growth scenarios',
+          '- Identify performance bottlenecks in ontology structure',
+          '- Validate memory and storage efficiency of current ontology design',
+
+          '**MAINTENANCE AND EVOLUTION ANALYSIS**:',
+          '- Assess ease of ontology maintenance and updates',
+          '- Validate ontology modularity and changeability',
+          '- Test impact propagation of ontology modifications',
+          '- Assess ontology versioning and backward compatibility',
+          '- Validate sustainability of current ontology architecture',
+
+          '=== STAKEHOLDER VALUE VALIDATION ===',
+          '**COMPREHENSIVE USABILITY RESEARCH**:',
+          '- Research stakeholder experience with ontology-based tools and interfaces',
+          '- Validate ontology comprehensibility for different user types',
+          '- Assess cognitive load and learning curve for ontology users',
+          '- Test ontology utility for actual user tasks and workflows',
+          '- Validate accessibility and inclusive design aspects of ontology',
+
+          '**BUSINESS VALUE VALIDATION**:',
+          '- Validate ontology contribution to business goals and objectives',
+          '- Assess ROI and cost-benefit of current ontology investment',
+          '- Validate ontology support for decision-making and problem-solving',
+          '- Assess ontology impact on operational efficiency and effectiveness',
+          '- Validate strategic value of ontology for competitive advantage',
+
+          '=== QUALITY AND MATURITY ASSESSMENT ===',
+          '**MULTI-DIMENSIONAL QUALITY EVALUATION**:',
+          '- Assess conceptual quality: accuracy, completeness, consistency',
+          '- Evaluate structural quality: modularity, maintainability, scalability',
+          '- Validate functional quality: usability, performance, reliability',
+          '- Assess strategic quality: business alignment, stakeholder value, future readiness',
+          '- Evaluate process quality: development methodology, governance, documentation',
+
+          '**MATURITY AND EVOLUTION READINESS**:',
+          '- Assess ontology maturity level and stability',
+          '- Validate readiness for production deployment and scaling',
+          '- Assess governance and maintenance capability requirements',
+          '- Evaluate organizational readiness for ontology adoption',
+          '- Validate long-term sustainability and evolution planning',
+
+          '=== IMPROVEMENT OPPORTUNITY IDENTIFICATION ===',
+          '**SYSTEMATIC OPPORTUNITY MAPPING**:',
+          '- Map improvement opportunities across all validation dimensions',
+          '- Prioritize opportunities by impact potential and implementation feasibility',
+          '- Identify quick wins vs. long-term strategic improvements',
+          '- Assess interdependencies between different improvement opportunities',
+          '- Consider stakeholder preferences and organizational constraints',
+
+          '**INNOVATION AND ADVANCEMENT RESEARCH**:',
+          '- Research emerging approaches and technologies applicable to ontology',
+          '- Identify opportunities for AI/ML integration and automation',
+          '- Explore semantic web and linked data enhancement possibilities',
+          '- Research ontology federation and interoperability improvements',
+          '- Identify opportunities for community collaboration and sharing',
+
+          'Provide comprehensive validation results with specific improvement recommendations and implementation guidance.',
+
+          `Context: Adaptation iteration ${inputs.adaptationIteration} for ${inputs.domainType} domain with ${inputs.ontologyScope} scope`
+        ],
+        context: {
+          projectName: inputs.projectName,
+          currentOntology: inputs.currentOntology,
+          currentSchema: inputs.currentSchema,
+          allResults: inputs.allResults,
+          evidenceFramework: inputs.evidenceFramework,
+          validationFramework: inputs.validationFramework,
+          reinforcementLearningFramework: inputs.reinforcementLearningFramework,
+          adaptationIteration: inputs.adaptationIteration,
+          stakeholderContext: inputs.stakeholderContext,
+          domainType: inputs.domainType,
+          ontologyScope: inputs.ontologyScope
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['ontology-validation', 'self-research', 'comprehensive-analysis', 'improvement-identification']
+    };
+  }
+});
+
+/**
+ * Task: Comprehensive Generator Validation
+ * Purpose: Comprehensive validation of generators including output quality, conformance, and usability
+ */
+const comprehensiveGeneratorValidationTask = defineTask({
+  name: 'comprehensive-generator-validation',
+  description: 'Comprehensive validation of generators including output quality, conformance, usability, and performance',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    generators: { type: 'object', required: true },
+    knowledgeGraph: { type: 'object', required: true },
+    schema: { type: 'object', required: true },
+    validationFramework: { type: 'object', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    stakeholderContext: { type: 'string', default: 'multi-team' },
+    domainType: { type: 'string', default: 'general' }
+  },
+
+  outputs: {
+    qualityAssessment: { type: 'object' },
+    conformanceResults: { type: 'object' },
+    usabilityResults: { type: 'object' },
+    performanceResults: { type: 'object' },
+    overallValidationScore: { type: 'number' },
+    performanceRating: { type: 'number' },
+    validationIssues: { type: 'array' },
+    improvementRecommendations: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Comprehensive Generator Validation: ${inputs.projectName}`,
+      agent: {
+        role: 'generator-validation-specialist',
+        goal: `Validate generators comprehensively for ${inputs.projectName}`,
+        instructions: [
+          '=== COMPREHENSIVE GENERATOR VALIDATION FRAMEWORK ===',
+          'Apply systematic validation methodology covering all aspects of generator performance and utility.',
+
+          '=== OUTPUT QUALITY ASSESSMENT ===',
+          '**CONTENT QUALITY VALIDATION**:',
+          '- Validate accuracy and correctness of generated outputs',
+          '- Assess completeness and coverage of generated content',
+          '- Check consistency and coherence across different generated outputs',
+          '- Validate compliance with domain standards and conventions',
+          '- Assess clarity and comprehensibility of generated content',
+
+          '**SEMANTIC FIDELITY TESTING**:',
+          '- Validate semantic accuracy of generated content against ontology',
+          '- Check preservation of semantic relationships in generated outputs',
+          '- Assess consistency of concept usage across generated artifacts',
+          '- Validate maintenance of ontological commitments in outputs',
+          '- Test semantic reasoning support in generated structures',
+
+          '=== CONFORMANCE VALIDATION ===',
+          '**SCHEMA CONFORMANCE TESTING**:',
+          '- Validate generated outputs conform to schema specifications',
+          '- Check compliance with structural constraints and patterns',
+          '- Validate adherence to naming conventions and standards',
+          '- Test conformance to data types and format requirements',
+          '- Assess compliance with validation rules and constraints',
+
+          '**SPECIFICATION COMPLIANCE CHECKING**:',
+          '- Validate generators produce outputs meeting functional specifications',
+          '- Check compliance with non-functional requirements (performance, security)',
+          '- Validate adherence to industry standards and best practices',
+          '- Test compliance with accessibility and usability guidelines',
+          '- Assess conformance to integration and interoperability requirements',
+
+          '=== USABILITY AND STAKEHOLDER VALIDATION ===',
+          '**USER EXPERIENCE TESTING**:',
+          '- Test generator usability for different stakeholder types',
+          '- Assess learnability and ease of use for generator interfaces',
+          '- Validate generator workflow integration with stakeholder processes',
+          '- Test generator responsiveness and feedback mechanisms',
+          '- Assess accessibility and inclusive design aspects',
+
+          '**STAKEHOLDER VALUE VALIDATION**:',
+          '- Validate generators support stakeholder goals and objectives',
+          '- Assess generator utility for actual business workflows',
+          '- Test generator outputs meet stakeholder quality expectations',
+          '- Validate generator efficiency gains for stakeholder tasks',
+          '- Assess stakeholder satisfaction with generator capabilities',
+
+          '=== PERFORMANCE AND SCALABILITY VALIDATION ===',
+          '**COMPUTATIONAL PERFORMANCE TESTING**:',
+          '- Test generator execution speed and response times',
+          '- Validate memory usage and resource efficiency',
+          '- Assess scalability with increasing ontology size and complexity',
+          '- Test concurrent usage and multi-user performance',
+          '- Validate performance under stress and peak load conditions',
+
+          '**RELIABILITY AND ROBUSTNESS TESTING**:',
+          '- Test generator behavior with edge cases and boundary conditions',
+          '- Validate error handling and graceful failure mechanisms',
+          '- Test generator stability under various operating conditions',
+          '- Assess recovery capabilities from failure scenarios',
+          '- Validate consistency of outputs across multiple executions',
+
+          '=== INTEGRATION AND COMPATIBILITY VALIDATION ===',
+          '**SYSTEM INTEGRATION TESTING**:',
+          '- Test generator integration with existing systems and tools',
+          '- Validate API compatibility and interface specifications',
+          '- Test data format compatibility and transformation capabilities',
+          '- Assess integration impact on system performance and stability',
+          '- Validate security and privacy compliance in integrated environments',
+
+          '**EVOLUTION AND MAINTENANCE VALIDATION**:',
+          '- Test generator adaptability to ontology changes and evolution',
+          '- Validate generator maintenance and update procedures',
+          '- Assess backward compatibility with previous ontology versions',
+          '- Test generator configuration and customization capabilities',
+          '- Validate generator documentation and support materials',
+
+          'Provide comprehensive validation results with specific recommendations for generator improvement.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          generators: inputs.generators,
+          knowledgeGraph: inputs.knowledgeGraph,
+          schema: inputs.schema,
+          validationFramework: inputs.validationFramework,
+          evidenceFramework: inputs.evidenceFramework,
+          stakeholderContext: inputs.stakeholderContext,
+          domainType: inputs.domainType
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['generator-validation', 'quality-assessment', 'conformance-testing', 'usability-validation']
+    };
+  }
+});
+
+/**
+ * Task: Encyclopedia Validation
+ * Purpose: Comprehensive validation of encyclopedia/documentation completeness, accuracy, and usability
+ */
+const encyclopediaValidationTask = defineTask({
+  name: 'encyclopedia-validation',
+  description: 'Comprehensive validation of encyclopedia completeness, accuracy, consistency, and usability',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    documentation: { type: 'object', required: true },
+    knowledgeGraph: { type: 'object', required: true },
+    schema: { type: 'object', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    validationFramework: { type: 'object', required: true },
+    ontologyScope: { type: 'string', default: 'comprehensive' },
+    stakeholderContext: { type: 'string', default: 'multi-team' },
+    domainType: { type: 'string', default: 'general' }
+  },
+
+  outputs: {
+    completenessResults: { type: 'object' },
+    accuracyResults: { type: 'object' },
+    consistencyResults: { type: 'object' },
+    usabilityResults: { type: 'object' },
+    coverageScore: { type: 'number' },
+    accuracyScore: { type: 'number' },
+    consistencyScore: { type: 'number' },
+    issuesFound: { type: 'array' },
+    improvementRecommendations: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Encyclopedia Validation: ${inputs.projectName}`,
+      agent: {
+        role: 'encyclopedia-validation-specialist',
+        goal: `Comprehensively validate encyclopedia quality and completeness for ${inputs.projectName}`,
+        instructions: [
+          '=== COMPREHENSIVE ENCYCLOPEDIA VALIDATION FRAMEWORK ===',
+          'Apply systematic validation methodology for encyclopedia completeness, accuracy, and usability.',
+
+          '=== COMPLETENESS VALIDATION ===',
+          '**DOMAIN COVERAGE ASSESSMENT**:',
+          '- Map encyclopedia content against ontology concepts and relationships',
+          '- Identify concepts, relationships, and attributes missing from documentation',
+          '- Assess coverage depth for different concept categories and importance levels',
+          '- Validate coverage of domain-specific terminology and specialized knowledge',
+          '- Check coverage of edge cases, exceptions, and boundary conditions',
+
+          '**STAKEHOLDER PERSPECTIVE COVERAGE**:',
+          '- Validate coverage of different stakeholder viewpoints and use cases',
+          '- Assess documentation completeness for different user roles and contexts',
+          '- Check coverage of domain workflows, processes, and procedures',
+          '- Validate inclusion of practical examples and real-world scenarios',
+          '- Assess coverage of troubleshooting, FAQs, and common issues',
+
+          '**HIERARCHICAL COMPLETENESS CHECKING**:',
+          '- Validate completeness at different levels of detail and abstraction',
+          '- Check consistency of detail levels across different concept areas',
+          '- Assess adequacy of high-level overviews and detailed specifications',
+          '- Validate completeness of cross-references and relationship documentation',
+          '- Check completeness of metadata, provenance, and attribution information',
+
+          '=== ACCURACY VALIDATION ===',
+          '**FACT-CHECKING AND VERIFICATION**:',
+          '- Verify factual accuracy against authoritative sources and evidence',
+          '- Cross-check claims and assertions with primary source materials',
+          '- Validate consistency with established domain standards and practices',
+          '- Check accuracy of examples, illustrations, and case studies',
+          '- Verify correctness of technical specifications and implementation details',
+
+          '**ONTOLOGY ALIGNMENT VALIDATION**:',
+          '- Validate accuracy of documentation against ontology content',
+          '- Check for inconsistencies between documented and modeled concepts',
+          '- Verify accuracy of relationship descriptions and semantic connections',
+          '- Validate consistency of concept definitions across documentation',
+          '- Check alignment between documented examples and ontology instances',
+
+          '**EVIDENCE-BASED ACCURACY ASSESSMENT**:',
+          '- Validate that documented claims are supported by appropriate evidence',
+          '- Check quality and credibility of sources cited in documentation',
+          '- Assess strength of evidence for different types of claims',
+          '- Identify unsupported assertions requiring additional evidence',
+          '- Validate accuracy of evidence interpretation and citation',
+
+          '=== CONSISTENCY VALIDATION ===',
+          '**INTERNAL CONSISTENCY CHECKING**:',
+          '- Identify contradictions and inconsistencies within documentation',
+          '- Check consistency of terminology usage across different sections',
+          '- Validate consistency of formatting, style, and presentation',
+          '- Check consistency of cross-references and linking',
+          '- Assess consistency of detail levels and explanation approaches',
+
+          '**CROSS-ARTIFACT CONSISTENCY VALIDATION**:',
+          '- Validate consistency between encyclopedia and other project artifacts',
+          '- Check alignment between documentation and generated outputs',
+          '- Verify consistency with schema definitions and specifications',
+          '- Validate alignment with validation results and quality assessments',
+          '- Check consistency with stakeholder requirements and expectations',
+
+          '=== USABILITY AND ACCESSIBILITY VALIDATION ===',
+          '**USER EXPERIENCE ASSESSMENT**:',
+          '- Test encyclopedia navigation and information findability',
+          '- Assess readability and comprehensibility for target audiences',
+          '- Validate search functionality and information retrieval',
+          '- Test accessibility compliance and inclusive design',
+          '- Assess mobile responsiveness and multi-device compatibility',
+
+          '**STAKEHOLDER UTILITY VALIDATION**:',
+          '- Validate encyclopedia utility for different stakeholder workflows',
+          '- Test effectiveness for learning and knowledge transfer',
+          '- Assess utility for decision-making and problem-solving',
+          '- Validate effectiveness for troubleshooting and support',
+          '- Test utility for ongoing maintenance and evolution',
+
+          '=== MAINTENANCE AND EVOLUTION VALIDATION ===',
+          '**MAINTAINABILITY ASSESSMENT**:',
+          '- Assess ease of updating and maintaining encyclopedia content',
+          '- Validate version control and change management processes',
+          '- Test scalability for growing content and user base',
+          '- Assess sustainability of documentation maintenance approach',
+          '- Validate integration with content management and publication workflows',
+
+          '**EVOLUTION READINESS VALIDATION**:',
+          '- Test adaptability to ontology changes and evolution',
+          '- Validate flexibility for changing stakeholder needs',
+          '- Assess capability for localization and internationalization',
+          '- Test integration with emerging technologies and platforms',
+          '- Validate long-term sustainability and preservation strategies',
+
+          '=== QUALITY SCORING AND ASSESSMENT ===',
+          '**COMPREHENSIVE QUALITY METRICS**:',
+          '- Calculate coverage score: percentage of ontology concepts documented',
+          '- Assess accuracy score: percentage of verified accurate information',
+          '- Evaluate consistency score: degree of internal and external consistency',
+          '- Measure usability score: effectiveness for stakeholder tasks',
+          '- Calculate overall quality index combining multiple dimensions',
+
+          '**IMPROVEMENT PRIORITIZATION**:',
+          '- Prioritize identified issues by impact on stakeholder value',
+          '- Assess improvement effort vs. benefit for different recommendations',
+          '- Consider stakeholder feedback and preferences in prioritization',
+          '- Identify quick wins vs. long-term strategic improvements',
+          '- Plan improvement implementation strategy and timeline',
+
+          'Provide detailed validation results with prioritized improvement recommendations.',
+
+          `Validation scope: ${inputs.ontologyScope} for ${inputs.domainType} domain with ${inputs.stakeholderContext} context`
+        ],
+        context: {
+          projectName: inputs.projectName,
+          documentation: inputs.documentation,
+          knowledgeGraph: inputs.knowledgeGraph,
+          schema: inputs.schema,
+          evidenceFramework: inputs.evidenceFramework,
+          validationFramework: inputs.validationFramework,
+          ontologyScope: inputs.ontologyScope,
+          stakeholderContext: inputs.stakeholderContext,
+          domainType: inputs.domainType
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['encyclopedia-validation', 'completeness-assessment', 'accuracy-verification', 'usability-testing']
+    };
+  }
+});
+
+/**
+ * Task: Cross-System Validation
+ * Purpose: Comprehensive validation across generators, documentation, ontology, and schema
+ */
+const crossSystemValidationTask = defineTask({
+  name: 'cross-system-validation',
+  description: 'Comprehensive validation across generators, documentation, ontology, and schema for integration and coherence',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    generators: { type: 'object', required: true },
+    documentation: { type: 'object', required: true },
+    knowledgeGraph: { type: 'object', required: true },
+    schema: { type: 'object', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    validationFramework: { type: 'object', required: true },
+    allResults: { type: 'object', required: true }
+  },
+
+  outputs: {
+    integrationResults: { type: 'object' },
+    holisticResults: { type: 'object' },
+    integrationScore: { type: 'number' },
+    holisticScore: { type: 'number' },
+    coherenceAnalysis: { type: 'object' },
+    interoperabilityAssessment: { type: 'object' },
+    systemLevelIssues: { type: 'array' },
+    optimizationOpportunities: { type: 'array' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Cross-System Validation: ${inputs.projectName}`,
+      agent: {
+        role: 'cross-system-validation-specialist',
+        goal: `Validate integration and coherence across all system components for ${inputs.projectName}`,
+        instructions: [
+          '=== COMPREHENSIVE CROSS-SYSTEM VALIDATION FRAMEWORK ===',
+          'Apply systematic validation methodology across all system components for integration and holistic coherence.',
+
+          '=== INTEGRATION VALIDATION ===',
+          '**COMPONENT INTEGRATION TESTING**:',
+          '- Validate integration between schema and ontology components',
+          '- Test generator integration with ontology and schema',
+          '- Validate documentation integration with all system components',
+          '- Test end-to-end workflows across integrated components',
+          '- Assess data flow and transformation accuracy across components',
+
+          '**INTERFACE COMPATIBILITY VALIDATION**:',
+          '- Validate API compatibility between different system components',
+          '- Test data format compatibility and transformation accuracy',
+          '- Check protocol compatibility and communication reliability',
+          '- Validate security and access control integration',
+          '- Test error handling and exception propagation across components',
+
+          '**WORKFLOW INTEGRATION ASSESSMENT**:',
+          '- Test complete user workflows spanning multiple components',
+          '- Validate business process support across integrated system',
+          '- Assess stakeholder workflow efficiency with integrated components',
+          '- Test integration impact on user experience and satisfaction',
+          '- Validate workflow reliability and error recovery mechanisms',
+
+          '=== HOLISTIC SYSTEM VALIDATION ===',
+          '**SYSTEM-LEVEL COHERENCE ANALYSIS**:',
+          '- Validate conceptual coherence across all system components',
+          '- Assess semantic consistency throughout integrated system',
+          '- Check logical coherence of system architecture and design',
+          '- Validate goal alignment across all system components',
+          '- Assess strategic coherence with organizational objectives',
+
+          '**EMERGENT PROPERTIES ASSESSMENT**:',
+          '- Identify emergent properties arising from component integration',
+          '- Assess positive and negative emergent behaviors',
+          '- Validate emergent capabilities against stakeholder requirements',
+          '- Test emergent system performance and scalability characteristics',
+          '- Assess emergent security and reliability properties',
+
+          '**WHOLE-SYSTEM PERFORMANCE VALIDATION**:',
+          '- Test overall system performance under realistic load conditions',
+          '- Validate system scalability with growing data and users',
+          '- Assess system reliability and availability under stress',
+          '- Test disaster recovery and business continuity capabilities',
+          '- Validate system maintainability and evolution capabilities',
+
+          '=== STAKEHOLDER VALUE COHERENCE ===',
+          '**MULTI-STAKEHOLDER VALUE ASSESSMENT**:',
+          '- Validate value delivery for all stakeholder groups',
+          '- Assess trade-offs and conflicts in stakeholder value optimization',
+          '- Test stakeholder satisfaction with integrated system capabilities',
+          '- Validate alignment with diverse stakeholder goals and objectives',
+          '- Assess long-term value sustainability for all stakeholders',
+
+          '**BUSINESS OBJECTIVE ALIGNMENT**:',
+          '- Validate system alignment with strategic business objectives',
+          '- Assess contribution to organizational competitive advantage',
+          '- Test support for business decision-making and operations',
+          '- Validate ROI and cost-benefit across all system components',
+          '- Assess strategic positioning and future readiness',
+
+          '=== INTEROPERABILITY AND STANDARDS COMPLIANCE ===',
+          '**STANDARDS COMPLIANCE VALIDATION**:',
+          '- Validate compliance with relevant industry standards',
+          '- Test interoperability with standard protocols and formats',
+          '- Assess accessibility and inclusive design compliance',
+          '- Validate security and privacy standards compliance',
+          '- Test regulatory compliance across all system components',
+
+          '**ECOSYSTEM INTEROPERABILITY TESTING**:',
+          '- Test interoperability with external systems and services',
+          '- Validate data exchange capabilities with partner systems',
+          '- Assess integration capabilities with cloud and enterprise platforms',
+          '- Test compatibility with emerging technologies and standards',
+          '- Validate ecosystem positioning and network effects',
+
+          '=== SYSTEM EVOLUTION AND ADAPTABILITY ===',
+          '**EVOLUTION CAPABILITY ASSESSMENT**:',
+          '- Test system adaptability to changing requirements',
+          '- Validate capability for component evolution and replacement',
+          '- Assess system flexibility for emerging use cases',
+          '- Test scalability for organizational growth and change',
+          '- Validate long-term sustainability and maintainability',
+
+          '**FUTURE READINESS VALIDATION**:',
+          '- Assess system readiness for anticipated future requirements',
+          '- Validate compatibility with emerging technologies',
+          '- Test adaptability to changing regulatory environments',
+          '- Assess strategic positioning for future competitive advantage',
+          '- Validate investment protection and evolution pathways',
+
+          '=== OPTIMIZATION OPPORTUNITY IDENTIFICATION ===',
+          '**SYSTEM-LEVEL OPTIMIZATION ANALYSIS**:',
+          '- Identify optimization opportunities spanning multiple components',
+          '- Assess potential for performance improvements through integration',
+          '- Identify redundancies and inefficiencies in current integration',
+          '- Assess opportunities for automation and process optimization',
+          '- Identify potential for enhanced stakeholder value delivery',
+
+          '**INTEGRATION ENHANCEMENT RECOMMENDATIONS**:',
+          '- Recommend improvements to component integration approaches',
+          '- Suggest enhancements to data flow and transformation processes',
+          '- Recommend interface improvements and standardization',
+          '- Suggest workflow optimization and user experience improvements',
+          '- Recommend strategic positioning and ecosystem enhancement',
+
+          'Provide comprehensive cross-system validation results with strategic optimization recommendations.'
+        ],
+        context: {
+          projectName: inputs.projectName,
+          generators: inputs.generators,
+          documentation: inputs.documentation,
+          knowledgeGraph: inputs.knowledgeGraph,
+          schema: inputs.schema,
+          evidenceFramework: inputs.evidenceFramework,
+          validationFramework: inputs.validationFramework,
+          allResults: inputs.allResults
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['cross-system-validation', 'integration-testing', 'holistic-assessment', 'interoperability']
     };
   }
 });

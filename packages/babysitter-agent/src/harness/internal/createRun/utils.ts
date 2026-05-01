@@ -6,6 +6,7 @@
 import { Type } from "@sinclair/typebox";
 import {
   detectCallerHarness,
+  getAdapterByName,
   type EffectAction,
   type IterationResult,
 } from "@a5c-ai/babysitter-sdk";
@@ -206,7 +207,14 @@ export function shouldUseExternalHarness(harnessName: string): boolean {
   if (!usesExternalHarness(harnessName)) {
     return false;
   }
-  return detectCallerHarness()?.name === harnessName;
+  if (detectCallerHarness()?.name === harnessName) {
+    return true;
+  }
+  try {
+    return Boolean(getAdapterByName(harnessName)?.resolveSessionId({}));
+  } catch {
+    return false;
+  }
 }
 
 export function shellQuoteArg(value: string): string {

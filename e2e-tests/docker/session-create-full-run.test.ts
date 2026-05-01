@@ -89,6 +89,7 @@ describeInternalHarness("babysitter-harness call full internal-harness run", () 
       dockerExec(
         [
           "cd /workspace/session-create-internal",
+          "set -euo pipefail",
           `export AZURE_OPENAI_API_KEY=${shellEscape(process.env.AZURE_OPENAI_API_KEY || "")}`,
           `export AZURE_OPENAI_PROJECT_NAME=${shellEscape(process.env.AZURE_OPENAI_PROJECT_NAME || "")}`,
           `export AZURE_OPENAI_RESOURCE_NAME=${shellEscape(process.env.AZURE_OPENAI_PROJECT_NAME || "")}`,

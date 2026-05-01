@@ -1,7 +1,7 @@
 # Process Library
 
 <!-- process-library:lead:start -->
-The Babysitter Process Library is the SDK-managed library under [`library/`](../../../library/README.md). The current generated snapshot counts **2,236 JavaScript process files**, including **148 methodology files**, **2,036 specialization files**, and **31 shared process files**, plus support assets such as **2,019 skills** and **1,342 agents** discovered in the live tree.
+The Babysitter Process Library is the SDK-managed library under [`library/`](../../../library/README.md). The current generated snapshot counts **2,239 JavaScript process files**, including **149 methodology files**, **2,038 specialization files**, and **31 shared process files**, plus support assets such as **2,021 skills** and **1,342 agents** discovered in the live tree.
 <!-- process-library:lead:end -->
 
 ---
@@ -9,7 +9,7 @@ The Babysitter Process Library is the SDK-managed library under [`library/`](../
 ## In Plain English
 
 <!-- process-library:plain-english:start -->
-> **Think of the Process Library like a cookbook with 2,236 recipes in the live repository tree.**
+> **Think of the Process Library like a cookbook with 2,239 recipes in the live repository tree.**
 <!-- process-library:plain-english:end -->
 >
 > Just like how a cookbook has recipes for Italian, Mexican, Japanese, and French cuisine - the Process Library has "recipes" for building web apps, mobile apps, APIs, security audits, and much more.
@@ -187,7 +187,7 @@ Process files follow a consistent naming pattern:
 The catalog data in this section is refreshed from the live `library/` tree. The explanatory prose on this page remains hand-written.
 
 <!-- process-library:catalog:start -->
-Snapshot refreshed from the live `library/` tree on 2026-04-27.
+Snapshot refreshed from the live `library/` tree on 2026-04-30.
 
 - [Current snapshot counts](#current-snapshot-counts)
 - [Methodology families](#methodology-families)
@@ -202,19 +202,19 @@ Snapshot refreshed from the live `library/` tree on 2026-04-27.
 
 | Area | Current Count | Source |
 |------|---------------|--------|
-| **All library `.js` process files** | 2,236 | [`library/`](../../../library/) |
-| **Methodology directories** | 37 | [`library/methodologies/`](../../../library/methodologies/) |
-| **Methodology `.js` process files** | 148 | [`library/methodologies/`](../../../library/methodologies/) |
+| **All library `.js` process files** | 2,239 | [`library/`](../../../library/) |
+| **Methodology directories** | 38 | [`library/methodologies/`](../../../library/methodologies/) |
+| **Methodology `.js` process files** | 149 | [`library/methodologies/`](../../../library/methodologies/) |
 | **Shared `.js` process files** | 31 | [`library/processes/shared/`](../../../library/processes/shared/) |
-| **Specialization `.js` process files** | 2,036 | [`library/specializations/`](../../../library/specializations/) |
+| **Specialization `.js` process files** | 2,038 | [`library/specializations/`](../../../library/specializations/) |
 | **Top-level specialization directories** | 39 | [`library/specializations/`](../../../library/specializations/) |
-| **Development and technical specialization processes** | 835 | [`library/specializations/`](../../../library/specializations/) |
+| **Development and technical specialization processes** | 837 | [`library/specializations/`](../../../library/specializations/) |
 | **Business-domain specialization processes** | 490 | [`library/specializations/domains/business/`](../../../library/specializations/domains/business/) |
 | **Science-domain specialization processes** | 551 | [`library/specializations/domains/science/`](../../../library/specializations/domains/science/) |
 | **Social-sciences-and-humanities specialization processes** | 160 | [`library/specializations/domains/social-sciences-humanities/`](../../../library/specializations/domains/social-sciences-humanities/) |
-| **Skill definition files** | 2,019 | [`library/`](../../../library/) |
+| **Skill definition files** | 2,021 | [`library/`](../../../library/) |
 | **Agent definition files** | 1,342 | [`library/`](../../../library/) |
-| **README files under library** | 1,814 | [`library/`](../../../library/) |
+| **README files under library** | 1,815 | [`library/`](../../../library/) |
 
 ## Methodology Families
 
@@ -250,6 +250,7 @@ Snapshot refreshed from the live `library/` tree on 2026-04-27.
 | `impact-mapping` | 1 | [Browse →](../../../library/methodologies/impact-mapping/) |
 | `jobs-to-be-done` | 1 | [Browse →](../../../library/methodologies/jobs-to-be-done/) |
 | `kanban` | 1 | [Browse →](../../../library/methodologies/kanban/) |
+| `ontology-driven-development` | 1 | [Browse →](../../../library/methodologies/ontology-driven-development/) |
 | `process-hardening` | 1 | [Browse →](../../../library/methodologies/process-hardening/) |
 | `rup` | 1 | [Browse →](../../../library/methodologies/rup/) |
 | `scrum` | 1 | [Browse →](../../../library/methodologies/scrum/) |
@@ -298,10 +299,10 @@ Snapshot refreshed from the live `library/` tree on 2026-04-27.
 | `technical-documentation` | 21 | [Browse →](../../../library/specializations/technical-documentation/) |
 | `qa-testing-automation` | 20 | [Browse →](../../../library/specializations/qa-testing-automation/) |
 | `software-architecture` | 20 | [Browse →](../../../library/specializations/software-architecture/) |
+| `product-management` | 19 | [Browse →](../../../library/specializations/product-management/) |
 | `collaboration` | 18 | [Browse →](../../../library/specializations/collaboration/) |
 | `data-engineering-analytics` | 18 | [Browse →](../../../library/specializations/data-engineering-analytics/) |
 | `data-science-ml` | 18 | [Browse →](../../../library/specializations/data-science-ml/) |
-| `product-management` | 17 | [Browse →](../../../library/specializations/product-management/) |
 | `media` | 7 | [Browse →](../../../library/specializations/media/) |
 | `observability` | 5 | [Browse →](../../../library/specializations/observability/) |
 | `research` | 5 | [Browse →](../../../library/specializations/research/) |

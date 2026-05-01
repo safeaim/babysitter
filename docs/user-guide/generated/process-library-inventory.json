@@ -1,5 +1,5 @@
 {
-  "refreshedAt": "2026-04-27",
+  "refreshedAt": "2026-04-30",
   "paths": {
     "libraryRoot": "library",
     "methodologiesRoot": "library/methodologies",
@@ -10,20 +10,20 @@
     "socialRoot": "library/specializations/domains/social-sciences-humanities"
   },
   "counts": {
-    "docsMarkdownFiles": 480,
-    "allLibraryProcessFiles": 2236,
-    "methodologyDirectories": 37,
-    "methodologyProcessFiles": 148,
+    "docsMarkdownFiles": 483,
+    "allLibraryProcessFiles": 2239,
+    "methodologyDirectories": 38,
+    "methodologyProcessFiles": 149,
     "sharedProcessFiles": 31,
-    "specializationProcessFiles": 2036,
+    "specializationProcessFiles": 2038,
     "topLevelSpecializationDirectories": 39,
-    "technicalSpecializationProcesses": 835,
+    "technicalSpecializationProcesses": 837,
     "businessDomainProcesses": 490,
     "scienceDomainProcesses": 551,
     "socialDomainProcesses": 160,
-    "skillFiles": 2019,
+    "skillFiles": 2021,
     "agentFiles": 1342,
-    "readmeFiles": 1814
+    "readmeFiles": 1815
   },
   "methodologyFamilies": [
     {
@@ -205,6 +205,12 @@
       "count": 1,
       "repoPath": "library/methodologies/kanban",
       "docLink": "../../../library/methodologies/kanban/"
+    },
+    {
+      "slug": "ontology-driven-development",
+      "count": 1,
+      "repoPath": "library/methodologies/ontology-driven-development",
+      "docLink": "../../../library/methodologies/ontology-driven-development/"
     },
     {
       "slug": "process-hardening",
@@ -439,6 +445,12 @@
       "docLink": "../../../library/specializations/software-architecture/"
     },
     {
+      "slug": "product-management",
+      "count": 19,
+      "repoPath": "library/specializations/product-management",
+      "docLink": "../../../library/specializations/product-management/"
+    },
+    {
       "slug": "collaboration",
       "count": 18,
       "repoPath": "library/specializations/collaboration",
@@ -455,12 +467,6 @@
       "count": 18,
       "repoPath": "library/specializations/data-science-ml",
       "docLink": "../../../library/specializations/data-science-ml/"
-    },
-    {
-      "slug": "product-management",
-      "count": 17,
-      "repoPath": "library/specializations/product-management",
-      "docLink": "../../../library/specializations/product-management/"
     },
     {
       "slug": "media",

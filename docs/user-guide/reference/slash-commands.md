@@ -381,6 +381,6 @@ Start here
 - [CLI Reference](./cli-reference.md) — SDK command-line interface
 - [Quickstart](../getting-started/quickstart.md) — Your first run
 <!-- slash-commands:process-library-link:start -->
-- [Process Library](../features/process-library.md) — 2,236 generated pre-built process files
+- [Process Library](../features/process-library.md) — 2,239 generated pre-built process files
 <!-- slash-commands:process-library-link:end -->
 - [Troubleshooting](./troubleshooting.md) — Common issues and solutions

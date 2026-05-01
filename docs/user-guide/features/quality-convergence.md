@@ -1093,7 +1093,7 @@ Beyond methodologies, Babysitter includes the following generated specialization
 <!-- quality-convergence:domains:start -->
 | Domain | Processes | Examples |
 |--------|-----------|----------|
-| **Development and technical specializations** | 835 | Web APIs, mobile apps, DevOps pipelines, AI, security, and related technical workflows |
+| **Development and technical specializations** | 837 | Web APIs, mobile apps, DevOps pipelines, AI, security, and related technical workflows |
 | **Business domains** | 490 | Legal contracts, HR workflows, marketing campaigns, finance, logistics, and related domains |
 | **Science & engineering domains** | 551 | Quantum algorithms, aerospace systems, biomedical devices, mathematics, and related domains |
 | **Social sciences & humanities** | 160 | Education, healthcare, arts, philosophy, and social-science research |

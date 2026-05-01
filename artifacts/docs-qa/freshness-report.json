@@ -4,9 +4,9 @@
   "generatedDocsChecked": 8,
   "staleGeneratedDocs": [],
   "staleHumanUpdatedDocs": [],
-  "publishedDocsChecked": 149,
-  "historicalDocsExcluded": 323,
-  "landingPagesChecked": 6,
+  "publishedDocsChecked": 160,
+  "historicalDocsExcluded": 324,
+  "landingPagesChecked": 18,
   "metadataFailures": [],
   "invalidCliReferences": [],
   "invalidPackageReferences": [],
@@ -98,27 +98,27 @@
     },
     {
       "file": "docs/v6-spec-and-roadmap/package-specs.md",
-      "line": 100,
+      "line": 102,
       "packageName": "@a5c-ai/agent-runtime"
     },
     {
       "file": "docs/v6-spec-and-roadmap/package-specs.md",
-      "line": 101,
+      "line": 103,
       "packageName": "@a5c-ai/agent-platform"
     },
     {
       "file": "docs/v6-spec-and-roadmap/package-specs.md",
-      "line": 102,
+      "line": 104,
       "packageName": "@a5c-ai/agent-platform-meta-plugins"
     },
     {
       "file": "docs/v6-spec-and-roadmap/package-specs.md",
-      "line": 103,
+      "line": 105,
       "packageName": "@a5c-ai/agent-platform-orchestration-plugin"
     },
     {
       "file": "docs/v6-spec-and-roadmap/package-specs.md",
-      "line": 109,
+      "line": 111,
       "packageName": "@a5c-ai/agent-platform-meta-plugins"
     },
     {
@@ -204,11 +204,6 @@
       "claim": "v1.0"
     },
     {
-      "file": "docs/agent-mux/reference/14-harness-mock.md",
-      "line": 3,
-      "claim": "v1.0"
-    },
-    {
       "file": "docs/reference/TROUBLESHOOTING.md",
       "line": 5,
       "claim": "1.0.0"
@@ -280,7 +275,7 @@
     },
     {
       "file": "docs/user-guide/index.md",
-      "line": 221,
+      "line": 222,
       "claim": "5.0.0"
     },
     {

@@ -1,13 +1,13 @@
 export const processLibraryStats = {
-  "refreshedAt": "2026-04-27",
-  "docsMarkdownFiles": 480,
-  "libraryProcessFiles": 2236,
-  "methodologyDirectories": 37,
-  "specializationProcessFiles": 2036
+  "refreshedAt": "2026-04-30",
+  "docsMarkdownFiles": 483,
+  "libraryProcessFiles": 2239,
+  "methodologyDirectories": 38,
+  "specializationProcessFiles": 2038
 };
 
 export const homepageStats = [
-  { label: 'Docs files', value: '480' },
-  { label: 'Library process files', value: '2,236' },
+  { label: 'Docs files', value: '483' },
+  { label: 'Library process files', value: '2,239' },
   { label: 'Core modes', value: 'Call, Yolo, Plan, Forever' }
 ];

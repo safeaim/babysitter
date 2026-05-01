@@ -658,11 +658,11 @@ A JavaScript/TypeScript function that is the *low-level code implementation* of 
 **Key distinction:** Process = low-level code implementation; [Methodology](#methodology) = high-level concept/pattern that a process implements.
 
 <!-- glossary:process-library:start -->
-**Babysitter currently exposes 2,236 JavaScript process files in the live repository tree** organized across methodologies, shared processes, and specializations.
+**Babysitter currently exposes 2,239 JavaScript process files in the live repository tree** organized across methodologies, shared processes, and specializations.
 
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development and technical specializations** | 835 | [Browse →](../../../library/specializations/) |
+| **Development and technical specializations** | 837 | [Browse →](../../../library/specializations/) |
 | **Business domains** | 490 | [Browse →](../../../library/specializations/domains/business/) |
 | **Science & engineering domains** | 551 | [Browse →](../../../library/specializations/domains/science/) |
 | **Social sciences & humanities** | 160 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |

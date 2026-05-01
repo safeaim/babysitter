@@ -85,3 +85,5 @@ packages/sdk/**/*.d.ts
 packages/sdk/src/**/*.js
 legacy/
 .claude/skills/welcome/SKILL.md
+tmp-e2e-artifact*/**
+tmp-*/**

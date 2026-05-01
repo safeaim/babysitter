@@ -1426,7 +1426,7 @@ Beyond methodologies, explore the current specialization catalog:
 <!-- best-practices:domains:start -->
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development and technical specializations** | 835 | [Browse →](../../../library/specializations/) |
+| **Development and technical specializations** | 837 | [Browse →](../../../library/specializations/) |
 | **Business domains** | 490 | [Browse →](../../../library/specializations/domains/business/) |
 | **Science & engineering domains** | 551 | [Browse →](../../../library/specializations/domains/science/) |
 | **Social sciences & humanities** | 160 | [Browse →](../../../library/specializations/domains/social-sciences-humanities/) |

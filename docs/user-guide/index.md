@@ -137,7 +137,7 @@ Deep dives into Babysitter's core capabilities.
 <!-- user-guide-index:features-table:start -->
 | Feature | Description |
 |---------|-------------|
-| [**Process Library**](./features/process-library.md) | **2,236 JavaScript process files in the live generated snapshot**, plus methodology, shared-process, skill, and agent layers discovered under `library/` |
+| [**Process Library**](./features/process-library.md) | **2,239 JavaScript process files in the live generated snapshot**, plus methodology, shared-process, skill, and agent layers discovered under `library/` |
 | [**Two-Loops Architecture**](./features/two-loops-architecture.md) | **Hybrid agentic systems** - symbolic orchestration + agentic harness, guardrails, and evidence-driven completion |
 | [**Quality Convergence**](./features/quality-convergence.md) | **Five quality gate types** (tests, code quality, static analysis, security, performance) with 90-score patterns |
 | [**Best Practices**](./features/best-practices.md) | **Four guardrail layers**, multi-gate validation, workflow design, and team collaboration patterns |
@@ -149,7 +149,7 @@ Deep dives into Babysitter's core capabilities.
 <!-- user-guide-index:features-table:end -->
 
 <!-- user-guide-index:process-library-highlight:start -->
-> **Highlight:** The Process Library snapshot currently tracks 2,236 process files across 37 methodology families and the full specialization tree. [Explore the library →](./features/process-library.md)
+> **Highlight:** The Process Library snapshot currently tracks 2,239 process files across 38 methodology families and the full specialization tree. [Explore the library →](./features/process-library.md)
 <!-- user-guide-index:process-library-highlight:end -->
 
 > **Essential Reading:** Understanding the [Two-Loops Architecture](./features/two-loops-architecture.md) is key to designing reliable, bounded agentic workflows with proper guardrails and evidence-driven completion.

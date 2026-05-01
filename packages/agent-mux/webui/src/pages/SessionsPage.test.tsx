@@ -6,9 +6,14 @@ import { render, screen, setupUser } from '@/test/test-utils';
 import { SessionsPage } from './SessionsPage.js';
 
 const mockUseGateway = vi.fn();
+const mockUseGatewayFetch = vi.fn();
 
 vi.mock('@a5c-ai/agent-mux-ui', () => ({
   useGateway: () => mockUseGateway(),
+}));
+
+vi.mock('../providers/GatewayProvider.js', () => ({
+  useGatewayFetch: () => mockUseGatewayFetch(),
 }));
 
 function createGatewayStore() {
@@ -57,6 +62,15 @@ function createGatewayStore() {
 }
 
 describe('SessionsPage', () => {
+  beforeEach(() => {
+    mockUseGatewayFetch.mockReturnValue(
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({ sessions: [] }),
+      })),
+    );
+  });
+
   it('surfaces active sessions first with workspace and run navigation', () => {
     mockUseGateway.mockReturnValue({ store: createGatewayStore() });
 

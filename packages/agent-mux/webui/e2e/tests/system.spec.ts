@@ -6,7 +6,8 @@ import { expect, test, type APIRequestContext, type Page } from "@playwright/tes
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const stateFile = path.resolve(__dirname, "../../.tmp/amux-webui-e2e-state.json");
+const testPort = Number.parseInt(process.env.AMUX_WEBUI_E2E_PORT ?? "4175", 10);
+const stateFile = path.resolve(__dirname, `../../.tmp/amux-webui-e2e-state-${testPort}.json`);
 
 type FixtureState = {
   baseUrl: string;
@@ -123,13 +124,16 @@ test.describe("agent-mux webui e2e", () => {
 
       await expect(page.getByTestId("board-controls-details")).toBeVisible();
       await expect(page.getByTestId("board-controls-details")).not.toHaveAttribute("open", "");
+      await expect(page.getByTestId("board-review-details")).not.toHaveAttribute("open", "");
       await expect(page.getByLabel("Workflow filter")).not.toBeVisible();
 
       const linkedCard = page.getByTestId(`kanban-card-${state.issueKey}`);
       await expect(linkedCard).toBeVisible();
       await expect(linkedCard.getByText("Repository lifecycle")).not.toBeVisible();
+      await expect(page.getByTestId(`manage-workspaces-${state.issueKey}`)).not.toBeVisible();
       await linkedCard.locator("details summary").click();
       await expect(linkedCard.getByText("Repository lifecycle")).toBeVisible();
+      await expect(page.getByTestId(`manage-workspaces-${state.issueKey}`)).toBeVisible();
     });
 
     test("board workspace links keep issue association visible and hand off cleanly into the linked session chat", async ({ page }) => {

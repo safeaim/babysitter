@@ -4645,22 +4645,6 @@ export function BacklogOverview({
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <div className="rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
-            {visibleCards.length} visible of {boardCards.length} issues
-          </div>
-          {selectedCards.length > 0 ? (
-            <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">
-              {selectedCards.length} selected
-            </div>
-          ) : null}
-          {activeFilterCount > 0 ? (
-            <div className="rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
-              {activeFilterCount} active filter{activeFilterCount === 1 ? "" : "s"}
-            </div>
-          ) : null}
-        </div>
-
         <details
           className="backlog-overview__planning-details mt-4"
           data-testid="board-controls-details"
@@ -4672,7 +4656,7 @@ export function BacklogOverview({
                 Board controls
               </p>
               <h3 className="mt-1 text-lg font-semibold text-foreground">
-                Keep advanced filters, metrics, and bulk actions tucked away
+                Open filters, triage, and bulk actions only when you need them
               </h3>
             </div>
             <div className="backlog-overview__planning-badges">
@@ -5051,12 +5035,14 @@ export function BacklogOverview({
                                 const allowedMoveTargets = card.moveTargets.filter((target) => target.allowed);
                                 const primaryMoveTarget = allowedMoveTargets[0] ?? null;
                                 const secondaryMoveTargets = allowedMoveTargets.slice(1);
+                                const hasWorkspaceOverflowAction = issue != null;
                                 const showSecondaryDetails =
                                   Boolean(card.repositoryLifecycle) ||
                                   card.collaboratorNames.length > 0 ||
                                   card.assigneeNames.length > 0 ||
                                   card.labelNames.length > 0;
                                 const hasExpandableDetails =
+                                  hasWorkspaceOverflowAction ||
                                   showSecondaryDetails ||
                                   secondaryMoveTargets.length > 0 ||
                                   card.dependencyCount > 0 ||
@@ -5149,34 +5135,23 @@ export function BacklogOverview({
                                           </div>
                                           <p className="mt-1 text-xs opacity-75">
                                             {linkedWorkspaceCount > 0
-                                              ? "Jump into the owned workspace, then continue execution from the linked session."
-                                              : "Create or link only when this issue is ready to execute."}
+                                              ? "Jump straight into the linked workspace."
+                                              : "Create the workspace when this issue is ready to move."}
                                           </p>
                                         </div>
                                         <div className="flex flex-wrap gap-2">
                                           {linkedWorkspaceCount === 0 ? (
-                                            <>
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  navigate(projectIssueWorkspaceCreateHref(primaryProject.id, card.issueId))
-                                                }
-                                                className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
-                                                data-testid={`create-workspace-${card.issueKey}`}
-                                              >
-                                                <Plus className="h-3.5 w-3.5" />
-                                                Create workspace
-                                              </button>
-                                              <button
-                                                type="button"
-                                                onClick={() => issue && setFocusedIssue(issue)}
-                                                className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
-                                                data-testid={`link-existing-${card.issueKey}`}
-                                              >
-                                                <Link2 className="h-3.5 w-3.5" />
-                                                Link existing
-                                              </button>
-                                            </>
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                navigate(projectIssueWorkspaceCreateHref(primaryProject.id, card.issueId))
+                                              }
+                                              className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
+                                              data-testid={`create-workspace-${card.issueKey}`}
+                                            >
+                                              <Plus className="h-3.5 w-3.5" />
+                                              Create workspace
+                                            </button>
                                           ) : (
                                             <>
                                               {primaryWorkspaceLink ? (
@@ -5190,15 +5165,6 @@ export function BacklogOverview({
                                                   Open workspace
                                                 </button>
                                               ) : null}
-                                              <button
-                                                type="button"
-                                                onClick={() => issue && setFocusedIssue(issue)}
-                                                className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
-                                                data-testid={`manage-workspaces-${card.issueKey}`}
-                                              >
-                                                <Link2 className="h-3.5 w-3.5" />
-                                                Manage links
-                                              </button>
                                             </>
                                           )}
                                         </div>
@@ -5257,6 +5223,36 @@ export function BacklogOverview({
                                           </span>
                                         </summary>
                                         <div className="backlog-overview__card-details-body">
+                                          {hasWorkspaceOverflowAction ? (
+                                            <div className="space-y-3">
+                                              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground-muted">
+                                                Workspace options
+                                              </div>
+                                              <div className="flex flex-wrap gap-2">
+                                                {linkedWorkspaceCount === 0 ? (
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => issue && setFocusedIssue(issue)}
+                                                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground transition-all duration-200 hover:border-primary/30 hover:bg-card hover:shadow-sm"
+                                                    data-testid={`link-existing-${card.issueKey}`}
+                                                  >
+                                                    <Link2 className="h-3.5 w-3.5" />
+                                                    Link existing workspace
+                                                  </button>
+                                                ) : (
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => issue && setFocusedIssue(issue)}
+                                                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground transition-all duration-200 hover:border-primary/30 hover:bg-card hover:shadow-sm"
+                                                    data-testid={`manage-workspaces-${card.issueKey}`}
+                                                  >
+                                                    <Link2 className="h-3.5 w-3.5" />
+                                                    Manage workspace links
+                                                  </button>
+                                                )}
+                                              </div>
+                                            </div>
+                                          ) : null}
                                           <div className="grid gap-3 sm:grid-cols-3">
                                             <div className="rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground-muted">
                                               <div className="font-semibold text-foreground">Dependencies</div>
@@ -5573,29 +5569,53 @@ export function BacklogOverview({
         </div>
       </details>
 
-      <div className="mt-6">
-        <ReviewPanel
-          title="Issue diff and feedback loop"
-          description="Review, comments, and approval state for issues stay together here."
-          empty="No issue reviews are queued yet."
-          loading={issueReviews.loading}
-          error={issueReviews.error}
-          artifacts={issueReviews.artifacts}
-          queue={issueReviews.queue}
-          summary={issueReviews.summary}
-          pendingArtifactId={issueReviews.pendingArtifactId}
-          onApprove={(artifactId) => issueReviews.actOnReview({ action: "approve", artifactId }).then(() => refresh())}
-          onRequestChanges={(artifactId) =>
-            issueReviews.actOnReview({ action: "request-changes", artifactId }).then(() => refresh())
-          }
-          onSubmitReview={(input) =>
-            issueReviews.actOnReview({ action: "submit-review", ...input }).then(() => refresh())
-          }
-          onAddComment={(input) =>
-            issueReviews.actOnReview({ action: "add-comment", ...input }).then(() => refresh())
-          }
-        />
-      </div>
+      <details className="backlog-overview__support-details mt-6" data-testid="board-review-details">
+        <summary className="backlog-overview__support-summary">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted">
+              Review queue
+            </p>
+            <h3 className="mt-1 text-lg font-semibold text-foreground">
+              Issue diff and feedback loop
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-foreground-muted">
+              Keep comments and approvals available, but out of the main board until you explicitly open them.
+            </p>
+          </div>
+          <div className="backlog-overview__support-badges">
+            <span className="rounded-full border border-border bg-background px-3 py-1 text-xs text-foreground-muted">
+              {issueReviews.artifacts.length} reviews
+            </span>
+            <span className="rounded-full border border-border bg-background px-3 py-1 text-xs text-foreground-muted">
+              {(issueReviews.summary?.pendingCount ?? 0) + (issueReviews.summary?.changesRequestedCount ?? 0)} waiting
+            </span>
+          </div>
+        </summary>
+
+        <div className="backlog-overview__support-body">
+          <ReviewPanel
+            title="Issue diff and feedback loop"
+            description="Review, comments, and approval state for issues stay together here."
+            empty="No issue reviews are queued yet."
+            loading={issueReviews.loading}
+            error={issueReviews.error}
+            artifacts={issueReviews.artifacts}
+            queue={issueReviews.queue}
+            summary={issueReviews.summary}
+            pendingArtifactId={issueReviews.pendingArtifactId}
+            onApprove={(artifactId) => issueReviews.actOnReview({ action: "approve", artifactId }).then(() => refresh())}
+            onRequestChanges={(artifactId) =>
+              issueReviews.actOnReview({ action: "request-changes", artifactId }).then(() => refresh())
+            }
+            onSubmitReview={(input) =>
+              issueReviews.actOnReview({ action: "submit-review", ...input }).then(() => refresh())
+            }
+            onAddComment={(input) =>
+              issueReviews.actOnReview({ action: "add-comment", ...input }).then(() => refresh())
+            }
+          />
+        </div>
+      </details>
     </section>
   );
 }

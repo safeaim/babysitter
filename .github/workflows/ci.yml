@@ -159,6 +159,16 @@ jobs:
           set -euo pipefail
           npm run verify:realtime-flow-release 2>&1 | tee artifacts/test-logs/realtime-flow-release.log
 
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium 2>&1 | tee artifacts/test-logs/agent-mux-webui-playwright-install.log
+
+      - name: agent-mux webui browser e2e
+        run: |
+          set -euo pipefail
+          npm run test:e2e --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/test-logs/agent-mux-webui-browser-e2e.log
+
       - name: Build agent-plugins-mux
         run: |
           set -euo pipefail
@@ -215,6 +225,16 @@ jobs:
           name: test-logs
           path: artifacts/test-logs
           if-no-files-found: error
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-mux-webui-playwright-artifacts
+          path: |
+            packages/agent-mux/webui/.tmp/playwright-report
+            packages/agent-mux/webui/.tmp/playwright-test-results
+          if-no-files-found: ignore
 
   workspace-coverage:
     name: Workspace Coverage

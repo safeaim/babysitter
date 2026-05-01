@@ -1,4 +1,4 @@
-import React, { useDeferredValue, useMemo, useState } from 'react';
+import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { Link } from 'react-router-dom-v6';
@@ -6,6 +6,7 @@ import { Search } from 'lucide-react';
 import { useGateway } from '@a5c-ai/agent-mux-ui';
 
 import { PageHeroGrid, PageSection, PageShell } from '../components/shared/page-shell.js';
+import { useGatewayFetch } from '../providers/GatewayProvider.js';
 
 type SessionCost = {
   totalUsd?: number;
@@ -172,6 +173,7 @@ function SessionRowCard(props: { session: SessionRow }) {
 
 export function SessionsPage(): JSX.Element {
   const { store } = useGateway();
+  const fetchGateway = useGatewayFetch();
   const sessions = useStore(store, useShallow((state) => Object.values(state.sessions.byId)));
   const runs = useStore(store, useShallow((state) => Object.values(state.runs.byId)));
   const eventBuffers = useStore(store, (state) => state.events.byRunId);
@@ -179,6 +181,43 @@ export function SessionsPage(): JSX.Element {
   const [filter, setFilter] = useState<SessionFilter>('all');
   const deferredSearchTerm = useDeferredValue(searchTerm);
   const normalizedSearchTerm = deferredSearchTerm.trim().toLowerCase();
+
+  useEffect(() => {
+    let cancelled = false;
+    let timer: number | null = null;
+
+    const refreshSessions = async () => {
+      try {
+        const response = await fetchGateway('/api/v1/sessions');
+        if (!response.ok || cancelled) {
+          return;
+        }
+        const payload = (await response.json()) as { sessions?: Array<Record<string, unknown>> };
+        const mergeSession = store.getState().actions.mergeSession;
+        for (const session of payload.sessions ?? []) {
+          const sessionId = typeof session.sessionId === 'string' ? session.sessionId : '';
+          if (!sessionId) {
+            continue;
+          }
+          mergeSession(sessionId, session);
+        }
+      } catch {
+        // Keep the last known store snapshot visible if the refresh fails.
+      }
+    };
+
+    void refreshSessions();
+    timer = window.setInterval(() => {
+      void refreshSessions();
+    }, 2_000);
+
+    return () => {
+      cancelled = true;
+      if (timer != null) {
+        window.clearInterval(timer);
+      }
+    };
+  }, [fetchGateway, store]);
 
   const rows = useMemo<SessionRow[]>(
     () =>

@@ -1296,7 +1296,16 @@ describe("BacklogOverview", () => {
 
     expect(details).toBeInTheDocument();
     expect(details).not.toHaveAttribute("open");
-    expect(screen.queryByText("Keep advanced filters, metrics, and bulk actions tucked away")).toBeInTheDocument();
+    expect(screen.queryByText("Open filters, triage, and bulk actions only when you need them")).toBeInTheDocument();
+  });
+
+  it("keeps the review queue collapsed until it is explicitly opened", () => {
+    render(<BacklogOverview />);
+
+    const details = screen.getByTestId("board-review-details");
+
+    expect(details).toBeInTheDocument();
+    expect(details).not.toHaveAttribute("open");
   });
 
   it("keeps advanced board controls collapsed by default", () => {

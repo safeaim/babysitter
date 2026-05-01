@@ -515,7 +515,7 @@ describe("workspaces-page helpers", () => {
     const { container } = render(<WorkspacesPageContent isAuthenticated sessions={[]} mode="attention" />);
 
     await waitFor(() => {
-      expect(screen.getByText("Workspaces that need attention")).toBeInTheDocument();
+      expect(screen.getByText("review")).toBeInTheDocument();
     });
 
     expect(screen.getByText("review")).toBeInTheDocument();
@@ -709,6 +709,7 @@ describe("workspaces-page helpers", () => {
 
     expect(screen.getByLabelText("Workspace search")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Grouped" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("workspace-review-queue-details")).not.toHaveAttribute("open");
     expect(screen.getByText("Pinned workspaces (1)")).toBeInTheDocument();
     expect(screen.getAllByText("Pinned").length).toBeGreaterThan(0);
     expect(screen.getByText("Dev server running")).toBeInTheDocument();
@@ -801,6 +802,7 @@ describe("workspaces-page helpers", () => {
     });
 
     expect(screen.getByRole("button", { name: "Open chat" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show details" }));
     const maintenanceDetails = screen.getByText("Workspace maintenance").closest("details");
     expect(maintenanceDetails).not.toHaveAttribute("open");
 
@@ -1130,6 +1132,7 @@ describe("workspaces-page helpers", () => {
   });
 
   it("renders rebase conflict workflow actions and generated instructions", async () => {
+    const user = setupUser();
     vi.stubGlobal("confirm", vi.fn(() => true));
     vi.stubGlobal("open", vi.fn());
 
@@ -1201,6 +1204,10 @@ describe("workspaces-page helpers", () => {
     render(<WorkspacesPageContent isAuthenticated sessions={[]} />);
 
     await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Show details" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Show details" }));
+    await waitFor(() => {
       expect(screen.getByText("Rebase workflow")).toBeInTheDocument();
     });
 
@@ -1220,6 +1227,7 @@ describe("workspaces-page helpers", () => {
   });
 
   it("renders post-resolution readiness state from persisted rebase data", async () => {
+    const user = setupUser();
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({
         summary: { total: 1, active: 0, idle: 1, archived: 0, missing: 0 },
@@ -1284,12 +1292,17 @@ describe("workspaces-page helpers", () => {
     render(<WorkspacesPageContent isAuthenticated sessions={[]} />);
 
     await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Show details" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Show details" }));
+    await waitFor(() => {
       expect(screen.getByText("Ready for merge")).toBeInTheDocument();
     });
     expect(screen.getByText(/Continue the workspace through merge readiness/)).toBeInTheDocument();
   });
 
   it("renders linked PR guidance for workspace review artifacts with degraded integration", async () => {
+    const user = setupUser();
     workspaceReviewArtifacts = [
       {
         id: "workspace-review-1",
@@ -1382,9 +1395,12 @@ describe("workspaces-page helpers", () => {
     render(<WorkspacesPageContent isAuthenticated sessions={[]} />);
 
     await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Show details" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Show details" }));
+    await waitFor(() => {
       expect(screen.getAllByText("Pull request").length).toBeGreaterThan(0);
     });
-
     expect(screen.getByText(/GitHub PR #612 is partially linked/)).toBeInTheDocument();
     expect(screen.getAllByText("expired auth").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/Reconnect GitHub before linked review actions can continue/).length).toBeGreaterThanOrEqual(1);
@@ -1490,6 +1506,10 @@ describe("workspaces-page helpers", () => {
     render(<WorkspacesPageContent isAuthenticated sessions={[]} />);
 
     await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Show details" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Show details" }));
+    await waitFor(() => {
       expect(screen.getByRole("button", { name: "Create PR" })).toBeInTheDocument();
     });
 
@@ -1508,6 +1528,7 @@ describe("workspaces-page helpers", () => {
   });
 
   it("renders missing metadata, disconnected runtime, and empty notes states", async () => {
+    const user = setupUser();
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({
         summary: { total: 1, active: 0, idle: 1, archived: 0, missing: 0 },
@@ -1563,6 +1584,10 @@ describe("workspaces-page helpers", () => {
     render(<WorkspacesPageContent isAuthenticated sessions={[]} />);
 
     await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Show details" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Show details" }));
+    await waitFor(() => {
       expect(screen.getByText("Repository metadata unavailable")).toBeInTheDocument();
     });
 
@@ -1571,6 +1596,7 @@ describe("workspaces-page helpers", () => {
   });
 
   it("renders linked execution context inside the workspace runtime panel", async () => {
+    const user = setupUser();
     mockUseBacklog.mockReturnValue({
       snapshot: {
         generatedAt: "2026-04-24T00:00:00.000Z",
@@ -1684,6 +1710,10 @@ describe("workspaces-page helpers", () => {
     );
 
     await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Show details" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Show details" }));
+    await waitFor(() => {
       expect(screen.getByText("Execution context")).toBeInTheDocument();
     });
 
@@ -1751,6 +1781,10 @@ describe("workspaces-page helpers", () => {
 
     render(<WorkspacesPageContent isAuthenticated sessions={[]} />);
 
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Show details" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Show details" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Open in editor" })).toBeEnabled();
     });
@@ -2058,6 +2092,27 @@ describe("workspaces-page helpers", () => {
         headers: { "content-type": "application/json" },
       }),
     );
+  });
+
+  it("uses a compact shell loading state when opening a focused workspace before inventory arrives", async () => {
+    vi.mocked(fetch).mockImplementation(
+      () =>
+        new Promise<Response>(() => {
+          // Keep the initial inventory request pending.
+        }),
+    );
+
+    render(
+      <WorkspacesPageContent
+        isAuthenticated
+        selectedWorkspacePath="/repo/worktrees/task"
+        sessions={[]}
+      />,
+    );
+
+    expect(await screen.findByTestId("workspace-loading-shell")).toBeInTheDocument();
+    expect(screen.getByText("Loading the linked issue, session roster, and runtime so you can stay on this route instead of bouncing through a waiting screen.")).toBeInTheDocument();
+    expect(screen.getByText("Workspace handoff")).toBeInTheDocument();
   });
 
   it("does not reload inventory when rerendered with an equivalent session snapshot", async () => {

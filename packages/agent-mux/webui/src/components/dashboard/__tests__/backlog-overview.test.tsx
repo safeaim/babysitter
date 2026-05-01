@@ -1282,6 +1282,23 @@ describe("BacklogOverview", () => {
     expect(supportingDetails).not.toHaveAttribute("open");
   });
 
+  it("keeps board metrics tucked inside the advanced controls block", () => {
+    render(
+      <BacklogOverview
+        projectId="kanban-app"
+        routeBasePath="/projects/kanban-app"
+        forcedPresentation="board"
+      />,
+    );
+
+    const summary = screen.getByText("Board controls");
+    const details = summary.closest("details");
+
+    expect(details).toBeInTheDocument();
+    expect(details).not.toHaveAttribute("open");
+    expect(screen.queryByText("Keep advanced filters, metrics, and bulk actions tucked away")).toBeInTheDocument();
+  });
+
   it("keeps advanced board controls collapsed by default", () => {
     render(<BacklogOverview />);
 
@@ -1290,6 +1307,8 @@ describe("BacklogOverview", () => {
 
     expect(controlsDetails).toBeInTheDocument();
     expect(controlsDetails).not.toHaveAttribute("open");
+    expect(screen.getByLabelText("Workflow filter")).not.toBeVisible();
+    expect(screen.getByLabelText("Readiness filter")).not.toBeVisible();
   });
 
   it("filters cards by assignee and applies bulk move to the visible selection", async () => {
@@ -1297,6 +1316,7 @@ describe("BacklogOverview", () => {
     render(<BacklogOverview />);
 
     await user.click(screen.getByText("Board controls"));
+    expect(screen.getByLabelText("Workflow filter")).toBeVisible();
     await user.selectOptions(screen.getByLabelText("Assignee filter"), "tal");
 
     expect(screen.getByTestId("kanban-card-KANBAN-GAP-007")).toBeInTheDocument();

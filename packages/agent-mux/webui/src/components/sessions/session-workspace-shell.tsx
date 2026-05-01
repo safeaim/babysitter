@@ -77,9 +77,9 @@ const PANEL_DEFINITIONS: PanelDefinition[] = [
 ];
 
 const DEFAULT_SESSION_SHELL_SIZES: WorkspacePanelSizes = {
-  sidebar: 18,
-  conversation: 58,
-  context: 14,
+  sidebar: 16,
+  conversation: 62,
+  context: 12,
   details: 10,
 };
 
@@ -391,7 +391,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
             emptyStateTitle={props.conversationEmptyStateTitle ?? "No transcript events yet"}
             emptyStateBody={
               props.conversationEmptyStateBody ??
-              "The session will start filling in chat, trace, and file activity as soon as new events arrive."
+              "The transcript will appear here as soon as the gateway or native session history has something to show."
             }
             placeholder={props.conversationPlaceholder ?? "Continue the session..."}
             submitLabel={props.conversationSubmitLabel}
@@ -443,8 +443,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
                 <div className="text-sm font-medium text-foreground">Runtime details unavailable</div>
               </div>
               <p className="mt-3 text-sm leading-6 text-foreground-muted">
-                This session has not published a workspace runtime surface yet. Once preview, shell,
-                or dev-server metadata is available it will appear here.
+                Preview, terminal, and dev-server details will appear here once this session starts publishing them.
               </p>
             </div>
             {props.workspacePath ? (
@@ -463,8 +462,8 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
   };
 
   return (
-    <div data-testid="workspace-shell" className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6">
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
+    <div data-testid="workspace-shell" className="flex w-full flex-1 flex-col gap-4 px-3 py-4 sm:px-5 sm:py-6 xl:px-6">
+      <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-3 text-sm text-foreground-muted">
@@ -475,8 +474,8 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
             <div className="mt-3 text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
               {props.heroEyebrow ?? "Session workspace"}
             </div>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight">{props.sessionTitle}</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight">{props.sessionTitle}</h1>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-foreground-muted">
               {props.heroBody ??
                 "Keep the chat primary while trace, approvals, and runtime stay close enough to open only when needed."}
             </p>
@@ -499,6 +498,20 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
                 </Button>
               );
             })}
+          </div>
+        </div>
+
+        <details className="mt-3 rounded-2xl border border-border bg-background/65">
+          <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-foreground">
+            <span>Shortcuts and layout</span>
+            <span className="text-xs text-foreground-muted">Reveal keyboard hints and the command bar only when needed</span>
+          </summary>
+          <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-4 text-xs text-foreground-muted">
+            {PANEL_DEFINITIONS.map((panel) => (
+              <span key={panel.key} className="rounded-full border border-border px-3 py-1.5">
+                {panel.label}: {panel.shortcut}
+              </span>
+            ))}
             <Button
               type="button"
               variant="ghost"
@@ -510,21 +523,12 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
               Command bar
             </Button>
           </div>
-        </div>
-
-        <div data-testid="workspace-navbar" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-xs text-foreground-muted [scrollbar-width:none]">
-          {PANEL_DEFINITIONS.map((panel) => (
-            <span key={panel.key} className="shrink-0 rounded-full border border-border px-3 py-1.5">
-              {panel.label}: {panel.shortcut}
-            </span>
-          ))}
-          <span className="shrink-0 rounded-full border border-border px-3 py-1.5">Command bar: Ctrl/Cmd+K</span>
-        </div>
+        </details>
       </section>
 
       {isConstrained ? (
-        <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
-          <div className="flex flex-wrap gap-2" data-testid="workspace-mobile-panel-selector">
+          <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
+            <div className="flex flex-wrap gap-2" data-testid="workspace-mobile-panel-selector">
             {visiblePanels.map((panel) => (
               <Button
                 key={panel}
@@ -544,7 +548,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
         <div
           ref={shellRef}
           data-testid="workspace-desktop-panels"
-          className="grid min-h-[72vh] flex-1 items-stretch"
+          className="grid min-h-[68vh] flex-1 items-stretch"
           style={{ gridTemplateColumns: desktopColumns }}
         >
           {visiblePanels.map((panel, index) => {

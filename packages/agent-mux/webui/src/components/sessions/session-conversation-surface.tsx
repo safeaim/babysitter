@@ -348,7 +348,7 @@ function TranscriptCard(props: {
   const isUser = props.node.kind === "user";
   return (
     <div className={cx("flex", isUser ? "justify-end" : "justify-start")}>
-      <article className={cx("w-full max-w-[88%] rounded-[24px] border p-4 shadow-sm", nodeTone(props.node.kind, props.node.status))}>
+      <article className={cx("w-full max-w-[96%] rounded-[24px] border p-4 shadow-sm", nodeTone(props.node.kind, props.node.status))}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className={cx("rounded-full border px-2 py-0.5 text-[11px] uppercase tracking-[0.18em]", badgeTone(props.node.kind, props.node.status))}>
@@ -655,11 +655,11 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="rounded-2xl border border-border bg-background/65 p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="rounded-2xl border border-border bg-background/65 p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.18em] text-foreground-muted">Conversation</div>
-            <div className="mt-2 text-sm font-medium text-foreground">{props.sessionLabel}</div>
+            <div className="mt-1 text-sm font-medium text-foreground">{props.sessionLabel}</div>
             <div className="mt-2 flex flex-wrap gap-2 text-xs text-foreground-muted">
               <span className="rounded-full border border-border px-2 py-1">{props.sessionStatus}</span>
               <span className="rounded-full border border-border px-2 py-1">{props.sessionAgent}</span>
@@ -690,41 +690,9 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
             ) : null}
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2 text-xs text-foreground-muted">
-          <span className="rounded-full border border-border px-3 py-1.5">
-            {formatNumber(flowModel.transcript.length)} messages
-          </span>
-          <span className="rounded-full border border-border px-3 py-1.5">
-            {formatNumber(flowModel.files.filter((file) => file.writes > 0).length)} files changed
-          </span>
-          <span className="rounded-full border border-border px-3 py-1.5">
-            {hookRequests.length} approvals waiting
-          </span>
-          <span className="rounded-full border border-border px-3 py-1.5">
-            {formatUsd(sessionCost?.totalUsd)} total cost
-          </span>
-        </div>
-        <details className="mt-4 rounded-2xl border border-border bg-card/60">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground">
-            Session details
-          </summary>
-          <div className="grid gap-3 border-t border-border px-4 py-4 sm:grid-cols-2 xl:grid-cols-5">
-            <MetricCard label="Token usage" value={formatNumber((sessionCost?.inputTokens ?? 0) + (sessionCost?.outputTokens ?? 0) + (sessionCost?.thinkingTokens ?? 0))} detail={`${formatNumber(sessionCost?.inputTokens)} in · ${formatNumber(sessionCost?.outputTokens)} out`} />
-            <MetricCard label="Cost" value={formatUsd(sessionCost?.totalUsd)} detail={`${formatNumber(sessionCost?.thinkingTokens)} thinking tokens`} />
-            <MetricCard label="Task progress" value={`${progressValue}%`} detail={`${flowModel.summary.pendingTools} pending tools`} />
-            <MetricCard label="File changes" value={formatNumber(flowModel.files.filter((file) => file.writes > 0).length)} detail={`${formatNumber(flowModel.summary.fileCount)} files touched`} />
-            <MetricCard label="Approvals" value={formatNumber(hookRequests.length)} detail={`${timelineSummary.toolOutputs} tool outputs`} />
-          </div>
-          <div className="border-t border-border px-4 py-4">
-            <ProgressBar value={progressValue} variant={hookRequests.length > 0 ? "warning" : "default"} glow />
-          </div>
-        </details>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
-          Focus
-        </span>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -741,6 +709,9 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
               </Button>
             );
           })}
+        </div>
+        <div className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground-muted">
+          Transcript first, trace on demand
         </div>
       </div>
 
@@ -893,51 +864,37 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
         </section>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="mt-4 grid gap-3 border-t border-border pt-4">
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)_minmax(12rem,0.7fr)]">
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-foreground">Agent</span>
-            <select
-              value={selectedAgent}
-              disabled={props.disabled || sortedAgents.length === 0}
-              onChange={(event) => setSelectedAgent(event.target.value)}
-              className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {sortedAgents.length === 0 ? <option value={selectedAgent}>{selectedAgent}</option> : null}
-              {sortedAgents.map((agent) => (
-                <option key={agent.agent} value={agent.agent}>
-                  {String(agent.displayName ?? agent.agent)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-foreground">Variant / model</span>
-            <input
-              value={selectedModel}
-              onChange={(event) => setSelectedModel(event.target.value)}
-              disabled={props.disabled}
-              placeholder="Leave blank for session default"
-              className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-            />
-          </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-foreground">Approvals</span>
-            <select
-              value={approvalMode}
-              onChange={(event) => setApprovalMode(event.target.value as ApprovalMode)}
-              disabled={props.disabled}
-              className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {agentApprovalModes.map((mode) => (
-                <option key={mode} value={mode}>
-                  {approvalModeLabel(mode)}
-                </option>
-              ))}
-            </select>
-          </label>
+      <details className="mt-4 rounded-2xl border border-border bg-card/60" data-testid="conversation-stats-details">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground">
+          Session stats
+        </summary>
+        <div className="flex flex-wrap gap-2 border-t border-border px-4 py-4 text-xs text-foreground-muted">
+          <span className="rounded-full border border-border px-3 py-1.5">
+            {formatNumber(flowModel.transcript.length)} messages
+          </span>
+          <span className="rounded-full border border-border px-3 py-1.5">
+            {formatNumber(flowModel.files.filter((file) => file.writes > 0).length)} files changed
+          </span>
+          <span className="rounded-full border border-border px-3 py-1.5">
+            {hookRequests.length} approvals waiting
+          </span>
+          <span className="rounded-full border border-border px-3 py-1.5">
+            {formatUsd(sessionCost?.totalUsd)} total cost
+          </span>
         </div>
+        <div className="grid gap-3 border-t border-border px-4 py-4 sm:grid-cols-2 xl:grid-cols-5">
+          <MetricCard label="Token usage" value={formatNumber((sessionCost?.inputTokens ?? 0) + (sessionCost?.outputTokens ?? 0) + (sessionCost?.thinkingTokens ?? 0))} detail={`${formatNumber(sessionCost?.inputTokens)} in · ${formatNumber(sessionCost?.outputTokens)} out`} />
+          <MetricCard label="Cost" value={formatUsd(sessionCost?.totalUsd)} detail={`${formatNumber(sessionCost?.thinkingTokens)} thinking tokens`} />
+          <MetricCard label="Task progress" value={`${progressValue}%`} detail={`${flowModel.summary.pendingTools} pending tools`} />
+          <MetricCard label="File changes" value={formatNumber(flowModel.files.filter((file) => file.writes > 0).length)} detail={`${formatNumber(flowModel.summary.fileCount)} files touched`} />
+          <MetricCard label="Approvals" value={formatNumber(hookRequests.length)} detail={`${timelineSummary.toolOutputs} tool outputs`} />
+        </div>
+        <div className="border-t border-border px-4 py-4">
+          <ProgressBar value={progressValue} variant={hookRequests.length > 0 ? "warning" : "default"} glow />
+        </div>
+      </details>
 
+      <form onSubmit={handleSubmit} className="mt-4 grid gap-3 border-t border-border pt-4">
         <label className="grid gap-2">
           <span className="text-sm font-medium text-foreground">Send another turn</span>
           <TaskTagAutocompleteTextarea
@@ -963,8 +920,57 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
           </span>
           {canAttachImages ? (
             <span className="rounded-full border border-border px-3 py-1.5">Image input ready</span>
-          ) : null}
+            ) : null}
         </div>
+
+        <details className="rounded-2xl border border-border bg-card/60" data-testid="composer-options-details">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground">
+            Dispatch options
+          </summary>
+          <div className="grid gap-3 border-t border-border px-4 py-4 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)_minmax(12rem,0.7fr)]">
+            <label className="grid gap-2">
+              <span className="text-sm font-medium text-foreground">Agent</span>
+              <select
+                value={selectedAgent}
+                disabled={props.disabled || sortedAgents.length === 0}
+                onChange={(event) => setSelectedAgent(event.target.value)}
+                className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {sortedAgents.length === 0 ? <option value={selectedAgent}>{selectedAgent}</option> : null}
+                {sortedAgents.map((agent) => (
+                  <option key={agent.agent} value={agent.agent}>
+                    {String(agent.displayName ?? agent.agent)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-2">
+              <span className="text-sm font-medium text-foreground">Variant / model</span>
+              <input
+                value={selectedModel}
+                onChange={(event) => setSelectedModel(event.target.value)}
+                disabled={props.disabled}
+                placeholder="Leave blank for session default"
+                className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-sm font-medium text-foreground">Approvals</span>
+              <select
+                value={approvalMode}
+                onChange={(event) => setApprovalMode(event.target.value as ApprovalMode)}
+                disabled={props.disabled}
+                className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {agentApprovalModes.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {approvalModeLabel(mode)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </details>
 
         {attachments.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2">

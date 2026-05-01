@@ -70,6 +70,7 @@ export function TopBar(props: { pathname: string; onOpenPalette(): void }): JSX.
   const sessions = useStore(store, useShallow((state) => Object.values(state.sessions.byId)));
   const runs = useStore(store, useShallow((state) => Object.values(state.runs.byId)));
   const meta = useMemo(() => topBarMeta(props.pathname), [props.pathname]);
+  const compactPlanningTopBar = props.pathname.startsWith('/projects/');
   const activeSessions = useMemo(
     () => sessions.filter((session) => session.status === 'active').length,
     [sessions],
@@ -80,11 +81,11 @@ export function TopBar(props: { pathname: string; onOpenPalette(): void }): JSX.
   );
 
   return (
-    <header className="app-topbar">
+    <header className={`app-topbar${compactPlanningTopBar ? ' app-topbar--compact' : ''}`}>
       <div className="app-topbar__copy">
         <p className="app-topbar__eyebrow">{meta.eyebrow}</p>
         <h2>{titleForPath(props.pathname)}</h2>
-        <p className="app-topbar__subtitle">{meta.subtitle}</p>
+        {compactPlanningTopBar ? null : <p className="app-topbar__subtitle">{meta.subtitle}</p>}
       </div>
 
       <div className="app-topbar__actions">
@@ -99,19 +100,23 @@ export function TopBar(props: { pathname: string; onOpenPalette(): void }): JSX.
         </div>
 
         <div className="app-topbar__buttons">
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => window.dispatchEvent(new Event('open-shortcuts-help'))}
-          >
-            <Keyboard className="h-4 w-4" />
-            Shortcuts
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={props.onOpenPalette}>
-            <Command className="h-4 w-4" />
-            Command palette
-          </Button>
+          {compactPlanningTopBar ? null : (
+            <>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => window.dispatchEvent(new Event('open-shortcuts-help'))}
+              >
+                <Keyboard className="h-4 w-4" />
+                Shortcuts
+              </Button>
+              <Button type="button" size="sm" variant="ghost" onClick={props.onOpenPalette}>
+                <Command className="h-4 w-4" />
+                Command palette
+              </Button>
+            </>
+          )}
           <Button type="button" size="sm" onClick={() => navigate('/sessions/new')}>
             <PlayCircle className="h-4 w-4" />
             New session

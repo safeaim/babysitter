@@ -903,36 +903,57 @@ export function WorkspacesPageContent(props: {
     if (loading && !inventory) {
       return (
         <PageShell>
-          <PageSection>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Workspace</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">{workspaceNameFromPath(selectedWorkspacePath)}</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
-              Opening the selected workspace now. The issue link, session chat, and runtime panels will appear as soon as the inventory finishes loading.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Button variant="ghost" onClick={() => navigate("/workspaces")}>
-                Back to workspaces
-              </Button>
-              <span className="rounded-full border border-border px-3 py-1.5 font-mono text-xs text-foreground-muted">
-                {truncatePath(selectedWorkspacePath)}
+          <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-foreground-muted">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 text-primary"
+                    onClick={() => navigate("/workspaces")}
+                  >
+                    Back to workspaces
+                  </button>
+                  <span>/</span>
+                  <span className="font-mono text-xs text-foreground-secondary">
+                    {truncatePath(selectedWorkspacePath)}
+                  </span>
+                </div>
+                <div className="mt-3 text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
+                  Workspace
+                </div>
+                <h1 className="mt-3 text-3xl font-semibold tracking-tight">
+                  {workspaceNameFromPath(selectedWorkspacePath)}
+                </h1>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
+                  Loading the linked issue, session roster, and runtime so you can stay on this route instead of bouncing through a waiting screen.
+                </p>
+              </div>
+              <span className="rounded-full border border-border bg-background/65 px-3 py-1.5 text-xs text-foreground-muted">
+                Workspace handoff
               </span>
             </div>
-          </PageSection>
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-            <PageSection inset>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted">Workspace status</p>
-              <h2 className="mt-2 text-lg font-semibold text-foreground">Loading workspace details…</h2>
-              <p className="mt-2 text-sm leading-6 text-foreground-muted">
-                Pulling the linked issue, git status, notes, and workspace actions.
-              </p>
-            </PageSection>
-            <PageSection inset>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted">Session chat</p>
-              <h2 className="mt-2 text-lg font-semibold text-foreground">Chat stays ready here</h2>
-              <p className="mt-2 text-sm leading-6 text-foreground-muted">
-                If this workspace has an attached session, the chat-first shell will open in this view automatically.
-              </p>
-            </PageSection>
+          </section>
+
+          <div
+            data-testid="workspace-loading-shell"
+            className="grid gap-5 xl:grid-cols-[minmax(18rem,0.95fr)_minmax(0,1.7fr)]"
+          >
+            <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
+              <div className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Workspace</div>
+              <div className="mt-4 grid gap-3">
+                <div className="h-20 rounded-2xl border border-dashed border-border bg-background/65" />
+                <div className="h-40 rounded-2xl border border-dashed border-border bg-background/65" />
+              </div>
+            </section>
+            <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
+              <div className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Chat</div>
+              <div className="mt-4 grid gap-3">
+                <div className="h-24 rounded-2xl border border-dashed border-border bg-background/65" />
+                <div className="h-24 rounded-2xl border border-dashed border-border bg-background/65" />
+                <div className="h-36 rounded-2xl border border-dashed border-border bg-background/65" />
+              </div>
+            </section>
           </div>
         </PageShell>
       );
@@ -1064,14 +1085,19 @@ export function WorkspacesPageContent(props: {
 
   return (
     <PageShell>
-      <PageSection>
+      {error ? (
+        <section className="rounded-3xl border border-error/30 bg-error/10 p-4 text-sm text-error">
+          {error}
+        </section>
+      ) : null}
+
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-lg" data-testid="workspace-sidebar-surface">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Workspaces</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Find the right workspace and jump back into the session</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
-              Start with the workspace list, keep issue links visible, and open the focused workspace shell only
-              when you need chat, runtime, or recovery detail.
+              Search by issue, branch, or ownership, open the workspace you need, and reveal review or maintenance detail only when it becomes relevant.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -1085,40 +1111,26 @@ export function WorkspacesPageContent(props: {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-5">
-          <SummaryCard label="Known workspaces" value={String(summary.total)} />
-          <SummaryCard label="Active" value={String(summary.active)} />
-          <SummaryCard label="Idle" value={String(summary.idle)} />
-          <SummaryCard label="Archived" value={String(summary.archived)} />
-          <SummaryCard label="Missing" value={String(summary.missing)} />
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-3 text-sm text-foreground-muted">
+        <div className="mt-4 flex flex-wrap gap-3 text-sm text-foreground-muted">
           <span className="rounded-full border border-border px-3 py-1.5">
             {getWorkspaceOwnershipLabel(props.isAuthenticated, props.sessions, workspaces)}
           </span>
           <span className="rounded-full border border-border px-3 py-1.5">
-            {props.sessions.length} live session{props.sessions.length === 1 ? "" : "s"} attached
+            {summary.total} known
           </span>
           <span className="rounded-full border border-border px-3 py-1.5">
-            Cleanup stays hidden until a workspace is archived and inactive.
+            {summary.active} active
+          </span>
+          <span className="rounded-full border border-border px-3 py-1.5">
+            {attentionWorkspaces.length} need attention
           </span>
         </div>
-      </PageSection>
 
-      {error ? (
-        <section className="rounded-3xl border border-error/30 bg-error/10 p-4 text-sm text-error">
-          {error}
-        </section>
-      ) : null}
-
-      <section className="rounded-3xl border border-border bg-card p-6 shadow-lg" data-testid="workspace-sidebar-surface">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Workspace list</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Search, group, and open the right workspace</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
-              Keep this list compact, search by issue or branch, and open the workspace shell only when you need deeper detail.
+            <p className="mt-2 text-sm leading-6 text-foreground-muted">
+              Keep the list compact and open deeper recovery or runtime detail only when needed.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -1143,7 +1155,7 @@ export function WorkspacesPageContent(props: {
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <label className="relative min-w-[260px] flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
             <input
@@ -1276,29 +1288,56 @@ export function WorkspacesPageContent(props: {
         ) : null}
       </section>
 
-      <ReviewPanel
-        title="Workspace diff and approval handoff"
-        description="Workspace review, comments, and approval state stay together here."
-        empty="No workspace reviews are queued yet."
-        loading={workspaceReviews.loading}
-        error={workspaceReviews.error}
-        artifacts={workspaceReviews.artifacts}
-        queue={workspaceReviews.queue}
-        summary={workspaceReviews.summary}
-        pendingArtifactId={workspaceReviews.pendingArtifactId}
-        onApprove={(artifactId) =>
-          workspaceReviews.actOnReview({ action: "approve", artifactId }).then(() => refreshInventory())
-        }
-        onRequestChanges={(artifactId) =>
-          workspaceReviews.actOnReview({ action: "request-changes", artifactId }).then(() => refreshInventory())
-        }
-        onSubmitReview={(input) =>
-          workspaceReviews.actOnReview({ action: "submit-review", ...input }).then(() => refreshInventory())
-        }
-        onAddComment={(input) =>
-          workspaceReviews.actOnReview({ action: "add-comment", ...input }).then(() => refreshInventory())
-        }
-      />
+      <details
+        className="rounded-3xl border border-border bg-card shadow-lg"
+        data-testid="workspace-review-queue-details"
+      >
+        <summary className="flex cursor-pointer flex-wrap items-start justify-between gap-4 px-6 py-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Review queue</p>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight">Workspace diff and approval handoff</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
+              Keep review, comments, and approval state nearby without letting it crowd the inventory by default.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs text-foreground-muted">
+            <span className="rounded-full border border-border px-3 py-1.5">
+              queued {workspaceReviews.summary?.pendingCount ?? 0}
+            </span>
+            <span className="rounded-full border border-border px-3 py-1.5">
+              approved {workspaceReviews.summary?.approvedCount ?? 0}
+            </span>
+            <span className="rounded-full border border-border px-3 py-1.5">
+              open comments {workspaceReviews.summary?.openCommentCount ?? 0}
+            </span>
+          </div>
+        </summary>
+        <div className="border-t border-border px-6 py-6">
+          <ReviewPanel
+            title="Workspace diff and approval handoff"
+            description="Workspace review, comments, and approval state stay together here."
+            empty="No workspace reviews are queued yet."
+            loading={workspaceReviews.loading}
+            error={workspaceReviews.error}
+            artifacts={workspaceReviews.artifacts}
+            queue={workspaceReviews.queue}
+            summary={workspaceReviews.summary}
+            pendingArtifactId={workspaceReviews.pendingArtifactId}
+            onApprove={(artifactId) =>
+              workspaceReviews.actOnReview({ action: "approve", artifactId }).then(() => refreshInventory())
+            }
+            onRequestChanges={(artifactId) =>
+              workspaceReviews.actOnReview({ action: "request-changes", artifactId }).then(() => refreshInventory())
+            }
+            onSubmitReview={(input) =>
+              workspaceReviews.actOnReview({ action: "submit-review", ...input }).then(() => refreshInventory())
+            }
+            onAddComment={(input) =>
+              workspaceReviews.actOnReview({ action: "add-comment", ...input }).then(() => refreshInventory())
+            }
+          />
+        </div>
+      </details>
     </PageShell>
   );
 }
@@ -1418,7 +1457,7 @@ function WorkspaceColumn(props: {
           const integration = reviewArtifact?.integration;
           const statusBadges = workspaceSidebarBadges(workspace, runtimeSession ?? null, linkedPullRequest);
           const isSelected = props.selectedWorkspacePath === workspace.path;
-          const detailsExpanded = props.workspaces.length === 1 || Boolean(expandedWorkspacePaths[workspace.path]);
+          const detailsExpanded = Boolean(isSelected) || Boolean(expandedWorkspacePaths[workspace.path]);
 
           return (
             <article
@@ -1488,15 +1527,13 @@ function WorkspaceColumn(props: {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {props.workspaces.length > 1 ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleWorkspaceDetails(workspace.path)}
-                    >
-                      {detailsExpanded ? "Hide details" : "Show details"}
-                    </Button>
-                  ) : null}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleWorkspaceDetails(workspace.path)}
+                  >
+                    {detailsExpanded ? "Hide details" : "Show details"}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

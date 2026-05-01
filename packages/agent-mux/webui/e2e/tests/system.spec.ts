@@ -77,6 +77,8 @@ test.describe("agent-mux webui e2e", () => {
     await expect(page).toHaveURL(/\/workspaces$/);
     await expect(page.getByTestId("workspace-sidebar-surface")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Find the right workspace and jump back into the session" })).toBeVisible();
+    await expect(page.getByLabel("Workspace search")).toBeVisible();
+    await expect(page.getByTestId("workspace-review-queue-details")).not.toHaveAttribute("open", "");
   });
 
   test.describe("authenticated surfaces", () => {
@@ -104,6 +106,9 @@ test.describe("agent-mux webui e2e", () => {
 
       const swimlane = page.locator('[data-testid^="kanban-swimlane-"]').first();
       await expect(swimlane).toBeVisible();
+      const swimlaneBox = await swimlane.boundingBox();
+      expect(swimlaneBox).not.toBeNull();
+      expect(swimlaneBox!.y).toBeLessThan(viewport!.height * 0.95);
       const columns = swimlane.locator('[data-testid^="kanban-column-"]');
       await expect(columns).toHaveCount(4);
       const firstFourBoxes = await Promise.all(
@@ -117,6 +122,8 @@ test.describe("agent-mux webui e2e", () => {
       expect(firstFourBoxes[3]!.x).toBeGreaterThan(firstFourBoxes[2]!.x);
 
       await expect(page.getByTestId("board-controls-details")).toBeVisible();
+      await expect(page.getByTestId("board-controls-details")).not.toHaveAttribute("open", "");
+      await expect(page.getByLabel("Workflow filter")).not.toBeVisible();
 
       const linkedCard = page.getByTestId(`kanban-card-${state.issueKey}`);
       await expect(linkedCard).toBeVisible();
@@ -156,8 +163,10 @@ test.describe("agent-mux webui e2e", () => {
       await expect(page.getByTestId("workspace-desktop-panels")).toBeVisible();
       await expect(page.getByTestId("workspace-panel-conversation")).toBeVisible();
       await expect(page.getByText(state.transcriptText)).toBeVisible();
-      await expect(page.getByText("This route is now chat-first. Keep the live conversation visible while execution context, run history, and runtime details stay alongside it instead of hiding behind secondary tabs.")).toBeVisible();
-      await expect(page.getByTestId("workspace-panel-sidebar").getByRole("button", { name: "Open workspace" })).toBeVisible();
+      await expect(page.getByText("Keep the transcript open, continue the session from here, and pull in runtime or execution detail only when you need it.")).toBeVisible();
+      await expect(page.getByTestId("workspace-panel-sidebar")).toContainText("Session context and quick links");
+      await expect(page.getByTestId("conversation-stats-details")).not.toHaveAttribute("open", "");
+      await expect(page.getByTestId("composer-options-details")).not.toHaveAttribute("open", "");
       await expect(page.getByPlaceholder("Continue the session...")).toBeEnabled();
       await expect(page.getByTestId("panel-toggle-sidebar")).toHaveAttribute("aria-pressed", "true");
       await expect(page.getByTestId("panel-toggle-conversation")).toHaveAttribute("aria-pressed", "true");

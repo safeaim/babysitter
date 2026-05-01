@@ -101,9 +101,9 @@ const PANEL_DEFINITIONS: PanelDefinition[] = [
 ];
 
 const DEFAULT_WORKSPACE_DETAIL_SIZES: WorkspacePanelSizes = {
-  sidebar: 20,
-  conversation: 58,
-  context: 14,
+  sidebar: 18,
+  conversation: 62,
+  context: 12,
   details: 8,
 };
 
@@ -550,8 +550,8 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
   };
 
   return (
-    <div data-testid="workspace-shell" className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6">
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
+    <div data-testid="workspace-shell" className="flex w-full flex-1 flex-col gap-4 px-3 py-4 sm:px-5 sm:py-6 xl:px-6">
+      <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-3 text-sm text-foreground-muted">
@@ -562,11 +562,11 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
               <span>/</span>
               <span className="font-mono text-xs text-foreground-secondary">{props.workspace.path}</span>
             </div>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight">{props.workspace.name}</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight">{props.workspace.name}</h1>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-foreground-muted">
               {linkedIssue
-                ? `${linkedIssue.issueKey} is linked here. Keep the issue visible, then open chat only when a workspace session is active.`
-                : "Keep the workspace summary visible, then open chat only when a session is active."}
+                ? `${linkedIssue.issueKey} stays pinned here while the linked session chat and runtime stay beside it.`
+                : "Keep the workspace, chat, and runtime together so you can continue work without losing context."}
             </p>
             {linkedIssue ? (
               <div className="mt-3">
@@ -616,7 +616,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)]">
+        <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)]">
           <div className="flex flex-wrap gap-3">
             <div className="rounded-full border border-border bg-background/65 px-3 py-1.5 text-sm">
               <span className="text-foreground-muted">Status</span>
@@ -699,8 +699,8 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
       </section>
 
       {isConstrained ? (
-        <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
-          <div className="flex flex-wrap gap-2" data-testid="workspace-mobile-panel-selector">
+          <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
+            <div className="flex flex-wrap gap-2" data-testid="workspace-mobile-panel-selector">
             {visiblePanels.map((panel) => (
               <Button
                 key={panel}
@@ -720,7 +720,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
         <div
           ref={shellRef}
           data-testid="workspace-desktop-panels"
-          className="grid min-h-[72vh] flex-1 items-stretch"
+          className="grid min-h-[68vh] flex-1 items-stretch"
           style={{ gridTemplateColumns: desktopColumns }}
         >
           {visiblePanels.map((panel, index) => {

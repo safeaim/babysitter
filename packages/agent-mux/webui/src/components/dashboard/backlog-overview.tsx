@@ -4536,135 +4536,87 @@ export function BacklogOverview({
 
   return (
     <section
-      className="backlog-overview-surface mb-6 rounded-3xl border border-border bg-card p-6 shadow-lg"
+      className="backlog-overview-surface mb-4 rounded-3xl border border-border bg-card p-4 shadow-lg"
       data-testid="backlog-overview"
     >
-      <div className="backlog-overview__hero flex flex-wrap items-start justify-between gap-4">
-        <div className="max-w-4xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
-            Kanban Board
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
-            Work the backlog as a board
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-foreground-muted">
-            Keep columns, workspace links, and review handoffs in one place. Open a card only when
-            you need depth.
-          </p>
-        </div>
-
-        <div className="backlog-overview__project-card min-w-[260px] rounded-2xl border border-border bg-background p-4">
-          <div className="text-xs uppercase tracking-[0.2em] text-foreground-muted">
-            Primary Project
+      <div className="backlog-overview__hero flex flex-wrap items-end justify-between gap-3">
+        <div className="flex min-w-[280px] flex-1 flex-col gap-2">
+          <div className="flex flex-wrap gap-2 text-xs text-foreground-muted">
+            <span className="rounded-full border border-border bg-background px-3 py-1.5 font-semibold uppercase tracking-[0.2em] text-primary/80">
+              Kanban board
+            </span>
+            <span className="rounded-full border border-border bg-background px-3 py-1.5">
+              {primaryProject.name}
+            </span>
+            <span className="rounded-full border border-border bg-background px-3 py-1.5">
+              {summary.issueCount} issues
+            </span>
+            <span className="rounded-full border border-border bg-background px-3 py-1.5">
+              {summary.inProgressCount} in progress
+            </span>
+            <span className="rounded-full border border-border bg-background px-3 py-1.5">
+              {(issueReviews.summary?.pendingCount ?? 0) + (issueReviews.summary?.changesRequestedCount ?? 0)} in review
+            </span>
+            {primaryProject.linkedRunSummary ? (
+              <span className="rounded-full border border-border bg-background px-3 py-1.5">
+                {primaryProject.linkedRunSummary.activeRuns} live runs linked
+              </span>
+            ) : null}
           </div>
-          <div className="mt-2 text-lg font-semibold text-foreground">{primaryProject.name}</div>
-          <div className="mt-3 text-sm text-foreground-muted">
-            {primaryProject.metrics.totalIssues} issues tracked
-          </div>
-          {primaryProject.linkedRunSummary ? (
-            <div className="mt-2 text-sm text-foreground-muted">
-              {primaryProject.linkedRunSummary.activeRuns} live runs linked
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+              Move work first and reveal planning detail only when needed
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => navigateToPresentation("board")}
+                className={`inline-flex h-10 items-center gap-2 rounded-xl border px-3 text-sm font-semibold ${
+                  presentation === "board"
+                    ? "border-primary/30 bg-primary/10 text-primary"
+                    : "border-border bg-background text-foreground-muted"
+                }`}
+              >
+                <Layers className="h-4 w-4" />
+                Board view
+              </button>
+              <button
+                type="button"
+                onClick={() => navigateToPresentation("list")}
+                className={`inline-flex h-10 items-center gap-2 rounded-xl border px-3 text-sm font-semibold ${
+                  presentation === "list"
+                    ? "border-primary/30 bg-primary/10 text-primary"
+                    : "border-border bg-background text-foreground-muted"
+                }`}
+              >
+                <ListTodo className="h-4 w-4" />
+                List view
+              </button>
+              <button
+                type="button"
+                onClick={() => openCreateMode("header")}
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 text-sm font-semibold text-primary"
+                data-testid="board-header-create"
+              >
+                <Plus className="h-4 w-4" />
+                Create issue
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(projectWorkspaceCreateHref(primaryProject.id))}
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground"
+                data-testid="board-header-create-workspace"
+              >
+                <FolderGit2 className="h-4 w-4" />
+                Create workspace
+              </button>
             </div>
-          ) : null}
+          </div>
         </div>
       </div>
 
-      <div className="backlog-overview__metrics-grid mt-5 grid gap-3 md:grid-cols-4">
-        <div className="rounded-2xl border border-border bg-background p-4">
-          <div className="flex items-center gap-2 text-sm text-foreground-muted">
-            <Layers className="h-4 w-4" />
-            Scope
-          </div>
-          <div className="mt-3 text-2xl font-semibold text-foreground">{summary.issueCount}</div>
-          <div className="text-sm text-foreground-muted">{summary.projectCount} project models</div>
-        </div>
-        <div className="rounded-2xl border border-warning/25 bg-warning-muted p-4">
-          <div className="flex items-center gap-2 text-sm text-warning">
-            <Workflow className="h-4 w-4" />
-            Active WIP
-          </div>
-          <div className="mt-3 text-2xl font-semibold text-warning">{summary.inProgressCount}</div>
-          <div className="text-sm text-warning/80">
-            {summary.needsDecompositionCount} waiting on decomposition
-          </div>
-        </div>
-        <div className="rounded-2xl border border-primary/25 bg-primary/10 p-4">
-          <div className="flex items-center gap-2 text-sm text-primary">
-            <TimerReset className="h-4 w-4" />
-            Review Queue
-          </div>
-          <div className="mt-3 text-2xl font-semibold text-primary">
-            {(issueReviews.summary?.pendingCount ?? 0) + (issueReviews.summary?.changesRequestedCount ?? 0)}
-          </div>
-          <div className="text-sm text-primary/80">reviews waiting for action</div>
-        </div>
-        <div className="rounded-2xl border border-error/25 bg-error-muted p-4">
-          <div className="flex items-center gap-2 text-sm text-error">
-            <AlertCircle className="h-4 w-4" />
-            Blocked
-          </div>
-          <div className="mt-3 text-2xl font-semibold text-error">{summary.blockedCount}</div>
-          <div className="text-sm text-error/80">{summary.completedCount} completed</div>
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted">
-            Planning surface
-          </p>
-          <h3 className="mt-1 text-lg font-semibold text-foreground">
-            Filter, focus, and move work
-          </h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => navigateToPresentation("board")}
-            className={`inline-flex h-11 items-center gap-2 rounded-xl border px-3 text-sm font-semibold ${
-              presentation === "board"
-                ? "border-primary/30 bg-primary/10 text-primary"
-                : "border-border bg-background text-foreground-muted"
-            }`}
-          >
-            <Layers className="h-4 w-4" />
-            Board view
-          </button>
-          <button
-            type="button"
-            onClick={() => navigateToPresentation("list")}
-            className={`inline-flex h-11 items-center gap-2 rounded-xl border px-3 text-sm font-semibold ${
-              presentation === "list"
-                ? "border-primary/30 bg-primary/10 text-primary"
-                : "border-border bg-background text-foreground-muted"
-            }`}
-          >
-            <ListTodo className="h-4 w-4" />
-            List view
-          </button>
-          <button
-            type="button"
-            onClick={() => openCreateMode("header")}
-            className="inline-flex h-11 items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 text-sm font-semibold text-primary"
-            data-testid="board-header-create"
-          >
-            <Plus className="h-4 w-4" />
-            Create issue
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate(projectWorkspaceCreateHref(primaryProject.id))}
-            className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground"
-            data-testid="board-header-create-workspace"
-          >
-            <FolderGit2 className="h-4 w-4" />
-            Create workspace
-          </button>
-        </div>
-      </div>
-
-      <div className="backlog-overview__controls mt-4 rounded-3xl border border-border bg-background/70 p-4">
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.7fr)_repeat(2,minmax(0,180px))]">
+      <div className="backlog-overview__controls mt-2 rounded-3xl border border-border bg-background/70 p-3">
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.9fr)_auto]">
           <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
             Search
             <div className="mt-2 flex h-11 items-center gap-2 rounded-xl border border-border bg-card px-3">
@@ -4678,38 +4630,19 @@ export function BacklogOverview({
               />
             </div>
           </label>
-          <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
-            Workflow
-            <select
-              value={workflowFilter}
-              onChange={(event) => setWorkflowFilter(event.target.value as KanbanWorkflowState | "all")}
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
-              aria-label="Workflow filter"
-            >
-              <option value="all">All columns</option>
-              {workflowOrder.map((state) => (
-                <option key={state} value={state}>
-                  {stateLabel(state)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
-            Readiness
-            <select
-              value={readinessFilter}
-              onChange={(event) => setReadinessFilter(event.target.value as KanbanBoardCard["readiness"] | "all")}
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
-              aria-label="Readiness filter"
-            >
-              <option value="all">All readiness</option>
-              <option value="needs-decomposition">Needs decomposition</option>
-              <option value="ready">Ready</option>
-              <option value="blocked">Blocked</option>
-                <option value="dispatched">Dispatched</option>
-                <option value="completed">Completed</option>
-              </select>
-            </label>
+          <div className="flex flex-wrap items-end gap-2">
+            <span className="rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
+              {visibleCards.length} visible
+            </span>
+            <span className="rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
+              {activeFilterCount} active filter{activeFilterCount === 1 ? "" : "s"}
+            </span>
+            {selectedCards.length > 0 ? (
+              <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">
+                {selectedCards.length} selected
+              </span>
+            ) : null}
+          </div>
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -4739,7 +4672,7 @@ export function BacklogOverview({
                 Board controls
               </p>
               <h3 className="mt-1 text-lg font-semibold text-foreground">
-                Keep advanced filters and bulk actions tucked away
+                Keep advanced filters, metrics, and bulk actions tucked away
               </h3>
             </div>
             <div className="backlog-overview__planning-badges">
@@ -4756,6 +4689,78 @@ export function BacklogOverview({
           </summary>
 
           <div className="backlog-overview__planning-body">
+            <div className="backlog-overview__metrics-grid grid gap-3 md:grid-cols-4">
+              <div className="rounded-2xl border border-border bg-background p-4">
+                <div className="flex items-center gap-2 text-sm text-foreground-muted">
+                  <Layers className="h-4 w-4" />
+                  Scope
+                </div>
+                <div className="mt-3 text-2xl font-semibold text-foreground">{summary.issueCount}</div>
+                <div className="text-sm text-foreground-muted">{summary.projectCount} project models</div>
+              </div>
+              <div className="rounded-2xl border border-warning/25 bg-warning-muted p-4">
+                <div className="flex items-center gap-2 text-sm text-warning">
+                  <Workflow className="h-4 w-4" />
+                  Active WIP
+                </div>
+                <div className="mt-3 text-2xl font-semibold text-warning">{summary.inProgressCount}</div>
+                <div className="text-sm text-warning/80">
+                  {summary.needsDecompositionCount} waiting on decomposition
+                </div>
+              </div>
+              <div className="rounded-2xl border border-primary/25 bg-primary/10 p-4">
+                <div className="flex items-center gap-2 text-sm text-primary">
+                  <TimerReset className="h-4 w-4" />
+                  Review Queue
+                </div>
+                <div className="mt-3 text-2xl font-semibold text-primary">
+                  {(issueReviews.summary?.pendingCount ?? 0) + (issueReviews.summary?.changesRequestedCount ?? 0)}
+                </div>
+                <div className="text-sm text-primary/80">reviews waiting for action</div>
+              </div>
+              <div className="rounded-2xl border border-error/25 bg-error-muted p-4">
+                <div className="flex items-center gap-2 text-sm text-error">
+                  <AlertCircle className="h-4 w-4" />
+                  Blocked
+                </div>
+                <div className="mt-3 text-2xl font-semibold text-error">{summary.blockedCount}</div>
+                <div className="text-sm text-error/80">{summary.completedCount} completed</div>
+              </div>
+            </div>
+            <div className="grid gap-3 xl:grid-cols-[repeat(2,minmax(0,220px))_auto]">
+              <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                Workflow
+                <select
+                  value={workflowFilter}
+                  onChange={(event) => setWorkflowFilter(event.target.value as KanbanWorkflowState | "all")}
+                  className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
+                  aria-label="Workflow filter"
+                >
+                  <option value="all">All columns</option>
+                  {workflowOrder.map((state) => (
+                    <option key={state} value={state}>
+                      {stateLabel(state)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                Readiness
+                <select
+                  value={readinessFilter}
+                  onChange={(event) => setReadinessFilter(event.target.value as KanbanBoardCard["readiness"] | "all")}
+                  className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
+                  aria-label="Readiness filter"
+                >
+                  <option value="all">All readiness</option>
+                  <option value="needs-decomposition">Needs decomposition</option>
+                  <option value="ready">Ready</option>
+                  <option value="blocked">Blocked</option>
+                  <option value="dispatched">Dispatched</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </label>
+            </div>
             <div className="grid gap-3 xl:grid-cols-[repeat(2,minmax(0,180px))_auto]">
               <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
                 Assignee
@@ -4948,7 +4953,7 @@ export function BacklogOverview({
 
       <div
         className={`backlog-overview__workspace mt-6 grid gap-5 ${
-          activeSidePanel ? "xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,430px)]" : "grid-cols-1"
+          activeSidePanel ? "xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,400px)]" : "grid-cols-1"
         }`}
       >
         <div className="backlog-overview__board-stack space-y-5">
@@ -5043,6 +5048,9 @@ export function BacklogOverview({
                                   : undefined;
                                 const linkedWorkspaceCount = issue?.workspaceLinks?.length ?? 0;
                                 const primaryWorkspaceLink = issue?.workspaceLinks?.[0];
+                                const allowedMoveTargets = card.moveTargets.filter((target) => target.allowed);
+                                const primaryMoveTarget = allowedMoveTargets[0] ?? null;
+                                const secondaryMoveTargets = allowedMoveTargets.slice(1);
                                 const showSecondaryDetails =
                                   Boolean(card.repositoryLifecycle) ||
                                   card.collaboratorNames.length > 0 ||
@@ -5050,6 +5058,7 @@ export function BacklogOverview({
                                   card.labelNames.length > 0;
                                 const hasExpandableDetails =
                                   showSecondaryDetails ||
+                                  secondaryMoveTargets.length > 0 ||
                                   card.dependencyCount > 0 ||
                                   card.childCount > 0 ||
                                   card.acceptanceProgress.total > 0 ||
@@ -5215,20 +5224,25 @@ export function BacklogOverview({
                                       ) : null}
                                     </div>
 
-                                    <div className="mt-4 flex flex-wrap gap-2">
-                                      {card.moveTargets.map((target) => (
+                                    {primaryMoveTarget ? (
+                                      <div className="mt-4 flex flex-wrap items-center gap-2">
                                         <button
-                                          key={`${card.issueId}-${target.state}`}
-                                          disabled={!target.allowed || movingIssueId === card.issueId}
-                                          onClick={() => handleMoveIssue(card.issueId, target.state)}
-                                          className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-border-hover bg-transparent px-3 text-xs font-medium italic tracking-[0.04em] text-foreground transition-all duration-200 hover:bg-card hover:border-primary/30 hover:shadow-sm disabled:pointer-events-none disabled:opacity-50 font-serif"
-                                          data-testid={`move-${card.issueKey}-${target.state}`}
+                                          type="button"
+                                          disabled={movingIssueId === card.issueId}
+                                          onClick={() => handleMoveIssue(card.issueId, primaryMoveTarget.state)}
+                                          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-4 text-xs font-semibold tracking-[0.04em] text-primary transition-all duration-200 hover:border-primary/40 hover:bg-primary/15 hover:shadow-sm disabled:pointer-events-none disabled:opacity-50"
+                                          data-testid={`move-${card.issueKey}-${primaryMoveTarget.state}`}
                                         >
                                           <ArrowRight className="h-3.5 w-3.5" />
-                                          {stateLabel(target.state)}
+                                          Move to {stateLabel(primaryMoveTarget.state)}
                                         </button>
-                                      ))}
-                                    </div>
+                                        {secondaryMoveTargets.length > 0 ? (
+                                          <span className="rounded-full border border-border bg-background/70 px-3 py-1.5 text-xs text-foreground-muted">
+                                            +{secondaryMoveTargets.length} more move{secondaryMoveTargets.length === 1 ? "" : "s"} in details
+                                          </span>
+                                        ) : null}
+                                      </div>
+                                    ) : null}
 
                                     {hasExpandableDetails ? (
                                       <details className="backlog-overview__card-details mt-4">
@@ -5283,6 +5297,28 @@ export function BacklogOverview({
                                                   </div>
                                                 )),
                                               )}
+                                            </div>
+                                          ) : null}
+                                          {secondaryMoveTargets.length > 0 ? (
+                                            <div className="space-y-3">
+                                              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground-muted">
+                                                Alternate moves
+                                              </div>
+                                              <div className="flex flex-wrap gap-2">
+                                                {secondaryMoveTargets.map((target) => (
+                                                  <button
+                                                    key={`${card.issueId}-${target.state}`}
+                                                    type="button"
+                                                    disabled={movingIssueId === card.issueId}
+                                                    onClick={() => handleMoveIssue(card.issueId, target.state)}
+                                                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground transition-all duration-200 hover:border-primary/30 hover:bg-card hover:shadow-sm disabled:pointer-events-none disabled:opacity-50"
+                                                    data-testid={`move-secondary-${card.issueKey}-${target.state}`}
+                                                  >
+                                                    <ArrowRight className="h-3.5 w-3.5" />
+                                                    Move to {stateLabel(target.state)}
+                                                  </button>
+                                                ))}
+                                              </div>
                                             </div>
                                           ) : null}
                                           <RepositoryLifecyclePanel

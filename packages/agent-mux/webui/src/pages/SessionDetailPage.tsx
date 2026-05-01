@@ -343,7 +343,7 @@ export function SessionDetailPage(): JSX.Element {
   return (
     <>
       {error ? (
-        <div className="mx-auto w-full max-w-[1800px] px-4 pt-4 sm:px-6 sm:pt-6">
+        <div className="w-full px-3 pt-4 sm:px-5 sm:pt-6 xl:px-6">
           <div className="rounded-2xl border border-error/20 bg-error-muted px-4 py-3 text-sm text-error">
             {error}
           </div>
@@ -370,9 +370,9 @@ export function SessionDetailPage(): JSX.Element {
         }
         conversationSubmitLabel="Continue session"
         conversationEmptyStateTitle="No transcript yet"
-        conversationEmptyStateBody="The session chat stays primary here. Transcript, flow, timeline, and file attention will appear as soon as gateway activity or native session history is available."
-        heroEyebrow="Realtime session"
-        heroBody="This route is now chat-first. Keep the live conversation visible while execution context, run history, and runtime details stay alongside it instead of hiding behind secondary tabs."
+        conversationEmptyStateBody="The transcript will appear here as soon as the gateway or native session history has something to show."
+        heroEyebrow="Live session"
+        heroBody="Keep the transcript open, continue the session from here, and pull in runtime or execution detail only when you need it."
         onSubmit={handleSubmit}
       />
     </>

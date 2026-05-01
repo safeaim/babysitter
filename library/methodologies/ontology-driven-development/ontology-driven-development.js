@@ -304,6 +304,9 @@ export async function process(inputs, ctx) {
       primarySources: [], // Direct research, interviews, observations
       secondarySources: [], // Academic papers, industry reports, documentation
       empiricalEvidence: [], // Data analysis, measurements, experiments
+      empiricalExperiments: [], // Online reproducible experiments and replication studies
+      reproducibleResearch: [], // Open science with replication instructions and data
+      crowdSourcedValidation: [], // Community-validated results and collaborative verification
       codeEvidence: [], // Implementation examples, repositories, technical specifications
       onlineEvidence: [], // Web sources, forums, community knowledge
       expertValidation: [] // Expert review and validation of claims
@@ -328,6 +331,16 @@ export async function process(inputs, ctx) {
       evidenceGaps: [], // Identified gaps in evidence coverage
       researchNeeds: [], // Areas requiring additional evidence collection
       evidenceBasedConfidence: {} // Overall confidence based on evidence strength
+    },
+    evidenceGeneration: {
+      originalResearch: [], // Self-generated research studies and investigations
+      designedExperiments: [], // Experiments designed and conducted by the process
+      empiricalValidation: [], // Empirical validation studies for ontology claims
+      dataCollection: [], // Original data collection efforts and results
+      collaborativeStudies: [], // Multi-stakeholder research and validation studies
+      hypothesisValidation: [], // Hypothesis generation and testing for evidence gaps
+      syntheticEvidence: [], // Evidence generated through systematic analysis and synthesis
+      validationExperiments: [] // Experiments specifically designed to validate ontology components
     },
     evidenceManagement: {
       citationStandards: {}, // Standardized citation and attribution protocols
@@ -464,6 +477,35 @@ export async function process(inputs, ctx) {
     evidenceBasedModelingFramework.evidenceIntegration.evidenceGaps.push(...worldEvidenceValidation.evidenceGaps);
 
     artifacts.push(...(worldEvidenceValidation.artifacts || []));
+
+    // Evidence generation for critical gaps
+    if (worldEvidenceValidation.evidenceGaps && worldEvidenceValidation.evidenceGaps.length > 0) {
+      const criticalGaps = worldEvidenceValidation.evidenceGaps.filter(gap => gap.priority === 'critical' || gap.priority === 'high');
+
+      if (criticalGaps.length > 0) {
+        ctx.log?.('info', `Generating evidence for ${criticalGaps.length} critical evidence gaps through original research...`);
+
+        const evidenceGeneration = await ctx.task(evidenceGenerationTask, {
+          projectName,
+          evidenceGaps: criticalGaps,
+          evidenceFramework: evidenceBasedModelingFramework,
+          currentPhase: 'world-ontology',
+          domainType,
+          stakeholderContext,
+          researchPriority: 'high'
+        });
+
+        // Integrate generated evidence into framework
+        evidenceBasedModelingFramework.evidenceGeneration.originalResearch.push(...evidenceGeneration.researchStudies);
+        evidenceBasedModelingFramework.evidenceGeneration.designedExperiments.push(...evidenceGeneration.designedExperiments);
+        evidenceBasedModelingFramework.evidenceGeneration.empiricalValidation.push(...evidenceGeneration.empiricalValidation);
+        evidenceBasedModelingFramework.evidenceCollection.empiricalExperiments.push(...evidenceGeneration.designedExperiments);
+
+        artifacts.push(...(evidenceGeneration.artifacts || []));
+
+        ctx.log?.('info', `Generated ${evidenceGeneration.researchStudies?.length || 0} research studies and ${evidenceGeneration.designedExperiments?.length || 0} experiments`);
+      }
+    }
 
     await ctx.breakpoint({
       question: `World ontology research complete. Domain coverage: ${worldOntologyResult.result?.domainCoverage?.percentage}%, Key entities: ${worldOntologyResult.result?.keyEntities?.length}, External systems: ${worldOntologyResult.result?.externalSystems?.length}. Proceed to problem space analysis?`,
@@ -1909,7 +1951,11 @@ export async function process(inputs, ctx) {
       cognitiveOptimization: processEvolutionContext.cognitiveLoadManagement.complexityReductionStrategies.length,
       multiLevelLearningDepth: Object.keys(multiLevelLearning).reduce((sum, key) => sum + multiLevelLearning[key].length, 0),
       // Evidence-based modeling metrics
-      evidenceCollectionCount: evidenceBasedModelingFramework.evidenceCollection.primarySources.length + evidenceBasedModelingFramework.evidenceCollection.secondarySources.length,
+      evidenceCollectionCount: evidenceBasedModelingFramework.evidenceCollection.primarySources.length +
+                                        evidenceBasedModelingFramework.evidenceCollection.secondarySources.length +
+                                        evidenceBasedModelingFramework.evidenceCollection.empiricalExperiments.length +
+                                        evidenceBasedModelingFramework.evidenceCollection.reproducibleResearch.length +
+                                        evidenceBasedModelingFramework.evidenceCollection.crowdSourcedValidation.length,
       evidenceQualityScore: calculateAverageEvidenceQuality(evidenceBasedModelingFramework),
       sourceCredibilityScore: calculateAverageCredibilityScore(evidenceBasedModelingFramework),
       evidenceGapsIdentified: evidenceBasedModelingFramework.evidenceIntegration.evidenceGaps.length,
@@ -2663,6 +2709,19 @@ const worldOntologyResearchTask = defineTask({
           '- Direct stakeholder interviews and surveys',
           '- Original research data and experimental results',
           '- Technical documentation from authoritative implementers',
+          '',
+          '**EMPIRICAL EXPERIMENTS** (Online and Reproducible - High Credibility):',
+          '- Reproducible experiments with open methodology and publicly available data',
+          '- Open science experiments with complete replication instructions',
+          '- Community-validated experimental results with independent confirmations',
+          '- Crowd-sourced empirical validation with aggregated statistical results',
+          '- Online lab notebooks and experimental documentation with version control',
+          '- Replication studies and validation attempts with documented outcomes',
+          '- Public datasets with documented collection and validation methodologies',
+          '- Collaborative research platforms (e.g., OSF, GitHub, Zenodo) with peer validation',
+          '- Citizen science projects with rigorous data collection protocols',
+          '- Collaborative validation networks with distributed peer review',
+          '- Multi-institutional replication consortiums with standardized protocols',
 
           '**SECONDARY SOURCES** (Moderate Credibility, Require Validation):',
           '- Industry analyst reports (Gartner, Forrester, etc.) with methodology',
@@ -2694,6 +2753,8 @@ const worldOntologyResearchTask = defineTask({
           '- CURRENCY: Recency and ongoing relevance of information',
           '- CONSISTENCY: Alignment with other credible sources',
           '- VERIFIABILITY: Ability for others to access and verify sources',
+          '- REPRODUCIBILITY: Complete methodology documentation enabling replication',
+          '- REPLICATION: Evidence of successful independent reproductions',
 
           '**BIAS IDENTIFICATION AND MITIGATION**:',
           '- COMMERCIAL BIAS: Identify vendor/commercial interests affecting claims',
@@ -2702,11 +2763,34 @@ const worldOntologyResearchTask = defineTask({
           '- AVAILABILITY BIAS: Don\'t overweight easily accessible information',
           '- AUTHORITY BIAS: Validate claims even from respected sources',
 
+          '=== EMPIRICAL EXPERIMENT VALIDATION PROTOCOL ===',
+          '**REPRODUCIBILITY VALIDATION**:',
+          '- Verify complete methodology documentation is publicly available',
+          '- Check availability of raw data, analysis code, and environment specifications',
+          '- Validate replication instructions are clear and complete',
+          '- Assess feasibility of reproduction with available resources',
+          '- Document any barriers to reproduction and workarounds',
+          '',
+          '**REPLICATION ASSESSMENT**:',
+          '- Identify independent replication attempts and their outcomes',
+          '- Assess statistical significance across multiple replications',
+          '- Document variations in results and potential explanations',
+          '- Evaluate community consensus on experimental validity',
+          '- Track updates and corrections to original experiments',
+          '',
+          '**ONLINE EVIDENCE VALIDATION**:',
+          '- Verify persistent URLs and archive availability (Wayback Machine, etc.)',
+          '- Check version control history and change documentation',
+          '- Validate community peer review and feedback incorporation',
+          '- Assess collaborative validation and crowd-sourced verification',
+          '- Document evidence update frequency and maintenance status',
+          '',
           '=== EVIDENCE DOCUMENTATION STANDARDS ===',
-          '**CITATION FORMAT**: Author/Organization. "Title". Source, Date. [Evidence Quality: X/10] [Confidence: High/Medium/Low]',
+          '**CITATION FORMAT**: Author/Organization. "Title". Source, Date. [Evidence Quality: X/10] [Confidence: High/Medium/Low] [Reproducible: Yes/No]',
           '**EVIDENCE CHAIN**: For complex claims, document logical evidence chains from sources to conclusions',
           '**CONFLICT RESOLUTION**: When sources conflict, document why certain sources were prioritized',
           '**VERIFICATION PATH**: Provide clear instructions for stakeholders to verify critical evidence',
+          '**REPLICATION GUIDE**: For empirical claims, provide step-by-step replication instructions',
 
           '=== SYSTEMATIC CRITICAL THINKING FRAMEWORK ===',
           'Apply rigorous agent-based analysis using the DEEP-CARE framework:',
@@ -8222,11 +8306,14 @@ const evidenceValidationManagementTask = defineTask({
           '- Document research needed to address priority gaps',
 
           '**GAP FILLING STRATEGIES**:',
-          '- PRIMARY RESEARCH: Areas requiring original data collection',
-          '- EXPERT CONSULTATION: Topics needing specialist input',
+          '- PRIMARY RESEARCH: Areas requiring original data collection and research studies',
+          '- EXPERIMENTAL DESIGN: Design and conduct experiments to generate missing evidence',
+          '- EMPIRICAL VALIDATION: Create validation studies for ontology claims requiring verification',
+          '- COLLABORATIVE RESEARCH: Organize multi-stakeholder studies for complex evidence needs',
+          '- EXPERT CONSULTATION: Topics needing specialist input and validation',
           '- LITERATURE SEARCH: Systematic search for overlooked sources',
           '- STAKEHOLDER INPUT: Areas where practitioner knowledge is crucial',
-          '- EMPIRICAL VALIDATION: Claims requiring experimental verification',
+          '- HYPOTHESIS TESTING: Generate and test hypotheses for uncertain domain aspects',
 
           '=== STAKEHOLDER VERIFICATION GUIDES ===',
           '**ACCESSIBILITY ASSESSMENT**:',
@@ -9356,6 +9443,202 @@ const crossSystemValidationTask = defineTask({
         outputJsonPath: `tasks/${effectId}/result.json`
       },
       labels: ['cross-system-validation', 'integration-testing', 'holistic-assessment', 'interoperability']
+    };
+  }
+});
+
+/**
+ * Task: Evidence Generation Through Research and Experimentation
+ * Purpose: Generate original evidence through research studies and experiments when existing evidence is insufficient
+ */
+const evidenceGenerationTask = defineTask({
+  name: 'evidence-generation-research',
+  description: 'Generate original evidence through designed research studies and experiments to fill critical evidence gaps',
+
+  inputs: {
+    projectName: { type: 'string', required: true },
+    evidenceGaps: { type: 'array', required: true },
+    evidenceFramework: { type: 'object', required: true },
+    currentPhase: { type: 'string', required: true },
+    domainType: { type: 'string', default: 'general' },
+    stakeholderContext: { type: 'string', default: 'multi-team' },
+    resourceConstraints: { type: 'object', default: {} },
+    researchPriority: { type: 'string', default: 'high' }
+  },
+
+  outputs: {
+    researchStudies: { type: 'array' },
+    designedExperiments: { type: 'array' },
+    empiricalValidation: { type: 'array' },
+    originalData: { type: 'object' },
+    collaborativeStudies: { type: 'array' },
+    generatedEvidence: { type: 'object' },
+    validationResults: { type: 'object' },
+    researchMethodology: { type: 'object' },
+    replicationInstructions: { type: 'object' },
+    artifacts: { type: 'array' }
+  },
+
+  async run(inputs, taskCtx) {
+    const effectId = taskCtx.effectId;
+
+    return {
+      kind: 'agent',
+      title: `Evidence Generation Research: ${inputs.currentPhase} - ${inputs.projectName}`,
+      agent: {
+        role: 'evidence-generation-researcher',
+        goal: `Design and conduct research studies and experiments to generate missing evidence for ${inputs.projectName}`,
+        instructions: [
+          '=== EVIDENCE GENERATION RESEARCH FRAMEWORK ===',
+          'Design and execute original research studies and experiments to fill critical evidence gaps.',
+
+          '=== EVIDENCE GAP ANALYSIS AND PRIORITIZATION ===',
+          '**CRITICAL GAP ASSESSMENT**:',
+          '- Analyze each evidence gap for criticality to ontology validity',
+          '- Assess impact of missing evidence on decision-making and stakeholder confidence',
+          '- Prioritize gaps by potential research feasibility and resource requirements',
+          '- Evaluate urgency based on project timeline and dependencies',
+          '- Consider stakeholder needs and regulatory requirements for evidence',
+
+          '**RESEARCH FEASIBILITY EVALUATION**:',
+          '- Assess feasibility of generating evidence through original research',
+          '- Evaluate available resources (time, budget, expertise, technology)',
+          '- Consider ethical constraints and approval requirements',
+          '- Assess stakeholder availability and participation capacity',
+          '- Evaluate technical feasibility and methodological requirements',
+
+          '=== RESEARCH STUDY DESIGN ===',
+          '**SYSTEMATIC RESEARCH METHODOLOGY**:',
+          '- Design appropriate research methodologies for different evidence types',
+          '- Select quantitative vs. qualitative approaches based on evidence needs',
+          '- Design sampling strategies and data collection protocols',
+          '- Establish validity and reliability measures for research instruments',
+          '- Plan data analysis methods and statistical approaches',
+
+          '**STAKEHOLDER RESEARCH STUDIES**:',
+          '- Design surveys and interviews for stakeholder knowledge elicitation',
+          '- Create focus group protocols for collaborative knowledge validation',
+          '- Develop participatory research approaches for domain expertise capture',
+          '- Design longitudinal studies for process and workflow validation',
+          '- Create case study protocols for real-world scenario validation',
+
+          '=== EXPERIMENTAL DESIGN AND EXECUTION ===',
+          '**CONTROLLED EXPERIMENT DESIGN**:',
+          '- Design controlled experiments for ontology component validation',
+          '- Create experimental protocols with appropriate controls and variables',
+          '- Establish measurement criteria and success metrics',
+          '- Design replication protocols for independent validation',
+          '- Plan statistical analysis and significance testing approaches',
+
+          '**EMPIRICAL VALIDATION EXPERIMENTS**:',
+          '- Design experiments to validate ontology accuracy against real-world data',
+          '- Create performance testing experiments for ontology query efficiency',
+          '- Design usability experiments for stakeholder interaction validation',
+          '- Develop scalability experiments for large-scale deployment scenarios',
+          '- Create integration experiments for system compatibility validation',
+
+          '**COLLABORATIVE VALIDATION STUDIES**:',
+          '- Design multi-stakeholder validation studies for consensus building',
+          '- Create cross-organizational studies for broader domain validation',
+          '- Develop expert panel studies for specialized domain knowledge',
+          '- Design comparative studies against existing ontologies and standards',
+          '- Create longitudinal validation studies for temporal stability',
+
+          '=== ORIGINAL DATA COLLECTION ===',
+          '**SYSTEMATIC DATA COLLECTION PROTOCOLS**:',
+          '- Design data collection instruments and procedures',
+          '- Establish data quality standards and validation procedures',
+          '- Create data management and storage protocols',
+          '- Design data cleaning and preprocessing methodologies',
+          '- Establish data versioning and change management procedures',
+
+          '**DOMAIN-SPECIFIC DATA GENERATION**:',
+          '- Collect domain-specific examples and counter-examples',
+          '- Generate test datasets for ontology validation',
+          '- Create benchmark datasets for comparative evaluation',
+          '- Develop synthetic data for edge case and boundary condition testing',
+          '- Collect real-world usage data for practical validation',
+
+          '=== HYPOTHESIS GENERATION AND TESTING ===',
+          '**SYSTEMATIC HYPOTHESIS DEVELOPMENT**:',
+          '- Generate testable hypotheses for uncertain domain aspects',
+          '- Design hypothesis testing protocols and acceptance criteria',
+          '- Create alternative hypotheses and null hypothesis testing',
+          '- Plan hypothesis refinement based on experimental results',
+          '- Document hypothesis evolution and learning progression',
+
+          '**PREDICTIVE VALIDATION STUDIES**:',
+          '- Design studies to test ontology predictive capabilities',
+          '- Create validation experiments for ontology inference accuracy',
+          '- Test ontology robustness under various scenarios and conditions',
+          '- Validate ontology adaptability to changing domain conditions',
+          '- Test ontology generalizability across different contexts',
+
+          '=== RESEARCH EXECUTION AND VALIDATION ===',
+          '**RIGOROUS EXECUTION PROTOCOLS**:',
+          '- Execute research studies with proper controls and documentation',
+          '- Maintain research integrity and ethical standards throughout',
+          '- Document all procedures, decisions, and unexpected outcomes',
+          '- Implement quality control measures and peer validation',
+          '- Create comprehensive audit trails for research reproducibility',
+
+          '**RESULTS VALIDATION AND ANALYSIS**:',
+          '- Apply appropriate statistical analysis and significance testing',
+          '- Validate results through independent analysis and review',
+          '- Assess generalizability and external validity of findings',
+          '- Document limitations, biases, and potential confounding factors',
+          '- Create confidence intervals and uncertainty quantification',
+
+          '=== GENERATED EVIDENCE INTEGRATION ===',
+          '**EVIDENCE SYNTHESIS AND INTEGRATION**:',
+          '- Synthesize generated evidence with existing evidence sources',
+          '- Resolve conflicts between generated and existing evidence',
+          '- Update evidence quality assessments based on original research',
+          '- Integrate findings into ontology and documentation',
+          '- Update stakeholder confidence and validation status',
+
+          '**REPLICATION AND REPRODUCIBILITY PROTOCOLS**:',
+          '- Create complete replication instructions for all studies and experiments',
+          '- Document all materials, procedures, and analytical approaches',
+          '- Provide access to raw data and analysis code where possible',
+          '- Create guidance for independent replication attempts',
+          '- Establish protocols for ongoing validation and updates',
+
+          '=== COLLABORATIVE RESEARCH COORDINATION ===',
+          '**MULTI-STAKEHOLDER RESEARCH COORDINATION**:',
+          '- Coordinate research activities across different stakeholder groups',
+          '- Manage collaborative data collection and validation efforts',
+          '- Facilitate expert participation and knowledge contribution',
+          '- Coordinate with external research institutions and organizations',
+          '- Manage intellectual property and data sharing agreements',
+
+          '**COMMUNITY VALIDATION AND PEER REVIEW**:',
+          '- Organize peer review processes for generated research',
+          '- Facilitate community validation and feedback collection',
+          '- Coordinate with domain experts for specialized validation',
+          '- Manage external validation and independent replication efforts',
+          '- Create mechanisms for ongoing community contribution and validation',
+
+          'Execute systematic evidence generation with rigorous methodology and complete documentation.',
+
+          `Research context: ${inputs.currentPhase} phase for ${inputs.domainType} domain with ${inputs.stakeholderContext} stakeholder complexity`
+        ],
+        context: {
+          projectName: inputs.projectName,
+          evidenceGaps: inputs.evidenceGaps,
+          evidenceFramework: inputs.evidenceFramework,
+          currentPhase: inputs.currentPhase,
+          domainType: inputs.domainType,
+          stakeholderContext: inputs.stakeholderContext,
+          resourceConstraints: inputs.resourceConstraints,
+          researchPriority: inputs.researchPriority
+        }
+      },
+      io: {
+        inputJsonPath: `tasks/${effectId}/input.json`,
+        outputJsonPath: `tasks/${effectId}/result.json`
+      },
+      labels: ['evidence-generation', 'original-research', 'experimental-design', 'empirical-validation']
     };
   }
 });

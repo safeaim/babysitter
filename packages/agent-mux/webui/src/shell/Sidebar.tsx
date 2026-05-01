@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom-v6';
+import { NavLink } from 'react-router-dom-v6';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { Button } from '@a5c-ai/compendium';
-import { Bot, FolderKanban, GitBranchPlus, Inbox, Layers3, PlaySquare, Settings2, Sparkles, Workflow } from 'lucide-react';
+import { Bot, FolderKanban, Inbox, Layers3, PlaySquare, Settings2, Sparkles, Workflow } from 'lucide-react';
 import { useGateway } from '@a5c-ai/agent-mux-ui';
 
 type NavItem = {
@@ -19,7 +18,6 @@ function countPendingHooks(value: Record<string, ReadonlyArray<unknown> | undefi
 }
 
 export function Sidebar(): JSX.Element {
-  const navigate = useNavigate();
   const { store } = useGateway();
   const sessions = useStore(store, useShallow((state) => Object.values(state.sessions.byId)));
   const runs = useStore(store, useShallow((state) => Object.values(state.runs.byId)));
@@ -54,29 +52,10 @@ export function Sidebar(): JSX.Element {
     <aside className="app-sidebar">
       <div className="app-sidebar__brand">
         <p className="app-sidebar__label">agent-mux</p>
-        <h1 className="app-sidebar__title">Workspace hub</h1>
-        <p className="app-sidebar__copy">
-          Projects, sessions, workspaces, and runs in one place.
-        </p>
-      </div>
-
-      <div className="app-sidebar__spotlight">
-        <div className="app-sidebar__spotlight-card">
-          <div>
-            <div className="app-sidebar__spotlight-label">Live now</div>
-            <div className="app-sidebar__spotlight-value">{activeSessions} sessions</div>
-          </div>
-          <div className="app-sidebar__spotlight-meta">{runningRuns} running runs</div>
-        </div>
-        <div className="app-sidebar__quick-actions">
-          <Button type="button" size="sm" onClick={() => navigate('/sessions/new')}>
-            <GitBranchPlus className="h-4 w-4" />
-            Start session
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={() => navigate('/projects')}>
-            <FolderKanban className="h-4 w-4" />
-            Open board
-          </Button>
+        <h1 className="app-sidebar__title">Operate</h1>
+        <div className="app-sidebar__mini-status">
+          <span className="connection-pill">{activeSessions} live</span>
+          <span className="connection-pill">{runningRuns} runs</span>
         </div>
       </div>
 

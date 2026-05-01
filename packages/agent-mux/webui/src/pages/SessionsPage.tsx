@@ -271,14 +271,15 @@ export function SessionsPage(): JSX.Element {
   return (
     <PageShell>
       <PageSection>
-        <PageHeroGrid className="session-browser__hero-grid">
-          <div className="session-browser__hero-copy">
-            <p className="page-kicker">Sessions</p>
-            <h1 className="page-title page-title--secondary">Sessions are conversation workspaces, not a run log.</h1>
-            <p className="page-copy page-copy--wide">
-              Jump straight into live chat, reopen paused threads, or pivot into the linked workspace and active run
-              without hunting through separate screens.
-            </p>
+        <div className="session-browser__intro">
+          <div className="session-browser__intro-header">
+            <div className="session-browser__intro-copy">
+              <p className="page-kicker">Sessions</p>
+              <h1 className="page-title page-title--secondary">Jump back into the right chat.</h1>
+              <p className="page-copy page-copy--wide">
+                Live conversations, paused threads, linked workspaces, and the latest run stay on one surface so you can resume work without hunting across routes.
+              </p>
+            </div>
             <div className="page-actions">
               <Link to="/sessions/new" className="session-browser__action session-browser__action--primary">
                 Start session
@@ -289,59 +290,57 @@ export function SessionsPage(): JSX.Element {
             </div>
           </div>
 
-          <div className="session-browser__hero-kpis">
-            <div className="summary-card">
-              <span className="summary-label">Live now</span>
-              <strong>{activeSessions.length}</strong>
+          <div className="session-browser__controls">
+            <label className="session-browser__search" aria-label="Search sessions">
+              <Search className="h-4 w-4" />
+              <input
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search session id, title, agent, workspace, or run id"
+              />
+            </label>
+
+            <div className="session-browser__filters" role="tablist" aria-label="Session filters">
+              {([
+                ['all', `All sessions (${rows.length})`],
+                ['active', `Active (${activeSessions.length})`],
+                ['inactive', `Inactive (${inactiveSessions.length})`],
+              ] as const).map(([nextFilter, label]) => (
+                <button
+                  key={nextFilter}
+                  type="button"
+                  role="tab"
+                  aria-selected={filter === nextFilter}
+                  className={`session-browser__filter ${filter === nextFilter ? 'session-browser__filter--active' : ''}`}
+                  onClick={() => setFilter(nextFilter)}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-            <div className="summary-card">
-              <span className="summary-label">Paused</span>
-              <strong>{inactiveSessions.length}</strong>
-            </div>
-            <div className="summary-card">
-              <span className="summary-label">Workspace-linked</span>
-              <strong>{workspaceBoundCount}</strong>
-            </div>
-            <div className="summary-card">
-              <span className="summary-label">Observed cost</span>
-              <strong>{rows.length > 0 ? formatUsd(totalCost) ?? 'unavailable' : 'No usage yet'}</strong>
+
+            <div className="session-browser__visible-count">
+              {filteredRows.length} visible
             </div>
           </div>
-        </PageHeroGrid>
-      </PageSection>
 
-      <PageSection inset>
-        <div className="session-browser__controls">
-          <label className="session-browser__search" aria-label="Search sessions">
-            <Search className="h-4 w-4" />
-            <input
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Search session id, title, agent, workspace, or run id"
-            />
-          </label>
-
-          <div className="session-browser__filters" role="tablist" aria-label="Session filters">
-            {([
-              ['all', `All sessions (${rows.length})`],
-              ['active', `Active (${activeSessions.length})`],
-              ['inactive', `Inactive (${inactiveSessions.length})`],
-            ] as const).map(([nextFilter, label]) => (
-              <button
-                key={nextFilter}
-                type="button"
-                role="tab"
-                aria-selected={filter === nextFilter}
-                className={`session-browser__filter ${filter === nextFilter ? 'session-browser__filter--active' : ''}`}
-                onClick={() => setFilter(nextFilter)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <div className="session-browser__visible-count">
-            {filteredRows.length} visible
+          <div className="session-browser__summary-strip">
+            <span className="page-chip session-browser__summary-chip">
+              <strong>Live</strong>
+              <span>{activeSessions.length}</span>
+            </span>
+            <span className="page-chip session-browser__summary-chip">
+              <strong>Paused</strong>
+              <span>{inactiveSessions.length}</span>
+            </span>
+            <span className="page-chip session-browser__summary-chip">
+              <strong>Workspace-linked</strong>
+              <span>{workspaceBoundCount}</span>
+            </span>
+            <span className="page-chip session-browser__summary-chip">
+              <strong>Observed cost</strong>
+              <span>{rows.length > 0 ? formatUsd(totalCost) ?? 'unavailable' : 'No usage yet'}</span>
+            </span>
           </div>
         </div>
       </PageSection>
@@ -351,7 +350,7 @@ export function SessionsPage(): JSX.Element {
           <div className="session-browser__section-header">
             <div>
               <p className="page-kicker page-kicker--compact">Live</p>
-              <h2 className="page-title page-title--secondary">Active chats that can be resumed immediately</h2>
+              <h2 className="page-title page-title--secondary">Active chats</h2>
             </div>
           </div>
           <div className="session-browser__spotlight-list">
@@ -371,7 +370,7 @@ export function SessionsPage(): JSX.Element {
           <div className="session-browser__section-header">
             <div>
               <p className="page-kicker page-kicker--compact">Recent</p>
-              <h2 className="page-title page-title--secondary">Paused threads worth picking back up</h2>
+              <h2 className="page-title page-title--secondary">Paused chats</h2>
             </div>
           </div>
           <div className="session-browser__spotlight-list">
@@ -393,9 +392,6 @@ export function SessionsPage(): JSX.Element {
           <div>
             <p className="page-kicker page-kicker--compact">Directory</p>
             <h2 className="page-title page-title--secondary">All tracked sessions</h2>
-            <p className="page-copy">
-              Keep scanning on one surface. Open the chat when you need the transcript, or jump directly to the linked workspace and latest run.
-            </p>
           </div>
         </div>
 

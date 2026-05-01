@@ -180,5 +180,41 @@ test.describe("agent-mux webui e2e", () => {
       expect(shellBox!.width / viewport!.width).toBeGreaterThan(0.65);
       expect(desktopPanelsBox!.width / shellBox!.width).toBeGreaterThan(0.9);
     });
+
+    test("sessions directory stays compact and keeps utility chrome collapsed until requested", async ({ page }) => {
+      const state = await readFixtureState();
+      await page.goto("/sessions", { waitUntil: "domcontentloaded" });
+
+      await expect(page.getByRole("heading", { name: "Jump back into the right chat." })).toBeVisible();
+      await expect(page.getByLabel("Search sessions")).toBeVisible();
+      await expect(page.getByTestId("topbar-tools-details")).not.toHaveAttribute("open", "");
+      await expect(page.getByTestId(`session-card-${state.sessionId}`)).toBeVisible();
+
+      const viewport = page.viewportSize();
+      const topbarBox = await page.locator(".app-topbar").boundingBox();
+      const searchBox = await page.getByLabel("Search sessions").boundingBox();
+      const liveCardBox = await page.getByTestId(`session-card-${state.sessionId}`).boundingBox();
+      expect(viewport).not.toBeNull();
+      expect(topbarBox).not.toBeNull();
+      expect(searchBox).not.toBeNull();
+      expect(liveCardBox).not.toBeNull();
+      expect(topbarBox!.height / viewport!.height).toBeLessThan(0.22);
+      expect(searchBox!.y).toBeLessThan(viewport!.height * 0.55);
+      expect(liveCardBox!.y).toBeLessThan(viewport!.height * 0.95);
+    });
+
+    test("runs route keeps triage controls in view without a doc-heavy hero", async ({ page }) => {
+      await page.goto("/runs", { waitUntil: "domcontentloaded" });
+
+      await expect(page.getByRole("heading", { name: "Run queue and approvals" })).toBeVisible();
+      await expect(page.getByTestId("global-search-input")).toBeVisible();
+      await expect(page.getByTestId("topbar-tools-details")).not.toHaveAttribute("open", "");
+
+      const viewport = page.viewportSize();
+      const searchBox = await page.getByTestId("global-search-input").boundingBox();
+      expect(viewport).not.toBeNull();
+      expect(searchBox).not.toBeNull();
+      expect(searchBox!.y).toBeLessThan(viewport!.height * 0.78);
+    });
   });
 });

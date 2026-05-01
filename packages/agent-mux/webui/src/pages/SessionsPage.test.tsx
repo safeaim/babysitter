@@ -62,7 +62,8 @@ describe('SessionsPage', () => {
 
     render(<SessionsPage />);
 
-    expect(screen.getByText('Sessions are conversation workspaces, not a run log.')).toBeInTheDocument();
+    expect(screen.getByText('Jump back into the right chat.')).toBeInTheDocument();
+    expect(screen.getByText('Observed cost')).toBeInTheDocument();
     expect(screen.getAllByText('Realtime workspace repair').length).toBeGreaterThan(0);
     expect(screen.getAllByText('/repo/worktrees/active').length).toBeGreaterThan(0);
     expect(
@@ -84,6 +85,7 @@ describe('SessionsPage', () => {
 
     render(<SessionsPage />);
 
+    expect(screen.getByLabelText('Search sessions')).toBeInTheDocument();
     await user.click(screen.getByRole('tab', { name: 'Inactive (1)' }));
     expect(screen.getByTestId('session-row-session-paused')).toBeInTheDocument();
     expect(screen.queryByTestId('session-row-session-active')).not.toBeInTheDocument();

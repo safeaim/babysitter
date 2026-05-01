@@ -52,9 +52,9 @@ function AuthPendingScreen(): JSX.Element {
     <main className="login-page">
       <section className="login-card auth-card">
         <p className="eyebrow">agent-mux webui</p>
-        <h1>Checking saved gateway access</h1>
+        <h1>Checking gateway access</h1>
         <p className="lede auth-note">
-          Revalidating the stored gateway token before the app reconnects live sessions and run feeds.
+          Reconnecting to the saved gateway before loading live sessions, workspaces, and run activity.
         </p>
       </section>
     </main>

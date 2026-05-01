@@ -170,27 +170,26 @@ export function KanbanRunsPage(): JSX.Element {
     <PageShell>
       <PageHeroGrid>
         <PageSection>
-          <p className="page-kicker">Execution overlays</p>
+          <p className="page-kicker">Runs</p>
           <div className="page-logo">
             <LogoWordmark className="h-6 w-auto" />
           </div>
-          <h1 className="page-title">Runs stay visible without replacing the planning workspace</h1>
+          <h1 className="page-title">Run queue and approvals</h1>
           <p className="page-copy">
-            The project board now owns the main journey. This route keeps Babysitter runs,
-            approvals, search, and status triage available as an execution dashboard.
+            Inspect live execution, breakpoints, and recent history here, then jump back to the linked project, workspace, or chat without losing context.
           </p>
           <div className="page-actions">
             <Button variant="primary" onClick={() => navigate('/projects')}>
-              Open projects
+              Projects
             </Button>
             <Button variant="ghost" onClick={() => navigate('/sessions/new')}>
-              Start session
+              New session
             </Button>
             <Button variant="ghost" onClick={() => navigate('/workspaces')}>
-              Open workspaces
+              Workspaces
             </Button>
             <Button variant="ghost" onClick={() => navigate('/inbox')}>
-              Open inbox
+              Inbox
             </Button>
           </div>
         </PageSection>
@@ -198,12 +197,12 @@ export function KanbanRunsPage(): JSX.Element {
         <PageSection>
           <p className="page-kicker">Gateway</p>
           <h2 className="page-title page-title--secondary">
-            {isAuthenticated ? 'agent-mux connected' : 'agent-mux disconnected'}
+            {isAuthenticated ? 'Connected and streaming' : 'Reconnect the gateway'}
           </h2>
           <p className="page-copy">
             {isAuthenticated
-              ? 'Live sessions and workspace attention are available now.'
-              : 'Connect the gateway to enable session creation, chat continuation, and live workspace context from the same app.'}
+              ? 'Live sessions, workspace attention, and run telemetry are available now.'
+              : 'Reconnect to create sessions, continue chats, and pull live workspace context into the same surface.'}
           </p>
           <div className="page-actions">
             <Button variant="ghost" onClick={() => navigate(isAuthenticated ? '/sessions' : '/login')}>
@@ -213,8 +212,8 @@ export function KanbanRunsPage(): JSX.Element {
         </PageSection>
       </PageHeroGrid>
 
-      <BabysitterOverlayPanel />
       <GlobalSearch />
+      <BabysitterOverlayPanel />
 
       {showBanners ? (
         <ErrorBoundary section="Executive Summary">

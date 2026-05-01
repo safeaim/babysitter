@@ -4,62 +4,55 @@ import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { useConnection, useGateway } from '@a5c-ai/agent-mux-ui';
 import { Button } from '@a5c-ai/compendium';
-import { Command, Keyboard, PlayCircle } from 'lucide-react';
+import { Command, PlayCircle } from 'lucide-react';
 
 import { titleForPath } from './navigation.js';
 
-function topBarMeta(pathname: string): { eyebrow: string; subtitle: string } {
+function topBarMeta(pathname: string): { label: string; subtitle?: string } {
   if (pathname.startsWith('/sessions/pending/')) {
     return {
-      eyebrow: 'Handoff',
-      subtitle: 'Waiting for the bootstrap run to promote into a durable session.',
+      label: 'Session handoff',
+      subtitle: 'Promoting this run into a durable chat.',
     };
   }
   if (/^\/runs\/[^/]+$/.test(pathname)) {
     return {
-      eyebrow: 'Handoff',
-      subtitle: 'This route exists only long enough to redirect the run into its session chat.',
+      label: 'Session handoff',
+      subtitle: 'Opening the bound session chat for this run.',
     };
   }
   if (pathname.startsWith('/sessions/')) {
     return {
-      eyebrow: 'Conversation',
-      subtitle: 'Keep the chat primary while execution context and runtime stay alongside it.',
+      label: 'Chat',
     };
   }
   if (pathname === '/sessions') {
     return {
-      eyebrow: 'Sessions',
-      subtitle: 'Scan live and paused conversations, then jump back into the right thread.',
+      label: 'Directory',
     };
   }
   if (pathname.startsWith('/workspaces')) {
     return {
-      eyebrow: 'Workspace',
-      subtitle: 'Keep the issue link, session chat, and workspace status close together.',
+      label: 'Workspace',
     };
   }
   if (pathname.startsWith('/projects/')) {
     return {
-      eyebrow: 'Planning',
-      subtitle: 'Work the board, issues, reviews, and linked workspaces from one surface.',
+      label: 'Board',
     };
   }
   if (pathname.startsWith('/runs')) {
     return {
-      eyebrow: 'Execution',
-      subtitle: 'Inspect runs, approvals, and breakpoints without losing track of the active plan.',
+      label: 'Run queue',
     };
   }
   if (pathname === '/inbox') {
     return {
-      eyebrow: 'Attention',
-      subtitle: 'Handle breakpoints, approvals, and workspace recovery work that needs intervention.',
+      label: 'Attention',
     };
   }
   return {
-    eyebrow: 'Workbench',
-    subtitle: 'Plan, execute, and recover work from one connected operator surface.',
+    label: 'Workspace',
   };
 }
 
@@ -70,7 +63,7 @@ export function TopBar(props: { pathname: string; onOpenPalette(): void }): JSX.
   const sessions = useStore(store, useShallow((state) => Object.values(state.sessions.byId)));
   const runs = useStore(store, useShallow((state) => Object.values(state.runs.byId)));
   const meta = useMemo(() => topBarMeta(props.pathname), [props.pathname]);
-  const compactPlanningTopBar = props.pathname.startsWith('/projects/');
+  const compactTopBar = !meta.subtitle;
   const activeSessions = useMemo(
     () => sessions.filter((session) => session.status === 'active').length,
     [sessions],
@@ -81,42 +74,51 @@ export function TopBar(props: { pathname: string; onOpenPalette(): void }): JSX.
   );
 
   return (
-    <header className={`app-topbar${compactPlanningTopBar ? ' app-topbar--compact' : ''}`}>
+    <header className={`app-topbar${compactTopBar ? ' app-topbar--compact' : ''}`}>
       <div className="app-topbar__copy">
-        <p className="app-topbar__eyebrow">{meta.eyebrow}</p>
-        <h2>{titleForPath(props.pathname)}</h2>
-        {compactPlanningTopBar ? null : <p className="app-topbar__subtitle">{meta.subtitle}</p>}
+        <div className="app-topbar__title-row">
+          <h2>{titleForPath(props.pathname)}</h2>
+          <span className="connection-pill app-topbar__chip app-topbar__chip--route">{meta.label}</span>
+          <span
+            className={`connection-pill connection-${connection.status}`}
+            data-testid="topbar-connection-status"
+          >
+            {connection.status}
+          </span>
+        </div>
+        {meta.subtitle ? <p className="app-topbar__subtitle">{meta.subtitle}</p> : null}
       </div>
 
       <div className="app-topbar__actions">
         <div className="app-topbar__chips">
           <span className="connection-pill app-topbar__chip">
-            {activeSessions} live sessions
+            {activeSessions} active
           </span>
           <span className="connection-pill app-topbar__chip">
-            {runningRuns} running runs
+            {runningRuns} running
           </span>
-          <span className={`connection-pill connection-${connection.status}`}>{connection.status}</span>
         </div>
 
+        <details className="app-topbar__details" data-testid="topbar-tools-details">
+          <summary className="app-topbar__details-summary">
+            Tools
+          </summary>
+          <div className="app-topbar__details-body">
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => window.dispatchEvent(new Event('open-shortcuts-help'))}
+            >
+              Shortcuts
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={props.onOpenPalette}>
+              <Command className="h-4 w-4" />
+              Command palette
+            </Button>
+          </div>
+        </details>
         <div className="app-topbar__buttons">
-          {compactPlanningTopBar ? null : (
-            <>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={() => window.dispatchEvent(new Event('open-shortcuts-help'))}
-              >
-                <Keyboard className="h-4 w-4" />
-                Shortcuts
-              </Button>
-              <Button type="button" size="sm" variant="ghost" onClick={props.onOpenPalette}>
-                <Command className="h-4 w-4" />
-                Command palette
-              </Button>
-            </>
-          )}
           <Button type="button" size="sm" onClick={() => navigate('/sessions/new')}>
             <PlayCircle className="h-4 w-4" />
             New session

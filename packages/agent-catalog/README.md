@@ -1,8 +1,8 @@
 # @a5c-ai/agent-catalog
 
-`@a5c-ai/agent-catalog` is an internal-only workspace package for the shared agent ontology, discovery catalog, packaged evidence shards, and graph-backed helper APIs used across this monorepo.
+`@a5c-ai/agent-catalog` is a public package for the shared agent ontology, discovery catalog, packaged evidence shards, and graph-backed helper APIs used across the Babysitter toolchain.
 
-The package is versioned and packable so workspace consumers can exercise installed-package behavior in tests, but it is not part of the central `release.yml` or `staging-publish.yml` publish set and should not be treated as an externally supported npm release target.
+The package is published through the central `release.yml` and `staging-publish.yml` workflows. `main` publishes production releases, and `staging` publishes prerelease builds with the `staging` dist-tag.
 
 ## What ships
 
@@ -77,15 +77,15 @@ When graph structure or evidence claims change, update the YAML inputs first, th
 
 ## Lifecycle policy
 
-- The package stays `private: true` and is validated through workspace CI, not the public npm release pipeline.
-- `npm run ci:test --workspace=@a5c-ai/agent-catalog` is the release-equivalent contract for this workspace. It covers build output, graph validation, evidence freshness, package contract tests, and the internal-only lifecycle policy check.
-- Any future promotion to a public release target must update package metadata, central release workflows, workspace validation docs, and catalog CI metadata in the same change.
+- The package must stay publishable: it ships with `publishConfig.access = public`, includes this README in `files`, and is owned by the central publish workflows.
+- `npm run ci:test --workspace=@a5c-ai/agent-catalog` is the release-equivalent contract for this workspace. It covers build output, graph validation, evidence freshness, package contract tests, and the publish lifecycle policy check.
+- `release.yml` and `staging-publish.yml` version, pack, and publish this package alongside the SDK, hooks-mux, agent-mux, and plugin compiler surfaces that consume it.
 
 ## Downstream compatibility
 
-- Monorepo consumers may depend on the package's documented exports and packaged graph/evidence assets.
-- The compatibility contract is lockstep within this repository, not external semver support. A version bump here does not by itself promise independent release cadence or backward compatibility for third-party consumers.
-- Breaking changes to exported APIs, graph documents, evidence layout, or generated discovery data must land in the same change as every downstream consumer update and must keep consumer contract tests green.
+- Public and monorepo consumers may depend on the package's documented exports and packaged graph/evidence assets.
+- Breaking changes to exported APIs, graph documents, evidence layout, or generated discovery data require a semver-major release and must keep downstream consumer contract tests green in the same change.
+- Workspace consumers in this repo should still be updated in lockstep whenever a change would otherwise break their install, build, or runtime assumptions.
 
 ## Expected validation
 

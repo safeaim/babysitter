@@ -606,6 +606,7 @@ jobs:
             const fs = require('fs');
             const pkgs = [
               'package.json',
+              'packages/agent-catalog/package.json',
               'packages/sdk/package.json',
               'packages/babysitter/package.json',
               'packages/observer-dashboard/package.json',
@@ -783,6 +784,7 @@ jobs:
             const unifiedVersion = '${{ steps.version.outputs.staging_version_unified }}';
             const agentMuxVersion = '${{ steps.version.outputs.staging_version_agent_mux }}';
             const versionByPackageName = new Map([
+              ['@a5c-ai/agent-catalog', sdkVersion],
               ['@a5c-ai/babysitter', sdkVersion],
               ['@a5c-ai/babysitter-observer-dashboard', sdkVersion],
               ['@a5c-ai/babysitter-sdk', sdkVersion],
@@ -904,6 +906,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: agent-catalog
+            build: npm run build --workspace=@a5c-ai/agent-catalog
+            publish: npm publish --workspace=@a5c-ai/agent-catalog --access public --tag staging
           - name: babysitter-sdk
             build: npm run build:sdk
             publish: npm publish --workspace=@a5c-ai/babysitter-sdk --access public --tag staging

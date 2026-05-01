@@ -19,21 +19,25 @@ const ciWorkflow = readText(path.join(repoRoot, ".github", "workflows", "ci.yml"
 const releaseWorkflow = readText(path.join(repoRoot, ".github", "workflows", "release.yml"));
 const stagingWorkflow = readText(path.join(repoRoot, ".github", "workflows", "staging-publish.yml"));
 const workspaceValidationDoc = readText(path.join(repoRoot, "docs", "workspace-validation.md"));
+const packageMapDoc = readText(path.join(repoRoot, "docs", "package-and-plugin-map.md"));
+const releasePipelineDoc = readText(path.join(repoRoot, "docs", "release-pipeline.md"));
+const packageMapAgentCatalogLine = packageMapDoc
+  .split(/\r?\n/)
+  .find((line) => line.includes("`packages/agent-catalog`"));
+const releasePipelineAgentCatalogLine = releasePipelineDoc
+  .split(/\r?\n/)
+  .find((line) => line.includes("@a5c-ai/agent-catalog"));
 
-if (packageJson.private !== true) {
-  fail("@a5c-ai/agent-catalog must remain private while its lifecycle policy is internal-only.");
+if (packageJson.private === true) {
+  fail("@a5c-ai/agent-catalog must stay publishable and must not be marked private.");
 }
 
-if ("publishConfig" in packageJson) {
-  fail("@a5c-ai/agent-catalog must not declare publishConfig while it is internal-only.");
+if (packageJson.publishConfig?.access !== "public") {
+  fail("@a5c-ai/agent-catalog must declare publishConfig.access=\"public\".");
 }
 
-if (packageJson.scripts?.prepack || packageJson.scripts?.prepublishOnly) {
-  fail("@a5c-ai/agent-catalog must not declare publish-only package scripts while it is internal-only.");
-}
-
-if (packageJson.scripts?.["ci:staging"] || packageJson.scripts?.["ci:prod"]) {
-  fail("@a5c-ai/agent-catalog must not advertise staging/prod release scripts while it is internal-only.");
+if (packageJson.license === "UNLICENSED") {
+  fail("@a5c-ai/agent-catalog must declare a public license before npm publishing.");
 }
 
 if (!packageJson.scripts?.["policy:check"]) {
@@ -45,10 +49,10 @@ if (!Array.isArray(packageJson.files) || !packageJson.files.includes("README.md"
 }
 
 const requiredReadmeSnippets = [
-  "internal-only workspace package",
-  "not part of the central `release.yml` or `staging-publish.yml` publish set",
-  "compatibility contract is lockstep within this repository, not external semver support",
-  "Breaking changes to exported APIs, graph documents, evidence layout, or generated discovery data must land in the same change",
+  "public package",
+  "published through the central `release.yml` and `staging-publish.yml` workflows",
+  "`npm run ci:test --workspace=@a5c-ai/agent-catalog` is the release-equivalent contract",
+  "Breaking changes to exported APIs, graph documents, evidence layout, or generated discovery data require a semver-major release",
 ];
 
 for (const snippet of requiredReadmeSnippets) {
@@ -61,24 +65,32 @@ if (!ciWorkflow.includes("npm run ci:test --workspace=@a5c-ai/agent-catalog")) {
   fail("CI workflow must validate @a5c-ai/agent-catalog through npm run ci:test --workspace=@a5c-ai/agent-catalog.");
 }
 
-if (!workspaceValidationDoc.includes("packages/agent-catalog") || !workspaceValidationDoc.includes("lockstep")) {
-  fail("docs/workspace-validation.md must describe the agent-catalog internal-only lockstep compatibility policy.");
+if (!workspaceValidationDoc.includes("packages/agent-catalog") || !workspaceValidationDoc.includes("release.yml") || !workspaceValidationDoc.includes("staging-publish.yml")) {
+  fail("docs/workspace-validation.md must describe @a5c-ai/agent-catalog as a public package validated by CI plus release/staging workflows.");
 }
 
-if (releaseWorkflow.includes("@a5c-ai/agent-catalog")) {
-  fail("release.yml must not publish @a5c-ai/agent-catalog while it is internal-only.");
+if (!packageMapAgentCatalogLine || !packageMapAgentCatalogLine.includes("Public advanced/runtime package")) {
+  fail("docs/package-and-plugin-map.md must classify @a5c-ai/agent-catalog as a public package.");
 }
 
-if (stagingWorkflow.includes("@a5c-ai/agent-catalog")) {
-  fail("staging-publish.yml must not publish @a5c-ai/agent-catalog while it is internal-only.");
+if (!releasePipelineAgentCatalogLine || releasePipelineAgentCatalogLine.includes("intentionally excluded")) {
+  fail("docs/release-pipeline.md must describe @a5c-ai/agent-catalog as part of the central publish workflows.");
+}
+
+if (!releaseWorkflow.includes("npm publish --workspace=@a5c-ai/agent-catalog --access public")) {
+  fail("release.yml must publish @a5c-ai/agent-catalog as a public package.");
+}
+
+if (!stagingWorkflow.includes("npm publish --workspace=@a5c-ai/agent-catalog --access public --tag staging")) {
+  fail("staging-publish.yml must publish @a5c-ai/agent-catalog as a public staging package.");
 }
 
 console.log(
   JSON.stringify(
     {
       package: packageJson.name,
-      private: packageJson.private,
-      publishStrategy: "internal-only-workspace",
+      private: packageJson.private ?? false,
+      publishStrategy: "public-central-publish",
       validationCommand: "npm run ci:test --workspace=@a5c-ai/agent-catalog",
     },
     null,

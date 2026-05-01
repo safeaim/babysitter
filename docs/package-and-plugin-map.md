@@ -40,6 +40,7 @@ Use it to answer three questions quickly:
 | `packages/agent-plugins-mux` | Public package | [packages/agent-plugins-mux/README.md](../packages/agent-plugins-mux/README.md) | — | README is the canonical package-level contract. |
 | `packages/babysitter` | Public package | [packages/babysitter/README.md](../packages/babysitter/README.md) | — | README is the canonical package-level contract. |
 | `packages/babysitter-agent` | Public advanced/runtime package | [packages/babysitter-agent/README.md](../packages/babysitter-agent/README.md) | [README.md](../README.md) | Public npm package, but it is an advanced/operator-facing runtime CLI rather than the default entrypoint for new users. |
+| `packages/agent-catalog` | Public advanced/runtime package | [packages/agent-catalog/README.md](../packages/agent-catalog/README.md) | [docs/release-pipeline.md](./release-pipeline.md) | Public npm package for shared ontology/discovery/evidence assets used by other published runtimes; README is the canonical package contract. |
 | `packages/breakpoints-mux` | Public package | [packages/breakpoints-mux/README.md](../packages/breakpoints-mux/README.md) | — | README is the canonical package-level contract. |
 | `packages/cloud` | Public package | [packages/cloud/README.md](../packages/cloud/README.md) | — | README is the canonical public docs home today; the validation matrix does not currently expose a separate central docs entrypoint for this package. |
 | `packages/sdk` | Public package | [packages/sdk/README.md](../packages/sdk/README.md) | — | README is the canonical package-level contract. |
@@ -95,7 +96,6 @@ Use it to answer three questions quickly:
 
 | Surface | Status | Canonical docs home | Supporting entrypoints | Coverage note |
 | --- | --- | --- | --- | --- |
-| `packages/agent-catalog` | Internal-only workspace | [packages/agent-catalog/README.md](../packages/agent-catalog/README.md) | — | Internal-only metadata/catalog surface. Keep discovery honest and routed through internal notes rather than productized public docs. |
 | `packages/agent-core` | Internal-only workspace | [packages/agent-core/README.md](../packages/agent-core/README.md) | — | Repo-internal runtime/tool surface consumed by advanced runtime flows; do not present it as a standalone public product offering. |
 | `packages/agent-mux/mobile-android-app` | Internal-only companion app | [docs/package-and-plugin-map.md](./package-and-plugin-map.md) | [docs/agent-mux/README.md](./agent-mux/README.md) | No package README today. This map is the explicit internal-only note until the surface is promoted. |
 | `packages/agent-mux/mobile-ios-app` | Internal-only companion app | [docs/package-and-plugin-map.md](./package-and-plugin-map.md) | [docs/agent-mux/README.md](./agent-mux/README.md) | No package README today. This map is the explicit internal-only note until the surface is promoted. |

@@ -1,12 +1,20 @@
 {
   "name": "@a5c-ai/agent-catalog",
   "version": "0.1.0",
-  "private": true,
-  "description": "Internal-only workspace package for the shared agent ontology, discovery catalog, and evidence graph consumed across the monorepo.",
-  "license": "UNLICENSED",
+  "description": "Public package for the shared agent ontology, discovery catalog, and packaged evidence graph consumed across the Babysitter toolchain.",
+  "license": "MIT",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a5c-ai/babysitter.git",
+    "directory": "packages/agent-catalog"
+  },
+  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/packages/agent-catalog#readme",
+  "bugs": {
+    "url": "https://github.com/a5c-ai/babysitter/issues"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -28,6 +36,9 @@
     "docs",
     "evidence"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "check:src-artifacts": "node ./scripts/check-src-artifacts.cjs",
     "generate:evidence": "node ./scripts/generate-evidence.cjs",

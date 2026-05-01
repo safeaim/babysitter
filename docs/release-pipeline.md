@@ -1,7 +1,7 @@
 ---
 title: Continuous Release Pipeline
 description: Release ownership, workflow contracts, and guardrails for the Babysitter monorepo publish pipeline.
-last_updated: 2026-04-26
+last_updated: 2026-05-01
 ---
 
 # Continuous Release Pipeline
@@ -10,21 +10,21 @@ last_updated: 2026-04-26
 - `.github/workflows/release.yml` owns production npm releases from `main`, guarded by the `release-main` concurrency group so only one run executes at a time.
 - `.github/workflows/staging-publish.yml` owns prerelease npm publishing from `staging`, guarded by the `staging-publish` concurrency group.
 - `@a5c-ai/babysitter-observer-dashboard` is part of those central workflows. The former standalone `.github/workflows/observer-dashboard-publish.yml` path is retired, so observer-dashboard no longer has a separate `main` release workflow.
-- `@a5c-ai/agent-catalog` is intentionally excluded from those central publish workflows. It remains an internal-only workspace package whose compatibility contract is enforced through CI/workspace validation rather than npm release automation.
+- `@a5c-ai/agent-catalog` is part of those central publish workflows. It ships as a public dependency surface for SDK, hooks-mux, agent-mux, and agent-plugins-mux consumers.
 - `process-library-catalog` (`packages/catalog`) is intentionally excluded from those central publish workflows. It remains an internal-only workspace UI/API surface whose support contract is enforced through workspace CI rather than npm release automation.
 - Both central workflows validate, build, and publish observer-dashboard alongside the other public workspaces they own.
 
 ## Ownership Matrix
-- `release.yml` on `main`: validates the monorepo, bumps versions through `scripts/bump-version.mjs`, packs release artifacts, publishes public npm packages, tags `vX.Y.Z`, and creates the GitHub Release.
+- `release.yml` on `main`: validates the monorepo, bumps versions through `scripts/bump-version.mjs`, packs release artifacts, publishes public npm packages including `@a5c-ai/agent-catalog`, tags `vX.Y.Z`, and creates the GitHub Release.
 - `staging-publish.yml` on `staging`: validates the monorepo, writes prerelease versions into the publishable package manifests, and publishes the same centrally-owned npm packages with the `staging` dist-tag.
 - `packages/catalog`: validated through `npm run ci:test --workspace=process-library-catalog` in `.github/workflows/ci.yml`; no central publish workflow currently owns it.
-- `scripts/bump-version.mjs`: production version source of truth for the centrally versioned workspace packages, including `packages/observer-dashboard/package.json`.
+- `scripts/bump-version.mjs`: production version source of truth for the centrally versioned workspace packages, including `packages/agent-catalog/package.json` and `packages/observer-dashboard/package.json`.
 - `packages/observer-dashboard/README.md`: user-facing install guidance for the published package; it should describe the same central release ownership as this document.
 
 ## Secrets & Permissions
 - The workflow-level permissions block sets `contents: write` and `id-token: write`; `validate` reduces its scope to `contents: read`.
 - `GITHUB_TOKEN` **must** retain `contents: write` on `main` to push version bump commits and tags. If branch protection blocks the Actions bot, create a scoped PAT and store it as `RELEASE_BOT_TOKEN`, then replace usages in the workflow.
-- `NPM_TOKEN` authenticates `npm publish`; it must correspond to an account with publish rights to `@a5c-ai/babysitter-sdk` and should be rotated every 90 days.
+- `NPM_TOKEN` authenticates `npm publish`; it must correspond to an account with publish rights to `@a5c-ai/babysitter-sdk`, `@a5c-ai/agent-catalog`, and the rest of the centrally published packages, and should be rotated every 90 days.
 
 ## Guardrails
 - All GitHub Actions are pinned to immutable SHAs.

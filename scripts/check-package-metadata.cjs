@@ -157,7 +157,14 @@ function walkPackageJsons(dirPath, output) {
     return;
   }
   for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
-    if (entry.name.startsWith('.')) {
+    if (
+      entry.name.startsWith('.') ||
+      entry.name === 'node_modules' ||
+      entry.name === 'dist' ||
+      entry.name === 'dist-types' ||
+      entry.name === 'coverage' ||
+      entry.name === 'artifacts'
+    ) {
       continue;
     }
     const fullPath = path.join(dirPath, entry.name);

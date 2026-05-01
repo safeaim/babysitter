@@ -35,12 +35,12 @@
     {
       "surface": "packages/agent-catalog",
       "packageName": "@a5c-ai/agent-catalog",
-      "description": "Internal-only workspace package for the shared agent ontology, discovery catalog, and evidence graph consumed across the monorepo.",
+      "description": "Public package for the shared agent ontology, discovery catalog, and packaged evidence graph consumed across the Babysitter toolchain.",
       "hasReadme": true,
-      "status": "Internal-only workspace",
+      "status": "Public advanced/runtime package",
       "canonicalHome": "../packages/agent-catalog/README.md",
       "supporting": [],
-      "note": "Internal-only metadata/catalog surface. Keep discovery honest and routed through internal notes rather than productized public docs."
+      "note": "Public npm package for shared ontology, discovery, and evidence assets used by other published runtimes."
     },
     {
       "surface": "packages/agent-core",

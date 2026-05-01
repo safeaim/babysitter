@@ -135,6 +135,7 @@ jobs:
           do
             npm run build --workspace="$workspace"
           done 2>&1 | tee artifacts/mux-logs/agent-mux-test-prereqs-build.log
+          npm run build --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/mux-logs/agent-mux-webui-build.log
 
       - name: Hooks-proxy unit tests
         run: |
@@ -177,6 +178,26 @@ jobs:
           npm run build --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-build.log
           npm run test --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-tests.log
           npm run scorecard:migration --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-scorecard.log
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium 2>&1 | tee artifacts/mux-logs/agent-mux-webui-playwright-install.log
+
+      - name: agent-mux webui browser e2e
+        run: |
+          set -euo pipefail
+          npm run test:e2e --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/mux-logs/agent-mux-webui-browser-e2e.log
+
+      - name: Upload mux Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-mux-playwright-artifacts
+          path: |
+            packages/agent-mux/webui/.tmp/playwright-report
+            packages/agent-mux/webui/.tmp/playwright-test-results
+          if-no-files-found: warn
 
       - name: Upload mux validation logs
         if: always()

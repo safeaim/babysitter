@@ -113,7 +113,7 @@ function normalizeTaskId(id: string): string {
 function defineTaskFromObject<TArgs, TResult>(
   spec: DefineTaskObjectSpec<TArgs, TResult>
 ): DefinedTask<TArgs, TResult> {
-  const taskId = (spec.id ?? spec.name) as string | undefined;
+  const taskId = spec.id ?? spec.name;
   if (typeof taskId !== "string" || !taskId.trim()) {
     throw new Error(
       "defineTask object form requires a non-empty `id` or `name` string"
@@ -130,7 +130,7 @@ function defineTaskFromObject<TArgs, TResult>(
   let impl: TaskImpl<TArgs, TResult>;
   if (typeof spec.run === "function") {
     // Flavor (2): defineTask({ id|name, run, ... })
-    impl = spec.run as TaskImpl<TArgs, TResult>;
+    impl = spec.run;
   } else {
     // Flavor (1): static TaskDef. Everything except SDK-recognized envelope
     // fields becomes the static TaskDef.

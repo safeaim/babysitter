@@ -433,7 +433,10 @@ export async function process(inputs, ctx) {
         qualityDimensions: ['domain_accuracy', 'world_model_completeness', 'stakeholder_coverage', 'external_system_mapping'],
         targetQuality,
         maxIterations: maxIterationsPerPhase,
-        phaseName: 'World Ontology & Domain Research'
+        phaseName: 'World Ontology & Domain Research',
+        adaptiveQualityManager,
+        processContext: processEvolutionContext,
+        previousPhaseLearnings: []
       }
     );
 

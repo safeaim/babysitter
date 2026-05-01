@@ -3729,8 +3729,8 @@ export function BacklogOverview({
     false,
   );
   const [showPolicySignals, setShowPolicySignals] = usePersistedState(
-    `kanban-show-policy-signals-${stateScopeKey}`,
-    true,
+    `kanban-show-policy-signals-v2-${stateScopeKey}`,
+    false,
   );
   const [selectedIssueIds, setSelectedIssueIds] = useState<string[]>([]);
   const [bulkTargetState, setBulkTargetState] = useState<KanbanWorkflowState>("in-progress");
@@ -4545,11 +4545,11 @@ export function BacklogOverview({
             Kanban Board
           </p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
-            Run the backlog as an actual board
+            Work the backlog as a board
           </h2>
           <p className="mt-3 text-sm leading-6 text-foreground-muted">
-            Keep columns, workspace links, and review handoffs in one place. Open a card when you
-            need depth; stay on the board when you just need to move work.
+            Keep columns, workspace links, and review handoffs in one place. Open a card only when
+            you need depth.
           </p>
         </div>
 
@@ -4596,7 +4596,7 @@ export function BacklogOverview({
           <div className="mt-3 text-2xl font-semibold text-primary">
             {(issueReviews.summary?.pendingCount ?? 0) + (issueReviews.summary?.changesRequestedCount ?? 0)}
           </div>
-          <div className="text-sm text-primary/80">shared issue review artifacts awaiting action</div>
+          <div className="text-sm text-primary/80">reviews waiting for action</div>
         </div>
         <div className="rounded-2xl border border-error/25 bg-error-muted p-4">
           <div className="flex items-center gap-2 text-sm text-error">
@@ -4614,7 +4614,7 @@ export function BacklogOverview({
             Planning surface
           </p>
           <h3 className="mt-1 text-lg font-semibold text-foreground">
-            Filter, focus, and move work without leaving the board
+            Filter, focus, and move work
           </h3>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -4664,7 +4664,7 @@ export function BacklogOverview({
       </div>
 
       <div className="backlog-overview__controls mt-4 rounded-3xl border border-border bg-background/70 p-4">
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,180px))]">
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.7fr)_repeat(2,minmax(0,180px))]">
           <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
             Search
             <div className="mt-2 flex h-11 items-center gap-2 rounded-xl border border-border bg-card px-3">
@@ -4706,188 +4706,232 @@ export function BacklogOverview({
               <option value="needs-decomposition">Needs decomposition</option>
               <option value="ready">Ready</option>
               <option value="blocked">Blocked</option>
-              <option value="dispatched">Dispatched</option>
-              <option value="completed">Completed</option>
-            </select>
-          </label>
-          <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
-            Assignee
-            <select
-              value={assigneeFilter}
-              onChange={(event) => setAssigneeFilter(event.target.value)}
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
-              aria-label="Assignee filter"
-            >
-              <option value="all">All assignees</option>
-              {selectableAssignees.map((assignee) => (
-                <option key={assignee.id} value={assignee.id}>
-                  {assignee.displayName}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
-            Tag
-            <select
-              value={tagFilter}
-              onChange={(event) => setTagFilter(event.target.value)}
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
-              aria-label="Tag filter"
-            >
-              <option value="all">All tags</option>
-              {selectableTags.map((label) => (
-                <option key={label.id} value={label.id}>
-                  {label.name}
-                </option>
-              ))}
-            </select>
-          </label>
+                <option value="dispatched">Dispatched</option>
+                <option value="completed">Completed</option>
+              </select>
+            </label>
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
-            Sort
-            <div className="mt-2 flex items-center gap-2 rounded-xl border border-border bg-card px-3">
-              <ArrowUpDown className="h-4 w-4 text-foreground-muted" />
-              <select
-                value={sortMode}
-                onChange={(event) => setSortMode(event.target.value as PlanningSortMode)}
-                className="h-11 bg-transparent pr-2 text-sm text-foreground outline-none"
-                aria-label="Sort cards"
-              >
-                <option value="board-order">Board order</option>
-                <option value="priority">Priority</option>
-                <option value="activity">Recent activity</option>
-                <option value="title">Title</option>
-              </select>
-            </div>
-          </label>
-
-          <label className="mt-7 inline-flex items-center gap-2 text-sm text-foreground-muted">
-            <input
-              type="checkbox"
-              checked={showEmptySwimlanes}
-              onChange={(event) => setShowEmptySwimlanes(event.target.checked)}
-              className="h-4 w-4 rounded border border-border"
-            />
-            Show empty swimlanes
-          </label>
-
-          <label className="mt-7 inline-flex items-center gap-2 text-sm text-foreground-muted">
-            <input
-              type="checkbox"
-              checked={showPolicySignals}
-              onChange={(event) => setShowPolicySignals(event.target.checked)}
-              className="h-4 w-4 rounded border border-border"
-            />
-            Show policy feedback
-          </label>
-
-          <div className="mt-7 rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
+          <div className="rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
             {visibleCards.length} visible of {boardCards.length} issues
           </div>
+          {selectedCards.length > 0 ? (
+            <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">
+              {selectedCards.length} selected
+            </div>
+          ) : null}
+          {activeFilterCount > 0 ? (
+            <div className="rounded-full border border-border px-3 py-2 text-xs text-foreground-muted">
+              {activeFilterCount} active filter{activeFilterCount === 1 ? "" : "s"}
+            </div>
+          ) : null}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
-          <label className="inline-flex items-center gap-2 text-sm text-foreground">
-            <input
-              type="checkbox"
-              checked={allVisibleSelected}
-              onChange={toggleSelectAllVisible}
-              className="h-4 w-4 rounded border border-border"
-              aria-label="Select visible issues"
-            />
-            Select visible
-          </label>
-          <span className="text-sm text-foreground-muted">
-            {selectedCards.length} selected
-          </span>
-          <select
-            value={bulkTargetState}
-            onChange={(event) => setBulkTargetState(event.target.value as KanbanWorkflowState)}
-            className="h-11 rounded-xl border border-border bg-background px-3 text-sm text-foreground"
-            aria-label="Bulk move target"
-          >
-            {workflowOrder.map((state) => (
-              <option key={state} value={state} disabled={!bulkTargetOptions.includes(state)}>
-                Move to {stateLabel(state)}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={() => void handleBulkMove()}
-            disabled={selectedCards.length === 0 || bulkPending !== null || !bulkTargetOptions.includes(bulkTargetState)}
-            className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground disabled:opacity-50"
-          >
-            Move selected
-          </button>
-          <button
-            type="button"
-            onClick={() => void handleBulkWorkspaceProvision()}
-            disabled={selectedCards.length === 0 || bulkPending !== null}
-            className="inline-flex h-11 items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 text-sm font-semibold text-primary disabled:opacity-50"
-          >
-            Create workspaces
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedIssueIds([])}
-            disabled={selectedCards.length === 0 || bulkPending !== null}
-            className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground-muted disabled:opacity-50"
-          >
-            Clear selection
-          </button>
-        </div>
+        <details
+          className="backlog-overview__planning-details mt-4"
+          data-testid="board-controls-details"
+          open={selectedCards.length > 0 || Boolean(focusedIssue) ? true : undefined}
+        >
+          <summary className="backlog-overview__planning-summary">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted">
+                Board controls
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-foreground">
+                Keep advanced filters and bulk actions tucked away
+              </h3>
+            </div>
+            <div className="backlog-overview__planning-badges">
+              <span className="rounded-full border border-border bg-background px-3 py-1 text-xs text-foreground-muted">
+                Sort {sortMode.replace("-", " ")}
+              </span>
+              <span className="rounded-full border border-border bg-background px-3 py-1 text-xs text-foreground-muted">
+                {selectedCards.length} selected
+              </span>
+              <span className="rounded-full border border-border bg-background px-3 py-1 text-xs text-foreground-muted">
+                {activeFilterCount} active filters
+              </span>
+            </div>
+          </summary>
 
-        <div className="mt-4 grid gap-3 xl:grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,180px))]">
-          <div className="rounded-2xl border border-border bg-card px-4 py-3">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Board focus</p>
-                <p className="mt-2 text-sm font-semibold text-foreground">
-                  {focusedIssue ? `${focusedIssue.key} · ${focusedIssue.title}` : "No issue selected"}
-                </p>
+          <div className="backlog-overview__planning-body">
+            <div className="grid gap-3 xl:grid-cols-[repeat(2,minmax(0,180px))_auto]">
+              <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                Assignee
+                <select
+                  value={assigneeFilter}
+                  onChange={(event) => setAssigneeFilter(event.target.value)}
+                  className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
+                  aria-label="Assignee filter"
+                >
+                  <option value="all">All assignees</option>
+                  {selectableAssignees.map((assignee) => (
+                    <option key={assignee.id} value={assignee.id}>
+                      {assignee.displayName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                Tag
+                <select
+                  value={tagFilter}
+                  onChange={(event) => setTagFilter(event.target.value)}
+                  className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
+                  aria-label="Tag filter"
+                >
+                  <option value="all">All tags</option>
+                  {selectableTags.map((label) => (
+                    <option key={label.id} value={label.id}>
+                      {label.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                  Sort
+                  <div className="mt-2 flex items-center gap-2 rounded-xl border border-border bg-card px-3">
+                    <ArrowUpDown className="h-4 w-4 text-foreground-muted" />
+                    <select
+                      value={sortMode}
+                      onChange={(event) => setSortMode(event.target.value as PlanningSortMode)}
+                      className="h-11 bg-transparent pr-2 text-sm text-foreground outline-none"
+                      aria-label="Sort cards"
+                    >
+                      <option value="board-order">Board order</option>
+                      <option value="priority">Priority</option>
+                      <option value="activity">Recent activity</option>
+                      <option value="title">Title</option>
+                    </select>
+                  </div>
+                </label>
+
+                <label className="inline-flex items-center gap-2 text-sm text-foreground-muted">
+                  <input
+                    type="checkbox"
+                    checked={showEmptySwimlanes}
+                    onChange={(event) => setShowEmptySwimlanes(event.target.checked)}
+                    className="h-4 w-4 rounded border border-border"
+                  />
+                  Show empty swimlanes
+                </label>
+
+                <label className="inline-flex items-center gap-2 text-sm text-foreground-muted">
+                  <input
+                    type="checkbox"
+                    checked={showPolicySignals}
+                    onChange={(event) => setShowPolicySignals(event.target.checked)}
+                    className="h-4 w-4 rounded border border-border"
+                  />
+                  Show policy feedback
+                </label>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+              <label className="inline-flex items-center gap-2 text-sm text-foreground">
+                <input
+                  type="checkbox"
+                  checked={allVisibleSelected}
+                  onChange={toggleSelectAllVisible}
+                  className="h-4 w-4 rounded border border-border"
+                  aria-label="Select visible issues"
+                />
+                Select visible
+              </label>
+              <span className="text-sm text-foreground-muted">
+                {selectedCards.length} selected
+              </span>
+              <select
+                value={bulkTargetState}
+                onChange={(event) => setBulkTargetState(event.target.value as KanbanWorkflowState)}
+                className="h-11 rounded-xl border border-border bg-background px-3 text-sm text-foreground"
+                aria-label="Bulk move target"
+              >
+                {workflowOrder.map((state) => (
+                  <option key={state} value={state} disabled={!bulkTargetOptions.includes(state)}>
+                    Move to {stateLabel(state)}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => void handleBulkMove()}
+                disabled={selectedCards.length === 0 || bulkPending !== null || !bulkTargetOptions.includes(bulkTargetState)}
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground disabled:opacity-50"
+              >
+                Move selected
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleBulkWorkspaceProvision()}
+                disabled={selectedCards.length === 0 || bulkPending !== null}
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 text-sm font-semibold text-primary disabled:opacity-50"
+              >
+                Create workspaces
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedIssueIds([])}
+                disabled={selectedCards.length === 0 || bulkPending !== null}
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground-muted disabled:opacity-50"
+              >
+                Clear selection
+              </button>
+            </div>
+
+            <div className="mt-4 grid gap-3 xl:grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,180px))]">
+              <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Board focus</p>
+                    <p className="mt-2 text-sm font-semibold text-foreground">
+                      {focusedIssue ? `${focusedIssue.key} · ${focusedIssue.title}` : "No issue selected"}
+                    </p>
+                    <p className="mt-1 text-sm text-foreground-muted">
+                      {focusedIssue
+                        ? "The detail panel is open beside the board so you can edit without losing column context."
+                        : "Open any card to inspect acceptance criteria, review state, workspace links, and child issues."}
+                    </p>
+                  </div>
+                  {focusedIssue ? (
+                    <button
+                      type="button"
+                      onClick={clearFocusedIssue}
+                      className="inline-flex h-10 items-center rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground"
+                    >
+                      Clear focus
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Filters</p>
+                <p className="mt-2 text-base font-semibold text-foreground">{activeFilterCount}</p>
                 <p className="mt-1 text-sm text-foreground-muted">
-                  {focusedIssue
-                    ? "The detail panel is open beside the board so you can edit without losing column context."
-                    : "Open any card to inspect acceptance criteria, review state, workspace links, and child issues."}
+                  {activeFilterCount === 0 ? "Board showing the default scope." : "Filters actively narrowing the board."}
                 </p>
               </div>
-              {focusedIssue ? (
-                <button
-                  type="button"
-                  onClick={clearFocusedIssue}
-                  className="inline-flex h-10 items-center rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground"
-                >
-                  Clear focus
-                </button>
-              ) : null}
+
+              <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Selection</p>
+                <p className="mt-2 text-base font-semibold text-foreground">{selectedCards.length}</p>
+                <p className="mt-1 text-sm text-foreground-muted">Cards ready for bulk move or workspace creation.</p>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Review queue</p>
+                <p className="mt-2 text-base font-semibold text-foreground">
+                  {(issueReviews.summary?.pendingCount ?? 0) + (issueReviews.summary?.changesRequestedCount ?? 0)}
+                </p>
+                <p className="mt-1 text-sm text-foreground-muted">Artifacts waiting on review, approval, or rework.</p>
+              </div>
             </div>
           </div>
-
-          <div className="rounded-2xl border border-border bg-card px-4 py-3">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Filters</p>
-            <p className="mt-2 text-base font-semibold text-foreground">{activeFilterCount}</p>
-            <p className="mt-1 text-sm text-foreground-muted">
-              {activeFilterCount === 0 ? "Board showing the default scope." : "Filters actively narrowing the board."}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card px-4 py-3">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Selection</p>
-            <p className="mt-2 text-base font-semibold text-foreground">{selectedCards.length}</p>
-            <p className="mt-1 text-sm text-foreground-muted">Cards ready for bulk move or workspace creation.</p>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card px-4 py-3">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-foreground-muted">Review queue</p>
-            <p className="mt-2 text-base font-semibold text-foreground">
-              {(issueReviews.summary?.pendingCount ?? 0) + (issueReviews.summary?.changesRequestedCount ?? 0)}
-            </p>
-            <p className="mt-1 text-sm text-foreground-muted">Artifacts waiting on review, approval, or rework.</p>
-          </div>
-        </div>
+        </details>
       </div>
 
       {createNotice ? (
@@ -5003,6 +5047,14 @@ export function BacklogOverview({
                                   card.collaboratorNames.length > 0 ||
                                   card.assigneeNames.length > 0 ||
                                   card.labelNames.length > 0;
+                                const hasExpandableDetails =
+                                  showSecondaryDetails ||
+                                  card.dependencyCount > 0 ||
+                                  card.childCount > 0 ||
+                                  card.acceptanceProgress.total > 0 ||
+                                  (showPolicySignals &&
+                                    (card.policySignals.length > 0 ||
+                                      card.moveTargets.some((target) => target.signals.length > 0)));
 
                                 return (
                                   <article
@@ -5046,51 +5098,36 @@ export function BacklogOverview({
                                     </button>
 
                                     {card.summary ? (
-                                      <p className="mt-2 text-sm leading-6 opacity-90">{card.summary}</p>
+                                      <p className="backlog-overview__card-summary-copy mt-2 text-sm leading-6 opacity-90">
+                                        {card.summary}
+                                      </p>
                                     ) : null}
 
-                                    {parentIssue ? (
-                                      <div className="mt-3 text-xs text-foreground-muted">
-                                        Parent{" "}
-                                        <button
-                                          type="button"
-                                          onClick={() => setFocusedIssue(parentIssue)}
-                                          className="font-semibold text-foreground underline-offset-4 hover:underline"
-                                          data-testid={`open-parent-${card.issueKey}`}
-                                        >
-                                          {parentIssue.key}
-                                        </button>
+                                    {parentIssue || card.review ? (
+                                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                                        {parentIssue ? (
+                                          <button
+                                            type="button"
+                                            onClick={() => setFocusedIssue(parentIssue)}
+                                            className="rounded-full border border-current/20 px-2.5 py-1 text-left font-semibold opacity-85"
+                                            data-testid={`open-parent-${card.issueKey}`}
+                                          >
+                                            Parent {parentIssue.key}
+                                          </button>
+                                        ) : null}
+                                        {card.review ? (
+                                          <span className="rounded-full border border-current/20 px-2.5 py-1 opacity-85">
+                                            Review {card.review.decision}
+                                            {card.review.openCommentCount > 0
+                                              ? ` · ${card.review.openCommentCount} open`
+                                              : ""}
+                                          </span>
+                                        ) : null}
                                       </div>
                                     ) : null}
-
-                                    {card.review ? (
-                                      <div className="mt-3 flex flex-wrap gap-2 text-xs opacity-90">
-                                        <span className="rounded-full border border-current/20 px-2 py-0.5">
-                                          Review {card.review.decision}
-                                        </span>
-                                        <span className="rounded-full border border-current/20 px-2 py-0.5">
-                                          {card.review.openCommentCount} open comments
-                                        </span>
-                                      </div>
-                                    ) : null}
-
-                                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs opacity-80">
-                                      <span className="inline-flex items-center gap-1">
-                                        <GitBranch className="h-3.5 w-3.5" />
-                                        {card.dependencyCount} dependencies
-                                      </span>
-                                      <span className="inline-flex items-center gap-1">
-                                        <Workflow className="h-3.5 w-3.5" />
-                                        {card.childCount} child issues
-                                      </span>
-                                      <span className="inline-flex items-center gap-1">
-                                        <CheckCircle2 className="h-3.5 w-3.5" />
-                                        {card.acceptanceProgress.satisfied}/{card.acceptanceProgress.total} accepted
-                                      </span>
-                                    </div>
 
                                     <div className="mt-4 rounded-2xl border border-current/15 bg-card/70 p-3 text-current/90">
-                                      <div className="flex flex-wrap items-start justify-between gap-3">
+                                      <div className="flex flex-wrap items-center justify-between gap-3">
                                         <div>
                                           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] opacity-70">
                                             Workspace
@@ -5100,25 +5137,48 @@ export function BacklogOverview({
                                               ? `${linkedWorkspaceCount} linked workspace${linkedWorkspaceCount === 1 ? "" : "s"}`
                                               : "No workspace linked yet"}
                                           </div>
-                                          <p className="mt-1 text-xs leading-5 opacity-80">
+                                          <p className="mt-1 text-xs opacity-75">
                                             {linkedWorkspaceCount > 0
-                                              ? "Open the active workspace directly from the board."
-                                              : "Create a workspace when this issue moves into active execution."}
+                                              ? "Open or relink from the board."
+                                              : "Create or link only when this issue is ready to execute."}
                                           </p>
                                         </div>
-                                        {linkedWorkspaceCount === 0 ? (
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              navigate(projectIssueWorkspaceCreateHref(primaryProject.id, card.issueId))
-                                            }
-                                            className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
-                                            data-testid={`create-workspace-${card.issueKey}`}
-                                          >
-                                            <Plus className="h-3.5 w-3.5" />
-                                            Create workspace
-                                          </button>
-                                        ) : null}
+                                        <div className="flex flex-wrap gap-2">
+                                          {linkedWorkspaceCount === 0 ? (
+                                            <>
+                                              <button
+                                                type="button"
+                                                onClick={() =>
+                                                  navigate(projectIssueWorkspaceCreateHref(primaryProject.id, card.issueId))
+                                                }
+                                                className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
+                                                data-testid={`create-workspace-${card.issueKey}`}
+                                              >
+                                                <Plus className="h-3.5 w-3.5" />
+                                                Create workspace
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => issue && setFocusedIssue(issue)}
+                                                className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
+                                                data-testid={`link-existing-${card.issueKey}`}
+                                              >
+                                                <Link2 className="h-3.5 w-3.5" />
+                                                Link existing
+                                              </button>
+                                            </>
+                                          ) : (
+                                            <button
+                                              type="button"
+                                              onClick={() => issue && setFocusedIssue(issue)}
+                                              className="inline-flex h-10 items-center gap-2 rounded-xl border border-current/20 bg-background/70 px-3 text-xs font-semibold"
+                                              data-testid={`manage-workspaces-${card.issueKey}`}
+                                            >
+                                              <Link2 className="h-3.5 w-3.5" />
+                                              Manage links
+                                            </button>
+                                          )}
+                                        </div>
                                       </div>
 
                                       {linkedWorkspaceCount > 0 ? (
@@ -5141,19 +5201,6 @@ export function BacklogOverview({
                                       ) : null}
                                     </div>
 
-                                    {showPolicySignals && card.policySignals.length > 0 ? (
-                                      <div className="mt-3 space-y-2">
-                                        {card.policySignals.map((signal, index) => (
-                                          <div
-                                            key={`${card.issueId}-${signal.hookId}-${index}`}
-                                            className="rounded-xl border border-current/15 bg-card/70 px-3 py-2 text-xs"
-                                          >
-                                            {signal.message}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : null}
-
                                     <div className="mt-4 flex flex-wrap gap-2">
                                       {card.moveTargets.map((target) => (
                                         <button
@@ -5169,32 +5216,61 @@ export function BacklogOverview({
                                       ))}
                                     </div>
 
-                                    {showPolicySignals && card.moveTargets.some((target) => target.signals.length > 0) ? (
-                                      <div className="mt-3 space-y-2">
-                                        {card.moveTargets.flatMap((target) =>
-                                          target.signals.map((signal, index) => (
-                                            <div
-                                              key={`${card.issueId}-${target.state}-${signal.hookId}-${index}`}
-                                              className="rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground-muted"
-                                            >
-                                              {stateLabel(target.state)}: {signal.message}
-                                            </div>
-                                          )),
-                                        )}
-                                      </div>
-                                    ) : null}
-
-                                    {showSecondaryDetails ? (
+                                    {hasExpandableDetails ? (
                                       <details className="backlog-overview__card-details mt-4">
                                         <summary className="backlog-overview__card-summary">
                                           <span>More details</span>
                                           <span>
-                                            {card.assigneeNames.length} assignee{card.assigneeNames.length === 1 ? "" : "s"}
+                                            {card.dependencyCount} dep
+                                            {card.dependencyCount === 1 ? "" : "s"}
                                             {" · "}
-                                            {card.labelNames.length} label{card.labelNames.length === 1 ? "" : "s"}
+                                            {card.childCount} child
+                                            {card.childCount === 1 ? "" : "ren"}
                                           </span>
                                         </summary>
                                         <div className="backlog-overview__card-details-body">
+                                          <div className="grid gap-3 sm:grid-cols-3">
+                                            <div className="rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground-muted">
+                                              <div className="font-semibold text-foreground">Dependencies</div>
+                                              <div className="mt-1">{card.dependencyCount}</div>
+                                            </div>
+                                            <div className="rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground-muted">
+                                              <div className="font-semibold text-foreground">Child issues</div>
+                                              <div className="mt-1">{card.childCount}</div>
+                                            </div>
+                                            <div className="rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground-muted">
+                                              <div className="font-semibold text-foreground">Acceptance</div>
+                                              <div className="mt-1">
+                                                {card.acceptanceProgress.satisfied}/{card.acceptanceProgress.total} accepted
+                                              </div>
+                                            </div>
+                                          </div>
+                                          {showPolicySignals && card.policySignals.length > 0 ? (
+                                            <div className="space-y-2">
+                                              {card.policySignals.map((signal, index) => (
+                                                <div
+                                                  key={`${card.issueId}-${signal.hookId}-${index}`}
+                                                  className="rounded-xl border border-current/15 bg-card/70 px-3 py-2 text-xs"
+                                                >
+                                                  {signal.message}
+                                                </div>
+                                              ))}
+                                            </div>
+                                          ) : null}
+                                          {showPolicySignals && card.moveTargets.some((target) => target.signals.length > 0) ? (
+                                            <div className="space-y-2">
+                                              {card.moveTargets.flatMap((target) =>
+                                                target.signals.map((signal, index) => (
+                                                  <div
+                                                    key={`${card.issueId}-${target.state}-${signal.hookId}-${index}`}
+                                                    className="rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground-muted"
+                                                  >
+                                                    {stateLabel(target.state)}: {signal.message}
+                                                  </div>
+                                                )),
+                                              )}
+                                            </div>
+                                          ) : null}
                                           <RepositoryLifecyclePanel
                                             card={card}
                                             mutating={movingIssueId === card.issueId || mutatingIssueId === card.issueId}

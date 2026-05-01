@@ -36,13 +36,13 @@ function topBarMeta(pathname: string): { eyebrow: string; subtitle: string } {
   if (pathname.startsWith('/workspaces')) {
     return {
       eyebrow: 'Workspace',
-      subtitle: 'Stay close to the session, runtime, and lifecycle controls for the selected worktree.',
+      subtitle: 'Keep the issue link, session chat, and workspace status close together.',
     };
   }
   if (pathname.startsWith('/projects/')) {
     return {
       eyebrow: 'Planning',
-      subtitle: 'Run the board, issues, reviews, and linked workspaces from the same product surface.',
+      subtitle: 'Work the board, issues, reviews, and linked workspaces from one surface.',
     };
   }
   if (pathname.startsWith('/runs')) {

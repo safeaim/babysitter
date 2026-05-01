@@ -1819,4 +1819,243 @@ describe("workspaces-page helpers", () => {
     expect(screen.getByTestId("workspace-panel-details")).toBeInTheDocument();
     expect(screen.getByText("runtime session-1")).toBeInTheDocument();
   });
+
+  it("keeps the selected workspace shell visible while inventory refreshes in the background", async () => {
+    let resolveRefresh: ((response: Response) => void) | null = null;
+    const initialPayload = {
+      summary: { total: 1, active: 1, idle: 0, archived: 0, missing: 0 },
+      workspaces: [
+        {
+          path: "/repo/worktrees/task",
+          name: "task",
+          status: "active",
+          missing: false,
+          archivedAt: null,
+          cleanedAt: null,
+          lastActivityAt: "2026-04-24T12:00:00.000Z",
+          git: {
+            root: "/repo/main",
+            commonDir: "/repo/main/.git",
+            trackingBranch: "origin/vk/task",
+            branch: "vk/task",
+            head: "abc123",
+            ahead: 2,
+            behind: 1,
+            dirty: true,
+            uncommittedCount: 3,
+            isWorktree: true,
+            isPrimary: false,
+          },
+          notes: {
+            value: "",
+            updatedAt: null,
+          },
+          links: {
+            editorHref: "vscode://file/repo/worktrees/task",
+          },
+          sessions: {
+            total: 1,
+            active: 1,
+            items: [
+              {
+                sessionId: "session-1",
+                agent: "codex",
+                status: "active",
+                cwd: "/repo/worktrees/task",
+                title: "Workspace parity session",
+                updatedAt: 1713960000000,
+                latestRunId: "run-2",
+              },
+            ],
+          },
+          runs: { total: 1, active: 1, items: [] },
+          actions: {
+            canArchive: true,
+            canCleanup: false,
+            canRecover: false,
+            canRebaseStart: false,
+            canRebaseAutoResolve: false,
+            canRebaseOpenInEditor: false,
+            canRebaseMarkResolved: false,
+            canRebaseAbort: false,
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(initialPayload), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise<Response>((resolve) => {
+            resolveRefresh = resolve;
+          }),
+      );
+
+    const view = render(
+      <WorkspacesPageContent
+        isAuthenticated
+        selectedWorkspacePath="/repo/worktrees/task"
+        sessions={[
+          {
+            sessionId: "session-1",
+            agent: "codex",
+            status: "active",
+            cwd: "/repo/worktrees/task",
+            title: "Workspace parity session",
+            updatedAt: 1713960000000,
+          },
+        ]}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-shell")).toBeInTheDocument();
+    });
+
+    view.rerender(
+      <WorkspacesPageContent
+        isAuthenticated
+        selectedWorkspacePath="/repo/worktrees/task"
+        sessions={[
+          {
+            sessionId: "session-1",
+            agent: "codex",
+            status: "active",
+            cwd: "/repo/worktrees/task",
+            title: "Workspace parity session",
+            updatedAt: 1713960005000,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByTestId("workspace-shell")).toBeInTheDocument();
+    expect(screen.queryByText("Loading workspace shell…")).not.toBeInTheDocument();
+
+    resolveRefresh?.(
+      new Response(JSON.stringify(initialPayload), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+  });
+
+  it("does not reload inventory when rerendered with an equivalent session snapshot", async () => {
+    const payload = {
+      summary: { total: 1, active: 1, idle: 0, archived: 0, missing: 0 },
+      workspaces: [
+        {
+          path: "/repo/worktrees/task",
+          name: "task",
+          status: "active",
+          missing: false,
+          archivedAt: null,
+          cleanedAt: null,
+          lastActivityAt: "2026-04-24T12:00:00.000Z",
+          git: {
+            root: "/repo/main",
+            commonDir: "/repo/main/.git",
+            trackingBranch: "origin/vk/task",
+            branch: "vk/task",
+            head: "abc123",
+            ahead: 0,
+            behind: 0,
+            dirty: false,
+            uncommittedCount: 0,
+            isWorktree: true,
+            isPrimary: false,
+          },
+          notes: {
+            value: "",
+            updatedAt: null,
+          },
+          links: {
+            editorHref: "vscode://file/repo/worktrees/task",
+          },
+          sessions: {
+            total: 1,
+            active: 1,
+            items: [
+              {
+                sessionId: "session-1",
+                agent: "codex",
+                status: "active",
+                cwd: "/repo/worktrees/task",
+                title: "Workspace parity session",
+                updatedAt: 1713960000000,
+              },
+            ],
+          },
+          runs: { total: 0, active: 0, items: [] },
+          actions: {
+            canArchive: true,
+            canCleanup: false,
+            canRecover: false,
+            canRebaseStart: false,
+            canRebaseAutoResolve: false,
+            canRebaseOpenInEditor: false,
+            canRebaseMarkResolved: false,
+            canRebaseAbort: false,
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify(payload), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    const view = render(
+      <WorkspacesPageContent
+        isAuthenticated
+        selectedWorkspacePath="/repo/worktrees/task"
+        sessions={[
+          {
+            sessionId: "session-1",
+            agent: "codex",
+            status: "active",
+            cwd: "/repo/worktrees/task",
+            title: "Workspace parity session",
+            updatedAt: 1713960000000,
+          },
+        ]}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-shell")).toBeInTheDocument();
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    view.rerender(
+      <WorkspacesPageContent
+        isAuthenticated
+        selectedWorkspacePath="/repo/worktrees/task"
+        sessions={[
+          {
+            sessionId: "session-1",
+            agent: "codex",
+            status: "active",
+            cwd: "/repo/worktrees/task",
+            title: "Workspace parity session",
+            updatedAt: 1713960000000,
+          },
+        ]}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-shell")).toBeInTheDocument();
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
 });

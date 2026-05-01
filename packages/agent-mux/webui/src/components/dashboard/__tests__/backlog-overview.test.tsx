@@ -837,6 +837,16 @@ describe("BacklogOverview", () => {
     expect(push).toHaveBeenCalledWith("/projects/kanban-app/issues/KANBAN-GAP-007/workspace/new");
   });
 
+  it("opens issue workspace linking controls directly from the board card", async () => {
+    const user = setupUser();
+
+    render(<BacklogOverview projectId="kanban-app" forcedPresentation="board" />);
+
+    await user.click(await screen.findByTestId("link-existing-KANBAN-GAP-007"));
+
+    expect(push).toHaveBeenCalledWith("/?issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
+  });
+
   it("links an existing workspace from the issue panel", async () => {
     const user = setupUser();
     searchParams = new URLSearchParams("issueId=KANBAN-GAP-007&issueKey=KANBAN-GAP-007");
@@ -1240,10 +1250,21 @@ describe("BacklogOverview", () => {
     expect(supportingDetails).not.toHaveAttribute("open");
   });
 
+  it("keeps advanced board controls collapsed by default", () => {
+    render(<BacklogOverview />);
+
+    const controlsSummary = screen.getByText("Board controls");
+    const controlsDetails = controlsSummary.closest("details");
+
+    expect(controlsDetails).toBeInTheDocument();
+    expect(controlsDetails).not.toHaveAttribute("open");
+  });
+
   it("filters cards by assignee and applies bulk move to the visible selection", async () => {
     const user = setupUser();
     render(<BacklogOverview />);
 
+    await user.click(screen.getByText("Board controls"));
     await user.selectOptions(screen.getByLabelText("Assignee filter"), "tal");
 
     expect(screen.getByTestId("kanban-card-KANBAN-GAP-007")).toBeInTheDocument();
@@ -1270,7 +1291,7 @@ describe("BacklogOverview", () => {
     expect(screen.getByTestId("kanban-list")).toBeInTheDocument();
 
     await user.click(screen.getByLabelText("Select KANBAN-GAP-007"));
-    expect(screen.getByText("1 selected")).toBeInTheDocument();
+    expect(screen.getAllByText("1 selected").length).toBeGreaterThan(0);
 
     await user.click(screen.getByTestId("move-list-KANBAN-GAP-007-in-progress"));
     expect(moveIssueMock).toHaveBeenCalledWith("KANBAN-GAP-007", "in-progress");

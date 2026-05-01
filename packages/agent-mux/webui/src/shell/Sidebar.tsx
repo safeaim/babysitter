@@ -54,9 +54,9 @@ export function Sidebar(): JSX.Element {
     <aside className="app-sidebar">
       <div className="app-sidebar__brand">
         <p className="app-sidebar__label">agent-mux</p>
-        <h1 className="app-sidebar__title">Operator workbench</h1>
+        <h1 className="app-sidebar__title">Workspace hub</h1>
         <p className="app-sidebar__copy">
-          Keep planning, sessions, workspaces, and execution on one surface.
+          Projects, sessions, workspaces, and runs in one place.
         </p>
       </div>
 

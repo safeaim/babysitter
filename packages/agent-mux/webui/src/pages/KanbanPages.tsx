@@ -36,6 +36,37 @@ function readRuntime(value: unknown): WorkspaceRuntimeSurface | undefined {
   return value as WorkspaceRuntimeSurface;
 }
 
+function toWorkspaceSessionSummary(session: Record<string, unknown>): KanbanWorkspaceSessionSummary[] {
+  const sessionId = typeof session.sessionId === 'string' ? session.sessionId : '';
+  const agent = typeof session.agent === 'string' ? session.agent : '';
+  const runtime = readRuntime(session.runtime);
+  const workspacePath =
+    typeof session.cwd === 'string' && session.cwd.length > 0
+      ? session.cwd
+      : typeof runtime?.workspacePath === 'string' && runtime.workspacePath.length > 0
+        ? runtime.workspacePath
+        : undefined;
+  const status: KanbanWorkspaceSessionSummary['status'] =
+    session.status === 'active' ? 'active' : 'inactive';
+  if (!sessionId || !agent || !workspacePath) {
+    return [];
+  }
+
+  return [
+    {
+      sessionId,
+      agent,
+      status,
+      cwd: workspacePath,
+      title: typeof session.title === 'string' ? session.title : undefined,
+      updatedAt: typeof session.updatedAt === 'number' ? session.updatedAt : undefined,
+      activeRunId: typeof session.activeRunId === 'string' ? session.activeRunId : null,
+      latestRunId: typeof session.latestRunId === 'string' ? session.latestRunId : null,
+      runtime,
+    },
+  ];
+}
+
 export function ProjectsPage(): JSX.Element {
   return <ProjectsRoutePage />;
 }
@@ -285,30 +316,7 @@ function KanbanWorkspacesGatewayContent(): JSX.Element {
   const eventBuffers = useStore(store, (state) => state.events.byRunId);
 
   const workspaceSessions = useMemo<KanbanWorkspaceSessionSummary[]>(
-    () =>
-      sessions.flatMap((session) => {
-        const sessionId = typeof session.sessionId === 'string' ? session.sessionId : '';
-        const agent = typeof session.agent === 'string' ? session.agent : '';
-        const status: KanbanWorkspaceSessionSummary['status'] =
-          session.status === 'active' ? 'active' : 'inactive';
-        if (!sessionId || !agent) {
-          return [];
-        }
-
-        return [
-          {
-            sessionId,
-            agent,
-            status,
-            cwd: typeof session.cwd === 'string' ? session.cwd : undefined,
-            title: typeof session.title === 'string' ? session.title : undefined,
-            updatedAt: typeof session.updatedAt === 'number' ? session.updatedAt : undefined,
-            activeRunId: typeof session.activeRunId === 'string' ? session.activeRunId : null,
-            latestRunId: typeof session.latestRunId === 'string' ? session.latestRunId : null,
-            runtime: readRuntime(session.runtime),
-          },
-        ];
-      }),
+    () => sessions.flatMap((session) => toWorkspaceSessionSummary(session as Record<string, unknown>)),
     [sessions],
   );
 
@@ -374,30 +382,7 @@ function KanbanInboxContent(): JSX.Element {
   const sessions = useStore(store, useShallow((state) => Object.values(state.sessions.byId)));
 
   const workspaceSessions = useMemo<KanbanWorkspaceSessionSummary[]>(
-    () =>
-      sessions.flatMap((session) => {
-        const sessionId = typeof session.sessionId === 'string' ? session.sessionId : '';
-        const agent = typeof session.agent === 'string' ? session.agent : '';
-        const status: KanbanWorkspaceSessionSummary['status'] =
-          session.status === 'active' ? 'active' : 'inactive';
-        if (!sessionId || !agent) {
-          return [];
-        }
-
-        return [
-          {
-            sessionId,
-            agent,
-            status,
-            cwd: typeof session.cwd === 'string' ? session.cwd : undefined,
-            title: typeof session.title === 'string' ? session.title : undefined,
-            updatedAt: typeof session.updatedAt === 'number' ? session.updatedAt : undefined,
-            activeRunId: typeof session.activeRunId === 'string' ? session.activeRunId : null,
-            latestRunId: typeof session.latestRunId === 'string' ? session.latestRunId : null,
-            runtime: readRuntime(session.runtime),
-          },
-        ];
-      }),
+    () => sessions.flatMap((session) => toWorkspaceSessionSummary(session as Record<string, unknown>)),
     [sessions],
   );
 

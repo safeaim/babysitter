@@ -44,6 +44,12 @@ function workspaceDetailHref(value: string): string {
   return `/workspaces?workspace=${encodeURIComponent(value)}`;
 }
 
+function workspaceNameFromPath(value: string): string {
+  const normalized = value.replace(/[\\/]+/g, "/").replace(/\/$/, "");
+  const segments = normalized.split("/");
+  return segments[segments.length - 1] || value;
+}
+
 type WorkspaceSurfaceMode = "full" | "attention";
 type WorkspaceListLayoutMode = "grouped" | "flat";
 
@@ -188,11 +194,14 @@ function sortWorkspaceSidebarItems(workspaces: WorkspaceInventoryItem[]): Worksp
 }
 
 export async function loadInventory(sessions: WorkspaceSessionSnapshot[]): Promise<WorkspaceInventoryResponse> {
-  const response = await fetch("/api/workspaces", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ sessions }),
-  });
+  const response =
+    sessions.length === 0
+      ? await fetch("/api/workspaces")
+      : await fetch("/api/workspaces", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ sessions }),
+        });
 
   if (!response.ok) {
     throw new Error(`Workspace inventory request failed: ${response.status}`);
@@ -473,6 +482,7 @@ export function WorkspacesPageContent(props: {
       ),
     [props.sessions],
   );
+  const inventorySessions = useMemo(() => props.sessions, [sessionFingerprint]);
 
   useEffect(() => {
     let cancelled = false;
@@ -480,7 +490,7 @@ export function WorkspacesPageContent(props: {
     setLoading(true);
     setError(null);
 
-    void loadInventory(props.sessions)
+    void loadInventory(inventorySessions)
       .then((payload) => {
         if (!cancelled) {
           setInventory(payload);
@@ -500,7 +510,7 @@ export function WorkspacesPageContent(props: {
     return () => {
       cancelled = true;
     };
-  }, [props.sessions, sessionFingerprint]);
+  }, [inventorySessions]);
 
   const summary = inventory?.summary ?? {
     total: 0,
@@ -648,7 +658,7 @@ export function WorkspacesPageContent(props: {
     startTransition(() => {
       setLoading(true);
       setError(null);
-      void loadInventory(props.sessions)
+      void loadInventory(inventorySessions)
         .then((payload) => setInventory(payload))
         .catch((cause) => setError(cause instanceof Error ? cause.message : String(cause)))
         .finally(() => setLoading(false));
@@ -879,12 +889,40 @@ export function WorkspacesPageContent(props: {
     const selectedReviewArtifact =
       selectedWorkspace != null ? (liveArtifactByPath.get(selectedWorkspace.path) ?? undefined) : undefined;
 
-    if (loading) {
+    if (loading && !inventory) {
       return (
         <PageShell>
           <PageSection>
-            <p className="text-sm text-foreground-muted">Loading workspace shell…</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Workspace</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">{workspaceNameFromPath(selectedWorkspacePath)}</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
+              Opening the selected workspace now. The issue link, session chat, and runtime panels will appear as soon as the inventory finishes loading.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Button variant="ghost" onClick={() => navigate("/workspaces")}>
+                Back to workspaces
+              </Button>
+              <span className="rounded-full border border-border px-3 py-1.5 font-mono text-xs text-foreground-muted">
+                {truncatePath(selectedWorkspacePath)}
+              </span>
+            </div>
           </PageSection>
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <PageSection inset>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted">Workspace status</p>
+              <h2 className="mt-2 text-lg font-semibold text-foreground">Loading workspace details…</h2>
+              <p className="mt-2 text-sm leading-6 text-foreground-muted">
+                Pulling the linked issue, git status, notes, and workspace actions.
+              </p>
+            </PageSection>
+            <PageSection inset>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted">Session chat</p>
+              <h2 className="mt-2 text-lg font-semibold text-foreground">Chat stays ready here</h2>
+              <p className="mt-2 text-sm leading-6 text-foreground-muted">
+                If this workspace has an attached session, the chat-first shell will open in this view automatically.
+              </p>
+            </PageSection>
+          </div>
         </PageShell>
       );
     }

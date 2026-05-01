@@ -353,7 +353,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
   const activeSessionLabel = props.activeSession?.title ?? props.activeSession?.sessionId ?? "No session selected";
   const runtime = props.activeSession?.runtime;
   const canSendMessages = props.canSendMessages ?? true;
-  const forceMinimalWorkspaceDefaults = !props.activeSession && !canSendMessages;
+  const forceMinimalWorkspaceDefaults = !props.activeSession && props.sessions.length === 0;
 
   useEffect(() => {
     if (!forceMinimalWorkspaceDefaults) {
@@ -383,7 +383,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
         <WorkspacePanelFrame
           panelKey="sidebar"
           title="Workspace"
-          subtitle="Session roster, notes, and quick actions"
+          subtitle="Issue link, session roster, and quick actions"
         >
           <div className="grid gap-4">
             <div className="rounded-2xl border border-border bg-background/65 p-4">
@@ -465,7 +465,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
         <WorkspacePanelFrame
           panelKey="conversation"
           title="Session chat"
-          subtitle="Selected session transcript, approvals, and next-turn input"
+          subtitle="Transcript first, controls second"
         >
           <SessionConversationSurface
             sessionId={props.activeSession?.sessionId ?? "no-session"}
@@ -505,7 +505,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
         <WorkspacePanelFrame
           panelKey="context"
           title="Trace"
-          subtitle="Flow, files, and execution history for the selected session"
+          subtitle="Timeline, files, and execution history"
         >
           {props.activeSession ? (
             <SessionObservabilityPanel
@@ -529,7 +529,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
       <WorkspacePanelFrame
         panelKey="details"
         title="Runtime"
-        subtitle="Preview, shell, and live workspace output"
+        subtitle="Preview, shell, and workspace output"
       >
         {runtime ? (
           <WorkspaceRuntimePanel
@@ -565,8 +565,8 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">{props.workspace.name}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-foreground-muted">
               {linkedIssue
-                ? `${linkedIssue.issueKey} is linked here. Start from the workspace summary, then open chat or runtime only when you need them.`
-                : "Start from the workspace summary, then open chat or runtime only when you need them."}
+                ? `${linkedIssue.issueKey} is linked here. Keep the issue visible, then open chat only when a workspace session is active.`
+                : "Keep the workspace summary visible, then open chat only when a session is active."}
             </p>
             {linkedIssue ? (
               <div className="mt-3">

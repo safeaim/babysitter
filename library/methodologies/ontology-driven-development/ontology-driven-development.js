@@ -610,17 +610,17 @@ export async function process(inputs, ctx) {
   }
 
   // ============================================================================
-  // PHASE 7: AI-DRIVEN PREDICTIVE OPTIMIZATION & FORMAL VERIFICATION
+  // PHASE 7: COMPREHENSIVE VALIDATION & VERIFICATION
   // ============================================================================
 
-  if (phase === 'full' || phase === 'ai-optimization') {
-    ctx.log?.('info', 'Phase 7: AI-driven predictive optimization and formal verification...');
+  if (phase === 'full' || phase === 'comprehensive-validation') {
+    ctx.log?.('info', 'Phase 7: Comprehensive validation and verification...');
 
-    const aiOptimizationResult = await executeIterativePhase(
+    const comprehensiveValidationResult = await executeIterativePhase(
       ctx,
-      'ai-optimization',
+      'comprehensive-validation',
       {
-        mainTask: aiDrivenOptimizationTask,
+        mainTask: comprehensiveValidationTask,
         taskInputs: {
           projectName,
           perfectGraph: results.knowledgeGraph,
@@ -628,142 +628,145 @@ export async function process(inputs, ctx) {
           optimizedOntology: results.integratedOntology,
           empiricalHistory: results.empiricalValidation,
           optimizationHistory: results.schemaOptimizations,
-          performanceMetrics: results.metadata
+          allResults: results
         },
-        qualityDimensions: ['ai_optimization_effectiveness', 'formal_verification_completeness', 'predictive_accuracy', 'automated_quality_improvement'],
+        qualityDimensions: ['validation_completeness', 'verification_rigor', 'consistency_checking', 'stakeholder_validation'],
         targetQuality,
         maxIterations: maxIterationsPerPhase,
-        phaseName: 'AI-Driven Predictive Optimization & Formal Verification'
+        phaseName: 'Comprehensive Validation & Verification'
       }
     );
 
-    results.aiOptimization = aiOptimizationResult.result;
-    results.metadata.phaseIterations['ai-optimization'] = aiOptimizationResult.iterations;
-    results.metadata.qualityScores['ai-optimization'] = aiOptimizationResult.qualityMetrics;
-    results.metadata.totalIterations += aiOptimizationResult.iterations;
-    artifacts.push(...(aiOptimizationResult.artifacts || []));
+    results.comprehensiveValidation = comprehensiveValidationResult.result;
+    results.metadata.phaseIterations['comprehensive-validation'] = comprehensiveValidationResult.iterations;
+    results.metadata.qualityScores['comprehensive-validation'] = comprehensiveValidationResult.qualityMetrics;
+    results.metadata.totalIterations += comprehensiveValidationResult.iterations;
+    artifacts.push(...(comprehensiveValidationResult.artifacts || []));
 
     await ctx.breakpoint({
-      question: `AI optimization complete. Predictive accuracy: ${aiOptimizationResult.result?.predictiveAccuracy}%, Formal verification coverage: ${aiOptimizationResult.result?.verificationCoverage}%, AI-generated improvements: ${aiOptimizationResult.result?.aiImprovements?.length}. Proceed to adaptive systems?`,
-      title: 'AI Optimization Review',
+      question: `Comprehensive validation complete. Validation coverage: ${comprehensiveValidationResult.result?.validationCoverage}%, Consistency score: ${comprehensiveValidationResult.result?.consistencyScore}%, Stakeholder validation: ${comprehensiveValidationResult.result?.stakeholderValidationScore}%. Proceed to stress testing?`,
+      title: 'Comprehensive Validation Review',
       context: {
         runId: ctx.runId,
         data: {
-          predictiveAccuracy: aiOptimizationResult.result?.predictiveAccuracy,
-          verificationCoverage: aiOptimizationResult.result?.verificationCoverage,
-          aiImprovements: aiOptimizationResult.result?.aiImprovements?.length,
-          automatedOptimizations: aiOptimizationResult.result?.automatedOptimizations
+          validationCoverage: comprehensiveValidationResult.result?.validationCoverage,
+          consistencyScore: comprehensiveValidationResult.result?.consistencyScore,
+          stakeholderValidationScore: comprehensiveValidationResult.result?.stakeholderValidationScore,
+          issuesFound: comprehensiveValidationResult.result?.issuesFound?.length
         },
         files: [
-          { path: 'artifacts/odd/AI_OPTIMIZATION.md', format: 'markdown', label: 'AI Optimization' },
-          { path: 'artifacts/odd/FORMAL_VERIFICATION.md', format: 'markdown', label: 'Formal Verification' },
-          { path: 'artifacts/odd/PREDICTIVE_MODELS.md', format: 'markdown', label: 'Predictive Models' }
+          { path: 'artifacts/odd/COMPREHENSIVE_VALIDATION.md', format: 'markdown', label: 'Validation Report' },
+          { path: 'artifacts/odd/CONSISTENCY_ANALYSIS.md', format: 'markdown', label: 'Consistency Analysis' },
+          { path: 'artifacts/odd/STAKEHOLDER_VALIDATION.md', format: 'markdown', label: 'Stakeholder Validation' }
         ]
       }
     });
   }
 
   // ============================================================================
-  // PHASE 8: REAL-TIME ADAPTIVE SYSTEMS & COLLABORATIVE INTELLIGENCE
+  // PHASE 8: STRESS TESTING & ROBUSTNESS ANALYSIS
   // ============================================================================
 
-  if (phase === 'full' || phase === 'adaptive-systems') {
-    ctx.log?.('info', 'Phase 8: Real-time adaptive systems and collaborative intelligence...');
+  if (phase === 'full' || phase === 'stress-testing') {
+    ctx.log?.('info', 'Phase 8: Stress testing and robustness analysis...');
 
-    const adaptiveSystemsResult = await executeIterativePhase(
+    const stressTestingResult = await executeIterativePhase(
       ctx,
-      'adaptive-systems',
+      'stress-testing',
       {
-        mainTask: adaptiveIntelligenceSystemTask,
+        mainTask: stressTestingRobustnessTask,
         taskInputs: {
           projectName,
           perfectGraph: results.knowledgeGraph,
-          aiOptimization: results.aiOptimization,
+          comprehensiveValidation: results.comprehensiveValidation,
           stakeholderContext,
           domainType,
-          projectComplexity
+          projectComplexity,
+          allResults: results
         },
-        qualityDimensions: ['adaptability_effectiveness', 'collaborative_intelligence_quality', 'real_time_optimization', 'ecosystem_integration'],
+        qualityDimensions: ['stress_test_coverage', 'robustness_score', 'failure_resilience', 'edge_case_handling'],
         targetQuality,
         maxIterations: maxIterationsPerPhase,
-        phaseName: 'Real-Time Adaptive Systems & Collaborative Intelligence'
+        phaseName: 'Stress Testing & Robustness Analysis'
       }
     );
 
-    results.adaptiveSystems = adaptiveSystemsResult.result;
-    results.metadata.phaseIterations['adaptive-systems'] = adaptiveSystemsResult.iterations;
-    results.metadata.qualityScores['adaptive-systems'] = adaptiveSystemsResult.qualityMetrics;
-    results.metadata.totalIterations += adaptiveSystemsResult.iterations;
-    artifacts.push(...(adaptiveSystemsResult.artifacts || []));
+    results.stressTesting = stressTestingResult.result;
+    results.metadata.phaseIterations['stress-testing'] = stressTestingResult.iterations;
+    results.metadata.qualityScores['stress-testing'] = stressTestingResult.qualityMetrics;
+    results.metadata.totalIterations += stressTestingResult.iterations;
+    artifacts.push(...(stressTestingResult.artifacts || []));
 
     await ctx.breakpoint({
-      question: `Adaptive systems complete. Real-time adaptation capability: ${adaptiveSystemsResult.result?.adaptationCapability}%, Collaborative intelligence score: ${adaptiveSystemsResult.result?.collaborativeScore}%, Ecosystem integration: ${adaptiveSystemsResult.result?.ecosystemIntegration}%. Proceed to evolutionary framework?`,
-      title: 'Adaptive Systems Review',
+      question: `Stress testing complete. Test coverage: ${stressTestingResult.result?.testCoverage}%, Robustness score: ${stressTestingResult.result?.robustnessScore}%, Failure scenarios tested: ${stressTestingResult.result?.failureScenarios?.length}. Proceed to collaborative refinement?`,
+      title: 'Stress Testing Review',
       context: {
         runId: ctx.runId,
         data: {
-          adaptationCapability: adaptiveSystemsResult.result?.adaptationCapability,
-          collaborativeScore: adaptiveSystemsResult.result?.collaborativeScore,
-          ecosystemIntegration: adaptiveSystemsResult.result?.ecosystemIntegration,
-          realTimeMetrics: adaptiveSystemsResult.result?.realTimeMetrics
+          testCoverage: stressTestingResult.result?.testCoverage,
+          robustnessScore: stressTestingResult.result?.robustnessScore,
+          failureScenarios: stressTestingResult.result?.failureScenarios?.length,
+          vulnerabilities: stressTestingResult.result?.vulnerabilities?.length
         },
         files: [
-          { path: 'artifacts/odd/ADAPTIVE_SYSTEMS.md', format: 'markdown', label: 'Adaptive Systems' },
-          { path: 'artifacts/odd/COLLABORATIVE_INTELLIGENCE.md', format: 'markdown', label: 'Collaborative Intelligence' },
-          { path: 'artifacts/odd/REAL_TIME_OPTIMIZATION.md', format: 'markdown', label: 'Real-Time Optimization' }
+          { path: 'artifacts/odd/STRESS_TESTING.md', format: 'markdown', label: 'Stress Testing Report' },
+          { path: 'artifacts/odd/ROBUSTNESS_ANALYSIS.md', format: 'markdown', label: 'Robustness Analysis' },
+          { path: 'artifacts/odd/FAILURE_SCENARIOS.md', format: 'markdown', label: 'Failure Scenarios' }
         ]
       }
     });
   }
 
   // ============================================================================
-  // PHASE 9: EVOLUTIONARY FRAMEWORK & TEMPORAL COGNITION
+  // PHASE 9: COLLABORATIVE REFINEMENT & STAKEHOLDER INTEGRATION
   // ============================================================================
 
-  if (phase === 'full' || phase === 'evolutionary-framework') {
-    ctx.log?.('info', 'Phase 9: Evolutionary framework and temporal cognition...');
+  if (phase === 'full' || phase === 'collaborative-refinement') {
+    ctx.log?.('info', 'Phase 9: Collaborative refinement and stakeholder integration...');
 
-    const evolutionaryFrameworkResult = await executeIterativePhase(
+    const collaborativeRefinementResult = await executeIterativePhase(
       ctx,
-      'evolutionary-framework',
+      'collaborative-refinement',
       {
-        mainTask: evolutionaryTemporalFrameworkTask,
+        mainTask: collaborativeRefinementTask,
         taskInputs: {
           projectName,
           perfectGraph: results.knowledgeGraph,
-          adaptiveSystems: results.adaptiveSystems,
-          aiOptimization: results.aiOptimization,
+          stressTesting: results.stressTesting,
+          comprehensiveValidation: results.comprehensiveValidation,
+          stakeholderContext,
+          domainType,
           allResults: results,
           targetQuality
         },
-        qualityDimensions: ['evolutionary_capability', 'temporal_awareness', 'cognitive_alignment', 'future_adaptability'],
+        qualityDimensions: ['stakeholder_satisfaction', 'collaborative_effectiveness', 'refinement_quality', 'integration_success'],
         targetQuality,
         maxIterations: maxIterationsPerPhase,
-        phaseName: 'Evolutionary Framework & Temporal Cognition'
+        phaseName: 'Collaborative Refinement & Stakeholder Integration'
       }
     );
 
-    results.evolutionaryFramework = evolutionaryFrameworkResult.result;
-    results.metadata.phaseIterations['evolutionary-framework'] = evolutionaryFrameworkResult.iterations;
-    results.metadata.qualityScores['evolutionary-framework'] = evolutionaryFrameworkResult.qualityMetrics;
-    results.metadata.totalIterations += evolutionaryFrameworkResult.iterations;
-    artifacts.push(...(evolutionaryFrameworkResult.artifacts || []));
+    results.collaborativeRefinement = collaborativeRefinementResult.result;
+    results.metadata.phaseIterations['collaborative-refinement'] = collaborativeRefinementResult.iterations;
+    results.metadata.qualityScores['collaborative-refinement'] = collaborativeRefinementResult.qualityMetrics;
+    results.metadata.totalIterations += collaborativeRefinementResult.iterations;
+    artifacts.push(...(collaborativeRefinementResult.artifacts || []));
 
     await ctx.breakpoint({
-      question: `Evolutionary framework complete. Evolution capability: ${evolutionaryFrameworkResult.result?.evolutionCapability}%, Temporal awareness: ${evolutionaryFrameworkResult.result?.temporalAwareness}%, Cognitive alignment: ${evolutionaryFrameworkResult.result?.cognitiveAlignment}%. Proceed to remaining phases?`,
-      title: 'Evolutionary Framework Review',
+      question: `Collaborative refinement complete. Stakeholder satisfaction: ${collaborativeRefinementResult.result?.stakeholderSatisfaction}%, Integration success: ${collaborativeRefinementResult.result?.integrationSuccess}%, Refinements applied: ${collaborativeRefinementResult.result?.refinements?.length}. Proceed to remaining phases?`,
+      title: 'Collaborative Refinement Review',
       context: {
         runId: ctx.runId,
         data: {
-          evolutionCapability: evolutionaryFrameworkResult.result?.evolutionCapability,
-          temporalAwareness: evolutionaryFrameworkResult.result?.temporalAwareness,
-          cognitiveAlignment: evolutionaryFrameworkResult.result?.cognitiveAlignment,
-          futureAdaptability: evolutionaryFrameworkResult.result?.futureAdaptability
+          stakeholderSatisfaction: collaborativeRefinementResult.result?.stakeholderSatisfaction,
+          integrationSuccess: collaborativeRefinementResult.result?.integrationSuccess,
+          refinements: collaborativeRefinementResult.result?.refinements?.length,
+          collaborationQuality: collaborativeRefinementResult.result?.collaborationQuality
         },
         files: [
-          { path: 'artifacts/odd/EVOLUTIONARY_FRAMEWORK.md', format: 'markdown', label: 'Evolutionary Framework' },
-          { path: 'artifacts/odd/TEMPORAL_COGNITION.md', format: 'markdown', label: 'Temporal Cognition' },
-          { path: 'artifacts/odd/COGNITIVE_ALIGNMENT.md', format: 'markdown', label: 'Cognitive Alignment' }
+          { path: 'artifacts/odd/COLLABORATIVE_REFINEMENT.md', format: 'markdown', label: 'Collaborative Refinement' },
+          { path: 'artifacts/odd/STAKEHOLDER_INTEGRATION.md', format: 'markdown', label: 'Stakeholder Integration' },
+          { path: 'artifacts/odd/REFINEMENT_SUMMARY.md', format: 'markdown', label: 'Refinement Summary' }
         ]
       }
     });
@@ -1551,62 +1554,60 @@ const worldOntologyResearchTask = defineTask({
         role: 'world-ontology-researcher',
         goal: `Build comprehensive world model and domain ontology for ${inputs.projectName}`,
         instructions: [
-          '=== AI-ENHANCED CRITICAL THINKING FRAMEWORK ===',
-          'Apply AI-augmented systematic analysis using the DEEP-CARE-AI framework:',
-          'D - DEPTH ANALYSIS: What fundamental concepts need deeper investigation? (AI: Pattern recognition)',
-          'E - EVIDENCE QUALITY: How strong is our evidence base? (AI: Source credibility scoring)',
-          'E - EXPANSION NEEDS: What domains/perspectives are underrepresented? (AI: Gap prediction)',
-          'P - PRECISION GAPS: Where are our models imprecise? (AI: Uncertainty quantification)',
-          'C - CONSISTENCY CHECK: What contradictions exist? (AI: Automated consistency verification)',
-          'A - ACCURACY VALIDATION: What claims need verification? (AI: Fact-checking automation)',
-          'R - RELEVANCE ASSESSMENT: What research is critical? (AI: Relevance scoring)',
-          'E - EVOLUTION PLANNING: How to advance understanding? (AI: Learning trajectory optimization)',
-          'A - ADAPTIVE LEARNING: How should AI models learn from this iteration?',
-          'I - INTELLIGENT PREDICTION: What outcomes can AI predict for next iteration?',
+          '=== SYSTEMATIC CRITICAL THINKING FRAMEWORK ===',
+          'Apply rigorous agent-based analysis using the DEEP-CARE framework:',
+          'D - DEPTH ANALYSIS: What fundamental concepts need deeper investigation?',
+          'E - EVIDENCE QUALITY: How strong is our evidence base? What sources need validation?',
+          'E - EXPANSION NEEDS: What domains/perspectives are underrepresented?',
+          'P - PRECISION GAPS: Where are our models imprecise or ambiguous?',
+          'C - CONSISTENCY CHECK: What internal contradictions exist?',
+          'A - ACCURACY VALIDATION: What claims need empirical verification?',
+          'R - RELEVANCE ASSESSMENT: What research is peripheral vs. critical?',
+          'E - EVOLUTION PLANNING: How should this iteration advance our understanding?',
 
-          '=== ADVANCED MULTI-METHOD RESEARCH FRAMEWORK ===',
-          'Use AI-enhanced triangulation across research methods:',
-          '1. AI-AUGMENTED SYSTEMATIC LITERATURE REVIEW',
-          '   - Use NLP and machine learning for automated literature discovery',
-          '   - Apply semantic search and knowledge graph mining',
-          '   - Implement automated quality assessment using trained models',
-          '   - Use AI for systematic data extraction and synthesis',
-          '   - Apply network analysis for citation and influence mapping',
+          '=== COMPREHENSIVE MULTI-METHOD RESEARCH FRAMEWORK ===',
+          'Use systematic triangulation across research methods:',
+          '1. SYSTEMATIC LITERATURE REVIEW',
+          '   - Define comprehensive search strategy with keywords, databases, inclusion criteria',
+          '   - Apply rigorous quality assessment framework for source credibility',
+          '   - Extract data systematically using standardized forms and protocols',
+          '   - Synthesize findings using thematic analysis, meta-analysis, or systematic mapping',
+          '   - Document evidence quality levels, confidence intervals, and bias assessment',
 
-          '2. INTELLIGENT EXPERT CONSULTATION',
-          '   - Use AI matching for optimal expert identification and recruitment',
-          '   - Apply conversational AI for structured interview assistance',
-          '   - Use sentiment analysis and bias detection in expert responses',
-          '   - Implement automated Delphi round facilitation',
-          '   - Apply machine learning for expert credibility weighting',
+          '2. EXPERT CONSULTATION & VALIDATION',
+          '   - Identify and recruit domain experts using snowball sampling and expertise mapping',
+          '   - Design structured interview protocols with validation questions and scenarios',
+          '   - Use Delphi method for consensus building on contested or ambiguous topics',
+          '   - Apply inter-rater reliability measures and expert agreement analysis',
+          '   - Weight expert opinions by demonstrated expertise, track record, and domain relevance',
 
-          '3. BIG DATA EMPIRICAL ANALYSIS',
-          '   - Use web scraping and APIs for real-time data collection',
-          '   - Apply machine learning for pattern recognition in large datasets',
-          '   - Use predictive analytics for trend identification',
-          '   - Implement natural language processing for unstructured data',
-          '   - Apply blockchain for data integrity and provenance tracking',
+          '3. EMPIRICAL DATA ANALYSIS',
+          '   - Collect quantitative and qualitative data from industry reports, surveys, metrics',
+          '   - Apply statistical analysis to identify patterns, trends, and correlations',
+          '   - Use observational studies of existing systems, processes, and implementations',
+          '   - Conduct comparative analysis across similar domains, organizations, and contexts',
+          '   - Validate findings through replication studies and sensitivity analysis',
 
-          '4. QUANTUM RESEARCH METHODOLOGIES',
-          '   - Use quantum computing for complex optimization problems',
-          '   - Apply quantum machine learning for pattern recognition',
-          '   - Implement quantum simulation for scenario modeling',
-          '   - Use quantum cryptography for secure research collaboration',
-          '   - Apply quantum sensing for ultra-precise measurements',
+          '4. CASE STUDY METHODOLOGY',
+          '   - Design multiple case studies across different contexts and domains',
+          '   - Use cross-case analysis for pattern identification and theory building',
+          '   - Apply within-case analysis for deep contextual understanding',
+          '   - Implement theoretical sampling for maximum learning and validation',
+          '   - Use case study databases for systematic evidence collection',
 
-          '5. NEUROMORPHIC AND BIOLOGICAL MODELING',
-          '   - Use brain-inspired computing for cognitive modeling',
-          '   - Apply biological algorithms for optimization problems',
-          '   - Implement DNA computing for parallel processing',
-          '   - Use swarm intelligence for distributed problem solving',
-          '   - Apply evolutionary algorithms for solution discovery',
+          '5. ETHNOGRAPHIC OBSERVATION',
+          '   - Conduct participant observation in real-world domain contexts',
+          '   - Use structured observation protocols with systematic data collection',
+          '   - Apply contextual inquiry methods for deep understanding',
+          '   - Document tacit knowledge and implicit domain practices',
+          '   - Use video analysis and interaction analysis for detailed examination',
 
-          '6. IMMERSIVE RESEARCH TECHNOLOGIES',
-          '   - Use virtual reality for stakeholder experience research',
-          '   - Apply augmented reality for contextual data collection',
-          '   - Implement digital twins for system behavior modeling',
-          '   - Use haptic feedback for tactile research experiences',
-          '   - Apply brain-computer interfaces for direct cognitive measurement',
+          '6. EXPERIMENTAL VALIDATION',
+          '   - Design controlled experiments to test specific hypotheses',
+          '   - Use quasi-experimental designs for real-world validation',
+          '   - Apply randomized controlled trials where feasible and ethical',
+          '   - Implement natural experiments using existing variations',
+          '   - Use experimental protocols with rigorous controls and measurement',
 
           '=== COMPREHENSIVE WORLD RESEARCH ===',
           '1. DOMAIN LANDSCAPE ANALYSIS',
@@ -1693,38 +1694,27 @@ const worldOntologyResearchTask = defineTask({
           '- CONVERGENCE PREDICTION: Estimate iterations needed for target quality',
           '- RISK-BENEFIT ANALYSIS: Optimize iteration focus for maximum impact',
 
-          '=== ADVANCED UNCERTAINTY & RISK MANAGEMENT ===',
-          'Next-generation uncertainty handling:',
-          '- QUANTUM UNCERTAINTY MODELING: Use quantum probability for uncertain states',
-          '- BAYESIAN DEEP LEARNING: Neural networks with uncertainty quantification',
-          '- FUZZY ONTOLOGICAL REASONING: Handle vagueness and imprecision',
-          '- PROBABILISTIC KNOWLEDGE GRAPHS: Represent uncertain relationships',
-          '- MONTE CARLO TREE SEARCH: Explore uncertainty space systematically',
-          '- ROBUST OPTIMIZATION: Solutions that perform well under uncertainty',
-          '- ADVERSARIAL VALIDATION: Test against worst-case scenarios',
-          '- CHAOS THEORY ANALYSIS: Understand sensitivity to initial conditions',
-          '- FRACTAL DIMENSION ANALYSIS: Measure complexity and predictability',
-          '- INFORMATION THEORY METRICS: Quantify knowledge and uncertainty',
+          '=== COMPREHENSIVE UNCERTAINTY MANAGEMENT ===',
+          'Systematic uncertainty handling through agent-based analysis:',
+          '- UNCERTAINTY QUANTIFICATION: Assign confidence levels to all claims with evidence',
+          '- SENSITIVITY ANALYSIS: Test model robustness to assumption changes',
+          '- SCENARIO PLANNING: Model ontology behavior under different future conditions',
+          '- ASSUMPTION TRACKING: Document and systematically validate underlying assumptions',
+          '- CONTINGENCY PLANNING: Prepare alternative models for uncertain or contested areas',
+          '- CONFIDENCE INTERVAL ESTIMATION: Statistical bounds on all quantitative claims',
+          '- BIAS DETECTION: Systematic identification of cognitive and methodological biases',
+          '- ERROR PROPAGATION ANALYSIS: Track how uncertainties compound through the process',
 
-          '=== BLOCKCHAIN & CRYPTOGRAPHIC VALIDATION ===',
-          'Immutable validation and trust:',
-          '- BLOCKCHAIN VALIDATION TRAILS: Immutable record of all validations',
-          '- SMART CONTRACT VALIDATION: Automated validation execution',
-          '- ZERO-KNOWLEDGE PROOFS: Validate without revealing sensitive data',
-          '- HOMOMORPHIC ENCRYPTION: Compute on encrypted validation data',
-          '- DISTRIBUTED CONSENSUS: Multi-party validation agreement',
-          '- CRYPTOGRAPHIC SIGNATURES: Guarantee validation integrity',
-          '- MERKLE TREES: Efficient validation of large datasets',
-          '- RING SIGNATURES: Anonymous but verified expert validation',
-
-          '=== QUANTUM-ENHANCED VALIDATION ===',
-          'Quantum computing for validation:',
-          '- QUANTUM SIMULATION: Model complex system behaviors',
-          '- QUANTUM OPTIMIZATION: Find optimal validation strategies',
-          '- QUANTUM MACHINE LEARNING: Enhanced pattern recognition',
-          '- QUANTUM CRYPTOGRAPHY: Ultimate security for validation data',
-          '- QUANTUM SENSING: Ultra-precise measurement and validation',
-          '- QUANTUM ENTANGLEMENT: Instantaneous validation synchronization'
+          '=== VALIDATION INTEGRITY & TRACEABILITY ===',
+          'Comprehensive validation audit trail:',
+          '- VALIDATION DOCUMENTATION: Complete audit trail of all validation steps and decisions',
+          '- SOURCE TRACKING: Full provenance of all evidence and validation inputs',
+          '- REVIEWER CREDENTIALS: Documented expertise and potential conflicts of interest',
+          '- VALIDATION METHODOLOGY: Explicit documentation of validation criteria and processes',
+          '- INTER-VALIDATOR AGREEMENT: Measurement of consensus among independent validators',
+          '- VALIDATION VERSIONING: Track changes in validation status over time',
+          '- EVIDENCE QUALITY SCORING: Systematic rating of evidence strength and reliability',
+          '- VALIDATION CHAIN INTEGRITY: Ensure no broken links in validation reasoning'
         ],
         context: {
           projectName: inputs.projectName,
@@ -4878,12 +4868,12 @@ const perfectGraphConstructionTask = defineTask({
 });
 
 /**
- * Task: AI-Driven Predictive Optimization
- * Purpose: Use AI to predict and optimize ontology evolution and performance
+ * Task: Comprehensive Validation & Verification
+ * Purpose: Rigorous validation through systematic agent-based analysis
  */
-const aiDrivenOptimizationTask = defineTask({
-  name: 'ai-driven-optimization',
-  description: 'AI-powered predictive optimization with formal verification capabilities',
+const comprehensiveValidationTask = defineTask({
+  name: 'comprehensive-validation',
+  description: 'Comprehensive validation and verification through systematic agent analysis',
 
   inputs: {
     projectName: { type: 'string', required: true },
@@ -4892,21 +4882,21 @@ const aiDrivenOptimizationTask = defineTask({
     optimizedOntology: { type: 'object', required: true },
     empiricalHistory: { type: 'object', required: true },
     optimizationHistory: { type: 'array', required: true },
-    performanceMetrics: { type: 'object', required: true },
+    allResults: { type: 'object', required: true },
     iteration: { type: 'number', default: 0 },
     previousResult: { type: 'object', default: null },
     identifiedGaps: { type: 'array', default: [] }
   },
 
   outputs: {
-    predictiveModels: { type: 'object' },
-    predictiveAccuracy: { type: 'number' },
-    aiImprovements: { type: 'array' },
-    automatedOptimizations: { type: 'object' },
-    formalVerification: { type: 'object' },
-    verificationCoverage: { type: 'number' },
-    futureProjections: { type: 'object' },
-    intelligentRecommendations: { type: 'array' },
+    validationCoverage: { type: 'number' },
+    consistencyScore: { type: 'number' },
+    stakeholderValidationScore: { type: 'number' },
+    validationReport: { type: 'object' },
+    consistencyAnalysis: { type: 'object' },
+    verificationResults: { type: 'object' },
+    issuesFound: { type: 'array' },
+    recommendations: { type: 'array' },
     artifacts: { type: 'array' }
   },
 
@@ -4915,106 +4905,106 @@ const aiDrivenOptimizationTask = defineTask({
 
     return {
       kind: 'agent',
-      title: `AI-Driven Optimization: ${inputs.projectName} (Iteration ${inputs.iteration + 1})`,
+      title: `Comprehensive Validation: ${inputs.projectName} (Iteration ${inputs.iteration + 1})`,
       agent: {
-        role: 'ai-optimization-architect',
-        goal: `Deploy AI-driven predictive optimization and formal verification for ${inputs.projectName}`,
+        role: 'validation-verification-specialist',
+        goal: `Conduct comprehensive validation and verification of ontology and knowledge graph for ${inputs.projectName}`,
         instructions: [
-          '=== AI-POWERED PREDICTIVE OPTIMIZATION FRAMEWORK ===',
-          'Deploy advanced AI techniques for ontology optimization:',
-          '- MACHINE LEARNING MODELS: Train on optimization history for pattern recognition',
-          '- PREDICTIVE ANALYTICS: Forecast optimization outcomes and convergence trajectories',
-          '- AUTOMATED OPTIMIZATION: AI-driven schema and graph optimization suggestions',
-          '- FORMAL VERIFICATION: Mathematical proofs of ontology correctness and consistency',
-          '- INTELLIGENT ADAPTATION: Self-improving optimization strategies',
+          '=== SYSTEMATIC VALIDATION FRAMEWORK ===',
+          'Apply comprehensive multi-dimensional validation:',
+          '- LOGICAL CONSISTENCY: Verify logical coherence across all ontology components',
+          '- SEMANTIC ACCURACY: Validate semantic relationships and concept definitions',
+          '- STAKEHOLDER VALIDATION: Systematic validation with all stakeholder groups',
+          '- EMPIRICAL VERIFICATION: Test against real-world data and usage scenarios',
+          '- COMPLETENESS ASSESSMENT: Verify coverage of all required domain aspects',
 
-          '=== ADVANCED MACHINE LEARNING INTEGRATION ===',
-          '1. OPTIMIZATION PATTERN RECOGNITION',
-          '   - Train neural networks on optimization history and outcomes',
-          '   - Use deep learning for complex pattern recognition in ontology structures',
-          '   - Apply reinforcement learning for optimization strategy improvement',
-          '   - Implement ensemble methods for robust prediction accuracy',
-          '   - Use transfer learning from similar domain ontologies',
+          '=== LOGICAL CONSISTENCY VERIFICATION ===',
+          '1. STRUCTURAL CONSISTENCY ANALYSIS',
+          '   - Check for circular dependencies and logical contradictions',
+          '   - Verify hierarchical relationships for consistency',
+          '   - Validate constraint satisfaction across all ontology rules',
+          '   - Check for missing or incomplete logical connections',
+          '   - Verify subsumption relationships and class hierarchies',
 
-          '2. PREDICTIVE QUALITY MODELING',
-          '   - Build predictive models for optimization outcome forecasting',
-          '   - Use time series analysis for quality trajectory prediction',
-          '   - Apply Bayesian optimization for parameter tuning',
-          '   - Implement Monte Carlo methods for uncertainty quantification',
-          '   - Use genetic algorithms for multi-objective optimization',
+          '2. SEMANTIC RELATIONSHIP VALIDATION',
+          '   - Validate all semantic relationships for logical coherence',
+          '   - Check relationship cardinalities and domain/range specifications',
+          '   - Verify inverse relationship consistency',
+          '   - Validate transitive and symmetric relationship properties',
+          '   - Check for conflicting or contradictory semantic assertions',
 
-          '3. AUTOMATED OPTIMIZATION GENERATION',
-          '   - Generate optimization suggestions using generative AI models',
-          '   - Use constraint satisfaction programming for optimization validation',
-          '   - Apply search algorithms for optimal solution space exploration',
-          '   - Implement multi-agent systems for collaborative optimization',
-          '   - Use evolutionary computation for schema evolution',
+          '3. RULE AND CONSTRAINT VERIFICATION',
+          '   - Validate all business rules against domain requirements',
+          '   - Check constraint satisfaction across all data instances',
+          '   - Verify integrity constraints and validation rules',
+          '   - Test exception handling and edge case scenarios',
+          '   - Validate temporal and conditional constraint logic',
 
-          '=== FORMAL VERIFICATION & MATHEMATICAL PROOFS ===',
-          '1. LOGICAL CONSISTENCY VERIFICATION',
-          '   - Apply automated theorem proving for logical consistency',
-          '   - Use model checking for temporal and modal logic properties',
-          '   - Implement satisfiability (SAT) solving for constraint verification',
-          '   - Apply description logic reasoning for subsumption checking',
-          '   - Use proof assistants for formal correctness proofs',
+          '=== COMPREHENSIVE STAKEHOLDER VALIDATION ===',
+          '1. DOMAIN EXPERT VALIDATION',
+          '   - Systematic review with subject matter experts',
+          '   - Validate concept definitions against domain knowledge',
+          '   - Check terminology accuracy and appropriateness',
+          '   - Verify relationship semantics match domain understanding',
+          '   - Validate completeness of domain coverage',
 
-          '2. SEMANTIC CORRECTNESS VALIDATION',
-          '   - Formal verification of semantic relationship accuracy',
-          '   - Mathematical validation of ontology completeness',
-          '   - Proof of semantic consistency across integrated models',
-          '   - Verification of constraint satisfaction and rule compliance',
-          '   - Formal validation of traceability and alignment properties',
+          '2. END USER VALIDATION',
+          '   - Test ontology usability with intended users',
+          '   - Validate user interface and interaction patterns',
+          '   - Check accessibility and ease of understanding',
+          '   - Test user workflows and task completion',
+          '   - Gather user feedback on practical utility',
 
-          '3. PERFORMANCE GUARANTEE PROOFS',
-          '   - Mathematical proofs of query performance bounds',
-          '   - Formal verification of scalability properties',
-          '   - Proof of optimization convergence guarantees',
-          '   - Verification of system stability and robustness',
-          '   - Mathematical validation of quality improvement claims',
+          '3. TECHNICAL STAKEHOLDER VALIDATION',
+          '   - Review with developers and system architects',
+          '   - Validate implementation feasibility and complexity',
+          '   - Check integration requirements and constraints',
+          '   - Verify performance and scalability characteristics',
+          '   - Validate maintenance and evolution requirements',
 
-          '=== INTELLIGENT PREDICTION & FORECASTING ===',
-          '1. FUTURE STATE PROJECTION',
-          '   - Predict ontology evolution under different scenarios',
-          '   - Forecast performance degradation and optimization needs',
-          '   - Project stakeholder satisfaction and adoption patterns',
-          '   - Predict integration challenges and compatibility issues',
-          '   - Forecast maintenance requirements and technical debt accumulation',
+          '=== EMPIRICAL VERIFICATION TESTING ===',
+          '1. REAL-WORLD DATA VALIDATION',
+          '   - Test ontology against actual domain data samples',
+          '   - Validate data mapping and transformation accuracy',
+          '   - Check for data loss or distortion during population',
+          '   - Verify query accuracy and result completeness',
+          '   - Test data quality preservation and enhancement',
 
-          '2. RISK PREDICTION & MITIGATION',
-          '   - AI-powered risk identification and severity prediction',
-          '   - Automated generation of risk mitigation strategies',
-          '   - Predictive failure mode analysis and prevention',
-          '   - Early warning systems for quality degradation',
-          '   - Automated contingency planning for predicted issues',
+          '2. USE CASE SCENARIO TESTING',
+          '   - Validate ontology against all defined use cases',
+          '   - Test query patterns and information retrieval',
+          '   - Verify decision support and reasoning capabilities',
+          '   - Check integration with existing workflows',
+          '   - Test exception handling and error scenarios',
 
-          '3. OPTIMIZATION TRAJECTORY MODELING',
-          '   - Model optimal optimization sequences and timing',
-          '   - Predict diminishing returns and convergence points',
-          '   - Optimize resource allocation for maximum improvement',
-          '   - Predict stakeholder impact and change management needs',
-          '   - Model ecosystem effects and co-evolution patterns',
+          '3. PERFORMANCE AND SCALABILITY VALIDATION',
+          '   - Test query performance under realistic data volumes',
+          '   - Validate system behavior under concurrent usage',
+          '   - Check memory usage and storage efficiency',
+          '   - Test network performance for distributed scenarios',
+          '   - Validate backup and recovery procedures',
 
-          '=== META-LEARNING & SELF-IMPROVEMENT ===',
-          '1. OPTIMIZATION STRATEGY EVOLUTION',
-          '   - Learn from optimization successes and failures across iterations',
-          '   - Evolve optimization strategies based on domain characteristics',
-          '   - Adapt approaches based on stakeholder feedback and constraints',
-          '   - Improve prediction accuracy through continuous learning',
-          '   - Develop domain-specific optimization expertise',
+          '=== COMPLETENESS AND COVERAGE ASSESSMENT ===',
+          '1. DOMAIN COVERAGE ANALYSIS',
+          '   - Map ontology coverage against domain requirements',
+          '   - Identify gaps in concept or relationship coverage',
+          '   - Verify alignment with business goals and user needs',
+          '   - Check coverage of edge cases and exceptional scenarios',
+          '   - Validate regulatory and compliance requirement coverage',
 
-          '2. AUTOMATED QUALITY IMPROVEMENT',
-          '   - Self-improving quality assessment and prediction',
-          '   - Automated refinement of optimization criteria',
-          '   - Dynamic adjustment of optimization parameters',
-          '   - Continuous improvement of formal verification coverage',
-          '   - Self-tuning performance and scalability optimization',
+          '2. FUNCTIONAL COMPLETENESS VERIFICATION',
+          '   - Verify all required functionalities are supported',
+          '   - Check integration completeness with external systems',
+          '   - Validate all user workflows and processes',
+          '   - Test all specified quality attributes',
+          '   - Verify traceability completeness from requirements to implementation',
 
-          '3. COLLABORATIVE AI ENHANCEMENT',
-          '   - Integration with external AI systems and knowledge bases',
-          '   - Collective intelligence aggregation from multiple AI agents',
-          '   - Cross-domain knowledge transfer and application',
-          '   - Federated learning from distributed ontology projects',
-          '   - AI-AI collaboration for complex optimization challenges'
+          '3. QUALITY COMPLETENESS VALIDATION',
+          '   - Assess completeness of quality assurance processes',
+          '   - Verify all validation criteria have been met',
+          '   - Check completeness of documentation and artifacts',
+          '   - Validate training and support material completeness',
+          '   - Verify change management process completeness'
         ],
         context: {
           projectName: inputs.projectName,
@@ -5023,7 +5013,7 @@ const aiDrivenOptimizationTask = defineTask({
           optimizedOntology: inputs.optimizedOntology,
           empiricalHistory: inputs.empiricalHistory,
           optimizationHistory: inputs.optimizationHistory,
-          performanceMetrics: inputs.performanceMetrics,
+          allResults: inputs.allResults,
           iteration: inputs.iteration,
           previousResult: inputs.previousResult,
           identifiedGaps: inputs.identifiedGaps
@@ -5033,40 +5023,41 @@ const aiDrivenOptimizationTask = defineTask({
         inputJsonPath: `tasks/${effectId}/input.json`,
         outputJsonPath: `tasks/${effectId}/result.json`
       },
-      labels: ['ai-optimization', 'predictive-modeling', 'formal-verification', 'automated-improvement']
+      labels: ['comprehensive-validation', 'stakeholder-verification', 'empirical-testing', 'consistency-checking']
     };
   }
 });
 
 /**
- * Task: Adaptive Intelligence System
- * Purpose: Real-time adaptive systems with collaborative intelligence
+ * Task: Stress Testing & Robustness Analysis
+ * Purpose: Comprehensive stress testing and robustness validation
  */
-const adaptiveIntelligenceSystemTask = defineTask({
-  name: 'adaptive-intelligence-system',
-  description: 'Real-time adaptive systems with human-AI collaborative intelligence',
+const stressTestingRobustnessTask = defineTask({
+  name: 'stress-testing-robustness',
+  description: 'Comprehensive stress testing and robustness analysis through systematic scenarios',
 
   inputs: {
     projectName: { type: 'string', required: true },
     perfectGraph: { type: 'object', required: true },
-    aiOptimization: { type: 'object', required: true },
+    comprehensiveValidation: { type: 'object', required: true },
     stakeholderContext: { type: 'string', required: true },
     domainType: { type: 'string', required: true },
     projectComplexity: { type: 'string', required: true },
+    allResults: { type: 'object', required: true },
     iteration: { type: 'number', default: 0 },
     previousResult: { type: 'object', default: null },
     identifiedGaps: { type: 'array', default: [] }
   },
 
   outputs: {
-    adaptiveFramework: { type: 'object' },
-    adaptationCapability: { type: 'number' },
-    collaborativeIntelligence: { type: 'object' },
-    collaborativeScore: { type: 'number' },
-    realTimeOptimization: { type: 'object' },
-    ecosystemIntegration: { type: 'object' },
-    humanAICollaboration: { type: 'object' },
-    realTimeMetrics: { type: 'object' },
+    stressTestResults: { type: 'object' },
+    testCoverage: { type: 'number' },
+    robustnessScore: { type: 'number' },
+    failureScenarios: { type: 'array' },
+    vulnerabilities: { type: 'array' },
+    performanceUnderStress: { type: 'object' },
+    recoveryCapability: { type: 'object' },
+    recommendations: { type: 'array' },
     artifacts: { type: 'array' }
   },
 
@@ -5075,18 +5066,18 @@ const adaptiveIntelligenceSystemTask = defineTask({
 
     return {
       kind: 'agent',
-      title: `Adaptive Intelligence Systems: ${inputs.projectName} (Iteration ${inputs.iteration + 1})`,
+      title: `Stress Testing & Robustness: ${inputs.projectName} (Iteration ${inputs.iteration + 1})`,
       agent: {
-        role: 'adaptive-systems-architect',
-        goal: `Build real-time adaptive systems with collaborative intelligence for ${inputs.projectName}`,
+        role: 'stress-testing-specialist',
+        goal: `Conduct comprehensive stress testing and robustness analysis for ${inputs.projectName}`,
         instructions: [
-          '=== REAL-TIME ADAPTIVE SYSTEMS FRAMEWORK ===',
-          'Build intelligent systems that adapt and evolve in real-time:',
-          '- CONTINUOUS LEARNING: Real-time learning from usage patterns and feedback',
-          '- DYNAMIC OPTIMIZATION: Live optimization based on changing conditions',
-          '- SELF-HEALING SYSTEMS: Automatic detection and correction of issues',
-          '- PREDICTIVE ADAPTATION: Proactive adaptation based on predicted changes',
-          '- COLLABORATIVE INTELLIGENCE: Human-AI collaboration for continuous improvement',
+          '=== COMPREHENSIVE STRESS TESTING FRAMEWORK ===',
+          'Test ontology and knowledge graph robustness through systematic scenarios:',
+          '- EXTREME LOAD TESTING: Test behavior under maximum expected loads',
+          '- FAILURE MODE ANALYSIS: Systematic identification of potential failure points',
+          '- EDGE CASE VALIDATION: Test handling of unusual and boundary conditions',
+          '- DEGRADED PERFORMANCE TESTING: Validate graceful degradation under stress',
+          '- RECOVERY TESTING: Verify system recovery after failures or interruptions',
 
           '=== ADVANCED REAL-TIME ADAPTATION ===',
           '1. CONTINUOUS LEARNING SYSTEMS',

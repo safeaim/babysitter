@@ -4,7 +4,6 @@ vi.mock("@a5c-ai/babysitter-sdk", async (importOriginal) => {
   return {
     ...actual,
     detectCallerHarness: vi.fn(() => null),
-    getAdapterByName: vi.fn(() => undefined),
   };
 });
 import {
@@ -19,14 +18,12 @@ import {
   BabysitterRuntimeError,
   ErrorCategory,
   detectCallerHarness,
-  getAdapterByName,
 } from "@a5c-ai/babysitter-sdk";
 import type { AgentCoreSessionHandle } from "../../../piWrapper";
 
 describe("harnessUtils", () => {
   beforeEach(() => {
     vi.mocked(detectCallerHarness).mockReturnValue(null);
-    vi.mocked(getAdapterByName).mockReturnValue(undefined);
   });
 
   it("falls back to default answers when the interactive UI tool fails", async () => {
@@ -174,17 +171,14 @@ describe("harnessUtils", () => {
     expect(options.ephemeral).toBe(true);
   });
 
-  it("uses the external orchestration path when a non-internal harness can resolve a session", () => {
-    vi.mocked(getAdapterByName).mockReturnValue({
-      resolveSessionId: vi.fn(() => "pi-session-123"),
-    } as unknown as ReturnType<typeof getAdapterByName>);
-
+  it("uses the external orchestration path for non-internal harnesses", () => {
     expect(shouldUseExternalHarness("pi")).toBe(true);
+    expect(shouldUseExternalHarness("codex")).toBe(true);
   });
 
-  it("keeps the internal orchestration path when no external session is resolvable", () => {
-    expect(shouldUseExternalHarness("pi")).toBe(false);
+  it("keeps the internal orchestration path for built-in harnesses", () => {
     expect(shouldUseExternalHarness("agent-core")).toBe(false);
+    expect(shouldUseExternalHarness("oh-my-pi")).toBe(false);
   });
 
   describe("promptPiWithRetry", () => {

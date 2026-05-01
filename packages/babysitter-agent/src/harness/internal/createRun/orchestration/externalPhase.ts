@@ -90,7 +90,7 @@ export async function runExternalOrchestrationPhase(args: RunOrchestrationPhaseA
       verbose: args.verbose,
       json: args.json,
       state,
-      requireBoundSession: true,
+      requireBoundSession: false,
     });
     if (runState.createdRun) {
       emitProgress(

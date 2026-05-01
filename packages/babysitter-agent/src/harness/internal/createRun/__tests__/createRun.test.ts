@@ -4130,7 +4130,7 @@ describe("handleHarnessCreateRun", () => {
       expect(code).toBe(0);
     });
 
-    it("treats explicit --harness pi as a non-invoked binding hint in create-run", async () => {
+    it("routes explicit --harness pi through host-driven external orchestration", async () => {
       (discoverHarnesses as Mock).mockResolvedValue([
         makeDiscoveryResult({ name: "pi" }),
         makeDiscoveryResult({ name: "claude-code" }),
@@ -4173,9 +4173,9 @@ describe("handleHarnessCreateRun", () => {
         interactive: false,
       });
 
-      expect(code).toBe(1);
-      expect(invokeHarness).not.toHaveBeenCalled();
-      expect(commitEffectResult).not.toHaveBeenCalled();
+      expect(code).toBe(0);
+      expect(invokeHarness).toHaveBeenCalled();
+      expect(commitEffectResult).toHaveBeenCalled();
     });
 
     it("returns 1 when neither --prompt nor --process is provided", async () => {

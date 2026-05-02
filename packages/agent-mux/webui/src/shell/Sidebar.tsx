@@ -37,7 +37,7 @@ export function Sidebar(): JSX.Element {
       { to: '/projects', label: 'Projects', section: 'Plan', icon: FolderKanban },
       { to: '/sessions', label: 'Sessions', section: 'Plan', icon: Layers3, badge: activeSessions > 0 ? activeSessions : null },
       { to: '/workspaces', label: 'Workspaces', section: 'Plan', icon: Workflow },
-      { to: '/runs', label: 'Dispatches', section: 'Operate', icon: PlaySquare, badge: runningRuns > 0 ? runningRuns : null },
+      { to: '/dispatches', label: 'Dispatches', section: 'Operate', icon: PlaySquare, badge: runningRuns > 0 ? runningRuns : null },
       { to: '/inbox', label: 'Inbox', section: 'Operate', icon: Inbox, badge: pendingHooks > 0 ? pendingHooks : null },
       { to: '/automations', label: 'Automations', section: 'Operate', icon: Sparkles },
       { to: '/agents', label: 'Agents', section: 'System', icon: Bot },

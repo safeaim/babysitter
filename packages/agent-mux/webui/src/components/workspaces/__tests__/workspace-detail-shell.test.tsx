@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, setupUser } from "@/test/test-utils";
+import { render, screen, setupUser, within } from "@/test/test-utils";
 
 import { WorkspaceDetailShell } from "../workspace-detail-shell";
 
@@ -30,6 +30,29 @@ vi.mock("@a5c-ai/compendium", () => ({
         ))}
       </div>
     ) : null,
+  Select: ({
+    value,
+    onChange,
+    options,
+    ...props
+  }: {
+    value?: string;
+    onChange?: (value: string) => void;
+    options?: Array<{ label: string; value: string }>;
+    [key: string]: unknown;
+  }) => (
+    <select
+      {...props}
+      value={value}
+      onChange={(event) => onChange?.(event.currentTarget.value)}
+    >
+      {(options ?? []).map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  ),
   cx: (...args: unknown[]) => args.filter(Boolean).join(" "),
 }));
 
@@ -198,17 +221,17 @@ describe("WorkspaceDetailShell", () => {
     );
 
     expect(screen.queryByTestId("workspace-panel-details")).toBeNull();
-    expect(screen.getByTestId("workspace-session-select")).toHaveValue("session-1");
+    expect(within(screen.getByTestId("workspace-session-select")).getByRole("combobox")).toHaveValue("session-1");
 
     await user.click(screen.getByTestId("panel-toggle-details"));
     expect(screen.getByTestId("workspace-panel-details")).toBeInTheDocument();
-    expect(screen.getByTestId("workspace-session-select")).toHaveValue("session-1");
+    expect(within(screen.getByTestId("workspace-session-select")).getByRole("combobox")).toHaveValue("session-1");
     await user.click(screen.getByTestId("panel-toggle-details"));
     expect(screen.queryByTestId("workspace-panel-details")).toBeNull();
     await user.click(screen.getByTestId("panel-toggle-details"));
     expect(screen.getByTestId("workspace-panel-details")).toBeInTheDocument();
     expect(screen.getByText("runtime session-1")).toBeInTheDocument();
-    expect(screen.getByTestId("workspace-session-select")).toHaveValue("session-1");
+    expect(within(screen.getByTestId("workspace-session-select")).getByRole("combobox")).toHaveValue("session-1");
   });
 
   it("keeps the workspace shell compact when no session is linked yet", () => {

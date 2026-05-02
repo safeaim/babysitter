@@ -431,6 +431,8 @@ function workspaceAttentionRank(workspace: WorkspaceInventoryItem): number {
   return 4;
 }
 
+const WORKSPACE_PAGE_SIZE = 24;
+
 function compareAttentionWorkspaces(left: WorkspaceInventoryItem, right: WorkspaceInventoryItem): number {
   const rankDiff = workspaceAttentionRank(left) - workspaceAttentionRank(right);
   if (rankDiff !== 0) {
@@ -460,7 +462,7 @@ export function WorkspacesPageContent(props: {
     model?: string;
     attachments?: Attachment[];
     approvalMode?: "yolo" | "prompt" | "deny";
-  }) => Promise<void>;
+  }) => Promise<{ runId?: string; sessionId?: string } | void>;
   mode?: WorkspaceSurfaceMode;
 }) {
   const navigate = useNavigate();
@@ -474,6 +476,7 @@ export function WorkspacesPageContent(props: {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [layoutMode, setLayoutMode] = usePersistedState<WorkspaceListLayoutMode>("workspace-sidebar.layout-mode", "grouped");
   const [searchTerm, setSearchTerm] = usePersistedState("workspace-sidebar.search", "");
+  const [page, setPage] = useState(0);
   const [isPending, startTransition] = useTransition();
   const { snapshot } = useBacklog();
   const workspaceReviews = useReviews({ targetType: "workspace" });
@@ -488,7 +491,8 @@ export function WorkspacesPageContent(props: {
           sessionId: session.sessionId,
           status: session.status,
           cwd: session.cwd ?? "",
-          updatedAt: session.updatedAt ?? 0,
+          activeRunId: session.activeRunId ?? "",
+          latestRunId: session.latestRunId ?? "",
         })),
       ),
     [props.sessions],
@@ -558,6 +562,19 @@ export function WorkspacesPageContent(props: {
     archived: filteredWorkspaces.filter((workspace) => workspace.status === "archived" && !workspace.pinnedAt),
     missing: filteredWorkspaces.filter((workspace) => workspace.status === "missing" && !workspace.pinnedAt),
   }), [filteredWorkspaces]);
+  const totalPages = Math.max(1, Math.ceil(filteredWorkspaces.length / WORKSPACE_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pagedWorkspaces = useMemo(
+    () => filteredWorkspaces.slice(safePage * WORKSPACE_PAGE_SIZE, (safePage + 1) * WORKSPACE_PAGE_SIZE),
+    [filteredWorkspaces, safePage],
+  );
+  const pagedGroups = useMemo(() => ({
+    pinned: pagedWorkspaces.filter((workspace) => Boolean(workspace.pinnedAt)),
+    active: pagedWorkspaces.filter((workspace) => workspace.status === "active" && !workspace.pinnedAt),
+    idle: pagedWorkspaces.filter((workspace) => workspace.status === "idle" && !workspace.pinnedAt),
+    archived: pagedWorkspaces.filter((workspace) => workspace.status === "archived" && !workspace.pinnedAt),
+    missing: pagedWorkspaces.filter((workspace) => workspace.status === "missing" && !workspace.pinnedAt),
+  }), [pagedWorkspaces]);
   const hiddenWorkspaceCount = workspaces.length - filteredWorkspaces.length;
   const sidebarEmptyMessage = normalizedSearchTerm
     ? `No workspaces match "${searchTerm}". Clear the search or adjust the layout to widen the sidebar.`
@@ -655,6 +672,16 @@ export function WorkspacesPageContent(props: {
     (workspaceReviews.summary?.pendingCount ?? 0) > 0 ||
     (workspaceReviews.summary?.approvedCount ?? 0) > 0 ||
     (workspaceReviews.summary?.openCommentCount ?? 0) > 0;
+
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm, layoutMode]);
+
+  useEffect(() => {
+    if (page !== safePage) {
+      setPage(safePage);
+    }
+  }, [page, safePage]);
 
   useEffect(() => {
     if (!selectedWorkspacePath) {
@@ -894,11 +921,15 @@ export function WorkspacesPageContent(props: {
     if (!selectedSessionId || !props.onSendPrompt) {
       return;
     }
-    await props.onSendPrompt({
+    const result = await props.onSendPrompt({
       ...input,
       sessionId: selectedSessionId,
       agent: input.agent ?? activeSession?.agent,
     });
+    if (result?.sessionId && result.sessionId !== selectedSessionId) {
+      setSelectedSessionId(result.sessionId);
+      refreshInventory();
+    }
   }
 
   if (selectedWorkspacePath) {
@@ -1182,6 +1213,9 @@ export function WorkspacesPageContent(props: {
             {filteredWorkspaces.length} visible
           </span>
           <span className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground-muted">
+            Page {safePage + 1} of {totalPages}
+          </span>
+          <span className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground-muted">
             {filteredGroups.pinned.length} pinned
           </span>
           <span className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground-muted">
@@ -1208,12 +1242,25 @@ export function WorkspacesPageContent(props: {
 
         {!loading && filteredWorkspaces.length > 0 ? (
           <div className="mt-5 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm">
+              <div className="text-foreground-muted">
+                Showing workspaces {safePage * WORKSPACE_PAGE_SIZE + 1}-{Math.min((safePage + 1) * WORKSPACE_PAGE_SIZE, filteredWorkspaces.length)} of {filteredWorkspaces.length}
+              </div>
+              <div className="flex gap-2">
+                <Button type="button" size="sm" variant="ghost" disabled={safePage === 0} onClick={() => setPage((current) => Math.max(0, current - 1))}>
+                  Previous
+                </Button>
+                <Button type="button" size="sm" variant="ghost" disabled={safePage >= totalPages - 1} onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}>
+                  Next
+                </Button>
+              </div>
+            </div>
             {layoutMode === "flat" ? (
               <WorkspaceColumn
                 title="Workspace list"
                 icon={FolderGit2}
                 empty={sidebarEmptyMessage}
-                workspaces={filteredWorkspaces}
+                workspaces={pagedWorkspaces}
                 reviewByPath={liveReviewByPath}
                 artifactByPath={liveArtifactByPath}
                 executionContextsBySessionId={executionContextsBySessionId}
@@ -1234,14 +1281,14 @@ export function WorkspacesPageContent(props: {
             ) : (
               <Accordion
                 items={[
-                  ...(filteredGroups.pinned.length > 0 ? [{
-                    title:`Pinned workspaces (${filteredGroups.pinned.length})`,
+                  ...(pagedGroups.pinned.length > 0 ? [{
+                    title:`Pinned workspaces (${pagedGroups.pinned.length})`,
                     body: (
                       <WorkspaceColumn
                         title="Pinned workspaces"
                         icon={Pin}
                         empty="No pinned workspaces match the current sidebar filters."
-                        workspaces={filteredGroups.pinned}
+                        workspaces={pagedGroups.pinned}
                         reviewByPath={liveReviewByPath}
                         artifactByPath={liveArtifactByPath}
                         executionContextsBySessionId={executionContextsBySessionId}
@@ -1262,10 +1309,10 @@ export function WorkspacesPageContent(props: {
                     ),
                   }] : []),
                   ...[
-                    { key: "active", title: "Active workspaces", icon: FolderGit2, empty: "No active workspaces are currently visible.", workspaces: filteredGroups.active },
-                    { key: "idle", title: "Idle workspaces", icon: Wrench, empty: "No idle workspaces are currently visible.", workspaces: filteredGroups.idle },
-                    { key: "archived", title: "Archived workspaces", icon: Archive, empty: "No archived workspaces are currently visible.", workspaces: filteredGroups.archived },
-                    { key: "missing", title: "Recovery queue", icon: AlertTriangle, empty: "No missing workspaces are currently visible.", workspaces: filteredGroups.missing },
+                    { key: "active", title: "Active workspaces", icon: FolderGit2, empty: "No active workspaces are currently visible.", workspaces: pagedGroups.active },
+                    { key: "idle", title: "Idle workspaces", icon: Wrench, empty: "No idle workspaces are currently visible.", workspaces: pagedGroups.idle },
+                    { key: "archived", title: "Archived workspaces", icon: Archive, empty: "No archived workspaces are currently visible.", workspaces: pagedGroups.archived },
+                    { key: "missing", title: "Recovery queue", icon: AlertTriangle, empty: "No missing workspaces are currently visible.", workspaces: pagedGroups.missing },
                   ].map((group) => ({
                     title: `${group.title} (${group.workspaces.length})`,
                     body: (

@@ -172,6 +172,6 @@ describe('BreakpointBanner', () => {
   it('renders links to run detail pages', () => {
     render(<BreakpointBanner breakpointRuns={[makeBp({ runId: 'link-run' })]} />);
     const link = screen.getByRole('link', { name: /approve deployment\?/i });
-    expect(link).toHaveAttribute('href', '/runs/link-run');
+    expect(link).toHaveAttribute('href', '/dispatches/link-run');
   });
 });

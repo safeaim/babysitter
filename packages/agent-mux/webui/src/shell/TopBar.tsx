@@ -15,7 +15,7 @@ function topBarMeta(pathname: string): { label: string; subtitle?: string } {
       subtitle: 'Promoting this dispatch into a durable chat.',
     };
   }
-  if (/^\/runs\/[^/]+$/.test(pathname)) {
+  if (/^\/(?:dispatches|runs)\/[^/]+$/.test(pathname)) {
     return {
       label: 'Dispatch handoff',
       subtitle: 'Opening the bound session chat for this dispatch.',
@@ -41,7 +41,7 @@ function topBarMeta(pathname: string): { label: string; subtitle?: string } {
       label: 'Board',
     };
   }
-  if (pathname.startsWith('/runs')) {
+  if (pathname.startsWith('/dispatches') || pathname.startsWith('/runs')) {
     return {
       label: 'Dispatch queue',
     };

@@ -272,12 +272,12 @@ describe('SessionObservabilityPanel', () => {
       />,
     );
 
-    expect(screen.getAllByRole('link', { name: 'Open dispatch' }).some((link) => link.getAttribute('href') === '/runs/run-1')).toBe(true);
+    expect(screen.getAllByRole('link', { name: 'Open dispatch' }).some((link) => link.getAttribute('href') === '/dispatches/run-1')).toBe(true);
     expect(
-      screen.getAllByRole('link', { name: 'Review breakpoint' }).some((link) => link.getAttribute('href') === '/runs/run-1?effectId=bp-1'),
+      screen.getAllByRole('link', { name: 'Review breakpoint' }).some((link) => link.getAttribute('href') === '/dispatches/run-1?effectId=bp-1'),
     ).toBe(true);
     expect(
-      screen.getAllByRole('link', { name: 'Open failed task' }).some((link) => link.getAttribute('href') === '/runs/run-1?effectId=task-1'),
+      screen.getAllByRole('link', { name: 'Open failed task' }).some((link) => link.getAttribute('href') === '/dispatches/run-1?effectId=task-1'),
     ).toBe(true);
     expect(
       screen.getAllByRole('link', { name: 'Open file' }).some((link) => link.getAttribute('href') === 'vscode://file/repo/worktrees/task-1/src/panel.tsx'),

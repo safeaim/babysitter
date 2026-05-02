@@ -89,7 +89,9 @@ describe('SessionsPage', () => {
       ),
     ).toBe(true);
     expect(
-      screen.getAllByRole('link', { name: 'Open dispatch' }).some((link) => link.getAttribute('href') === '/runs/run-active'),
+      screen.getAllByRole('link', { name: 'Open dispatch' }).some(
+        (link) => link.getAttribute('href') === '/dispatches/run-active',
+      ),
     ).toBe(true);
   });
 

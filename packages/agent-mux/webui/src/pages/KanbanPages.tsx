@@ -327,17 +327,36 @@ function KanbanWorkspacesGatewayContent(): JSX.Element {
     attachments?: Attachment[];
     approvalMode?: 'yolo' | 'prompt' | 'deny';
   }) {
-    const response = await fetchGateway(`/api/v1/sessions/${input.sessionId}/messages`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        prompt: input.prompt,
-        agent: input.agent,
-        model: input.model,
-        attachments: input.attachments,
-        approvalMode: input.approvalMode,
-      }),
-    });
+    const currentSession = sessions.find((session) => String(session.sessionId) === input.sessionId) as Record<string, unknown> | undefined;
+    const sessionAgent = typeof currentSession?.agent === 'string' ? currentSession.agent : undefined;
+    const switchesAgent = input.agent && sessionAgent && input.agent !== sessionAgent;
+    const response = await fetchGateway(
+      switchesAgent ? '/api/v1/sessions' : `/api/v1/sessions/${input.sessionId}/messages`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(
+          switchesAgent
+            ? {
+                agent: input.agent,
+                prompt: input.prompt,
+                model: input.model,
+                attachments: input.attachments,
+                approvalMode: input.approvalMode,
+                forkSessionId: input.sessionId,
+                workspaceId: typeof currentSession?.workspaceId === 'string' ? currentSession.workspaceId : undefined,
+                cwd: typeof currentSession?.cwd === 'string' ? currentSession.cwd : undefined,
+              }
+            : {
+                prompt: input.prompt,
+                agent: input.agent,
+                model: input.model,
+                attachments: input.attachments,
+                approvalMode: input.approvalMode,
+              },
+        ),
+      },
+    );
 
     if (!response.ok) {
       throw new Error(`Gateway request failed: ${response.status}`);
@@ -346,6 +365,7 @@ function KanbanWorkspacesGatewayContent(): JSX.Element {
     const body = (await response.json()) as {
       run?: Record<string, unknown>;
       session?: Record<string, unknown>;
+      sourceSessionId?: string | null;
     };
 
     if (body.run?.runId) {
@@ -354,6 +374,14 @@ function KanbanWorkspacesGatewayContent(): JSX.Element {
     if (body.session?.sessionId) {
       store.getState().actions.mergeSession(String(body.session.sessionId), body.session);
     }
+    return {
+      runId: typeof body.run?.runId === 'string' ? body.run.runId : undefined,
+      sessionId: typeof body.run?.sessionId === 'string'
+        ? body.run.sessionId
+        : typeof body.session?.sessionId === 'string'
+          ? body.session.sessionId
+          : undefined,
+    };
   }
 
   return (

@@ -22,6 +22,29 @@ vi.mock("@a5c-ai/compendium", () => ({
     children?: ReactNode;
     [key: string]: unknown;
   }) => <button {...props}>{children}</button>,
+  Select: ({
+    value,
+    onChange,
+    options,
+    ...props
+  }: {
+    value?: string;
+    onChange?: (value: string) => void;
+    options?: Array<{ label: string; value: string }>;
+    [key: string]: unknown;
+  }) => (
+    <select
+      {...props}
+      value={value}
+      onChange={(event) => onChange?.(event.currentTarget.value)}
+    >
+      {(options ?? []).map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  ),
   cx: (...args: unknown[]) => args.filter(Boolean).join(" "),
 }));
 

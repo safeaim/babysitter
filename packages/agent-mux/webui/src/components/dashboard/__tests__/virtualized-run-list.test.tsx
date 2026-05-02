@@ -34,8 +34,8 @@ describe('VirtualizedRunList', () => {
       render(<VirtualizedRunList runs={runs} />);
       // Both should render in the given order (not re-sorted)
       const links = screen.getAllByRole('link');
-      expect(links[0]).toHaveAttribute('href', '/runs/run-b');
-      expect(links[1]).toHaveAttribute('href', '/runs/run-a');
+      expect(links[0]).toHaveAttribute('href', '/dispatches/run-b');
+      expect(links[1]).toHaveAttribute('href', '/dispatches/run-a');
     });
 
     it('accepts a custom renderItem function', () => {
@@ -110,9 +110,9 @@ describe('VirtualizedRunList', () => {
       rerender(<VirtualizedRunList runs={runsV2} />);
 
       const links = screen.getAllByRole('link');
-      expect(links[0]).toHaveAttribute('href', '/runs/run-1');
-      expect(links[1]).toHaveAttribute('href', '/runs/run-2');
-      expect(links[2]).toHaveAttribute('href', '/runs/run-3');
+      expect(links[0]).toHaveAttribute('href', '/dispatches/run-1');
+      expect(links[1]).toHaveAttribute('href', '/dispatches/run-2');
+      expect(links[2]).toHaveAttribute('href', '/dispatches/run-3');
     });
 
     it('handles new runs being prepended', () => {
@@ -132,7 +132,7 @@ describe('VirtualizedRunList', () => {
 
       const links = screen.getAllByRole('link');
       expect(links).toHaveLength(3);
-      expect(links[0]).toHaveAttribute('href', '/runs/run-1');
+      expect(links[0]).toHaveAttribute('href', '/dispatches/run-1');
     });
   });
 });

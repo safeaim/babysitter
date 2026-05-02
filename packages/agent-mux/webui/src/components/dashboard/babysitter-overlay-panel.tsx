@@ -155,7 +155,7 @@ export function BabysitterOverlayPanel() {
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2 text-xs">
                         {item.primaryRunId ? (
-                          <Link to={`/runs/${item.primaryRunId}`} className="inline-flex items-center gap-1 text-primary">
+                          <Link to={`/dispatches/${item.primaryRunId}`} className="inline-flex items-center gap-1 text-primary">
                             Run
                             <ArrowUpRight className="h-3 w-3" />
                           </Link>
@@ -194,7 +194,7 @@ export function BabysitterOverlayPanel() {
               {health.map((item) => (
                 <div key={item.runId} className="rounded-2xl border border-border bg-card p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <Link to={`/runs/${item.runId}`} className="font-mono text-sm text-primary">
+                    <Link to={`/dispatches/${item.runId}`} className="font-mono text-sm text-primary">
                       {item.runId}
                     </Link>
                     <span className={`rounded-full border px-2.5 py-1 text-xs ${severityTone(item.severity)}`}>

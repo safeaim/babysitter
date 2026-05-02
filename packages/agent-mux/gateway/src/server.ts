@@ -1,6 +1,6 @@
 import * as http from 'node:http';
 
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import { WebSocketServer } from 'ws';
 import type { Attachment } from '@a5c-ai/agent-mux-core';
 import { resolveWorkspaceDefaultCwd, WorkspaceService } from '@a5c-ai/agent-mux-core';
@@ -111,6 +111,52 @@ function readApprovalMode(value: unknown): 'yolo' | 'prompt' | 'deny' | undefine
   return value === 'yolo' || value === 'prompt' || value === 'deny' ? value : undefined;
 }
 
+type PaginationOptions = {
+  offset: number;
+  limit: number | null;
+};
+
+function readPaginationOptions(requestUrl: string): PaginationOptions {
+  const url = new URL(requestUrl);
+  const offsetRaw = Number.parseInt(url.searchParams.get('offset') ?? '0', 10);
+  const limitRaw = url.searchParams.get('limit');
+  const limitParsed = limitRaw == null || limitRaw.length === 0 ? null : Number.parseInt(limitRaw, 10);
+  return {
+    offset: Number.isFinite(offsetRaw) && offsetRaw > 0 ? offsetRaw : 0,
+    limit: Number.isFinite(limitParsed) && limitParsed != null && limitParsed >= 0 ? limitParsed : null,
+  };
+}
+
+function paginateItems<T>(items: T[], options: PaginationOptions): {
+  items: T[];
+  pagination: {
+    total: number;
+    offset: number;
+    limit: number;
+    hasMore: boolean;
+  };
+} {
+  const total = items.length;
+  const offset = Math.min(options.offset, total);
+  const limit = options.limit == null ? total : options.limit;
+  const paged = options.limit == null ? items : items.slice(offset, offset + limit);
+  return {
+    items: paged,
+    pagination: {
+      total,
+      offset,
+      limit,
+      hasMore: options.limit == null ? false : offset + paged.length < total,
+    },
+  };
+}
+
+function readTailFlag(requestUrl: string): boolean {
+  const url = new URL(requestUrl);
+  const raw = url.searchParams.get('tail');
+  return raw === '1' || raw === 'true';
+}
+
 export function createGatewayServer(
   config: GatewayConfig,
   logger: GatewayLogger = createGatewayLogger(),
@@ -219,20 +265,29 @@ export function createGatewayServer(
     return context.json({ issuedToken }, 201);
   });
 
-  app.get('/api/v1/runs', async (context) => {
+  const listDispatches = async (context: Context) => {
     const tokenRecord = await requireAuth(context.req.header('authorization'));
     if (!tokenRecord) {
       return context.json({ error: 'unauthorized' }, 401);
     }
-    return context.json({ runs: runManager.list() });
-  });
+    const paged = paginateItems(runManager.list(), readPaginationOptions(context.req.url));
+    return context.json({
+      dispatches: paged.items,
+      runs: paged.items,
+      pagination: paged.pagination,
+    });
+  };
+
+  app.get('/api/v1/dispatches', listDispatches);
+  app.get('/api/v1/runs', listDispatches);
 
   app.get('/api/v1/sessions', async (context) => {
     const tokenRecord = await requireAuth(context.req.header('authorization'));
     if (!tokenRecord) {
       return context.json({ error: 'unauthorized' }, 401);
     }
-    return context.json({ sessions: await runManager.listSessions() });
+    const paged = paginateItems(await runManager.listSessions(), readPaginationOptions(context.req.url));
+    return context.json({ sessions: paged.items, pagination: paged.pagination });
   });
 
   app.get('/api/v1/workspaces', async (context) => {
@@ -240,7 +295,13 @@ export function createGatewayServer(
     if (!tokenRecord) {
       return context.json({ error: 'unauthorized' }, 401);
     }
-    return context.json(await runManager.listWorkspaces());
+    const inventory = await runManager.listWorkspaces();
+    const paged = paginateItems([...(inventory.workspaces ?? [])], readPaginationOptions(context.req.url));
+    return context.json({
+      ...inventory,
+      workspaces: paged.items,
+      pagination: paged.pagination,
+    });
   });
 
   app.post('/api/v1/workspaces', async (context) => {
@@ -327,13 +388,22 @@ export function createGatewayServer(
     if (!(await ensureAgentAvailable(agent))) {
       return context.json({ error: 'agent_unavailable', agent }, 400);
     }
+    const forkSessionId = typeof body['forkSessionId'] === 'string' ? body['forkSessionId'] : undefined;
+    const forkSourceSession = forkSessionId ? await runManager.getSession(forkSessionId) : null;
     const run = await runManager.start(
       {
         agent,
         model: typeof body['model'] === 'string' ? body['model'] : undefined,
         prompt: typeof body['prompt'] === 'string' ? body['prompt'] : '',
-        cwd: typeof body['cwd'] === 'string' ? body['cwd'] : undefined,
-        workspaceId: typeof body['workspaceId'] === 'string' ? body['workspaceId'] : undefined,
+        cwd:
+          typeof body['cwd'] === 'string'
+            ? body['cwd']
+            : forkSourceSession?.cwd ?? forkSourceSession?.workspace?.currentPath ?? forkSourceSession?.workspace?.workspaceDefaultCwd,
+        workspaceId:
+          typeof body['workspaceId'] === 'string'
+            ? body['workspaceId']
+            : forkSourceSession?.workspaceId ?? forkSourceSession?.workspace?.workspaceId,
+        forkSessionId,
       },
       {
         tokenId: tokenRecord.id,
@@ -341,7 +411,34 @@ export function createGatewayServer(
         remoteAddress: context.req.header('x-forwarded-for') ?? null,
       },
     );
-    return context.json({ run }, 201);
+    return context.json({ run, sourceSessionId: forkSessionId ?? null }, 201);
+  });
+
+  app.get('/api/v1/sessions/:sessionId/messages', async (context) => {
+    const tokenRecord = await requireAuth(context.req.header('authorization'));
+    if (!tokenRecord) {
+      return context.json({ error: 'unauthorized' }, 401);
+    }
+    const session = await runManager.getSessionContent(context.req.param('sessionId'));
+    if (!session) {
+      return context.json({ error: 'not_found' }, 404);
+    }
+    const paginationOptions = readPaginationOptions(context.req.url);
+    const messages = Array.isArray(session.messages) ? [...session.messages] : [];
+    const tail = readTailFlag(context.req.url);
+    const effectiveOptions =
+      tail && paginationOptions.limit != null
+        ? {
+            offset: Math.max(0, messages.length - paginationOptions.limit),
+            limit: paginationOptions.limit,
+          }
+        : paginationOptions;
+    const paged = paginateItems(messages, effectiveOptions);
+    return context.json({
+      sessionId: session.sessionId,
+      messages: paged.items,
+      pagination: paged.pagination,
+    });
   });
 
   app.post('/api/v1/sessions/:sessionId/messages', async (context) => {
@@ -384,7 +481,7 @@ export function createGatewayServer(
     return context.json({ agents, agentDescriptors });
   });
 
-  app.post('/api/v1/runs', async (context) => {
+  const createDispatch = async (context: Context) => {
     const tokenRecord = await requireAuth(context.req.header('authorization'));
     if (!tokenRecord) {
       return context.json({ error: 'unauthorized' }, 401);
@@ -403,28 +500,39 @@ export function createGatewayServer(
       },
     );
     return context.json(run, 201);
-  });
+  };
 
-  app.get('/api/v1/runs/:runId', async (context) => {
+  app.post('/api/v1/dispatches', createDispatch);
+  app.post('/api/v1/runs', createDispatch);
+
+  const getDispatch = async (context: Context) => {
     const tokenRecord = await requireAuth(context.req.header('authorization'));
     if (!tokenRecord) {
       return context.json({ error: 'unauthorized' }, 401);
     }
-    const run = runManager.get(context.req.param('runId'));
+    const runId = context.req.param('runId') ?? '';
+    const run = runManager.get(runId);
     if (!run) {
       return context.json({ error: 'not_found' }, 404);
     }
     return context.json(run);
-  });
+  };
 
-  app.post('/api/v1/runs/:runId/stop', async (context) => {
+  app.get('/api/v1/dispatches/:runId', getDispatch);
+  app.get('/api/v1/runs/:runId', getDispatch);
+
+  const stopDispatch = async (context: Context) => {
     const tokenRecord = await requireAuth(context.req.header('authorization'));
     if (!tokenRecord) {
       return context.json({ error: 'unauthorized' }, 401);
     }
-    const stopped = await runManager.stop(context.req.param('runId'));
+    const runId = context.req.param('runId') ?? '';
+    const stopped = await runManager.stop(runId);
     return context.json({ stopped }, stopped ? 200 : 404);
-  });
+  };
+
+  app.post('/api/v1/dispatches/:runId/stop', stopDispatch);
+  app.post('/api/v1/runs/:runId/stop', stopDispatch);
 
   app.post('/api/v1/pairing/register', async (context) => {
     const tokenRecord = await requireAuth(context.req.header('authorization'));

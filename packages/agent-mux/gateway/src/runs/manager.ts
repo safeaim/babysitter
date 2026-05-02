@@ -238,6 +238,10 @@ export class RunManager {
     if (!session) {
       return null;
     }
+    const requestedAgent =
+      typeof overrides.agent === 'string' && overrides.agent.trim().length > 0
+        ? overrides.agent.trim()
+        : session.agent;
     if (session.activeRunId) {
       const adapter = (this.client as {
         adapters?: {
@@ -249,29 +253,29 @@ export class RunManager {
         };
       }).adapters?.get(session.agent);
       const transport = adapter?.capabilities?.structuredSessionTransport ?? 'none';
-      if (transport !== 'persistent') {
+      if (transport === 'persistent' && requestedAgent === session.agent) {
+        await this.recordGatewayEvent(session.activeRunId, {
+          type: 'user_message',
+          text: input,
+          sessionId,
+        });
+        const sent = await this.sendInput(session.activeRunId, input);
+        if (!sent) {
+          return null;
+        }
         return this.get(session.activeRunId);
       }
-      await this.recordGatewayEvent(session.activeRunId, {
-        type: 'user_message',
-        text: input,
-        sessionId,
-      });
-      const sent = await this.sendInput(session.activeRunId, input);
-      if (!sent) {
-        return null;
-      }
-      return this.get(session.activeRunId);
     }
 
     return await this.start(
       {
-        agent: overrides.agent ?? session.agent,
+        agent: requestedAgent,
         model: overrides.model,
         prompt: input,
         attachments: overrides.attachments as Attachment[] | undefined,
         approvalMode: overrides.approvalMode,
-        sessionId,
+        sessionId: requestedAgent === session.agent ? sessionId : undefined,
+        forkSessionId: requestedAgent !== session.agent ? sessionId : undefined,
         cwd: session.cwd ?? session.workspace?.currentPath ?? session.workspace?.workspaceDefaultCwd,
         workspaceId: session.workspaceId ?? session.workspace?.workspaceId,
       },

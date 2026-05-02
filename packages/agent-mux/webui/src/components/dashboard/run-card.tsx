@@ -90,7 +90,7 @@ export const RunCard = memo(function RunCard({ run, selected }: RunCardProps) {
     : undefined;
 
   return (
-    <Link to={`/runs/${run.runId}`}>
+    <Link to={`/dispatches/${run.runId}`}>
       <div className={cx("tkc-panel",
         "cursor-pointer p-4 transition-all card-hover-lift",
         "hover:shadow-md",

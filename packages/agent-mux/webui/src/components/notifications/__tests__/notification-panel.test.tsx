@@ -147,7 +147,7 @@ describe('NotificationPanel', () => {
     const onDismiss = vi.fn();
     const onClose = vi.fn();
     const notifications = [
-      makeNotification({ id: 'n1', title: 'Go Here', href: '/runs/abc' }),
+      makeNotification({ id: 'n1', title: 'Go Here', href: '/dispatches/abc' }),
     ];
 
     render(
@@ -161,7 +161,7 @@ describe('NotificationPanel', () => {
 
     await user.click(screen.getByText('Go Here'));
 
-    expect(mockPush).toHaveBeenCalledWith('/runs/abc');
+    expect(mockPush).toHaveBeenCalledWith('/dispatches/abc');
     expect(onDismiss).toHaveBeenCalledWith('n1');
     expect(onClose).toHaveBeenCalled();
   });

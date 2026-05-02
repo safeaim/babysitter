@@ -19,7 +19,7 @@ import { AlertTriangle, Bot, FileImage, FileStack, Files, LoaderCircle, Messages
 
 import { ProgressBar } from "@/components/shared/progress-bar";
 import { TaskTagAutocompleteTextarea } from "@/components/task-tags/task-tag-autocomplete-textarea";
-import { Button } from "@a5c-ai/compendium";
+import { Button, Select } from "@a5c-ai/compendium";
 import { useTaskTags } from "@/hooks/use-task-tags";
 import { cx } from "@a5c-ai/compendium";
 import { useGateway } from "@/lib/agent-mux-ui";
@@ -336,7 +336,7 @@ function TranscriptCard(props: {
             <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground-muted">
               {props.node.label}
             </span>
-            <Link to={`/runs/${props.node.runId}`} className="text-xs text-primary">
+            <Link to={`/dispatches/${props.node.runId}`} className="text-xs text-primary">
               {props.node.runId}
             </Link>
             <span className="text-xs text-foreground-muted">{formatTimestamp(props.node.timestamp)}</span>
@@ -480,6 +480,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
   const canAttachFiles = selectedAgentRecord?.supportsFileAttachments === true;
   const canAttachAny = canAttachImages || canAttachFiles;
   const fileMentionLabel = canAttachFiles ? "Attach file" : "Insert path";
+  const switchesAgent = selectedAgent !== props.sessionAgent;
 
   useEffect(() => {
     setPrompt("");
@@ -697,7 +698,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
                         {lane.status}
                       </span>
                       <span className="text-sm font-medium text-foreground">{lane.agent}</span>
-                      <Link to={`/runs/${lane.runId}`} className="text-xs text-primary">
+                      <Link to={`/dispatches/${lane.runId}`} className="text-xs text-primary">
                         {lane.runId}
                       </Link>
                     </div>
@@ -858,6 +859,12 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
             ) : null}
         </div>
 
+        {switchesAgent ? (
+          <div className="rounded-2xl border border-warning/20 bg-warning/10 px-4 py-3 text-sm text-warning">
+            Switching agents continues this prompt in a new session. The new session keeps the current workspace and issue link, then becomes the focused chat.
+          </div>
+        ) : null}
+
         <details className="rounded-2xl border border-border bg-card/60" data-testid="composer-options-details">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground">
             Dispatch options
@@ -865,19 +872,19 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
           <div className="grid gap-3 border-t border-border px-4 py-4 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)_minmax(12rem,0.7fr)]">
             <label className="grid gap-2">
               <span className="text-sm font-medium text-foreground">Agent</span>
-              <select
+              <Select
                 value={selectedAgent}
                 disabled={props.disabled || sortedAgents.length === 0}
-                onChange={(event) => setSelectedAgent(event.target.value)}
-                className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {sortedAgents.length === 0 ? <option value={selectedAgent}>{selectedAgent}</option> : null}
-                {sortedAgents.map((agent) => (
-                  <option key={agent.agent} value={agent.agent}>
-                    {String(agent.displayName ?? agent.agent)}
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedAgent}
+                options={
+                  sortedAgents.length === 0
+                    ? [{ label: selectedAgent, value: selectedAgent }]
+                    : sortedAgents.map((agent) => ({
+                        label: String(agent.displayName ?? agent.agent),
+                        value: agent.agent,
+                      }))
+                }
+              />
             </label>
             <label className="grid gap-2">
               <span className="text-sm font-medium text-foreground">Variant / model</span>
@@ -891,18 +898,15 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
             </label>
             <label className="grid gap-2">
               <span className="text-sm font-medium text-foreground">Approvals</span>
-              <select
+              <Select
                 value={approvalMode}
-                onChange={(event) => setApprovalMode(event.target.value as ApprovalMode)}
+                onChange={(value) => setApprovalMode(value as ApprovalMode)}
                 disabled={props.disabled}
-                className="rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {agentApprovalModes.map((mode) => (
-                  <option key={mode} value={mode}>
-                    {approvalModeLabel(mode)}
-                  </option>
-                ))}
-              </select>
+                options={agentApprovalModes.map((mode) => ({
+                  label: approvalModeLabel(mode),
+                  value: mode,
+                }))}
+              />
             </label>
           </div>
         </details>

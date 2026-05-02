@@ -811,6 +811,17 @@ export function registerKanbanRoutes(app: Hono): void {
           });
           break;
         }
+        case 'link-issue-session': {
+          if (typeof body.issueId !== 'string') {
+            throw new AppError('issueId is required.', 'BAD_REQUEST', 400);
+          }
+          overview = await backlogService.linkIssueSession({
+            issueId: body.issueId,
+            sessionId: typeof body.sessionId === 'string' ? body.sessionId : undefined,
+            runId: typeof body.runId === 'string' ? body.runId : undefined,
+          });
+          break;
+        }
         default:
           throw new AppError('Unsupported backlog action.', 'BAD_REQUEST', 400);
       }

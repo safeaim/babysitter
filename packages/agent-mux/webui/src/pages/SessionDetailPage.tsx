@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom-v6';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom-v6';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { useGateway } from '@a5c-ai/agent-mux-ui';
@@ -15,9 +15,14 @@ import {
   type SessionFlowModel,
 } from '@a5c-ai/agent-mux-ui/session-flow';
 import type { Attachment, WorkspaceRuntimeSurface } from '@a5c-ai/agent-mux-core';
+import { Button } from '@a5c-ai/compendium';
 
 import { SessionWorkspaceShell } from '../components/sessions/session-workspace-shell.js';
+import { useBacklog } from '../hooks/use-backlog.js';
+import { findDispatchContextAuditsBySessionId } from '../lib/dispatch-context-audit.js';
 import { useGatewayFetch } from '../providers/GatewayProvider.js';
+
+const MESSAGE_PAGE_SIZE = 60;
 
 function formatUsd(totalUsd: number | null): string {
   if (totalUsd == null || !Number.isFinite(totalUsd)) {
@@ -139,8 +144,11 @@ function resolveFlowModel(args: {
 export function SessionDetailPage(): JSX.Element {
   const params = useParams<{ sessionId: string }>();
   const sessionId = params.sessionId ?? '';
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const fetchGateway = useGatewayFetch();
   const { client, store } = useGateway();
+  const { snapshot } = useBacklog();
   const agentRecords = useStore(store, (state) => state.agents.byId);
   const session = useStore(store, (state) => state.sessions.byId[sessionId] ?? null);
   const runs = useStore(
@@ -155,6 +163,9 @@ export function SessionDetailPage(): JSX.Element {
 
   const [error, setError] = useState<string | null>(null);
   const [nativeMessages, setNativeMessages] = useState<NativeSessionMessage[]>([]);
+  const [messagePageOffset, setMessagePageOffset] = useState<number | null>(null);
+  const [messagePage, setMessagePage] = useState({ total: 0, offset: 0, limit: MESSAGE_PAGE_SIZE, hasMore: false });
+  const linkedIssueKeyRef = useRef<string | null>(null);
 
   const transportCandidates = useMemo(
     () => [
@@ -186,6 +197,12 @@ export function SessionDetailPage(): JSX.Element {
       ? session.cwd
       : readWorkspacePath(session?.workspace);
   const runtime = readRuntime(session?.runtime);
+  const sessionAudit = useMemo(
+    () => findDispatchContextAuditsBySessionId(snapshot, sessionId)[0] ?? null,
+    [sessionId, snapshot],
+  );
+  const linkedIssueId = searchParams.get('issueId') ?? sessionAudit?.issueId ?? null;
+  const linkedIssueKey = searchParams.get('issueKey') ?? sessionAudit?.issueKey ?? null;
 
   const eventFlowModel = useMemo(() => buildSessionFlowModel(runs, eventBuffers), [eventBuffers, runs]);
   const flowModel = useMemo(
@@ -208,6 +225,7 @@ export function SessionDetailPage(): JSX.Element {
     session?.cost && typeof session.cost === 'object'
       ? session.cost as SessionCost
       : eventCost;
+  const activeRunId = typeof runs[0]?.runId === 'string' ? String(runs[0]?.runId) : null;
 
   useEffect(() => {
     if (!sessionId) {
@@ -249,8 +267,13 @@ export function SessionDetailPage(): JSX.Element {
   }, [fetchGateway, sessionId, store]);
 
   useEffect(() => {
+    setMessagePageOffset(null);
+  }, [sessionId]);
+
+  useEffect(() => {
     if (!sessionId) {
       setNativeMessages([]);
+      setMessagePage({ total: 0, offset: 0, limit: MESSAGE_PAGE_SIZE, hasMore: false });
       return;
     }
     if (status === 'active' && eventFlowModel.transcript.length > 0) {
@@ -259,26 +282,34 @@ export function SessionDetailPage(): JSX.Element {
 
     let cancelled = false;
     setError(null);
-    setNativeMessages([]);
     void (async () => {
       try {
-        const response = await fetchGateway(`/api/v1/sessions/${encodeURIComponent(sessionId)}/full`);
+        const params = new URLSearchParams();
+        params.set('limit', String(MESSAGE_PAGE_SIZE));
+        if (messagePageOffset == null) {
+          params.set('tail', 'true');
+        } else {
+          params.set('offset', String(messagePageOffset));
+        }
+        const response = await fetchGateway(`/api/v1/sessions/${encodeURIComponent(sessionId)}/messages?${params.toString()}`);
         if (!response.ok) {
           if (response.status === 404) {
             if (!cancelled) {
               setNativeMessages([]);
+              setMessagePage({ total: 0, offset: 0, limit: MESSAGE_PAGE_SIZE, hasMore: false });
             }
             return;
           }
           throw new Error(`Gateway request failed: ${response.status}`);
         }
         const body = await response.json() as {
-          title?: string;
-          turnCount?: number;
-          model?: string;
-          cost?: SessionCost;
-          cwd?: string;
           messages?: NativeSessionMessage[];
+          pagination?: {
+            total?: number;
+            offset?: number;
+            limit?: number;
+            hasMore?: boolean;
+          };
         };
         if (cancelled) {
           return;
@@ -286,12 +317,11 @@ export function SessionDetailPage(): JSX.Element {
         if (Array.isArray(body.messages)) {
           setNativeMessages(body.messages);
         }
-        store.getState().actions.mergeSession(sessionId, {
-          title: body.title,
-          turnCount: body.turnCount,
-          model: body.model,
-          cost: body.cost,
-          cwd: body.cwd,
+        setMessagePage({
+          total: Number(body.pagination?.total ?? body.messages?.length ?? 0),
+          offset: Number(body.pagination?.offset ?? 0),
+          limit: Number(body.pagination?.limit ?? MESSAGE_PAGE_SIZE),
+          hasMore: body.pagination?.hasMore === true,
         });
       } catch (cause) {
         if (!cancelled) {
@@ -303,7 +333,30 @@ export function SessionDetailPage(): JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, [eventFlowModel.transcript.length, fetchGateway, sessionId, status, store]);
+  }, [eventFlowModel.transcript.length, fetchGateway, messagePageOffset, sessionId, status]);
+
+  useEffect(() => {
+    if (!linkedIssueId || !sessionId) {
+      return;
+    }
+    const linkKey = `${linkedIssueId}:${sessionId}:${activeRunId ?? ''}`;
+    if (linkedIssueKeyRef.current === linkKey) {
+      return;
+    }
+    linkedIssueKeyRef.current = linkKey;
+    void fetch('/api/backlog', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        action: 'link-issue-session',
+        issueId: linkedIssueId,
+        sessionId,
+        runId: activeRunId ?? undefined,
+      }),
+    }).catch(() => {
+      linkedIssueKeyRef.current = null;
+    });
+  }, [activeRunId, linkedIssueId, sessionId]);
 
   async function handleSubmit(input: {
     sessionId: string;
@@ -313,6 +366,53 @@ export function SessionDetailPage(): JSX.Element {
     attachments?: Attachment[];
     approvalMode?: 'yolo' | 'prompt' | 'deny';
   }): Promise<void> {
+    if (input.agent && input.agent !== resolvedAgent) {
+      const response = await fetchGateway('/api/v1/sessions', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          agent: input.agent,
+          prompt: input.prompt,
+          model: input.model,
+          attachments: input.attachments,
+          approvalMode: input.approvalMode,
+          forkSessionId: input.sessionId,
+          workspaceId: typeof session?.workspaceId === 'string' ? session.workspaceId : undefined,
+          cwd: workspacePath ?? undefined,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Gateway request failed: ${response.status}`);
+      }
+      const body = (await response.json()) as {
+        run?: Record<string, unknown>;
+      };
+      const runId = typeof body.run?.runId === 'string' ? body.run.runId : null;
+      const targetSessionId = typeof body.run?.sessionId === 'string' ? body.run.sessionId : null;
+      if (!runId) {
+        throw new Error('Gateway did not return a dispatch id');
+      }
+      store.getState().actions.mergeRun(runId, body.run ?? {});
+      client.subscribeRun(runId);
+      if (linkedIssueId) {
+        await fetch('/api/backlog', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            action: 'link-issue-session',
+            issueId: linkedIssueId,
+            sessionId: targetSessionId ?? undefined,
+            runId,
+          }),
+        }).catch(() => undefined);
+      }
+      const issueQuery = linkedIssueId
+        ? `?issueId=${encodeURIComponent(linkedIssueId)}${linkedIssueKey ? `&issueKey=${encodeURIComponent(linkedIssueKey)}` : ''}`
+        : '';
+      navigate(targetSessionId ? `/sessions/${targetSessionId}${issueQuery}` : `/sessions/pending/${runId}${issueQuery}`);
+      return;
+    }
+
     const response = await fetchGateway(`/api/v1/sessions/${encodeURIComponent(input.sessionId)}/messages`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -340,6 +440,35 @@ export function SessionDetailPage(): JSX.Element {
     }
   }
 
+  const showingTranscriptPager = flowModel.transcript.length === nativeMessages.length && messagePage.total > messagePage.limit;
+  const conversationSupplement = showingTranscriptPager ? (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/65 px-4 py-3 text-sm">
+      <div className="text-foreground-muted">
+        Showing messages {messagePage.offset + 1}-{Math.min(messagePage.offset + nativeMessages.length, messagePage.total)} of {messagePage.total}
+      </div>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          disabled={messagePage.offset <= 0}
+          onClick={() => setMessagePageOffset(Math.max(0, messagePage.offset - messagePage.limit))}
+        >
+          Older
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          disabled={messagePage.offset + messagePage.limit >= messagePage.total}
+          onClick={() => setMessagePageOffset(Math.min(Math.max(0, messagePage.total - messagePage.limit), messagePage.offset + messagePage.limit))}
+        >
+          Newer
+        </Button>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <>
       {error ? (
@@ -362,6 +491,7 @@ export function SessionDetailPage(): JSX.Element {
         sessionModel={typeof session?.model === 'string' ? session.model : null}
         flowModelOverride={flowModel}
         sessionCostOverride={sessionCost}
+        conversationSupplement={conversationSupplement}
         conversationDisabled={!canCompose}
         conversationPlaceholder={
           status === 'active' && transport !== 'persistent'

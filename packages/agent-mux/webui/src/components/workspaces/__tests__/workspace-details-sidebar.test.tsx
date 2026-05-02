@@ -11,6 +11,29 @@ vi.mock("@a5c-ai/compendium", () => ({
     children?: unknown;
     [key: string]: unknown;
   }) => <button {...props}>{children}</button>,
+  Select: ({
+    value,
+    onChange,
+    options,
+    ...props
+  }: {
+    value?: string;
+    onChange?: (value: string) => void;
+    options?: Array<{ label: string; value: string }>;
+    [key: string]: unknown;
+  }) => (
+    <select
+      {...props}
+      value={value}
+      onChange={(event) => onChange?.(event.currentTarget.value)}
+    >
+      {(options ?? []).map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  ),
   cx: (...args: unknown[]) => args.filter(Boolean).join(" "),
 }));
 
@@ -124,7 +147,7 @@ describe("WorkspaceDetailsSidebar", () => {
     expect(screen.getByText("Workspace parity session")).toBeInTheDocument();
     expect(screen.getByText("Runtime updated")).toBeInTheDocument();
     expect(screen.getByText("Dev server")).toBeInTheDocument();
-    expect(screen.getByTestId("workspace-status-run-run-2")).toHaveAttribute("href", "/runs/run-2");
+    expect(screen.getByTestId("workspace-status-run-run-2")).toHaveAttribute("href", "/dispatches/run-2");
     expect(screen.getByText("Git")).toBeInTheDocument();
     expect(screen.getByText("Notes")).toBeInTheDocument();
   });

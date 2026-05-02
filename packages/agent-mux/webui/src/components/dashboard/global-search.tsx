@@ -86,7 +86,7 @@ export function GlobalSearch() {
       setQuery("");
       setResults([]);
       setHasSearched(false);
-      navigate(`/runs/${runId}`);
+      navigate(`/dispatches/${runId}`);
     },
     [navigate]
   );

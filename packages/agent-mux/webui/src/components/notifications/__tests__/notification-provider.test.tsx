@@ -351,7 +351,7 @@ describe('NotificationProvider', () => {
         'New Run Started',
         expect.stringContaining('started'),
         'info',
-        expect.objectContaining({ href: '/runs/run-new' }),
+        expect.objectContaining({ href: '/dispatches/run-new' }),
       );
     });
 
@@ -434,7 +434,7 @@ describe('NotificationProvider', () => {
         'Run Completed',
         expect.stringContaining('finished successfully'),
         'success',
-        expect.objectContaining({ href: '/runs/run-001' }),
+        expect.objectContaining({ href: '/dispatches/run-001' }),
       );
 
       mockNotify.mockClear();
@@ -540,7 +540,7 @@ describe('NotificationProvider', () => {
         expect.stringContaining('needs attention'),
         'Approve deployment?',
         'warning',
-        expect.objectContaining({ href: '/runs/run-001', persistent: true }),
+        expect.objectContaining({ href: '/dispatches/run-001', persistent: true }),
       );
     });
 
@@ -596,7 +596,7 @@ describe('NotificationProvider', () => {
         'Breakpoint Resolved',
         expect.stringContaining('approved'),
         'success',
-        expect.objectContaining({ href: '/runs/run-001' }),
+        expect.objectContaining({ href: '/dispatches/run-001' }),
       );
     });
   });

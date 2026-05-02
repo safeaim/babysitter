@@ -183,9 +183,13 @@ function GatewayBootstrap(props: {
       }
 
       const run = (async () => {
-        const [agentsResponse, runsResponse, sessionsResponse] = await Promise.allSettled([
+        const [agentsResponse, dispatchesResponse, sessionsResponse] = await Promise.allSettled([
           fetchAuthorized<{ agents: unknown[]; agentDescriptors?: unknown[] }>(props.gatewayUrl, props.token, '/api/v1/agents'),
-          fetchAuthorized<{ runs: Array<Record<string, unknown>> }>(props.gatewayUrl, props.token, '/api/v1/runs'),
+          fetchAuthorized<{ dispatches?: Array<Record<string, unknown>>; runs?: Array<Record<string, unknown>> }>(
+            props.gatewayUrl,
+            props.token,
+            '/api/v1/dispatches',
+          ),
           fetchAuthorized<{ sessions: Array<Record<string, unknown>> }>(props.gatewayUrl, props.token, '/api/v1/sessions'),
         ]);
 
@@ -193,7 +197,7 @@ function GatewayBootstrap(props: {
           return;
         }
 
-        const rejectedResponses = [agentsResponse, runsResponse, sessionsResponse].filter(
+        const rejectedResponses = [agentsResponse, dispatchesResponse, sessionsResponse].filter(
           (response): response is PromiseRejectedResult => response.status === 'rejected',
         );
         if (rejectedResponses.some((response) => isUnauthorizedError(response.reason))) {
@@ -206,7 +210,11 @@ function GatewayBootstrap(props: {
           actions.setAgents(normalizeAgents(agentsResponse.value.agentDescriptors ?? agentsResponse.value.agents));
         }
 
-        for (const run of runsResponse.status === 'fulfilled' ? runsResponse.value.runs : []) {
+        const dispatches =
+          dispatchesResponse.status === 'fulfilled'
+            ? dispatchesResponse.value.dispatches ?? dispatchesResponse.value.runs ?? []
+            : [];
+        for (const run of dispatches) {
           const runId = String(run['runId'] ?? '');
           if (!runId) continue;
           actions.mergeRun(runId, run);

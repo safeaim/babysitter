@@ -50,6 +50,7 @@ type SessionWorkspaceShellProps = {
   conversationSubmitLabel?: string;
   conversationEmptyStateTitle?: string;
   conversationEmptyStateBody?: string;
+  conversationSupplement?: React.ReactNode;
   heroEyebrow?: string;
   heroBody?: string;
   onSubmit: (input: {
@@ -346,7 +347,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
                 {props.runs.map((run) => (
                   <article key={String(run.runId)} className="rounded-2xl border border-border bg-card/80 p-3">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Link to={`/runs/${String(run.runId)}`} className="font-mono text-sm text-primary">
+                      <Link to={`/dispatches/${String(run.runId)}`} className="font-mono text-sm text-primary">
                         {String(run.runId)}
                       </Link>
                       <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground-muted">
@@ -377,6 +378,9 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
           title="Chat"
           subtitle="Transcript and the next turn"
         >
+          {props.conversationSupplement ? (
+            <div className="mb-4">{props.conversationSupplement}</div>
+          ) : null}
           <SessionConversationSurface
             sessionId={props.sessionId}
             sessionLabel={props.sessionTitle}

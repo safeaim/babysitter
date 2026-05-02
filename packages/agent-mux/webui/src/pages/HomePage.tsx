@@ -194,7 +194,7 @@ export function HomePage(): JSX.Element {
                       </Link>
                     ) : null}
                     {runId ? (
-                      <Link to={`/runs/${runId}`} className="session-browser__action">
+                      <Link to={`/dispatches/${runId}`} className="session-browser__action">
                         Dispatch handoff
                       </Link>
                     ) : null}

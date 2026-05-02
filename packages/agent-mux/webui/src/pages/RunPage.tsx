@@ -1,18 +1,19 @@
 import React from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom-v6';
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom-v6';
 import { useRun } from '@a5c-ai/agent-mux-ui';
 
 import { PageHeroGrid, PageSection, PageShell } from '../components/shared/page-shell.js';
 
 export function SessionPendingPage(): JSX.Element {
   const params = useParams<{ runId: string }>();
+  const location = useLocation();
   const runId = params.runId ?? '';
   const run = useRun(runId);
   const agent = String(run?.agent ?? 'unknown');
   const status = String(run?.status ?? 'starting');
 
   if (typeof run?.sessionId === 'string' && run.sessionId.length > 0) {
-    return <Navigate to={`/sessions/${run.sessionId}`} replace />;
+    return <Navigate to={`/sessions/${run.sessionId}${location.search}`} replace />;
   }
 
   return (

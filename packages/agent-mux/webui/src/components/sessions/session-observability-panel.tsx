@@ -154,11 +154,11 @@ export function SessionObservabilityPanel(props: {
         runId,
         {
           runId,
-          runHref: `/runs/${encodeURIComponent(runId)}`,
+          runHref: `/dispatches/${encodeURIComponent(runId)}`,
           workspaceHref: runWorkspacePath ? buildEditorHref(runWorkspacePath) : undefined,
           runtimeHref: runRuntimeHref ?? undefined,
-          breakpointHref: shortcut?.breakpointEffectId ? `/runs/${encodeURIComponent(runId)}?effectId=${encodeURIComponent(shortcut.breakpointEffectId)}` : undefined,
-          failedTaskHref: shortcut?.errorEffectId ? `/runs/${encodeURIComponent(runId)}?effectId=${encodeURIComponent(shortcut.errorEffectId)}` : undefined,
+          breakpointHref: shortcut?.breakpointEffectId ? `/dispatches/${encodeURIComponent(runId)}?effectId=${encodeURIComponent(shortcut.breakpointEffectId)}` : undefined,
+          failedTaskHref: shortcut?.errorEffectId ? `/dispatches/${encodeURIComponent(runId)}?effectId=${encodeURIComponent(shortcut.errorEffectId)}` : undefined,
           fileHref,
         } satisfies RunActionContext,
       ] as const;
@@ -338,7 +338,7 @@ export function SessionObservabilityPanel(props: {
               {shortcuts.map((item) => (
                 <div key={item.runId} className="rounded-2xl border border-border bg-card p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <Link to={`/runs/${item.runId}`} className="font-mono text-sm text-primary">
+                    <Link to={`/dispatches/${item.runId}`} className="font-mono text-sm text-primary">
                       {item.runId}
                     </Link>
                     <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground-muted">
@@ -354,7 +354,7 @@ export function SessionObservabilityPanel(props: {
                   <div className="mt-3 flex flex-wrap gap-2 text-xs">
                     {item.breakpointEffectId ? (
                       <Link
-                        to={`/runs/${item.runId}?effectId=${encodeURIComponent(item.breakpointEffectId)}`}
+                        to={`/dispatches/${item.runId}?effectId=${encodeURIComponent(item.breakpointEffectId)}`}
                         className="inline-flex items-center gap-1 text-primary"
                       >
                         <Hand className="h-3 w-3" />
@@ -363,14 +363,14 @@ export function SessionObservabilityPanel(props: {
                     ) : null}
                     {item.errorEffectId ? (
                       <Link
-                        to={`/runs/${item.runId}?effectId=${encodeURIComponent(item.errorEffectId)}`}
+                        to={`/dispatches/${item.runId}?effectId=${encodeURIComponent(item.errorEffectId)}`}
                         className="inline-flex items-center gap-1 text-primary"
                       >
                         <AlertTriangle className="h-3 w-3" />
                         Open failed task
                       </Link>
                     ) : null}
-                    <Link to={`/runs/${item.runId}`} className="inline-flex items-center gap-1 text-primary">
+                    <Link to={`/dispatches/${item.runId}`} className="inline-flex items-center gap-1 text-primary">
                       <ArrowUpRight className="h-3 w-3" />
                       Open dispatch
                     </Link>

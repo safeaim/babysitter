@@ -50,7 +50,7 @@ function BreakpointBannerItem({ bp, stale, onDismiss }: { bp: BreakpointRunInfo;
       "shadow-breakpoint-glow animate-breakpoint-glow",
       stale && "opacity-70"
     )}>
-      <Link to={`/runs/${bp.runId}`} className="flex items-center gap-3 flex-1 min-w-0">
+      <Link to={`/dispatches/${bp.runId}`} className="flex items-center gap-3 flex-1 min-w-0">
         <div className="relative shrink-0">
           <Hand className="h-5 w-5 text-warning animate-pulse-dot" />
           <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-warning animate-ping" />
@@ -256,7 +256,7 @@ export function BreakpointBanner({ breakpointRuns }: BreakpointBannerProps) {
       {resolvedEntries.map((entry) => (
         <Link
           key={`resolved-${entry.bp.runId}`}
-          to={`/runs/${entry.bp.runId}`}
+          to={`/dispatches/${entry.bp.runId}`}
           className={cx(
             "group relative flex items-center gap-3 px-4 py-3 rounded-lg",
             "bg-success-muted border border-success/30",

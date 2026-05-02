@@ -7,7 +7,7 @@ import { ChevronLeft, ExternalLink, GripVertical, LayoutDashboard, MessagesSquar
 
 import { SessionConversationSurface } from "@/components/sessions/session-conversation-surface";
 import { SessionObservabilityPanel } from "@/components/sessions/session-observability-panel";
-import { Button, CommandPalette } from "@a5c-ai/compendium";
+import { Button, CommandPalette, Select } from "@a5c-ai/compendium";
 import type { CommandItem } from "@a5c-ai/compendium";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { usePersistedState } from "@/hooks/use-persisted-state";
@@ -237,6 +237,9 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
   const [minimalLayoutAppliedForWorkspace, setMinimalLayoutAppliedForWorkspace] = useState<string | null>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const linkedIssue = props.workspace.issues?.[0] ?? null;
+  const newSessionHref = `/sessions/new?workspacePath=${encodeURIComponent(props.workspace.path)}${
+    linkedIssue ? `&issueId=${encodeURIComponent(linkedIssue.issueId)}&issueKey=${encodeURIComponent(linkedIssue.issueKey)}` : ""
+  }`;
   const hasSessions = props.sessions.length > 0;
   const availablePanels = hasSessions
     ? PANEL_DEFINITIONS
@@ -441,6 +444,11 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
                 <p className="mt-2 text-sm leading-6 text-foreground-muted">
                   This workspace still keeps its issue and repo context here. Link or start a session from the board when you want the chat and runtime to appear beside it.
                 </p>
+                <div className="mt-4">
+                  <Button type="button" size="sm" onClick={() => navigate(newSessionHref)}>
+                    Start workspace session
+                  </Button>
+                </div>
               </div>
             )}
 
@@ -618,6 +626,9 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
                 View session
               </Button>
             ) : null}
+            <Button type="button" variant="ghost" onClick={() => navigate(newSessionHref)}>
+              New session
+            </Button>
             {availablePanels.map((panel) => {
               const Icon = panel.icon;
               return (
@@ -686,20 +697,16 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
                 ) : null}
               </div>
               {hasSessions ? (
-                <label className="w-full xl:max-w-sm">
+                <label className="w-full xl:max-w-sm" data-testid="workspace-session-select">
                   <span className="sr-only">Select workspace session</span>
-                  <select
-                    data-testid="workspace-session-select"
+                  <Select
                     value={props.selectedSessionId ?? ""}
-                    onChange={(event) => props.onSelectSession(event.target.value)}
-                    className="w-full rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary/40"
-                  >
-                    {props.sessions.map((session) => (
-                      <option key={session.sessionId} value={session.sessionId}>
-                        {(session.title ?? session.sessionId)} · {session.status} · {session.agent}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={props.onSelectSession}
+                    options={props.sessions.map((session) => ({
+                      label: `${session.title ?? session.sessionId} · ${session.status} · ${session.agent}`,
+                      value: session.sessionId,
+                    }))}
+                  />
                 </label>
               ) : (
                 <div className="rounded-2xl border border-dashed border-border px-4 py-3 text-sm text-foreground-muted">

@@ -45,7 +45,7 @@ export const SHORTCUT_SECTION_LABELS: Record<string, string> = {
 export function ShortcutsHelp() {
   const [open, setOpen] = useState(false);
   const pathname = useLocation().pathname;
-  const isRunDetail = pathname?.startsWith("/runs/") ?? false;
+  const isRunDetail = pathname?.startsWith("/dispatches/") || pathname?.startsWith("/runs/") || false;
   const isSessionWorkspace = pathname?.startsWith("/sessions/") ?? false;
 
   useKeyboard([

@@ -65,6 +65,29 @@ vi.mock("@a5c-ai/compendium", () => ({
         ))}
       </div>
     ) : null,
+  Select: ({
+    value,
+    onChange,
+    options,
+    ...props
+  }: {
+    value?: string;
+    onChange?: (value: string) => void;
+    options?: Array<{ label: string; value: string }>;
+    [key: string]: unknown;
+  }) => (
+    <select
+      {...props}
+      value={value}
+      onChange={(event) => onChange?.(event.currentTarget.value)}
+    >
+      {(options ?? []).map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  ),
   cx: (...args: unknown[]) => args.filter(Boolean).join(" "),
 }));
 
@@ -2010,7 +2033,7 @@ describe("workspaces-page helpers", () => {
     expect(screen.getByTestId("workspace-panel-conversation")).toBeInTheDocument();
     expect(screen.queryByTestId("workspace-panel-context")).toBeNull();
     expect(screen.queryByTestId("workspace-panel-details")).toBeNull();
-    expect(screen.getByTestId("workspace-session-select")).toHaveValue("session-1");
+    expect(within(screen.getByTestId("workspace-session-select")).getByRole("combobox")).toHaveValue("session-1");
     expect(screen.getByTestId("workspace-issue-link-KANBAN-GAP-007")).toHaveAttribute(
       "href",
       "/projects/kanban-app/issues/KANBAN-GAP-007",

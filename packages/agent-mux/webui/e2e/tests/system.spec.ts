@@ -72,7 +72,7 @@ async function authenticatePage(page: Page, request: APIRequestContext, testInfo
 }
 
 test.describe("agent-mux webui e2e", () => {
-  test("workspaces remains usable without gateway auth", async ({ page }) => {
+  test("workspaces keeps its shell stable before an authenticated session is established", async ({ page }) => {
     await page.goto("/workspaces", { waitUntil: "domcontentloaded" });
 
     await expect(page).toHaveURL(/\/workspaces$/);
@@ -150,7 +150,7 @@ test.describe("agent-mux webui e2e", () => {
       await linkedCard.locator("details summary").click();
       await expect(linkedCard.getByText("Workspace options")).toBeVisible();
       await expect(linkedCard.getByText("Repository lifecycle")).toBeVisible();
-      await expect(linkedCard.getByRole("button", { name: /linked workspace/i })).toBeVisible();
+      await expect(linkedCard.getByTestId(`open-linked-workspace-${state.issueKey}`)).toBeVisible();
     });
 
     test("board workspace links keep issue association visible and hand off cleanly into the linked session chat", async ({ page }) => {

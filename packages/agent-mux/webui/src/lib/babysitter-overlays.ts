@@ -265,8 +265,8 @@ export function buildRunHealthRecords(runs: Run[], nowMs = Date.now()): RunHealt
         stuck,
         pendingBreakpoints,
         severity,
-        recoveryHref: run.sessionId ? `/sessions/${run.sessionId}` : `/runs/${run.runId}`,
-        reviewHref: breakpoint ? `/runs/${run.runId}?effectId=${encodeURIComponent(breakpoint.effectId)}` : undefined,
+        recoveryHref: run.sessionId ? `/sessions/${run.sessionId}` : `/dispatches/${run.runId}`,
+        reviewHref: breakpoint ? `/dispatches/${run.runId}?effectId=${encodeURIComponent(breakpoint.effectId)}` : undefined,
         summary: summaryParts.join(" · "),
         updatedAt: run.updatedAt,
       };
@@ -340,7 +340,7 @@ export function buildSessionTimeline(
       kind: "run",
       label: "Run started",
       text: `${processId} entered the session overlay.`,
-      href: `/runs/${runId}`,
+      href: `/dispatches/${runId}`,
     });
 
     let currentAssistantText = "";
@@ -356,7 +356,7 @@ export function buildSessionTimeline(
         kind,
         label: kind === "assistant" ? "Assistant" : "Reasoning",
         text,
-        href: `/runs/${runId}`,
+        href: `/dispatches/${runId}`,
       });
       if (kind === "assistant") {
         currentAssistantText = "";
@@ -376,7 +376,7 @@ export function buildSessionTimeline(
           kind: "user",
           label: "User turn",
           text: String(event.text ?? ""),
-          href: `/runs/${runId}`,
+          href: `/dispatches/${runId}`,
         });
         continue;
       }
@@ -426,7 +426,7 @@ export function buildSessionTimeline(
               : type === "tool_call_ready"
                 ? JSON.stringify(event.input ?? {}, null, 2)
                 : String(event.inputAccumulated ?? ""),
-          href: `/runs/${runId}`,
+          href: `/dispatches/${runId}`,
         });
       }
     }
@@ -451,7 +451,7 @@ export function buildSessionTimeline(
         kind: "approval",
         label: "Breakpoint review",
         text: pendingBreakpoint.breakpointQuestion ?? "Run is waiting on an approval breakpoint.",
-        href: `/runs/${runId}?effectId=${encodeURIComponent(pendingBreakpoint.effectId)}`,
+        href: `/dispatches/${runId}?effectId=${encodeURIComponent(pendingBreakpoint.effectId)}`,
       });
     }
 
@@ -462,7 +462,7 @@ export function buildSessionTimeline(
         kind: "error",
         label: "Run failed",
         text: String(run.failureMessage ?? run.failedStep ?? "Execution failed and needs recovery."),
-        href: `/runs/${runId}`,
+        href: `/dispatches/${runId}`,
       });
     } else {
       timeline.push({
@@ -471,7 +471,7 @@ export function buildSessionTimeline(
         kind: status === "completed" ? "complete" : "run",
         label: status === "completed" ? "Run completed" : "Latest run state",
         text: `${status} · ${Number(run.completedTasks ?? 0)}/${Number(run.totalTasks ?? 0)} tasks complete`,
-        href: `/runs/${runId}`,
+        href: `/dispatches/${runId}`,
       });
     }
   }

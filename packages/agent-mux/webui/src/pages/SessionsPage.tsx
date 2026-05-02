@@ -27,6 +27,7 @@ type SessionRow = {
 };
 
 type SessionFilter = 'all' | 'active' | 'inactive';
+const SESSION_PAGE_SIZE = 24;
 
 function formatUsd(totalUsd: number | null): string | null {
   if (totalUsd == null || !Number.isFinite(totalUsd)) {
@@ -118,7 +119,7 @@ function SessionSpotlightCard(props: { session: SessionRow }) {
           </Link>
         ) : null}
         {runId ? (
-          <Link to={`/runs/${runId}`} className="session-browser__action">
+          <Link to={`/dispatches/${runId}`} className="session-browser__action">
             Open dispatch
           </Link>
         ) : null}
@@ -161,7 +162,7 @@ function SessionRowCard(props: { session: SessionRow }) {
             </Link>
           ) : null}
           {runId ? (
-            <Link to={`/runs/${runId}`} className="session-browser__action">
+            <Link to={`/dispatches/${runId}`} className="session-browser__action">
               Dispatch
             </Link>
           ) : null}
@@ -179,6 +180,7 @@ export function SessionsPage(): JSX.Element {
   const eventBuffers = useStore(store, (state) => state.events.byRunId);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<SessionFilter>('all');
+  const [page, setPage] = useState(0);
   const deferredSearchTerm = useDeferredValue(searchTerm);
   const normalizedSearchTerm = deferredSearchTerm.trim().toLowerCase();
 
@@ -297,15 +299,31 @@ export function SessionsPage(): JSX.Element {
       }),
     [filter, normalizedSearchTerm, rows],
   );
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / SESSION_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pagedRows = useMemo(
+    () => filteredRows.slice(safePage * SESSION_PAGE_SIZE, (safePage + 1) * SESSION_PAGE_SIZE),
+    [filteredRows, safePage],
+  );
 
   const activeSessions = rows.filter((session) => session.status === 'active');
   const inactiveSessions = rows.filter((session) => session.status !== 'active');
-  const visibleActiveSessions = filteredRows.filter((session) => session.status === 'active');
-  const visibleInactiveSessions = filteredRows.filter((session) => session.status !== 'active');
+  const visibleActiveSessions = pagedRows.filter((session) => session.status === 'active');
+  const visibleInactiveSessions = pagedRows.filter((session) => session.status !== 'active');
   const totalCost = rows.reduce((sum, session) => sum + (session.costTotalUsd ?? 0), 0);
   const workspaceBoundCount = rows.filter((session) => session.workspacePath != null).length;
   const spotlightActive = visibleActiveSessions.slice(0, 3);
   const spotlightRecent = visibleInactiveSessions.slice(0, 3);
+
+  useEffect(() => {
+    setPage(0);
+  }, [filter, normalizedSearchTerm]);
+
+  useEffect(() => {
+    if (page !== safePage) {
+      setPage(safePage);
+    }
+  }, [page, safePage]);
 
   return (
     <PageShell>
@@ -359,7 +377,7 @@ export function SessionsPage(): JSX.Element {
             </div>
 
             <div className="session-browser__visible-count">
-              {filteredRows.length} visible
+              {filteredRows.length} visible · page {safePage + 1} of {totalPages}
             </div>
           </div>
 
@@ -435,7 +453,20 @@ export function SessionsPage(): JSX.Element {
         </div>
 
         <div className="session-browser__row-list">
-          {filteredRows.map((session) => (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm">
+            <div className="text-foreground-muted">
+              Showing sessions {safePage * SESSION_PAGE_SIZE + 1}-{Math.min((safePage + 1) * SESSION_PAGE_SIZE, filteredRows.length)} of {filteredRows.length}
+            </div>
+            <div className="flex gap-2">
+              <button type="button" className="session-browser__action" disabled={safePage === 0} onClick={() => setPage((current) => Math.max(0, current - 1))}>
+                Previous
+              </button>
+              <button type="button" className="session-browser__action" disabled={safePage >= totalPages - 1} onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}>
+                Next
+              </button>
+            </div>
+          </div>
+          {pagedRows.map((session) => (
             <SessionRowCard key={session.sessionId} session={session} />
           ))}
           {filteredRows.length === 0 ? (

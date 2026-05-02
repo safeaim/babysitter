@@ -25,6 +25,7 @@ type SessionWorkspaceShellProps = {
     conversationSubmitLabel?: string;
     conversationEmptyStateTitle?: string;
     conversationEmptyStateBody?: string;
+    conversationSupplement?: React.ReactNode;
     heroEyebrow?: string;
     heroBody?: string;
     onSubmit: (input: {

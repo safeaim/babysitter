@@ -230,7 +230,7 @@ describe("babysitter overlays", () => {
     expect(health[0]?.runId).toBe("run-critical");
     expect(health[0]?.severity).toBe("critical");
     expect(health[0]?.retryCount).toBe(1);
-    expect(health[0]?.reviewHref).toBe("/runs/run-critical?effectId=eff-health");
+    expect(health[0]?.reviewHref).toBe("/dispatches/run-critical?effectId=eff-health");
   });
 
   it("builds artifact shortcuts and merged session timeline entries", () => {

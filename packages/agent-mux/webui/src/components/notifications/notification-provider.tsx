@@ -126,7 +126,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           "New Run Started",
           `${formatShortId(run.runId, 4)} started`,
           "info",
-          { href: `/runs/${run.runId}` },
+          { href: `/dispatches/${run.runId}` },
         );
         continue;
       }
@@ -138,7 +138,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           "Run Completed",
           `${formatShortId(run.runId, 4)} finished successfully`,
           "success",
-          { href: `/runs/${run.runId}` },
+          { href: `/dispatches/${run.runId}` },
         );
       }
 
@@ -149,7 +149,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           "Run Failed",
           `${formatShortId(run.runId, 4)} failed`,
           "error",
-          { href: `/runs/${run.runId}` },
+          { href: `/dispatches/${run.runId}` },
         );
       }
 
@@ -169,7 +169,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           `Run ${formatShortId(run.runId, 4)} needs attention`,
           breakpointTitle,
           "warning",
-          { href: `/runs/${run.runId}`, persistent: true },
+          { href: `/dispatches/${run.runId}`, persistent: true },
         );
       }
 
@@ -184,7 +184,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           "Breakpoint Resolved",
           `Breakpoint in ${formatShortId(run.runId, 4)} was approved`,
           "success",
-          { href: `/runs/${run.runId}` },
+          { href: `/dispatches/${run.runId}` },
         );
       }
       wm.pendingBreakpoints = run.pendingBreakpoints || 0;

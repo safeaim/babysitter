@@ -7,7 +7,7 @@ export type GatewayBootstrapResponse = {
 export async function loadGatewayBootstrapSnapshot(fetcher: (pathname: string) => Promise<unknown>): Promise<GatewayBootstrapResponse> {
   const [agents, runs, sessions] = await Promise.allSettled([
     fetcher("/api/v1/agents"),
-    fetcher("/api/v1/runs"),
+    fetcher("/api/v1/dispatches"),
     fetcher("/api/v1/sessions"),
   ]);
 

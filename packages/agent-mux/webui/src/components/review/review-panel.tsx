@@ -190,8 +190,8 @@ function buildFeedbackContext(artifact: KanbanReviewArtifact): Array<{ id: strin
         id: `run:${source.runId}:${source.effectId ?? ""}`,
         label: source.effectId ? "Run task" : "Run",
         href: source.effectId
-          ? `/runs/${source.runId}?effectId=${encodeURIComponent(source.effectId)}`
-          : `/runs/${source.runId}`,
+          ? `/dispatches/${source.runId}?effectId=${encodeURIComponent(source.effectId)}`
+          : `/dispatches/${source.runId}`,
       });
     }
     if (source.sessionId) {

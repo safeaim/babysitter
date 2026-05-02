@@ -47,6 +47,13 @@ function LegacySessionRouteRedirect(): JSX.Element {
   return <Navigate to={sessionId ? `/sessions/${sessionId}${location.search}` : '/sessions'} replace />;
 }
 
+function LegacyDispatchRouteRedirect(): JSX.Element {
+  const location = useLocation();
+  const match = location.pathname.match(/^\/runs(?:\/([^/?#]+))?/);
+  const runId = match?.[1];
+  return <Navigate to={runId ? `/dispatches/${runId}${location.search}` : `/dispatches${location.search}`} replace />;
+}
+
 function AuthPendingScreen(): JSX.Element {
   return (
     <main className="login-page">
@@ -113,7 +120,7 @@ function AppShellFrame(props: { children: React.ReactNode }): JSX.Element {
   const actions = useMemo(
     () => [
       { id: 'projects', label: 'Open projects', run: () => navigate('/projects') },
-      { id: 'runs', label: 'Open dispatches', run: () => navigate('/runs') },
+      { id: 'runs', label: 'Open dispatches', run: () => navigate('/dispatches') },
       { id: 'new-session', label: 'Start session', run: () => navigate('/sessions/new') },
       { id: 'sessions', label: 'Browse sessions', run: () => navigate('/sessions') },
       { id: 'workspaces', label: 'Open workspaces', run: () => navigate('/workspaces') },
@@ -149,7 +156,8 @@ function AppShell(): JSX.Element {
         <Route path="/sessions" element={<SessionsPage />} />
         <Route path="/sessions/new" element={<NewRunPage />} />
         <Route path="/sessions/pending/:runId" element={<SessionPendingPage />} />
-        <Route path="/runs/:runId" element={<SessionPendingPage />} />
+        <Route path="/dispatches/:runId" element={<SessionPendingPage />} />
+        <Route path="/runs/:runId" element={<LegacyDispatchRouteRedirect />} />
         <Route path="/sessions/:sessionId" element={<SessionDetailPage />} />
         <Route path="/sessions/:agent/:sessionId" element={<LegacySessionRouteRedirect />} />
         <Route path="/pair-device" element={<PairDevicePage />} />
@@ -162,7 +170,8 @@ function AppShell(): JSX.Element {
           <Route path="/projects/:projectId/workspaces/new" element={<ProjectWorkspaceCreatePage />} />
           <Route path="/projects/:projectId/issues/:issueId/workspace/new" element={<IssueWorkspaceCreatePage />} />
           <Route path="/issues/:issueId" element={<IssueDetailPage />} />
-          <Route path="/runs" element={<KanbanRunsPage />} />
+          <Route path="/dispatches" element={<KanbanRunsPage />} />
+          <Route path="/runs" element={<LegacyDispatchRouteRedirect />} />
           <Route path="/workspaces" element={<KanbanWorkspacesPage />} />
           <Route path="/workspaces/new" element={<HostWorkspaceCreatePage />} />
           <Route path="/inbox" element={<KanbanInboxPage />} />

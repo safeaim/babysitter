@@ -6,7 +6,7 @@ import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
 import type { KanbanIntegrationProvider, KanbanReviewArtifact } from "@a5c-ai/agent-mux-core/kanban";
 import { AlertCircle, ArrowUpDown, ExternalLink, FileText, GitBranch, Loader2, Wrench } from "lucide-react";
 
-import { Button, cx } from "@a5c-ai/compendium";
+import { Button, Select, cx } from "@a5c-ai/compendium";
 import type { WorkspaceInventoryItem } from "@/lib/workspace-lifecycle";
 
 type WorkspaceSidebarAction =
@@ -296,7 +296,7 @@ export function WorkspaceDetailsSidebar(props: {
                   {recentRuns.map((run) => (
                     <Link
                       key={`${props.workspace.path}:${run.runId}`}
-                      to={`/runs/${encodeURIComponent(run.runId)}`}
+                      to={`/dispatches/${encodeURIComponent(run.runId)}`}
                       data-testid={`workspace-status-run-${run.runId}`}
                       className="rounded-xl border border-border bg-background/70 px-3 py-2 transition-colors hover:border-primary/30"
                     >
@@ -556,14 +556,16 @@ export function WorkspaceDetailsSidebar(props: {
                   <div className="grid gap-3 md:grid-cols-2">
                     <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
                       Provider
-                      <select
+                      <div className="mt-2">
+                        <Select
                         value={provider}
-                        onChange={(event) => setProvider(event.target.value === "azure-repos" ? "azure-repos" : "github")}
-                        className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground"
-                      >
-                        <option value="github">GitHub</option>
-                        <option value="azure-repos">Azure Repos</option>
-                      </select>
+                        onChange={(value) => setProvider(value === "azure-repos" ? "azure-repos" : "github")}
+                        options={[
+                          { label: "GitHub", value: "github" },
+                          { label: "Azure Repos", value: "azure-repos" },
+                        ]}
+                      />
+                      </div>
                     </label>
                     <label className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
                       Branch

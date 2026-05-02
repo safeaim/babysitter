@@ -16,7 +16,8 @@ function firstAgent(agents: string[], preferred: string | null): string {
 function isSessionCapable(record: Record<string, unknown> | null): boolean {
   return (
     record?.['supportsInteractiveMode'] === true ||
-    record?.['structuredSessionTransport'] === 'persistent'
+    record?.['structuredSessionTransport'] === 'persistent' ||
+    record?.['canResume'] === true
   );
 }
 
@@ -38,10 +39,16 @@ export function NewRunPage(): JSX.Element {
   const [searchParams] = useSearchParams();
   const agents = useAgents();
   const requestedAgent = searchParams.get('agent');
+  const requestedWorkspaceId = searchParams.get('workspaceId');
+  const requestedWorkspacePath = searchParams.get('workspacePath');
+  const requestedIssueId = searchParams.get('issueId');
+  const requestedIssueKey = searchParams.get('issueKey');
   const [agent, setAgent] = useState(() => firstAgent(agents, requestedAgent));
   const [prompt, setPrompt] = useState('');
-  const [workspaceId, setWorkspaceId] = useState('');
-  const [workspaceMode, setWorkspaceMode] = useState<'existing' | 'create' | 'none'>('none');
+  const [workspaceId, setWorkspaceId] = useState(requestedWorkspaceId ?? '');
+  const [workspaceMode, setWorkspaceMode] = useState<'existing' | 'create' | 'none'>(
+    requestedWorkspaceId || requestedWorkspacePath ? 'existing' : 'none',
+  );
   const [workspaceName, setWorkspaceName] = useState('session-workspace');
   const [workspaceMaterialization, setWorkspaceMaterialization] = useState<'worktree' | 'symlink'>('worktree');
   const [workspaceRepos, setWorkspaceRepos] = useState('');
@@ -88,6 +95,26 @@ export function NewRunPage(): JSX.Element {
     };
   }, [fetchGateway]);
 
+  useEffect(() => {
+    if (!requestedWorkspaceId && !requestedWorkspacePath) {
+      return;
+    }
+    const match = workspaces.find((workspace) => {
+      if (requestedWorkspaceId && workspace.id === requestedWorkspaceId) {
+        return true;
+      }
+      if (!requestedWorkspacePath) {
+        return false;
+      }
+      return workspace.defaultCwd === requestedWorkspacePath || workspace.rootPath === requestedWorkspacePath;
+    });
+    if (!match) {
+      return;
+    }
+    setWorkspaceMode('existing');
+    setWorkspaceId(match.id);
+  }, [requestedWorkspaceId, requestedWorkspacePath, workspaces]);
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     if (!prompt.trim() || !agent) {
@@ -127,6 +154,8 @@ export function NewRunPage(): JSX.Element {
         const selected = workspaces.find((workspace) => workspace.id === workspaceId);
         resolvedWorkspaceId = workspaceId;
         resolvedWorkspaceCwd = selected?.defaultCwd ?? selected?.rootPath;
+      } else if (requestedWorkspacePath) {
+        resolvedWorkspaceCwd = requestedWorkspacePath;
       }
 
       const response = await fetchGateway('/api/v1/sessions', {
@@ -153,12 +182,27 @@ export function NewRunPage(): JSX.Element {
           status: 'active',
         });
       }
+      if (requestedIssueId) {
+        await fetch('/api/backlog', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            action: 'link-issue-session',
+            issueId: requestedIssueId,
+            sessionId: typeof run?.sessionId === 'string' ? run.sessionId : undefined,
+            runId,
+          }),
+        }).catch(() => undefined);
+      }
       client.subscribeRun(runId);
+      const issueQuery = requestedIssueId
+        ? `?issueId=${encodeURIComponent(requestedIssueId)}`
+        : '';
       if (typeof run?.sessionId === 'string' && run.sessionId.length > 0) {
-        navigate(`/sessions/${run.sessionId}`);
+        navigate(`/sessions/${run.sessionId}${issueQuery}`);
         return;
       }
-      navigate(`/sessions/pending/${runId}`);
+      navigate(`/sessions/pending/${runId}${issueQuery}`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
     } finally {
@@ -175,6 +219,11 @@ export function NewRunPage(): JSX.Element {
           This creates a real session on the selected harness. If the harness does not emit its session
           id immediately, the browser stays inside the sessions flow until the live session is ready.
         </p>
+        {requestedWorkspacePath ? (
+          <p className="muted-copy">
+            This session will stay attached to the selected workspace{requestedIssueKey ? ` and ${requestedIssueKey}` : ''}.
+          </p>
+        ) : null}
       </article>
 
       <article className="panel">

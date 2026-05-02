@@ -21,7 +21,10 @@ export declare function WorkspacesPageContent(props: {
         model?: string;
         attachments?: Attachment[];
         approvalMode?: "yolo" | "prompt" | "deny";
-    }) => Promise<void>;
+    }) => Promise<{
+        runId?: string;
+        sessionId?: string;
+    } | void>;
     mode?: WorkspaceSurfaceMode;
 }): import("react/jsx-runtime").JSX.Element;
 export {};

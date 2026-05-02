@@ -40,7 +40,7 @@ describe('RunCard', () => {
     const run = createMockRun({ runId: 'run-abc-123' });
     render(<RunCard run={run} />);
     const link = screen.getByRole('link', { name: /data pipeline ingest/i });
-    expect(link).toHaveAttribute('href', '/runs/run-abc-123');
+    expect(link).toHaveAttribute('href', '/dispatches/run-abc-123');
   });
 
   it('shows the project name tag when present', () => {

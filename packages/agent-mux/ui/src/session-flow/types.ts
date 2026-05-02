@@ -4,7 +4,7 @@ import type { EventBuffer, RunRecord } from '../store/index.js';
 
 export type NativeSessionToolCall = Partial<Pick<SessionToolCall, 'toolCallId' | 'toolName' | 'input' | 'output' | 'durationMs'>>;
 
-export type NativeSessionMessage = Partial<Pick<SessionMessage, 'role' | 'content' | 'thinking'>> & {
+export type NativeSessionMessage = Partial<Pick<SessionMessage, 'role' | 'content' | 'thinking' | 'timestamp'>> & {
   toolCalls?: NativeSessionToolCall[];
   toolResult?: Partial<NonNullable<SessionMessage['toolResult']>>;
 };

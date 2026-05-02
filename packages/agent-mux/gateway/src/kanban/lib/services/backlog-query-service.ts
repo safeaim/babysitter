@@ -157,6 +157,12 @@ export interface UpdateIssueDetailInput {
 
 export type LinkIssueWorkspaceInput = KanbanIssueWorkspaceLinkInput;
 
+export interface LinkIssueSessionInput {
+  readonly issueId: string;
+  readonly sessionId?: string;
+  readonly runId?: string;
+}
+
 type BacklogSeedProject = StoredKanbanProject;
 type BacklogSeedIssue = StoredKanbanIssue;
 type BacklogSeedDispatchContextLabel = KanbanDispatchContextLabelDefinition;
@@ -490,6 +496,15 @@ function buildActivityEntry(
 
 function appendUniqueIssueId(issueIds: readonly string[], issueId: string): string[] {
   return issueIds.includes(issueId) ? [...issueIds] : [...issueIds, issueId];
+}
+
+function appendUniqueString(values: readonly string[] | undefined, value: string | undefined): string[] {
+  const normalized = value?.trim() ?? '';
+  const current = values ? [...values] : [];
+  if (!normalized) {
+    return current;
+  }
+  return current.includes(normalized) ? current : [...current, normalized];
 }
 
 function arrayEquals(left: readonly string[], right: readonly string[]): boolean {
@@ -2479,6 +2494,71 @@ export class BacklogQueryService {
 
     return this.persistPayload({
       projects: nextProjects,
+      issues: nextIssues,
+      dispatchContextLabels: payload.dispatchContextLabels,
+    });
+  }
+
+  async linkIssueSession(input: LinkIssueSessionInput): Promise<BacklogOverview> {
+    const payload = await this.readSeedPayload();
+    const issue = this.findIssue(payload, input.issueId);
+    const normalizedSessionId = input.sessionId?.trim() ?? '';
+    const normalizedRunId = input.runId?.trim() ?? '';
+
+    if (!normalizedSessionId && !normalizedRunId) {
+      throw new AppError('sessionId or runId is required.', 'BAD_REQUEST', 400);
+    }
+
+    if (normalizedSessionId) {
+      const linkedIssue = payload.issues.find(
+        (candidate) =>
+          candidate.id !== issue.id &&
+          (candidate.dispatch?.sessionIds ?? []).includes(normalizedSessionId),
+      );
+      if (linkedIssue) {
+        throw new AppError(
+          `${normalizedSessionId} is already linked to ${linkedIssue.key}.`,
+          'BAD_REQUEST',
+          409,
+        );
+      }
+    }
+
+    const updatedAt = this.deps.now();
+    const nextIssues = payload.issues.map((candidate) =>
+      candidate.id === issue.id
+        ? {
+            ...candidate,
+            dispatch: {
+              ...candidate.dispatch,
+              runIds: appendUniqueString(candidate.dispatch?.runIds, normalizedRunId),
+              sessionIds: appendUniqueString(candidate.dispatch?.sessionIds, normalizedSessionId),
+              lastDispatchedAt: updatedAt,
+            },
+            updatedAt,
+            activity: [
+              buildActivityEntry(
+                `activity-issue-session-link-${updatedAt}`,
+                'issue',
+                candidate.id,
+                'dispatch-linked',
+                `Linked ${normalizedSessionId ? `session ${normalizedSessionId}` : `dispatch ${normalizedRunId}`} to ${candidate.key}.`,
+                {
+                  kind: 'human',
+                  id: 'tal',
+                  displayName: 'Tal Muskal',
+                  role: 'owner',
+                },
+                updatedAt,
+              ),
+              ...(candidate.activity ?? []),
+            ],
+          }
+        : candidate,
+    );
+
+    return this.persistPayload({
+      projects: payload.projects,
       issues: nextIssues,
       dispatchContextLabels: payload.dispatchContextLabels,
     });

@@ -1,10 +1,28 @@
 import type { AgentFlowLane, AgentFlowSegment, NativeSessionMessage, SessionTranscriptNode } from './types.js';
 import { collectPaths, computeSegmentWeight, previewText, renderPayload } from './utils.js';
 
+function readMessageTimestamp(message: NativeSessionMessage, index: number): number {
+  const value = message.timestamp;
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = Date.parse(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return index;
+}
+
 export function buildNativeTranscript(sessionId: string, messages: NativeSessionMessage[]): SessionTranscriptNode[] {
   const nodes: SessionTranscriptNode[] = [];
   for (const [index, message] of messages.entries()) {
     const runId = `${sessionId}:native:${index}`;
+    const baseTimestamp = readMessageTimestamp(message, index);
     if (message.role === 'user' && typeof message.content === 'string' && message.content.length > 0) {
       nodes.push({
         id: `${runId}:user`,
@@ -12,7 +30,7 @@ export function buildNativeTranscript(sessionId: string, messages: NativeSession
         label: 'user',
         text: message.content,
         runId,
-        timestamp: index,
+        timestamp: baseTimestamp,
         filePaths: [],
       });
       continue;
@@ -24,7 +42,7 @@ export function buildNativeTranscript(sessionId: string, messages: NativeSession
         label: 'thinking',
         text: message.thinking,
         runId,
-        timestamp: index + 0.1,
+        timestamp: baseTimestamp + 0.1,
         filePaths: [],
       });
     }
@@ -41,7 +59,7 @@ export function buildNativeTranscript(sessionId: string, messages: NativeSession
             durationMs: toolCall.durationMs,
           }),
           runId,
-          timestamp: index + 0.2 + toolIndex / 10,
+          timestamp: baseTimestamp + 0.2 + toolIndex / 10,
           filePaths,
         });
       }
@@ -53,7 +71,7 @@ export function buildNativeTranscript(sessionId: string, messages: NativeSession
         label: String(message.toolResult.toolName ?? 'tool'),
         text: renderPayload(message.toolResult.output),
         runId,
-        timestamp: index + 0.25,
+        timestamp: baseTimestamp + 0.25,
         filePaths: [...collectPaths(message.toolResult.output)],
       });
       continue;
@@ -65,7 +83,7 @@ export function buildNativeTranscript(sessionId: string, messages: NativeSession
         label: 'assistant',
         text: message.content,
         runId,
-        timestamp: index + 0.3,
+        timestamp: baseTimestamp + 0.3,
         filePaths: [],
       });
       continue;
@@ -77,7 +95,7 @@ export function buildNativeTranscript(sessionId: string, messages: NativeSession
         label: 'system',
         text: message.content,
         runId,
-        timestamp: index + 0.4,
+        timestamp: baseTimestamp + 0.4,
         filePaths: [],
       });
     }

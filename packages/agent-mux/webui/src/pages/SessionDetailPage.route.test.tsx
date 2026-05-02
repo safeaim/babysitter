@@ -16,10 +16,17 @@ const mockBuildSessionTimelineFromTranscript = vi.fn();
 const mockBuildSessionFilesFromTranscript = vi.fn();
 const mockAccumulateEventCost = vi.fn();
 const capturedShellProps: Array<Record<string, unknown>> = [];
+const mockNavigate = vi.fn();
 
-vi.mock('react-router-dom-v6', () => ({
-  useParams: () => ({ sessionId: 'session-1' }),
-}));
+vi.mock('react-router-dom-v6', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom-v6')>();
+  return {
+    ...actual,
+    useParams: () => ({ sessionId: 'session-1' }),
+    useNavigate: () => mockNavigate,
+    useSearchParams: () => [new URLSearchParams(), vi.fn()] as const,
+  };
+});
 
 vi.mock('@a5c-ai/agent-mux-ui', () => ({
   useGateway: () => mockUseGateway(),
@@ -145,6 +152,7 @@ function latestShellProps() {
 describe('SessionDetailPage route shell wiring', () => {
   beforeEach(() => {
     capturedShellProps.length = 0;
+    mockNavigate.mockReset();
     mockUseGateway.mockReset();
     mockFetchGateway.mockReset();
     mockBuildSessionFlowModel.mockReset();
@@ -183,9 +191,15 @@ describe('SessionDetailPage route shell wiring', () => {
     const store = createMockStore(createSessionState());
     mockUseGateway.mockReturnValue({ client, store });
     mockFetchGateway.mockImplementation(async (path: string) => {
-      if (path.endsWith('/full')) {
+      if (path.includes('/messages?')) {
         return okJson({
           messages: [{ role: 'assistant', content: 'unused native payload' }],
+          pagination: {
+            total: 1,
+            offset: 0,
+            limit: 60,
+            hasMore: false,
+          },
         });
       }
       return okJson({});
@@ -256,7 +270,7 @@ describe('SessionDetailPage route shell wiring', () => {
     expect(await screen.findByTestId('session-workspace-shell')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(mockFetchGateway).toHaveBeenCalledWith('/api/v1/sessions/session-1/full');
+      expect(mockFetchGateway).toHaveBeenCalledWith('/api/v1/sessions/session-1/messages?limit=60&tail=true');
     });
 
     const props = latestShellProps();
@@ -349,7 +363,7 @@ describe('SessionDetailPage route shell wiring', () => {
 
     await waitFor(() => {
       expect(
-        mockFetchGateway.mock.calls.some(([path]) => String(path).endsWith('/full')),
+        mockFetchGateway.mock.calls.some(([path]) => String(path).includes('/messages?')),
       ).toBe(false);
     });
 
@@ -375,8 +389,16 @@ describe('SessionDetailPage route shell wiring', () => {
     );
     mockUseGateway.mockReturnValue({ client, store });
     mockFetchGateway.mockImplementation(async (path: string) => {
-      if (path.endsWith('/full')) {
-        return okJson({ messages: [] });
+      if (path.includes('/messages?')) {
+        return okJson({
+          messages: [],
+          pagination: {
+            total: 0,
+            offset: 0,
+            limit: 60,
+            hasMore: false,
+          },
+        });
       }
       return okJson({});
     });
@@ -398,6 +420,17 @@ describe('SessionDetailPage route shell wiring', () => {
     const store = createMockStore(state);
     mockUseGateway.mockReturnValue({ client, store });
     mockFetchGateway.mockImplementation(async (path: string, init?: RequestInit) => {
+      if (path.includes('/messages?')) {
+        return okJson({
+          messages: [],
+          pagination: {
+            total: 0,
+            offset: 0,
+            limit: 60,
+            hasMore: false,
+          },
+        });
+      }
       if (path.endsWith('/messages')) {
         expect(init?.method).toBe('POST');
         expect(JSON.parse(String(init?.body))).toEqual({
@@ -411,9 +444,6 @@ describe('SessionDetailPage route shell wiring', () => {
           run: { runId: 'run-2', sessionId: 'session-1', status: 'queued' },
           session: { sessionId: 'session-1', status: 'active' },
         });
-      }
-      if (path.endsWith('/full')) {
-        return okJson({ messages: [] });
       }
       return okJson({});
     });

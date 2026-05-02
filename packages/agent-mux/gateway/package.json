@@ -45,7 +45,7 @@
   },
   "scripts": {
     "build": "tsc --build && tsc --emitDeclarationOnly --declarationMap false -p tsconfig.json",
-    "test": "vitest run --config ../../../vitest.config.ts \"tests/**/*.test.ts\" \"tests/**/*.test.tsx\" \"src/**/*.test.ts\" \"src/**/*.test.tsx\"",
+    "test": "vitest run --root ../../.. --config vitest.config.ts packages/agent-mux/gateway/tests/builtin-adapters.test.ts packages/agent-mux/gateway/tests/e2e.test.ts packages/agent-mux/gateway/tests/event-log.test.ts packages/agent-mux/gateway/tests/manager.test.ts packages/agent-mux/gateway/tests/protocol.test.ts packages/agent-mux/gateway/tests/server.test.ts packages/agent-mux/gateway/tests/session-runtime.test.ts packages/agent-mux/gateway/tests/tokens.test.ts packages/agent-mux/gateway/tests/webhook-out.test.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

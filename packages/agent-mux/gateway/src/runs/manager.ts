@@ -537,15 +537,26 @@ export class RunManager {
     const { handle } = active;
     try {
       for await (const event of handle) {
+        let eventToRecord = event;
         if (event.type === 'session_start' && 'sessionId' in event && typeof event.sessionId === 'string') {
-          active.entry.sessionId = event.sessionId;
+          const resumedSessionId =
+            event.resumed === true && typeof active.entry.sessionId === 'string' && active.entry.sessionId.length > 0
+              ? active.entry.sessionId
+              : event.sessionId;
+          if (resumedSessionId !== event.sessionId) {
+            eventToRecord = {
+              ...event,
+              sessionId: resumedSessionId,
+            };
+          }
+          active.entry.sessionId = resumedSessionId;
           this.eventLog.index.upsertRun(active.entry);
           if (active.entry.workspaceId) {
             await this.workspaceService.bindSession({
               workspaceId: active.entry.workspaceId,
               session: {
                 agent: active.entry.agent,
-                sessionId: event.sessionId,
+                sessionId: resumedSessionId,
                 status: 'running',
                 cwd: active.entry.cwd,
                 updatedAt: new Date().toISOString(),
@@ -554,9 +565,9 @@ export class RunManager {
               },
             });
           }
-          await this.attachSessionSubscribersToRun(event.sessionId, handle.runId);
+          await this.attachSessionSubscribersToRun(resumedSessionId, handle.runId);
         }
-        await this.recordAgentEvent(handle.runId, event);
+        await this.recordAgentEvent(handle.runId, eventToRecord);
       }
     } finally {
       const result = await handle.result();

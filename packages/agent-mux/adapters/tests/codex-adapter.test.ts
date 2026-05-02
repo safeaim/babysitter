@@ -170,9 +170,21 @@ describe('CodexAdapter', () => {
         JSON.stringify({ type: 'thread.started', thread_id: 'thread-123' }),
         makeContext(),
       );
-      const event = result as { type: string; sessionId: string };
+      const event = result as { type: string; sessionId: string; resumed: boolean };
       expect(event.type).toBe('session_start');
       expect(event.sessionId).toBe('thread-123');
+      expect(event.resumed).toBe(false);
+    });
+
+    it('preserves the requested session id when codex emits thread.started during resume', () => {
+      const result = adapter.parseEvent(
+        JSON.stringify({ type: 'thread.started', thread_id: 'thread-newly-emitted' }),
+        makeContext({ sessionId: 'thread-existing-session' }),
+      );
+      const event = result as { type: string; sessionId: string; resumed: boolean };
+      expect(event.type).toBe('session_start');
+      expect(event.sessionId).toBe('thread-existing-session');
+      expect(event.resumed).toBe(true);
     });
 
     it('parses item.completed agent messages from codex exec --json', () => {

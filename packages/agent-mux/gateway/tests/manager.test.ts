@@ -300,4 +300,64 @@ describe('gateway run manager', () => {
       }
     }
   });
+
+  it('keeps the original session binding when a resumed dispatch emits a different session_start id', async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gateway-session-resume-'));
+    tempDirs.push(tempDir);
+    const fakeClient = createFakeRunClient();
+    const manager = new RunManager(
+      resolveGatewayConfig({
+        eventLogDir: tempDir,
+        client: fakeClient,
+      }),
+      { debug() {}, info() {}, warn() {}, error() {} },
+    );
+    const conn = createStubConn('resume-listener');
+
+    const run = await manager.start(
+      {
+        runId: '01TESTRUN000000000000000005',
+        agent: 'codex',
+        prompt: 'follow up',
+        sessionId: 'session-existing',
+      },
+      { tokenId: 'tok-1', name: 'browser' },
+    );
+    await manager.subscribe(conn as unknown as ClientConn, run.runId, 0);
+
+    fakeClient.latest!.handle.emit({
+      type: 'session_start',
+      runId: run.runId,
+      agent: 'codex',
+      timestamp: Date.now(),
+      sessionId: 'session-unexpected-new-id',
+      resumed: true,
+    });
+
+    await waitUntil(() => manager.get(run.runId)?.sessionId === 'session-existing');
+
+    expect(manager.get(run.runId)?.sessionId).toBe('session-existing');
+    expect((await manager.getSession('session-existing'))?.latestRunId).toBe(run.runId);
+    expect(await manager.getSession('session-unexpected-new-id')).toBeNull();
+    await waitUntil(() =>
+      conn.frames.some(
+        (frame) =>
+          frame['type'] === 'run.event' &&
+          typeof frame['event'] === 'object' &&
+          frame['event'] != null &&
+          (frame['event'] as Record<string, unknown>)['type'] === 'session_start',
+      ),
+    );
+    const normalizedFrame = conn.frames.find(
+      (frame) =>
+        frame['type'] === 'run.event' &&
+        typeof frame['event'] === 'object' &&
+        frame['event'] != null &&
+        (frame['event'] as Record<string, unknown>)['type'] === 'session_start',
+    );
+    expect((normalizedFrame?.['event'] as Record<string, unknown>)?.['sessionId']).toBe('session-existing');
+
+    fakeClient.latest!.handle.complete('completed', 0, null);
+    await manager.shutdown();
+  });
 });

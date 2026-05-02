@@ -194,8 +194,11 @@ export class CodexAdapter extends BaseAgentAdapter {
 
     // Proper Codex event types from 'codex exec --json'
     if (type === 'thread.started') {
-      const sessionId = String(obj['thread_id'] ?? context.sessionId ?? '');
-      return { ...base, type: 'session_start', sessionId, resumed: false } as AgentEvent;
+      const resumed = typeof context.sessionId === 'string' && context.sessionId.length > 0;
+      const sessionId = resumed
+        ? context.sessionId
+        : String(obj['thread_id'] ?? context.sessionId ?? '');
+      return { ...base, type: 'session_start', sessionId, resumed } as AgentEvent;
     }
 
     if (type === 'turn.started') {

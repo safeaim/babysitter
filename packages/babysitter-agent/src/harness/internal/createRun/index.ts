@@ -33,6 +33,7 @@ import {
 import { resolveRunsDir } from "@a5c-ai/babysitter-sdk";
 import { getProcessOutputDir, runPlanProcessPhase } from "./planProcess";
 import { runOrchestrationPhase } from "./orchestration";
+import { normalizeBuiltInHarnessName } from "../../builtInHarness";
 
 // ── Re-exports for backward compatibility ────────────────────────────
 
@@ -88,7 +89,7 @@ export async function handleHarnessCreateRun(
     }
 
     const discovered = await discoverHarnesses();
-    const selectedHarnessName = preferredHarness ?? "agent-core";
+    const selectedHarnessName = normalizeBuiltInHarnessName(preferredHarness ?? "agent-core");
     const compressionConfig = loadSessionCompressionConfig(workspace);
     const promptContext = buildPromptContext({
       workspace,

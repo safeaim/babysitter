@@ -1,3 +1,5 @@
+import { normalizeBuiltInHarnessName } from "../builtInHarness";
+
 /**
  * Mapping from babysitter harness identifiers to agent-mux adapter names.
  *
@@ -30,12 +32,13 @@ export const HARNESS_TO_AMUX_ADAPTER: Readonly<Record<string, string>> = {
  *         or if the harness has no known mapping.
  */
 export function mapHarnessToAmuxAdapter(harness: string): string {
-  if (harness === "pi" || harness === "agent-core") {
+  const normalizedHarness = normalizeBuiltInHarnessName(harness);
+  if (normalizedHarness === "pi" || normalizedHarness === "agent-core") {
     throw new Error(
       `Harness "${harness}" uses agent-core and cannot be invoked via agent-mux.`,
     );
   }
-  const adapter = HARNESS_TO_AMUX_ADAPTER[harness];
+  const adapter = HARNESS_TO_AMUX_ADAPTER[normalizedHarness];
   if (!adapter) {
     throw new Error(
       `No agent-mux adapter mapping for harness "${harness}". ` +
@@ -49,5 +52,6 @@ export function mapHarnessToAmuxAdapter(harness: string): string {
  * Check whether a harness name has a corresponding agent-mux adapter.
  */
 export function hasAmuxAdapter(harness: string): boolean {
-  return harness in HARNESS_TO_AMUX_ADAPTER;
+  const normalizedHarness = normalizeBuiltInHarnessName(harness);
+  return normalizedHarness in HARNESS_TO_AMUX_ADAPTER;
 }

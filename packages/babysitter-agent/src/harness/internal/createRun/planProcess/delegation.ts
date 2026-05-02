@@ -8,6 +8,10 @@ import {
   promptPiWithRetry,
   type AgentCoreSessionOptions,
 } from "../utils";
+import {
+  isBuiltInHarnessName,
+  normalizeBuiltInHarnessName,
+} from "../../../builtInHarness";
 
 function resolveSkillFileCandidates(workspace: string, skillRef: string): string[] {
   const trimmed = skillRef.trim();
@@ -96,8 +100,8 @@ export async function runDelegatedHarnessTask(args: {
       ].join("\n")
     : args.task;
 
-  const harnessName = args.harness?.trim() || "agent-core";
-  if (harnessName === "agent-core" || harnessName === "oh-my-pi") {
+  const harnessName = normalizeBuiltInHarnessName(args.harness?.trim() || "agent-core");
+  if (isBuiltInHarnessName(harnessName)) {
     const session = createAgentCoreSession({
       workspace,
       model: args.model,

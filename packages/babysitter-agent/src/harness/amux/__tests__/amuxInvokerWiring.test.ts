@@ -181,6 +181,19 @@ describe("invokeHarness amux wiring", () => {
     expect(result.harness).toBe("agent-core");
   });
 
+  it("uses direct invocation for internal harness alias even when amux is available", async () => {
+    const mockClient = createMockAmuxClient();
+    vi.mocked(getAmuxClient).mockResolvedValue(mockClient);
+
+    const result = await invokeHarness("internal", {
+      prompt: "test prompt",
+    });
+
+    expect(getAmuxClient).not.toHaveBeenCalled();
+    expect(invokeViaAgentMux).not.toHaveBeenCalled();
+    expect(result.harness).toBe("agent-core");
+  });
+
   it("routes codex through amux", async () => {
     const mockClient = createMockAmuxClient();
     vi.mocked(getAmuxClient).mockResolvedValue(mockClient);

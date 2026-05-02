@@ -70,6 +70,12 @@ describe("mapHarnessToAmuxAdapter", () => {
     );
   });
 
+  it("throws for internal alias (uses agent-core)", () => {
+    expect(() => mapHarnessToAmuxAdapter("internal")).toThrow(
+      /agent-core/,
+    );
+  });
+
   it("throws for unknown harness names", () => {
     expect(() => mapHarnessToAmuxAdapter("nonexistent")).toThrow(
       /No agent-mux adapter mapping/,
@@ -86,6 +92,10 @@ describe("hasAmuxAdapter", () => {
 
   it("returns false for pi", () => {
     expect(hasAmuxAdapter("pi")).toBe(false);
+  });
+
+  it("returns false for internal alias", () => {
+    expect(hasAmuxAdapter("internal")).toBe(false);
   });
 
   it("returns false for unknown harnesses", () => {

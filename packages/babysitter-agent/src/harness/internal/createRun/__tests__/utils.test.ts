@@ -177,6 +177,7 @@ describe("harnessUtils", () => {
   });
 
   it("keeps the internal orchestration path for built-in harnesses", () => {
+    expect(shouldUseExternalHarness("internal")).toBe(false);
     expect(shouldUseExternalHarness("agent-core")).toBe(false);
     expect(shouldUseExternalHarness("oh-my-pi")).toBe(false);
   });

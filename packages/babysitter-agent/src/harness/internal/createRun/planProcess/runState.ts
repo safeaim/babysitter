@@ -11,6 +11,7 @@ import {
   type SessionBindResult,
   AgentCoreSessionHandle,
 } from "../utils";
+import { normalizeBuiltInHarnessName } from "../../../builtInHarness";
 
 type EnsureRunAndMaybeBindArgs = {
   processPath: string;
@@ -90,11 +91,12 @@ export async function ensureRunAndMaybeBindFromProcessDefinition(
   let runId = args.state?.runId;
   let runDir = args.state?.runDir;
   let createdRun = false;
+  const selectedHarnessName = normalizeBuiltInHarnessName(args.selectedHarnessName);
 
   if (!runId || !runDir) {
     const created = await createRun({
       runsDir: args.runsDir,
-      harness: args.selectedHarnessName,
+      harness: selectedHarnessName,
       process: {
         processId,
         importPath: path.resolve(args.processPath),
@@ -112,7 +114,7 @@ export async function ensureRunAndMaybeBindFromProcessDefinition(
     }
   }
 
-  const adapter = getAdapterByName(args.selectedHarnessName);
+  const adapter = getAdapterByName(selectedHarnessName);
   if (!adapter) {
     return { runId, runDir, sessionBound: args.state?.sessionBound, createdRun, boundSession: false };
   }
@@ -128,13 +130,13 @@ export async function ensureRunAndMaybeBindFromProcessDefinition(
   }
 
   let sessionId = adapter.resolveSessionId({});
-  if (!sessionId && args.selectedHarnessName === "agent-core") {
+  if (!sessionId && selectedHarnessName === "agent-core") {
     sessionId = args.phaseSession?.sessionId;
   }
   if (!sessionId && args.requireBoundSession) {
     throw new BabysitterRuntimeError(
       "MissingHarnessSessionId",
-      `Cannot resolve a session ID for harness ${args.selectedHarnessName}.`,
+      `Cannot resolve a session ID for harness ${selectedHarnessName}.`,
       { category: ErrorCategory.Configuration },
     );
   }
@@ -168,7 +170,7 @@ export async function ensureRunAndMaybeBindFromProcessDefinition(
   }
   if (stateDir && args.workspace) {
     const worktree = await resolveSessionWorktreeContext(args.workspace);
-    const sessionContextId = resolveCurrentSessionContextId(args.selectedHarnessName, sessionId);
+    const sessionContextId = resolveCurrentSessionContextId(selectedHarnessName, sessionId);
     await updateSessionContext(stateDir, sessionContextId, {
       worktree,
     });

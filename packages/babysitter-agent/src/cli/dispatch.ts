@@ -12,6 +12,7 @@ import { handleDaemonRun, handleDaemonStart, handleDaemonStatus, handleDaemonSto
 import { handleMcpServe } from "./commands/mcpServe";
 import { handleSessionHistory } from "./commands/session/history";
 import { formatResultAsAmuxEvents } from "./amuxEventsFormatter";
+import { normalizeBuiltInHarnessName } from "../harness/builtInHarness";
 
 type HarnessRunPromptKind =
   | "forever"
@@ -95,7 +96,7 @@ export async function executeAgentCliCommand(parsed: HarnessParsedArgs): Promise
     case "resume":
       return await handleHarnessResumeRun({
         runId: parsed.runIdOverride,
-        harness: parsed.harness,
+        harness: parsed.harness ? normalizeBuiltInHarnessName(parsed.harness) : parsed.harness,
         workspace: parsed.workspace,
         model: parsed.model,
         maxIterations: parsed.maxIterations,
@@ -152,7 +153,7 @@ export async function executeAgentCliCommand(parsed: HarnessParsedArgs): Promise
           json: false,
           verbose: parsed.verbose,
           workspace: parsed.workspace,
-          harness: parsed.harness,
+          harness: parsed.harness ? normalizeBuiltInHarnessName(parsed.harness) : parsed.harness,
           runId: parsed.runIdOverride,
           verbosity: parsed.verbosity as "minimal" | "normal" | "verbose" | undefined,
         });
@@ -168,7 +169,7 @@ export async function executeAgentCliCommand(parsed: HarnessParsedArgs): Promise
         json: parsed.json,
         verbose: parsed.verbose,
         positional: parsed.positional,
-        harness: parsed.harness,
+        harness: parsed.harness ? normalizeBuiltInHarnessName(parsed.harness) : parsed.harness,
         workspace: parsed.workspace,
         prompt: parsed.prompt,
         runId: parsed.runIdOverride,
@@ -234,7 +235,8 @@ async function handleHarnessInvoke(parsed: HarnessParsedArgs): Promise<number> {
     console.error('Usage: babysitter-agent invoke <name> --prompt "<text>"');
     return 1;
   }
-  const result = await invokeHarness(harnessName, {
+  const normalizedHarnessName = normalizeBuiltInHarnessName(harnessName);
+  const result = await invokeHarness(normalizedHarnessName, {
     prompt: parsed.prompt,
     workspace: parsed.workspace,
     model: parsed.model,
@@ -243,7 +245,7 @@ async function handleHarnessInvoke(parsed: HarnessParsedArgs): Promise<number> {
 
   // amux-events output format: JSONL compatible with agent-mux event stream
   if (parsed.outputFormat === "amux-events") {
-    const lines = formatResultAsAmuxEvents(harnessName, result);
+    const lines = formatResultAsAmuxEvents(normalizedHarnessName, result);
     for (const line of lines) {
       console.log(line);
     }
@@ -302,7 +304,7 @@ async function runHarnessCreateRun(
   return await handleHarnessCreateRun({
     invocationCommand: parsed.command,
     prompt: overrides.prompt ?? parsed.prompt,
-    harness: parsed.harness,
+    harness: parsed.harness ? normalizeBuiltInHarnessName(parsed.harness) : parsed.harness,
     processPath: parsed.processPath,
     workspace: parsed.workspace,
     model: parsed.model,

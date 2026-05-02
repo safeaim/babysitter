@@ -26,6 +26,7 @@ import {
 import { getAmuxClient } from "./amux/amuxClientFactory";
 import { hasAmuxAdapter } from "./amux/amuxHarnessMap";
 import { invokeViaAgentMux } from "./amux/amuxBridge";
+import { normalizeBuiltInHarnessName } from "./builtInHarness";
 
 // ---------------------------------------------------------------------------
 // CLI mapping — Pi only (external harnesses use agent-mux adapters)
@@ -121,13 +122,14 @@ export async function invokeHarness(
   name: string,
   options: HarnessInvokeOptions,
 ): Promise<HarnessInvokeResult> {
+  const harnessName = normalizeBuiltInHarnessName(name);
   // Pi / agent-core always use agent-core directly
-  if (name === "pi" || name === "agent-core") {
-    return invokeHarnessDirect(name, options);
+  if (harnessName === "pi" || harnessName === "agent-core") {
+    return invokeHarnessDirect(harnessName, options);
   }
 
   // External harnesses go through agent-mux
-  if (!hasAmuxAdapter(name)) {
+  if (!hasAmuxAdapter(harnessName)) {
     throw new BabysitterRuntimeError(
       "UnknownHarnessError",
       `No agent-mux adapter for harness "${name}". External harnesses must have an agent-mux mapping.`,
@@ -136,7 +138,7 @@ export async function invokeHarness(
   }
 
   const amuxClient = await getAmuxClient();
-  return invokeViaAgentMux(amuxClient, name, options);
+  return invokeViaAgentMux(amuxClient, harnessName, options);
 }
 
 /**

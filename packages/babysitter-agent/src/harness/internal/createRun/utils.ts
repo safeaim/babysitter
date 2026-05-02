@@ -16,6 +16,10 @@ import type {
   AskUserQuestionUiContext,
   AskUserQuestionResponse,
 } from "../../../interaction";
+import {
+  isBuiltInHarnessName,
+  normalizeBuiltInHarnessName,
+} from "../../builtInHarness";
 
 export type OutputMode = "cli" | "json" | "tui" | "amux-events";
 
@@ -179,11 +183,12 @@ export function resolveTaskHarness(
 ): string {
   const meta = action.taskDef?.metadata as Record<string, unknown> | undefined;
   if (typeof meta?.harness === "string") {
-    const match = discovered.find((h) => h.name === meta.harness && h.installed);
+    const requestedHarness = normalizeBuiltInHarnessName(meta.harness);
+    const match = discovered.find((h) => h.name === requestedHarness && h.installed);
     if (match) return match.name;
   }
 
-  return defaultHarness;
+  return normalizeBuiltInHarnessName(defaultHarness);
 }
 
 /**
@@ -194,7 +199,7 @@ export function isPiHarness(harnessName: string): boolean {
 }
 
 export function isInternalHarness(harnessName: string): boolean {
-  return harnessName === "agent-core" || harnessName === "oh-my-pi";
+  return isBuiltInHarnessName(harnessName);
 }
 
 export function usesExternalHarness(harnessName: string): boolean {

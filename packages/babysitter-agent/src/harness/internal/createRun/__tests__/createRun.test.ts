@@ -610,6 +610,49 @@ describe("handleHarnessCreateRun", () => {
       expect(orchestrationSession.prompt).toHaveBeenCalled();
     });
 
+    it("normalizes the internal harness alias to agent-core for orchestration", async () => {
+      const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "session-create-internal-alias-"));
+      tempDirs.push(workspace);
+      const generatedPath = path.join(workspace, ".a5c", "processes");
+      const generatedFile = path.join(generatedPath, "test-process.mjs");
+
+      await fs.mkdir(generatedPath, { recursive: true });
+      await fs.writeFile(
+        generatedFile,
+        buildMinimalAgentProcessSource(),
+        "utf8",
+      );
+
+      (discoverHarnesses as Mock).mockResolvedValue([
+        makeDiscoveryResult({ name: "pi" }),
+      ]);
+      (createRun as Mock).mockResolvedValue({
+        runId: "run-internal-alias",
+        runDir: "/tmp/runs/run-internal-alias",
+        metadata: {},
+      });
+      (orchestrateIteration as Mock).mockResolvedValue({
+        status: "completed",
+        output: "done",
+      });
+
+      const code = await handleHarnessCreateRun({
+        prompt: "create a game",
+        harness: "internal",
+        workspace,
+        runsDir: "/tmp/runs",
+        json: false,
+        verbose: false,
+        interactive: false,
+      });
+
+      expect(code).toBe(0);
+      expect(createRun).toHaveBeenCalledWith(expect.objectContaining({
+        harness: "agent-core",
+      }));
+      expect(invokeHarness).not.toHaveBeenCalled();
+    });
+
     it("binds an interactive UI context into the agent-core PI sessions", async () => {
       const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "session-create-interactive-ui-"));
       tempDirs.push(workspace);

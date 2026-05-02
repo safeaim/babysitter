@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { createStore } from "zustand/vanilla";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { render, screen, setupUser } from "@/test/test-utils";
@@ -233,5 +234,132 @@ describe("SessionConversationSurface", () => {
     expect(screen.getByTestId("composer-options-details")).not.toHaveAttribute("open");
     expect(screen.getByPlaceholderText("Continue the session...")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Attach" })).toBeEnabled();
+  });
+
+  it("auto-follows the transcript until the user scrolls away", async () => {
+    const requestAnimationFrameSpy = vi
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
+        return 1;
+      });
+    const cancelAnimationFrameSpy = vi
+      .spyOn(window, "cancelAnimationFrame")
+      .mockImplementation(() => undefined);
+
+    const props = {
+      sessionId: "session-auto-follow",
+      sessionLabel: "Session auto follow",
+      sessionAgent: "claude",
+      sessionStatus: "active",
+      sessionModel: "sonnet",
+      workspacePath: "/repo/worktree",
+      emptyStateTitle: "Empty",
+      emptyStateBody: "No events",
+      placeholder: "Continue the session...",
+      onSubmit: vi.fn().mockResolvedValue(undefined),
+    } as const;
+
+    const { rerender } = render(
+      <SessionConversationSurface
+        {...props}
+        runs={[{ runId: "run-auto", agent: "claude", status: "running", startedAt: 1_000 }]}
+        eventBuffers={{
+          "run-auto": {
+            events: [
+              { type: "user_message", text: "hello", timestamp: 1_100 },
+              { type: "assistant_message", text: "world", timestamp: 1_200 },
+            ],
+          },
+        }}
+      />,
+    );
+
+    const region = screen.getByTestId("conversation-scroll-region");
+    let scrollTop = 0;
+    let scrollHeight = 1_240;
+    Object.defineProperty(region, "clientHeight", {
+      configurable: true,
+      value: 240,
+    });
+    Object.defineProperty(region, "scrollHeight", {
+      configurable: true,
+      get: () => scrollHeight,
+    });
+    Object.defineProperty(region, "scrollTop", {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value: number) => {
+        scrollTop = value;
+      },
+    });
+
+    rerender(
+      <SessionConversationSurface
+        {...props}
+        runs={[{ runId: "run-auto", agent: "claude", status: "running", startedAt: 1_000 }]}
+        eventBuffers={{
+          "run-auto": {
+            events: [
+              { type: "user_message", text: "hello", timestamp: 1_100 },
+              { type: "user_message", text: "world", timestamp: 1_200 },
+              { type: "user_message", text: "new output", timestamp: 1_300 },
+            ],
+          },
+        }}
+      />,
+    );
+
+    await waitFor(() => expect(scrollTop).toBe(scrollHeight));
+
+    scrollTop = 120;
+    fireEvent.scroll(region);
+
+    scrollHeight = 1_480;
+    rerender(
+      <SessionConversationSurface
+        {...props}
+        runs={[{ runId: "run-auto", agent: "claude", status: "running", startedAt: 1_000 }]}
+        eventBuffers={{
+          "run-auto": {
+            events: [
+              { type: "user_message", text: "hello", timestamp: 1_100 },
+              { type: "user_message", text: "world", timestamp: 1_200 },
+              { type: "user_message", text: "new output", timestamp: 1_300 },
+              { type: "user_message", text: "latest output", timestamp: 1_400 },
+            ],
+          },
+        }}
+      />,
+    );
+
+    await waitFor(() => expect(scrollTop).toBe(120));
+
+    scrollTop = 1_240;
+    fireEvent.scroll(region);
+
+    scrollHeight = 1_720;
+    rerender(
+      <SessionConversationSurface
+        {...props}
+        runs={[{ runId: "run-auto", agent: "claude", status: "running", startedAt: 1_000 }]}
+        eventBuffers={{
+          "run-auto": {
+            events: [
+              { type: "user_message", text: "hello", timestamp: 1_100 },
+              { type: "user_message", text: "world", timestamp: 1_200 },
+              { type: "user_message", text: "new output", timestamp: 1_300 },
+              { type: "user_message", text: "latest output", timestamp: 1_400 },
+              { type: "user_message", text: "bottom again", timestamp: 1_500 },
+            ],
+          },
+        }}
+      />,
+    );
+
+    await waitFor(() => expect(scrollTop).toBe(scrollHeight));
+
+    requestAnimationFrameSpy.mockRestore();
+    cancelAnimationFrameSpy.mockRestore();
   });
 });

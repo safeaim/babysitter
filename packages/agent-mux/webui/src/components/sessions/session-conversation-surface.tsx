@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, useNavigate } from "react-router-dom-v6";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type UIEvent } from "react";
 import { useStore } from "zustand";
 import type { Attachment, WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
 import type {
@@ -430,6 +430,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
   const navigate = useNavigate();
   const { taskTags } = useTaskTags();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const scrollRegionRef = useRef<HTMLDivElement | null>(null);
   const [viewMode, setViewMode] = useState<ConversationViewMode>("transcript");
   const [prompt, setPrompt] = useState("");
   const [selectedAgent, setSelectedAgent] = useState(props.sessionAgent);
@@ -438,6 +439,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [autoFollowTranscript, setAutoFollowTranscript] = useState(true);
 
   const agentRecords = useStore(store, (state) => state.agents.byId);
   const runIds = useMemo(
@@ -471,6 +473,10 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
   const canAttachAny = canAttachImages || canAttachFiles;
   const fileMentionLabel = canAttachFiles ? "Attach file" : "Insert path";
   const switchesAgent = selectedAgent !== props.sessionAgent;
+  const transcriptSignature = useMemo(
+    () => flowModel.transcript.map((node) => `${node.id}:${node.timestamp ?? 0}:${node.text.length}`).join("|"),
+    [flowModel.transcript],
+  );
 
   useEffect(() => {
     setPrompt("");
@@ -479,6 +485,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
     setSelectedAgent(props.sessionAgent);
     setSelectedModel(props.sessionModel ?? "");
     setApprovalMode("prompt");
+    setAutoFollowTranscript(true);
   }, [props.sessionAgent, props.sessionId, props.sessionModel]);
 
   useEffect(() => {
@@ -494,6 +501,64 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
     }
     setAttachments([]);
   }, [canAttachAny]);
+
+  useEffect(() => {
+    if (viewMode !== "transcript") {
+      return;
+    }
+    const region = scrollRegionRef.current;
+    if (!region || !autoFollowTranscript) {
+      return;
+    }
+
+    const scrollToBottom = () => {
+      region.scrollTop = region.scrollHeight;
+    };
+
+    if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+      const frame = window.requestAnimationFrame(scrollToBottom);
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    scrollToBottom();
+    return undefined;
+  }, [autoFollowTranscript, transcriptSignature, viewMode]);
+
+  useEffect(() => {
+    if (viewMode !== "transcript") {
+      return;
+    }
+
+    const handleWindowKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "PageUp" && event.key !== "Home") {
+        return;
+      }
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.tagName === "SELECT" ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+      setAutoFollowTranscript(false);
+    };
+
+    window.addEventListener("keydown", handleWindowKeyDown);
+    return () => window.removeEventListener("keydown", handleWindowKeyDown);
+  }, [viewMode]);
+
+  function isNearTranscriptBottom(element: HTMLDivElement): boolean {
+    return element.scrollHeight - (element.scrollTop + element.clientHeight) <= 48;
+  }
+
+  function handleTranscriptScroll(event: UIEvent<HTMLDivElement>) {
+    if (viewMode !== "transcript") {
+      return;
+    }
+    setAutoFollowTranscript(isNearTranscriptBottom(event.currentTarget));
+  }
 
   function reuseText(text: string) {
     setPrompt((current) => appendToPrompt(current, text));
@@ -643,7 +708,12 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
         </div>
       </div>
 
-      <div className="mt-4 min-h-0 flex-1 overflow-auto" data-testid="conversation-scroll-region">
+      <div
+        ref={scrollRegionRef}
+        className="mt-4 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1"
+        data-testid="conversation-scroll-region"
+        onScroll={handleTranscriptScroll}
+      >
         {viewMode === "transcript" ? (
           <div className="grid gap-3">
             {flowModel.transcript.map((node) => (

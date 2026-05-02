@@ -580,8 +580,11 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
   };
 
   return (
-    <div data-testid="workspace-shell" className="flex w-full flex-1 flex-col gap-4 px-3 py-4 sm:px-5 sm:py-6 xl:px-6">
-      <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
+    <div
+      data-testid="workspace-shell"
+      className="flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden px-3 py-4 sm:px-5 sm:py-6 xl:px-6"
+    >
+      <section className="shrink-0 rounded-3xl border border-border bg-card p-4 shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-3 text-sm text-foreground-muted">
@@ -741,7 +744,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
       </section>
 
       {isConstrained ? (
-          <section className="rounded-3xl border border-border bg-card p-4 shadow-lg">
+          <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-lg">
             <div className="flex flex-wrap gap-2" data-testid="workspace-mobile-panel-selector">
             {visiblePanels.map((panel) => (
               <Button
@@ -756,13 +759,13 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
               </Button>
             ))}
           </div>
-          <div className="mt-4 min-h-[65vh]">{renderPanel(activeConstrainedPanel)}</div>
+          <div className="mt-4 min-h-0 flex-1">{renderPanel(activeConstrainedPanel)}</div>
         </section>
       ) : (
         <div
           ref={shellRef}
           data-testid="workspace-desktop-panels"
-          className="grid min-h-[68vh] flex-1 items-stretch"
+          className="grid min-h-0 flex-1 items-stretch overflow-hidden"
           style={{ gridTemplateColumns: desktopColumns }}
         >
           {visiblePanels.map((panel, index) => {

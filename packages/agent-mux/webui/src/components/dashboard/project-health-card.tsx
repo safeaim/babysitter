@@ -446,7 +446,7 @@ export function ProjectHealthCard({ project, statusFilter, sortMode = "status", 
                       className="flex items-center gap-2 py-1.5 text-xs group w-fit"
                     >
                       <AlertCircle className="h-3.5 w-3.5 text-error/70" />
-                      <span className="font-semibold text-error/80 group-hover:text-error transition-colors">Failed Runs</span>
+                      <span className="font-semibold text-error/80 group-hover:text-error transition-colors">Failed Dispatches</span>
                       <span className="rounded-full bg-error/10 border border-error/20 px-2 py-px text-xs font-semibold text-error tabular-nums">
                         {failedRuns.length}
                       </span>

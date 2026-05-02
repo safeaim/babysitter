@@ -227,10 +227,10 @@ test.describe("agent-mux webui e2e", () => {
       expect(liveCardBox!.y).toBeLessThan(viewport!.height * 0.95);
     });
 
-    test("runs route keeps triage controls in view without a doc-heavy hero", async ({ page }) => {
+    test("dispatches route keeps triage controls in view without a doc-heavy hero", async ({ page }) => {
       await page.goto("/runs", { waitUntil: "domcontentloaded" });
 
-      await expect(page.getByRole("heading", { name: "Run queue and approvals" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Dispatch queue and approvals" })).toBeVisible();
       await expect(page.getByTestId("global-search-input")).toBeVisible();
       await expect(page.getByTestId("topbar-tools-details")).not.toHaveAttribute("open", "");
 

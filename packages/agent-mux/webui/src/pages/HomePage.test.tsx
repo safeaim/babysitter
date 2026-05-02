@@ -52,7 +52,7 @@ describe('HomePage', () => {
     expect(screen.getAllByText('Realtime workspace repair').length).toBeGreaterThan(0);
     expect(screen.getByText('/repo/worktrees/active')).toBeInTheDocument();
     expect(
-      screen.getAllByRole('link', { name: 'Run handoff' }).some((link) => link.getAttribute('href') === '/runs/run-active'),
+      screen.getAllByRole('link', { name: 'Dispatch handoff' }).some((link) => link.getAttribute('href') === '/runs/run-active'),
     ).toBe(true);
   });
 });

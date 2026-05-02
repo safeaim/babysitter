@@ -102,7 +102,7 @@ function buildRuntime(overrides: Partial<NonNullable<Parameters<typeof Workspace
 }
 
 describe("WorkspaceDetailsSidebar", () => {
-  it("surfaces workspace-native session, runtime, and run status beside notes and git details", () => {
+  it("surfaces workspace-native session, runtime, and dispatch status beside notes and git details", () => {
     render(
       <WorkspaceDetailsSidebar
         workspace={buildWorkspace()}
@@ -129,7 +129,7 @@ describe("WorkspaceDetailsSidebar", () => {
     expect(screen.getByText("Notes")).toBeInTheDocument();
   });
 
-  it("renders explicit disconnected and no-run states when the workspace shell has no live runtime", () => {
+  it("renders explicit disconnected and no-dispatch states when the workspace shell has no live runtime", () => {
     render(
       <WorkspaceDetailsSidebar
         workspace={buildWorkspace({
@@ -151,6 +151,6 @@ describe("WorkspaceDetailsSidebar", () => {
 
     expect(screen.getByText("No active session selected")).toBeInTheDocument();
     expect(screen.getAllByText("Runtime disconnected")).toHaveLength(1);
-    expect(screen.getByText("No workspace runs yet")).toBeInTheDocument();
+    expect(screen.getByText("No workspace dispatches yet")).toBeInTheDocument();
   });
 });

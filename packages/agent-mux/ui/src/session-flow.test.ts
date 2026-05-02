@@ -85,6 +85,52 @@ describe('buildSessionFlowModel', () => {
       title: 'Write',
     });
   });
+
+  it('tracks nested file payloads without treating workspace directories as files', () => {
+    const model = buildSessionFlowModel(
+      [{ runId: 'run-3', agent: 'codex', status: 'completed', startedAt: 100 }],
+      {
+        'run-3': {
+          events: [
+            {
+              type: 'tool_call_ready',
+              toolCallId: 'tool-nested',
+              toolName: 'ApplyPatch',
+              input: {
+                workspacePath: '/repo/worktree',
+                payload: {
+                  changedFiles: [
+                    { filePath: 'src/app.tsx' },
+                    { targetPath: 'docs/README.md' },
+                  ],
+                },
+              },
+              timestamp: 150,
+            },
+            {
+              type: 'tool_result',
+              toolCallId: 'tool-nested',
+              toolName: 'ApplyPatch',
+              output: {
+                summary: {
+                  updated: [{ relativePath: 'src/routes.ts' }],
+                },
+                cwd: '/repo/worktree',
+              },
+              timestamp: 200,
+            },
+          ],
+        },
+      },
+    );
+
+    expect(model.files.map((file) => file.path)).toEqual(expect.arrayContaining([
+      'src/app.tsx',
+      'docs/README.md',
+      'src/routes.ts',
+    ]));
+    expect(model.files.map((file) => file.path)).not.toContain('/repo/worktree');
+  });
 });
 
 describe('transcript-derived fallback helpers', () => {

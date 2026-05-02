@@ -57,7 +57,7 @@ export function ProjectSection({
     <div>
       <ProjectSearchInput
         onSearch={handleSearch}
-        placeholder="Search by run ID, process, task, or error..."
+        placeholder="Search by dispatch ID, process, task, or error..."
         className="mb-3"
       />
       {loading && displayRuns.length === 0 ? (
@@ -66,7 +66,7 @@ export function ProjectSection({
         </div>
       ) : displayRuns.length === 0 ? (
         <div className="text-xs text-foreground-muted text-center py-4">
-          No runs found
+          No dispatches found
         </div>
       ) : (
         <VirtualizedRunList

@@ -119,7 +119,7 @@ function SessionSpotlightCard(props: { session: SessionRow }) {
         ) : null}
         {runId ? (
           <Link to={`/runs/${runId}`} className="session-browser__action">
-            Open run
+            Open dispatch
           </Link>
         ) : null}
       </div>
@@ -162,7 +162,7 @@ function SessionRowCard(props: { session: SessionRow }) {
           ) : null}
           {runId ? (
             <Link to={`/runs/${runId}`} className="session-browser__action">
-              Run
+              Dispatch
             </Link>
           ) : null}
         </div>
@@ -316,7 +316,7 @@ export function SessionsPage(): JSX.Element {
               <p className="page-kicker">Sessions</p>
               <h1 className="page-title page-title--secondary">Jump back into the right chat.</h1>
               <p className="page-copy page-copy--wide">
-                Live conversations, paused threads, linked workspaces, and the latest run stay on one surface so you can resume work without hunting across routes.
+                Live conversations, paused threads, linked workspaces, and the latest dispatch stay on one surface so you can resume work without hunting across routes.
               </p>
             </div>
             <div className="page-actions">
@@ -335,7 +335,7 @@ export function SessionsPage(): JSX.Element {
               <input
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Search session id, title, agent, workspace, or run id"
+                placeholder="Search session id, title, agent, workspace, or dispatch id"
               />
             </label>
 

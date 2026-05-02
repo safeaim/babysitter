@@ -340,7 +340,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
             <div className="rounded-2xl border border-border bg-background/65 p-4">
               <div className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4 text-primary" />
-                <div className="text-sm font-medium text-foreground">Runs in this session</div>
+                <div className="text-sm font-medium text-foreground">Dispatches in this session</div>
               </div>
               <div className="mt-4 grid gap-3">
                 {props.runs.map((run) => (
@@ -360,7 +360,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
                 ))}
                 {props.runs.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-foreground-muted">
-                    No runs recorded for this session yet.
+                    No dispatches recorded for this session yet.
                   </div>
                 ) : null}
               </div>
@@ -408,7 +408,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
         <WorkspacePanelFrame
           panelKey="context"
           title="Trace"
-          subtitle="Flow, files, and execution history"
+          subtitle="Dispatch flow, files, and breakpoint context"
         >
           <SessionObservabilityPanel
             sessionId={props.sessionId}
@@ -479,7 +479,7 @@ export function SessionWorkspaceShell(props: SessionWorkspaceShellProps) {
             </h1>
             <p className="mt-1 max-w-3xl text-sm leading-6 text-foreground-muted">
               {props.heroBody ??
-                "Keep the chat primary while trace, approvals, and runtime stay close enough to open only when needed."}
+                "Keep the chat primary while dispatch trace, approvals, and runtime stay close enough to open only when needed."}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

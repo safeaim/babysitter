@@ -1582,7 +1582,7 @@ function WorkspaceColumn(props: {
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <MiniStat label="Sessions" value={`${workspace.sessions.active}/${workspace.sessions.total}`} />
-                <MiniStat label="Runs" value={`${workspace.runs.active}/${workspace.runs.total}`} />
+                <MiniStat label="Dispatches" value={`${workspace.runs.active}/${workspace.runs.total}`} />
                 <MiniStat label="Git" value={workspace.git.isPrimary ? "primary" : workspace.git.isWorktree ? "worktree" : "repo"} />
                 <MiniStat label="Changes" value={workspace.git.dirty == null ? "unknown" : workspace.git.dirty ? "dirty" : "clean"} />
               </div>

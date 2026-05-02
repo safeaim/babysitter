@@ -175,7 +175,7 @@ function buildDefaultArtifacts(workspacePath: string): KanbanReviewArtifact[] {
           label: "Open linked run task",
           href: "/runs/run-review-issue?effectId=eff-review-issue",
           description: "Inspect the originating run task and continue the implementation loop from the review context.",
-          actionLabel: "Open run task",
+          actionLabel: "Open dispatch task",
         },
         {
           id: "issue-session-follow-up",
@@ -289,7 +289,7 @@ function buildDefaultArtifacts(workspacePath: string): KanbanReviewArtifact[] {
           label: "Inspect linked run",
           href: "/runs/run-review-workspace?effectId=eff-review-workspace",
           description: "Open the run/effect that produced the current review handoff for direct follow-through.",
-          actionLabel: "Open run",
+          actionLabel: "Open dispatch",
         },
       ],
       integration: {

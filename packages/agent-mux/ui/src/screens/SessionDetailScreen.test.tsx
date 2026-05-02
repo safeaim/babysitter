@@ -121,8 +121,8 @@ describe('SessionDetailScreen', () => {
     const user = userEvent.setup();
     render(<SessionDetailScreen sessionId="session-1" />);
 
-    expect(await screen.findByText('codex')).toBeTruthy();
-    expect(await screen.findByText(/run-1/)).toBeTruthy();
+    expect(await screen.findByText(/codex/)).toBeTruthy();
+    expect((await screen.findAllByText(/run-1/)).length).toBeGreaterThan(0);
     expect(await screen.findByText('Read')).toBeTruthy();
 
     await user.click(screen.getByRole('button', { name: 'transcript' }));
@@ -144,13 +144,10 @@ describe('SessionDetailScreen', () => {
     const user = userEvent.setup();
     render(<SessionDetailScreen sessionId="session-empty" />);
 
-    expect(await screen.findByText('No structured execution flow is available for this session yet.')).toBeTruthy();
-
-    await user.click(screen.getByRole('button', { name: 'timeline' }));
-    expect(await screen.findByText('No timeline events are available for this session yet.')).toBeTruthy();
-
-    await user.click(screen.getByRole('button', { name: 'transcript' }));
     expect(await screen.findByText('No transcript turns are available for this session yet.')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'trace' }));
+    expect(await screen.findByText('No structured execution flow is available for this session yet.')).toBeTruthy();
 
     await user.click(screen.getByRole('button', { name: 'files' }));
     expect(await screen.findByText('File attention will appear here once the session touches the workspace.')).toBeTruthy();

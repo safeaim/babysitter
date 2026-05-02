@@ -170,13 +170,13 @@ export function KanbanRunsPage(): JSX.Element {
     <PageShell>
       <PageHeroGrid>
         <PageSection>
-          <p className="page-kicker">Runs</p>
+          <p className="page-kicker">Dispatches</p>
           <div className="page-logo">
             <LogoWordmark className="h-6 w-auto" />
           </div>
-          <h1 className="page-title">Run queue and approvals</h1>
+          <h1 className="page-title">Dispatch queue and approvals</h1>
           <p className="page-copy">
-            Inspect live execution, breakpoints, and recent history here, then jump back to the linked project, workspace, or chat without losing context.
+            Inspect live dispatch activity, breakpoints, and recent history here, then jump back to the linked project, workspace, or chat without losing context.
           </p>
           <div className="page-actions">
             <Button variant="primary" onClick={() => navigate('/projects')}>
@@ -201,7 +201,7 @@ export function KanbanRunsPage(): JSX.Element {
           </h2>
           <p className="page-copy">
             {isAuthenticated
-              ? 'Live sessions, workspace attention, and run telemetry are available now.'
+              ? 'Live sessions, workspace attention, and dispatch telemetry are available now.'
               : 'Reconnect to create sessions, continue chats, and pull live workspace context into the same surface.'}
           </p>
           <div className="page-actions">

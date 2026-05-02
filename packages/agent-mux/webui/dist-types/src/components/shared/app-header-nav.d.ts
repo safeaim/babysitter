@@ -4,7 +4,7 @@ export declare const APP_HEADER_NAV_ITEMS: readonly [{
     readonly icon: import("react").ForwardRefExoticComponent<Omit<import("lucide-react").LucideProps, "ref"> & import("react").RefAttributes<SVGSVGElement>>;
 }, {
     readonly href: "/runs";
-    readonly label: "Runs";
+    readonly label: "Dispatches";
     readonly icon: import("react").ForwardRefExoticComponent<Omit<import("lucide-react").LucideProps, "ref"> & import("react").RefAttributes<SVGSVGElement>>;
 }, {
     readonly href: "/automations";

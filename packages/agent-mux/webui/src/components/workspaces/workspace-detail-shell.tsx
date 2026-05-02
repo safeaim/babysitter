@@ -525,7 +525,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
         <WorkspacePanelFrame
           panelKey="context"
           title="Trace"
-          subtitle="Timeline, files, and execution history"
+          subtitle="Dispatch trace, files, and execution history"
         >
           {props.activeSession ? (
             <SessionObservabilityPanel
@@ -538,7 +538,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
           ) : (
             <EmptyWorkspaceState
               title="No session context"
-              body="Choose a session to unlock trace, timeline, transcript, and file activity."
+              body="Choose a session to unlock trace and file activity beside the chat."
             />
           )}
         </WorkspacePanelFrame>
@@ -653,7 +653,7 @@ export function WorkspaceDetailShell(props: WorkspaceDetailShellProps) {
               <span className="ml-2 font-medium text-foreground">{props.workspace.sessions.active}/{props.workspace.sessions.total}</span>
             </div>
             <div className="rounded-full border border-border bg-background/65 px-3 py-1.5 text-sm">
-              <span className="text-foreground-muted">Runs</span>
+              <span className="text-foreground-muted">Dispatches</span>
               <span className="ml-2 font-medium text-foreground">{props.workspace.runs.active}/{props.workspace.runs.total}</span>
             </div>
           </div>

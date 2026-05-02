@@ -246,7 +246,7 @@ export function GlobalSearch() {
             <div className="px-4 py-6 text-center">
               <Search className="h-5 w-5 text-foreground-muted/30 mx-auto mb-2" />
               <p className="text-xs text-foreground-muted">
-                No runs found for &ldquo;{debouncedQuery}&rdquo;
+                No dispatches found for &ldquo;{debouncedQuery}&rdquo;
               </p>
             </div>
           )}

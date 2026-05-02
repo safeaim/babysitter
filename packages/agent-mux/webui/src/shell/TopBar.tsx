@@ -11,14 +11,14 @@ import { titleForPath } from './navigation.js';
 function topBarMeta(pathname: string): { label: string; subtitle?: string } {
   if (pathname.startsWith('/sessions/pending/')) {
     return {
-      label: 'Session handoff',
-      subtitle: 'Promoting this run into a durable chat.',
+      label: 'Dispatch handoff',
+      subtitle: 'Promoting this dispatch into a durable chat.',
     };
   }
   if (/^\/runs\/[^/]+$/.test(pathname)) {
     return {
-      label: 'Session handoff',
-      subtitle: 'Opening the bound session chat for this run.',
+      label: 'Dispatch handoff',
+      subtitle: 'Opening the bound session chat for this dispatch.',
     };
   }
   if (pathname.startsWith('/sessions/')) {
@@ -43,7 +43,7 @@ function topBarMeta(pathname: string): { label: string; subtitle?: string } {
   }
   if (pathname.startsWith('/runs')) {
     return {
-      label: 'Run queue',
+      label: 'Dispatch queue',
     };
   }
   if (pathname === '/inbox') {
@@ -95,7 +95,7 @@ export function TopBar(props: { pathname: string; onOpenPalette(): void }): JSX.
             {activeSessions} active
           </span>
           <span className="connection-pill app-topbar__chip">
-            {runningRuns} running
+            {runningRuns} dispatching
           </span>
         </div>
 

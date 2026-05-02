@@ -84,7 +84,7 @@ function IdleEmptyState() {
       <Eye className="h-10 w-10 text-foreground-muted/30 mx-auto mb-3" />
       <p className="text-sm text-foreground-muted mb-1">All quiet — no active orchestration runs</p>
       <p className="text-xs text-foreground-muted/60">
-        Runs will appear here when babysitter processes are started
+        Dispatches will appear here when babysitter processes are started
       </p>
     </div>
   );
@@ -145,14 +145,14 @@ export function ProjectListView({
         <div data-testid="idle-with-history-banner" className="flex items-center gap-2 px-3 py-2 rounded-md bg-background-secondary/50 border border-border w-fit">
           <Activity className="h-3.5 w-3.5 text-foreground-muted/50" />
           <span className="text-xs text-foreground-muted">
-            {sortMode === "activity" ? "No activity in the last 24 hours" : "No runs in progress"}
+            {sortMode === "activity" ? "No activity in the last 24 hours" : "No dispatches in progress"}
           </span>
         </div>
       )}
 
       {/* Active / Recent section */}
       {activeProjects.length > 0 && (statusFilter === "all" || statusFilter === "stale" || statusFilter === "waiting") && (
-        <ErrorBoundary section="Active Runs">
+        <ErrorBoundary section="Active Dispatches">
           <section data-testid="active-runs-section">
             <div className="flex items-center gap-2 mb-3">
               {sortMode === "activity" ? (

@@ -6,17 +6,17 @@ import { EmptyState } from '../empty-state';
 describe('EmptyState', () => {
   it('renders without crashing', () => {
     render(<EmptyState />);
-    expect(screen.getByText('No runs found')).toBeInTheDocument();
+    expect(screen.getByText('No dispatches found')).toBeInTheDocument();
   });
 
   it('renders default title', () => {
     render(<EmptyState />);
-    expect(screen.getByText('No runs found')).toBeInTheDocument();
+    expect(screen.getByText('No dispatches found')).toBeInTheDocument();
   });
 
   it('renders default description', () => {
     render(<EmptyState />);
-    expect(screen.getByText('Start a babysitter run to see it here.')).toBeInTheDocument();
+    expect(screen.getByText('Start a babysitter dispatch to see it here.')).toBeInTheDocument();
   });
 
   it('renders custom title', () => {

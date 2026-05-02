@@ -1989,7 +1989,7 @@ export default function SettingsPage() {
             >
               <h2 className="text-xl font-semibold tracking-tight">Keyboard shortcut settings</h2>
               <p className="mt-2 text-sm leading-6 text-foreground-muted">
-                Shortcut visibility is explicit here so the app shell, run detail view, and session
+                Shortcut visibility is explicit here so the app shell, dispatch detail view, and session
                 workspace remain keyboard-driven without hiding the available commands behind memory alone.
               </p>
               <div className="mt-5 grid gap-3 lg:grid-cols-3">
@@ -3087,7 +3087,7 @@ function SettingsConnected() {
         <SettingCard label="Socket status" value={connection.status} />
         <SettingCard label="Agents" value={String(agentCount)} />
         <SettingCard label="Sessions" value={String(sessionCount)} />
-        <SettingCard label="Runs" value={String(runCount)} />
+        <SettingCard label="Dispatches" value={String(runCount)} />
       </div>
       {connection.error ? (
         <div className="mt-4 rounded-2xl border border-error/20 bg-error-muted px-4 py-3 text-sm text-error">

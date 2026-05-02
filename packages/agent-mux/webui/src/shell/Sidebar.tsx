@@ -37,7 +37,7 @@ export function Sidebar(): JSX.Element {
       { to: '/projects', label: 'Projects', section: 'Plan', icon: FolderKanban },
       { to: '/sessions', label: 'Sessions', section: 'Plan', icon: Layers3, badge: activeSessions > 0 ? activeSessions : null },
       { to: '/workspaces', label: 'Workspaces', section: 'Plan', icon: Workflow },
-      { to: '/runs', label: 'Runs', section: 'Operate', icon: PlaySquare, badge: runningRuns > 0 ? runningRuns : null },
+      { to: '/runs', label: 'Dispatches', section: 'Operate', icon: PlaySquare, badge: runningRuns > 0 ? runningRuns : null },
       { to: '/inbox', label: 'Inbox', section: 'Operate', icon: Inbox, badge: pendingHooks > 0 ? pendingHooks : null },
       { to: '/automations', label: 'Automations', section: 'Operate', icon: Sparkles },
       { to: '/agents', label: 'Agents', section: 'System', icon: Bot },
@@ -55,7 +55,7 @@ export function Sidebar(): JSX.Element {
         <h1 className="app-sidebar__title">Operate</h1>
         <div className="app-sidebar__mini-status">
           <span className="connection-pill">{activeSessions} live</span>
-          <span className="connection-pill">{runningRuns} runs</span>
+          <span className="connection-pill">{runningRuns} dispatches</span>
         </div>
       </div>
 

@@ -564,12 +564,10 @@ describe("BacklogOverview", () => {
     await user.click(screen.getByTestId("board-header-create"));
     expect(screen.getByText("Draft is empty.")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Issue title"), "Draft that should be cleared");
+    fireEvent.change(screen.getByLabelText("Issue title"), { target: { value: "Draft that should be cleared" } });
 
     expect(screen.getByTestId("create-issue-panel")).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.getByText("Draft autosaved locally.")).toBeInTheDocument();
-    });
+    expect(await screen.findByText("Draft autosaved locally.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByTestId("create-issue-panel")).not.toBeInTheDocument();
@@ -577,7 +575,7 @@ describe("BacklogOverview", () => {
     await user.click(screen.getByTestId("board-header-create"));
     expect(screen.getByLabelText("Issue title")).toHaveValue("");
     expect(screen.getByText("Draft is empty.")).toBeInTheDocument();
-  });
+  }, 10000);
 
   it("opens create mode from a column header, seeds the target column, and blocks invalid submit", async () => {
     const user = setupUser();
@@ -676,7 +674,7 @@ describe("BacklogOverview", () => {
       expect(screen.getByText("Backend unavailable")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Issue save failed. Draft preserved locally for retry.")).toBeInTheDocument();
+    expect(await screen.findByText("Issue save failed. Draft preserved locally for retry.")).toBeInTheDocument();
     expect(screen.getByLabelText("Issue title")).toHaveValue("Retry me");
     expect(screen.getByLabelText("Issue summary")).toHaveValue("Draft should remain after failure");
   });

@@ -258,7 +258,8 @@ export function projectRunFlow(
           : [];
       const filePaths = [...new Set([...pendingFilePaths, ...outputFilePaths])];
       const writeLike = /write|edit|patch/i.test(toolName);
-      for (const path of writeLike ? pendingFilePaths : outputFilePaths) {
+      const touchedPaths = writeLike ? filePaths : outputFilePaths;
+      for (const path of touchedPaths) {
         recordFileTouch(files, path, writeLike ? 'write' : 'read', run.runId, timestamp, toolName);
       }
       pushSegment(event.type === 'tool_error' ? 'error' : 'tool', toolName, detail, pending?.startedAt ?? timestamp, timestamp, event.type === 'tool_error' ? 'error' : 'complete', {

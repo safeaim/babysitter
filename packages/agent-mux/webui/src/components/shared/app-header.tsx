@@ -47,7 +47,7 @@ export function AppHeader() {
                   <span className="text-sm font-semibold tracking-tight">Kanban</span>
                 </div>
                 <div className="truncate text-xs text-foreground-muted">
-                  agent-mux sessions + babysitter runs
+                  agent-mux sessions + babysitter dispatches
                 </div>
               </div>
             </Link>
@@ -63,7 +63,7 @@ export function AppHeader() {
                 title={streamConnected ? "Live updates connected" : "Live updates disconnected"}
               >
                 {streamConnected ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
-                {streamConnected ? "Runs live" : "Runs offline"}
+                {streamConnected ? "Dispatches live" : "Dispatches offline"}
               </span>
 
               <span

@@ -59,11 +59,11 @@ describe('ProjectSection', () => {
     expect(spinner).toBeInTheDocument();
   });
 
-  it('shows "No runs found" when not loading and no runs', () => {
+  it('shows "No dispatches found" when not loading and no runs', () => {
     setupMockHook([], 0, false);
 
     render(<ProjectSection projectName="test-project" runs={[]} />);
-    expect(screen.getByText('No runs found')).toBeInTheDocument();
+    expect(screen.getByText('No dispatches found')).toBeInTheDocument();
   });
 
   it('renders the search input', () => {
@@ -71,7 +71,7 @@ describe('ProjectSection', () => {
 
     render(<ProjectSection projectName="test-project" runs={[]} />);
     expect(
-      screen.getByPlaceholderText('Search by run ID, process, task, or error...')
+      screen.getByPlaceholderText('Search by dispatch ID, process, task, or error...')
     ).toBeInTheDocument();
   });
 

@@ -19,7 +19,7 @@ vi.mock('@a5c-ai/agent-mux-ui', () => ({
 }));
 
 describe('SessionPendingPage', () => {
-  it('renders the run handoff surface while waiting for a session id', () => {
+  it('renders the dispatch handoff surface while waiting for a session id', () => {
     mockUseRun.mockReturnValue({
       runId: 'run-123',
       agent: 'codex',
@@ -28,7 +28,7 @@ describe('SessionPendingPage', () => {
 
     render(<SessionPendingPage />);
 
-    expect(screen.getByText('Waiting for this run to bind to its session.')).toBeInTheDocument();
+    expect(screen.getByText('Waiting for this dispatch to bind to its session.')).toBeInTheDocument();
     expect(screen.getByText('run-123')).toBeInTheDocument();
     expect(screen.getByText('queued')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Open sessions' })).toHaveAttribute('href', '/sessions');

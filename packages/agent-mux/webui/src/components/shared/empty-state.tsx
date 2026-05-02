@@ -9,8 +9,8 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  title = "No runs found",
-  description = "Start a babysitter run to see it here.",
+  title = "No dispatches found",
+  description = "Start a babysitter dispatch to see it here.",
   className,
   compact = false,
 }: EmptyStateProps) {

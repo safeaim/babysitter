@@ -128,7 +128,7 @@ export function SessionObservabilityPanel(props: {
   runtime?: WorkspaceRuntimeSurface | null;
   flowModelOverride?: SessionFlowModel;
 }) {
-  const [viewMode, setViewMode] = useState<"flow" | "timeline" | "transcript" | "files">("flow");
+  const [viewMode, setViewMode] = useState<"flow" | "files">("flow");
   const flowModel = useMemo(
     () => props.flowModelOverride ?? buildSessionFlowModel(props.runs, props.eventBuffers),
     [props.eventBuffers, props.flowModelOverride, props.runs],
@@ -172,7 +172,7 @@ export function SessionObservabilityPanel(props: {
       return [];
     }
     const actions: ActionLink[] = [
-      { key: `${runId}:run`, label: "Open run detail", href: context.runHref },
+      { key: `${runId}:run`, label: "Open dispatch", href: context.runHref },
     ];
     if (options?.includeFailures && context.breakpointHref) {
       actions.push({ key: `${runId}:breakpoint`, label: "Review breakpoint", href: context.breakpointHref });
@@ -213,7 +213,7 @@ export function SessionObservabilityPanel(props: {
   const tabItems: TabItem[] = [
     {
       value: "flow",
-      label: "Flow",
+      label: "Trace",
       badge: flowModel.lanes.length,
       body: (
         <div className="grid gap-4">
@@ -224,7 +224,7 @@ export function SessionObservabilityPanel(props: {
                   <div className="text-sm font-semibold text-foreground">{lane.agent}</div>
                   <div className="text-xs text-foreground-muted">
                     {lane.startedAt > 0 ? `${formatFlowTime(lane.startedAt)} · ` : ""}
-                    {lane.runId}
+                    dispatch {lane.runId}
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs text-foreground-muted">
@@ -269,72 +269,6 @@ export function SessionObservabilityPanel(props: {
       ),
     },
     {
-      value: "timeline",
-      label: "Timeline",
-      badge: flowModel.timeline.length,
-      body: (
-        <div className="grid gap-3">
-          {flowModel.timeline.map((item) => (
-            <article key={item.id} className="rounded-2xl border border-border bg-background/65 p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <div className="text-sm font-semibold text-foreground">{item.title}</div>
-                  <div className="text-xs text-foreground-muted">
-                    {item.timestamp != null ? `${formatFlowTime(item.timestamp)} · ` : ""}
-                    {item.runId}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-foreground-muted">
-                  <span>{item.kind}</span>
-                  <span>{item.status}</span>
-                </div>
-              </div>
-              <pre className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-foreground-secondary">
-                {item.detail}
-              </pre>
-              <ActionLinks actions={buildEntryActions(item.runId, item.filePaths, { includeFailures: true })} />
-            </article>
-          ))}
-          {flowModel.timeline.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-foreground-muted">
-              No timeline events are available for this session yet.
-            </div>
-          ) : null}
-        </div>
-      ),
-    },
-    {
-      value: "transcript",
-      label: "Transcript",
-      badge: flowModel.transcript.length,
-      body: (
-        <div className="grid gap-3">
-          {flowModel.transcript.map((node) => (
-            <article key={node.id} className="rounded-2xl border border-border bg-background/65 p-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-border px-2 py-0.5 text-[11px] uppercase tracking-[0.18em] text-foreground-muted">
-                  {node.kind}
-                </span>
-                <span className="text-sm font-semibold text-foreground">{node.label}</span>
-                <Link to={`/runs/${node.runId}`} className="text-xs text-primary">
-                  {node.runId}
-                </Link>
-              </div>
-              <pre className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-foreground-secondary">
-                {node.text}
-              </pre>
-              <ActionLinks actions={buildEntryActions(node.runId, node.filePaths, { includeFailures: true })} />
-            </article>
-          ))}
-          {flowModel.transcript.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-foreground-muted">
-              No transcript turns are available for this session yet.
-            </div>
-          ) : null}
-        </div>
-      ),
-    },
-    {
       value: "files",
       label: "Files",
       badge: flowModel.files.length,
@@ -351,7 +285,7 @@ export function SessionObservabilityPanel(props: {
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-foreground-muted">
                 <span>{file.reads} reads</span>
                 <span>{file.writes} writes</span>
-                <span>{file.runIds.length} runs</span>
+                <span>{file.runIds.length} dispatches</span>
                 {file.tools.length > 0 ? <span>{file.tools.length} tools</span> : null}
               </div>
               <ActionLinks actions={buildEntryActions(file.runIds[0] ?? "", [file.path], { includeFailures: true })} />
@@ -372,9 +306,9 @@ export function SessionObservabilityPanel(props: {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">Realtime execution</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Agent flow reconstructed on the gateway stack</h2>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Dispatch trace reconstructed on the gateway stack</h2>
           <p className="mt-2 text-sm leading-6 text-foreground-muted">
-            Flow lanes, transcript turns, tool work, and file attention are projected from the same live event buffers so session review stays aligned with kanban execution.
+            Trace lanes and file attention are projected from the same live event buffers so session review stays aligned with current dispatch activity.
           </p>
         </div>
         <span className="rounded-full border border-border px-3 py-1 text-xs text-foreground-muted">
@@ -383,7 +317,7 @@ export function SessionObservabilityPanel(props: {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-foreground-muted">
-        <span className="rounded-full border border-border px-3 py-1">{flowModel.summary.totalRuns} runs</span>
+        <span className="rounded-full border border-border px-3 py-1">{flowModel.summary.totalRuns} dispatches</span>
         <span className="rounded-full border border-border px-3 py-1">{flowModel.summary.totalSegments} segments</span>
         <span className="rounded-full border border-border px-3 py-1">{flowModel.summary.totalTools} tools</span>
         <span className="rounded-full border border-border px-3 py-1">{flowModel.summary.fileCount} files</span>
@@ -438,14 +372,14 @@ export function SessionObservabilityPanel(props: {
                     ) : null}
                     <Link to={`/runs/${item.runId}`} className="inline-flex items-center gap-1 text-primary">
                       <ArrowUpRight className="h-3 w-3" />
-                      Open run detail
+                      Open dispatch
                     </Link>
                   </div>
                 </div>
               ))}
               {shortcuts.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-foreground-muted">
-                  Run artifacts will appear here once the session emits execution data.
+                  Dispatch artifacts will appear here once the session emits execution data.
                 </div>
               ) : null}
             </div>

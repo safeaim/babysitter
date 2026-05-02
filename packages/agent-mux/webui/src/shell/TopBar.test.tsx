@@ -46,6 +46,6 @@ describe('TopBar', () => {
     expect(screen.getByTestId('topbar-connection-status')).toHaveTextContent('connected');
     expect(screen.getByText('Directory')).toBeInTheDocument();
     expect(screen.getByText('1 active')).toBeInTheDocument();
-    expect(screen.getByText('1 running')).toBeInTheDocument();
+    expect(screen.getByText('1 dispatching')).toBeInTheDocument();
   });
 });

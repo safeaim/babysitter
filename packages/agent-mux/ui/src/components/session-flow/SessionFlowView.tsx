@@ -6,14 +6,13 @@ import type {
   AgentFlowSegment,
   SessionFlowFileRecord,
   SessionFlowModel,
-  SessionFlowTimelineItem,
   SessionTranscriptNode,
 } from '../../session-flow.js';
 import { Card } from '../primitives/Card.js';
 import { Text } from '../primitives/Text.js';
 import { useTheme } from '../primitives/theme.js';
 
-export type SessionFlowViewMode = 'flow' | 'timeline' | 'transcript' | 'files';
+export type SessionFlowViewMode = 'flow' | 'transcript' | 'files';
 
 type SessionFlowViewProps = {
   model: SessionFlowModel;
@@ -22,15 +21,13 @@ type SessionFlowViewProps = {
 };
 
 const VIEW_ITEMS: Array<{ value: SessionFlowViewMode; label: string }> = [
-  { value: 'flow', label: 'Flow' },
-  { value: 'timeline', label: 'Timeline' },
+  { value: 'flow', label: 'Trace' },
   { value: 'transcript', label: 'Transcript' },
   { value: 'files', label: 'Files' },
 ];
 
 const EMPTY_MESSAGES: Record<SessionFlowViewMode, string> = {
   flow: 'No structured execution flow is available for this session yet.',
-  timeline: 'No timeline events are available for this session yet.',
   transcript: 'No transcript turns are available for this session yet.',
   files: 'File attention will appear here once the session touches the workspace.',
 };
@@ -161,29 +158,6 @@ function renderSegmentTiming(segment: AgentFlowSegment): JSX.Element | null {
   return <MetadataChip label={[time, duration].filter(Boolean).join(' · ')} subtle />;
 }
 
-function TimelineCard(props: { item: SessionFlowTimelineItem }): JSX.Element {
-  const time = formatFlowTime(props.item.timestamp);
-  return (
-    <Card style={styles.sectionCard}>
-      <View style={styles.cardHeader}>
-        <View style={styles.cardHeaderText}>
-          <Text style={styles.cardTitle}>{props.item.title}</Text>
-          <Text style={styles.mutedText}>
-            {time ? `${time} · ` : ''}
-            {props.item.runId}
-          </Text>
-        </View>
-        <View style={styles.metaRow}>
-          <MetadataChip label={props.item.kind} subtle />
-          <MetadataChip label={props.item.status} subtle />
-          {props.item.filePaths.length > 0 ? <MetadataChip label={`${props.item.filePaths.length} files`} subtle /> : null}
-        </View>
-      </View>
-      <Text>{props.item.detail}</Text>
-    </Card>
-  );
-}
-
 function TranscriptCard(props: { node: SessionTranscriptNode }): JSX.Element {
   const time = formatFlowTime(props.node.timestamp);
   return (
@@ -225,7 +199,7 @@ function FileCard(props: { file: SessionFlowFileRecord }): JSX.Element {
       <View style={styles.metaRow}>
         <MetadataChip label={`${props.file.reads} reads`} subtle />
         <MetadataChip label={`${props.file.writes} writes`} subtle />
-        <MetadataChip label={`${props.file.runIds.length} runs`} subtle />
+        <MetadataChip label={`${props.file.runIds.length} dispatches`} subtle />
         {props.file.tools.length > 0 ? <MetadataChip label={`${props.file.tools.length} tools`} subtle /> : null}
       </View>
     </Card>
@@ -237,9 +211,7 @@ export function SessionFlowView(props: SessionFlowViewProps): JSX.Element {
   const activeItems =
     props.viewMode === 'flow'
       ? props.model.lanes
-      : props.viewMode === 'timeline'
-        ? props.model.timeline
-        : props.viewMode === 'transcript'
+      : props.viewMode === 'transcript'
           ? props.model.transcript
           : props.model.files;
   const totalCost = formatUsd(props.model.summary.totalUsd);
@@ -247,7 +219,7 @@ export function SessionFlowView(props: SessionFlowViewProps): JSX.Element {
   return (
     <View style={styles.container}>
       <View style={styles.summaryRow}>
-        <MetadataChip label={`${props.model.summary.totalRuns} runs`} />
+        <MetadataChip label={`${props.model.summary.totalRuns} dispatches`} />
         <MetadataChip label={`${props.model.summary.totalSegments} segments`} />
         <MetadataChip label={`${props.model.summary.totalTools} tools`} />
         <MetadataChip label={`${props.model.summary.fileCount} files`} />
@@ -263,9 +235,7 @@ export function SessionFlowView(props: SessionFlowViewProps): JSX.Element {
           const count =
             item.value === 'flow'
               ? props.model.lanes.length
-              : item.value === 'timeline'
-                ? props.model.timeline.length
-                : item.value === 'transcript'
+              : item.value === 'transcript'
                   ? props.model.transcript.length
                   : props.model.files.length;
           return (
@@ -291,9 +261,6 @@ export function SessionFlowView(props: SessionFlowViewProps): JSX.Element {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {props.viewMode === 'flow' ? props.model.lanes.map((lane) => <FlowLaneCard key={lane.runId} lane={lane} />) : null}
-        {props.viewMode === 'timeline'
-          ? props.model.timeline.map((item) => <TimelineCard key={item.id} item={item} />)
-          : null}
         {props.viewMode === 'transcript'
           ? props.model.transcript.map((node) => <TranscriptCard key={node.id} node={node} />)
           : null}

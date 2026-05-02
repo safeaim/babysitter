@@ -26,7 +26,7 @@ export function SessionDetailScreen(props: { sessionId: string }): JSX.Element {
     ),
   );
   const eventBuffers = useStore(store, (state: GatewayStoreState) => state.events.byRunId);
-  const [viewMode, setViewMode] = useState<SessionFlowViewMode>('flow');
+  const [viewMode, setViewMode] = useState<SessionFlowViewMode>('transcript');
   const sendSessionMessage = useSendSessionMessage();
 
   const flowModel = useMemo(() => buildSessionFlowModel(runs, eventBuffers), [eventBuffers, runs]);

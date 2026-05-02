@@ -89,7 +89,7 @@ describe('SessionsPage', () => {
       ),
     ).toBe(true);
     expect(
-      screen.getAllByRole('link', { name: 'Open run' }).some((link) => link.getAttribute('href') === '/runs/run-active'),
+      screen.getAllByRole('link', { name: 'Open dispatch' }).some((link) => link.getAttribute('href') === '/runs/run-active'),
     ).toBe(true);
   });
 
@@ -104,11 +104,11 @@ describe('SessionsPage', () => {
     expect(screen.getByTestId('session-row-session-paused')).toBeInTheDocument();
     expect(screen.queryByTestId('session-row-session-active')).not.toBeInTheDocument();
 
-    await user.type(screen.getByPlaceholderText('Search session id, title, agent, workspace, or run id'), 'board');
+    await user.type(screen.getByPlaceholderText('Search session id, title, agent, workspace, or dispatch id'), 'board');
     expect(screen.getByTestId('session-row-session-paused')).toBeInTheDocument();
 
-    await user.clear(screen.getByPlaceholderText('Search session id, title, agent, workspace, or run id'));
-    await user.type(screen.getByPlaceholderText('Search session id, title, agent, workspace, or run id'), 'missing');
+    await user.clear(screen.getByPlaceholderText('Search session id, title, agent, workspace, or dispatch id'));
+    await user.type(screen.getByPlaceholderText('Search session id, title, agent, workspace, or dispatch id'), 'missing');
     expect(screen.getByText('No sessions match the current filter.')).toBeInTheDocument();
   });
 });

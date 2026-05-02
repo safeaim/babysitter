@@ -286,7 +286,7 @@ export function WorkspaceDetailsSidebar(props: {
               <div className="rounded-2xl border border-border bg-card/80 px-3 py-3">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded-full border border-border px-2 py-0.5 text-foreground-muted">
-                    Recent runs
+                    Recent dispatches
                   </span>
                   <span className={cx("rounded-full border px-2 py-0.5", lifecycleTone(latestRun.status))}>
                     {latestRun.status}
@@ -313,8 +313,8 @@ export function WorkspaceDetailsSidebar(props: {
             ) : (
               <SectionState
                 tone="neutral"
-                title="No workspace runs yet"
-                body="Run status will appear here once this workspace starts publishing executions."
+                title="No workspace dispatches yet"
+                body="Dispatch status will appear here once this workspace starts publishing executions."
               />
             )}
           </div>

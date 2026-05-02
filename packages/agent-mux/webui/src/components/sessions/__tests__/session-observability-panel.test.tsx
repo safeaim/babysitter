@@ -92,17 +92,13 @@ describe('SessionObservabilityPanel', () => {
 
     expect(screen.getByText('No structured execution flow is available for this session yet.')).toBeTruthy();
 
-    await user.click(screen.getByRole('tab', { name: 'Timeline' }));
-    expect(screen.getByText('No timeline events are available for this session yet.')).toBeTruthy();
-
-    await user.click(screen.getByRole('tab', { name: 'Transcript' }));
-    expect(screen.getByText('No transcript turns are available for this session yet.')).toBeTruthy();
+    expect(screen.getByRole('tab', { name: 'Trace' })).toBeTruthy();
 
     await user.click(screen.getByRole('tab', { name: 'Files' }));
     expect(screen.getByText('File attention will appear here once the session touches the workspace.')).toBeTruthy();
   });
 
-  it('renders realtime transcript and file attention when flow data exists', async () => {
+  it('renders realtime trace and file attention when flow data exists', async () => {
     mockBuildSessionFlowModel.mockReturnValue({
       lanes: [
         {
@@ -175,14 +171,11 @@ describe('SessionObservabilityPanel', () => {
       },
     });
 
-    const user = userEvent.setup();
     render(<SessionObservabilityPanel sessionId="session-1" runs={[{ runId: 'run-1' }]} eventBuffers={{}} />);
 
     expect(screen.getByText('Editing src/panel.tsx')).toBeTruthy();
 
-    await user.click(screen.getByRole('tab', { name: 'Transcript' }));
-    expect(screen.getByText('Realtime panel updated.')).toBeTruthy();
-
+    const user = userEvent.setup();
     await user.click(screen.getByRole('tab', { name: 'Files' }));
     expect(screen.getByText('src/panel.tsx')).toBeTruthy();
     expect(screen.getByText('2 touches')).toBeTruthy();
@@ -279,7 +272,7 @@ describe('SessionObservabilityPanel', () => {
       />,
     );
 
-    expect(screen.getAllByRole('link', { name: 'Open run detail' }).some((link) => link.getAttribute('href') === '/runs/run-1')).toBe(true);
+    expect(screen.getAllByRole('link', { name: 'Open dispatch' }).some((link) => link.getAttribute('href') === '/runs/run-1')).toBe(true);
     expect(
       screen.getAllByRole('link', { name: 'Review breakpoint' }).some((link) => link.getAttribute('href') === '/runs/run-1?effectId=bp-1'),
     ).toBe(true);
@@ -294,18 +287,6 @@ describe('SessionObservabilityPanel', () => {
     ).toBe(true);
     expect(
       screen.getAllByRole('link', { name: 'Open runtime' }).some((link) => link.getAttribute('href') === 'http://localhost:3000'),
-    ).toBe(true);
-
-    await user.click(screen.getByRole('tab', { name: 'Transcript' }));
-    expect(screen.getByText('Realtime panel updated.')).toBeTruthy();
-    expect(
-      screen.getAllByRole('link', { name: 'Review breakpoint' }).some((link) => link.getAttribute('href') === '/runs/run-1?effectId=bp-1'),
-    ).toBe(true);
-
-    await user.click(screen.getByRole('tab', { name: 'Timeline' }));
-    expect(screen.getByText('Editing src/panel.tsx')).toBeTruthy();
-    expect(
-      screen.getAllByRole('link', { name: 'Open failed task' }).some((link) => link.getAttribute('href') === '/runs/run-1?effectId=task-1'),
     ).toBe(true);
 
     await user.click(screen.getByRole('tab', { name: 'Files' }));

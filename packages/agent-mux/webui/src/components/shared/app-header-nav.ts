@@ -2,7 +2,7 @@ import { Bot, Columns3, FolderGit2, GitBranch, PlaySquare, Settings, Activity } 
 
 export const APP_HEADER_NAV_ITEMS = [
   { href: "/projects", label: "Projects", icon: Columns3 },
-  { href: "/runs", label: "Runs", icon: Activity },
+  { href: "/runs", label: "Dispatches", icon: Activity },
   { href: "/automations", label: "Automations", icon: Bot },
   { href: "/sessions", label: "Sessions", icon: PlaySquare },
   { href: "/workspaces", label: "Workspaces", icon: FolderGit2 },

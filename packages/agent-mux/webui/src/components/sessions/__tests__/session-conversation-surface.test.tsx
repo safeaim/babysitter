@@ -62,7 +62,102 @@ vi.mock("@/lib/agent-mux-ui", () => ({
 }));
 
 describe("SessionConversationSurface", () => {
+  it("attaches a referenced workspace file when the selected agent supports file attachments", async () => {
+    const user = setupUser();
+    render(
+      <SessionConversationSurface
+        sessionId="session-1"
+        sessionLabel="Session 1"
+        sessionAgent="claude"
+        sessionStatus="active"
+        sessionModel="sonnet"
+        runs={[
+          { runId: "run-1", agent: "claude", status: "running", startedAt: 1_000 },
+        ]}
+        eventBuffers={{
+          "run-1": {
+            events: [
+              { type: "file_write", path: "src/app.ts", timestamp: 1_350 },
+            ],
+          },
+        }}
+        workspacePath="/repo/worktree"
+        emptyStateTitle="Empty"
+        emptyStateBody="No events"
+        placeholder="Continue the session..."
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Attach file" }));
+
+    expect(screen.getByDisplayValue("Use the attached file: src/app.ts")).toBeInTheDocument();
+    expect(screen.getByText("workspace file")).toBeInTheDocument();
+  });
+
+  it("falls back to inserting a file path when the selected agent does not support file attachments", async () => {
+    gatewayStore.setState({
+      ...gatewayStore.getState(),
+      agents: {
+        items: ["codex"],
+        byId: {
+          codex: {
+            agent: "codex",
+            displayName: "Codex",
+            supportsImageInput: false,
+            supportsFileAttachments: false,
+            approvalModes: ["prompt"],
+          },
+        },
+      },
+    });
+    const user = setupUser();
+    render(
+      <SessionConversationSurface
+        sessionId="session-2"
+        sessionLabel="Session 2"
+        sessionAgent="codex"
+        sessionStatus="active"
+        runs={[
+          { runId: "run-2", agent: "codex", status: "running", startedAt: 1_000 },
+        ]}
+        eventBuffers={{
+          "run-2": {
+            events: [
+              { type: "file_write", path: "src/app.ts", timestamp: 1_350 },
+            ],
+          },
+        }}
+        workspacePath="/repo/worktree"
+        emptyStateTitle="Empty"
+        emptyStateBody="No events"
+        placeholder="Continue the session..."
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Insert path" }));
+
+    expect(screen.getByDisplayValue("Relevant file: /repo/worktree/src/app.ts")).toBeInTheDocument();
+    expect(screen.queryByText("workspace file")).not.toBeInTheDocument();
+  });
+
   it("renders parity message kinds and approval controls in one surface", async () => {
+    gatewayStore.setState({
+      ...gatewayStore.getState(),
+      agents: {
+        items: ["claude"],
+        byId: {
+          claude: {
+            agent: "claude",
+            displayName: "Claude",
+            supportsImageInput: true,
+            supportsFileAttachments: true,
+            approvalModes: ["prompt", "yolo", "deny"],
+          },
+        },
+      },
+    });
     const user = setupUser();
     render(
       <SessionConversationSurface

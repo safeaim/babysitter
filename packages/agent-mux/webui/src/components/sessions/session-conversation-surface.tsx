@@ -11,12 +11,11 @@ import type {
   SessionCost,
   SessionFlowFileRecord,
   SessionFlowModel,
-  SessionFlowTimelineItem,
   SessionTranscriptNode,
 } from "@a5c-ai/agent-mux-ui/session-flow";
 import { accumulateEventCost, buildSessionFlowModel } from "@a5c-ai/agent-mux-ui/session-flow";
 import type { AgentRecord } from "@a5c-ai/agent-mux-ui/gateway";
-import { AlertTriangle, Bot, FileImage, FileStack, Files, Hammer, LoaderCircle, MessagesSquare, PlayCircle, RefreshCw, ShieldCheck, Sparkles, WandSparkles } from "lucide-react";
+import { AlertTriangle, Bot, FileImage, FileStack, Files, LoaderCircle, MessagesSquare, PlayCircle, RefreshCw, ShieldCheck, Sparkles, WandSparkles } from "lucide-react";
 
 import { ProgressBar } from "@/components/shared/progress-bar";
 import { TaskTagAutocompleteTextarea } from "@/components/task-tags/task-tag-autocomplete-textarea";
@@ -29,7 +28,7 @@ type EventBuffer = {
   events: Array<Record<string, unknown>>;
 };
 
-type ConversationViewMode = "transcript" | "flow" | "timeline" | "files";
+type ConversationViewMode = "transcript" | "flow" | "files";
 type ApprovalMode = "yolo" | "prompt" | "deny";
 
 type ComposerSubmitInput = {
@@ -99,20 +98,6 @@ function formatTimestamp(value: number | null | undefined): string {
   });
 }
 
-function formatDuration(start: number | null | undefined, end: number | null | undefined): string | null {
-  if (start == null || end == null || !Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
-    return null;
-  }
-  const delta = end - start;
-  if (delta < 1_000) {
-    return `${delta}ms`;
-  }
-  if (delta < 60_000) {
-    return `${(delta / 1_000).toFixed(1)}s`;
-  }
-  return `${Math.round(delta / 1_000)}s`;
-}
-
 function formatBytes(value: number): string {
   if (!Number.isFinite(value) || value <= 0) {
     return "0 B";
@@ -162,6 +147,19 @@ function appendToPrompt(current: string, addition: string): string {
     return addition;
   }
   return `${current.trimEnd()}\n${addition}`;
+}
+
+function formatFileReference(path: string): string {
+  return `Relevant file: ${path}`;
+}
+
+function buildAttachedFilePrompt(path: string): string {
+  return `Use the attached file: ${path}`;
+}
+
+function fileNameFromPath(path: string): string {
+  const segments = path.split(/[\\/]/).filter(Boolean);
+  return segments.at(-1) ?? path;
 }
 
 function nodeTone(kind: SessionTranscriptNode["kind"], status?: string): string {
@@ -237,26 +235,6 @@ function computeProgress(lanes: AgentFlowLane[]): number {
   }
   const settledSegments = activeLane.segments.filter((segment) => segment.status !== "running").length;
   return Math.round((settledSegments / totalSegments) * 100);
-}
-
-function summarizeTimelineItems(timeline: SessionFlowTimelineItem[]): {
-  toolOutputs: number;
-  systemEvents: number;
-  errors: number;
-} {
-  return timeline.reduce(
-    (summary, item) => {
-      if (item.kind === "tool") {
-        summary.toolOutputs += 1;
-      } else if (item.kind === "system" || item.kind === "lifecycle") {
-        summary.systemEvents += 1;
-      } else if (item.kind === "error") {
-        summary.errors += 1;
-      }
-      return summary;
-    },
-    { toolOutputs: 0, systemEvents: 0, errors: 0 },
-  );
 }
 
 async function readFileAsDataUrl(file: File): Promise<string> {
@@ -343,6 +321,7 @@ function TranscriptCard(props: {
   workspacePath?: string | null;
   onReuseText: (text: string) => void;
   onMentionFile: (path: string) => void;
+  mentionLabel: string;
 }) {
   const filePaths = props.node.filePaths.slice(0, 6);
   const isUser = props.node.kind === "user";
@@ -388,7 +367,7 @@ function TranscriptCard(props: {
                     <span className="text-foreground-secondary">{path}</span>
                   )}
                   <button type="button" className="text-foreground-muted hover:text-foreground" onClick={() => props.onMentionFile(path)}>
-                    mention
+                    {props.mentionLabel}
                   </button>
                 </div>
               );
@@ -400,64 +379,11 @@ function TranscriptCard(props: {
   );
 }
 
-function TimelineCard(props: {
-  item: SessionFlowTimelineItem;
-  workspacePath?: string | null;
-  onReuseText: (text: string) => void;
-}) {
-  const duration = formatDuration(props.item.timestamp, props.item.timestamp);
-  return (
-    <article className="rounded-2xl border border-border bg-background/70 p-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={cx("rounded-full border px-2 py-0.5 text-[11px] uppercase tracking-[0.18em]", badgeTone(props.item.kind === "lifecycle" ? "system" : props.item.kind, props.item.status))}>
-              {props.item.kind}
-            </span>
-            <span className="text-sm font-medium text-foreground">{props.item.title}</span>
-          </div>
-          <div className="mt-1 text-xs text-foreground-muted">
-            {formatTimestamp(props.item.timestamp)}
-            {duration ? ` · ${duration}` : ""}
-          </div>
-        </div>
-        <Button type="button" size="sm" variant="ghost" onClick={() => props.onReuseText(props.item.detail)}>
-          Use output
-        </Button>
-      </div>
-      <pre className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-foreground-secondary">
-        {props.item.detail}
-      </pre>
-      {props.item.filePaths.length > 0 ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {props.item.filePaths.slice(0, 6).map((path) => {
-            const absolutePath = resolveAbsoluteFilePath(props.workspacePath, path);
-            return absolutePath ? (
-              <a
-                key={`${props.item.id}-${path}`}
-                href={buildEditorHref(absolutePath)}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-border px-3 py-1.5 text-xs text-primary"
-              >
-                {path}
-              </a>
-            ) : (
-              <span key={`${props.item.id}-${path}`} className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground-secondary">
-                {path}
-              </span>
-            );
-          })}
-        </div>
-      ) : null}
-    </article>
-  );
-}
-
 function FilesCard(props: {
   file: SessionFlowFileRecord;
   workspacePath?: string | null;
   onMentionFile: (path: string) => void;
+  mentionLabel: string;
 }) {
   const absolutePath = resolveAbsoluteFilePath(props.workspacePath, props.file.path);
   return (
@@ -476,7 +402,7 @@ function FilesCard(props: {
           </div>
         </div>
         <Button type="button" size="sm" variant="ghost" onClick={() => props.onMentionFile(props.file.path)}>
-          Mention file
+          {props.mentionLabel}
         </Button>
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-4">
@@ -537,7 +463,6 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
     () => props.sessionCostOverride ?? accumulateEventCost(runIds, props.eventBuffers),
     [props.eventBuffers, props.sessionCostOverride, runIds],
   );
-  const timelineSummary = useMemo(() => summarizeTimelineItems(flowModel.timeline), [flowModel.timeline]);
   const progressValue = useMemo(() => computeProgress(flowModel.lanes), [flowModel.lanes]);
 
   const sortedAgents = useMemo(() => {
@@ -554,6 +479,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
   const canAttachImages = selectedAgentRecord?.supportsImageInput === true;
   const canAttachFiles = selectedAgentRecord?.supportsFileAttachments === true;
   const canAttachAny = canAttachImages || canAttachFiles;
+  const fileMentionLabel = canAttachFiles ? "Attach file" : "Insert path";
 
   useEffect(() => {
     setPrompt("");
@@ -584,7 +510,34 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
   }
 
   function mentionFile(path: string) {
-    setPrompt((current) => appendToPrompt(current, path));
+    const absolutePath = resolveAbsoluteFilePath(props.workspacePath, path);
+    if (canAttachFiles && absolutePath) {
+      setAttachments((current) => {
+        if (current.some((attachment) => attachment.filePath === absolutePath)) {
+          return current;
+        }
+        return [
+          ...current,
+          {
+            id: `file:${absolutePath}`,
+            filePath: absolutePath,
+            name: fileNameFromPath(path),
+            size: 0,
+            isImage: false,
+          },
+        ];
+      });
+      setPrompt((current) => appendToPrompt(current, buildAttachedFilePrompt(path)));
+      setError(null);
+      setViewMode("transcript");
+      return;
+    }
+    setPrompt((current) => appendToPrompt(current, formatFileReference(absolutePath ?? path)));
+    if (canAttachFiles && !absolutePath) {
+      setError("This agent can take files, but the workspace path could not be resolved. The path was inserted into the prompt instead.");
+    } else {
+      setError(null);
+    }
     setViewMode("transcript");
   }
 
@@ -649,7 +602,6 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
   }> = [
     { id: "transcript", label: "Chat", icon: MessagesSquare },
     { id: "flow", label: "Trace", icon: Sparkles },
-    { id: "timeline", label: "Timeline", icon: Hammer },
     { id: "files", label: "Files", icon: Files },
   ];
 
@@ -725,6 +677,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
                 workspacePath={props.workspacePath}
                 onReuseText={reuseText}
                 onMentionFile={mentionFile}
+                mentionLabel={fileMentionLabel}
               />
             ))}
             {flowModel.transcript.length === 0 ? (
@@ -780,25 +733,6 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
           </div>
         ) : null}
 
-        {viewMode === "timeline" ? (
-          <div className="grid gap-3">
-            {flowModel.timeline.map((item) => (
-              <TimelineCard
-                key={item.id}
-                item={item}
-                workspacePath={props.workspacePath}
-                onReuseText={reuseText}
-              />
-            ))}
-            {flowModel.timeline.length === 0 ? (
-              <EmptyConversationState
-                title="No timeline activity"
-                body="The timeline populates when the session emits tool, lifecycle, or system events."
-              />
-            ) : null}
-          </div>
-        ) : null}
-
         {viewMode === "files" ? (
           <div className="grid gap-3">
             {flowModel.files.map((file) => (
@@ -807,6 +741,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
                 file={file}
                 workspacePath={props.workspacePath}
                 onMentionFile={mentionFile}
+                mentionLabel={fileMentionLabel}
               />
             ))}
             {flowModel.files.length === 0 ? (
@@ -829,12 +764,12 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
             {hookRequests.map((request) => (
               <article key={request.hookRequestId} className="rounded-2xl border border-warning/25 bg-background/80 p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-medium text-foreground">{request.hookKind}</div>
-                    <div className="mt-1 text-xs text-foreground-muted">
-                      Deadline {formatTimestamp(request.deadlineTs)} · run {request.runId}
+                    <div>
+                      <div className="text-sm font-medium text-foreground">{request.hookKind}</div>
+                      <div className="mt-1 text-xs text-foreground-muted">
+                        Deadline {formatTimestamp(request.deadlineTs)} · dispatch {request.runId}
+                      </div>
                     </div>
-                  </div>
                   <div className="flex gap-2">
                     <Button
                       type="button"
@@ -887,7 +822,7 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
           <MetricCard label="Cost" value={formatUsd(sessionCost?.totalUsd)} detail={`${formatNumber(sessionCost?.thinkingTokens)} thinking tokens`} />
           <MetricCard label="Task progress" value={`${progressValue}%`} detail={`${flowModel.summary.pendingTools} pending tools`} />
           <MetricCard label="File changes" value={formatNumber(flowModel.files.filter((file) => file.writes > 0).length)} detail={`${formatNumber(flowModel.summary.fileCount)} files touched`} />
-          <MetricCard label="Approvals" value={formatNumber(hookRequests.length)} detail={`${timelineSummary.toolOutputs} tool outputs`} />
+          <MetricCard label="Approvals" value={formatNumber(hookRequests.length)} detail={`${formatNumber(flowModel.summary.totalTools)} tool calls seen`} />
         </div>
         <div className="border-t border-border px-4 py-4">
           <ProgressBar value={progressValue} variant={hookRequests.length > 0 ? "warning" : "default"} glow />
@@ -979,15 +914,15 @@ export function SessionConversationSurface(props: SessionConversationSurfaceProp
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      {attachment.isImage ? (
-                        <FileImage className="h-4 w-4 text-primary" />
-                      ) : (
-                        <FileStack className="h-4 w-4 text-primary" />
-                      )}
+                {attachment.isImage ? (
+                  <FileImage className="h-4 w-4 text-primary" />
+                ) : (
+                  <FileStack className="h-4 w-4 text-primary" />
+                )}
                       <div className="truncate text-sm font-medium text-foreground">{attachment.name ?? "attachment"}</div>
                     </div>
                     <div className="mt-1 text-xs text-foreground-muted">
-                      {attachment.mimeType ?? "application/octet-stream"} · {formatBytes(attachment.size)}
+                      {attachment.filePath ? "workspace file" : `${attachment.mimeType ?? "application/octet-stream"} · ${formatBytes(attachment.size)}`}
                     </div>
                   </div>
                   <button

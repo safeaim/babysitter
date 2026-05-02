@@ -88,7 +88,7 @@ export function KpiGrid({ metrics, statusFilter, hasStaleRuns, onToggleFilter }:
   return (
     <div data-testid="kpi-grid" aria-live="polite" aria-label="Key metrics" className={cx("grid gap-3 mb-6", kpiCols)}>
       <MetricTile
-        label="Total Runs"
+        label="Total Dispatches"
         value={metrics.totalRuns}
         icon={<Layers className="h-4 w-4" />}
         color="primary"

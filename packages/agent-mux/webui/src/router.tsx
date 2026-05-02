@@ -54,7 +54,7 @@ function AuthPendingScreen(): JSX.Element {
         <p className="eyebrow">agent-mux webui</p>
         <h1>Checking gateway access</h1>
         <p className="lede auth-note">
-          Reconnecting to the saved gateway before loading live sessions, workspaces, and run activity.
+          Reconnecting to the saved gateway before loading live sessions, workspaces, and dispatch activity.
         </p>
       </section>
     </main>
@@ -113,7 +113,7 @@ function AppShellFrame(props: { children: React.ReactNode }): JSX.Element {
   const actions = useMemo(
     () => [
       { id: 'projects', label: 'Open projects', run: () => navigate('/projects') },
-      { id: 'runs', label: 'Open runs', run: () => navigate('/runs') },
+      { id: 'runs', label: 'Open dispatches', run: () => navigate('/runs') },
       { id: 'new-session', label: 'Start session', run: () => navigate('/sessions/new') },
       { id: 'sessions', label: 'Browse sessions', run: () => navigate('/sessions') },
       { id: 'workspaces', label: 'Open workspaces', run: () => navigate('/workspaces') },

@@ -47,20 +47,51 @@ export function pushUnique(target: string[], values: Iterable<string>): void {
   }
 }
 
+const FILE_PATH_KEYS = new Set([
+  'path',
+  'paths',
+  'file',
+  'files',
+  'file_path',
+  'filePath',
+  'filePaths',
+  'relative_path',
+  'relativePath',
+  'target',
+  'target_path',
+  'targetPath',
+  'source_path',
+  'sourcePath',
+  'oldPath',
+  'newPath',
+  'output_path',
+  'outputPath',
+]);
+
+const FILE_BASENAME_PATTERN = /^(dockerfile|makefile|procfile|gemfile|rakefile|justfile|readme(?:\.[^.]+)?|license(?:\.[^.]+)?|jenkinsfile|brewfile|tiltfile|vagrantfile)$/i;
+
+function normalizePotentialPath(value: string): string | null {
+  const trimmed = value.trim().replace(/^["'`]+|["'`]+$/g, '');
+  if (trimmed.length === 0 || trimmed.length > 300 || /[\r\n]/.test(trimmed) || trimmed.endsWith('/') || trimmed.endsWith('\\')) {
+    return null;
+  }
+  const normalized = trimmed.replace(/^vscode:\/\/file/, '');
+  const basename = normalized.split(/[\\/]/).filter(Boolean).at(-1) ?? normalized;
+  const hasExtension = /\.[A-Za-z0-9_-]{1,16}$/.test(basename);
+  if (hasExtension || FILE_BASENAME_PATTERN.test(basename)) {
+    return normalized;
+  }
+  return null;
+}
+
 export function collectPaths(value: unknown, depth = 0, results = new Set<string>()): Set<string> {
-  if (depth > 3 || value == null) {
+  if (depth > 5 || value == null) {
     return results;
   }
   if (typeof value === 'string') {
-    if (
-      /[\\/]/.test(value) ||
-      value.endsWith('.ts') ||
-      value.endsWith('.tsx') ||
-      value.endsWith('.js') ||
-      value.endsWith('.json') ||
-      value.endsWith('.md')
-    ) {
-      results.add(value);
+    const normalized = normalizePotentialPath(value);
+    if (normalized) {
+      results.add(normalized);
     }
     return results;
   }
@@ -72,19 +103,11 @@ export function collectPaths(value: unknown, depth = 0, results = new Set<string
   }
   if (typeof value === 'object') {
     for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
-      if (
-        key === 'path' ||
-        key === 'paths' ||
-        key === 'file' ||
-        key === 'files' ||
-        key === 'file_path' ||
-        key === 'cwd' ||
-        key === 'target'
-      ) {
+      if (FILE_PATH_KEYS.has(key)) {
         collectPaths(child, depth + 1, results);
         continue;
       }
-      if (depth < 2) {
+      if (depth < 4) {
         collectPaths(child, depth + 1, results);
       }
     }

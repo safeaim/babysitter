@@ -20,13 +20,13 @@ export function SessionPendingPage(): JSX.Element {
       <PageSection>
         <PageHeroGrid className="session-browser__hero-grid">
           <div>
-            <p className="page-kicker">Run handoff</p>
+            <p className="page-kicker">Dispatch handoff</p>
             <h1 className="page-title page-title--secondary">
-              Waiting for this run to bind to its session.
+              Waiting for this dispatch to bind to its session.
             </h1>
             <p className="page-copy page-copy--wide">
               The browser is holding this bootstrap route only long enough for the gateway to attach
-              the run to a durable session id. As soon as that happens, this page redirects into the
+              the dispatch to a durable session id. As soon as that happens, this page redirects into the
               live session chat automatically.
             </p>
             <div className="page-actions">
@@ -41,7 +41,7 @@ export function SessionPendingPage(): JSX.Element {
 
           <div className="session-browser__hero-kpis">
             <div className="summary-card">
-              <span className="summary-label">Run id</span>
+              <span className="summary-label">Dispatch id</span>
               <strong>{runId || 'pending session'}</strong>
             </div>
             <div className="summary-card">
@@ -64,11 +64,11 @@ export function SessionPendingPage(): JSX.Element {
         <div className="session-browser__section-header">
           <div>
             <p className="page-kicker page-kicker--compact">What Happens Next</p>
-            <h2 className="page-title page-title--secondary">Runs are only the transport bootstrap.</h2>
+            <h2 className="page-title page-title--secondary">Dispatches are only the transport bootstrap.</h2>
             <p className="page-copy">
               Once the harness publishes the final `sessionId`, the session route becomes the real
               working surface. That keeps transcript, approvals, runtime context, and follow-up turns
-              on one stable screen instead of forcing users to stay on a run-centric detail view.
+              on one stable screen instead of forcing users to stay on a dispatch-centric detail view.
             </p>
           </div>
         </div>

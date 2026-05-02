@@ -106,7 +106,7 @@ export function HomePage(): JSX.Element {
         <div className="session-browser__section-header">
           <div>
             <p className="page-kicker page-kicker--compact">Focus</p>
-            <h2 className="page-title page-title--secondary">The main unit is the conversation, not the run id.</h2>
+            <h2 className="page-title page-title--secondary">The main unit is the conversation, not the dispatch id.</h2>
             <p className="page-copy">
               Projects decide what to work on. Sessions hold the live transcript and next turn.
               Workspaces keep the code, runtime, and review context attached to that same thread.
@@ -117,7 +117,7 @@ export function HomePage(): JSX.Element {
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           <div className="summary-card">
             <span className="summary-label">Plan</span>
-            <strong>Run the board from projects</strong>
+            <strong>Drive the board from projects</strong>
             <p className="muted-copy">Backlog, workspace creation, and review handoff stay in one project surface.</p>
           </div>
           <div className="summary-card">
@@ -195,7 +195,7 @@ export function HomePage(): JSX.Element {
                     ) : null}
                     {runId ? (
                       <Link to={`/runs/${runId}`} className="session-browser__action">
-                        Run handoff
+                        Dispatch handoff
                       </Link>
                     ) : null}
                   </div>

@@ -18,7 +18,7 @@ beforeEach(() => {
 describe('RunList', () => {
   it('renders an empty state when there are no runs', () => {
     render(<RunList runs={[]} />);
-    expect(screen.getByText('No runs found')).toBeInTheDocument();
+    expect(screen.getByText('No dispatches found')).toBeInTheDocument();
   });
 
   it('renders a list of RunCards for each run', () => {

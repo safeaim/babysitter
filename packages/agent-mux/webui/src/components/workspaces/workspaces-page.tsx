@@ -469,7 +469,8 @@ export function WorkspacesPageContent(props: {
   const [searchParams] = useSearchParams();
   const [inventory, setInventory] = useState<WorkspaceInventoryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [pendingNotePath, setPendingNotePath] = useState<string | null>(null);
   const [feedbackByWorkspacePath, setFeedbackByWorkspacePath] = useState<Record<string, WorkspaceSidebarFeedback | null>>({});
@@ -483,6 +484,7 @@ export function WorkspacesPageContent(props: {
   const mode = props.mode ?? "full";
   const selectedWorkspacePath =
     props.selectedWorkspacePath ?? (searchParams.get("workspace")?.trim() || null);
+  const loading = initialLoading || refreshing;
 
   const sessionFingerprint = useMemo(
     () =>
@@ -502,7 +504,11 @@ export function WorkspacesPageContent(props: {
   useEffect(() => {
     let cancelled = false;
 
-    setLoading(true);
+    if (inventory) {
+      setRefreshing(true);
+    } else {
+      setInitialLoading(true);
+    }
     setError(null);
 
     void loadInventory(inventorySessions, selectedWorkspacePath)
@@ -518,7 +524,8 @@ export function WorkspacesPageContent(props: {
       })
       .finally(() => {
         if (!cancelled) {
-          setLoading(false);
+          setInitialLoading(false);
+          setRefreshing(false);
         }
       });
 
@@ -699,12 +706,19 @@ export function WorkspacesPageContent(props: {
 
   function refreshInventory() {
     startTransition(() => {
-      setLoading(true);
+      if (inventory) {
+        setRefreshing(true);
+      } else {
+        setInitialLoading(true);
+      }
       setError(null);
       void loadInventory(inventorySessions, selectedWorkspacePath)
         .then((payload) => setInventory(payload))
         .catch((cause) => setError(cause instanceof Error ? cause.message : String(cause)))
-        .finally(() => setLoading(false));
+        .finally(() => {
+          setInitialLoading(false);
+          setRefreshing(false);
+        });
     });
   }
 
@@ -936,7 +950,7 @@ export function WorkspacesPageContent(props: {
     const selectedReviewArtifact =
       selectedWorkspace != null ? (liveArtifactByPath.get(selectedWorkspace.path) ?? undefined) : undefined;
 
-    if (loading && !inventory) {
+    if (initialLoading && !inventory) {
       return (
         <PageShell>
           <section className="rounded-3xl border border-border bg-card p-5 shadow-lg">
@@ -1228,19 +1242,19 @@ export function WorkspacesPageContent(props: {
           ) : null}
         </div>
 
-        {loading && workspaces.length === 0 ? (
+        {initialLoading && workspaces.length === 0 ? (
           <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4 text-sm text-foreground-muted">
             Loading workspace sidebar…
           </div>
         ) : null}
 
-        {!loading && filteredWorkspaces.length === 0 ? (
+        {!initialLoading && filteredWorkspaces.length === 0 ? (
           <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4 text-sm text-foreground-muted">
             {sidebarEmptyMessage}
           </div>
         ) : null}
 
-        {!loading && filteredWorkspaces.length > 0 ? (
+        {filteredWorkspaces.length > 0 ? (
           <div className="mt-5 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm">
               <div className="text-foreground-muted">

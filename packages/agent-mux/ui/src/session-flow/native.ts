@@ -116,11 +116,14 @@ export function buildNativeTranscript(sessionId: string, messages: NativeSession
       }
     }
     if (message.role === 'tool' && message.toolResult) {
+      const toolText = normalizedContent.length > 0
+        ? normalizedContent
+        : renderPayload(message.toolResult.output);
       nodes.push({
         id: `${runId}:tool-result`,
         kind: 'tool',
         label: String(message.toolResult.toolName ?? 'tool'),
-        text: renderPayload(message.toolResult.output),
+        text: toolText,
         runId,
         timestamp: baseTimestamp + 0.25,
         filePaths: [...collectPaths(message.toolResult.output)],

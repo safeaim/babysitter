@@ -7,6 +7,13 @@ type SavedGatewayAuth = {
   token: string;
 };
 
+function normalizeAuth(input: SavedGatewayAuth): SavedGatewayAuth {
+  return {
+    gatewayUrl: normalizeGatewayUrlCandidate(input.gatewayUrl),
+    token: input.token.trim(),
+  };
+}
+
 type GatewayAuthContextValue = {
   auth: SavedGatewayAuth | null;
   isAuthenticated: boolean;
@@ -101,10 +108,7 @@ function readStoredAuth(): SavedGatewayAuth | null {
     if (!parsed.token || !parsed.gatewayUrl) {
       return null;
     }
-    return {
-      gatewayUrl: normalizeGatewayUrlCandidate(parsed.gatewayUrl),
-      token: parsed.token,
-    };
+    return normalizeAuth(parsed);
   } catch {
     return null;
   }
@@ -141,9 +145,10 @@ function isUnauthorizedError(error: unknown): boolean {
 }
 
 async function validateAuth(input: SavedGatewayAuth): Promise<void> {
+  const normalized = normalizeAuth(input);
   const client = new GatewayClient({
-    url: toSocketUrl(input.gatewayUrl),
-    token: input.token,
+    url: toSocketUrl(normalized.gatewayUrl),
+    token: normalized.token,
   });
   try {
     await client.connect();
@@ -154,7 +159,7 @@ async function validateAuth(input: SavedGatewayAuth): Promise<void> {
 }
 
 async function fetchAuthorized<T>(gatewayUrl: string, token: string, pathname: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${sanitizeGatewayUrl(gatewayUrl)}${pathname}`, {
+  const response = await fetch(`${sanitizeGatewayUrl(normalizeGatewayUrlCandidate(gatewayUrl))}${pathname}`, {
     ...init,
     headers: {
       'content-type': 'application/json',
@@ -349,6 +354,20 @@ export function GatewayProvider(props: { children: React.ReactNode }): JSX.Eleme
 
   useEffect(() => {
     if (!auth) {
+      return;
+    }
+    const normalized = normalizeAuth(auth);
+    const serialized = JSON.stringify(normalized);
+    if (window.localStorage.getItem(STORAGE_KEY) !== serialized) {
+      window.localStorage.setItem(STORAGE_KEY, serialized);
+    }
+    if (normalized.gatewayUrl !== auth.gatewayUrl || normalized.token !== auth.token) {
+      setAuth(normalized);
+    }
+  }, [auth]);
+
+  useEffect(() => {
+    if (!auth) {
       setIsReady(true);
       return;
     }
@@ -388,10 +407,10 @@ export function GatewayProvider(props: { children: React.ReactNode }): JSX.Eleme
       isAuthenticated: auth !== null && isReady,
       isReady,
       async login(input) {
-        const nextAuth = {
-          gatewayUrl: normalizeGatewayUrlCandidate(input.gatewayUrl || defaultGatewayUrl()),
-          token: input.token.trim(),
-        };
+        const nextAuth = normalizeAuth({
+          gatewayUrl: input.gatewayUrl || defaultGatewayUrl(),
+          token: input.token,
+        });
         await validateAuth(nextAuth);
         persistAuthError();
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextAuth));
@@ -410,9 +429,10 @@ export function GatewayProvider(props: { children: React.ReactNode }): JSX.Eleme
     if (!auth || !isReady) {
       return null;
     }
+    const normalized = normalizeAuth(auth);
     return new GatewayClient({
-      url: toSocketUrl(auth.gatewayUrl),
-      token: auth.token,
+      url: toSocketUrl(normalized.gatewayUrl),
+      token: normalized.token,
     });
   }, [auth, isReady]);
 
@@ -421,8 +441,8 @@ export function GatewayProvider(props: { children: React.ReactNode }): JSX.Eleme
       {client && auth && isReady ? (
         <UiGatewayProvider client={client}>
           <GatewayBootstrap
-            gatewayUrl={auth.gatewayUrl}
-            token={auth.token}
+            gatewayUrl={normalizeGatewayUrlCandidate(auth.gatewayUrl)}
+            token={auth.token.trim()}
             onAuthFailure={clearAuth}
           >
             {props.children}
@@ -450,10 +470,11 @@ export function useGatewayFetch(): (pathname: string, init?: RequestInit) => Pro
       if (!auth) {
         throw new Error('Gateway auth is required');
       }
-      const response = await fetch(`${sanitizeGatewayUrl(auth.gatewayUrl)}${pathname}`, {
+      const normalized = normalizeAuth(auth);
+      const response = await fetch(`${sanitizeGatewayUrl(normalized.gatewayUrl)}${pathname}`, {
         ...init,
         headers: {
-          authorization: `Bearer ${auth.token}`,
+          authorization: `Bearer ${normalized.token}`,
           ...(init?.headers ?? {}),
         },
       });

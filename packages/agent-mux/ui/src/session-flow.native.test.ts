@@ -41,4 +41,25 @@ describe('buildNativeAgentFlowLane', () => {
 
     expect(transcript.map((node) => node.text)).toEqual(['Normalized text', 'Tool output']);
   });
+
+  it('prefers normalized tool-result text over rendering the raw structured payload', () => {
+    const transcript = buildNativeTranscript('session-3', [
+      {
+        role: 'tool',
+        content: 'Readable tool summary',
+        toolResult: {
+          toolCallId: 'tool-1',
+          toolName: 'Agent',
+          output: [{ type: 'text', text: 'Readable tool summary' }],
+        },
+      } as never,
+    ]);
+
+    expect(transcript).toEqual([
+      expect.objectContaining({
+        kind: 'tool',
+        text: 'Readable tool summary',
+      }),
+    ]);
+  });
 });

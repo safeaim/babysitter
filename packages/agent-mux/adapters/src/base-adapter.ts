@@ -217,14 +217,25 @@ export abstract class BaseAgentAdapter implements SubprocessAdapter {
     binPath = this.resolveWindowsBinaryPath(binPath);
 
     let version: string | undefined;
-    try {
-      const versionCommand = this.resolveVersionProbeCommand(binPath);
-      const vres = await this._spawner(versionCommand.command, versionCommand.args);
-      if (vres.code === 0) {
+    const versionCommands = [
+      this.resolveVersionProbeCommand(binPath),
+      ...(binPath.toLowerCase().includes(this.cliCommand.toLowerCase())
+        ? [{ command: this.cliCommand, args: ['--version'] }]
+        : []),
+    ];
+    for (const versionCommand of versionCommands) {
+      try {
+        const vres = await this._spawner(versionCommand.command, versionCommand.args);
+        if (vres.code !== 0) {
+          continue;
+        }
         version = this.parseVersionOutput(vres.stdout + '\n' + vres.stderr);
+        if (version) {
+          break;
+        }
+      } catch {
+        // ignore; still installed
       }
-    } catch {
-      // ignore; still installed
     }
 
     const out: DetectInstallationResult = { installed: true, path: binPath };

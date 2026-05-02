@@ -124,5 +124,11 @@ describe('GatewayProvider', () => {
 
     expect(screen.getByTestId('gateway-url').textContent).toBe('http://localhost:57751');
     expect(screen.getByTestId('authenticated').textContent).toBe('yes');
+    await waitFor(() => {
+      expect(JSON.parse(window.localStorage.getItem('amux.webui.auth') ?? '{}')).toMatchObject({
+        gatewayUrl: 'http://localhost:57751',
+        token: 'valid-token',
+      });
+    });
   });
 });

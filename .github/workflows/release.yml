@@ -434,9 +434,6 @@ jobs:
           const depFields = ['dependencies', 'peerDependencies', 'optionalDependencies', 'devDependencies'];
 
           const rewriteVersion = (current, version) => {
-            if (typeof current !== 'string') return version;
-            if (current.startsWith('^')) return `^${version}`;
-            if (current.startsWith('~')) return `~${version}`;
             return version;
           };
 

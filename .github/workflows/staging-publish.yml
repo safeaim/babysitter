@@ -845,15 +845,6 @@ jobs:
             }
 
             function rewriteInternalDependencyVersion(currentValue, nextVersion) {
-              if (typeof currentValue !== 'string') {
-                return nextVersion;
-              }
-              if (currentValue.startsWith('workspace:^') || currentValue.startsWith('^')) {
-                return '^' + nextVersion;
-              }
-              if (currentValue.startsWith('workspace:~') || currentValue.startsWith('~')) {
-                return '~' + nextVersion;
-              }
               return nextVersion;
             }
 

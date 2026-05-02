@@ -23,6 +23,7 @@ import {
 import { discoverRepoInstructionPrompts } from "./piWrapper/instructionPrompts";
 import {
   configureAzureOpenAiEnvDefaults,
+  describePiModelResolutionFailure,
   extractAssistantFailure,
   loadPiModule,
   resolvePiModel,
@@ -269,6 +270,14 @@ export class AgentCoreSessionHandle {
   // ---------------------------------------------------------------------------
   // Internal helpers
   // ---------------------------------------------------------------------------
+  private async cleanupPendingTasks(): Promise<void> {
+    while (this.cleanupTasks.length > 0) {
+      const cleanup = this.cleanupTasks.pop();
+      if (cleanup) {
+        await cleanup();
+      }
+    }
+  }
   private async doInitialize(): Promise<void> {
     const mod = await loadPiModule();
     // Bridge common Azure env var aliases that pi-coding-agent doesn't know
@@ -366,8 +375,14 @@ export class AgentCoreSessionHandle {
       const resolved = await resolvePiModel(mod, this.options.model);
       if (resolved) {
         createOpts.model = resolved;
+      } else {
+        await this.cleanupPendingTasks();
+        throw new BabysitterRuntimeError(
+          "PiModelResolutionFailed",
+          describePiModelResolutionFailure(this.options.model),
+          { category: ErrorCategory.Configuration },
+        );
       }
-      // If not resolved, let createAgentSession handle default model selection
     }
     try {
       const { session } = await mod.createAgentSession(createOpts);
@@ -376,12 +391,7 @@ export class AgentCoreSessionHandle {
       }
       this.session = session;
     } catch (error: unknown) {
-      while (this.cleanupTasks.length > 0) {
-        const cleanup = this.cleanupTasks.pop();
-        if (cleanup) {
-          await cleanup();
-        }
-      }
+      await this.cleanupPendingTasks();
       throw error;
     }
   }

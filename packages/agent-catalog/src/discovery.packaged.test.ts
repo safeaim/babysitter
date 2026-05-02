@@ -74,6 +74,8 @@ describe("agent-catalog packaged discovery", () => {
 
   it("ships a packaged discovery snapshot", () => {
     expect(packedEntries.some((entry) => entry.path === "dist/discovery-snapshot.json")).toBe(true);
+    expect(packedEntries.some((entry) => entry.path === "index.js")).toBe(true);
+    expect(packedEntries.some((entry) => entry.path === "index.d.ts")).toBe(true);
     expect(packedEntries.some((entry) => /\.test\.(?:js|d\.ts|d\.ts\.map)$/.test(entry.path))).toBe(false);
   });
 
@@ -192,6 +194,28 @@ describe("agent-catalog packaged discovery", () => {
     expect(result.error).toMatch(/Failed to load graph assets for @a5c-ai\/agent-catalog/);
     expect(result.error).toMatch(/graph\/agent-catalog\.graph\.yaml/);
     expect(result.error).toMatch(/valid YAML/);
+  });
+
+  it("still loads through the root entry shim when package.json is missing from the installed package root", () => {
+    const rootEntryConsumer = installPackedConsumer(tempRoot, packedTgzPath, "consumer-missing-package-json");
+    const installedRoot = path.join(rootEntryConsumer, "node_modules", "@a5c-ai", "agent-catalog");
+    fs.rmSync(path.join(installedRoot, "package.json"), { force: true });
+
+    const output = runNodeScript(rootEntryConsumer, [
+      'const catalog = require("@a5c-ai/agent-catalog");',
+      "process.stdout.write(JSON.stringify({",
+      "  exportCount: Object.keys(catalog).length,",
+      '  hasDiscoveryCallsite: typeof catalog.getCatalogDiscoverySnapshot === "function",',
+      "}));",
+    ]);
+
+    const result = JSON.parse(output) as {
+      exportCount: number;
+      hasDiscoveryCallsite: boolean;
+    };
+
+    expect(result.exportCount).toBeGreaterThan(0);
+    expect(result.hasDiscoveryCallsite).toBe(true);
   });
 
   it("keeps import-only package loading working when evidence assets are malformed and fails at the evidence callsite", () => {

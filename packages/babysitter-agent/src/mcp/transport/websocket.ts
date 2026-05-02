@@ -139,8 +139,8 @@ export async function createWebSocketTransport(
   const wss = new WebSocketServer({ noServer: true });
 
   const connections = new Set<WebSocket>();
-  const pingTimers = new Map<WebSocket, NodeJS.Timeout>();
-  const sessionGraceTimers = new Map<string, NodeJS.Timeout>();
+  const pingTimers = new Map<WebSocket, ReturnType<typeof setInterval>>();
+  const sessionGraceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   let onconnection: ((transport: WebSocketConnectionTransport) => void) | undefined;
 
@@ -259,7 +259,7 @@ export async function createWebSocketTransport(
           await Promise.race([
             new Promise<void>((res) => {
               if (connections.size === 0) { res(); return; }
-              const check = setInterval(() => {
+              const check: ReturnType<typeof setInterval> = setInterval(() => {
                 if (connections.size === 0) {
                   clearInterval(check);
                   res();

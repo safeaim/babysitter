@@ -50,6 +50,74 @@ vi.mock("../../../../interaction", async () => {
   };
 });
 
+vi.mock("@a5c-ai/agent-mux-core", () => {
+  const workspaces: Array<{
+    workspaceDefaultCwd: string;
+    workspaceRootPath: string;
+    workspaceMode: string;
+    repo: {
+      sourcePath: string;
+      targetPath: string;
+      mode: string;
+      alias: string;
+      branch: null;
+    };
+  }> = [];
+
+  class MockWorkspaceService {
+    async createWorkspace(args: { name: string; repos: Array<{ path: string }>; mode: string }) {
+      const repoPath = args.repos[0]?.path ?? process.cwd();
+      const workspace = {
+        id: "workspace-1",
+        name: args.name,
+        mode: args.mode,
+        cwd: path.join(repoPath, ".amux-workspace"),
+        workspaceDefaultCwd: path.join(repoPath, ".amux-workspace"),
+        workspaceRootPath: path.join(repoPath, ".amux-workspace"),
+        repos: args.repos,
+        repo: {
+          sourcePath: repoPath,
+          targetPath: path.join(repoPath, ".amux-workspace"),
+          mode: args.mode,
+          alias: path.basename(repoPath),
+          branch: null,
+        },
+      };
+      workspaces.push({
+        workspaceDefaultCwd: workspace.workspaceDefaultCwd,
+        workspaceRootPath: workspace.workspaceRootPath,
+        workspaceMode: args.mode,
+        repo: workspace.repo,
+      });
+      return workspace;
+    }
+
+    async resolveSessionContext(args: { cwd: string }) {
+      const currentPath = path.resolve(args.cwd);
+      const match = workspaces.find((workspace) =>
+        currentPath === workspace.workspaceDefaultCwd ||
+        currentPath.startsWith(`${workspace.workspaceDefaultCwd}${path.sep}`),
+      );
+      if (!match) {
+        return null;
+      }
+      return {
+        currentPath,
+        workspaceDefaultCwd: match.workspaceDefaultCwd,
+        workspaceRootPath: match.workspaceRootPath,
+        workspaceMode: match.workspaceMode,
+        repo: match.repo,
+      };
+    }
+  }
+
+  return {
+    WorkspaceService: MockWorkspaceService,
+    resolveWorkspaceDefaultCwd: (workspace: { cwd?: string }) =>
+      workspace.cwd ?? process.cwd(),
+  };
+});
+
 vi.mock("../../../piWrapper", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../../piWrapper")>();
   let sessionCounter = 0;

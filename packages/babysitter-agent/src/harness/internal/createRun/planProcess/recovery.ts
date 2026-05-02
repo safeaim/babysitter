@@ -117,20 +117,6 @@ async function recoverProcessDefinitionFromOutputs(args: {
 }): Promise<ProcessDefinitionReport | null> {
   const resolvedDir = path.resolve(args.outputDir);
 
-  try {
-    const entries = await fs.readdir(resolvedDir);
-    const processFiles = entries.filter((entry) => /\.m?js$/.test(entry));
-    if (processFiles.length > 0) {
-      const candidatePath = path.join(resolvedDir, processFiles[0]);
-      return {
-        processPath: candidatePath,
-        summary: "Recovered from missing process-definition tool report by scanning the output directory.",
-      };
-    }
-  } catch {
-    // directory may not exist yet
-  }
-
   for (const output of args.outputs) {
     for (const candidatePath of extractMentionedProcessPaths(output, args.workspace)) {
       try {

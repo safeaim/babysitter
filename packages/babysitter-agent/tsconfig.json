@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "composite": true,
     "declaration": true,
     "declarationMap": true,
@@ -10,6 +10,7 @@
     "rootDir": "src",
     "strict": true,
     "moduleResolution": "node",
+    "types": ["node"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true

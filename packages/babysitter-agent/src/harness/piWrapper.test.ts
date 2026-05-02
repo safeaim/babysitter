@@ -14,6 +14,7 @@ const mockBuildCompactionSettings = vi.fn(() => ({
 }));
 const mockDiscoverRepoInstructionPrompts = vi.fn(() => []);
 const mockConfigureAzureOpenAiEnvDefaults = vi.fn();
+const mockDescribePiModelResolutionFailure = vi.fn((model: string) => `Explicit model "${model}" could not be resolved.`);
 const mockResolvePiModel = vi.fn(async () => undefined);
 const mockLoadPiModule = vi.fn();
 
@@ -40,6 +41,7 @@ vi.mock("./piWrapper/instructionPrompts", () => ({
 
 vi.mock("./piWrapper/moduleSupport", () => ({
   configureAzureOpenAiEnvDefaults: mockConfigureAzureOpenAiEnvDefaults,
+  describePiModelResolutionFailure: mockDescribePiModelResolutionFailure,
   extractAssistantFailure: vi.fn(() => undefined),
   loadPiModule: mockLoadPiModule,
   resolvePiModel: mockResolvePiModel,
@@ -166,5 +168,22 @@ describe("AgentCoreSessionHandle", () => {
       expect.objectContaining({ name: "bash" }),
       { name: "babysitter_run_iterate" },
     ]);
+  });
+
+  it("fails fast when an explicit model cannot be resolved", async () => {
+    const { AgentCoreSessionHandle } = await import("./piWrapper");
+
+    const session = new AgentCoreSessionHandle({
+      workspace: process.cwd(),
+      model: "gemini-3.1-pro-preview",
+    });
+
+    await expect(session.initialize()).rejects.toThrow(
+      'Explicit model "gemini-3.1-pro-preview" could not be resolved.',
+    );
+    expect(mockConfigureAzureOpenAiEnvDefaults).toHaveBeenCalledWith("gemini-3.1-pro-preview");
+    expect(mockResolvePiModel).toHaveBeenCalled();
+    expect(mockDescribePiModelResolutionFailure).toHaveBeenCalledWith("gemini-3.1-pro-preview");
+    expect(createAgentSessionOptions).toBeUndefined();
   });
 });

@@ -255,3 +255,24 @@ export async function resolvePiModel(
 
   return resolved ?? synthesizeAzureModelEntry(modelStr);
 }
+
+export function describePiModelResolutionFailure(modelStr: string): string {
+  const requestedModel = modelStr.trim();
+  const normalized = requestedModel.toLowerCase();
+
+  if (
+    normalized.includes("gemini") ||
+    normalized.startsWith("google:") ||
+    normalized.startsWith("gemini:")
+  ) {
+    return [
+      `Explicit model "${requestedModel}" could not be resolved to a configured internal agent-core model.`,
+      "Configure GOOGLE_API_KEY or GEMINI_API_KEY for Gemini/Google models, or choose a model available in the PI model registry.",
+    ].join(" ");
+  }
+
+  return [
+    `Explicit model "${requestedModel}" could not be resolved to a configured internal agent-core model.`,
+    "Configure auth for that model, or choose a model available in the PI model registry.",
+  ].join(" ");
+}

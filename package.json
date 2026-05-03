@@ -73,7 +73,8 @@
     "docs:dev": "npm run docs:prepare && docusaurus start docs-site --host 0.0.0.0",
     "docs:build": "npm run docs:prepare && docusaurus build docs-site",
     "docs:serve": "docusaurus serve docs-site/build",
-    "docs:clear": "docusaurus clear docs-site"
+    "docs:clear": "docusaurus clear docs-site",
+    "sync:external-plugins": "node scripts/sync-external-plugin-repos.mjs"
   },
   "devDependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.113",

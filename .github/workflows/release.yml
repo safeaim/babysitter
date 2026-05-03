@@ -377,29 +377,11 @@ jobs:
           npm run test:cloud
           npm run verify:cloud-release
 
-      - name: Prepare plugin and metapackage manifests for publish
+      - name: Prepare metapackage manifest for publish
         run: |
           set -euo pipefail
           node -e "
             const fs = require('fs');
-            const sdkVersion = '${{ steps.bump.outputs.version }}';
-            const pluginPackagePaths = [
-              'plugins/babysitter-codex/package.json',
-              'plugins/babysitter-github/package.json',
-              'plugins/babysitter-cursor/package.json',
-              'plugins/babysitter-gemini/package.json',
-              'plugins/babysitter-pi/package.json',
-              'plugins/babysitter-omp/package.json',
-              'plugins/babysitter-opencode/package.json',
-              'plugins/babysitter-openclaw/package.json',
-              'plugins/babysitter-paperclip/package.json'
-            ];
-            for (const pkgPath of pluginPackagePaths) {
-              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-              pkg.dependencies = pkg.dependencies || {};
-              pkg.dependencies['@a5c-ai/babysitter-sdk'] = sdkVersion;
-              fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-            }
             const metaPkgPath = 'packages/babysitter/package.json';
             const metaPkg = JSON.parse(fs.readFileSync(metaPkgPath, 'utf8'));
             metaPkg.dependencies = metaPkg.dependencies || {};
@@ -508,15 +490,6 @@ jobs:
           npm pack --workspace=@a5c-ai/agent-mux-tui --pack-destination artifacts/release
           npm pack --workspace=@a5c-ai/transport-mux --pack-destination artifacts/release
           (cd packages/babysitter && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-codex && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-github && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-cursor && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-gemini && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-pi && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-omp && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-opencode && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-openclaw && npm pack --pack-destination ../../artifacts/release)
-          (cd plugins/babysitter-paperclip && npm pack --pack-destination ../../artifacts/release)
 
       - name: Generate artifact checksums
         run: |
@@ -942,65 +915,6 @@ jobs:
           set -euo pipefail
           npm run deploy:cloud:prod
 
-  publish_release_plugins:
-    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip release]') }}
-    name: Publish Release Plugin - ${{ matrix.name }}
-    needs: publish_release_foundation
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: babysitter-codex
-            command: cd plugins/babysitter-codex && npm run deploy
-          - name: babysitter-github
-            command: cd plugins/babysitter-github && npm run deploy
-          - name: babysitter-cursor
-            command: cd plugins/babysitter-cursor && npm run deploy
-          - name: babysitter-gemini
-            command: cd plugins/babysitter-gemini && npm run deploy
-          - name: babysitter-pi
-            command: cd plugins/babysitter-pi && npm run deploy
-          - name: babysitter-omp
-            command: cd plugins/babysitter-omp && npm run deploy
-          - name: babysitter-opencode
-            command: cd plugins/babysitter-opencode && npm run deploy
-          - name: babysitter-openclaw
-            command: cd plugins/babysitter-openclaw && npm run deploy
-          - name: babysitter-paperclip
-            command: cd plugins/babysitter-paperclip && npm run deploy
-    steps:
-      - name: Download release publish workspace
-        uses: actions/download-artifact@v4
-        with:
-          name: release-publish-source
-          path: artifacts/publish-source
-
-      - name: Extract release publish workspace
-        run: |
-          set -euo pipefail
-          tar -xzf artifacts/publish-source/release-publish-source.tgz -C "$GITHUB_WORKSPACE"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org/
-          always-auth: true
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
-
-      - name: Publish plugin
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: ${{ matrix.command }}
-
   finalize_release:
     if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip release]') }}
     name: Finalize Release
@@ -1013,7 +927,6 @@ jobs:
       - publish_release_agent_mux_cli
       - publish_release_agent_mux_root
       - publish_release_agent_mux_tui
-      - publish_release_plugins
       - deploy_release_cloud
     runs-on: ubuntu-latest
     permissions:

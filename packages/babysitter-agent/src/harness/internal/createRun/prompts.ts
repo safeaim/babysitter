@@ -87,16 +87,16 @@ function formatHarnessAssignmentGuidance(context: HarnessPromptContext): string[
   return [
     "Harness assignment guidance:",
     `- Only assign installed harness names. Installed harnesses: ${installedList}.`,
-    "- Default `agent`, legacy `node`, and `orchestrator_task` work to the internal PI worker. Prefer `task.execution.harness` to route a task to a specific installed harness. The legacy `task.metadata.harness` field is still supported but `execution.harness` takes precedence when both are present.",
+    "- Default `agent`, legacy `node`, and `orchestrator_task` work to the internal agent-core worker. Prefer `task.execution.harness` to route a task to a specific installed harness. The legacy `task.metadata.harness` field is still supported but `execution.harness` takes precedence when both are present.",
     "- Treat `agent-core` / `oh-my-pi` as the built-in programmatic harness. Its default worker mode is native/local execution with isolation disabled unless the task opts into stronger guardrails.",
     "- Shell and legacy node effects must be executed intentionally by the orchestrating agent and then posted via `task:post`; never assume a host-side auto-executor exists.",
-    "- Shell effects run through the internal PI worker even when orchestration is bound to an external CLI harness. Keep shell work on that worker by default.",
-    "- Do not set `task.metadata.bashSandbox`, `task.metadata.isolated`, or `task.metadata.enableCompaction` for ordinary internal PI work. Leave them unset unless the task truly requires stronger guardrails or long-running compaction.",
+    "- Shell effects run through the internal agent-core worker even when orchestration is bound to an external CLI harness. Keep shell work on that worker by default.",
+    "- Do not set `task.metadata.bashSandbox`, `task.metadata.isolated`, or `task.metadata.enableCompaction` for ordinary internal agent-core work. Leave them unset unless the task truly requires stronger guardrails or long-running compaction.",
     "- For risky shell or system-changing subtasks that truly need stronger guardrails, encode them explicitly in task metadata: `bashSandbox: \"secure\"` to opt into AgentSH, `isolated: true` to disable repo/global extensions and skills, and `enableCompaction: true` when a long-running internal worker needs compaction.",
     "- Treat external CLI harnesses (resolved via agent-mux) as text-agent harnesses. Use them only when their behavior is materially better for that task.",
     "- Tasks may include an `execution` field with `model`, `harness`, and `permissions`. `execution.model` is universal (plugins and the built-in harness). `execution.harness` and `execution.permissions` are internal harness routing/guardrail hints, not a universal plugin contract.",
     "- Do not treat `execution.permissions` as a cross-harness security boundary. Plugin targets may ignore it entirely, so route security-sensitive work through an execution path whose enforcement you actually control.",
-    "- External CLI harnesses do not inherit AgentSH protection for their own internal shell or tool execution. Route security-sensitive shell work through the internal PI worker instead of assuming the external harness is guarded.",
+    "- External CLI harnesses do not inherit AgentSH protection for their own internal shell or tool execution. Route security-sensitive shell work through the internal agent-core worker instead of assuming the external harness is guarded.",
     context.selectedHarnessName
       ? `- The selected orchestration binding harness for this run is ${context.selectedHarnessName}.`
       : "- No orchestration binding harness has been selected yet.",

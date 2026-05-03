@@ -78,13 +78,13 @@ export function buildExternalProcessDefinitionPrompt(args: {
     "- Include quality gates and verification/refinement steps that fit the request.",
     "- For this request, a good default is a process that plans the game scope, scaffolds the project, implements the game loop and UI, and verifies the result with runnable checks.",
     "- Keep the module syntactically valid ESM. If you embed HTML/CSS/JS asset contents inside the process source, avoid raw nested template literals; prefer arrays joined with \"\\n\", String.raw, or escaped inner backticks and \\${...} sequences.",
-    "- Default every task to the internal PI worker. If task-level harness routing is needed, only use `task.metadata.harness` for explicit overrides to installed harness names from this list: "
+    "- Default every task to the internal agent-core worker. If task-level harness routing is needed, only use `task.metadata.harness` for explicit overrides to installed harness names from this list: "
       + `${installedHarnessList}.`,
     args.promptContext.selectedHarnessName
       ? `- The selected orchestration harness for the session will be ${args.promptContext.selectedHarnessName}; keep ` + "`task.metadata.harness`" + " unset for default internal execution and only encode it when a task must explicitly override that default."
       : "- No orchestration harness has been preselected; keep harness routing explicit only where it materially matters.",
-    "- Do not set `task.metadata.bashSandbox`, `task.metadata.isolated`, or `task.metadata.enableCompaction` for ordinary internal PI work. Leave them unset unless the task truly requires stronger guardrails or long-running compaction.",
-    "- External harnesses do not provide PI sandbox guardrails for their own tool execution. Keep security-sensitive shell work on the internal PI worker by using shell effects without routing them to an external harness.",
+    "- Do not set `task.metadata.bashSandbox`, `task.metadata.isolated`, or `task.metadata.enableCompaction` for ordinary internal agent-core work. Leave them unset unless the task truly requires stronger guardrails or long-running compaction.",
+    "- External harnesses do not provide agent-core worker guardrails for their own tool execution. Keep security-sensitive shell work on the internal agent-core worker by using shell effects without routing them to an external harness.",
     "",
     "Output rules:",
     `- Choose a descriptive kebab-case filename (e.g. "user-auth-tdd.mjs", "data-pipeline-setup.js") and write the file to the process output directory.`,

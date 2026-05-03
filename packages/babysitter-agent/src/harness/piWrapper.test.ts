@@ -2,11 +2,11 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockCreateSecureBashBackend = vi.fn(async (): Promise<{
+const mockCreateSecureBashBackend = vi.fn((): Promise<{
   operations: unknown;
   promptNote: string;
   dispose: () => void;
-} | null> => null);
+} | null> => Promise.resolve(null));
 const mockLoadCompressionConfigSafe = vi.fn(() => null);
 const mockBuildCompactionSettings = vi.fn(() => ({
   compaction: {},
@@ -15,7 +15,7 @@ const mockBuildCompactionSettings = vi.fn(() => ({
 const mockDiscoverRepoInstructionPrompts = vi.fn(() => []);
 const mockConfigureAzureOpenAiEnvDefaults = vi.fn();
 const mockDescribePiModelResolutionFailure = vi.fn((model: string) => `Explicit model "${model}" could not be resolved.`);
-const mockResolvePiModel = vi.fn(async () => undefined);
+const mockResolvePiModel = vi.fn(() => Promise.resolve(undefined));
 const mockLoadPiModule = vi.fn();
 
 let defaultResourceLoaderOptions: Record<string, unknown> | undefined;
@@ -55,21 +55,21 @@ describe("AgentCoreSessionHandle", () => {
     vi.clearAllMocks();
 
     mockLoadPiModule.mockResolvedValue({
-      createAgentSession: vi.fn(async (options?: Record<string, unknown>) => {
+      createAgentSession: vi.fn((options?: Record<string, unknown>) => {
         createAgentSessionOptions = options;
-        return {
+        return Promise.resolve({
           session: {
-            prompt: vi.fn(async () => undefined),
-            steer: vi.fn(async () => undefined),
-            followUp: vi.fn(async () => undefined),
+            prompt: vi.fn(() => Promise.resolve(undefined)),
+            steer: vi.fn(() => Promise.resolve(undefined)),
+            followUp: vi.fn(() => Promise.resolve(undefined)),
             subscribe: vi.fn(() => () => {}),
-            executeBash: vi.fn(async () => ({
+            executeBash: vi.fn(() => Promise.resolve({
               output: "",
               exitCode: 0,
               cancelled: false,
               truncated: false,
             })),
-            abort: vi.fn(async () => undefined),
+            abort: vi.fn(() => Promise.resolve(undefined)),
             dispose: vi.fn(),
             getLastAssistantText: vi.fn(() => ""),
             get sessionId() {
@@ -82,7 +82,7 @@ describe("AgentCoreSessionHandle", () => {
               return [];
             },
           },
-        };
+        });
       }),
       DefaultResourceLoader: class {
         constructor(options?: Record<string, unknown>) {

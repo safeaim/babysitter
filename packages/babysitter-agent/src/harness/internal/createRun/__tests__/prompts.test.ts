@@ -55,7 +55,7 @@ describe("harnessPrompts", () => {
     expect(prompt).toContain("Discovered harnesses:");
     expect(prompt).toContain("pi | installed=yes");
     expect(prompt).toContain("metadata.harness");
-    expect(prompt).toContain("Default `agent`, legacy `node`, and `orchestrator_task` work to the internal PI worker");
+    expect(prompt).toContain("Default `agent`, legacy `node`, and `orchestrator_task` work to the internal agent-core worker");
     expect(prompt).toContain("native/local execution");
     expect(prompt).toContain("Do not set `task.metadata.bashSandbox`, `task.metadata.isolated`, or `task.metadata.enableCompaction`");
     expect(prompt).toContain("bashSandbox: \"secure\"");
@@ -102,7 +102,7 @@ describe("harnessPrompts", () => {
     expect(prompt).toContain("respect task-level harness metadata");
     expect(prompt).toContain("Shell and legacy node effects are first-class pending effects");
     expect(prompt).toContain("For delegated or fresh-context work, prefer `task`");
-    expect(prompt).toContain("Shell effects run through the internal PI worker");
+    expect(prompt).toContain("Shell effects run through the internal agent-core worker");
     expect(prompt).toContain("env.CI=true");
   });
 

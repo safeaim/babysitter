@@ -118,8 +118,8 @@ vi.mock("@a5c-ai/agent-mux-core", () => {
   };
 });
 
-vi.mock("../../../piWrapper", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../../piWrapper")>();
+vi.mock("@a5c-ai/agent-core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@a5c-ai/agent-core")>();
   let sessionCounter = 0;
   const createAgentCoreSession = vi.fn((options?: { customTools?: Array<Record<string, unknown>>; workspace?: string }) => {
     sessionCounter += 1;
@@ -258,7 +258,7 @@ import {
 } from "@a5c-ai/babysitter-sdk";
 import { WorkspaceService, resolveWorkspaceDefaultCwd } from "@a5c-ai/agent-mux-core";
 import { invokeHarness } from "../../../invoker";
-import { createAgentCoreSession } from "../../../piWrapper";
+import { createAgentCoreSession } from "@a5c-ai/agent-core";
 import { getSessionContext } from "../../../../session/context";
 
 const detectCallerHarnessMock = detectCallerHarness as Mock;
@@ -3120,7 +3120,7 @@ describe("handleHarnessCreateRun", () => {
     });
   });
 
-  describe("PI worker defaults", () => {
+  describe("agent-core worker defaults", () => {
     it("uses native local PI defaults for phase sessions instead of forced secure isolation", async () => {
       (discoverHarnesses as Mock).mockResolvedValue([
         makeDiscoveryResult({ name: "pi" }),

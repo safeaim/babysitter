@@ -16,6 +16,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function isUnknownArray(value: unknown): value is unknown[] {
+  return Array.isArray(value);
+}
+
 function validateFileTrigger(raw: unknown, index: number): string | null {
   if (!isRecord(raw)) {
     return `Trigger at index ${index} must be an object`;
@@ -120,7 +124,7 @@ function validateConfig(raw: unknown): { valid: true; config: DaemonConfig } | {
     return { valid: false, error: "Missing required field: workspace" };
   }
 
-  if (!Array.isArray(obj.triggers)) {
+  if (!isUnknownArray(obj.triggers)) {
     return { valid: false, error: "Missing required field: triggers (must be an array)" };
   }
 

@@ -19,7 +19,7 @@ import {
   ErrorCategory,
   detectCallerHarness,
 } from "@a5c-ai/babysitter-sdk";
-import type { AgentCoreSessionHandle } from "../../../piWrapper";
+import type { AgentCoreSessionHandle } from "@a5c-ai/agent-core";
 
 describe("harnessUtils", () => {
   beforeEach(() => {
@@ -153,7 +153,7 @@ describe("harnessUtils", () => {
     }
   });
 
-  it("uses the longer PI worker timeout by default for delegated work", () => {
+  it("uses the longer agent-core worker timeout by default for delegated work", () => {
     const options = buildPiWorkerSessionOptions({
       action: {
         effectId: "eff-1",

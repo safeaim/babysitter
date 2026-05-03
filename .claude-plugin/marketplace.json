@@ -7,12 +7,13 @@
   "plugins": [
     {
       "name": "babysitter",
-      "source": "./plugins/babysitter",
+      "source": "https://github.com/a5c-ai/babysitter-claude.git",
       "description": "Babysitter",
       "version": "5.0.0",
       "author": {
         "name": "a5c.ai"
-      }
+      },
+      "repository": "https://github.com/a5c-ai/babysitter-claude"
     }
   ]
 }

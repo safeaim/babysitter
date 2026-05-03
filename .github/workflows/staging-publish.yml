@@ -657,10 +657,6 @@ jobs:
               }
               fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
             }
-            const codexPkgPath = 'plugins/babysitter-codex/package.json';
-            const codexPkg = JSON.parse(fs.readFileSync(codexPkgPath, 'utf8'));
-            codexPkg.version = '${STAGING_VERSION_CODEX}';
-            fs.writeFileSync(codexPkgPath, JSON.stringify(codexPkg, null, 2) + '\n');
             const githubPkgPath = 'plugins/babysitter-github/package.json';
             const githubPkg = JSON.parse(fs.readFileSync(githubPkgPath, 'utf8'));
             githubPkg.version = '${STAGING_VERSION_GITHUB}';
@@ -677,18 +673,6 @@ jobs:
             const cursorPlugin = JSON.parse(fs.readFileSync(cursorPluginPath, 'utf8'));
             cursorPlugin.version = '${STAGING_VERSION_CURSOR}';
             fs.writeFileSync(cursorPluginPath, JSON.stringify(cursorPlugin, null, 2) + '\n');
-            const geminiPkgPath = 'plugins/babysitter-gemini/package.json';
-            const geminiPkg = JSON.parse(fs.readFileSync(geminiPkgPath, 'utf8'));
-            geminiPkg.version = '${STAGING_VERSION_GEMINI}';
-            fs.writeFileSync(geminiPkgPath, JSON.stringify(geminiPkg, null, 2) + '\n');
-            const geminiPluginPath = 'plugins/babysitter-gemini/plugin.json';
-            const geminiPlugin = JSON.parse(fs.readFileSync(geminiPluginPath, 'utf8'));
-            geminiPlugin.version = '${STAGING_VERSION_GEMINI}';
-            fs.writeFileSync(geminiPluginPath, JSON.stringify(geminiPlugin, null, 2) + '\n');
-            const geminiExtensionPath = 'plugins/babysitter-gemini/gemini-extension.json';
-            const geminiExtension = JSON.parse(fs.readFileSync(geminiExtensionPath, 'utf8'));
-            geminiExtension.version = '${STAGING_VERSION_GEMINI}';
-            fs.writeFileSync(geminiExtensionPath, JSON.stringify(geminiExtension, null, 2) + '\n');
             const piPkgPath = 'plugins/babysitter-pi/package.json';
             const piPkg = JSON.parse(fs.readFileSync(piPkgPath, 'utf8'));
             piPkg.version = '${STAGING_VERSION_PI}';
@@ -1365,70 +1349,10 @@ jobs:
           set -euo pipefail
           npm run deploy:cloud:staging
 
-  publish_staging_plugins:
-    if: ${{ !contains(github.event.head_commit.message, '[skip staging]') }}
-    name: Publish Staging Plugin - ${{ matrix.name }}
-    needs: publish_staging_foundation
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: babysitter-codex
-            command: cd plugins/babysitter-codex && npm run deploy:staging
-          - name: babysitter-github
-            command: cd plugins/babysitter-github && npm run deploy:staging
-          - name: babysitter-cursor
-            command: cd plugins/babysitter-cursor && npm run deploy:staging
-          - name: babysitter-gemini
-            command: cd plugins/babysitter-gemini && npm run deploy:staging
-          - name: babysitter-pi
-            command: cd plugins/babysitter-pi && npm run deploy:staging
-          - name: babysitter-omp
-            command: cd plugins/babysitter-omp && npm run deploy:staging
-          - name: babysitter-opencode
-            command: cd plugins/babysitter-opencode && npm run deploy:staging
-          - name: babysitter-openclaw
-            command: cd plugins/babysitter-openclaw && npm run deploy:staging
-          - name: babysitter-paperclip
-            command: cd plugins/babysitter-paperclip && npm run deploy:staging
-    steps:
-      - name: Download staging publish workspace
-        uses: actions/download-artifact@v4
-        with:
-          name: staging-publish-source
-          path: artifacts/publish-source
-
-      - name: Extract staging publish workspace
-        run: |
-          set -euo pipefail
-          tar -xzf artifacts/publish-source/staging-publish-source.tgz -C "$GITHUB_WORKSPACE"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org/
-          always-auth: true
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
-
-      - name: Publish plugin
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: ${{ matrix.command }}
-
   publish_staging_metapackage:
     if: ${{ !contains(github.event.head_commit.message, '[skip staging]') }}
     name: Publish Staging Metapackage
     needs:
-      - publish_staging_plugins
       - publish_staging_agent_mux_tui
       - publish_staging_foundation
       - publish_staging_hooks_and_core

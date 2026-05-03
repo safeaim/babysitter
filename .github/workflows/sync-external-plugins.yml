@@ -1,0 +1,57 @@
+name: Sync External Plugins
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-external-plugins-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync_external_plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate a5c GitHub App token
+        id: a5c-token
+        continue-on-error: true
+        uses: a5c-ai/generate-token-action@main
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.a5c-token.outputs.a5c_token || github.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          npm ci
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Generate plugin snapshots
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-catalog
+          npm run build --workspace=@a5c-ai/agent-plugins-mux
+          npm run generate:plugins
+
+      - name: Sync generated plugin repositories
+        env:
+          GH_TOKEN: ${{ steps.a5c-token.outputs.a5c_token || github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/sync-external-plugin-repos.mjs --push --branch=${{ github.ref_name }}

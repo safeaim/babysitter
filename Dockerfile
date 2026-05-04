@@ -79,6 +79,9 @@ RUN --mount=type=cache,target=/root/.npm \
     npm install -g ./packages/sdk ./packages/agent-core ./packages/babysitter-agent --cache=/root/.npm
 
 RUN --mount=type=cache,target=/root/.npm \
+    npm install -g @openai/codex --cache=/root/.npm
+
+RUN --mount=type=cache,target=/root/.npm \
     npm install -g @mariozechner/pi-coding-agent --cache=/root/.npm
 
 # Read plugin version from plugin.json (single source of truth)

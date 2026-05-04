@@ -12,6 +12,7 @@ import {
   emitProgress,
   isIgnorablePiPromptFailure,
   promptPiWithRetry,
+  resolveAgentCoreBackendForHarness,
   resolveTaskHarness,
   writeVerboseBlock,
   writeVerboseLine,
@@ -326,6 +327,7 @@ export async function runInternalOrchestrationPhase(
   orchestrationSession = registerPiSession(createAgentCoreSession({
     workspace: args.workspace,
     model: args.model,
+    backend: resolveAgentCoreBackendForHarness(args.selectedHarnessName),
     toolsMode: "coding",
     customTools: mergedTools,
     uiContext: args.interactive && args.rl

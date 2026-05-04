@@ -5,6 +5,8 @@ import type {
   AgentCorePromptResult,
   AgentCoreSessionOptions,
 } from "../../types";
+import { mapHarnessToAmuxAdapter, hasAmuxAdapter } from "../../amux/amuxHarnessMap";
+import { normalizeBuiltInHarnessName } from "../../builtInHarness";
 import type { DelegationConfig } from "./utils";
 
 export const TRANSIENT_PI_PROMPT_RETRY_DELAYS_MS = process.env.VITEST
@@ -209,4 +211,18 @@ export function buildPiWorkerSessionOptions(args: {
     ...(appendSystemPrompt ? { appendSystemPrompt } : {}),
     ...(agentDir ? { agentDir } : {}),
   };
+}
+
+export function resolveAgentCoreBackendForHarness(harnessName?: string): string | undefined {
+  const normalizedHarness = normalizeBuiltInHarnessName(harnessName?.trim() ?? "");
+  if (!normalizedHarness || normalizedHarness === "agent-core") {
+    return undefined;
+  }
+  if (normalizedHarness === "pi") {
+    return "pi";
+  }
+  if (hasAmuxAdapter(normalizedHarness)) {
+    return mapHarnessToAmuxAdapter(normalizedHarness);
+  }
+  return normalizedHarness;
 }

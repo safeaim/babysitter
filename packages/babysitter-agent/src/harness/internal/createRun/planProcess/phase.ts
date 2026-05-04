@@ -7,6 +7,7 @@ import {
   createAgentCoreSession,
   createReadlineAskUserQuestionUiContext,
   emitProgress,
+  resolveAgentCoreBackendForHarness,
   writeVerboseBlock,
   writeVerboseLine,
   type AgentCoreSessionEvent,
@@ -97,6 +98,7 @@ export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanPr
   sessionRef.current = createAgentCoreSession({
     workspace: args.workspace,
     model: args.model,
+    backend: resolveAgentCoreBackendForHarness(args.selectedHarnessName),
     thinkingLevel: "low",
     toolsMode: planProcessToolsMode,
     customTools: mergedCustomTools,

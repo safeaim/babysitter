@@ -13,6 +13,7 @@ import {
   promptPiWithRetry,
   DEFAULT_INTERACTIVE_ASK_TIMEOUT_MS,
   PI_WORKER_TIMEOUT_MS,
+  resolveAgentCoreBackendForHarness,
 } from "../utils";
 import {
   BabysitterRuntimeError,
@@ -180,6 +181,15 @@ describe("harnessUtils", () => {
     expect(shouldUseExternalHarness("internal")).toBe(false);
     expect(shouldUseExternalHarness("agent-core")).toBe(false);
     expect(shouldUseExternalHarness("oh-my-pi")).toBe(false);
+  });
+
+  it("maps selected harnesses to the correct agent-core backend", () => {
+    expect(resolveAgentCoreBackendForHarness("internal")).toBeUndefined();
+    expect(resolveAgentCoreBackendForHarness("agent-core")).toBeUndefined();
+    expect(resolveAgentCoreBackendForHarness("pi")).toBe("pi");
+    expect(resolveAgentCoreBackendForHarness("codex")).toBe("codex");
+    expect(resolveAgentCoreBackendForHarness("github-copilot")).toBe("copilot");
+    expect(resolveAgentCoreBackendForHarness("oh-my-pi")).toBe("omp");
   });
 
   describe("promptPiWithRetry", () => {

@@ -268,6 +268,7 @@ export {
   isIgnorablePiPromptFailure,
   promptPiWithRetry,
   buildPiWorkerSessionOptions,
+  resolveAgentCoreBackendForHarness,
 } from "./pi";
 
 export type { CompressionConfig } from "@a5c-ai/babysitter-sdk";

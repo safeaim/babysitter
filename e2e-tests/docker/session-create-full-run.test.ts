@@ -98,7 +98,7 @@ describeInternalHarness("babysitter-harness call full internal-harness run", () 
           "babysitter-harness call --prompt \"create a game\" --harness pi --model gpt-5.4 --workspace /workspace/session-create-internal --runs-dir /workspace/session-create-internal/.a5c/runs --no-interactive --verbose 2>&1 | tee /tmp/session-create-internal.log",
         ].join("\n"),
         {
-          timeout: 1_200_000,
+          timeout: 1_800_000,
           maxBuffer: 20 * 1024 * 1024,
         },
       );
@@ -125,5 +125,5 @@ describeInternalHarness("babysitter-harness call full internal-harness run", () 
 
     const outputExists = dockerExec(`test -f ${runDir}/state/output.json && echo ok`).trim();
     expect(outputExists).toBe("ok");
-  }, 900_000);
+  }, 1_800_000);
 });

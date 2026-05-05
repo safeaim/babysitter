@@ -62,10 +62,10 @@ describeInternalHarness("babysitter-harness call full internal-harness run", () 
     const agents = [
       "# Session-create CI guardrails",
       "",
-      "- Build the smallest possible local browser game that satisfies the request.",
-      "- Prefer a single HTML file with embedded JavaScript and a tiny accompanying test or verification artifact.",
+      "- Build the smallest possible local HTML page that satisfies the request.",
+      "- Prefer a single HTML file with inline CSS and at most a tiny verification note.",
       "- Keep all work inside the current workspace.",
-      "- Finish only when the generated game can be opened locally and basic verification files exist.",
+      "- Finish only when the generated page can be opened locally and basic verification files exist.",
       "",
     ].join("\n");
     writeFileSync(path.join(ARTIFACT_ROOT, "AGENTS.md"), agents, "utf8");
@@ -95,7 +95,7 @@ describeInternalHarness("babysitter-harness call full internal-harness run", () 
           `export AZURE_OPENAI_RESOURCE_NAME=${shellEscape(process.env.AZURE_OPENAI_PROJECT_NAME || "")}`,
           `export AZURE_OPENAI_BASE_URL=${shellEscape(`https://${process.env.AZURE_OPENAI_PROJECT_NAME}.openai.azure.com`)}`,
           `export AZURE_OPENAI_DEPLOYMENT=${shellEscape(process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-5.4")}`,
-          "babysitter-harness call --prompt \"create a game\" --harness pi --model gpt-5.4 --workspace /workspace/session-create-internal --runs-dir /workspace/session-create-internal/.a5c/runs --no-interactive --verbose 2>&1 | tee /tmp/session-create-internal.log",
+          "babysitter-harness call --prompt \"create a single minimal HTML page that says hello\" --harness pi --model gpt-5.4 --workspace /workspace/session-create-internal --runs-dir /workspace/session-create-internal/.a5c/runs --no-interactive --verbose 2>&1 | tee /tmp/session-create-internal.log",
         ].join("\n"),
         {
           timeout: 1_800_000,

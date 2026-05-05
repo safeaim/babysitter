@@ -36,6 +36,82 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
+      - name: Prepare staging prerelease manifests
+        if: startsWith(github.ref_name, 'babysitter/staging/')
+        run: |
+          set -euo pipefail
+          BASE_SDK=$(node -e "console.log(require('./packages/sdk/package.json').version)")
+          IFS='.' read -r SDK_MAJOR SDK_MINOR SDK_PATCH <<< "$BASE_SDK"
+          SDK_NEXT_PATCH=$((SDK_PATCH + 1))
+          BASE_UNIFIED=$(node -e "console.log(require('./packages/agent-plugins-mux/package.json').version)")
+          IFS='.' read -r UNIFIED_MAJOR UNIFIED_MINOR UNIFIED_PATCH <<< "$BASE_UNIFIED"
+          UNIFIED_NEXT_PATCH=$((UNIFIED_PATCH + 1))
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          STAGING_VERSION_SDK="${SDK_MAJOR}.${SDK_MINOR}.${SDK_NEXT_PATCH}-staging.${SHORT_SHA}"
+          STAGING_VERSION_UNIFIED="${UNIFIED_MAJOR}.${UNIFIED_MINOR}.${UNIFIED_NEXT_PATCH}-staging.${SHORT_SHA}"
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const sdkVersion = '${STAGING_VERSION_SDK}';
+            const unifiedVersion = '${STAGING_VERSION_UNIFIED}';
+            const versionByPackageName = new Map([
+              ['@a5c-ai/agent-catalog', sdkVersion],
+              ['@a5c-ai/agent-core', sdkVersion],
+              ['@a5c-ai/babysitter', sdkVersion],
+              ['@a5c-ai/babysitter-agent', sdkVersion],
+              ['@a5c-ai/babysitter-observer-dashboard', sdkVersion],
+              ['@a5c-ai/babysitter-sdk', sdkVersion],
+              ['@a5c-ai/cloud', sdkVersion],
+              ['@a5c-ai/breakpoints-mux', sdkVersion],
+              ['@a5c-ai/agent-plugins-mux', unifiedVersion]
+            ]);
+            const fields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
+            const roots = ['packages', 'plugins'];
+            const skipDirs = new Set(['.git', 'node_modules', 'dist', 'build', 'coverage', 'artifacts']);
+            const packageJsonPaths = new Set(['package.json']);
+
+            function collectPackageJsons(dir) {
+              if (!fs.existsSync(dir)) return;
+              for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                const fullPath = path.join(dir, entry.name);
+                if (entry.isDirectory()) {
+                  if (!skipDirs.has(entry.name)) {
+                    collectPackageJsons(fullPath);
+                  }
+                  continue;
+                }
+                if (entry.isFile() && entry.name === 'package.json') {
+                  packageJsonPaths.add(fullPath);
+                }
+              }
+            }
+
+            for (const rootDir of roots) {
+              collectPackageJsons(rootDir);
+            }
+
+            for (const pkgPath of packageJsonPaths) {
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+              let changed = false;
+              const nextPackageVersion = versionByPackageName.get(pkg.name);
+              if (nextPackageVersion && pkg.version !== nextPackageVersion) {
+                pkg.version = nextPackageVersion;
+                changed = true;
+              }
+              for (const field of fields) {
+                if (!pkg[field]) continue;
+                for (const [depName, nextVersion] of versionByPackageName) {
+                  if (!pkg[field][depName] || pkg[field][depName] === nextVersion) continue;
+                  pkg[field][depName] = nextVersion;
+                  changed = true;
+                }
+              }
+              if (changed) {
+                fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\\n');
+              }
+            }
+          "
+
       - name: Publish package from tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

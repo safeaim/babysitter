@@ -204,10 +204,22 @@ function ensureRepo(target) {
   return repoDir;
 }
 
+function remoteBranchExists(repoDir, ref) {
+  return spawnSync('git', ['rev-parse', '--verify', `origin/${ref}`], {
+    cwd: repoDir,
+    stdio: 'ignore',
+  }).status === 0;
+}
+
 function prepareTarget(target) {
   const source = join(ROOT, target.sourceDir);
   if (!existsSync(source)) throw new Error(`Missing plugin source: ${target.sourceDir}`);
   const repoDir = ensureRepo(target);
+  if (shouldPush && remoteBranchExists(repoDir, branch)) {
+    run('git', ['checkout', '-B', branch, `origin/${branch}`], { cwd: repoDir });
+  } else if (shouldPush) {
+    run('git', ['checkout', '-B', branch], { cwd: repoDir });
+  }
   for (const entry of readdirSync(repoDir)) {
     if (entry === '.git') continue;
     rmSync(join(repoDir, entry), { recursive: true, force: true });
@@ -225,7 +237,6 @@ function prepareTarget(target) {
     run('git', ['commit', '-m', `chore: sync ${target.id} plugin release source`], { cwd: repoDir });
   }
   if (shouldPush) {
-    run('git', ['checkout', '-B', branch, 'HEAD'], { cwd: repoDir });
     run('git', ['push', '-u', 'origin', branch], { cwd: repoDir });
   }
   return { repo: target.repo, changed: hasChanges, path: repoDir, source: target.sourceDir };

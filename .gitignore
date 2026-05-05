@@ -51,6 +51,7 @@ e2e-tests/fixtures/*/**
 test-machine.sh
 bug.task.md
 .claude/settings.json
+.claude/worktrees/
 .claude/sound-hooks/config.json
 .claude/sound-hooks/scripts/play.sh
 .claude/sound-hooks/sounds/notification.mp3

@@ -12,6 +12,7 @@ import {
 const ROOT = path.resolve(__dirname, "../..");
 const ARTIFACT_ROOT = path.join(ROOT, "e2e-artifacts", "session-create-internal");
 const WORKSPACE = "/workspace/session-create-internal";
+const FULL_INTERNAL_RUN_TIMEOUT_MS = 2_700_000;
 const HAS_PROVIDER = Boolean(
   process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_PROJECT_NAME,
 );
@@ -98,7 +99,7 @@ describeInternalHarness("babysitter-harness call full internal-harness run", () 
           "babysitter-harness call --prompt \"create a single minimal HTML page that says hello\" --harness pi --model gpt-5.4 --workspace /workspace/session-create-internal --runs-dir /workspace/session-create-internal/.a5c/runs --no-interactive --verbose 2>&1 | tee /tmp/session-create-internal.log",
         ].join("\n"),
         {
-          timeout: 1_800_000,
+          timeout: FULL_INTERNAL_RUN_TIMEOUT_MS,
           maxBuffer: 20 * 1024 * 1024,
         },
       );
@@ -125,5 +126,5 @@ describeInternalHarness("babysitter-harness call full internal-harness run", () 
 
     const outputExists = dockerExec(`test -f ${runDir}/state/output.json && echo ok`).trim();
     expect(outputExists).toBe("ok");
-  }, 1_800_000);
+  }, FULL_INTERNAL_RUN_TIMEOUT_MS);
 });

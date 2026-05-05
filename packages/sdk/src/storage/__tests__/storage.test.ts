@@ -8,6 +8,7 @@ import { getDiskUsage, findOrphanedBlobs } from "../../storage/cleanup";
 import { acquireRunLock, releaseRunLock } from "../../storage/lock";
 import { readRunMetadata } from "../../storage/runFiles";
 import { __resetICloudDriveWarningCacheForTests } from "../../storage/icloudWarning";
+import { BABYSITTER_SDK_VERSION } from "../../sdkVersion";
 
 let tmpRoot: string;
 
@@ -32,6 +33,7 @@ describe("storage primitives", () => {
     });
     const runJson = JSON.parse(await fs.readFile(path.join(runDir, "run.json"), "utf8"));
     expect(runJson.layoutVersion).toBe("test-layout");
+    expect(runJson.sdkVersion).toBe(BABYSITTER_SDK_VERSION);
     expect(await fs.stat(path.join(runDir, "journal"))).toBeDefined();
   });
 
@@ -51,8 +53,10 @@ describe("storage primitives", () => {
     expect(files[0].startsWith("000001")).toBe(true);
     const events = await loadJournal(runDir);
     expect(events[0].type).toBe("RUN_CREATED");
+    expect(events[0].sdkVersion).toBe(BABYSITTER_SDK_VERSION);
     expect(events[0].data.harness).toBe("pi");
     expect(events[1].type).toBe("EFFECT_REQUESTED");
+    expect(events[1].sdkVersion).toBe(BABYSITTER_SDK_VERSION);
     expect(events[1].data.harness).toBe("pi");
   });
 

@@ -11,6 +11,7 @@ export interface RunMetadata extends JsonRecord {
   runId: string;
   request: string;
   processId: string;
+  sdkVersion?: string;
   harness?: string;
   nested?: {
     parentRunId: string;
@@ -101,6 +102,7 @@ export interface JournalEvent {
   path: string;
   type: string;
   recordedAt: string;
+  sdkVersion?: string;
   data: JsonRecord;
   checksum?: string;
 }
@@ -110,6 +112,7 @@ export interface StoredTaskResult {
   effectId: string;
   taskId: string;
   invocationKey: string;
+  sdkVersion?: string;
   status: "ok" | "error" | "cancelled";
   result?: unknown;
   value?: unknown;

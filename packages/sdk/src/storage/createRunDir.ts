@@ -16,6 +16,7 @@ import {
 import { writeFileAtomic } from "./atomic";
 import { getClockIsoString } from "./clock";
 import { warnIfICloudDrivePath } from "./icloudWarning";
+import { withSdkVersion } from "../sdkVersion";
 
 const GITIGNORE_CONTENT = `state/\ntasks/*/artifacts/\nblobs/\norphaned/\n`;
 
@@ -75,7 +76,10 @@ export async function createRunDir(options: CreateRunDirOptions) {
   if (options.extraMetadata) {
     Object.assign(metadata, options.extraMetadata);
   }
-  await writeFileAtomic(path.join(runDir, RUN_METADATA_FILE), JSON.stringify(metadata, null, 2) + "\n");
+  await writeFileAtomic(
+    path.join(runDir, RUN_METADATA_FILE),
+    JSON.stringify(withSdkVersion(metadata), null, 2) + "\n",
+  );
   if (options.inputs !== undefined) {
     await writeFileAtomic(path.join(runDir, INPUTS_FILE), JSON.stringify(options.inputs, null, 2) + "\n");
   }

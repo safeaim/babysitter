@@ -11,6 +11,7 @@ import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import { resolveInputPath } from "../../resolveInputPath";
 import type { KnownHookType } from "../../../hooks/types";
+import { BABYSITTER_SDK_VERSION } from "../../../sdkVersion";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -187,7 +188,9 @@ function formatLogLine(
   fields: Array<[string, string]>,
 ): string {
   const timestamp = new Date().toISOString();
-  const kvPairs = fields.map(([k, v]) => `${k}=${v}`).join(" ");
+  const kvPairs = [...fields, ["sdkVersion", BABYSITTER_SDK_VERSION]]
+    .map(([k, v]) => `${k}=${v}`)
+    .join(" ");
   return `[${timestamp}] [${eventLabel}] hook=${hookType} ${kvPairs}`;
 }
 

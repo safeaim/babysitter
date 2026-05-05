@@ -11,6 +11,8 @@ import { buildEffectIndex } from "../replay/effectIndex";
 import { globalTaskRegistry } from "../../tasks/registry";
 import { createRunDir } from "../../storage/createRunDir";
 import { readStateCache } from "../replay/stateCache";
+import { readTaskDefinition, readTaskResult } from "../../storage/tasks";
+import { BABYSITTER_SDK_VERSION } from "../../sdkVersion";
 
 let tmpRoot: string;
 
@@ -193,6 +195,24 @@ describe("commitEffectResult", () => {
     });
   });
 
+  test("stamps task definition and task result envelopes with the SDK version", async () => {
+    const effect = await requestSampleEffect();
+    const taskDef = await readTaskDefinition(effect.runDir, effect.effectId);
+    expect(taskDef?.sdkVersion).toBe(BABYSITTER_SDK_VERSION);
+
+    await commitEffectResult({
+      runDir: effect.runDir,
+      effectId: effect.effectId,
+      result: {
+        status: "ok",
+        value: { doubled: 4 },
+      },
+    });
+
+    const taskResult = await readTaskResult(effect.runDir, effect.effectId);
+    expect(taskResult?.sdkVersion).toBe(BABYSITTER_SDK_VERSION);
+  });
+
   test("refreshes the state cache after resolving an effect", async () => {
     const effect = await requestSampleEffect();
 
@@ -207,6 +227,7 @@ describe("commitEffectResult", () => {
 
     const stateCache = await readStateCache(effect.runDir);
     expect(stateCache).not.toBeNull();
+    expect(stateCache?.sdkVersion).toBe(BABYSITTER_SDK_VERSION);
     expect(stateCache?.rebuildReason).toBe("post_effect_resolution");
     expect(stateCache?.journalHead?.seq).toBe(3);
     expect(stateCache?.effectsByInvocation[effect.invocationKey]).toMatchObject({

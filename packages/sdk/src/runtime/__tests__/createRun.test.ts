@@ -8,6 +8,7 @@ import { readRunMetadata, readRunInputs } from "../../storage/runFiles";
 import { DEFAULT_LAYOUT_VERSION } from "../../storage/paths";
 import * as ulids from "../../storage/ulids";
 import * as runtimeHooks from "../hooks/runtime";
+import { BABYSITTER_SDK_VERSION } from "../../sdkVersion";
 
 let tmpRoot: string;
 
@@ -44,6 +45,7 @@ describe("createRun", () => {
     expect(metadata.runId).toBe("01HZWTESTRUNID");
     expect(metadata.processId).toBe("ci/pipeline");
     expect(metadata.request).toBe("ci/request-001");
+    expect(metadata.sdkVersion).toBe(BABYSITTER_SDK_VERSION);
     expect(metadata.entrypoint).toEqual({
       importPath: "../processes/pipeline.mjs",
       exportName: "handler",
@@ -53,6 +55,7 @@ describe("createRun", () => {
     const journal = await loadJournal(result.runDir);
     expect(journal).toHaveLength(1);
     expect(journal[0].type).toBe("RUN_CREATED");
+    expect(journal[0].sdkVersion).toBe(BABYSITTER_SDK_VERSION);
     expect(journal[0].data).toMatchObject({
       runId: "01HZWTESTRUNID",
       processId: "ci/pipeline",

@@ -17,6 +17,7 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import { getGlobalLogDir } from "../config";
+import { BABYSITTER_SDK_VERSION } from "../sdkVersion";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -100,6 +101,7 @@ export function formatLogLine(entry: RunLogEntry): string {
   const record: Record<string, unknown> = {
     ts: entry.timestamp,
     level: entry.level,
+    sdkVersion: BABYSITTER_SDK_VERSION,
   };
   if (entry.type) record.type = entry.type;
   if (entry.label) record.label = entry.label;

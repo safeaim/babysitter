@@ -8,6 +8,7 @@ import { nextUlid } from "./ulids";
 import { getClockIsoString } from "./clock";
 import { warnIfICloudDrivePath } from "./icloudWarning";
 import { resolveAmbientSessionId } from "../session/discovery";
+import { withSdkVersion } from "../sdkVersion";
 
 function formatSeq(seq: number) {
   return seq.toString().padStart(6, "0");
@@ -46,11 +47,11 @@ export async function appendEvent(opts: AppendEventOptions): Promise<AppendEvent
     eventData.sessionId = sessionId;
   }
 
-  const eventPayload: JsonRecord = {
+  const eventPayload = withSdkVersion({
     type: opts.eventType,
     recordedAt,
     data: eventData,
-  };
+  });
   const contents = JSON.stringify(eventPayload, null, 2) + "\n";
   const checksum = crypto.createHash("sha256").update(contents).digest("hex");
   const payloadWithChecksum = JSON.stringify({ ...eventPayload, checksum }, null, 2) + "\n";
@@ -103,6 +104,7 @@ export async function loadJournal(runDir: string): Promise<JournalEvent[]> {
         path: fullPath,
         type: raw.type ?? "UNKNOWN",
         recordedAt: typeof raw.recordedAt === "string" ? raw.recordedAt : getClockIsoString(),
+        sdkVersion: typeof raw.sdkVersion === "string" ? raw.sdkVersion : undefined,
         data: raw.data ?? {},
         checksum: typeof raw.checksum === "string" ? raw.checksum : undefined,
       });
@@ -118,6 +120,7 @@ export async function loadJournal(runDir: string): Promise<JournalEvent[]> {
 interface ParsedJournalFile {
   type?: string;
   recordedAt?: string;
+  sdkVersion?: string;
   data?: JsonRecord;
   checksum?: string;
 }

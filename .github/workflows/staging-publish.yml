@@ -841,6 +841,11 @@ jobs:
             for (const pkgPath of packageJsonPaths) {
               const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
               let changed = false;
+              const nextPackageVersion = versionByPackageName.get(pkg.name);
+              if (nextPackageVersion && pkg.version !== nextPackageVersion) {
+                pkg.version = nextPackageVersion;
+                changed = true;
+              }
               for (const field of fields) {
                 if (!pkg[field]) continue;
                 for (const [depName, nextVersion] of versionByPackageName) {

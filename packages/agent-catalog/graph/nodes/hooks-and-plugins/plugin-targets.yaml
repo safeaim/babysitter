@@ -88,6 +88,8 @@ nodes:
     skillHandling: derived-from-commands
     hookRegistrationFormat: cursor
     hookRegistrationOutputPath: hooks.json
+    hookRegistrationAliasPaths:
+      - hooks/hooks-cursor.json
     harnessManifestPath: .cursor-plugin/plugin.json
     scriptVariants:
       - bash

@@ -477,6 +477,7 @@ export interface PluginTargetDescriptor {
   skillHandling?: "native" | "derived-from-commands" | "none";
   hookRegistrationFormat?: string | null;
   hookRegistrationOutputPath?: string | null;
+  hookRegistrationAliasPaths?: string[];
   harnessManifestPath?: string | null;
   scriptVariants?: string[];
   adapterFamily?: "shell-hook" | "programmatic";

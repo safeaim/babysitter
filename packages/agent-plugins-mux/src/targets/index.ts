@@ -59,6 +59,7 @@ function toTargetProfile(target: PluginTargetDescriptor): TargetProfile {
     manifestFormat: toManifestFormat(target.manifestFormat),
     hookRegistrationFormat: toHookRegistrationFormat(target.hookRegistrationFormat),
     hookRegistrationOutputPath: target.hookRegistrationOutputPath ?? null,
+    hookRegistrationAliasPaths: target.hookRegistrationAliasPaths ?? [],
     harnessManifestPath: target.harnessManifestPath ?? null,
     scriptVariants: toScriptVariants(target.scriptVariants),
     npmPublishable: target.npmPublishable,

@@ -39,6 +39,7 @@ export function resolve(
         manifestFormat: 'plugin.json',
         hookRegistrationFormat: null,
         hookRegistrationOutputPath: null,
+        hookRegistrationAliasPaths: [],
         harnessManifestPath: null,
         scriptVariants: [],
         npmPublishable: false,

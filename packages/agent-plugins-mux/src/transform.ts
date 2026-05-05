@@ -314,11 +314,8 @@ function transformHooks(
     );
     if (hookRegFile) {
       files.push(hookRegFile);
-      if (targetProfile.name === 'cursor') {
-        files.push({
-          path: 'hooks/hooks-cursor.json',
-          content: hookRegFile.content,
-        });
+      for (const aliasPath of targetProfile.hookRegistrationAliasPaths) {
+        files.push({ path: aliasPath, content: hookRegFile.content });
       }
     }
   }

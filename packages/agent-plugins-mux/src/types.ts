@@ -238,6 +238,7 @@ export interface TargetProfile {
   manifestFormat: 'plugin.json' | 'package.json' | 'multiple';
   hookRegistrationFormat: HookRegistrationFormat | null;
   hookRegistrationOutputPath: string | null;
+  hookRegistrationAliasPaths: string[];
   harnessManifestPath: string | null;
   scriptVariants: Array<'bash' | 'powershell' | 'javascript' | 'typescript'>;
   npmPublishable: boolean;

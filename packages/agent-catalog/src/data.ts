@@ -531,6 +531,7 @@ function buildPluginTargetDescriptors(hooks: HookDescriptor[]): PluginTargetDesc
       hookRegistrationFormat: valueAsString(node.hookRegistrationFormat) || undefined,
       hookRegistrationOutputPath:
         node.hookRegistrationOutputPath === null ? null : valueAsString(node.hookRegistrationOutputPath) || undefined,
+      hookRegistrationAliasPaths: stringArray(node.hookRegistrationAliasPaths),
       harnessManifestPath:
         node.harnessManifestPath === null ? null : valueAsString(node.harnessManifestPath) || undefined,
       scriptVariants: stringArray(node.scriptVariants),

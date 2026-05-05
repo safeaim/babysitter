@@ -229,7 +229,7 @@ claude plugin list | grep babysitter
 
 1. **Add marketplace (if not added):**
    ```bash
-   claude plugin marketplace add a5c-ai/babysitter
+   claude plugin marketplace add a5c-ai/babysitter-claude
    ```
 
 2. **Install plugin:**
@@ -271,7 +271,7 @@ claude plugin marketplace list
 
 1. **Add marketplace first:**
    ```bash
-   claude plugin marketplace add a5c-ai/babysitter
+   claude plugin marketplace add a5c-ai/babysitter-claude
    ```
 
 2. **Check network connectivity:**

@@ -90,7 +90,7 @@ Babysitter supports multiple AI coding harnesses. Install the plugin for your ha
 Native marketplace install:
 
 ```bash
-claude plugin marketplace add a5c-ai/babysitter
+claude plugin marketplace add a5c-ai/babysitter-claude
 claude plugin install --scope user babysitter@a5c.ai
 ```
 

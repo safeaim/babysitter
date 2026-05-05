@@ -189,7 +189,7 @@ Common causes and solutions:
 
 1. **Plugin not installed:**
    ```bash
-   claude plugin marketplace add a5c-ai/babysitter
+   claude plugin marketplace add a5c-ai/babysitter-claude
    claude plugin install --scope user babysitter@a5c.ai
    ```
 

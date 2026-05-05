@@ -108,7 +108,7 @@ Copy and paste this to install the main CLI and the Claude Code plugin:
 
 ```bash
 npm install -g @a5c-ai/babysitter@latest && \
-claude plugin marketplace add a5c-ai/babysitter && \
+claude plugin marketplace add a5c-ai/babysitter-claude && \
 claude plugin install --scope user babysitter@a5c.ai && \
 claude plugin enable --scope user babysitter@a5c.ai
 ```
@@ -164,7 +164,7 @@ The plugin integrates Babysitter with Claude Code and enables the `/babysitter:*
 
 ```bash
 # Add the plugin repository
-claude plugin marketplace add a5c-ai/babysitter
+claude plugin marketplace add a5c-ai/babysitter-claude
 
 # Install the plugin
 claude plugin install --scope user babysitter@a5c.ai
@@ -294,7 +294,7 @@ The Claude Code plugin provides the `/babysitter:*` command surface that orchest
 
 ```bash
 # Step 1: Add the marketplace repository
-claude plugin marketplace add a5c-ai/babysitter
+claude plugin marketplace add a5c-ai/babysitter-claude
 ```
 
 **Expected:** `Marketplace 'a5c.ai' added`
@@ -547,7 +547,7 @@ babysitter --version
 claude plugin list
 
 # If not listed, install
-claude plugin marketplace add a5c-ai/babysitter
+claude plugin marketplace add a5c-ai/babysitter-claude
 claude plugin install --scope user babysitter@a5c.ai
 claude plugin enable --scope user babysitter@a5c.ai
 
@@ -561,7 +561,7 @@ claude plugin enable --scope user babysitter@a5c.ai
 **Solution:**
 ```bash
 # Add the marketplace first
-claude plugin marketplace add a5c-ai/babysitter
+claude plugin marketplace add a5c-ai/babysitter-claude
 
 # Then install
 claude plugin install --scope user babysitter@a5c.ai

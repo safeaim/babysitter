@@ -131,7 +131,7 @@ Available plugins: [...]
 **Solutions:**
 1. Add marketplace:
    ```bash
-   claude plugin marketplace add a5c-ai/babysitter
+   claude plugin marketplace add a5c-ai/babysitter-claude
    ```
 2. Install plugin:
    ```bash

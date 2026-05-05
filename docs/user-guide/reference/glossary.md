@@ -643,7 +643,7 @@ A Claude Code extension package. The Babysitter plugin (`babysitter@a5c.ai`) pro
 
 **Installation:**
 ```bash
-claude plugin marketplace add a5c-ai/babysitter
+claude plugin marketplace add a5c-ai/babysitter-claude
 claude plugin install --scope user babysitter@a5c.ai
 ```
 

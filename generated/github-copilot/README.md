@@ -28,7 +28,7 @@ Register the a5c.ai marketplace and install the plugin:
 
 ```bash
 # Register the marketplace
-copilot plugin marketplace add a5c-ai/babysitter
+copilot plugin marketplace add a5c-ai/babysitter-claude
 
 # Install the plugin
 copilot plugin install babysitter

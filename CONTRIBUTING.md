@@ -50,7 +50,7 @@ npm install
 ### 3. Install the Plugin in Claude Code
 
 ```bash
-claude plugin marketplace add a5c-ai/babysitter
+claude plugin marketplace add a5c-ai/babysitter-claude
 claude plugin install --scope user babysitter@a5c.ai
 ```
 

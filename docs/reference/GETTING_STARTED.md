@@ -89,7 +89,7 @@ Choose one of three installation methods:
 In Claude Code, run:
 
 ```
-/plugin marketplace add a5c-ai/babysitter
+/plugin marketplace add a5c-ai/babysitter-claude
 /plugin install babysitter@a5c.ai
 ```
 

@@ -2,26 +2,11 @@
  * Atlas bridge for agent-catalog.
  *
  * Adapts the Atlas graph singleton (`@a5c-ai/atlas`) into the same query
- * surface that `graph.ts` exposes, so `data.ts` can source its projections
- * from the pre-indexed Atlas graph instead of reading raw YAML files.
- *
- * Atlas records carry `_kind` where agent-catalog uses `kind`.
- * Atlas edges carry `kind` where agent-catalog uses `relation`.
- * The adapter functions below paper over these differences.
+ * surface that `graph.ts` previously exposed. All data comes from Atlas —
+ * there is no fallback to local YAML files.
  */
 
 import { atlas } from "@a5c-ai/atlas";
-import {
-  getCatalogGraph as getPackagedCatalogGraph,
-  getGraphDocument as getPackagedGraphDocument,
-  getNodeById as getPackagedNodeById,
-  getOntologySchema as getPackagedOntologySchema,
-  listGraphNodes as listPackagedGraphNodes,
-  listIncomingSources as listPackagedIncomingSources,
-  listNodesByKind as listPackagedNodesByKind,
-  listOutgoingTargets as listPackagedOutgoingTargets,
-  listRelationshipsByRelation as listPackagedRelationshipsByRelation,
-} from "./graph";
 import type { AtlasRecord, Edge } from "@a5c-ai/atlas";
 import type {
   CatalogGraph,
@@ -54,10 +39,6 @@ function adaptRecord(record: AtlasRecord): GraphNode {
   return { ...rest, kind: _kind } as unknown as GraphNode;
 }
 
-// ---------------------------------------------------------------------------
-// Edge adaptation: Atlas `kind` -> agent-catalog `relation`
-// ---------------------------------------------------------------------------
-
 function adaptEdge(edge: Edge, index: number): GraphRelationship {
   return {
     id: `edge:${edge.from}->${edge.to}:${edge.kind}:${index}`,
@@ -69,7 +50,7 @@ function adaptEdge(edge: Edge, index: number): GraphRelationship {
 }
 
 // ---------------------------------------------------------------------------
-// Public API — drop-in replacements for graph.ts functions
+// Cached projections
 // ---------------------------------------------------------------------------
 
 let cachedNodes: GraphNode[] | undefined;
@@ -81,10 +62,6 @@ function allNodes(): GraphNode[] {
     cachedNodes = atlas.getAllRecords().filter(isAgentCatalogRecord).map(adaptRecord);
   }
   return cachedNodes;
-}
-
-function hasAgentCatalogAtlasNodes(): boolean {
-  return allNodes().length > 0;
 }
 
 function agentCatalogNodeIds(): Set<string> {
@@ -99,20 +76,21 @@ function allEdges(): GraphRelationship[] {
     const nodeIds = agentCatalogNodeIds();
     cachedEdges = atlas
       .getIndex()
-      .edges.filter((edge) => nodeIds.has(edge.from) && nodeIds.has(edge.to))
+      .edges.filter((edge: Edge) => nodeIds.has(edge.from) && nodeIds.has(edge.to))
       .map(adaptEdge);
   }
   return cachedEdges;
 }
 
+// ---------------------------------------------------------------------------
+// Public API — drop-in replacements for graph.ts functions
+// ---------------------------------------------------------------------------
+
 export function listGraphNodes(): GraphNode[] {
-  return hasAgentCatalogAtlasNodes() ? [...allNodes()] : listPackagedGraphNodes();
+  return [...allNodes()];
 }
 
 export function listNodesByKind(kind: GraphNode["kind"]): GraphNode[] {
-  if (!hasAgentCatalogAtlasNodes()) {
-    return listPackagedNodesByKind(kind);
-  }
   return atlas.getRecordsByKind(kind as string).filter(isAgentCatalogRecord).map(adaptRecord);
 }
 
@@ -120,39 +98,28 @@ export function getNodeById<TNode extends GraphNode = GraphNode>(
   nodeId: string,
 ): TNode | undefined {
   const record = atlas.getRecord(nodeId);
-  return record && isAgentCatalogRecord(record)
-    ? (adaptRecord(record) as TNode)
-    : getPackagedNodeById<TNode>(nodeId);
+  return record ? (adaptRecord(record) as TNode) : undefined;
 }
 
 export function listRelationshipsByRelation(
   relation: string,
 ): GraphRelationship[] {
-  if (!hasAgentCatalogAtlasNodes()) {
-    return listPackagedRelationshipsByRelation(relation);
-  }
   return allEdges().filter((edge) => edge.relation === relation);
 }
 
 export function listGraphEdges(): GraphRelationship[] {
-  return hasAgentCatalogAtlasNodes() ? [...allEdges()] : getPackagedCatalogGraph().edges;
+  return [...allEdges()];
 }
 
 export function listOutgoingTargets(
   nodeId: string,
   relation: string,
 ): GraphNode[] {
-  if (!hasAgentCatalogAtlasNodes()) {
-    return listPackagedOutgoingTargets(nodeId, relation);
-  }
-  const targetIds = atlas
+  return atlas
     .getOutgoing(nodeId)
-    .filter((edge) => edge.kind === relation)
-    .map((edge) => edge.to);
-
-  return targetIds
-    .map((id) => atlas.getRecord(id))
-    .filter((record): record is AtlasRecord => record !== undefined && isAgentCatalogRecord(record))
+    .filter((edge: Edge) => edge.kind === relation)
+    .map((edge: Edge) => atlas.getRecord(edge.to))
+    .filter((record: AtlasRecord | undefined): record is AtlasRecord => record !== undefined)
     .map(adaptRecord);
 }
 
@@ -160,56 +127,56 @@ export function listIncomingSources(
   nodeId: string,
   relation: string,
 ): GraphNode[] {
-  if (!hasAgentCatalogAtlasNodes()) {
-    return listPackagedIncomingSources(nodeId, relation);
-  }
-  const sourceIds = atlas
+  return atlas
     .getIncoming(nodeId)
-    .filter((edge) => edge.kind === relation)
-    .map((edge) => edge.from);
-
-  return sourceIds
-    .map((id) => atlas.getRecord(id))
-    .filter((record): record is AtlasRecord => record !== undefined && isAgentCatalogRecord(record))
+    .filter((edge: Edge) => edge.kind === relation)
+    .map((edge: Edge) => atlas.getRecord(edge.from))
+    .filter((record: AtlasRecord | undefined): record is AtlasRecord => record !== undefined)
     .map(adaptRecord);
 }
 
+export function listRelationshipsForNode(nodeId: string): GraphRelationship[] {
+  return allEdges().filter(
+    (edge) => edge.from === nodeId || edge.to === nodeId,
+  );
+}
+
 // ---------------------------------------------------------------------------
-// Graph-document and schema synthesis
-//
-// The original graph.ts reads these from dedicated YAML files. Atlas stores
-// them as regular records (kind GraphDocument / OntologySchema). We pull them
-// from Atlas and cast to the expected shapes.
+// Synthetic graph document and schema
 // ---------------------------------------------------------------------------
 
 export function getGraphDocument(): GraphDocument {
-  const records = atlas.getRecordsByKind("GraphDocument");
-  const record = records.find(
-    (candidate) => candidate._cluster === "agent-catalog" || candidate.id === "graph:agent-catalog",
-  );
-  if (!record) {
-    return getPackagedGraphDocument();
-  }
-  return adaptRecord(record) as unknown as GraphDocument;
+  return {
+    kind: "GraphDocument",
+    id: "graph:agent-catalog",
+    graphId: "graph:agent-catalog",
+    schemaVersion: "2026.04.agent-catalog-v2",
+    catalogVersion: "2026.04.agent-catalog-v2",
+    generatedAt: new Date().toISOString(),
+    owners: ["@a5c-ai"],
+    imports: [],
+    schemaPath: "schema/ontology-schema.yaml",
+  } as unknown as GraphDocument;
 }
 
 export function getOntologySchema(): OntologySchema {
-  const records = atlas.getRecordsByKind("OntologySchema");
-  const record = records.find(
-    (candidate) =>
-      candidate._cluster === "agent-catalog" ||
-      candidate.id === "schema:agent-catalog-ontology",
-  );
-  if (!record) {
-    return getPackagedOntologySchema();
+  const nodeKinds: Record<string, { requiredAttributes: string[] }> = {};
+  for (const [name, def] of Object.entries(atlas.getNodeKinds())) {
+    nodeKinds[name] = { requiredAttributes: ["id", "kind"], ...def };
   }
-  return adaptRecord(record) as unknown as OntologySchema;
+  const edgeKinds: Record<string, { requiredAttributes: string[]; from?: string[]; to?: string[] }> = {};
+  for (const [name, def] of Object.entries(atlas.getEdgeKinds())) {
+    edgeKinds[name] = { requiredAttributes: ["id", "relation", "from", "to"], ...def };
+  }
+  return {
+    kind: "OntologySchema",
+    id: "schema:agent-catalog-ontology",
+    nodeKinds,
+    edgeKinds,
+  } as unknown as OntologySchema;
 }
 
 export function getCatalogGraph(): CatalogGraph {
-  if (!hasAgentCatalogAtlasNodes()) {
-    return getPackagedCatalogGraph();
-  }
   return {
     document: getGraphDocument(),
     schema: getOntologySchema(),
@@ -219,7 +186,7 @@ export function getCatalogGraph(): CatalogGraph {
 }
 
 // ---------------------------------------------------------------------------
-// Cache management
+// Utility functions (previously in graph.ts)
 // ---------------------------------------------------------------------------
 
 export function listEdgesForNode(
@@ -239,15 +206,12 @@ export function listEdgesByRelation(
 }
 
 export function assertGraphFileCoverage(): void {
-  // No-op: Atlas indexes all YAML at build time; file-level coverage
-  // is validated by the Atlas indexer, not at runtime.
+  // No-op: validation handled by Atlas indexer at build time.
 }
 
-export function listRelationshipsForNode(nodeId: string): GraphRelationship[] {
-  return allEdges().filter(
-    (edge) => edge.from === nodeId || edge.to === nodeId,
-  );
-}
+// ---------------------------------------------------------------------------
+// Cache management
+// ---------------------------------------------------------------------------
 
 export function clearAtlasBridgeCache(): void {
   cachedNodes = undefined;

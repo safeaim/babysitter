@@ -1,13 +1,23 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
+
+# Create minimal workspace structure with only atlas packages
+COPY package.json ./
 COPY packages/atlas/package.json packages/atlas/package.json
 COPY packages/atlas/webui/package.json packages/atlas/webui/package.json
-RUN npm ci
+
+# Override root package.json to only include atlas workspaces
+RUN node -e " \
+  const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8')); \
+  pkg.workspaces = ['packages/atlas', 'packages/atlas/*']; \
+  delete pkg.devDependencies; \
+  require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+
+RUN npm install --ignore-scripts
 
 FROM deps AS builder
 WORKDIR /app
-COPY . .
+COPY packages/atlas packages/atlas
 RUN npm run build -w @a5c-ai/atlas
 RUN npm run build -w @a5c-ai/atlas-webui
 
@@ -16,8 +26,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
-COPY --from=builder /app/package.json /app/package-lock.json* ./
+
+COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages/atlas ./packages/atlas
+
 EXPOSE 3000
 CMD ["npm", "run", "start", "-w", "@a5c-ai/atlas-webui"]

@@ -74,11 +74,6 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts/test-logs
 
-      - name: Check command surface sync
-        run: |
-          set -euo pipefail
-          npm run check:plugin-commands 2>&1 | tee artifacts/test-logs/plugin-command-sync.log
-
       - name: Lint
         run: |
           set -euo pipefail
@@ -220,27 +215,10 @@ jobs:
           set -euo pipefail
           npm run test --workspace=@a5c-ai/babysitter-agent 2>&1 | tee artifacts/test-logs/babysitter-harness-tests.log
 
-      - name: First-class plugin validation
+      - name: Generate unified plugin bundles
         run: |
           set -euo pipefail
-          plugins=(
-            plugins/babysitter-codex
-            plugins/babysitter-cursor
-            plugins/babysitter-gemini
-            plugins/babysitter-github
-            plugins/babysitter-omp
-            plugins/babysitter-opencode
-            plugins/babysitter-openclaw
-            plugins/babysitter-pi
-          )
-
-          for plugin_dir in "${plugins[@]}"; do
-            plugin_name="$(basename "$plugin_dir")"
-            log_path="artifacts/test-logs/${plugin_name}-validate.log"
-            echo "::group::${plugin_name}"
-            npm run validate:ci --prefix "$plugin_dir" 2>&1 | tee "$log_path"
-            echo "::endgroup::"
-          done
+          npm run generate:plugins 2>&1 | tee artifacts/test-logs/generated-plugin-bundles.log
 
       - name: Upload test logs
         if: always()
@@ -301,7 +279,7 @@ jobs:
           - @a5c-ai/cloud -> workspace-coverage + release/staging publish + deploy-hook paths
           - @a5c-ai/hooks-mux-* -> test + release/staging publish
           - @a5c-ai/agent-mux-* -> test + release/staging publish
-          - @a5c-ai/babysitter + harness plugin packages -> test + release/staging publish paths
+          - @a5c-ai/babysitter + unified plugin compiler/bundles -> test + release/staging publish paths
 
           Additional active workspaces validated in this job:
           - @a5c-ai/agent-catalog -> ci:test + public package lifecycle policy

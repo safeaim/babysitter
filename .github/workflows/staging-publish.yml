@@ -43,17 +43,6 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts/core-logs
 
-      - name: Build Atlas and agent-catalog (prerequisite for command sync)
-        run: |
-          set -euo pipefail
-          npm run build --workspace=@a5c-ai/atlas
-          npm run build --workspace=@a5c-ai/agent-catalog
-
-      - name: Check command surface sync
-        run: |
-          set -euo pipefail
-          npm run check:plugin-commands 2>&1 | tee artifacts/core-logs/plugin-command-sync.log
-
       - name: Verify metadata
         run: |
           set -euo pipefail

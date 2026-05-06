@@ -145,31 +145,39 @@ export function listIncomingSources(
 // ---------------------------------------------------------------------------
 
 export function getGraphDocument(): GraphDocument {
-  const records = atlas.getRecordsByKind("GraphDocument");
-  const record = records.find(
-    (r) => r._cluster === "agent-catalog" || r.id === "graph:agent-catalog",
-  );
-  if (!record) {
-    throw new Error(
-      "Atlas bridge: GraphDocument record for agent-catalog not found.",
-    );
-  }
-  return adaptRecord(record) as unknown as GraphDocument;
+  // Atlas doesn't store a GraphDocument record — return a synthetic one
+  // that satisfies the agent-catalog interface.
+  const stats = atlas.getStats();
+  return {
+    kind: "GraphDocument",
+    id: "graph:agent-catalog",
+    graphId: "graph:agent-catalog",
+    schemaVersion: "2026.04.agent-catalog-v2",
+    catalogVersion: "2026.04.agent-catalog-v2",
+    generatedAt: stats ? new Date().toISOString() : new Date().toISOString(),
+    owners: ["@a5c-ai"],
+    imports: [],
+    schemaPath: "schema/ontology-schema.yaml",
+  } as unknown as GraphDocument;
 }
 
 export function getOntologySchema(): OntologySchema {
-  const records = atlas.getRecordsByKind("OntologySchema");
-  const record = records.find(
-    (r) =>
-      r._cluster === "agent-catalog" ||
-      r.id === "schema:agent-catalog-ontology",
-  );
-  if (!record) {
-    throw new Error(
-      "Atlas bridge: OntologySchema record for agent-catalog not found.",
-    );
+  // Atlas doesn't store an OntologySchema record in agent-catalog format.
+  // Build a minimal schema from Atlas's node/edge kind metadata.
+  const nodeKinds: Record<string, { requiredAttributes: string[] }> = {};
+  for (const [name, def] of Object.entries(atlas.getNodeKinds())) {
+    nodeKinds[name] = { requiredAttributes: ["id", "kind"], ...def };
   }
-  return adaptRecord(record) as unknown as OntologySchema;
+  const edgeKinds: Record<string, { requiredAttributes: string[]; from?: string[]; to?: string[] }> = {};
+  for (const [name, def] of Object.entries(atlas.getEdgeKinds())) {
+    edgeKinds[name] = { requiredAttributes: ["id", "relation", "from", "to"], ...def };
+  }
+  return {
+    kind: "OntologySchema",
+    id: "schema:agent-catalog-ontology",
+    nodeKinds,
+    edgeKinds,
+  } as unknown as OntologySchema;
 }
 
 export function getCatalogGraph(): CatalogGraph {

@@ -54,6 +54,7 @@ jobs:
             TARGET_VERSION="${MAJOR}.${MINOR}.${NEXT_PATCH}-staging.${SHORT_SHA}"
           fi
           node scripts/sync-workspace-versions.mjs --version "$TARGET_VERSION"
+          npm run build --workspace=@a5c-ai/atlas
           npm run build --workspace=@a5c-ai/agent-catalog
           npm run build --workspace=@a5c-ai/agent-plugins-mux
           npm run generate:plugins

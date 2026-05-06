@@ -65,6 +65,16 @@ function stringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === "string") : [];
 }
 
+const PLUGIN_TARGET_ID_ALIASES: Record<string, string> = {
+  "copilot-cli": "github-copilot",
+  omp: "oh-my-pi",
+};
+
+function pluginTargetId(value: unknown): string {
+  const targetId = valueAsString(value).replace(/^plugin-target:/, "");
+  return PLUGIN_TARGET_ID_ALIASES[targetId] ?? targetId;
+}
+
 function nodeEvidenceIds(node: GraphNode): string[] {
   return stringArray(node.evidenceRefs);
 }
@@ -492,7 +502,7 @@ function buildHarnessImages(): HarnessImageEntry[] {
   return listNodesByKind("PluginArtifact")
     .filter((node) => valueAsString(node.artifactKind) === "container-image")
     .map((node) => ({
-      harness: valueAsString(node.targetId),
+      harness: pluginTargetId(node.targetId),
       image: valueAsString(node.pathPattern),
       tag: valueAsString(node.installerSurface) || undefined,
       preinstalled: stringArray(node.scriptVariants).includes("preinstalled"),

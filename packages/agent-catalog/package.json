@@ -38,6 +38,9 @@
     "docs",
     "evidence"
   ],
+  "bundleDependencies": [
+    "@a5c-ai/atlas"
+  ],
   "publishConfig": {
     "access": "public"
   },

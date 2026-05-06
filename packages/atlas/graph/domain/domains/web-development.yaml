@@ -3,5 +3,14 @@ id: domain:web-development
 attributes:
   displayName: "Web Development"
   description: |
-    The Web Development domain.
+    Web Development covers the full spectrum of building applications that
+    run in web browsers and on HTTP servers — from semantic HTML and CSS
+    layouts to JavaScript-driven interactivity, server-side rendering,
+    REST and GraphQL APIs, and progressive web app capabilities.
+
+    Key concerns include performance (Core Web Vitals, bundle sizes),
+    accessibility (WCAG compliance), security (CSP, CORS, OWASP Top 10),
+    and the developer experience of modern build toolchains (Vite, webpack,
+    esbuild). Adjacent to Mobile (shared TypeScript logic) and DevOps
+    (deployment pipelines, CDN configuration).
 edges: {}

@@ -4,5 +4,15 @@ attributes:
   displayName: "Logging"
   category: observability
   description: |
-    Aggregation and search of structured/unstructured log streams. Examples: ELK stack, Splunk, Loki, Papertrail.
+    Centralized log aggregation, indexing, and search for structured and
+    unstructured log streams emitted by applications, infrastructure, and
+    platform components. Core concerns include log shipping (Fluentd,
+    Fluent Bit, Vector), retention policies, cardinality, and cost.
+
+    Popular implementations: the ELK/EFK stack (Elasticsearch/OpenSearch +
+    Logstash/Fluentd + Kibana), Grafana Loki (label-based log aggregation
+    paired with Grafana dashboards), Splunk (enterprise), and managed
+    offerings (AWS CloudWatch Logs, Datadog Logs, Papertrail). Structured
+    JSON logging is preferred over plain text for machine-readable queries.
+    Closely integrated with the Metrics and Tracing stack parts.
 edges: {}

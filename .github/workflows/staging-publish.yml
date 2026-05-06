@@ -56,6 +56,7 @@ jobs:
       - name: Lint SDK
         run: |
           set -euo pipefail
+          npm run build --workspace=@a5c-ai/atlas 2>&1 | tee artifacts/core-logs/atlas-build-for-lint.log
           npm run build --workspace=@a5c-ai/agent-catalog 2>&1 | tee artifacts/core-logs/agent-catalog-build-for-lint.log
           npm run lint --workspace=@a5c-ai/babysitter-sdk 2>&1 | tee artifacts/core-logs/lint.log
 

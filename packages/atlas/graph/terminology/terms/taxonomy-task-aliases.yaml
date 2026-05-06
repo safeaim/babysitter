@@ -1,0 +1,84 @@
+---
+nodeKind: Term
+id: term:internationalization-and-localization
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Internationalization and Localization"
+  kind: concept
+  references:
+    - skill-area:internationalization
+  description: |
+    Taxonomy task alias for Atlas Internationalization & Localization.
+edges: {}
+---
+nodeKind: Term
+id: term:routing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Routing"
+  kind: concept
+  references:
+    - skill-area:frontend-routing
+  description: |
+    Taxonomy task alias for frontend routing design and implementation.
+edges: {}
+---
+nodeKind: Term
+id: term:server-side-rendering-frameworks
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Server-Side Rendering Frameworks"
+  kind: concept
+  references:
+    - skill-area:server-side-rendering
+  description: |
+    Taxonomy task alias for Atlas server-side rendering practice.
+edges: {}
+---
+nodeKind: Term
+id: term:backend-unit-testing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Backend Unit Testing"
+  kind: concept
+  references:
+    - skill-area:unit-testing
+  description: |
+    Taxonomy task alias for unit testing in backend-oriented codepaths.
+edges: {}
+---
+nodeKind: Term
+id: term:backend-integration-testing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Backend Integration Testing"
+  kind: concept
+  references:
+    - skill-area:integration-testing
+  description: |
+    Taxonomy task alias for backend integration testing practice.
+edges: {}
+---
+nodeKind: Term
+id: term:frontend-e2e-testing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Frontend E2E Testing"
+  kind: concept
+  references:
+    - skill-area:frontend-e2e-testing
+  description: |
+    Taxonomy task alias for browser-level end-to-end testing practice.
+edges: {}
+---
+nodeKind: Term
+id: term:state-management-testing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "State Management Testing"
+  kind: concept
+  references:
+    - skill-area:state-management-testing
+  description: |
+    Taxonomy task alias for testing stateful client/application logic.
+edges: {}

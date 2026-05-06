@@ -14,7 +14,7 @@ import {
   PLUGIN_TARGETS,
   getCatalogDataState,
 } from "./data";
-import { getCatalogGraph, listGraphNodes, listRelationshipsByRelation } from "./graph";
+import { getCatalogGraph, listGraphNodes, listRelationshipsByRelation } from "./atlas-bridge";
 import { effectiveTransportMuxClaimStatus, shouldSurfaceTransportProtocol } from "./transport-mux-cutover";
 import type {
   AgentCapabilitySupportMatrix,

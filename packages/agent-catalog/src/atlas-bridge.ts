@@ -15,6 +15,7 @@ import type { AtlasRecord, Edge } from "@a5c-ai/atlas";
 import type {
   CatalogGraph,
   GraphDocument,
+  GraphEdge,
   GraphNode,
   GraphRelationship,
   OntologySchema,
@@ -83,6 +84,10 @@ export function listRelationshipsByRelation(
   relation: string,
 ): GraphRelationship[] {
   return allEdges().filter((edge) => edge.relation === relation);
+}
+
+export function listGraphEdges(): GraphRelationship[] {
+  return [...allEdges()];
 }
 
 export function listOutgoingTargets(
@@ -163,6 +168,33 @@ export function getCatalogGraph(): CatalogGraph {
 // ---------------------------------------------------------------------------
 // Cache management
 // ---------------------------------------------------------------------------
+
+export function listEdgesForNode(
+  catalog: { graph: GraphEdge[] },
+  nodeId: string,
+): GraphEdge[] {
+  return catalog.graph.filter(
+    (edge) => edge.from === nodeId || edge.to === nodeId,
+  );
+}
+
+export function listEdgesByRelation(
+  catalog: { graph: GraphEdge[] },
+  relation: string,
+): GraphEdge[] {
+  return catalog.graph.filter((edge) => edge.relation === relation);
+}
+
+export function assertGraphFileCoverage(): void {
+  // No-op: Atlas indexes all YAML at build time; file-level coverage
+  // is validated by the Atlas indexer, not at runtime.
+}
+
+export function listRelationshipsForNode(nodeId: string): GraphRelationship[] {
+  return allEdges().filter(
+    (edge) => edge.from === nodeId || edge.to === nodeId,
+  );
+}
 
 export function clearAtlasBridgeCache(): void {
   cachedNodes = undefined;

@@ -1,0 +1,317 @@
+---
+nodeKind: Term
+id: term:hydration
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Hydration"
+  kind: concept
+  references:
+    - skill-area:hydration
+  description: |
+    Taxonomy alias term for Atlas hydration practice.
+edges: {}
+---
+nodeKind: Term
+id: term:bloc-architecture
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "BLoC Architecture"
+  kind: concept
+  references:
+    - skill-area:flutter-development
+    - skill-area:mobile-state-management
+  description: |
+    Taxonomy alias term for BLoC-style state architecture in mobile apps.
+edges: {}
+---
+nodeKind: Term
+id: term:bloc-pattern
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "BLoC Pattern"
+  kind: concept
+  references:
+    - skill-area:flutter-development
+    - skill-area:mobile-state-management
+  description: |
+    Taxonomy alias term for BLoC-style mobile state management.
+edges: {}
+---
+nodeKind: Term
+id: term:sqlite-database
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "SQLite Database"
+  kind: concept
+  references:
+    - skill-area:mobile-local-databases
+  description: |
+    Taxonomy alias term for on-device relational storage practice.
+edges: {}
+---
+nodeKind: Term
+id: term:realm-database
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Realm Database"
+  kind: concept
+  references:
+    - skill-area:mobile-local-databases
+  description: |
+    Taxonomy alias term for local mobile database persistence patterns.
+edges: {}
+---
+nodeKind: Term
+id: term:core-data
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Core Data"
+  kind: concept
+  references:
+    - skill-area:mobile-local-databases
+  description: |
+    Taxonomy alias term for iOS-local persistence patterns in Atlas.
+edges: {}
+---
+nodeKind: Term
+id: term:key-value-storage
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Key-Value Storage"
+  kind: concept
+  references:
+    - skill-area:mobile-local-databases
+  description: |
+    Taxonomy alias term for lightweight local key-value persistence.
+edges: {}
+---
+nodeKind: Term
+id: term:file-system-storage
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "File System Storage"
+  kind: concept
+  references:
+    - skill-area:file-handling
+  description: |
+    Taxonomy alias term for file-backed storage management.
+edges: {}
+---
+nodeKind: Term
+id: term:encrypted-storage
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Encrypted Storage"
+  kind: concept
+  references:
+    - topic:secure-storage-pattern
+    - skill-area:mobile-security-testing
+  description: |
+    Taxonomy alias term for secure persisted-state storage patterns.
+edges: {}
+---
+nodeKind: Term
+id: term:cache-storage
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Cache Storage"
+  kind: concept
+  references:
+    - skill-area:caching-strategies
+  description: |
+    Taxonomy alias term for local or edge cache storage behavior.
+edges: {}
+---
+nodeKind: Term
+id: term:cache-synchronization
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Cache Synchronization"
+  kind: concept
+  references:
+    - skill-area:mobile-offline-sync
+  description: |
+    Taxonomy alias term for sync behavior between cached and remote state.
+edges: {}
+---
+nodeKind: Term
+id: term:queue-based-updates
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Queue-Based Updates"
+  kind: concept
+  references:
+    - skill-area:mobile-offline-sync
+    - skill-area:background-job-processing
+  description: |
+    Taxonomy alias term for queued offline or deferred state updates.
+edges: {}
+---
+nodeKind: Term
+id: term:conflict-resolution
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Conflict Resolution"
+  kind: concept
+  references:
+    - skill-area:mobile-offline-sync
+  description: |
+    Taxonomy alias term for merge and reconciliation in offline sync flows.
+edges: {}
+---
+nodeKind: Term
+id: term:optimistic-ui-updates
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Optimistic UI Updates"
+  kind: concept
+  references:
+    - skill-area:application-state-management
+  description: |
+    Taxonomy alias term for optimistic client-side state updates.
+edges: {}
+---
+nodeKind: Term
+id: term:background-synchronization
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Background Synchronization"
+  kind: concept
+  references:
+    - skill-area:mobile-offline-sync
+    - skill-area:background-job-processing
+  description: |
+    Taxonomy alias term for synchronization work scheduled off the foreground path.
+edges: {}
+---
+nodeKind: Term
+id: term:image-caching
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Image Caching"
+  kind: concept
+  references:
+    - skill-area:caching-strategies
+  description: |
+    Taxonomy alias term for caching media assets in mobile experiences.
+edges: {}
+---
+nodeKind: Term
+id: term:background-processing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Background Processing"
+  kind: concept
+  references:
+    - skill-area:background-job-processing
+  description: |
+    Taxonomy alias term for background execution outside immediate request or UI flow.
+edges: {}
+---
+nodeKind: Term
+id: term:biometric-authentication
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Biometric Authentication"
+  kind: concept
+  references:
+    - skill-area:mobile-biometrics
+  description: |
+    Taxonomy alias term for biometric identity and device-auth flows.
+edges: {}
+---
+nodeKind: Term
+id: term:secure-storage
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Secure Storage"
+  kind: concept
+  references:
+    - topic:secure-storage-pattern
+  description: |
+    Taxonomy alias term for secure storage patterns already modeled in Atlas.
+edges: {}
+---
+nodeKind: Term
+id: term:certificate-pinning
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Certificate Pinning"
+  kind: concept
+  references:
+    - skill-area:mobile-security-testing
+  description: |
+    Taxonomy alias term for transport-trust hardening in mobile applications.
+edges: {}
+---
+nodeKind: Term
+id: term:app-signing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "App Signing"
+  kind: concept
+  references:
+    - skill-area:app-store-deployment
+  description: |
+    Taxonomy alias term for mobile signing and release packaging workflows.
+edges: {}
+---
+nodeKind: Term
+id: term:code-obfuscation
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Code Obfuscation"
+  kind: concept
+  references:
+    - skill-area:mobile-security-testing
+  description: |
+    Taxonomy alias term for code-hardening and tamper-resistance techniques.
+edges: {}
+---
+nodeKind: Term
+id: term:data-encryption
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Data Encryption"
+  kind: concept
+  references:
+    - skill-area:encryption-decryption
+  description: |
+    Taxonomy alias term for applied data-encryption practice.
+edges: {}
+---
+nodeKind: Term
+id: term:deep-linking
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Deep Linking"
+  kind: concept
+  references:
+    - skill-area:deep-linking
+  description: |
+    Taxonomy alias term for mobile deep-link routing and app-link setup.
+edges: {}
+---
+nodeKind: Term
+id: term:widget-testing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "Widget Testing"
+  kind: concept
+  references:
+    - skill-area:component-testing
+  description: |
+    Taxonomy alias term for component- and widget-level UI tests.
+edges: {}
+---
+nodeKind: Term
+id: term:ui-automation-testing
+attributes:
+  canonicalDefinitionId: "# TODO: link canonical definition"
+  displayName: "UI Automation Testing"
+  kind: concept
+  references:
+    - skill-area:mobile-ui-automation
+  description: |
+    Taxonomy alias term for scripted mobile UI automation flows.
+edges: {}

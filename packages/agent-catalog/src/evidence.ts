@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { resolveCatalogEvidenceAssetPath } from "./assets";
 import { buildClaimsByEvidence, getEvidenceClaimStatement } from "./evidence-projection";
-import { getCatalogGraph } from "./graph";
+import { getCatalogGraph } from "./atlas-bridge";
 import { effectiveTransportMuxClaimStatus, effectiveTransportMuxUnresolvedGaps } from "./transport-mux-cutover";
 import type {
   ClaimConfidence,

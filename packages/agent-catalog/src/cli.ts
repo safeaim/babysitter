@@ -1,5 +1,5 @@
 import { AGENT_CATALOG, GRAPH_DOCUMENT } from "./data";
-import { getNodeById, listGraphEdges, listGraphNodes, listOutgoingTargets } from "./graph";
+import { getNodeById, listGraphEdges, listGraphNodes, listOutgoingTargets } from "./atlas-bridge";
 import { effectiveTransportMuxClaimStatus } from "./transport-mux-cutover";
 import type { GraphNode, GraphRelationship } from "./models";
 

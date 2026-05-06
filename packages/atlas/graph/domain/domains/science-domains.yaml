@@ -102,3 +102,42 @@ attributes:
   description: |
     Quantum algorithms, error correction, and quantum hardware.
 edges: {}
+---
+nodeKind: Domain
+id: domain:computer-science
+attributes:
+  displayName: "Computer Science"
+  description: |
+    Theoretical and applied computer science — algorithms, computational complexity,
+    programming language theory, formal methods, type systems, automata theory,
+    and computer architecture. Bridges pure mathematics and software engineering,
+    underpinning cryptography, AI, databases, and distributed systems research.
+    Distinct from software engineering in its focus on mathematical foundations
+    and provable correctness rather than production delivery.
+edges: {}
+---
+nodeKind: Domain
+id: domain:mathematics
+attributes:
+  displayName: "Mathematics"
+  description: |
+    Pure and applied mathematics spanning algebra, analysis, topology, number
+    theory, combinatorics, probability, statistics, and numerical methods.
+    Includes optimization, operations research, and mathematical logic. Provides
+    the foundational language for physics, computer science, economics, and
+    machine learning — and is increasingly relevant to formal verification and
+    AI reasoning research.
+edges: {}
+---
+nodeKind: Domain
+id: domain:scientific-discovery
+attributes:
+  displayName: "Scientific Discovery"
+  description: |
+    Cross-disciplinary research methodology focused on the scientific method,
+    hypothesis generation, experimental design, and reproducibility. Covers
+    systematic innovation frameworks (TRIZ, design of experiments), literature
+    synthesis, open science practices, and AI-assisted discovery workflows.
+    Acts as a meta-domain enabling rigor and creativity across all scientific
+    and engineering fields.
+edges: {}

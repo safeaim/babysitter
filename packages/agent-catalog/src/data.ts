@@ -8,8 +8,6 @@ import {
   listOutgoingTargets,
   listRelationshipsByRelation,
 } from "./graph";
-import { atlas } from "@a5c-ai/atlas";
-import { buildPluginTargetDescriptorsFromAtlas } from "./atlas-bridge";
 import { buildClaimsByEvidence, getEvidenceClaimStatement } from "./evidence-projection";
 import {
   effectiveTransportMuxClaimStatus,
@@ -649,7 +647,7 @@ function buildDataState(): AgentCatalogDataState {
   const hooksMuxDetectionRules = buildHookDetectionRules();
   const fallbackMetadata = buildFallbackMetadata(sessionNuances, agents);
   const harnessImages = buildHarnessImages();
-  const pluginTargets = buildPluginTargetDescriptorsFromAtlas(atlas);
+  const pluginTargets = buildPluginTargetDescriptors(hooks);
   const capabilityAssertions = buildCapabilityAssertions();
   const agentCatalog: AgentCatalog = {
     schemaVersion: graphDocument.schemaVersion,

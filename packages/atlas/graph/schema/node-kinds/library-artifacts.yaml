@@ -1,0 +1,86 @@
+# NodeKinds for cluster 12-library.
+nodeKinds:
+- id: node:library-process
+  name: LibraryProcess
+  origin: generated
+  prefix: lib-process
+  cluster: 12-library
+  purpose: a process definition from the babysitter process library
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: false
+  - name: libraryPath
+    type: string
+    required: true
+  - name: specialization
+    type: string
+    required: false
+  incomingEdges: []
+  outgoingEdges:
+  - applies_to
+  invariants: []
+  examples: []
+- id: node:library-skill
+  name: LibrarySkill
+  origin: generated
+  prefix: lib-skill
+  cluster: 12-library
+  purpose: a skill definition from the babysitter process library
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: false
+  - name: libraryPath
+    type: string
+    required: true
+  - name: specialization
+    type: string
+    required: false
+  incomingEdges: []
+  outgoingEdges:
+  - applies_to
+  invariants: []
+  examples: []
+- id: node:library-agent
+  name: LibraryAgent
+  origin: generated
+  prefix: lib-agent
+  cluster: 12-library
+  purpose: an agent persona from the babysitter process library
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: false
+  - name: libraryPath
+    type: string
+    required: true
+  - name: specialization
+    type: string
+    required: false
+  - name: role
+    type: string
+    required: false
+  incomingEdges: []
+  outgoingEdges:
+  - applies_to
+  invariants: []
+  examples: []

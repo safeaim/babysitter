@@ -30,4 +30,5 @@ nodeKindFiles:
 - schema/node-kinds/compliance-safety.yaml
 - schema/node-kinds/context-engineering.yaml
 - schema/node-kinds/workflows.yaml
+- schema/node-kinds/library-artifacts.yaml
 edgeKindFile: schema/edge-kinds.yaml

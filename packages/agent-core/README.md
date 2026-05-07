@@ -118,6 +118,7 @@ If you still need the PI-era controls above, use the PI wrapper exposed from `@a
 - delegation tools: `AskUserQuestion`, `task`, `skill`
 - code tools: `calc`, `ast_grep`, `ast_edit`, `render_mermaid`, `notebook`
 - background/discovery/web tools: `background_status`, `background_list`, `tool_search`, `tool_fetch`, `web_search`, `fetch_process`
+- optional programmatic tool calling: `code_executor` when `programmaticToolCalling` is enabled
 
 `AgentCoreToolOptions` controls how those definitions are wired into a host runtime:
 
@@ -127,6 +128,18 @@ If you still need the PI-era controls above, use the PI wrapper exposed from `@a
 - `onToolUse`: observer callback fired after tool wrapping.
 - `onBackgroundComplete`, `maxBackgroundProcesses`, `backgroundRegistry`: background-process lifecycle hooks and limits.
 - `deferredToolRegistry`: enables `tool_search` and `tool_fetch`.
+- `programmaticToolCalling`: opt-in Code Mode / Programmatic Tool Calling surface. When enabled, `code_executor` runs a bounded JavaScript async body with `tools.<name>(params)` and `callTool(name, params)` helpers for batching existing agent-core tools behind one model-level tool call.
+
+Example:
+
+```ts
+const tools = createAgentCoreToolDefinitions({
+  workspace: process.cwd(),
+  interactive: false,
+  deferredToolRegistry,
+  programmaticToolCalling: { maxToolCalls: 10, timeout: 60_000 },
+});
+```
 
 ### Interactive and cancellation contract
 

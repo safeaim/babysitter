@@ -113,6 +113,19 @@ export interface AgentCoreToolOptions {
   /** Optional externally managed registry. When provided, the caller owns disposal. */
   backgroundRegistry?: BackgroundProcessRegistry;
   deferredToolRegistry?: DeferredToolRegistry;
+  /**
+   * Opt-in Programmatic Tool Calling / Code Mode surface. When enabled,
+   * agent-core exposes a single `code_executor` tool that can execute a
+   * JavaScript tool chain against the already configured agent-core tools.
+   */
+  programmaticToolCalling?: boolean | ProgrammaticToolCallingOptions;
+}
+
+export interface ProgrammaticToolCallingOptions {
+  /** Maximum wall-clock time for one code_executor invocation. Default: 120000. */
+  timeout?: number;
+  /** Maximum nested tool calls allowed from one code_executor invocation. Default: 25. */
+  maxToolCalls?: number;
 }
 
 export const AGENT_CORE_TOOL_NAMES: string[] = [
@@ -139,6 +152,7 @@ export const AGENT_CORE_TOOL_NAMES: string[] = [
   "background_list",
   "tool_search",
   "tool_fetch",
+  "code_executor",
   "web_search",
   "fetch_process",
 ];

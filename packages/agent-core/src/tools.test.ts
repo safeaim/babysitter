@@ -181,6 +181,98 @@ describe("agent-core tools", () => {
     });
   });
 
+  it("exposes code_executor only when programmatic tool calling is enabled", () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-code-mode-toggle-"));
+
+    expect(getToolDefinitions(workspace).some((tool) => tool.name === "code_executor")).toBe(false);
+    expect(getToolDefinitions(workspace, { programmaticToolCalling: true }).some((tool) => tool.name === "code_executor"))
+      .toBe(true);
+  });
+
+  it("executes a programmatic tool chain against existing tools", async () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-code-mode-"));
+    writeFileSync(path.join(workspace, "note.txt"), "alpha\nbeta\n", "utf8");
+    const onToolUse = vi.fn();
+    const definitions = getToolDefinitions(workspace, {
+      onToolUse,
+      programmaticToolCalling: true,
+    });
+    const codeExecutor = definitions.find((tool) => tool.name === "code_executor");
+    if (!codeExecutor) {
+      throw new Error("Expected code_executor to be registered");
+    }
+
+    const result = await codeExecutor.execute("code-mode", {
+      code: [
+        "const readResult = await tools.read({ path: 'note.txt' });",
+        "await callTool('write', { path: 'copy.txt', content: readResult });",
+        "console.log('read bytes', String(readResult).length);",
+        "return { readResult, copied: await tools.read({ path: 'copy.txt' }) };",
+      ].join("\n"),
+    });
+
+    const resultText = getText(result);
+    if (resultText.startsWith("Error:")) {
+      throw new Error(resultText);
+    }
+    const payload = JSON.parse(resultText) as {
+      result: { readResult: string; copied: string };
+      logs: string[];
+      toolCalls: Array<{ tool: string }>;
+    };
+    expect(payload.result.readResult).toContain("alpha");
+    expect(payload.result.copied).toContain("alpha");
+    expect(payload.logs).toEqual(["read bytes 17"]);
+    expect(payload.toolCalls.map((call) => call.tool)).toEqual(["read", "write", "read"]);
+    expect(onToolUse).toHaveBeenCalledWith("code_executor", expect.objectContaining({ code: expect.any(String) }));
+    expect(onToolUse).toHaveBeenCalledWith("read", { path: "note.txt" });
+    expect(onToolUse).toHaveBeenCalledWith("write", {
+      path: "copy.txt",
+      content: expect.stringContaining("alpha"),
+    });
+  });
+
+  it("enforces code_executor nested tool call limits", async () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-code-mode-limit-"));
+    const codeExecutor = getToolDefinitions(workspace, {
+      programmaticToolCalling: { maxToolCalls: 1 },
+    }).find((tool) => tool.name === "code_executor");
+    if (!codeExecutor) {
+      throw new Error("Expected code_executor to be registered");
+    }
+
+    const result = await codeExecutor.execute("code-mode-limit", {
+      code: [
+        "await tools.tool_search({ query: 'read' });",
+        "await tools.tool_search({ query: 'write' });",
+        "return 'unreachable';",
+      ].join("\n"),
+    });
+
+    expect(getText(result)).toBe("Error: code_executor exceeded max_tool_calls (1)");
+  });
+
+  it("does not allow code_executor invocations to raise configured limits", async () => {
+    const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-code-mode-limit-cap-"));
+    const codeExecutor = getToolDefinitions(workspace, {
+      programmaticToolCalling: { maxToolCalls: 1 },
+    }).find((tool) => tool.name === "code_executor");
+    if (!codeExecutor) {
+      throw new Error("Expected code_executor to be registered");
+    }
+
+    const result = await codeExecutor.execute("code-mode-limit-cap", {
+      max_tool_calls: 10,
+      code: [
+        "await tools.tool_search({ query: 'read' });",
+        "await tools.tool_search({ query: 'write' });",
+        "return 'unreachable';",
+      ].join("\n"),
+    });
+
+    expect(getText(result)).toBe("Error: code_executor exceeded max_tool_calls (1)");
+  });
+
   it("processes fetched html content and exposes helper exports directly", async () => {
     const workspace = mkdtempSync(path.join(os.tmpdir(), "agent-core-web-"));
     const fetchMock = vi.fn(async () => ({

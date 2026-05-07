@@ -32,3 +32,52 @@ https://blakecrosley.com/writing/taste-infrastructure
 
 
 unify canonicalized_to edges nodes to compact the graph.
+
+
+----
+library - graph:
+
+ Tier 2 — Schema evolution (the decision-making model)
+
+  #: 5
+  Item: Extend Responsibility with decision-making attributes — add responsibilityKind enum (operational, decision-making, advisory, oversight), ownershipAspect enum
+    (security, compliance, quality, execution, architecture, budget, hiring, strategy, privacy, reliability), and decisionScope (ref to the entity whose decisions
+  this
+     responsibility governs)
+  Details:
+  ────────────────────────────────────────
+  #: 6
+  Item: New node kind: DecisionType — models the type/category of decision (e.g., decision-type:technology-selection, decision-type:architecture-choice,
+    decision-type:vendor-selection, decision-type:hiring-decision, decision-type:budget-allocation, decision-type:security-policy, decision-type:compliance-ruling,
+    decision-type:release-go-no-go, decision-type:priority-call). Attributes: displayName, description, impactLevel (team/org/product/company), reversibility
+    (easily-reversible/costly-to-reverse/irreversible), typicalCadence
+  Details:
+  ────────────────────────────────────────
+  #: 7
+  Item: New edge kinds for the decision model — owns_decision_for (Responsibility → StackPart/Domain/Product entity, scoping what the decision applies to),
+    decision_of_type (Responsibility → DecisionType), escalates_to (Responsibility → Responsibility, for escalation chains), informed_by (DecisionType → SkillArea,
+    what expertise informs this decision type)
+  Details:
+  ────────────────────────────────────────
+  #: 8
+  Item: Populate decision instances — create ~20 DecisionType nodes, update ~30 existing responsibilities to carry the new attributes, create ~15 new decision-making
+    responsibilities (e.g., responsibility:api-contract-decision, responsibility:infrastructure-vendor-decision, responsibility:security-architecture-decision) with
+    ownership edges to stack-parts/domains
+  Details:
+
+  Tier 3 — Structural depth
+
+  ┌─────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │  #  │                                                                           Item                                                                           │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 9   │ Edge kind diversity for library nodes — currently all library edges are applies_to. Add requires_skill_area, implements_workflow, involves_role as       │
+  │     │ distinct edge kinds in the generator for semantic precision                                                                                              │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 10  │ Methodology graph nodes — 39 methodologies in library but no Methodology node kind. Add schema + instances, connect to workflows and processes           │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 11  │ More stack profiles — only 17 exist. Add LAMP, JAMstack, serverless patterns, data lake, ML inference, event-driven, CQRS stack profiles                 │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 12  │ Wiki pages from library READMEs — generate wiki pages with auto-linked graph context from specialization README.md files                                 │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 13  │ Edge weights/confidence — add confidence attributes to library annotations for search ranking quality                                                    │
+  └─────┴──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -5,6 +5,7 @@ export type {
   AgentCoreToolOptions,
   AgentCoreToolOptions as AgenticToolOptions,
   CustomToolDefinition,
+  ProgrammaticToolCallingOptions,
   ToolResult,
 } from "./types";
 export { AGENT_CORE_TOOL_NAMES } from "./types";

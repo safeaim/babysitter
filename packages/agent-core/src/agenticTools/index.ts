@@ -10,11 +10,15 @@ import { createCodeTools } from "./tools/code";
 import { createDelegationTools } from "./tools/delegation";
 import { createExecutionTools } from "./tools/execution";
 import { createFileSystemTools } from "./tools/fileSystem";
+import {
+  createProgrammaticToolCallingTool,
+  shouldEnableProgrammaticToolCalling,
+} from "./tools/programmaticToolCalling";
 
 const toolDefinitionScopes = new WeakMap<CustomToolDefinition[], AgenticToolOptions>();
 
 export function createAgentCoreToolDefinitions(options: AgenticToolOptions): CustomToolDefinition[] {
-  const tools = [
+  const baseTools = [
     ...createFileSystemTools(options),
     ...createExecutionTools(options),
     createBrowserTool(),
@@ -25,6 +29,13 @@ export function createAgentCoreToolDefinitions(options: AgenticToolOptions): Cus
     ...createDiscoveryTools(options),
     ...createWebTools(),
   ].map((tool) => wrapToolDefinition(tool, options.onToolUse));
+
+  const tools = shouldEnableProgrammaticToolCalling(options)
+    ? [
+      ...baseTools,
+      wrapToolDefinition(createProgrammaticToolCallingTool(options, baseTools), options.onToolUse),
+    ]
+    : baseTools;
 
   toolDefinitionScopes.set(tools, options);
   return tools;

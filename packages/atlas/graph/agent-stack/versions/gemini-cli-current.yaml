@@ -1,8 +1,20 @@
 nodeKind: AgentVersion
-id: agent-version:gemini-cli@current
+id: agentVersion:gemini:ge-0-0-0
 attributes:
+  agentId: "gemini"
+  aliases:
+    - "gemini-cli"
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "Gemini CLI"
+  summary: "Google's CLI agent for coding tasks"
+  sourcePackage: "@anthropic-ai/gemini-cli"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:gemini-cli
-  versionRange: ">=1.0.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2025-06-25"
   cliCommand: "gemini"
   installMethods:

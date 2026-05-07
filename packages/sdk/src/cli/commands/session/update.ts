@@ -1,7 +1,6 @@
 import type { SessionState, SessionUpdateResult } from "../../../session";
 import {
   SessionError,
-  deleteSessionFile,
   getSessionFilePath,
   readSessionFile,
   writeSessionFile,
@@ -14,7 +13,6 @@ export interface SessionUpdateArgs {
   iteration?: number;
   lastIterationAt?: string;
   iterationTimes?: string;
-  delete?: boolean;
   json: boolean;
 }
 
@@ -25,18 +23,6 @@ export async function handleSessionUpdate(args: SessionUpdateArgs): Promise<numb
   }
 
   const filePath = getSessionFilePath(required.stateDir, required.sessionId);
-  if (args.delete) {
-    const deleted = await deleteSessionFile(filePath);
-    const result: SessionUpdateResult = { success: true, deleted, stateFile: filePath };
-    if (args.json) {
-      console.log(JSON.stringify(result, null, 2));
-    } else {
-      console.log(`[session:update] deleted=${deleted}`);
-      console.log(`  stateFile: ${filePath}`);
-    }
-    return 0;
-  }
-
   let existing;
   try {
     existing = await readSessionFile(filePath);

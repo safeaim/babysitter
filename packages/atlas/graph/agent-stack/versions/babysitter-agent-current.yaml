@@ -1,6 +1,17 @@
 nodeKind: AgentVersion
-id: agent-version:babysitter-agent@current
+id: agentVersion:babysitter-agent:ge-5-0-0
 attributes:
+  agentId: "babysitter-agent"
+  aliases: []
+  runtimeFamily: "sdk-runtime"
+  releaseChannel: "stable"
+  displayName: "babysitter-agent"
+  summary: "babysitter-agent CLI binary — long-running agent service"
+  sourcePackage: "@a5c-ai/babysitter-agent"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:babysitter-agent
   versionRange: ">=5.0.0"
   releasedAt: "2026-01-11"
@@ -20,4 +31,8 @@ edges:
       role: platform
     - target: agent-ui-impl:babysitter-agent.ui@current
       role: ui
+  uses_transport:
+    - transport-runtime:terminal-cli
+  supports_modality:
+    - modality:mcp
   sourced_from: []

@@ -60,6 +60,7 @@ function buildConfig(): AdapterConfig {
     sessionEnvVars: "AGENT_SESSION_ID",
     hasIntentFidelityChecks: false,
     hasNonNegotiables: false,
+    hookDriven: true,
     autoReleaseStale: true,
   });
 }

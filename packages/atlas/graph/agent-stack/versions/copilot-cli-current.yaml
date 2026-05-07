@@ -1,8 +1,20 @@
 nodeKind: AgentVersion
-id: agent-version:copilot-cli@current
+id: agentVersion:copilot:ge-0-0-0
 attributes:
+  agentId: "copilot"
+  aliases:
+    - "github-copilot"
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "GitHub Copilot CLI"
+  summary: "GitHub's CLI coding agent"
+  sourcePackage: "@github/copilot-cli"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:copilot-cli
-  versionRange: ">=1.0.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2024-09-01"
   cliCommand: "gh copilot"
   installMethods:

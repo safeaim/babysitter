@@ -1,8 +1,20 @@
 nodeKind: AgentVersion
-id: agent-version:claude-code@1.x
+id: agentVersion:claude:ge-0-0-0
 attributes:
+  agentId: "claude"
+  aliases:
+    - "claude-code"
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "Claude Code"
+  summary: "Anthropic's official CLI agent for coding tasks"
+  sourcePackage: "@anthropic-ai/claude-code"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:claude-code
-  versionRange: ">=1.0.0 <2.0.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2025-05-22"
   cliCommand: "claude"
   installMethods:

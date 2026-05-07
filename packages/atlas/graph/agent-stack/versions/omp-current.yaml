@@ -1,8 +1,20 @@
 nodeKind: AgentVersion
-id: agent-version:omp@current
+id: agentVersion:omp:ge-0-0-0
 attributes:
+  agentId: "omp"
+  aliases:
+    - "oh-my-pi"
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "OMP (oh-my-pi)"
+  summary: "Oh-My-Pi terminal coding agent"
+  sourcePackage: "omp"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:omp
-  versionRange: ">=1.0.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2025-01-01"
   cliCommand: "omp"
   installMethods:

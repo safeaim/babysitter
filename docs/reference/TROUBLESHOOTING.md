@@ -448,7 +448,7 @@ If the loop stops due to "iteration too fast":
 
 ```bash
 # Check the stop reason in logs
-grep "iteration_too_fast" /tmp/babysitter-stop-hook.log
+grep "max_iterations_reached\|completion_proof_matched" /tmp/babysitter-stop-hook.log
 ```
 
 This protection triggers if iterations average under 15 seconds. Ensure your work takes meaningful time.
@@ -469,8 +469,13 @@ The completion promise must match exactly:
 If the state file has invalid YAML:
 
 ```bash
-# Delete the state file to stop the loop
-rm ~/.a5c/state/<session-id>.md
+# Mark the state file inactive to stop the loop
+python - <<'PY'
+from pathlib import Path
+p = Path.home() / '.a5c' / 'state' / '<session-id>.md'
+s = p.read_text()
+p.write_text(s.replace('active: true', 'active: false', 1))
+PY
 ```
 
 Then start fresh with `/babysitter:babysit`.
@@ -748,7 +753,12 @@ A: You can:
 1. Stop the iteration loop (Ctrl+C if running in terminal)
 2. Delete the session state file for in-session loops:
    ```bash
-   rm ~/.a5c/state/<session-id>.md
+   python - <<'PY'
+from pathlib import Path
+p = Path.home() / '.a5c' / 'state' / '<session-id>.md'
+s = p.read_text()
+p.write_text(s.replace('active: true', 'active: false', 1))
+PY
    ```
 
 **Q: How do I resume a failed run?**
@@ -803,9 +813,14 @@ A:
 A:
 1. Use `--max-iterations` to set a limit
 2. Output the completion proof: `<promise>SECRET</promise>`
-3. Delete the state file:
+3. Mark the state file inactive:
    ```bash
-   rm ~/.a5c/state/<session-id>.md
+   python - <<'PY'
+from pathlib import Path
+p = Path.home() / '.a5c' / 'state' / '<session-id>.md'
+s = p.read_text()
+p.write_text(s.replace('active: true', 'active: false', 1))
+PY
    ```
 
 **Q: Where is the session state stored?**
@@ -815,7 +830,7 @@ A: `~/.a5c/state/${AGENT_SESSION_ID}.md`
 **Q: What happens if I close Claude Code during a loop?**
 
 A: The state file remains. When you restart, the loop will not resume automatically. You can:
-- Delete the state file to clear it
+- Mark the state file inactive to clear hook blocking while retaining recovery context
 - Start a new loop with `/babysitter:babysit`
 
 ### Troubleshooting Commands
@@ -898,3 +913,7 @@ When reporting issues, collect:
 - Version: 1.0.0
 - Component: Babysitter Plugin Troubleshooting Guide
 - Status: Production
+
+
+
+

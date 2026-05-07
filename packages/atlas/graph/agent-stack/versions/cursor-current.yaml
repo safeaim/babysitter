@@ -1,8 +1,19 @@
 nodeKind: AgentVersion
-id: agent-version:cursor@current
+id: agentVersion:cursor:ge-0-0-0
 attributes:
+  agentId: "cursor"
+  aliases: []
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "Cursor"
+  summary: "Cursor IDE agent"
+  sourcePackage: "cursor"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:cursor
-  versionRange: ">=0.40.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2024-08-01"
   cliCommand: "cursor"
   installMethods:

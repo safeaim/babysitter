@@ -2981,7 +2981,7 @@ describe("handleHarnessCreateRun", () => {
         prompt: "",
         runsDir: "/tmp/runs",
         selectedHarnessName: "claude-code",
-        maxIterations: 256,
+        maxIterations: 65_000,
         interactive: false,
         verbose: false,
         json: false,
@@ -3029,7 +3029,7 @@ describe("handleHarnessCreateRun", () => {
         prompt: "",
         runsDir: "/tmp/runs",
         selectedHarnessName: "claude-code",
-        maxIterations: 256,
+        maxIterations: 65_000,
         interactive: false,
         verbose: false,
         json: false,
@@ -3093,7 +3093,7 @@ describe("handleHarnessCreateRun", () => {
           workspace: currentPath,
           runsDir: "/tmp/runs",
           selectedHarnessName: "claude-code",
-          maxIterations: 256,
+          maxIterations: 65_000,
           interactive: false,
           verbose: false,
           json: false,
@@ -4302,3 +4302,4 @@ describe("handleHarnessCreateRun", () => {
     });
   });
 });
+

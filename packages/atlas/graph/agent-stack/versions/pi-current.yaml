@@ -1,8 +1,19 @@
 nodeKind: AgentVersion
-id: agent-version:pi@current
+id: agentVersion:pi:ge-0-0-0
 attributes:
+  agentId: "pi"
+  aliases: []
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "Pi"
+  summary: "Pi CLI coding agent"
+  sourcePackage: "pi"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:pi
-  versionRange: ">=1.0.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2025-01-01"
   cliCommand: "pi"
   installMethods:

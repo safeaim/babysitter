@@ -1,8 +1,19 @@
 nodeKind: AgentVersion
-id: agent-version:opencode@1.x
+id: agentVersion:opencode:ge-0-0-0
 attributes:
+  agentId: "opencode"
+  aliases: []
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "OpenCode"
+  summary: "Terminal-native coding agent with configurable providers"
+  sourcePackage: "opencode"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:opencode
-  versionRange: ">=1.0.0 <2.0.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2025-01-01"
   cliCommand: "opencode"
   installMethods:

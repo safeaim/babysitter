@@ -1,8 +1,19 @@
 nodeKind: AgentVersion
-id: agent-version:openclaw@current
+id: agentVersion:openclaw:ge-0-0-0
 attributes:
+  agentId: "openclaw"
+  aliases: []
+  runtimeFamily: "cli-harness"
+  releaseChannel: "stable"
+  displayName: "OpenClaw"
+  summary: "OpenClaw CLI coding agent"
+  sourcePackage: "openclaw"
+  osSupport:
+    - "linux"
+    - "macos"
+    - "windows"
   agentProductId: agent:openclaw
-  versionRange: ">=1.0.0"
+  versionRange: ">=0.0.0"
   releasedAt: "2025-01-01"
   cliCommand: "openclaw"
   installMethods:

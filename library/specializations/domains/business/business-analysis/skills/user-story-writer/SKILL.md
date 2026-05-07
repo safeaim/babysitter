@@ -15,9 +15,9 @@ metadata:
 graph:
   domains: [domain:business-intelligence]
   specializations: [specialization:strategic-consulting]
-  skillAreas: [skill-area:business-analysis, skill-area:strategic-analysis, skill-area:competitive-intelligence]
+  skillAreas: [skill-area:requirements-engineering, skill-area:business-analysis, skill-area:agile-delivery]
   workflows: [workflow:market-analysis]
-  roles: [role:business-analyst, role:strategic-planner]
+  roles: [role:business-analyst, role:product-owner]
 ---
 
 # User Story Writer

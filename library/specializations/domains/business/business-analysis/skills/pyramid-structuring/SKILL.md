@@ -15,9 +15,9 @@ metadata:
 graph:
   domains: [domain:business-intelligence]
   specializations: [specialization:strategic-consulting]
-  skillAreas: [skill-area:business-analysis, skill-area:strategic-analysis, skill-area:competitive-intelligence]
+  skillAreas: [skill-area:strategic-analysis, skill-area:business-analysis, skill-area:executive-communication]
   workflows: [workflow:market-analysis]
-  roles: [role:business-analyst, role:strategic-planner]
+  roles: [role:strategic-planner, role:business-analyst]
 ---
 
 # Pyramid Principle Structuring

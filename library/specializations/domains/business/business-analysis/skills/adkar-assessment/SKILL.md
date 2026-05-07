@@ -15,9 +15,9 @@ metadata:
 graph:
   domains: [domain:business-intelligence]
   specializations: [specialization:strategic-consulting]
-  skillAreas: [skill-area:business-analysis, skill-area:strategic-analysis, skill-area:competitive-intelligence]
+  skillAreas: [skill-area:change-management, skill-area:stakeholder-management, skill-area:organizational-design]
   workflows: [workflow:market-analysis]
-  roles: [role:business-analyst, role:strategic-planner]
+  roles: [role:organizational-development-specialist, role:business-analyst]
 ---
 
 # ADKAR Assessment

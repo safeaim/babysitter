@@ -14,4 +14,4 @@ attributes:
     surfaces for human operators and other agents.
 edges:
   has_version:
-    - agent-version:babysitter-agent@current
+    - agentVersion:babysitter-agent:ge-5-0-0

@@ -451,7 +451,7 @@ Create a `.github/babysitter.env` reference file documenting available environme
 # Set these as env vars in your workflow YAML
 
 # BABYSITTER_RUNS_DIR=.a5c/runs         # Runs directory (default: .a5c/runs)
-# BABYSITTER_MAX_ITERATIONS=100          # Max iterations per run (default: 256)
+# BABYSITTER_MAX_ITERATIONS=100          # Max iterations per run (default: 65000)
 # BABYSITTER_QUALITY_THRESHOLD=85        # Quality gate threshold (default: 80)
 # BABYSITTER_LOG_LEVEL=debug             # Log level: info|debug|warn|error
 ```
@@ -487,3 +487,4 @@ After creating the workflow files:
 ## Reference
 
 Full documentation: [https://github.com/a5c-ai/babysitter/blob/main/docs/github-actions-setup-codex.md](https://github.com/a5c-ai/babysitter/blob/main/docs/github-actions-setup-codex.md)
+

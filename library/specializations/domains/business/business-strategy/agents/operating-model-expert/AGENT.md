@@ -19,9 +19,9 @@ metadata:
 graph:
   domains: [domain:strategy]
   specializations: [specialization:strategic-consulting]
-  skillAreas: [skill-area:strategic-planning, skill-area:business-model-design, skill-area:growth-strategy]
+  skillAreas: [skill-area:organizational-design, skill-area:operational-excellence, skill-area:strategic-planning]
   workflows: [workflow:strategic-planning, workflow:competitive-analysis]
-  roles: [role:strategic-planner, role:business-analyst]
+  roles: [role:organizational-development-specialist, role:strategic-planner]
 ---
 
 # Operating Model Expert Agent

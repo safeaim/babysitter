@@ -30,7 +30,7 @@ import {
   emitProgress,
   discoverHarnesses,
 } from "./utils";
-import { resolveRunsDir } from "@a5c-ai/babysitter-sdk";
+import { DEFAULTS, resolveRunsDir } from "@a5c-ai/babysitter-sdk";
 import { getProcessOutputDir, runPlanProcessPhase } from "./planProcess";
 import { runOrchestrationPhase } from "./orchestration";
 import { normalizeBuiltInHarnessName } from "../../builtInHarness";
@@ -54,7 +54,7 @@ export async function handleHarnessCreateRun(
     processPath: providedProcessPath,
     workspace,
     model,
-    maxIterations = 256,
+    maxIterations = DEFAULTS.maxIterations,
     runsDir: requestedRunsDir,
     json,
     verbose,

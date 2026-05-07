@@ -100,7 +100,7 @@ describe("session lifecycle commands", () => {
     expect(error.error).toBe("RUN_ALREADY_ASSOCIATED");
   });
 
-  it("updates and deletes session state", async () => {
+  it("updates session state", async () => {
     await handleSessionInit({
       sessionId: "session-4",
       stateDir,
@@ -121,16 +121,6 @@ describe("session lifecycle commands", () => {
     expect(updateOutput.state.iteration).toBe(5);
     expect(updateOutput.state.iterationTimes).toEqual([12, 15]);
 
-    logSpy.mockClear();
-    const deleteCode = await handleSessionUpdate({
-      sessionId: "session-4",
-      stateDir,
-      delete: true,
-      json: true,
-    });
-
-    expect(deleteCode).toBe(0);
-    const deleteOutput = JSON.parse(String(logSpy.mock.calls.at(-1)?.[0] ?? "{}"));
-    expect(deleteOutput.deleted).toBe(true);
   });
 });
+

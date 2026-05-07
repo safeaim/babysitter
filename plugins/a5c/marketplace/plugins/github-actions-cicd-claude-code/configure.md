@@ -68,7 +68,7 @@ Configure babysitter behavior by adding `env:` to any workflow step:
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
     # ... other config ...
   env:
-    BABYSITTER_MAX_ITERATIONS: 50        # Limit iterations (default: 256)
+    BABYSITTER_MAX_ITERATIONS: 50        # Limit iterations (default: 65000)
     BABYSITTER_QUALITY_THRESHOLD: 85     # Quality gate (default: 80)
     BABYSITTER_LOG_LEVEL: debug          # Logging: info|debug|warn|error
     BABYSITTER_TIMEOUT: 180000           # Timeout in ms (default: 120000)
@@ -154,3 +154,4 @@ Use babysitter methodologies in prompts:
 - [GitHub Actions Setup Guide (Gemini CLI)](https://github.com/a5c-ai/babysitter/blob/main/docs/github-actions-setup-gemini-cli.md)
 - [Claude Code Action](https://github.com/anthropics/claude-code-action)
 - [Claude Code Action Setup](https://github.com/anthropics/claude-code-action/blob/main/docs/setup.md)
+

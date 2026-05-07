@@ -9,14 +9,13 @@ import { extractPromiseTag } from "../../session/transcript";
 import type { SessionState } from "../../session/types";
 import {
   getCurrentTimestamp,
-  isIterationTooFast,
   updateIterationTimes,
   writeSessionFile,
 } from "../../session/write";
 import type { HookHandlerArgs } from "../types";
 import {
   appendStopHookEvent,
-  cleanupSession,
+  markSessionInactive,
   createHookLogger,
   type HookLogger,
   parseHookInput,
@@ -179,6 +178,11 @@ export async function handleStopHookCommon(
   }
   const { state } = sessionFile;
   const prompt = sessionFile.prompt ?? "";
+  if (!state.active) {
+    log.info("Session is inactive — allowing exit");
+    process.stdout.write("{}\n");
+    return makeExit(log, 0, "session_inactive", { sessionId: activeSessionId, filePath, state, prompt, resolvedPluginRoot, runsDir });
+  }
   // Check max iterations
   if (state.maxIterations > 0 && state.iteration >= state.maxIterations) {
     if (verbose) {
@@ -197,7 +201,7 @@ export async function handleStopHookCommon(
         hasPromise: false,
       }, options.harness);
     }
-    await cleanupSession(filePath);
+    await markSessionInactive(filePath, state, prompt, "max_iterations_reached");
     process.stdout.write("{}\n");
     return makeExit(log, 0, "max_iterations_reached", { sessionId: activeSessionId, filePath, state, prompt, resolvedPluginRoot, runsDir });
   }
@@ -207,28 +211,6 @@ export async function handleStopHookCommon(
     state.iteration >= 5
       ? updateIterationTimes(state.iterationTimes, state.lastIterationAt, now)
       : state.iterationTimes;
-  if (isIterationTooFast(updatedTimes)) {
-    if (verbose) {
-      const avg = updatedTimes.reduce((a, b) => a + b, 0) / updatedTimes.length;
-      process.stderr.write(`[hook:run stop] Iteration too fast (avg ${avg}s)\n`);
-    }
-    const runId = state.runId ?? "";
-    if (runId) {
-      const eventDir = state.runDir?.trim() || path.join(runsDir, runId);
-      await appendStopHookEvent(eventDir, {
-        sessionId: activeSessionId,
-        iteration: state.iteration,
-        decision: "approve",
-        reason: "iteration_too_fast",
-        runState: "",
-        pendingKinds: "",
-        hasPromise: false,
-      }, options.harness);
-    }
-    await cleanupSession(filePath);
-    process.stdout.write("{}\n");
-    return makeExit(log, 0, "iteration_too_fast", { sessionId: activeSessionId, filePath, state, prompt, resolvedPluginRoot, runsDir });
-  }
 
   // Extract promise from response
   const runId = state.runId ?? "";
@@ -260,7 +242,7 @@ export async function handleStopHookCommon(
     if (verbose) {
       process.stderr.write(`[hook:run stop] No run for session ${activeSessionId}\n`);
     }
-    await cleanupSession(filePath);
+    await markSessionInactive(filePath, state, prompt, "no_run_id");
     process.stdout.write("{}\n");
     return makeExit(log, 0, "no_run_id", { sessionId: activeSessionId, filePath, state, prompt, resolvedPluginRoot, runsDir });
   }
@@ -347,7 +329,7 @@ export async function handleStopHookCommon(
       pendingKinds,
       hasPromise,
     }, options.harness);
-    await cleanupSession(filePath);
+    await markSessionInactive(filePath, state, prompt, "completion_proof_matched");
     process.stdout.write("{}\n");
     return makeExit(log, 0, "completion_proof_matched", { sessionId: activeSessionId, filePath, state, prompt, resolvedPluginRoot, runsDir });
   }
@@ -398,3 +380,5 @@ function makeExit(log: HookLogger, exitCode: number, reason: string, extra?: Par
     updatedTimes: [], nextIteration: 0, log, ...extra,
   };
 }
+
+

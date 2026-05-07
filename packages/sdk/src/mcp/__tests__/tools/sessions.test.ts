@@ -75,14 +75,14 @@ describe("session_init", () => {
     const data = parseResult(result) as { stateFile: string; iteration: number; maxIterations: number };
     expect(data.stateFile).toBe(filePath);
     expect(data.iteration).toBe(1);
-    expect(data.maxIterations).toBe(256);
+    expect(data.maxIterations).toBe(65_000);
 
     expect(mockedWriteSessionFile).toHaveBeenCalledWith(
       filePath,
       expect.objectContaining({
         active: true,
         iteration: 1,
-        maxIterations: 256,
+        maxIterations: 65_000,
         runId: "",
       }),
       ""
@@ -111,7 +111,7 @@ describe("session_init", () => {
     mockedGetSessionFilePath.mockReturnValue("/tmp/s/sess-3.md");
     mockedSessionFileExists.mockResolvedValue(true);
     mockedReadSessionFile.mockResolvedValue({
-      state: { active: true, iteration: 5, maxIterations: 256, runId: "existing-run", startedAt: "", lastIterationAt: "", iterationTimes: [] },
+      state: { active: true, iteration: 5, maxIterations: 65_000, runId: "existing-run", startedAt: "", lastIterationAt: "", iterationTimes: [] },
       prompt: "",
     });
 
@@ -130,7 +130,7 @@ describe("session_init", () => {
     mockedGetSessionFilePath.mockReturnValue("/tmp/s/sess-4.md");
     mockedSessionFileExists.mockResolvedValue(true);
     mockedReadSessionFile.mockResolvedValue({
-      state: { active: true, iteration: 1, maxIterations: 256, runId: "", startedAt: "", lastIterationAt: "", iterationTimes: [] },
+      state: { active: true, iteration: 1, maxIterations: 65_000, runId: "", startedAt: "", lastIterationAt: "", iterationTimes: [] },
       prompt: "",
     });
 
@@ -151,7 +151,7 @@ describe("session_associate", () => {
     const filePath = "/tmp/s/sess-5.md";
     mockedGetSessionFilePath.mockReturnValue(filePath);
     mockedReadSessionFile.mockResolvedValue({
-      state: { active: true, iteration: 1, maxIterations: 256, runId: "", startedAt: "", lastIterationAt: "", iterationTimes: [] },
+      state: { active: true, iteration: 1, maxIterations: 65_000, runId: "", startedAt: "", lastIterationAt: "", iterationTimes: [] },
       prompt: "test prompt",
     });
     mockedWriteSessionFile.mockResolvedValue(undefined);
@@ -177,7 +177,7 @@ describe("session_associate", () => {
   it("rejects when session already has a run", async () => {
     mockedGetSessionFilePath.mockReturnValue("/tmp/s/sess-6.md");
     mockedReadSessionFile.mockResolvedValue({
-      state: { active: true, iteration: 1, maxIterations: 256, runId: "old-run", startedAt: "", lastIterationAt: "", iterationTimes: [] },
+      state: { active: true, iteration: 1, maxIterations: 65_000, runId: "old-run", startedAt: "", lastIterationAt: "", iterationTimes: [] },
       prompt: "",
     });
 
@@ -329,3 +329,4 @@ describe("session_resume", () => {
     expect(data.error).toContain("Run not found");
   });
 });
+

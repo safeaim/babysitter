@@ -213,7 +213,7 @@ describe("GAP-SESSION-001: Session-to-Run One-to-Many", () => {
       const frontmatter: Record<string, string> = {
         active: "true",
         iteration: "1",
-        max_iterations: "256",
+        max_iterations: "65000",
         run_id: "old-run",
         started_at: "2026-01-01T00:00:00Z",
         last_iteration_at: "",
@@ -227,3 +227,4 @@ describe("GAP-SESSION-001: Session-to-Run One-to-Many", () => {
     });
   });
 });
+

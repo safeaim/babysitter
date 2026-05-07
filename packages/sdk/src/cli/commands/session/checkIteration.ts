@@ -1,7 +1,6 @@
 import {
   getCurrentTimestamp,
   getSessionFilePath,
-  isIterationTooFast,
   readSessionFile,
   updateIterationTimes,
 } from "../../../session";
@@ -71,30 +70,6 @@ export async function handleSessionCheckIteration(
     state.iteration >= 5
       ? updateIterationTimes(state.iterationTimes, state.lastIterationAt, now)
       : state.iterationTimes;
-
-  if (isIterationTooFast(updatedTimes)) {
-    const averageTime = updatedTimes.reduce((sum, value) => sum + value, 0) / updatedTimes.length;
-    const result = {
-      found: true,
-      shouldContinue: false,
-      reason: "iteration_too_fast",
-      averageTime,
-      threshold: 15,
-      iteration: state.iteration,
-      maxIterations: state.maxIterations,
-      runId: state.runId ?? "",
-      prompt: file.prompt ?? "",
-      stopMessage: `Average iteration time too fast (${averageTime}s <= 15s)`,
-    };
-    if (args.json) {
-      console.log(JSON.stringify(result, null, 2));
-    } else {
-      console.log(
-        `[session:check-iteration] shouldContinue=false reason=iteration_too_fast avg=${averageTime}s`,
-      );
-    }
-    return 0;
-  }
 
   const result = {
     found: true,

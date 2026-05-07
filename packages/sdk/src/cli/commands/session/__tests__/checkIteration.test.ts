@@ -65,7 +65,7 @@ describe("handleSessionCheckIteration", () => {
     expect(output.runId).toBe("run-max");
   });
 
-  it("stops runaway fast iterations", async () => {
+  it("continues runaway fast iterations", async () => {
     await writeState({
       active: true,
       iteration: 20,
@@ -85,8 +85,8 @@ describe("handleSessionCheckIteration", () => {
 
     expect(exitCode).toBe(0);
     const output = JSON.parse(String(logSpy.mock.calls.at(-1)?.[0] ?? "{}"));
-    expect(output.reason).toBe("iteration_too_fast");
-    expect(output.shouldContinue).toBe(false);
+    expect(output.shouldContinue).toBe(true);
+    expect(output.nextIteration).toBe(21);
   });
 
   it("continues when below limits", async () => {
@@ -113,3 +113,4 @@ describe("handleSessionCheckIteration", () => {
     expect(output.nextIteration).toBe(3);
   });
 });
+

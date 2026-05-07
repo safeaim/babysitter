@@ -15,9 +15,9 @@ metadata:
 graph:
   domains: [domain:business-intelligence]
   specializations: [specialization:strategic-consulting]
-  skillAreas: [skill-area:business-analysis, skill-area:strategic-analysis, skill-area:competitive-intelligence]
+  skillAreas: [skill-area:financial-modeling, skill-area:business-analysis, skill-area:budgeting-forecasting]
   workflows: [workflow:market-analysis]
-  roles: [role:business-analyst, role:strategic-planner]
+  roles: [role:business-analyst, role:financial-analyst]
 ---
 
 # Financial Calculator

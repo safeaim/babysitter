@@ -14,4 +14,4 @@ attributes:
     Ships a TUI, an HTTP+SSE server mode, and an `AGENTS.md` skill format.
 edges:
   has_version:
-    - agent-version:opencode@1.x
+    - agentVersion:opencode:ge-0-0-0

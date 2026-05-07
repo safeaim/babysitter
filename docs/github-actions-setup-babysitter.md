@@ -136,7 +136,7 @@ model: claude-sonnet-4-20250514
 | `model` | No | — | Model in `provider:modelId` format |
 | `process-path` | No | — | Path to process definition (skips Phase 1) |
 | `workspace` | No | `$GITHUB_WORKSPACE` | Working directory |
-| `max-iterations` | No | `256` | Max orchestration iterations |
+| `max-iterations` | No | `65000` | Max orchestration iterations |
 | `runs-dir` | No | `~/.a5c/runs` | Run state directory |
 | `timeout-minutes` | No | `30` | Step timeout |
 | `verbose` | No | `false` | Enable debug output |
@@ -439,7 +439,7 @@ Configure babysitter behavior via environment variables on the workflow step:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `BABYSITTER_MAX_ITERATIONS` | `256` | Max orchestration iterations |
+| `BABYSITTER_MAX_ITERATIONS` | `65000` | Max orchestration iterations |
 | `BABYSITTER_QUALITY_THRESHOLD` | `80` | Quality gate threshold (0-100) |
 | `BABYSITTER_LOG_LEVEL` | `info` | Logging: info, debug, warn, error |
 | `BABYSITTER_TIMEOUT` | `120000` | Operation timeout in ms |
@@ -549,3 +549,4 @@ Enable verbose mode for debugging:
 - [github-actions-cicd-claude-code](https://github.com/a5c-ai/babysitter/blob/main/plugins/a5c/marketplace/plugins/github-actions-cicd-claude-code/configure.md) — Claude Code specific
 - [github-actions-cicd-codex](https://github.com/a5c-ai/babysitter/blob/main/plugins/a5c/marketplace/plugins/github-actions-cicd-codex/configure.md) — Codex specific
 - [github-actions-cicd-gemini-cli](https://github.com/a5c-ai/babysitter/blob/main/plugins/a5c/marketplace/plugins/github-actions-cicd-gemini-cli/configure.md) — Gemini CLI specific
+

@@ -30,7 +30,7 @@ skill runs commands sequentially with no progress indication between iterations.
 ## Target State
 An Ink `StatusLine` component rendered at terminal bottom showing:
 ```
-babysitter | run:01KNKDVE | iter 5/256 | 3 effects (1 pending) | 45k tokens | $0.12 | 3m 22s
+babysitter | run:01KNKDVE | iter 5/65000 | 3 effects (1 pending) | 45k tokens | $0.12 | 3m 22s
 ```
 
 Updates in real-time during `harness:call`, `harness:resume`, and embedded SDK
@@ -54,3 +54,4 @@ yellow=slow, red=error.
 Phase 1-2. Smallest TUI win with highest visibility. A single Ink component
 at terminal bottom. Data from `run:status --json` and `tokens:stats --json`.
 Can be implemented standalone even before full Ink adoption.
+

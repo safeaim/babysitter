@@ -1,6 +1,7 @@
 import * as path from "path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { DEFAULTS } from "../../config";
 import {
   readSessionFile,
   sessionFileExists,
@@ -25,7 +26,7 @@ export function registerSessionTools(server: McpServer): void {
       maxIterations: z
         .number()
         .optional()
-        .describe("Maximum number of iterations (default 256)"),
+        .describe("Maximum number of iterations (default 65000)"),
       runId: z
         .string()
         .optional()
@@ -38,7 +39,7 @@ export function registerSessionTools(server: McpServer): void {
     async (args) => {
       try {
         const stateDir = path.resolve(args.stateDir);
-        const maxIterations = args.maxIterations ?? 256;
+        const maxIterations = args.maxIterations ?? DEFAULTS.maxIterations;
         const runId = args.runId ?? "";
         const prompt = args.prompt ?? "";
 
@@ -146,7 +147,7 @@ export function registerSessionTools(server: McpServer): void {
       maxIterations: z
         .number()
         .optional()
-        .describe("Maximum number of iterations (default 256)"),
+        .describe("Maximum number of iterations (default 65000)"),
       runsDir: z.string().optional().describe("Override runs directory path"),
     },
     async (args) => {
@@ -154,7 +155,7 @@ export function registerSessionTools(server: McpServer): void {
         const stateDir = path.resolve(args.stateDir);
         const runsDir = resolveRunDir(args.runsDir);
         const runDir = path.join(runsDir, args.runId);
-        const maxIterations = args.maxIterations ?? 256;
+        const maxIterations = args.maxIterations ?? DEFAULTS.maxIterations;
 
         // Check run state from journal
         let runState = "unknown";
@@ -233,3 +234,4 @@ export function registerSessionTools(server: McpServer): void {
     }
   );
 }
+

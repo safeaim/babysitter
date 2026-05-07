@@ -22,6 +22,9 @@ export function serializeSessionState(state: SessionState): string {
   lines.push(`started_at: "${state.startedAt}"`);
   lines.push(`last_iteration_at: "${state.lastIterationAt}"`);
   lines.push(`iteration_times: ${state.iterationTimes.join(',')}`);
+  for (const [key, value] of Object.entries(state.metadata ?? {})) {
+    lines.push(`metadata_${key}: "${String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+  }
 
   return lines.join('\n');
 }
@@ -108,25 +111,6 @@ export async function updateSessionState(
   return updatedState;
 }
 
-/**
- * Delete session state file.
- */
-export async function deleteSessionFile(filePath: string): Promise<boolean> {
-  try {
-    await fs.unlink(filePath);
-    return true;
-  } catch (error) {
-    const err = error as NodeJS.ErrnoException;
-    if (err.code === 'ENOENT') {
-      return false; // File doesn't exist, consider it deleted
-    }
-    throw new SessionError(
-      `Failed to delete session state file: ${err.message}`,
-      SessionErrorCode.FS_ERROR,
-      { filePath, originalError: err.message }
-    );
-  }
-}
 
 /**
  * Bind a new run to the session, retiring the previous active run to history.
@@ -204,7 +188,7 @@ export function isoToEpochSeconds(isoTimestamp: string): number | null {
 
 /**
  * Calculate iteration duration and update times array.
- * Keeps only the last 10 durations for runaway loop detection.
+ * Keeps only the last 10 durations for diagnostics.
  */
 export function updateIterationTimes(
   existingTimes: number[],
@@ -228,16 +212,5 @@ export function updateIterationTimes(
   return newTimes.slice(-10);
 }
 
-/**
- * Check if average iteration time indicates runaway loop.
- * Returns true if at least 10 consecutive iterations averaged <= 15 seconds.
- */
-export function isIterationTooFast(iterationTimes: number[]): boolean {
-  if (iterationTimes.length < 10) {
-    return false;
-  }
 
-  const sum = iterationTimes.reduce((a, b) => a + b, 0);
-  const avg = sum / iterationTimes.length;
-  return avg <= 15;
-}
+

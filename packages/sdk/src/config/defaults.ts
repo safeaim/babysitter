@@ -59,7 +59,7 @@ export const CONFIG_ENV_VARS = {
 /** Default SDK configuration values; env vars and explicit overrides can replace them. */
 export const DEFAULTS: Readonly<BabysitterConfig> = {
   runsDir: path.join(getConfiguredGlobalStateRoot(), "runs"),
-  maxIterations: 256,
+  maxIterations: 65_000,
   qualityThreshold: 80,
   timeout: 120000,
   logLevel: "info",

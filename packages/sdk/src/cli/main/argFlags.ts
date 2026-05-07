@@ -45,9 +45,6 @@ export const BOOLEAN_FLAGS: Record<string, (parsed: ParsedArgs) => void> = {
   "--non-interactive": (parsed) => {
     parsed.interactive = false;
   },
-  "--delete": (parsed) => {
-    parsed.deleteSession = true;
-  },
   "--include-remote": (parsed) => {
     parsed.includeRemote = true;
   },

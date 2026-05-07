@@ -1,4 +1,5 @@
 import type { SessionInitResult, SessionState } from "../../../session";
+import { DEFAULTS } from "../../../config";
 import {
   SessionError,
   getCurrentTimestamp,
@@ -25,7 +26,7 @@ export async function handleSessionInit(args: SessionInitArgs): Promise<number> 
   }
 
   const { sessionId, stateDir } = required;
-  const maxIterations = args.maxIterations ?? 256;
+  const maxIterations = args.maxIterations ?? DEFAULTS.maxIterations;
   const runId = args.runId ?? "";
   const prompt = args.prompt ?? "";
   const filePath = getSessionFilePath(stateDir, sessionId);

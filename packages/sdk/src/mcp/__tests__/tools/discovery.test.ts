@@ -101,7 +101,7 @@ describe("configure_show", () => {
     mockedConfigureShow.mockReturnValue({
       values: {
         runsDir: "~/.a5c/runs",
-        maxIterations: 256,
+        maxIterations: 65_000,
         qualityThreshold: 80,
       },
       timestamp: "2026-03-15T12:00:00Z",
@@ -113,7 +113,7 @@ describe("configure_show", () => {
     expect(result.isError).toBeUndefined();
     const data = parseResult(result) as { values: Record<string, unknown>; timestamp: string };
     expect(data.values.runsDir).toBe("~/.a5c/runs");
-    expect(data.values.maxIterations).toBe(256);
+    expect(data.values.maxIterations).toBe(65_000);
     expect(data.timestamp).toBe("2026-03-15T12:00:00Z");
   });
 
@@ -172,3 +172,4 @@ describe("skill_discover", () => {
     expect(data.error).toBe("Plugin root not found");
   });
 });
+

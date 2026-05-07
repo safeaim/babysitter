@@ -274,7 +274,7 @@ describe("Gemini CLI AfterAgent hook (stop)", () => {
     const state: SessionState = {
       active: true,
       iteration: 1,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId: "",
       runIds: [],
       startedAt: now,
@@ -428,7 +428,7 @@ describe("Gemini CLI SessionStart hook", () => {
     const existingState: SessionState = {
       active: true,
       iteration: 7,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId: "existing-run-xyz",
       runIds: [],
       startedAt: now,
@@ -507,7 +507,7 @@ describe("Gemini CLI bindSession", () => {
     const state: SessionState = {
       active: true,
       iteration: 1,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId: "",
       runIds: [],
       startedAt: now,
@@ -541,7 +541,7 @@ describe("Gemini CLI bindSession", () => {
     const state: SessionState = {
       active: true,
       iteration: 3,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId: "existing-run-999",
       runIds: [],
       startedAt: now,
@@ -764,3 +764,4 @@ describe("Gemini CLI findHookDispatcherPath", () => {
     expect(result).toBeNull();
   });
 });
+

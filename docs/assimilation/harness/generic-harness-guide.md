@@ -881,7 +881,7 @@ schema. Summary:
 
 - `shouldContinue: true` -- safe to proceed; `nextIteration` indicates the next number
 - `shouldContinue: false` -- stop the loop; `reason` explains why (e.g.,
-  `max_iterations_reached`, `iteration_too_fast`, `session_not_found`)
+  `max_iterations_reached`, `session_not_found`)
 
 #### Guard Logic
 
@@ -909,7 +909,7 @@ function checkIterationGuards(sessionId, stateDir):
 **1. Max Iterations Guard**
 
 ```
-IF iteration >= maxIterations (default 256):
+IF iteration >= maxIterations (default 65000):
     STOP -- allow exit, clean up state file
 ```
 
@@ -1030,7 +1030,7 @@ machine-readable state. The Markdown body stores the user's original prompt.
 ---
 active: true
 iteration: 3
-max_iterations: 256
+max_iterations: 65000
 run_id: "my-run-abc123"
 started_at: "2026-03-02T10:00:00Z"
 last_iteration_at: "2026-03-02T10:05:30Z"
@@ -1046,7 +1046,7 @@ Build a REST API with authentication and rate limiting for the user service.
 |-------|------|---------|-------------|
 | `active` | boolean | `true` | Whether the orchestration loop is active |
 | `iteration` | number | `1` | Current iteration (1-based) |
-| `max_iterations` | number | `256` | Maximum iterations (0 = unlimited) |
+| `max_iterations` | number | `65000` | Maximum iterations (0 = unlimited) |
 | `run_id` | string | `""` | Bound run ID (empty before run:create) |
 | `started_at` | string (ISO 8601) | now | Session start timestamp |
 | `last_iteration_at` | string (ISO 8601) | now | Last iteration timestamp |
@@ -1063,7 +1063,7 @@ Build a REST API with authentication and rate limiting for the user service.
   |  BASELINE |     |   BOUND   |          |  ACTIVE   |       |  CLEANED   |
   |           |---->|           |--------->|           |------>|   UP       |
   | runId=""  |     | runId=X   |          | iter=N+1  |       | file       |
-  | iter=1    |     | iter=1    |          | times=[.] |       | deleted    |
+  | iter=1    |     | iter=1    |          | times=[.] |       | inactive   |
   +-----------+     +-----------+          +-----------+       +------------+
 ```
 
@@ -1191,17 +1191,15 @@ explain why.
 // shouldContinue: true
 { "found": true, "shouldContinue": true, "nextIteration": 4,
   "updatedIterationTimes": [45, 62, 58], "iteration": 3,
-  "maxIterations": 256, "runId": "my-run-abc123", "prompt": "Build the API..." }
+  "maxIterations": 65000, "runId": "my-run-abc123", "prompt": "Build the API..." }
 
 // shouldContinue: false -- possible reason values:
-//   "iteration_too_fast"     (+ averageTime, threshold, stopMessage)
 //   "max_iterations_reached" (+ stopMessage)
 //   "session_not_found"      (found=false, all counters zero)
 ```
 
 | `reason` value | Trigger condition | Extra fields |
 |---|---|---|
-| `iteration_too_fast` | iteration >= 5 and avg(last 3) <= 15s | `averageTime`, `threshold` |
 | `max_iterations_reached` | iteration >= maxIterations | -- |
 | `session_not_found` | State file does not exist | `found: false` |
 
@@ -1292,7 +1290,7 @@ error handling strategy.
 | **Timeout** | CLI command exceeds expected duration | Kill the process, log the timeout, retry once with a longer timeout. If the retry also times out, APPROVE exit and log a diagnostic warning. |
 | **JSON parse error** | stdout is empty or contains non-JSON text (e.g., stack traces, warnings) | Check stderr for error details. Strip any non-JSON prefix from stdout (some environments prepend warnings). If still unparseable, treat as a command failure. |
 | **Lock conflict** | `run:iterate` or `task:post` fails because another process holds `run.lock` | Retry after 250ms, up to 40 retries (matching the SDK's internal retry behavior). If all retries fail, log the conflict and APPROVE exit. |
-| **Missing run directory** | `run:status` or `run:iterate` returns non-zero with ENOENT-style error | The run was deleted or never created. Clean up the session state file and APPROVE exit. |
+| **Missing run directory** | `run:status` or `run:iterate` returns non-zero with ENOENT-style error | The run was deleted or never created. Mark the session inactive and approve/fail loudly according to harness policy. |
 | **Permission error** | EACCES or EPERM on file operations | Check file ownership and permissions. This usually indicates a misconfigured `BABYSITTER_RUNS_DIR`. |
 | **Non-zero exit, valid JSON** | CLI returns exit code != 0 but stdout contains valid JSON with an `error` field | Parse the JSON error object for structured diagnostics. The `error.code` field often contains a machine-readable error type. |
 
@@ -1650,7 +1648,7 @@ const crypto = require('crypto');
 // --- Configuration ---
 const RUNS_DIR = '.a5c/runs';
 const STATE_DIR = join(process.cwd(), '.harness-state');
-const MAX_ITERATIONS = 256;
+const MAX_ITERATIONS = 65000;
 const RUNAWAY_THRESHOLD_ITERATIONS = 5;
 const RUNAWAY_THRESHOLD_SECONDS = 15;
 const CLI_TIMEOUT_MS = 120_000;
@@ -1841,3 +1839,9 @@ main().catch(err => { console.error(err); process.exit(1); });
 | `babysitter session:check-iteration --session-id ID --state-dir DIR --json` | Check iteration guards | 2g |
 | `babysitter run:repair-journal RUNDIR --json` | Repair inconsistent journal | 7 |
 | `babysitter hook:run --hook-type TYPE --harness NAME --json` | Dispatch a lifecycle hook | 5 |
+
+
+
+
+
+

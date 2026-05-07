@@ -345,7 +345,7 @@ async function invokeSubprocessEffect(
   const spec = parseSubprocessSpec(action, options.workspace);
   const childHarness = spec.harness ?? harnessName;
   const childModel = spec.model ?? options.model;
-  const maxIterations = spec.maxIterations ?? options.maxIterations ?? 256;
+  const maxIterations = spec.maxIterations ?? options.maxIterations ?? 65_000;
   const childPrompt = spec.prompt ?? action.taskDef?.title ?? `Run subprocess ${spec.processId}`;
 
   const childRun = await createRun({

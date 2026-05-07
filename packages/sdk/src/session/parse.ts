@@ -13,7 +13,7 @@ import { SessionError, SessionErrorCode } from './types';
 export const DEFAULT_SESSION_STATE: SessionState = {
   active: false,
   iteration: 1,
-  maxIterations: 256,
+  maxIterations: 65_000,
   runId: '',
   runIds: [],
   startedAt: '',
@@ -105,6 +105,12 @@ export function parseSessionState(frontmatter: Record<string, string>): SessionS
     return value.split(',').map(s => s.trim()).filter(s => s.length > 0);
   };
 
+  const metadata = Object.fromEntries(
+    Object.entries(frontmatter)
+      .filter(([key]) => key.startsWith('metadata_'))
+      .map(([key, value]) => [key.slice('metadata_'.length), value]),
+  );
+
   return {
     active: parseBoolean(frontmatter.active, DEFAULT_SESSION_STATE.active),
     iteration: parseNumber(frontmatter.iteration, DEFAULT_SESSION_STATE.iteration),
@@ -115,6 +121,7 @@ export function parseSessionState(frontmatter: Record<string, string>): SessionS
     startedAt: frontmatter.started_at ?? DEFAULT_SESSION_STATE.startedAt,
     lastIterationAt: frontmatter.last_iteration_at ?? DEFAULT_SESSION_STATE.lastIterationAt,
     iterationTimes: parseNumberArray(frontmatter.iteration_times),
+    metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
   };
 }
 
@@ -191,3 +198,4 @@ export function validateSessionState(state: SessionState): void {
 export function getSessionFilePath(stateDir: string, sessionId: string): string {
   return `${stateDir}/${sessionId}.md`;
 }
+

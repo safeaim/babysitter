@@ -18,6 +18,7 @@ import {
   writeSessionFile,
   getSessionFilePath,
   getCurrentTimestamp,
+  readSessionFile,
 } from "../../../session";
 import type { SessionState } from "../../../session";
 
@@ -318,6 +319,9 @@ describe("handleHookRun stop", () => {
     expect(code).toBe(0);
     const output = JSON.parse(getStdout().trim());
     expect(output.decision).toBeUndefined();
+    const retained = await readSessionFile(filePath);
+    expect(retained.state.active).toBe(false);
+    expect(retained.state.metadata?.hookExitReason).toBe("max_iterations_reached");
   });
 
   it("allows exit when no run is associated", async () => {
@@ -346,6 +350,36 @@ describe("handleHookRun stop", () => {
       JSON.stringify({ session_id: sessionId, transcript_path: transcriptPath }),
       { ...baseArgs, stateDir },
     );
+    expect(code).toBe(0);
+    const output = JSON.parse(getStdout().trim());
+    expect(output.decision).toBeUndefined();
+    const retained = await readSessionFile(filePath);
+    expect(retained.state.active).toBe(false);
+    expect(retained.state.metadata?.hookExitReason).toBe("no_run_id");
+  });
+
+  it("allows exit for inactive retained sessions even when run remains associated", async () => {
+    const sessionId = "inactive-associated-session";
+    const filePath = getSessionFilePath(stateDir, sessionId);
+    const now = getCurrentTimestamp();
+    const state: SessionState = {
+      active: false,
+      iteration: 10,
+      maxIterations: 10,
+      runId: "still-associated-run",
+      runIds: [],
+      startedAt: now,
+      lastIterationAt: now,
+      iterationTimes: [],
+      metadata: { hookExitReason: "completion_proof_matched" },
+    };
+    await writeSessionFile(filePath, state, "Test prompt");
+
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId }),
+      { ...baseArgs, stateDir },
+    );
+
     expect(code).toBe(0);
     const output = JSON.parse(getStdout().trim());
     expect(output.decision).toBeUndefined();
@@ -595,3 +629,5 @@ describe("handleHookRun session-start", () => {
     expect(getStdout().trim()).toBe("{}");
   });
 });
+
+

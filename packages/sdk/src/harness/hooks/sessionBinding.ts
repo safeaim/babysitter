@@ -8,6 +8,7 @@
  */
 
 import * as path from "node:path";
+import { DEFAULTS } from "../../config";
 import { loadJournal } from "../../storage/journal";
 import {
   countPendingEffectsFromJournal,
@@ -21,7 +22,6 @@ import {
 } from "../../session/parse";
 import type { SessionState } from "../../session/types";
 import {
-  deleteSessionFile,
   getCurrentTimestamp,
   updateSessionState,
   writeSessionFile,
@@ -52,7 +52,7 @@ export async function bindSession(
   args: SharedBindSessionArgs,
 ): Promise<SessionBindResult> {
   const { harness, stateDir, opts, autoReleaseStale = false, extraState } = args;
-  const { sessionId, runId, runsDir, maxIterations = 256, prompt, verbose } = opts;
+  const { sessionId, runId, runsDir, maxIterations = DEFAULTS.maxIterations, prompt, verbose } = opts;
   const resolvedRunDir = path.resolve(opts.runDir);
   const filePath = getSessionFilePath(stateDir, sessionId);
 
@@ -91,7 +91,18 @@ export async function bindSession(
                 `[run:create] Auto-releasing stale session ${sessionId} from terminal run ${oldRunId}\n`,
               );
             }
-            await deleteSessionFile(filePath);
+            await updateSessionState(
+              filePath,
+              {
+                active: false,
+                metadata: {
+                  ...(existing.state.metadata ?? {}),
+                  hookExitReason: "auto_release_terminal_run",
+                  hookExitedAt: getCurrentTimestamp(),
+                },
+              },
+              { state: existing.state, prompt: existing.prompt },
+            );
           } else {
             return {
               harness,

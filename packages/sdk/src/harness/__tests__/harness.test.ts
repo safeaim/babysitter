@@ -462,7 +462,7 @@ describe("bindSession stale session handling", () => {
     return {
       active: true,
       iteration: 1,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId,
       runIds: [],
       startedAt: "2026-01-01T00:00:00Z",
@@ -786,7 +786,7 @@ describe("stop hook stale session fallback (Issue #69)", () => {
     return {
       active: true,
       iteration: 1,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId,
       runIds: [],
       startedAt: "2026-01-01T00:00:00Z",
@@ -944,7 +944,7 @@ describe("stop hook allows exit when only breakpoints are pending", () => {
     return {
       active: true,
       iteration: 1,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId,
       runIds: [],
       startedAt: "2026-01-01T00:00:00Z",
@@ -1078,3 +1078,4 @@ describe("stop hook allows exit when only breakpoints are pending", () => {
     expect(parsed.decision).toBe("block");
   });
 });
+

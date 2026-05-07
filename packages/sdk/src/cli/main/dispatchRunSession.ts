@@ -174,7 +174,6 @@ async function executeSupportCommand(parsed: ParsedArgs): Promise<number | undef
       iteration: parsed.iteration,
       lastIterationAt: parsed.lastIterationAt,
       iterationTimes: parsed.iterationTimes,
-      delete: parsed.deleteSession,
       json: parsed.json,
     });
   }

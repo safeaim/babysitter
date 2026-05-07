@@ -14,4 +14,4 @@ attributes:
     with the local workspace through file and shell tool use.
 edges:
   has_version:
-    - agent-version:gemini-cli@current
+    - agentVersion:gemini:ge-0-0-0

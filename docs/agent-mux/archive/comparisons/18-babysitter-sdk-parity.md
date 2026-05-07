@@ -6,7 +6,7 @@
 **Upstream:** github.com/a5c-ai/babysitter @ `staging` — `packages/sdk/src/harness/*`
 **Local:** `C:/work/agent-mux/packages/adapters/src/*-adapter.ts`
 
-> Note on scope: babysitter's `HarnessAdapter` and agent-mux's `AgentAdapter` are **not the same contract**. babysitter adapters are *orchestration-loop controllers* (session-binding, stop-hook decisions, iteration caps, runaway detection, completion-proof matching) that live next to an external harness. agent-mux adapters are *subprocess adapters* (spawn args, JSONL event parsing, auth, config, sessions on disk). Still, several generic features from babysitter are directly portable and close real gaps.
+> Note on scope: babysitter's `HarnessAdapter` and agent-mux's `AgentAdapter` are **not the same contract**. babysitter adapters are *orchestration-loop controllers* (session-binding, stop-hook decisions, iteration caps, inactive retained-state exits, completion-proof matching) that live next to an external harness. agent-mux adapters are *subprocess adapters* (spawn args, JSONL event parsing, auth, config, sessions on disk). Still, several generic features from babysitter are directly portable and close real gaps.
 
 ---
 
@@ -14,7 +14,7 @@
 
 | Adapter | babysitter file | agent-mux file | Babysitter-only features (gaps in agent-mux) |
 |---|---|---|---|
-| **claude** | `harness/claudeCode.ts` | `claude-adapter.ts` | PID-scoped session marker (`~/.a5c/state/current-session-pid-{PID}`); `CLAUDE_ENV_FILE` last-match resolution; `bindSession` with re-entrancy guard; `handleStopHook` (iteration cap 256, runaway detection via `iterationTimes[]`, breakpoint-only gating, promise-tag `<promise>VALUE</promise>` completion proof, density-filter prompt compression, processLibraryCache pre-warming); `STOP_HOOK_INVOKED` journal telemetry; process-tree ancestor walk (wmic/PowerShell on Windows); atomic tmp→target env file writes. |
+| **claude** | `harness/claudeCode.ts` | `claude-adapter.ts` | PID-scoped session marker (`~/.a5c/state/current-session-pid-{PID}`); `CLAUDE_ENV_FILE` last-match resolution; `bindSession` with re-entrancy guard; `handleStopHook` (iteration cap 65000, inactive retained-state exits, breakpoint-only gating, promise-tag `<promise>VALUE</promise>` completion proof, density-filter prompt compression, processLibraryCache pre-warming); `STOP_HOOK_INVOKED` journal telemetry; process-tree ancestor walk (wmic/PowerShell on Windows); atomic tmp→target env file writes. |
 | **codex** | `harness/codex.ts` | `codex-adapter.ts` | Session ID cascade (`CODEX_THREAD_ID`, `CODEX_SESSION_ID`); stop-hook delegates to claude adapter (shared loop logic); snake_case/camelCase input normalization; synthetic stdin injection for delegated hooks. |
 | **cursor** | `harness/cursor.ts` | `cursor-adapter.ts` | `conversation_id` extraction from hook stdin; `followup_message` auto-continue contract; IDE vs. CLI hook-type split (rejects `after-agent-response` in CLI); promise-tag matching against `run.completionProof`; fallback run resolution under `.a5c/.a5c/runs/`. |
 | **gemini** | `harness/geminiCli.ts` | `gemini-adapter.ts` | `{"decision":"block","reason":…,"systemMessage":…}` stop-hook contract; `prompt_response` parsing; `GEMINI_EXTENSION_PATH/hooks/after-agent.sh` dispatcher; env signals `GEMINI_PROJECT_DIR`, `GEMINI_CWD`. |
@@ -29,7 +29,7 @@
 
 ## 2. Top 10 Generic Feature Gaps
 
-1. **Orchestration stop-hook loop** — iteration counter, `maxIterations` (256), `iterationTimes[]` runaway detection, breakpoint-only gating. Not present in any agent-mux adapter.
+1. **Orchestration stop-hook loop** — iteration counter, `maxIterations` (65000), breakpoint-only gating. Not present in any agent-mux adapter.
 2. **Completion-proof / promise-tag matching** — `<promise>VALUE</promise>` extraction from last assistant message cross-checked against run metadata.
 3. **Session binding with re-entrancy guard** — prevents two runs grabbing the same harness session; auto-releases on terminal run state.
 4. **PID-scoped session markers + ancestor-PID walk** — Windows fallback via wmic/PowerShell; tolerates forked shells.
@@ -69,3 +69,5 @@
 - **agent-mux**: class-based `BaseAgentAdapter` with `buildSpawnArgs`/`parseEvent`/`detectAuth`/session-on-disk.
 - **babysitter**: factory-returning `HarnessAdapter` object with `isActive`/`bindSession`/`handleStopHook`/`handleSessionStartHook`/`installHarness`/`installPlugin`/`getPromptContext`.
 - These are **complementary, not overlapping**. A future `OrchestrationAdapter` mixin or sibling interface on agent-mux adapters would let a single package expose both. See F1–F3.
+
+

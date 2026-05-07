@@ -14,4 +14,4 @@ attributes:
     plugin shape but maintained independently.
 edges:
   has_version:
-    - agent-version:omp@current
+    - agentVersion:omp:ge-0-0-0

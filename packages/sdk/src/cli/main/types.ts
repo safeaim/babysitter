@@ -51,7 +51,6 @@ export interface ParsedArgs {
   prompt?: string;
   lastIterationAt?: string;
   iterationTimes?: string;
-  deleteSession?: boolean;
   timeout?: number;
   transcriptPath?: string;
   hookType?: string;

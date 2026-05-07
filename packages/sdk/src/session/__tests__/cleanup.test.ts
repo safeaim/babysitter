@@ -16,7 +16,7 @@ function makeState(overrides: Partial<SessionState> = {}): SessionState {
   return {
     active: true,
     iteration: 1,
-    maxIterations: 256,
+    maxIterations: 65_000,
     runId: "",
     runIds: [],
     startedAt: "2020-01-01T00:00:00.000Z",
@@ -121,3 +121,4 @@ describe("runSessionCleanup", () => {
     expect(content).toMatch(/active: true/);
   });
 });
+

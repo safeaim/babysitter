@@ -19,9 +19,9 @@ metadata:
 graph:
   domains: [domain:strategy]
   specializations: [specialization:strategic-consulting]
-  skillAreas: [skill-area:strategic-planning, skill-area:business-model-design, skill-area:growth-strategy]
+  skillAreas: [skill-area:economic-analysis, skill-area:strategic-analysis, skill-area:market-research]
   workflows: [workflow:strategic-planning, workflow:competitive-analysis]
-  roles: [role:strategic-planner, role:business-analyst]
+  roles: [role:strategic-planner, role:research-analyst]
 ---
 
 # Macro-Economist Agent

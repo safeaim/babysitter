@@ -1,8 +1,7 @@
 import * as path from "node:path";
 import { appendFileSync, mkdirSync } from "node:fs";
-import { getGlobalLogDir } from "../../config";
+import { DEFAULTS, getGlobalLogDir } from "../../config";
 import { appendEvent } from "../../storage/journal";
-import { deleteSessionFile } from "../../session/write";
 import {
   getSessionFilePath,
   sessionFileExists,
@@ -137,9 +136,22 @@ export async function appendStopHookEvent(
   }
 }
 
-export async function cleanupSession(filePath: string): Promise<void> {
+export async function markSessionInactive(
+  filePath: string,
+  state: SessionState,
+  prompt: string,
+  reason: string,
+): Promise<void> {
   try {
-    await deleteSessionFile(filePath);
+    await writeSessionFile(filePath, {
+      ...state,
+      active: false,
+      metadata: {
+        ...(state.metadata ?? {}),
+        hookExitReason: reason,
+        hookExitedAt: getCurrentTimestamp(),
+      },
+    }, prompt);
   } catch {
     // Best-effort
   }
@@ -157,7 +169,7 @@ export async function initializeSessionState(
       const state: SessionState = {
         active: true,
         iteration: 1,
-        maxIterations: options?.maxIterations ?? 256,
+        maxIterations: options?.maxIterations ?? DEFAULTS.maxIterations,
         runId: "",
         runIds: [],
         startedAt: nowTs,

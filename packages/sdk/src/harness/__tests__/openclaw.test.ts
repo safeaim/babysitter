@@ -373,7 +373,7 @@ describe("OpenClaw handleSessionStartHook()", () => {
     const content = await readSessionFile(filePath);
     expect(content.state.active).toBe(true);
     expect(content.state.iteration).toBe(1);
-    expect(content.state.maxIterations).toBe(256);
+    expect(content.state.maxIterations).toBe(65_000);
     expect(content.state.runId).toBe("");
   });
 
@@ -468,7 +468,7 @@ describe("OpenClaw bindSession()", () => {
     const state: SessionState = {
       active: true,
       iteration: 1,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId: "",
       runIds: [],
       startedAt: nowTs,
@@ -502,7 +502,7 @@ describe("OpenClaw bindSession()", () => {
     const state: SessionState = {
       active: true,
       iteration: 3,
-      maxIterations: 256,
+      maxIterations: 65_000,
       runId: "existing-run-xyz",
       runIds: [],
       startedAt: nowTs,
@@ -599,3 +599,4 @@ describe("OpenClaw getUnsupportedHookMessage()", () => {
     expect(msg).toContain("not supported");
   });
 });
+

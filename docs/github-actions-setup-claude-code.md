@@ -668,7 +668,7 @@ Configure Babysitter behavior through environment variables:
     # Keep runs under the checked-out repository for easy artifact upload
     BABYSITTER_RUNS_SCOPE: repo
 
-    # Set maximum iterations (default: 256)
+    # Set maximum iterations (default: 65000)
     BABYSITTER_MAX_ITERATIONS: 100
 
     # Set quality threshold (default: 80)
@@ -789,3 +789,4 @@ permissions:
 - [Getting Started](./reference/GETTING_STARTED.md)
 - [Process Selection Guide](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/PROCESS_SELECTION.md)
 - [Troubleshooting](https://github.com/a5c-ai/babysitter/blob/main/docs/reference/TROUBLESHOOTING.md)
+

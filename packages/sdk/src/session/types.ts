@@ -47,7 +47,7 @@ export interface SessionFile {
 export interface SessionInitOptions {
   /** Claude session ID */
   sessionId: string;
-  /** Maximum iterations (default: 256) */
+  /** Maximum iterations (default: 65000) */
   maxIterations?: number;
   /** Optional run ID if already known */
   runId?: string;
@@ -77,7 +77,7 @@ export interface SessionResumeOptions {
   sessionId: string;
   /** Run ID to resume */
   runId: string;
-  /** Maximum iterations (default: 256) */
+  /** Maximum iterations (default: 65000) */
   maxIterations?: number;
   /** Directory to store state files */
   stateDir: string;
@@ -109,8 +109,6 @@ export interface SessionUpdateOptions {
   lastIterationAt?: string;
   /** New iteration times array */
   iterationTimes?: number[];
-  /** Delete the state file */
-  delete?: boolean;
 }
 
 /**
@@ -171,10 +169,8 @@ export interface SessionStateResult {
 export interface SessionUpdateResult {
   /** Whether update was successful */
   success: boolean;
-  /** Updated state (if not deleted) */
+  /** Updated state */
   state?: SessionState;
-  /** Whether file was deleted */
-  deleted?: boolean;
   /** Path to state file */
   stateFile: string;
 }
@@ -216,3 +212,4 @@ export enum SessionErrorCode {
   /** File system error */
   FS_ERROR = 'FS_ERROR',
 }
+

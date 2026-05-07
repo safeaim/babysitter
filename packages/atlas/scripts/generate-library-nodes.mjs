@@ -79,6 +79,7 @@ function yamlString(value) {
     str.includes("'") ||
     str.includes('"') ||
     str.includes("\n") ||
+    str.includes("\r") ||
     str.includes("[") ||
     str.includes("]") ||
     str.includes("{") ||
@@ -96,7 +97,7 @@ function yamlString(value) {
     str.endsWith(" ") ||
     str === ""
   ) {
-    return '"' + str.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n") + '"';
+    return '"' + str.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r\n/g, "\\n").replace(/\r/g, "\\n").replace(/\n/g, "\\n") + '"';
   }
   return str;
 }

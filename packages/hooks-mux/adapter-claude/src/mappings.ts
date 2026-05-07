@@ -24,110 +24,24 @@ function hookMappingToPhaseMapping(mapping: HookMappingDescriptor): PhaseMapping
   };
 }
 
-const FALLBACK_MAPPINGS: PhaseMapping[] = [
-  {
-    canonicalPhase: 'session.start',
-    nativeHook: 'SessionStart',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-    notes: 'source values: startup, resume, clear, compact. CLAUDE_ENV_FILE available.',
-  },
-  {
-    canonicalPhase: 'session.end',
-    nativeHook: 'SessionEnd',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-    notes: 'Observer-only; no blocking or mutation.',
-  },
-  {
-    canonicalPhase: 'session.compact.before',
-    nativeHook: 'PreCompact',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-    notes: 'Fires before context compaction. Observer-only.',
-  },
-  {
-    canonicalPhase: 'turn.user_prompt_submitted',
-    nativeHook: 'UserPromptSubmit',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'turn',
-    notes: 'Fires when user submits a prompt.',
-  },
-  {
-    canonicalPhase: 'tool.before',
-    nativeHook: 'PreToolUse',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: false,
-    scope: 'tool',
-    notes: 'Can block (deny) or ask for permission. Tool input mutation not supported.',
-  },
-  {
-    canonicalPhase: 'tool.after',
-    nativeHook: 'PostToolUse',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'tool',
-    notes: 'Observer-only post-tool hook. CLAUDE_ENV_FILE available.',
-  },
-  {
-    canonicalPhase: 'turn.stop',
-    nativeHook: 'Stop',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: false,
-    scope: 'turn',
-    notes: 'Can continue session or stop. Guard against recursion via stop_hook_active.',
-  },
-  {
-    canonicalPhase: 'subagent.end',
-    nativeHook: 'SubagentStop',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'subagent',
-    notes: 'Fires when a subagent completes.',
-  },
-  {
-    canonicalPhase: 'notification',
-    nativeHook: 'Notification',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'notification',
-    notes: 'Observer-only notification event.',
-  },
-];
-
-function buildFromCatalog(): PhaseMapping[] | null {
-  try {
-    const mappings = listHookMappingsByAdapterFamily('claude');
-    if (mappings.length === 0) return null;
-    const phaseMappings = mappings
-      .map(hookMappingToPhaseMapping)
-      .filter((m): m is PhaseMapping => m !== null);
-    // Deduplicate by nativeHook (prefer first occurrence)
-    const seen = new Set<string>();
-    return phaseMappings.filter((m) => {
-      if (seen.has(m.nativeHook)) return false;
-      seen.add(m.nativeHook);
-      return true;
-    });
-  } catch {
-    return null;
+function buildFromCatalog(): PhaseMapping[] {
+  const mappings = listHookMappingsByAdapterFamily('claude');
+  if (mappings.length === 0) {
+    throw new Error('hooks-mux adapter-claude: catalog unavailable or returned no mappings for family "claude"');
   }
+  const phaseMappings = mappings
+    .map(hookMappingToPhaseMapping)
+    .filter((m): m is PhaseMapping => m !== null);
+  // Deduplicate by nativeHook (prefer first occurrence)
+  const seen = new Set<string>();
+  return phaseMappings.filter((m) => {
+    if (seen.has(m.nativeHook)) return false;
+    seen.add(m.nativeHook);
+    return true;
+  });
 }
 
-export const CLAUDE_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog() ?? FALLBACK_MAPPINGS;
+export const CLAUDE_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog();
 
 /**
  * Look up the phase mapping for a given Claude native event name.

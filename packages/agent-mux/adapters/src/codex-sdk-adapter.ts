@@ -39,9 +39,14 @@ import {
 } from './codex-sdk-mocks.js';
 
 export class CodexSdkAdapter extends BaseProgrammaticAdapter {
-  readonly agent = 'codex-sdk' as const;
+  readonly agent: string;
   readonly displayName = 'Codex (SDK)';
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase().replace(/sdk$/, '-sdk');
+  }
   readonly hostEnvSignals = ['OPENAI_API_KEY'] as const;
 
   readonly capabilities: AgentCapabilities = {

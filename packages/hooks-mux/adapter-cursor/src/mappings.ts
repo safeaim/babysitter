@@ -24,68 +24,23 @@ function hookMappingToPhaseMapping(mapping: HookMappingDescriptor): PhaseMapping
   };
 }
 
-const FALLBACK_MAPPINGS: PhaseMapping[] = [
-  {
-    canonicalPhase: 'session.start',
-    nativeHook: 'sessionStart',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-  },
-  {
-    canonicalPhase: 'session.end',
-    nativeHook: 'sessionEnd',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-  },
-  {
-    canonicalPhase: 'turn.stop',
-    nativeHook: 'stop',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: false,
-    scope: 'turn',
-  },
-  {
-    canonicalPhase: 'tool.before',
-    nativeHook: 'preToolUse',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: false,
-    scope: 'tool',
-  },
-  {
-    canonicalPhase: 'tool.after',
-    nativeHook: 'postToolUse',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'tool',
-  },
-];
-
-function buildFromCatalog(): PhaseMapping[] | null {
-  try {
-    const mappings = listHookMappingsByAdapterFamily('cursor');
-    if (mappings.length === 0) return null;
-    const phaseMappings = mappings
-      .map(hookMappingToPhaseMapping)
-      .filter((m): m is PhaseMapping => m !== null);
-    const seen = new Set<string>();
-    return phaseMappings.filter((m) => {
-      if (seen.has(m.nativeHook)) return false;
-      seen.add(m.nativeHook);
-      return true;
-    });
-  } catch {
-    return null;
+function buildFromCatalog(): PhaseMapping[] {
+  const mappings = listHookMappingsByAdapterFamily('cursor');
+  if (mappings.length === 0) {
+    throw new Error('hooks-mux adapter-cursor: catalog unavailable or returned no mappings for family "cursor"');
   }
+  const phaseMappings = mappings
+    .map(hookMappingToPhaseMapping)
+    .filter((m): m is PhaseMapping => m !== null);
+  const seen = new Set<string>();
+  return phaseMappings.filter((m) => {
+    if (seen.has(m.nativeHook)) return false;
+    seen.add(m.nativeHook);
+    return true;
+  });
 }
 
-export const CURSOR_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog() ?? FALLBACK_MAPPINGS;
+export const CURSOR_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog();
 
 /**
  * Quick lookup from native event name to phase mapping.

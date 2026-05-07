@@ -29,10 +29,16 @@ import {
 } from './session-fs.js';
 
 export class OmpAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'omp';
+  readonly agent: string;
   readonly displayName = 'OMP';
-  readonly cliCommand: string = 'omp';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['OMP_RUN_ID', 'OMP_SESSION_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -241,4 +247,7 @@ export class OmpAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('omp', () => new OmpAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'omp';
+registerAdapterFactory(_name, () => new OmpAdapter(_name, getPluginTargetDescriptor(_name)?.cliCommand ?? _name));

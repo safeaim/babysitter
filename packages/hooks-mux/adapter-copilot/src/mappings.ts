@@ -22,81 +22,23 @@ function hookMappingToPhaseMapping(mapping: HookMappingDescriptor): PhaseMapping
   };
 }
 
-const FALLBACK_MAPPINGS: PhaseMapping[] = [
-  {
-    canonicalPhase: 'session.start',
-    nativeHook: 'sessionStart',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-    notes: 'Session-start output is ignored by Copilot CLI; observer-only plus session-store init',
-  },
-  {
-    canonicalPhase: 'session.end',
-    nativeHook: 'sessionEnd',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-  },
-  {
-    canonicalPhase: 'turn.user_prompt_submitted',
-    nativeHook: 'userPromptSubmitted',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'turn',
-    notes: 'Output ignored on this event; observer-only',
-  },
-  {
-    canonicalPhase: 'tool.before',
-    nativeHook: 'preToolUse',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: false,
-    scope: 'tool',
-    notes: 'permissionDecision supports allow|deny|ask in schema but only deny is processed',
-  },
-  {
-    canonicalPhase: 'tool.after',
-    nativeHook: 'postToolUse',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'tool',
-    notes: 'Output ignored on non-preTool events',
-  },
-  {
-    canonicalPhase: 'turn.error',
-    nativeHook: 'errorOccurred',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'turn',
-    notes: 'Error reporting; output ignored',
-  },
-];
-
-function buildFromCatalog(): PhaseMapping[] | null {
-  try {
-    const mappings = listHookMappingsByAdapterFamily('copilot');
-    if (mappings.length === 0) return null;
-    const phaseMappings = mappings
-      .map(hookMappingToPhaseMapping)
-      .filter((m): m is PhaseMapping => m !== null);
-    const seen = new Set<string>();
-    return phaseMappings.filter((m) => {
-      if (seen.has(m.nativeHook)) return false;
-      seen.add(m.nativeHook);
-      return true;
-    });
-  } catch {
-    return null;
+function buildFromCatalog(): PhaseMapping[] {
+  const mappings = listHookMappingsByAdapterFamily('copilot');
+  if (mappings.length === 0) {
+    throw new Error('hooks-mux adapter-copilot: catalog unavailable or returned no mappings for family "copilot"');
   }
+  const phaseMappings = mappings
+    .map(hookMappingToPhaseMapping)
+    .filter((m): m is PhaseMapping => m !== null);
+  const seen = new Set<string>();
+  return phaseMappings.filter((m) => {
+    if (seen.has(m.nativeHook)) return false;
+    seen.add(m.nativeHook);
+    return true;
+  });
 }
 
-export const COPILOT_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog() ?? FALLBACK_MAPPINGS;
+export const COPILOT_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog();
 
 /**
  * Lookup a phase mapping by native hook name.

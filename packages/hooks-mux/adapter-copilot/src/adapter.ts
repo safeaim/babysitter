@@ -13,7 +13,7 @@ import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
  * - Pre-tool deny is the only blocking path
  * - Session-start output is ignored by Copilot CLI
  */
-export function createAdapter(name = 'copilot'): AdapterCapabilities {
+export function createAdapter(name: string): AdapterCapabilities {
   const target = getPluginTargetDescriptor(name === 'copilot' ? 'github-copilot' : name);
   return {
     name,

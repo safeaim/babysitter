@@ -9,7 +9,7 @@ import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
  *
  * Spec section 17.8.
  */
-export function createAdapter(name = 'opencode'): AdapterCapabilities {
+export function createAdapter(name: string): AdapterCapabilities {
   const target = getPluginTargetDescriptor(name);
   return {
     name,

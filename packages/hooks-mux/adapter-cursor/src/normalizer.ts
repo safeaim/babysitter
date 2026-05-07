@@ -5,8 +5,8 @@ import { getEventDiagnostics } from './capability-profile';
 /** The default adapter identifier used in all normalized events. */
 export const ADAPTER_NAME = 'cursor';
 
-/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
-let _adapterName = ADAPTER_NAME;
+/** Mutable adapter name — must be set via setAdapterName() before use. */
+let _adapterName: string;
 
 /** Override the adapter name used in normalized events. */
 export function setAdapterName(name: string): void {

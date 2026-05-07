@@ -36,146 +36,33 @@ function hookMappingToPhaseMapping(mapping: HookMappingDescriptor): PhaseMapping
   };
 }
 
-// ---------------------------------------------------------------------------
-// Plugin hooks — these map to canonical agent-lifecycle phases
-// ---------------------------------------------------------------------------
-
-const FALLBACK_PLUGIN_MAPPINGS: PhaseMapping[] = [
-  {
-    canonicalPhase: 'session.start',
-    nativeHook: 'plugin.session.start',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-    notes: 'Fires when a plugin session begins within OpenClaw.',
-  },
-  {
-    canonicalPhase: 'session.end',
-    nativeHook: 'plugin.session.end',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-    notes: 'Observer-only; fires when a plugin session is torn down.',
-  },
-  {
-    canonicalPhase: 'tool.before',
-    nativeHook: 'plugin.tool.before',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: true,
-    scope: 'tool',
-    notes: 'Fires before tool execution in plugin context. Can block or mutate tool input.',
-  },
-  {
-    canonicalPhase: 'tool.after',
-    nativeHook: 'plugin.tool.after',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'tool',
-    notes: 'Observer-only post-tool hook in plugin context.',
-  },
-  {
-    canonicalPhase: 'turn.stop',
-    nativeHook: 'plugin.turn.stop',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: false,
-    scope: 'turn',
-    notes: 'Fires when plugin turn completes. Can continue or stop.',
-  },
-  {
-    canonicalPhase: 'turn.user_prompt_submitted',
-    nativeHook: 'plugin.prompt.submitted',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'turn',
-    notes: 'Fires when user submits a prompt through the plugin.',
-  },
-];
-
-// ---------------------------------------------------------------------------
-// Gateway hooks — infrastructure-level, NOT agent-lifecycle equivalents
-// ---------------------------------------------------------------------------
-
-const FALLBACK_GATEWAY_MAPPINGS: PhaseMapping[] = [
-  {
-    canonicalPhase: 'session.start',
-    nativeHook: 'gateway.request.received',
-    supportLevel: 'lossy',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'gateway',
-    notes:
-      'Gateway request receipt is NOT equivalent to session.start. ' +
-      'Mapped with lossy fidelity for observability only.',
-  },
-  {
-    canonicalPhase: 'session.start',
-    nativeHook: 'gateway.request.routed',
-    supportLevel: 'lossy',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'gateway',
-    notes:
-      'Gateway routing decision. Infrastructure-level, not an agent session start.',
-  },
-  {
-    canonicalPhase: 'session.end',
-    nativeHook: 'gateway.request.completed',
-    supportLevel: 'lossy',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'gateway',
-    notes:
-      'Gateway request completion is NOT equivalent to session.end. ' +
-      'Mapped with lossy fidelity for observability only.',
-  },
-  {
-    canonicalPhase: 'tool.permission_request',
-    nativeHook: 'gateway.auth.check',
-    supportLevel: 'lossy',
-    blockCapability: true,
-    mutationCapability: false,
-    scope: 'gateway',
-    notes:
-      'Gateway auth check loosely maps to tool permission but is infrastructure-level. ' +
-      'Do not treat as an agent-level permission gate.',
-  },
-];
-
-function buildFromCatalog(): { plugin: PhaseMapping[]; gateway: PhaseMapping[] } | null {
-  try {
-    const mappings = listHookMappingsByAdapterFamily('openclaw');
-    if (mappings.length === 0) return null;
-    const phaseMappings = mappings
-      .map(hookMappingToPhaseMapping)
-      .filter((m): m is PhaseMapping => m !== null);
-    // Split into plugin and gateway
-    const plugin = phaseMappings.filter((m) => m.scope !== 'gateway');
-    const gateway = phaseMappings.filter((m) => m.scope === 'gateway');
-    // Deduplicate by nativeHook within each group
-    const dedup = (arr: PhaseMapping[]) => {
-      const seen = new Set<string>();
-      return arr.filter((m) => {
-        if (seen.has(m.nativeHook)) return false;
-        seen.add(m.nativeHook);
-        return true;
-      });
-    };
-    return { plugin: dedup(plugin), gateway: dedup(gateway) };
-  } catch {
-    return null;
+function buildFromCatalog(): { plugin: PhaseMapping[]; gateway: PhaseMapping[] } {
+  const mappings = listHookMappingsByAdapterFamily('openclaw');
+  if (mappings.length === 0) {
+    throw new Error('hooks-mux adapter-openclaw: catalog unavailable or returned no mappings for family "openclaw"');
   }
+  const phaseMappings = mappings
+    .map(hookMappingToPhaseMapping)
+    .filter((m): m is PhaseMapping => m !== null);
+  // Split into plugin and gateway
+  const plugin = phaseMappings.filter((m) => m.scope !== 'gateway');
+  const gateway = phaseMappings.filter((m) => m.scope === 'gateway');
+  // Deduplicate by nativeHook within each group
+  const dedup = (arr: PhaseMapping[]) => {
+    const seen = new Set<string>();
+    return arr.filter((m) => {
+      if (seen.has(m.nativeHook)) return false;
+      seen.add(m.nativeHook);
+      return true;
+    });
+  };
+  return { plugin: dedup(plugin), gateway: dedup(gateway) };
 }
 
 const catalogMappings = buildFromCatalog();
 
-export const OPENCLAW_PLUGIN_MAPPINGS: PhaseMapping[] = catalogMappings?.plugin ?? FALLBACK_PLUGIN_MAPPINGS;
-export const OPENCLAW_GATEWAY_MAPPINGS: PhaseMapping[] = catalogMappings?.gateway ?? FALLBACK_GATEWAY_MAPPINGS;
+export const OPENCLAW_PLUGIN_MAPPINGS: PhaseMapping[] = catalogMappings.plugin;
+export const OPENCLAW_GATEWAY_MAPPINGS: PhaseMapping[] = catalogMappings.gateway;
 
 /**
  * All OpenClaw phase mappings (plugin + gateway).

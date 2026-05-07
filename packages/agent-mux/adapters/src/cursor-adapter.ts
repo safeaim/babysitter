@@ -34,10 +34,16 @@ import {
 } from './session-fs.js';
 
 export class CursorAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'cursor';
+  readonly agent: string;
   readonly displayName = 'Cursor';
-  readonly cliCommand: string = 'cursor-agent';
+  readonly cliCommand: string;
   readonly minVersion = '0.40.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['CURSOR_SESSION', 'CURSOR_AGENT_SESSION'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -313,4 +319,7 @@ export class CursorAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('cursor', () => new CursorAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'cursor';
+registerAdapterFactory(_name, () => new CursorAdapter(_name, getPluginTargetDescriptor(_name)?.cliCommand ?? _name));

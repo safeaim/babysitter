@@ -133,9 +133,14 @@ class AsyncQueue<T> implements AsyncIterableIterator<T> {
 }
 
 export class ClaudeAgentSdkAdapter extends BaseProgrammaticAdapter {
-  readonly agent = 'claude-agent-sdk' as const;
+  readonly agent: string;
   readonly displayName = 'Claude (Agent SDK)';
   readonly minVersion = '0.2.0';
+
+  constructor(agent?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase().replace(/claudeagentsdk/, 'claude-agent-sdk');
+  }
   readonly hostEnvSignals = ['ANTHROPIC_API_KEY', 'CLAUDE_AGENT_API_KEY', 'CLAUDE_CODE_ENTRYPOINT'] as const;
 
   readonly capabilities: AgentCapabilities = {

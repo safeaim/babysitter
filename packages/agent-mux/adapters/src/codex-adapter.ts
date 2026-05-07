@@ -30,10 +30,16 @@ import {
 import { readAuthConfigIdentity } from './auth-config.js';
 
 export class CodexAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'codex';
+  readonly agent: string;
   readonly displayName = 'OpenAI Codex';
-  readonly cliCommand: string = 'codex';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['CODEX_SESSION_ID', 'CODEX_RUN_ID', 'CODEX_CLI'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -409,4 +415,7 @@ export class CodexAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('codex', () => new CodexAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'codex';
+registerAdapterFactory(_name, () => new CodexAdapter(_name, getPluginTargetDescriptor(_name)?.cliCommand ?? _name));

@@ -30,10 +30,15 @@ import {
 export { CodexWebSocketConnection } from './codex-websocket-connection.js';
 
 export class CodexWebSocketAdapter extends BaseRemoteAdapter {
-  readonly agent = 'codex-websocket' as const;
+  readonly agent: string;
   readonly displayName = 'Codex (App Server)';
   readonly connectionType = 'websocket' as const;
   readonly minVersion = '0.121.0';
+
+  constructor(agent?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase().replace(/websocket$/, '-websocket');
+  }
   readonly hostEnvSignals = ['CODEX_APP_SERVER', 'OPENAI_API_KEY', 'CODEX_CLI'] as const;
 
   readonly capabilities: AgentCapabilities = {

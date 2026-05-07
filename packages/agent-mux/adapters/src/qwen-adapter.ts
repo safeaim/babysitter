@@ -38,10 +38,16 @@ import {
 } from './session-fs.js';
 
 export class QwenAdapter extends BaseAgentAdapter {
-  readonly agent = 'qwen';
+  readonly agent: string;
   readonly displayName = 'Qwen Code';
-  readonly cliCommand = 'qwen';
+  readonly cliCommand: string;
   readonly minVersion = '0.0.1';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['QWEN_CODE', 'QWEN_SESSION_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {

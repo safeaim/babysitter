@@ -33,10 +33,16 @@ import {
 } from './session-fs.js';
 
 export class OpenClawAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'openclaw';
+  readonly agent: string;
   readonly displayName = 'OpenClaw';
-  readonly cliCommand: string = 'openclaw';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['OPENCLAW_SESSION', 'OPENCLAW_RUN_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -268,4 +274,7 @@ export class OpenClawAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('openclaw', () => new OpenClawAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'openclaw';
+registerAdapterFactory(_name, () => new OpenClawAdapter(_name, getPluginTargetDescriptor(_name)?.cliCommand ?? _name));

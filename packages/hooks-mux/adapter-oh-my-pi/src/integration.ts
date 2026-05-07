@@ -35,8 +35,8 @@ import { OH_MY_PI_PHASE_MAPPINGS } from './mappings';
  * Create a pre-configured hooks engine for the Oh-My-Pi adapter.
  * Ready to register handlers and process events.
  */
-export function createConfiguredEngine(options?: { sessionDir?: string; adapterName?: string }): HooksEngine {
-  const name = options?.adapterName ?? 'oh-my-pi';
+export function createConfiguredEngine(options: { sessionDir?: string; adapterName: string }): HooksEngine {
+  const name = options.adapterName;
   return createHooksEngine({
     adapter: name,
     capabilities: createAdapter(name),

@@ -34,10 +34,16 @@ import {
 } from './session-fs.js';
 
 export class OpenCodeAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'opencode';
+  readonly agent: string;
   readonly displayName = 'OpenCode';
-  readonly cliCommand: string = 'opencode';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['OPENCODE_SESSION_ID', 'OPENCODE_CONFIG'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -410,4 +416,7 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('opencode', () => new OpenCodeAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'opencode';
+registerAdapterFactory(_name, () => new OpenCodeAdapter(_name, getPluginTargetDescriptor(_name)?.cliCommand ?? _name));

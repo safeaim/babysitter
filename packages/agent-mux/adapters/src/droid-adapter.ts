@@ -33,10 +33,16 @@ import {
 } from './session-fs.js';
 
 export class DroidAdapter extends BaseAgentAdapter {
-  readonly agent = 'droid' as const;
+  readonly agent: string;
   readonly displayName = 'Factory Droid';
-  readonly cliCommand = 'droid';
+  readonly cliCommand: string;
   readonly minVersion = '1.0.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['DROID_API_KEY', 'DROID_CONFIG_PATH'] as const;
 
   readonly capabilities: AgentCapabilities = {

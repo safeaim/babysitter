@@ -26,10 +26,16 @@ import type {
 import { BaseAgentAdapter } from './base-adapter.js';
 
 export class BabysitterAdapter extends BaseAgentAdapter {
-  readonly agent = 'babysitter' as const;
+  readonly agent: string;
   readonly displayName = 'Babysitter';
-  readonly cliCommand = 'babysitter-agent';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['BABYSITTER_SESSION_ID', 'AGENT_SESSION_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {

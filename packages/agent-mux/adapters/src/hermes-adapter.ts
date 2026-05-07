@@ -32,10 +32,16 @@ import {
 } from './session-fs.js';
 
 export class HermesAdapter extends BaseAgentAdapter {
-  readonly agent = 'hermes' as const;
+  readonly agent: string;
   readonly displayName = 'Hermes';
-  readonly cliCommand = 'hermes';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['HERMES_SESSION', 'HERMES_RUN_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {

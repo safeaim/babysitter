@@ -32,10 +32,16 @@ import {
 } from './session-fs.js';
 
 export class AmpAdapter extends BaseAgentAdapter {
-  readonly agent = 'amp' as const;
+  readonly agent: string;
   readonly displayName = 'Sourcegraph Amp';
-  readonly cliCommand = 'amp';
+  readonly cliCommand: string;
   readonly minVersion = '2.0.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['SOURCEGRAPH_ACCESS_TOKEN', 'AMP_CONFIG_PATH'];
 
   readonly capabilities: AgentCapabilities = {

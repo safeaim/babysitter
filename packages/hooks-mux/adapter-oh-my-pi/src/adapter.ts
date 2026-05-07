@@ -9,7 +9,7 @@ import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
  *
  * Spec section 17.7.
  */
-export function createAdapter(name = 'oh-my-pi'): AdapterCapabilities {
+export function createAdapter(name: string): AdapterCapabilities {
   const target = getPluginTargetDescriptor(name === 'oh-my-pi' ? 'oh-my-pi' : name);
   return {
     name,

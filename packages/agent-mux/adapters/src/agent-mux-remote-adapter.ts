@@ -35,10 +35,16 @@ import { BaseAgentAdapter } from './base-adapter.js';
 import { createVirtualRuntimeHookCapabilities } from './shared/runtime-hooks-virtual.js';
 
 export class AgentMuxRemoteAdapter extends BaseAgentAdapter {
-  readonly agent = 'agent-mux-remote' as const;
+  readonly agent: string;
   readonly displayName = 'agent-mux (remote via invocation mode)';
-  readonly cliCommand = 'amux';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase().replace(/agentmuxremote/, 'agent-mux-remote');
+    this.cliCommand = cliCommand ?? 'amux';
+  }
   readonly hostEnvSignals = [] as const;
 
   readonly capabilities: AgentCapabilities = {

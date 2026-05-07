@@ -92,7 +92,7 @@ export function buildExecutionContext(
   stdinData: Record<string, unknown>,
   nativeEventName: string,
   env: Record<string, string>,
-  adapterName = 'claude',
+  adapterName: string,
 ): UnifiedExecutionContext {
   const persistedEnv: Record<string, string> = {};
   const contextVars: Record<string, string> = {};
@@ -233,7 +233,7 @@ export function normalizeClaude(
   nativeEventName: string,
   rawStdin: unknown,
   env: Record<string, string> = {},
-  adapterName = 'claude',
+  adapterName: string,
 ): UnifiedHookEvent {
   const stdinData = parseStdin(rawStdin);
   const mapping = getClaudePhaseMapping(nativeEventName);

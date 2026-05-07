@@ -24,55 +24,23 @@ function hookMappingToPhaseMapping(mapping: HookMappingDescriptor): PhaseMapping
   };
 }
 
-const FALLBACK_MAPPINGS: PhaseMapping[] = [
-  {
-    canonicalPhase: 'session.start',
-    nativeHook: 'session.created',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'session',
-    notes: 'Fires when the OpenCode session is initialized.',
-  },
-  {
-    canonicalPhase: 'tool.before',
-    nativeHook: 'tool.execute.before',
-    supportLevel: 'native',
-    blockCapability: true,
-    mutationCapability: true,
-    scope: 'tool',
-    notes: 'Fires before a tool is executed. Can block (deny) or mutate tool input.',
-  },
-  {
-    canonicalPhase: 'tool.after',
-    nativeHook: 'tool.execute.after',
-    supportLevel: 'native',
-    blockCapability: false,
-    mutationCapability: false,
-    scope: 'tool',
-    notes: 'Observer-only post-tool hook.',
-  },
-];
-
-function buildFromCatalog(): PhaseMapping[] | null {
-  try {
-    const mappings = listHookMappingsByAdapterFamily('opencode');
-    if (mappings.length === 0) return null;
-    const phaseMappings = mappings
-      .map(hookMappingToPhaseMapping)
-      .filter((m): m is PhaseMapping => m !== null);
-    const seen = new Set<string>();
-    return phaseMappings.filter((m) => {
-      if (seen.has(m.nativeHook)) return false;
-      seen.add(m.nativeHook);
-      return true;
-    });
-  } catch {
-    return null;
+function buildFromCatalog(): PhaseMapping[] {
+  const mappings = listHookMappingsByAdapterFamily('opencode');
+  if (mappings.length === 0) {
+    throw new Error('hooks-mux adapter-opencode: catalog unavailable or returned no mappings for family "opencode"');
   }
+  const phaseMappings = mappings
+    .map(hookMappingToPhaseMapping)
+    .filter((m): m is PhaseMapping => m !== null);
+  const seen = new Set<string>();
+  return phaseMappings.filter((m) => {
+    if (seen.has(m.nativeHook)) return false;
+    seen.add(m.nativeHook);
+    return true;
+  });
 }
 
-export const OPENCODE_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog() ?? FALLBACK_MAPPINGS;
+export const OPENCODE_PHASE_MAPPINGS: PhaseMapping[] = buildFromCatalog();
 
 /**
  * The shell.env event is a special env-injection hook, not a standard

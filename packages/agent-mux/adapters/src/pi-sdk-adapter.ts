@@ -66,9 +66,14 @@ interface PiTool {
 }
 
 export class PiSdkAdapter extends BaseProgrammaticAdapter {
-  readonly agent = 'pi-sdk' as const;
+  readonly agent: string;
   readonly displayName = 'Pi (SDK)';
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase().replace(/pisdk/, 'pi-sdk');
+  }
   readonly hostEnvSignals = ['PI_API_KEY', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY'] as const;
 
   readonly capabilities: AgentCapabilities = {

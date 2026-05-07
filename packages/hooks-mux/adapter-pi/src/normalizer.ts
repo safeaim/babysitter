@@ -4,8 +4,8 @@ import { getPiPhaseMapping } from './mappings';
 /** The default adapter name. */
 export const ADAPTER_NAME = 'pi';
 
-/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
-let _adapterName = ADAPTER_NAME;
+/** Mutable adapter name — must be set via setAdapterName() before use. */
+let _adapterName: string;
 
 /** Override the adapter name used in normalized events. */
 export function setAdapterName(name: string): void {

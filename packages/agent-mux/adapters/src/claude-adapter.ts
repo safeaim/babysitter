@@ -34,10 +34,16 @@ import {
 import { setupClaudeRuntimeHooks } from './claude-code/runtime-hooks/lifecycle.js';
 
 export class ClaudeAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'claude';
+  readonly agent: string;
   readonly displayName = 'Claude Code';
-  readonly cliCommand: string = 'claude';
+  readonly cliCommand: string;
   readonly minVersion = '1.0.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['CLAUDECODE', 'CLAUDE_CODE_SESSION_ID', 'CLAUDE_CODE', 'CLAUDE_PROJECT_DIR'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -648,4 +654,7 @@ export class ClaudeAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('claude', () => new ClaudeAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'claude';
+registerAdapterFactory(_name, () => new ClaudeAdapter(_name, getPluginTargetDescriptor('claude-code')?.cliCommand ?? _name));

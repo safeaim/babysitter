@@ -36,8 +36,8 @@ import { PI_PHASE_MAPPINGS } from './mappings';
  * Create a pre-configured hooks engine for the Pi adapter.
  * Ready to register handlers and process events.
  */
-export function createConfiguredEngine(options?: { sessionDir?: string; adapterName?: string }): HooksEngine {
-  const name = options?.adapterName ?? 'pi';
+export function createConfiguredEngine(options: { sessionDir?: string; adapterName: string }): HooksEngine {
+  const name = options.adapterName;
   return createHooksEngine({
     adapter: name,
     capabilities: createAdapter(name),

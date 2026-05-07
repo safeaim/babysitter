@@ -40,10 +40,15 @@ import { OpenCodeHttpConnection } from './opencode-http-connection.js';
  * HTTP-based OpenCode adapter using server mode for full capabilities.
  */
 export class OpenCodeHttpAdapter extends BaseRemoteAdapter {
-  readonly agent = 'opencode-http' as const;
+  readonly agent: string;
   readonly displayName = 'OpenCode (HTTP)';
   readonly connectionType = 'http' as const;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase().replace(/opencodehttp/, 'opencode-http');
+  }
   readonly hostEnvSignals = ['OPENCODE_SESSION_ID', 'OPENCODE_CONFIG'] as const;
 
   readonly capabilities: AgentCapabilities = {

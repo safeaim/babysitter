@@ -29,10 +29,16 @@ import {
 } from './session-fs.js';
 
 export class CopilotAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'copilot';
+  readonly agent: string;
   readonly displayName = 'GitHub Copilot';
-  readonly cliCommand: string = 'gh copilot';
+  readonly cliCommand: string;
   readonly minVersion = '1.0.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['COPILOT_CLI_SESSION', 'GH_COPILOT_SESSION'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -242,4 +248,7 @@ export class CopilotAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('copilot', () => new CopilotAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'copilot';
+registerAdapterFactory(_name, () => new CopilotAdapter(_name, getPluginTargetDescriptor(_name)?.cliCommand ?? _name));

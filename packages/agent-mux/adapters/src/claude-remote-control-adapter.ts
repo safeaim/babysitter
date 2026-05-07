@@ -143,9 +143,14 @@ class AsyncEventQueue implements ProgrammaticRun {
 }
 
 export class ClaudeRemoteControlAdapter extends BaseProgrammaticAdapter {
-  readonly agent = 'claude-remote-control' as const;
+  readonly agent: string;
   readonly displayName = 'Claude Remote Control';
   readonly minVersion = '2.1.0';
+
+  constructor(agent?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase().replace(/clauderemotecontrol/, 'claude-remote-control');
+  }
   readonly hostEnvSignals = ['CLAUDE_REMOTE_CONTROL_SESSION_NAME_PREFIX', 'CLAUDE_CODE_SESSION_ID'] as const;
 
   private readonly claudeCli = new ClaudeAdapter();

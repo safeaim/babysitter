@@ -13,7 +13,7 @@ import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
  *
  * Spec section 17.9.
  */
-export function createAdapter(name = 'openclaw'): AdapterCapabilities {
+export function createAdapter(name: string): AdapterCapabilities {
   const target = getPluginTargetDescriptor(name);
   return {
     name,

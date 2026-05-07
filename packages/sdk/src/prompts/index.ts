@@ -19,10 +19,7 @@ export type {
 
 // Context factories
 export {
-  createClaudeCodeContext,
-  createCodexContext,
-  createGeminiCliContext,
-  createPiContext,
+  createPromptContextFromCatalog,
   createInternalContext,
 } from './context';
 

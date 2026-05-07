@@ -29,10 +29,16 @@ import {
 } from './session-fs.js';
 
 export class PiAdapter extends BaseAgentAdapter {
-  readonly agent: string = 'pi';
+  readonly agent: string;
   readonly displayName = 'Pi';
-  readonly cliCommand: string = 'pi';
+  readonly cliCommand: string;
   readonly minVersion = '0.1.0';
+
+  constructor(agent?: string, cliCommand?: string) {
+    super();
+    this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
+    this.cliCommand = cliCommand ?? this.agent;
+  }
   readonly hostEnvSignals = ['PI_RUN_ID', 'PI_SESSION_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {
@@ -242,4 +248,7 @@ export class PiAdapter extends BaseAgentAdapter {
 
 // Self-register in the global adapter registry
 import { registerAdapterFactory } from './base-adapter.js';
-registerAdapterFactory('pi', () => new PiAdapter());
+import { getPluginTargetDescriptor } from '@a5c-ai/agent-catalog';
+
+const _name = 'pi';
+registerAdapterFactory(_name, () => new PiAdapter(_name, getPluginTargetDescriptor(_name)?.cliCommand ?? _name));

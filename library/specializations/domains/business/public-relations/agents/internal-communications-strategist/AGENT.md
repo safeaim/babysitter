@@ -18,8 +18,8 @@ metadata:
   agent-id: AG-007
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:content-strategy, skill-area:change-management, skill-area:community-management]
+  roles: [role:content-strategist, role:hr-manager, role:change-manager]
 ---
 
 # Internal Communications Strategist Agent

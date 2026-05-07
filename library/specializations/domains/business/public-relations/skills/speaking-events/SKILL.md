@@ -18,8 +18,8 @@ metadata:
     - Webinar platform APIs
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:event-management, skill-area:brand-positioning, skill-area:content-strategy]
+  roles: [role:marketing-manager, role:content-strategist, role:marketing-strategist]
 ---
 
 # Speaking and Events Skill

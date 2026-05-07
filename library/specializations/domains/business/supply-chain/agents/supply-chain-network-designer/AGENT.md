@@ -12,9 +12,9 @@ expertise:
 graph:
   domains: [domain:supply-chain]
   specializations: [specialization:supply-chain-optimization]
-  skillAreas: [skill-area:procurement-management, skill-area:vendor-management-ops]
+  skillAreas: [skill-area:procurement-management, skill-area:quantitative-modeling, skill-area:strategic-analysis]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:supply-chain-analyst, role:procurement-manager]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:strategic-planner]
 ---
 
 # Supply Chain Network Designer

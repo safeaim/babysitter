@@ -17,9 +17,9 @@ metadata:
   id: AG-012
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:change-management, skill-area:compliance-automation, skill-area:business-analysis]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:audit-analyst, role:compliance-officer]
 ---
 
 # Quality Manager Agent

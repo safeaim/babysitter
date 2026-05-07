@@ -12,9 +12,9 @@ expertise:
 graph:
   domains: [domain:supply-chain]
   specializations: [specialization:supply-chain-optimization]
-  skillAreas: [skill-area:procurement-management, skill-area:vendor-management-ops]
+  skillAreas: [skill-area:procurement-management, skill-area:change-management-leadership, skill-area:data-analytics]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:supply-chain-analyst, role:procurement-manager]
+  roles: [role:supply-chain-analyst, role:strategic-planner, role:procurement-manager]
 ---
 
 # Supply Chain Digitalization Lead

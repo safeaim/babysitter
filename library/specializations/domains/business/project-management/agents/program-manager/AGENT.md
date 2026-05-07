@@ -17,9 +17,9 @@ metadata:
   id: AG-010
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:roadmap-planning, skill-area:cross-team-coordination, skill-area:stakeholder-management]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:technical-program-manager, role:strategic-planner]
 ---
 
 # Program Manager Agent

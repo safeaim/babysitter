@@ -13,8 +13,8 @@ expertise:
   - What-if scenario execution
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:quantitative-modeling, skill-area:statistical-analysis, skill-area:strategic-analysis]
+  roles: [role:data-scientist, role:quantitative-analyst, role:operations-analyst]
 ---
 
 # Optimization Specialist

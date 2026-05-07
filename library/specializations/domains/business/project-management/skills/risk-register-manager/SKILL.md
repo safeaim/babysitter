@@ -14,9 +14,9 @@ metadata:
   id: SK-006
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:change-management, skill-area:stakeholder-management, skill-area:strategic-analysis]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:business-analyst, role:risk-analyst]
 ---
 
 # Risk Register Manager

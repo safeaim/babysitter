@@ -11,9 +11,9 @@ expertise:
   - Gage selection guidance
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:statistical-analysis, skill-area:data-analytics, skill-area:business-analysis]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:data-analyst, role:business-analyst]
 ---
 
 # Measurement Systems Analyst

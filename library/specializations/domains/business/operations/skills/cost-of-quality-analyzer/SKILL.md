@@ -13,9 +13,9 @@ metadata:
   category: quality-management
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:financial-planning, skill-area:data-analytics, skill-area:business-analysis]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:financial-analyst, role:business-analyst]
 ---
 
 # Cost of Quality Analyzer

@@ -20,8 +20,8 @@ metadata:
   agent-id: AG-012
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:brand-strategy, skill-area:content-strategy, skill-area:community-management]
+  roles: [role:marketing-strategist, role:content-strategist, role:brand-manager]
 ---
 
 # CSR and ESG Communications Expert Agent

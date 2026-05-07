@@ -13,8 +13,8 @@ expertise:
   - Strategic recommendation
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:competitive-intelligence, skill-area:market-research, skill-area:strategic-analysis]
+  roles: [role:strategic-planner, role:data-analyst, role:marketing-strategist]
 ---
 
 # Competitive Analyst

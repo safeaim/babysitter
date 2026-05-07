@@ -13,9 +13,9 @@ metadata:
   skill-id: SK-018
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:data-analytics, skill-area:financial-planning, skill-area:business-analysis]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:data-analyst, role:financial-analyst, role:product-analyst]
 ---
 
 # Startup Metrics Dashboard Skill

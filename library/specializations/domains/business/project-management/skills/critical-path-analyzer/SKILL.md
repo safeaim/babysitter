@@ -14,9 +14,9 @@ metadata:
   id: SK-002
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:roadmap-planning, skill-area:quantitative-modeling, skill-area:data-analytics]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:technical-program-manager, role:scrum-master]
 ---
 
 # Critical Path Analyzer

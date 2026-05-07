@@ -13,9 +13,9 @@ metadata:
   category: workflow-automation
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:capacity-planning-ops, skill-area:statistical-analysis, skill-area:change-management-ops]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:procurement-manager, role:business-analyst]
 ---
 
 # Maintenance Scheduler

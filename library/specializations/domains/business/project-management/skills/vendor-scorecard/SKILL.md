@@ -14,9 +14,9 @@ metadata:
   id: SK-020
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:procurement-management, skill-area:vendor-management-ops, skill-area:data-analytics]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:procurement-manager, role:operations-analyst]
 ---
 
 # Vendor Scorecard

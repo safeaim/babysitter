@@ -13,8 +13,8 @@ expertise:
   - Performance optimization
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:strategic-analysis, skill-area:data-analytics, skill-area:business-analysis]
+  roles: [role:strategic-planner, role:bi-developer, role:business-analyst]
 ---
 
 # DSS Architect

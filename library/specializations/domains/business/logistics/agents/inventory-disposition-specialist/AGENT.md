@@ -15,8 +15,8 @@ required-skills:
   - abc-xyz-classifier
 graph:
   domains: [domain:logistics]
-  skillAreas: [skill-area:procurement-management, skill-area:organizational-design]
-  roles: [role:supply-chain-analyst, role:operations-analyst]
+  skillAreas: [skill-area:procurement-management, skill-area:financial-planning, skill-area:data-analytics]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:procurement-manager]
 ---
 
 # Inventory Disposition Specialist

@@ -15,9 +15,9 @@ metadata:
 graph:
   domains: [domain:supply-chain]
   specializations: [specialization:supply-chain-optimization]
-  skillAreas: [skill-area:procurement-management, skill-area:vendor-management-ops]
+  skillAreas: [skill-area:procurement-management, skill-area:statistical-analysis, skill-area:quantitative-modeling]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:supply-chain-analyst, role:procurement-manager]
+  roles: [role:supply-chain-analyst, role:data-analyst, role:procurement-manager]
 ---
 
 # Demand Forecasting Engine

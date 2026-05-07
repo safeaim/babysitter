@@ -13,9 +13,9 @@ metadata:
   category: workflow-automation
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:procurement-management, skill-area:quantitative-modeling, skill-area:data-analytics]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:procurement-manager, role:supply-chain-analyst]
 ---
 
 # Inventory Optimizer

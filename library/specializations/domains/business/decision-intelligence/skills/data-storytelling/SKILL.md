@@ -19,8 +19,8 @@ metadata:
     - markdown
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:data-analytics, skill-area:data-visualization, skill-area:business-analysis]
+  roles: [role:data-analyst, role:bi-developer, role:business-analyst]
 ---
 
 # Data Storytelling

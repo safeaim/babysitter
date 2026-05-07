@@ -13,8 +13,8 @@ expertise:
   - Recommendation formulation
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:data-analytics, skill-area:data-visualization, skill-area:business-analysis]
+  roles: [role:bi-developer, role:data-analyst, role:business-analyst]
 ---
 
 # BI Analyst

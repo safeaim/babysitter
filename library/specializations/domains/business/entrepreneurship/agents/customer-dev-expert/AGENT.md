@@ -16,9 +16,9 @@ metadata:
   agent-id: AG-013
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:market-research, skill-area:customer-success, skill-area:growth-strategy]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:product-manager, role:business-analyst, role:strategic-planner]
 ---
 
 # Customer Development Expert Agent

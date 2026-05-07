@@ -18,8 +18,8 @@ metadata:
   agent-id: AG-005
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:brand-strategy, skill-area:content-strategy, skill-area:brand-positioning]
+  roles: [role:marketing-strategist, role:content-strategist, role:brand-manager]
 ---
 
 # Corporate Communications Strategist Agent

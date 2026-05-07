@@ -12,9 +12,9 @@ expertise:
 graph:
   domains: [domain:supply-chain]
   specializations: [specialization:supply-chain-optimization]
-  skillAreas: [skill-area:procurement-management, skill-area:vendor-management-ops]
+  skillAreas: [skill-area:procurement-management, skill-area:quantitative-modeling, skill-area:data-analytics]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:supply-chain-analyst, role:procurement-manager]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:procurement-manager]
 ---
 
 # Logistics Optimization Manager

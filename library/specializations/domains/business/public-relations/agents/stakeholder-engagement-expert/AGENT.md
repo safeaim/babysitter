@@ -18,8 +18,8 @@ metadata:
   agent-id: AG-008
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:community-management, skill-area:stakeholder-management, skill-area:brand-strategy]
+  roles: [role:marketing-strategist, role:partnerships-manager, role:marketing-manager]
 ---
 
 # Stakeholder Engagement Expert Agent

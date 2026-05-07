@@ -15,8 +15,8 @@ metadata:
   skill-id: SK-019
 graph:
   domains: [domain:knowledge-management]
-  skillAreas: [skill-area:docs-as-code, skill-area:reference-docs, skill-area:data-governance]
-  roles: [role:information-architect, role:technical-writer]
+  skillAreas: [skill-area:data-analytics, skill-area:data-governance, skill-area:data-quality]
+  roles: [role:information-architect, role:data-analyst, role:analytics-engineer]
 ---
 
 # Knowledge Analytics Skill

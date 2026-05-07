@@ -17,9 +17,9 @@ metadata:
   id: AG-011
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:procurement-management, skill-area:vendor-management-ops, skill-area:stakeholder-management]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:procurement-manager, role:operations-analyst]
 ---
 
 # Procurement Manager Agent

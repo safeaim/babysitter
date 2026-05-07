@@ -13,9 +13,9 @@ metadata:
   category: quality-management
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:compliance-automation, skill-area:change-management, skill-area:business-analysis]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:audit-analyst, role:compliance-officer]
 ---
 
 # Quality Auditor

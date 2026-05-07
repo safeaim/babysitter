@@ -11,9 +11,9 @@ expertise:
   - Certification preparation
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:change-management, skill-area:compliance-automation, skill-area:business-analysis]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:compliance-officer, role:audit-analyst]
 ---
 
 # QMS Implementation Specialist

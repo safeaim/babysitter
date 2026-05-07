@@ -16,9 +16,9 @@ metadata:
   agent-id: AG-014
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:investment-analysis, skill-area:financial-planning, skill-area:business-model-design]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:financial-analyst, role:strategic-planner, role:partnerships-manager]
 ---
 
 # Angel Investor Agent

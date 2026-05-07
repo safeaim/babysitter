@@ -16,9 +16,9 @@ metadata:
   agent-id: AG-003
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:market-research]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:strategic-planner, role:product-manager, role:business-analyst]
 ---
 
 # Lean Startup Practitioner Agent

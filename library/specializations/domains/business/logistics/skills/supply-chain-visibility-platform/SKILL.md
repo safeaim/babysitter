@@ -15,8 +15,8 @@ metadata:
   priority: medium
 graph:
   domains: [domain:logistics]
-  skillAreas: [skill-area:procurement-management, skill-area:organizational-design]
-  roles: [role:supply-chain-analyst, role:operations-analyst]
+  skillAreas: [skill-area:procurement-management, skill-area:data-analytics, skill-area:change-management-ops]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:procurement-manager]
 ---
 
 # Supply Chain Visibility Platform

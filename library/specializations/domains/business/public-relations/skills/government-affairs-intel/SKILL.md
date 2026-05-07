@@ -15,8 +15,8 @@ metadata:
   skill-id: SK-014
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:competitive-intelligence, skill-area:market-research, skill-area:brand-strategy]
+  roles: [role:marketing-strategist, role:content-strategist, role:legal-advisor]
 ---
 
 # Government Affairs Intelligence Skill

@@ -16,9 +16,9 @@ metadata:
   agent-id: AG-006
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:financial-planning, skill-area:business-model-design, skill-area:investment-analysis]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:financial-analyst, role:strategic-planner, role:partnerships-manager]
 ---
 
 # Pitch Coach Agent

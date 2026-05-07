@@ -18,8 +18,8 @@ metadata:
   agent-id: AG-006
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:brand-positioning, skill-area:content-strategy, skill-area:brand-strategy]
+  roles: [role:marketing-strategist, role:content-strategist, role:brand-manager]
 ---
 
 # Executive Visibility Expert Agent

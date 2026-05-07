@@ -15,8 +15,8 @@ metadata:
   skill-id: SK-020
 graph:
   domains: [domain:knowledge-management]
-  skillAreas: [skill-area:docs-as-code, skill-area:reference-docs, skill-area:data-governance]
-  roles: [role:information-architect, role:technical-writer]
+  skillAreas: [skill-area:natural-language-processing, skill-area:retrieval-augmented-generation, skill-area:search-indexing]
+  roles: [role:information-architect, role:data-scientist, role:analytics-engineer]
 ---
 
 # Semantic Similarity Skill

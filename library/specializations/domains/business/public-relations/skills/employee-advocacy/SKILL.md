@@ -15,8 +15,8 @@ metadata:
   skill-id: SK-015
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:brand-positioning, skill-area:community-management, skill-area:content-marketing]
+  roles: [role:marketing-manager, role:content-strategist, role:brand-manager]
 ---
 
 # Employee Advocacy Platform Skill

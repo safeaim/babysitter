@@ -14,9 +14,9 @@ metadata:
   id: SK-004
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:financial-planning, skill-area:roadmap-planning, skill-area:data-analytics]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:financial-analyst, role:business-analyst]
 ---
 
 # EVM Calculator

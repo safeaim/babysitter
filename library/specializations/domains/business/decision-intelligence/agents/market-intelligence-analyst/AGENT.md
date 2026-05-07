@@ -13,8 +13,8 @@ expertise:
   - Recommendation synthesis
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:market-research, skill-area:market-sizing, skill-area:competitive-intelligence]
+  roles: [role:data-analyst, role:strategic-planner, role:marketing-strategist]
 ---
 
 # Market Intelligence Analyst

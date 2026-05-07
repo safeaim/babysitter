@@ -18,8 +18,8 @@ metadata:
     - custom quiz engines
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:statistical-analysis, skill-area:data-analysis, skill-area:quantitative-modeling]
+  roles: [role:data-scientist, role:data-analyst, role:research-scientist]
 ---
 
 # Calibration Trainer

@@ -18,8 +18,8 @@ metadata:
     - Specialized stakeholder platforms
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:community-management, skill-area:stakeholder-management, skill-area:brand-positioning]
+  roles: [role:marketing-strategist, role:partnerships-manager, role:content-strategist]
 ---
 
 # Stakeholder CRM Skill

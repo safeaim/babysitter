@@ -16,8 +16,8 @@ required-skills:
   - carbon-footprint-calculator
 graph:
   domains: [domain:logistics]
-  skillAreas: [skill-area:procurement-management, skill-area:organizational-design]
-  roles: [role:supply-chain-analyst, role:operations-analyst]
+  skillAreas: [skill-area:procurement-management, skill-area:quantitative-modeling, skill-area:data-analytics]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:procurement-manager]
 ---
 
 # Route Optimization Analyst

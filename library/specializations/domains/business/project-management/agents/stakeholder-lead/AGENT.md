@@ -17,9 +17,9 @@ metadata:
   id: AG-013
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:stakeholder-management, skill-area:change-management, skill-area:strategic-analysis]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:business-analyst, role:partnerships-manager]
 ---
 
 # Stakeholder Engagement Lead Agent

@@ -12,9 +12,9 @@ used-by-processes:
   - specializations/domains/business/travel/flight-dataset-build
 graph:
   domains: [domain:travel]
-  skillAreas: [skill-area:travel-itinerary-planning, skill-area:product-discovery]
+  skillAreas: [skill-area:etl-pipelines, skill-area:travel-itinerary-planning, skill-area:data-quality]
   workflows: [workflow:customer-journey-optimization]
-  roles: [role:product-manager, role:operations-analyst]
+  roles: [role:data-engineer, role:analytics-engineer, role:data-analyst]
 ---
 
 # Python ETL Engineer

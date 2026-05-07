@@ -16,8 +16,8 @@ required-skills:
   - logistics-kpi-tracker
 graph:
   domains: [domain:logistics]
-  skillAreas: [skill-area:procurement-management, skill-area:organizational-design]
-  roles: [role:supply-chain-analyst, role:operations-analyst]
+  skillAreas: [skill-area:procurement-management, skill-area:data-analytics, skill-area:statistical-analysis]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:data-analyst]
 ---
 
 # Inventory Analyst

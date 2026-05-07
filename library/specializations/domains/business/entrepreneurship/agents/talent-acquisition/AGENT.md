@@ -16,9 +16,9 @@ metadata:
   agent-id: AG-011
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:talent-acquisition-strategy, skill-area:hiring-interviewing, skill-area:organizational-design]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:hr-manager, role:talent-recruiter, role:strategic-planner]
 ---
 
 # Startup Talent Acquisition Agent

@@ -13,9 +13,9 @@ metadata:
   category: theory-of-constraints
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:financial-planning, skill-area:capacity-planning-ops, skill-area:data-analytics]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:financial-analyst, role:business-analyst]
 ---
 
 # Throughput Accountant

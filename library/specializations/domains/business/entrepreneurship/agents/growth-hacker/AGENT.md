@@ -16,9 +16,9 @@ metadata:
   agent-id: AG-005
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:growth-strategy, skill-area:digital-marketing-analytics, skill-area:seo-sem]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:marketing-manager, role:marketing-strategist, role:product-manager]
 ---
 
 # Growth Hacker Agent

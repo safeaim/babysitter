@@ -13,8 +13,8 @@ expertise:
   - Learning synthesis
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:strategic-analysis, skill-area:business-analysis, skill-area:data-governance]
+  roles: [role:business-analyst, role:information-architect, role:data-analyst]
 ---
 
 # Decision Archivist

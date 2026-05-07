@@ -13,8 +13,8 @@ expertise:
   - Uncertainty communication
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:quantitative-modeling, skill-area:statistical-analysis, skill-area:financial-risk-modeling]
+  roles: [role:data-scientist, role:quantitative-analyst, role:risk-analyst]
 ---
 
 # Uncertainty Quantifier

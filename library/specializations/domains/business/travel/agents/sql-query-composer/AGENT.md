@@ -11,9 +11,9 @@ used-by-processes:
   - specializations/domains/business/travel/travel-plan-compose
 graph:
   domains: [domain:travel]
-  skillAreas: [skill-area:travel-itinerary-planning, skill-area:product-discovery]
+  skillAreas: [skill-area:travel-itinerary-planning, skill-area:data-analysis, skill-area:etl-pipelines]
   workflows: [workflow:customer-journey-optimization]
-  roles: [role:product-manager, role:operations-analyst]
+  roles: [role:data-analyst, role:analytics-engineer, role:data-engineer]
 ---
 
 # SQL Query Composer

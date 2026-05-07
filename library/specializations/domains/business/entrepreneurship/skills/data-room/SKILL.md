@@ -13,9 +13,9 @@ metadata:
   skill-id: SK-015
 graph:
   domains: [domain:entrepreneurship]
-  skillAreas: [skill-area:business-model-design, skill-area:growth-strategy, skill-area:product-strategy]
+  skillAreas: [skill-area:financial-modeling, skill-area:business-analysis, skill-area:investment-analysis]
   workflows: [workflow:product-discovery]
-  roles: [role:strategic-planner, role:product-manager]
+  roles: [role:financial-analyst, role:strategic-planner, role:business-analyst]
 ---
 
 # Data Room Organizer Skill

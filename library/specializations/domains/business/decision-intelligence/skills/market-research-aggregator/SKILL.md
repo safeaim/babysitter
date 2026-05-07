@@ -18,8 +18,8 @@ metadata:
     - custom integrations
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:market-research, skill-area:competitive-intelligence, skill-area:market-sizing]
+  roles: [role:data-analyst, role:strategic-planner, role:marketing-strategist]
 ---
 
 # Market Research Aggregator

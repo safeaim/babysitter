@@ -14,8 +14,8 @@ required-skills:
   - fleet-analytics-dashboard
 graph:
   domains: [domain:logistics]
-  skillAreas: [skill-area:procurement-management, skill-area:organizational-design]
-  roles: [role:supply-chain-analyst, role:operations-analyst]
+  skillAreas: [skill-area:procurement-management, skill-area:statistical-analysis, skill-area:change-management-ops]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:procurement-manager]
 ---
 
 # Maintenance Planner

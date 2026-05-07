@@ -11,9 +11,9 @@ expertise:
   - Continuous improvement culture
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:change-management-leadership, skill-area:organizational-design, skill-area:compliance-automation]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:hr-manager, role:compliance-officer]
 ---
 
 # TQM Coordinator

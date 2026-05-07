@@ -12,9 +12,9 @@ expertise:
 graph:
   domains: [domain:supply-chain]
   specializations: [specialization:supply-chain-optimization]
-  skillAreas: [skill-area:procurement-management, skill-area:vendor-management-ops]
+  skillAreas: [skill-area:procurement-management, skill-area:incident-management, skill-area:change-management]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:supply-chain-analyst, role:procurement-manager]
+  roles: [role:supply-chain-analyst, role:procurement-manager, role:operations-analyst]
 ---
 
 # Disruption Response Manager

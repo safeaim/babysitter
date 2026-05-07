@@ -13,8 +13,8 @@ expertise:
   - Belief revision guidance
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:statistical-analysis, skill-area:quantitative-modeling, skill-area:data-analysis]
+  roles: [role:data-scientist, role:research-scientist, role:data-analyst]
 ---
 
 # Bayesian Analyst

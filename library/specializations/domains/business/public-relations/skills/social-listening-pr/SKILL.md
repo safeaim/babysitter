@@ -19,8 +19,8 @@ metadata:
     - Native social APIs
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:digital-marketing-analytics, skill-area:community-management, skill-area:brand-positioning]
+  roles: [role:marketing-strategist, role:content-strategist, role:data-analyst]
 ---
 
 # Social Listening Skill

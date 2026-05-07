@@ -19,8 +19,8 @@ metadata:
     - Review platform APIs
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:brand-strategy, skill-area:digital-marketing-analytics, skill-area:competitive-intelligence]
+  roles: [role:marketing-strategist, role:data-analyst, role:brand-manager]
 ---
 
 # Reputation Intelligence Skill

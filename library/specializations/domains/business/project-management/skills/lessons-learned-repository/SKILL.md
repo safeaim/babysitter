@@ -14,9 +14,9 @@ metadata:
   id: SK-018
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:change-management, skill-area:stakeholder-management, skill-area:data-governance]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:business-analyst, role:information-architect]
 ---
 
 # Lessons Learned Repository

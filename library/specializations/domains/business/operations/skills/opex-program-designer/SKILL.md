@@ -13,9 +13,9 @@ metadata:
   category: continuous-improvement
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:change-management-leadership, skill-area:strategic-planning, skill-area:organizational-design]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:strategic-planner, role:hr-manager]
 ---
 
 # OpEx Program Designer

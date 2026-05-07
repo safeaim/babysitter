@@ -20,8 +20,8 @@ metadata:
   agent-id: AG-011
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:financial-planning, skill-area:brand-strategy, skill-area:stakeholder-management]
+  roles: [role:financial-analyst, role:marketing-strategist, role:partnerships-manager]
 ---
 
 # Investor Communications Expert Agent

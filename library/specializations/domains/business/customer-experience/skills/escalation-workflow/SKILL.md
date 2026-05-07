@@ -14,9 +14,9 @@ metadata:
   id: SK-014
 graph:
   domains: [domain:customer-experience]
-  skillAreas: [skill-area:customer-success, skill-area:user-research, skill-area:product-discovery]
+  skillAreas: [skill-area:customer-success, skill-area:incident-management, skill-area:change-management-ops]
   workflows: [workflow:customer-journey-optimization, workflow:user-feedback-loop]
-  roles: [role:product-designer, role:customer-success-manager, role:ux-researcher]
+  roles: [role:customer-success-manager, role:support-engineer, role:incident-commander]
 ---
 
 # Escalation Workflow Skill

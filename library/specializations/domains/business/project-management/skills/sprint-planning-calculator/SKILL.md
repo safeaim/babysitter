@@ -14,9 +14,9 @@ metadata:
   id: SK-010
 graph:
   domains: [domain:project-management]
-  skillAreas: [skill-area:stakeholder-management, skill-area:roadmap-planning]
+  skillAreas: [skill-area:roadmap-planning, skill-area:capacity-planning-ops, skill-area:data-analytics]
   workflows: [workflow:project-kickoff, workflow:feature-development]
-  roles: [role:project-manager, role:scrum-master]
+  roles: [role:project-manager, role:scrum-master, role:technical-program-manager]
 ---
 
 # Sprint Planning Calculator

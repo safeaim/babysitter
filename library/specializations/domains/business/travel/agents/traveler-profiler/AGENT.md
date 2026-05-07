@@ -12,9 +12,9 @@ used-by-processes:
   - specializations/domains/business/travel/travel-plan-compose
 graph:
   domains: [domain:travel]
-  skillAreas: [skill-area:travel-itinerary-planning, skill-area:product-discovery]
+  skillAreas: [skill-area:travel-itinerary-planning, skill-area:data-analysis, skill-area:natural-language-processing]
   workflows: [workflow:customer-journey-optimization]
-  roles: [role:product-manager, role:operations-analyst]
+  roles: [role:data-analyst, role:product-manager, role:operations-analyst]
 ---
 
 # Traveler Profiler

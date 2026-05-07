@@ -13,8 +13,8 @@ expertise:
   - Feedback integration
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:data-analytics, skill-area:strategic-analysis, skill-area:business-analysis]
+  roles: [role:data-analyst, role:business-analyst, role:strategic-planner]
 ---
 
 # Insight Translator

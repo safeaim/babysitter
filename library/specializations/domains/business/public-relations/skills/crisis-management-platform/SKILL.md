@@ -18,8 +18,8 @@ metadata:
     - Slack/Teams APIs
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:brand-strategy, skill-area:incident-management, skill-area:brand-positioning]
+  roles: [role:marketing-strategist, role:marketing-manager, role:brand-manager]
 ---
 
 # Crisis Management Platform Skill

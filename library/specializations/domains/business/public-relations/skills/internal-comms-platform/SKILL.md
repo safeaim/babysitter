@@ -19,8 +19,8 @@ metadata:
     - Slack API
 graph:
   domains: [domain:public-relations]
-  skillAreas: [skill-area:brand-positioning, skill-area:content-marketing, skill-area:brand-strategy]
-  roles: [role:marketing-strategist, role:content-strategist]
+  skillAreas: [skill-area:content-strategy, skill-area:change-management, skill-area:community-management]
+  roles: [role:content-strategist, role:marketing-manager, role:hr-manager]
 ---
 
 # Internal Communications Platform Skill

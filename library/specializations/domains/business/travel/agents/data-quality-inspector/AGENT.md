@@ -11,9 +11,9 @@ used-by-processes:
   - specializations/domains/business/travel/flight-dataset-build
 graph:
   domains: [domain:travel]
-  skillAreas: [skill-area:travel-itinerary-planning, skill-area:product-discovery]
+  skillAreas: [skill-area:data-quality, skill-area:data-analytics, skill-area:travel-itinerary-planning]
   workflows: [workflow:customer-journey-optimization]
-  roles: [role:product-manager, role:operations-analyst]
+  roles: [role:data-analyst, role:analytics-engineer, role:operations-analyst]
 ---
 
 # Data Quality Inspector

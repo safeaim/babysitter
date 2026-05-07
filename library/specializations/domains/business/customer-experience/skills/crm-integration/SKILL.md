@@ -15,9 +15,9 @@ metadata:
   id: SK-010
 graph:
   domains: [domain:customer-experience]
-  skillAreas: [skill-area:customer-success, skill-area:user-research, skill-area:product-discovery]
+  skillAreas: [skill-area:customer-success, skill-area:community-management, skill-area:data-analytics]
   workflows: [workflow:customer-journey-optimization, workflow:user-feedback-loop]
-  roles: [role:product-designer, role:customer-success-manager, role:ux-researcher]
+  roles: [role:customer-success-manager, role:support-engineer, role:operations-analyst]
 ---
 
 # CRM Integration Skill

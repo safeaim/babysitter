@@ -15,8 +15,8 @@ required-skills:
   - shipment-visibility-tracker
 graph:
   domains: [domain:logistics]
-  skillAreas: [skill-area:procurement-management, skill-area:organizational-design]
-  roles: [role:supply-chain-analyst, role:operations-analyst]
+  skillAreas: [skill-area:procurement-management, skill-area:quantitative-modeling, skill-area:customer-success]
+  roles: [role:supply-chain-analyst, role:operations-analyst, role:customer-success-manager]
 ---
 
 # Last-Mile Coordinator

@@ -11,9 +11,9 @@ expertise:
   - Control implementation
 graph:
   domains: [domain:operations]
-  skillAreas: [skill-area:organizational-design, skill-area:stakeholder-management]
+  skillAreas: [skill-area:statistical-analysis, skill-area:business-analysis, skill-area:change-management]
   workflows: [workflow:vendor-onboarding, workflow:vendor-evaluation]
-  roles: [role:operations-analyst, role:procurement-manager]
+  roles: [role:operations-analyst, role:business-analyst, role:data-analyst]
 ---
 
 # Process Improvement Analyst

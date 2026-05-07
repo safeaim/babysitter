@@ -18,8 +18,8 @@ metadata:
     - geneticalgorithm
 graph:
   domains: [domain:business-intelligence]
-  skillAreas: [skill-area:data-analysis, skill-area:statistical-analysis, skill-area:business-analysis]
-  roles: [role:data-analyst, role:business-analyst]
+  skillAreas: [skill-area:quantitative-modeling, skill-area:strategic-analysis, skill-area:data-analysis]
+  roles: [role:data-scientist, role:quantitative-analyst, role:operations-analyst]
 ---
 
 # Genetic Algorithm Optimizer

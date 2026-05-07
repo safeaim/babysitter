@@ -20,6 +20,8 @@ This directory defines the replacement testing strategy after the legacy Docker 
 - [Mock And Fixture Contracts](./mock-and-fixture-contracts.md) defines deterministic fixture families and live/mock compatibility rules.
 - [Quality Gates](./quality-gates.md) defines release-evidence gates and adversarial review criteria.
 - [Stack Permutations](./stack-permutations.md) defines valid and invalid layer combinations across the modular stack.
+- [Primary Flow Data Paths](./primary-flow-data-paths.md) maps the full data path for the main agent-mux, babysitter-agent, SDK run, hooks-mux, and transport-mux flows.
+- [Trace Identifiers And Evidence](./trace-identifiers-and-evidence.md) defines the IDs, logs, files, and artifact bundles required to correlate those flows.
 
 ## Principles
 
@@ -54,7 +56,7 @@ The repository already has Vitest, Playwright, package-local test scripts, relea
 | `harness:install` and plugin setup | [Harness And Plugin E2E](./harness-e2e.md), [Stack Permutations](./stack-permutations.md) | Setup only | Dry-run install JSON, plugin discovery JSON, idempotency checks; no babysitter-agent runtime claim |
 | Agent-mux functionality requiring credentials | [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md), [Pipeline Integration](./pipeline-integration.md) | Model-backed | Live adapter matrix for Codex and Claude Code |
 | Babysitter-agent whole-system flow | [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md), [Stack Permutations](./stack-permutations.md) | Both | Mock planner/executor first, bounded live process after staging promotion, no installer commands inside runtime E2E |
-| Muxes and transport-mux | [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md), [Mock And Fixture Contracts](./mock-and-fixture-contracts.md) | Both | Shared event fixtures, transport roundtrip, live transport smoke |
-| Hooks muxes | [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md), [Mock And Fixture Contracts](./mock-and-fixture-contracts.md) | Both | Normalized hook fixtures, live hook replay after redaction |
+| Muxes and transport-mux | [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md), [Mock And Fixture Contracts](./mock-and-fixture-contracts.md), [Primary Flow Data Paths](./primary-flow-data-paths.md) | Both | Shared event fixtures, transport roundtrip, live transport smoke with trace identifiers |
+| Hooks muxes | [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md), [Mock And Fixture Contracts](./mock-and-fixture-contracts.md), [Trace Identifiers And Evidence](./trace-identifiers-and-evidence.md) | Both | Normalized hook fixtures, live hook replay after redaction with session/run correlation |
 | Pipeline integration | [Pipeline Integration](./pipeline-integration.md), [Implementation Roadmap](./implementation-roadmap.md) | Both | New workflow contracts and staged required checks |
 | Coverage reporting | [Coverage And Reporting](./coverage-and-reporting.md) | Both | Package coverage baselines plus scenario coverage summaries |

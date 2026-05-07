@@ -48,14 +48,14 @@ jobs:
 
       - name: Install Babysitter Gemini Extension
         run: |
-          npm install -g @a5c-ai/babysitter-gemini
-          echo "BABYSITTER_EXTENSION_PATH=$(npm root -g)/@a5c-ai/babysitter-gemini" >> "$GITHUB_ENV"
+          babysitter harness:install-plugin gemini-cli
+          echo "BABYSITTER_EXTENSION_PATH=$HOME/.gemini/extensions/babysitter-gemini" >> "$GITHUB_ENV"
 
       - name: Run Gemini CLI with Babysitter
         uses: google-github-actions/run-gemini-cli@v1
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          extensions: '["@a5c-ai/babysitter-gemini"]'
+          extensions: '["babysitter"]'
           prompt: |
             You have the babysitter CLI available for orchestration.
 
@@ -137,12 +137,12 @@ The Babysitter Gemini extension provides hooks and commands within the Gemini CL
 
 ```yaml
 - name: Install Babysitter Gemini Extension
-  run: npm install -g @a5c-ai/babysitter-gemini
+  run: babysitter harness:install-plugin gemini-cli
 
 - uses: google-github-actions/run-gemini-cli@v1
   with:
     gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-    extensions: '["@a5c-ai/babysitter-gemini"]'
+    extensions: '["babysitter"]'
 ```
 
 ## Workflow Examples
@@ -313,7 +313,7 @@ Gemini CLI supports three authentication approaches:
     BABYSITTER_MAX_ITERATIONS: 100
     BABYSITTER_QUALITY_THRESHOLD: 85
     BABYSITTER_LOG_LEVEL: debug
-    BABYSITTER_EXTENSION_PATH: /usr/local/lib/node_modules/@a5c-ai/babysitter-gemini
+    BABYSITTER_EXTENSION_PATH: ~/.gemini/extensions/babysitter-gemini
 ```
 
 ## Artifacts and Outputs

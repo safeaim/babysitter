@@ -265,6 +265,7 @@ export const processGenerationTask = defineTask('process-generation', (args, tas
       instructions: [
         'Generate process file following SDK patterns:',
         '1. JSDoc header with @process, @description, @inputs, @outputs',
+        '   Include a @graph JSDoc block referencing relevant atlas graph node IDs (domains, skillAreas, topics, roles, workflows). Read packages/atlas/graph/domain/ to find valid IDs. At minimum include one domain: node.',
         '2. Import statement: import { defineTask } from "@a5c-ai/babysitter-sdk"',
         '3. Export async function process(inputs, ctx)',
         '4. Phase sections with ctx.log() calls',
@@ -314,6 +315,7 @@ export const processValidationTask = defineTask('process-validation', (args, tas
       instructions: [
         'Read the generated process file',
         'Validate JSDoc metadata is complete',
+        'Validate @graph block is present and references at least one domain: node ID from packages/atlas/graph/domain/',
         'Validate import statement is correct',
         'Validate process function signature',
         'Count and verify task definitions',

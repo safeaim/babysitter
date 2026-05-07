@@ -420,6 +420,7 @@ Each process must:
 - Include `@references` pointing back to the source SKILL.md
 - Include `@process assimilated/[name]` tag
 - Include `@placement` tag indicating the target library path (e.g. `@placement specializations/security-compliance/k8s-audit`)
+- Include a `@graph` JSDoc block referencing relevant atlas graph node IDs (domains, skillAreas, topics, roles, workflows). Read `packages/atlas/graph/domain/` to find valid IDs. At minimum include one `domain:` node. Example: `@graph\n *   domains: [domain:software-engineering]\n *   topics: [topic:security-scanning]\n *   roles: [role:sre]`
 - Honour the source repo's license in the JSDoc header
 
 ## Phase 6 -- Maintain indexes and history

@@ -280,6 +280,7 @@ For each process in the architecture design, create a complete .js file that:
         'Reference skills by name from skills/ dir',
         'Preserve source methodology sequencing and philosophy',
         'Add quality gates where the source lacks them',
+        'Include a @graph JSDoc block in each process file header referencing relevant atlas graph node IDs (domains, skillAreas, topics, roles, workflows). Read packages/atlas/graph/domain/ to find valid IDs. At minimum include one domain: node.',
         'Return list of all files created'
       ],
       outputFormat: 'JSON with { filesCreated: [{ path, processId, phases, taskCount }], totalFiles: number }'
@@ -332,6 +333,7 @@ For each skill in the architecture design, create a directory with:
         'Follow the exact SKILL.md pattern from software-architecture/skills/',
         'Include tool use instructions specific to each skill',
         'Include process integration table showing which processes use each skill',
+        'Add a graph: frontmatter block to each SKILL.md with relevant atlas node IDs from packages/atlas/graph/domain/. At minimum include one domain: node.',
         'Return list of all files created'
       ],
       outputFormat: 'JSON with { skillsCreated: [{ dir, name, files: [] }], totalSkills: number }'
@@ -381,6 +383,7 @@ For each agent in the architecture design, create a directory with:
         'Preserve original agent roles and expertise from source methodology',
         'Add prompt templates that match the babysitter task definition pattern',
         'Map deviation rules from source where they exist',
+        'Add a graph: frontmatter block to each AGENT.md with relevant atlas node IDs from packages/atlas/graph/domain/. At minimum include one domain: node and one role: node.',
         'Return list of all files created'
       ],
       outputFormat: 'JSON with { agentsCreated: [{ dir, name, role, files: [] }], totalAgents: number }'

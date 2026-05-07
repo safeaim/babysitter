@@ -38,14 +38,29 @@ function buildFromCatalog(): {
       }
     }
 
-    // Build native support from catalog agent-provider relationships
+    // Build native support from catalog agent-provider relationships and
+    // transport-family defaults exposed by plugin targets.
     const catalog = getAgentCatalog();
     const nativeSupport: NativeSupportEntry[] = [];
+    const addNativeSupport = (agent: string, providerId: string) => {
+      if (nativeSupport.some(e => e.agent === agent && e.provider === providerId)) return;
+      const provider = catalog.providers.find(p => p.providerId === providerId);
+      const mechanism = provider?.hostEnvSignals?.[0] ?? providerId;
+      nativeSupport.push({ agent, provider: providerId as ProviderId, mechanism });
+    };
+
     for (const agent of catalog.agents) {
       for (const providerId of agent.providerIds) {
-        const provider = catalog.providers.find(p => p.providerId === providerId);
-        const mechanism = provider?.hostEnvSignals?.[0] ?? providerId;
-        nativeSupport.push({ agent: agent.agentId, provider: providerId as ProviderId, mechanism });
+        addNativeSupport(agent.agentId, providerId);
+      }
+    }
+
+    for (const target of targets) {
+      const nativeProviders = target.defaultTransportId
+        ? NATIVE_PROVIDERS_BY_TRANSPORT[target.defaultTransportId as TransportId] ?? []
+        : [];
+      for (const providerId of nativeProviders) {
+        addNativeSupport(target.adapterName, providerId);
       }
     }
 
@@ -60,6 +75,12 @@ function getCatalogData() {
   if (!_cached) _cached = buildFromCatalog();
   return _cached;
 }
+
+const NATIVE_PROVIDERS_BY_TRANSPORT: Partial<Record<TransportId, ProviderId[]>> = {
+  anthropic: ['anthropic', 'bedrock', 'vertex'],
+  'openai-responses': ['openai', 'ollama'],
+  google: ['google', 'vertex'],
+};
 
 const PROVIDER_NATIVE_TRANSPORT: Record<string, TransportId> = {
   anthropic: 'anthropic', openai: 'openai-responses', google: 'google',

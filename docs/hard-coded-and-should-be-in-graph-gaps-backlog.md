@@ -2,97 +2,192 @@
 
 > All data should flow: **Atlas graph → agent-catalog (bridge) → consumer packages**
 >
-> Generated 2026-05-06. Updated 2026-05-07.
->
-> **Progress: P1 ✅, P2 ✅, P3 ✅, P4 ✅, P5 ⬜ (by design), P6 🟡 (1 remaining), P7 ✅**
+> Updated 2026-05-07. No backward compatibility — fix forward only.
 
-## Priority 1: Master Target Registries — ✅ Complete
+## Audit Summary
 
-| Item | Status | Commit |
-|------|--------|--------|
-| P1.1 — `buildPluginTargetDescriptors()` | ✅ Reads from Atlas | d30b5d08 |
-| P1.2 — SDK discovery specs | ✅ `buildDiscoverySpecs()` from catalog | abb240e9 |
-| P1.3 — `deriveProcessNames()` | ✅ Queries catalog `processNames` | abb240e9 |
-| P1.4 — adapter registry | ✅ Built from `listPluginTargetDescriptors()` | 0d56cc84 (earlier) |
+**Total hardcoded harness-specific literals in production code: ~201**
+(excludes test infrastructure in harness-mock: 55 refs)
 
-**Residual:** P1.3 has 3 hardcoded alias fallbacks (`claude`→`claude-code`, `gemini`→`gemini-cli`, `copilot`→`github-copilot`) for when exact match fails. Low priority.
+| Category | Count | Package | Severity |
+|----------|-------|---------|----------|
+| Adapter self-identity defaults | 38 | agent-mux/adapters | High |
+| Adapter self-registration calls | 10 | agent-mux/adapters | High |
+| hooks-mux adapter defaults + fallbacks | 40 | hooks-mux/adapter-* | High |
+| Dispatch switches (translate/launch/tui) | 11 | agent-mux/adapters + cli | Medium |
+| Adapter class→format maps | 9 | agent-plugins-mux | Medium |
+| SDK prompt context factory names | 9 | sdk/harness | Medium |
+| CLI paths/capabilities | 5 | agent-mux/cli | Medium |
+| Model/host-detection registries | 6 | agent-mux/core | Medium |
+| agent-mux CJS process scripts | 18 | agent-mux/processes | Low |
+| Test mock scenarios | 55 | agent-mux/harness-mock | Low |
 
-## Priority 2: Per-Target Type Definitions — ✅ Complete
+---
 
-| Item | Status | Commit |
-|------|--------|--------|
-| P2.1 — `HookRegistrationFormat` | ✅ Changed to `string` | 12b07f8e |
-| P2.2 — `HARNESS_ALIASES` | ✅ Dynamic from catalog | 12b07f8e |
+## HIGH: Adapter Identity & Registration (88 refs)
 
-## Priority 3: Per-Target Special Cases — ✅ Complete
+### H1 — agent-mux adapter self-identity (38 refs)
 
-| Item | Status | Commit |
-|------|--------|--------|
-| P3.1 — openclaw Stop hook | ✅ Checks `adapterFamily === 'programmatic'` | c0d76911 |
-| P3.2 — codex marketplace | ✅ Checks `activationMessage` | c0d76911 |
-| P3.3 — copilot bin scripts | ✅ Checks `componentSupport + lifecycle` | c0d76911 |
-| P3.4 — oh-my-pi adapter name | ✅ Uses `targetProfile.adapterName` | c0d76911 |
+Each adapter class hardcodes its own `agent` and `cliCommand`:
+```typescript
+readonly agent: string = 'claude';
+readonly cliCommand: string = 'claude';
+```
 
-**Zero `targetProfile.name ===` checks remain in agent-plugins-mux production code.**
+**Files:** claude-adapter.ts, codex-adapter.ts, cursor-adapter.ts, gemini-adapter.ts, copilot-adapter.ts, pi-adapter.ts, pi-sdk-adapter.ts, omp-adapter.ts, opencode-adapter.ts, opencode-http-adapter.ts, openclaw-adapter.ts, droid-adapter.ts, amp-adapter.ts, hermes-adapter.ts, qwen-adapter.ts, codex-sdk-adapter.ts, codex-websocket-adapter.ts, claude-agent-sdk-adapter.ts, claude-remote-control-adapter.ts, babysitter-adapter.ts, agent-mux-remote-adapter.ts
 
-## Priority 4: Env Vars and Install Paths — ✅ Complete (via P1.2)
+**Fix:** Constructor injection. Each adapter accepts `agent` and `cliCommand` as constructor params. The self-registration call provides these from the catalog:
+```typescript
+const target = getPluginTargetDescriptor('claude-code');
+registerAdapterFactory(target.adapterName, () => new ClaudeAdapter(target.adapterName, target.cliCommand));
+```
 
-Discovery specs now read `callerEnvVars` and `configPaths` from Atlas PluginTarget records. Hardcoded values remain only as fallback defaults in lazy getters.
+**Atlas data needed:** Already available — `adapterName` and `cliCommand` on PluginTarget.
 
-## Priority 5: agent-mux Dispatch — ⬜ By Design
+### H2 — agent-mux self-registration calls (10 refs)
 
-| Item | Status | Note |
-|------|--------|------|
-| P5.1 — translate-for-harness | ⬜ Code | Adapter self-identification — each adapter knows what it is |
-| P5.2 — CLI launch routing | ⬜ Code | Launch commands are inherently per-adapter code |
-| P5.3 — interactive-mode targets | ⬜ Code | Process definition, not data lookup |
+```typescript
+registerAdapterFactory('claude', () => new ClaudeAdapter());
+```
 
-These are **code dispatches**, not data lookups. Each adapter file (`claude-adapter.ts`, `codex-adapter.ts`) must identify itself. A registry pattern could replace the switch statements but the individual adapter imports would still be hardcoded.
+**Fix:** Read the adapter name from the catalog or from the `adapterModule` field that already exists in Atlas. The barrel import in index.ts triggers registrations.
 
-### P5.4 — `BuiltInAgentName` type (packages/agent-mux/core/src/types.ts)
-- **What:** `type BuiltInAgentName = 'claude' | 'codex' | 'droid' | 'amp' | 'gemini' | 'copilot' | 'cursor' | 'opencode' | 'pi' | 'omp' | ...`
-- **Note:** `AgentName = BuiltInAgentName | (string & {})` already accepts any string. The union is for IDE autocomplete only.
-- **Fix:** Could be generated at build time from Atlas. Low priority since the `(string & {})` fallback makes it non-breaking.
-- **Status:** 🟡 Low priority — autocomplete convenience only
+### H3 — hooks-mux adapter defaults + fallbacks (40 refs)
 
-### P5.5 — `translateForHarness` switch (packages/agent-mux/adapters/src/translate-for-harness.ts)
-- **What:** Switch on agent name dispatching to per-harness translation functions
-- **Note:** Each translation is different code logic (claude, codex, gemini, opencode each have unique provider translation). Cannot be data-driven.
-- **Status:** ⬜ By design — code dispatch
+Each hooks-mux adapter has:
+- `createAdapter(name = 'claude')` — default name literal
+- `ADAPTER_NAME = 'codex'` — const in normalizers
+- `_adapterName = 'claude'` — mutable default
+- `adapter: 'claude'` — in fallback mapping arrays
 
-### P5.6 — Adapter self-identification (packages/agent-mux/adapters/src/*-adapter.ts)
-- **What:** Each adapter class has `readonly agent = 'claude'`, `readonly cliCommand = 'claude'`, etc.
-- **Note:** 26 adapter files with hardcoded identity. Could read from catalog at construction but adds complexity for no functional benefit.
-- **Fix:** Could accept `agent` and `cliCommand` as constructor params sourced from catalog. Marginal value.
-- **Status:** ⬜ By design — adapter self-identity
+**Files:** All 9 adapter-*/src/ packages (adapter.ts, normalizer.ts, mappings.ts, integration.ts)
 
-## Priority 6: Scripts and CI — 🟡 Mostly Complete
+**Fix:** Remove ALL defaults. The adapter-loader in hooks-mux-cli MUST pass the name from the catalog. If catalog is unavailable, fail explicitly rather than silently using a wrong default.
 
-| Item | Status | Note |
-|------|--------|------|
-| P6.1 — Architecture boundaries | ✅ | Removed plugin bundle entries (938924c3) |
-| P6.2 — Bump version targets | ✅ | Plugin bundles removed — no paths to maintain |
-| P6.3 — Sync external repos | 🔴 | `targets` array with repo URLs still hardcoded |
-| P6.4 — Docs freshness | ✅ | Queries catalog with fallback (ecbc2c59) |
+**Atlas data needed:** Already available — `adapterName` on PluginTarget.
 
-**P6.3 remaining:** `scripts/sync-external-plugin-repos.mjs` has a hardcoded array mapping target IDs to external repo URLs (`a5c-ai/babysitter-codex`, etc.). Fix: add `externalRepo` field to Atlas PluginTarget records.
+---
 
-## Priority 7: Tests — ✅ Acceptable
+## MEDIUM: Dispatch & Registry Maps (40 refs)
 
-| Item | Status | Note |
-|------|--------|------|
-| P7.1 — Transform tests | ✅ | Tests validate specific behavior — hardcoded assertions are correct |
-| P7.2 — Contract tests | ✅ | Already catalog-driven |
+### M1 — translateForHarness switch (8 refs)
 
-## Summary
+```typescript
+switch (agent) {
+  case 'claude': return translateForClaude(config);
+  case 'codex': return translateForCodex(config);
+  ...
+}
+```
 
-| Priority | Items | Done | Remaining |
-|----------|-------|------|-----------|
-| P1 — Master registries | 4 | 4 ✅ | 0 |
-| P2 — Type definitions | 2 | 2 ✅ | 0 |
-| P3 — Special cases | 4 | 4 ✅ | 0 |
-| P4 — Env vars / paths | 2 | 2 ✅ | 0 |
-| P5 — agent-mux dispatch | 6 | 0 (by design) | 1 low-pri (BuiltInAgentName) |
-| P6 — Scripts / CI | 4 | 3 ✅ | 1 (P6.3) |
-| P7 — Tests | 2 | 2 ✅ | 0 |
-| **Total** | **21** | **17 ✅** | **1 remaining + 3 by-design** |
+**File:** packages/agent-mux/adapters/src/translate-for-harness.ts
+
+**Fix:** Each translation function self-registers in a `TRANSLATION_REGISTRY` map at import time (same pattern as adapter self-registration). The switch becomes a map lookup. Add `translationStrategy` field to Atlas PluginTarget if needed for grouping (e.g., codex-sdk uses the same translation as codex).
+
+### M2 — CLI launch/tui routing (5 refs)
+
+```typescript
+case 'codex': ...
+case 'gemini': ...
+```
+
+**Files:** packages/agent-mux/cli/src/commands/launch.ts, tui.ts, remote.ts
+
+**Fix:** Launch config comes from catalog. Each agent's launch behavior is an Atlas attribute (`launchMode: 'cli-spawn' | 'sdk-connect' | 'websocket'`).
+
+### M3 — agent-plugins-mux adapter class→format maps (9 refs)
+
+```typescript
+const ADAPTER_CLASS_BY_FORMAT = {
+  'claude-code': ClaudeCodeAdapter,
+  'codex': CodexAdapter,
+  ...
+};
+```
+
+**File:** packages/agent-plugins-mux/src/targets/adapters/index.ts
+
+**Fix:** Self-registration pattern. Each adapter class registers itself by hookRegistrationFormat at import time. The index.ts barrel import triggers all registrations.
+
+### M4 — SDK prompt context factory names (9 refs)
+
+```typescript
+export function createCodexContext(overrides?) { ... }
+export function createCursorContext(overrides?) { ... }
+```
+
+**File:** packages/sdk/src/harness/hooks/promptContexts.ts
+
+**Fix:** Already partially addressed — `createPromptContextFromCatalog()` exists. Remove the named factory functions entirely. Callers should use `createPromptContextFromCatalog(targetId)`.
+
+### M5 — agent-mux core registries (6 refs)
+
+- `model-registry.ts` — per-agent default model mappings
+- `host-detection.ts` — host detection signals
+- `builtin-hooks.ts` — built-in hook handlers
+- `spawn-runner-utils.ts` — spawn configuration
+
+**Fix:** Model registries and host detection should come from Atlas AgentVersion/PluginTarget records. Add `defaultModelId`, `spawnConfig` fields to Atlas.
+
+### M6 — agent-mux CLI paths/capabilities (5 refs)
+
+- `agent-subagent-paths.ts` — per-agent subagent path resolution
+- `agent-skill-paths.ts` — per-agent skill path resolution
+- `agent-capabilities.ts` — per-agent capability declarations
+
+**Fix:** Path resolution and capabilities from catalog. These are PluginTarget `installLayout` and `capabilities` fields.
+
+---
+
+## LOW: Scripts & Test Infrastructure (73 refs)
+
+### L1 — agent-mux CJS process scripts (18 refs)
+
+```
+fix-enums.cjs, fix-enums2.cjs, fix-capabilities.cjs, fix-adapters.cjs,
+fix-adapters-mcp.cjs, execute-advanced-uis-playbook.mjs, etc.
+```
+
+**Fix:** These are one-shot migration/fix scripts. They can hardcode names because they're ephemeral tooling, not runtime code. However, they should be cleaned up or deleted if no longer needed.
+
+### L2 — harness-mock test scenarios (55 refs)
+
+```
+per-agent.ts, probe.ts, types.ts, scenarios.ts, hooks.ts, errors.ts, interactive.ts
+```
+
+**Fix:** Test infrastructure that creates mock scenarios per agent. Could be generated from catalog but low priority — tests validating specific agent behavior reasonably hardcode the agent name.
+
+---
+
+## Atlas Schema Gaps (fields needed but not yet added)
+
+| Field | Node Kind | Purpose | Used By |
+|-------|-----------|---------|---------|
+| `translationStrategy` | PluginTarget | Groups agents sharing translation logic | translate-for-harness.ts |
+| `launchMode` | PluginTarget | CLI launch behavior (cli-spawn/sdk/ws) | launch.ts |
+| `defaultModelId` | AgentVersion | Default AI model per agent | model-registry.ts |
+| `spawnConfig` | PluginTarget | CLI spawn arguments and env | spawn-runner-utils.ts |
+| `subagentPaths` | PluginTarget | Subagent discovery paths | agent-subagent-paths.ts |
+| `skillPaths` | PluginTarget | Skill discovery paths | agent-skill-paths.ts |
+
+---
+
+## Completed Items (from previous work)
+
+| What | Status |
+|------|--------|
+| P1: Master target registries (buildPluginTargetDescriptors, SDK discovery specs, deriveProcessNames, adapter registry) | ✅ |
+| P2: Type definitions (HookRegistrationFormat, HARNESS_ALIASES) | ✅ |
+| P3: Special cases (openclaw Stop, codex marketplace, copilot bin scripts, oh-my-pi adapter) | ✅ |
+| P4: Env vars / install paths | ✅ |
+| P5.4: BuiltInAgentName | ✅ |
+| P6: Scripts/CI (sync-external, docs freshness, architecture) | ✅ |
+| Prompt contexts (capabilityCollector, compose, criticalRules, runCreation, taskKinds) | ✅ |
+| Provider support matrix | ✅ |
+| hooks-mux adapter capabilities → Atlas (11 fields) | ✅ |
+| hooks-mux phase mappings → Atlas (4 fields on HookMapping) | ✅ |
+| Pattern C: self-registering agent-mux adapters | ✅ |
+| 329 harness name literals → parameterized | ✅ |
+| agent-catalog: pure Atlas wrapper (no graph/, evidence/, assets.ts) | ✅ |
+| packages/catalog removed | ✅ |

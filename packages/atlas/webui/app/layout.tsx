@@ -14,19 +14,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="cpd-dark h-full antialiased">
-      <body
-        className="min-h-full flex flex-col"
-        style={{ background: 'var(--bg)', color: 'var(--fg)' }}
-      >
-        <Header />
-        <div className="flex flex-1 min-h-0">
+      <body className="atlas-body">
+        <div className="mk-dashboard atlas-app-shell">
           <Sidebar />
-          <main
-            className="flex-1 min-w-0 overflow-y-auto p-6"
-            style={{ background: 'var(--bg)' }}
-          >
-            {children}
-          </main>
+          <div className="atlas-app-main">
+            <Header />
+            <main className="atlas-main-content">{children}</main>
+          </div>
         </div>
         <KeyboardShortcuts />
       </body>

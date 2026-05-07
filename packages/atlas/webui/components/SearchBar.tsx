@@ -30,17 +30,18 @@ export function SearchBar() {
         e.preventDefault();
         if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
       }}
-      className="relative w-full max-w-md"
+      className="atlas-searchbar"
     >
-      <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none" style={{ color: 'var(--fg-3)' }} />
+      <Search className="atlas-searchbar__icon" />
       <Input
         ref={inputRef}
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Search records  (press / )"
-        className="pl-8"
+        placeholder="Search atlas records, pages, and node kinds"
+        className="atlas-searchbar__input"
         aria-label="Search records"
       />
+      <span className="atlas-searchbar__shortcut">/</span>
     </form>
   );
 }

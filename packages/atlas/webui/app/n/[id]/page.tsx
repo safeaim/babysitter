@@ -8,6 +8,11 @@ import {
   getPagesForRecord,
 } from "@a5c-ai/atlas";
 import { Badge } from "@/components/ui/badge";
+import {
+  AtlasDocsScaffold,
+  atlasLeadFromMarkdown,
+  atlasReadingTime,
+} from "@/components/AtlasDocsScaffold";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { AttributeTable } from "@/components/AttributeTable";
 import { EdgeList } from "@/components/EdgeList";
@@ -139,31 +144,101 @@ export default async function RecordPage({
       )}
 
       {tabActive === "article" && articlePage && (
-        <div className="space-y-4">
-          {articlePage.id !== rec.id && (
-            <div
-              className="rounded-md p-3 text-xs"
-              style={{
-                background: 'var(--bg-2)',
-                border: '1px solid var(--rule)',
-                color: 'var(--fg-2)',
-              }}
-            >
-              Article source:{" "}
-              <Link
-                href={`/wiki/${String(articlePage.slug ?? "").split("/").map(encodeURIComponent).join("/")}`}
-                className="hover:underline"
-                style={{ color: 'var(--brass)' }}
-              >
-                {String(articlePage.title ?? articlePage.id)}
-              </Link>
-            </div>
-          )}
+        <AtlasDocsScaffold
+          runningLeft={
+            <>
+              <span className="folio">ii</span>
+              <span>{rec._kind}</span>
+            </>
+          }
+          runningTitle={
+            <>
+              Atlas record · <em>{getDisplayName(rec)}</em>
+            </>
+          }
+          runningRight={
+            <>
+              <span>{id}</span>
+              <span>a5c.ai</span>
+            </>
+          }
+          tocSearchLabel="Search related folios"
+          tocBookLabel="Record · linked articles"
+          tocTitle="Current article and related pages"
+          chapters={[
+            {
+              num: "II.",
+              title: "Reference article",
+              pages: "pp. 1 - 1",
+              current: true,
+              items: [
+                { label: String(articlePage.title ?? articlePage.id), current: true },
+                ...relatedPages
+                  .filter((page) => page.id !== articlePage.id)
+                  .slice(0, 5)
+                  .map((page) => ({
+                    label: String(page.title ?? page.id),
+                    href: `/wiki/${String(page.slug ?? "").split("/").map(encodeURIComponent).join("/")}`,
+                  })),
+              ],
+            },
+          ]}
+          chapterMark={{
+            num: "II.",
+            subtitle: `${rec._kind} reference folio`,
+            context: id,
+            readingTime: atlasReadingTime(String(articlePage.article)),
+          }}
+          articleTitle={
+            <>
+              {getDisplayName(rec)} <em>reference</em>
+            </>
+          }
+          lead={atlasLeadFromMarkdown(String(articlePage.article), `Reference article for ${id} and its linked atlas edges.`)}
+          meta={
+            <>
+              <Badge variant="secondary">{rec._kind}</Badge>
+              <span>{typeof articlePage.articlePath === "string" ? articlePage.articlePath : articlePage._file}</span>
+              <span>Outgoing · {out.length}</span>
+              <span>Incoming · {inc.length}</span>
+            </>
+          }
+          marginSections={[
+            {
+              title: "Article source",
+              items: articlePage.id !== rec.id
+                ? [
+                    <Link
+                      key="article-source"
+                      href={`/wiki/${String(articlePage.slug ?? "").split("/").map(encodeURIComponent).join("/")}`}
+                    >
+                      {String(articlePage.title ?? articlePage.id)}
+                    </Link>,
+                    <p key="article-note" className="atlas-docs-note">This record inherits its article from a related Page node.</p>,
+                  ]
+                : [<p key="self-article" className="atlas-docs-note">The article body is owned directly by this record.</p>],
+            },
+            {
+              title: "Related pages",
+              items: relatedPages.length
+                ? relatedPages.slice(0, 8).map((page) => (
+                    <Link
+                      key={page.id}
+                      href={`/wiki/${String(page.slug ?? "").split("/").map(encodeURIComponent).join("/")}`}
+                    >
+                      {String(page.title ?? page.id)}
+                    </Link>
+                  ))
+                : [<p key="no-pages" className="atlas-docs-note">No related wiki pages for this record.</p>],
+            },
+          ]}
+        >
           <MarkdownArticle
             markdown={String(articlePage.article)}
             articlePath={typeof articlePage.articlePath === "string" ? articlePage.articlePath : articlePage._file}
+            variant="docs"
           />
-        </div>
+        </AtlasDocsScaffold>
       )}
 
       {tabActive === "json" && (

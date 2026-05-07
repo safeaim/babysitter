@@ -9,29 +9,37 @@ export function Sidebar() {
   );
 
   return (
-    <aside
-      className="w-60 shrink-0 overflow-y-auto"
-      style={{
-        background: 'var(--ground-ink)',
-        borderRight: '1px solid var(--rule)',
-      }}
-    >
-      <div className="p-4">
-        <div
-          className="text-xs font-semibold uppercase tracking-wider mb-3"
-          style={{ color: 'var(--glyph-fade)' }}
-        >
-          Clusters
+    <aside className="mk-dashboard__rail atlas-sidebar">
+      <div className="mk-dashboard__brand atlas-sidebar__brand">
+        <strong>a·5·c·ai</strong>
+        <span>atlas catalogue</span>
+      </div>
+      <div className="atlas-sidebar__sections">
+        <div className="mk-dashboard__nav-section">
+          <small>Core routes</small>
+          <Link href="/" className="atlas-rail__link">
+            Overview
+          </Link>
+          <Link href="/wiki" className="atlas-rail__link">
+            Wiki folios
+          </Link>
+          <Link href="/graph" className="atlas-rail__link">
+            Graph canvas
+          </Link>
+          <Link href="/edges" className="atlas-rail__link">
+            Edge ledger
+          </Link>
         </div>
+
+        <div className="atlas-sidebar__cluster-label">Clusters</div>
         <div className="space-y-4">
           {sortedClusters.map(([cluster, def]) => (
             <div key={cluster}>
               <div
-                className="text-xs font-medium px-2 py-1.5 flex items-center justify-between"
-                style={{ color: 'var(--glyph-bone)' }}
+                className="atlas-sidebar__cluster-head"
               >
                 <span className="truncate">{cluster}</span>
-                <span style={{ color: 'var(--brass)' }} className="tabular-nums">{def.recordCount}</span>
+                <span className="tabular-nums atlas-sidebar__cluster-count">{def.recordCount}</span>
               </div>
               <ul className="space-y-0.5">
                 {def.nodeKinds.map((nk) => {
@@ -40,11 +48,10 @@ export function Sidebar() {
                     <li key={nk}>
                       <Link
                         href={`/kind/${encodeURIComponent(nk)}`}
-                        className="sidebar-link flex items-center justify-between px-2 py-1.5 rounded text-xs transition-colors"
-                        style={{ color: 'var(--glyph-fade)' }}
+                        className="atlas-rail__link atlas-rail__link--kind"
                       >
                         <span className="truncate">{nk}</span>
-                        <span className="tabular-nums" style={{ color: 'var(--glyph-fade)' }}>{c}</span>
+                        <span className="tabular-nums atlas-sidebar__kind-count">{c}</span>
                       </Link>
                     </li>
                   );
@@ -54,6 +61,10 @@ export function Sidebar() {
           ))}
         </div>
       </div>
+      <footer className="atlas-sidebar__footer">
+        <strong>{sortedClusters.length.toLocaleString()} clusters</strong>
+        <small>Browse Atlas through record ledgers, docs folios, and graph edges.</small>
+      </footer>
     </aside>
   );
 }

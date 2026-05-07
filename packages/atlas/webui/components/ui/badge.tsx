@@ -9,9 +9,13 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function Badge({ className, variant, children, ...props }: BadgeProps) {
+  const tagChildren = typeof children === "bigint"
+    ? children.toString()
+    : (children as Exclude<React.ReactNode, bigint>);
+
   return (
     <span className={clsx("inline-flex", className)} {...props}>
-      <Tag>{children}</Tag>
+      <Tag>{tagChildren as never}</Tag>
     </span>
   );
 }

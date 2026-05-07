@@ -8,6 +8,7 @@ on:
       - develop
     paths:
       - packages/atlas/**
+      - library/**
       - .github/workflows/deploy-atlas-webui.yml
   workflow_call:
   workflow_dispatch:

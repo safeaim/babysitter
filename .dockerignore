@@ -45,6 +45,8 @@ temp/
 *.md
 !README.md
 !DOCKER.md
+!**/SKILL.md
+!**/AGENT.md
 
 # CI/CD
 .github/

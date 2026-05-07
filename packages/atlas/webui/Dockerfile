@@ -20,6 +20,7 @@ RUN npm install --ignore-scripts --no-package-lock
 FROM deps AS builder
 WORKDIR /app
 COPY packages/atlas packages/atlas
+COPY library library
 RUN npm run build -w @a5c-ai/atlas
 RUN npm run build -w @a5c-ai/atlas-webui
 

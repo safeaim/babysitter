@@ -47,7 +47,7 @@ Staging and release should be ordered like this:
 
 1. Build and no-model tests.
 2. Package and generated artifact checks.
-3. Model-backed runtime smoke and capability-gated plugin/session smoke.
+3. Model-backed runtime smoke, transport-mux bridge smoke, and capability-gated plugin/session smoke.
 4. Publish or deploy jobs.
 5. Post-publish verification or external sync jobs.
 
@@ -60,6 +60,9 @@ Every E2E job should upload:
 - command transcript,
 - redacted harness discovery JSON,
 - redacted event logs,
+- transport-mux launch-plan JSON when proxy launch is under test,
+- redacted proxy config and env injection diff,
+- route transcripts, streaming event transcripts, metrics snapshots, and cache stats for transport-mux lanes,
 - run IDs and session IDs,
 - coverage output when collected,
 - provider/harness version metadata,
@@ -72,7 +75,7 @@ Artifacts must never include raw API keys, token files, home-directory credentia
 | Workflow | Inputs | Outputs | Required artifacts | Downstream consumers |
 | --- | --- | --- | --- | --- |
 | `testing-no-model.yml` | `scope`, `changed_packages`, `coverage_mode` | `no_model_status`, `coverage_artifact`, `junit_artifact` | Vitest logs, Playwright traces on failure, package coverage summaries | `ci.yml`, `staging-publish.yml`, `release.yml` |
-| `testing-model-backed.yml` | `provider`, `agent`, `backend`, `path`, `prompt_fixture`, `required` | `model_backed_status`, `skip_reason`, `run_artifact` | Separate artifacts per path: setup JSON, agent-mux session events, babysitter-agent run proof, stop-hook evidence | Scheduled workflow, staging preflight, release preflight |
+| `testing-model-backed.yml` | `provider`, `agent`, `backend`, `path`, `prompt_fixture`, `required` | `model_backed_status`, `skip_reason`, `run_artifact` | Separate artifacts per path: setup JSON, agent-mux session events, transport-mux launch/env/metrics evidence, babysitter-agent run proof, stop-hook evidence | Scheduled workflow, staging preflight, release preflight |
 | `testing-coverage-report.yml` | `coverage_artifacts`, `playwright_artifacts`, `model_backed_artifacts` | `coverage_summary`, `scenario_summary` | Merged markdown summary, raw coverage JSON, trace index | PR summaries, release candidate notes |
 
 Required workflows should expose explicit failure/skip outputs. A publish workflow must depend on `*_status == success`; a scheduled workflow may record `skip_reason` without failing when credentials are intentionally absent.
@@ -83,10 +86,12 @@ Stable required-check names prevent branch protection churn:
 
 - `testing / no-model contracts`
 - `testing / no-model runtime`
+- `testing / no-model transport-mux`
 - `testing / no-model ui`
 - `testing / model-backed codex`
 - `testing / model-backed claude-code`
 - `testing / model-backed babysitter-agent`
+- `testing / model-backed transport-mux bridge`
 - `testing / coverage summary`
 
 Only no-model checks should be required for ordinary PRs at first. Model-backed checks should become required only on `staging` and release branches after their quarantine period ends.
@@ -99,11 +104,12 @@ Package owners may initially wire these bundles as workflow steps that call exis
 | Proposed command | Lane | Contents |
 | --- | --- | --- |
 | `npm run test:no-model` | No-model | Package unit, contract, mock harness, CLI smoke, docs/generator checks |
-| `npm run test:no-model:mux` | No-model | Agent-mux, transport-mux, hooks-mux, gateway, and fixture compatibility checks |
+| `npm run test:no-model:mux` | No-model | Agent-mux, transport-mux route/runtime/env/launch-plan, hooks-mux, gateway, and fixture compatibility checks |
 | `npm run test:no-model:harness-setup` | No-model | `harness:list`, install dry-runs, plugin install dry-runs, discovery fixtures |
 | `npm run test:model-backed` | Model-backed | All selected live provider/harness tests with credential gates |
 | `npm run test:model-backed:agent-mux-plugin` | Model-backed | Capability-gated `amux run` plugin/session tests with Babysitter plugin preconditions |
-| `npm run test:model-backed:runtime` | Model-backed | Agent-core, transport-mux, agent-mux session smoke, and babysitter-agent runtime smoke; babysitter-agent jobs do not run installers |
+| `npm run test:model-backed:runtime` | Model-backed | Agent-core, transport-mux bridge, agent-mux session smoke, and babysitter-agent runtime smoke; babysitter-agent jobs do not run installers |
+| `npm run test:model-backed:transport-mux` | Model-backed | Agent-core stream through transport-mux plus agent-mux-launched external harness proxy smoke with credential gates |
 | `npm run coverage:repo` | No-model plus reports | Merge package coverage and scenario summaries into one artifact |
 
 Initial workflow implementation can call package-local commands directly. These bundle names become useful once at least two packages share a lane.

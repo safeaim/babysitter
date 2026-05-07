@@ -15,7 +15,7 @@ No-model tests must run without provider secrets, paid model calls, or installed
 | Scope | Primary tools | What it covers | CI timing |
 | --- | --- | --- | --- |
 | Package unit tests | Vitest | Pure functions, schema parsing, protocol serialization, command helpers, state machines | Every PR and push |
-| Contract tests | Vitest + fixtures | Stable boundaries between SDK, hooks-mux, agent-mux, transport-mux, agent-core, and babysitter-agent | Every PR and push |
+| Contract tests | Vitest + fixtures | Stable boundaries between SDK, hooks-mux, agent-mux, transport-mux, agent-core, and babysitter-agent, including transport-mux route matrix and runtime env injection contracts | Every PR and push |
 | Mock harness tests | Vitest + existing mock adapters | Session lifecycle, adapter dispatch, tool-call translation, stop-hook semantics, plugin discovery, fallback metadata | Every PR and push |
 | Browser/UI E2E | Playwright + mock gateway | Agent-mux WebUI session flows, transcript rendering, model picker behavior, approvals, reconnect behavior | PRs touching WebUI/gateway/session code; staging before publish |
 | CLI smoke tests | Node subprocess tests | `babysitter`, `amux`, hooks-mux CLI, package entrypoints, help output, dry-run paths | Every PR for touched packages; staging before publish |
@@ -33,9 +33,22 @@ Model-backed tests exercise real provider integrations, real installed harnesses
 | Agent-mux plugin/session E2E | Provider secrets, installed external CLI, and plugin precondition where supported | `amux run` or `createClient().run` starts a session, plugin command creates a Babysitter run, and hooks/process lifecycle are asserted | Scheduled, manual, staging gate |
 | Babysitter-agent live orchestration | Preinstalled/mocked backend plus `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or configured cloud equivalents where needed | `@a5c-ai/babysitter-agent` can plan, execute, post task results, and close a run without executing harness installer commands | Staging, release candidate, manual |
 | Agent-mux live adapters | Provider-specific credentials | Claude Code and Codex adapters produce protocol events that match the mux contracts | Scheduled, manual, release candidate |
-| Transport-mux live transport | Local process ports plus provider/harness credentials | Transport-mux can carry real session traffic between CLI/runtime/gateway boundaries | Scheduled, manual, release candidate |
+| Transport-mux live transport | Local process ports plus provider/harness credentials | Transport-mux carries real agent-core streams and agent-mux-launched external harness traffic through proxy routes with redacted launch/env/metrics artifacts | Scheduled, manual, staging gate after quarantine, release candidate |
 
 Model-backed tests must be opt-in by environment detection. A missing credential should mark the lane skipped or not scheduled, not silently pass a test that claims provider coverage.
+
+## Transport-Mux Lane Split
+
+Transport-mux scenarios must be split across both lanes instead of hidden inside broad mux smoke tests.
+
+| Scenario | Lane | Why it belongs there |
+| --- | --- | --- |
+| Route/codec matrix for supported transports | No-model | A fixture completion engine can prove request parsing, response envelopes, streaming shape, auth errors, invalid JSON, and token-count behavior deterministically |
+| Runtime lifecycle and env injection | No-model | Local ports and redacted env diffs do not require provider credentials |
+| Agent-mux launch proxy decision | No-model | `resolveLaunchPlan` can prove proxy forced/if-needed/native/forbidden behavior with fixture provider configs |
+| Agent-core through transport-mux | Both | Fixture stream belongs in no-model; live provider stream belongs in model-backed when credentials exist |
+| External harness through agent-mux proxy | Model-backed | Only a real harness plus provider credential can prove the harness actually consumes the proxy env and completes a sentinel stream |
+| Passthrough upstream bridge | No-model first, model-backed optional | Path/query/auth/error mapping is deterministic with a fixture upstream; live passthrough only adds value for provider-specific drift |
 
 ## Required Labels
 

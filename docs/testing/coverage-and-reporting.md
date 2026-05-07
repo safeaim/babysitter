@@ -81,9 +81,19 @@ Scenario coverage is separate from line coverage. It tracks whether critical use
 | Codex SDK setup | Dry-run harness/plugin installer JSON | Capability-gated live setup or documented skip; do not claim agent-mux plugin-manager support unless adapter capability allows it |
 | Claude Code SDK setup | Dry-run harness/plugin installer JSON | Live setup artifact plus installed plugin manifest where selected |
 | Agent-mux adapter/session protocol | Fixture transcript through adapter tests | Live Codex/Claude session event comparison via `amux run` or SDK `createClient().run` |
-| Transport-mux roundtrip | Local fixture stream and cancellation tests | Live harness or agent-core stream through transport |
+| Transport-mux route/runtime bridge | Local route matrix, env injection, launch-plan proxy decisions, fixture stream, passthrough, metrics/cache, and cancellation tests | Live agent-core stream through transport plus agent-mux-launched external harness proxy stream with redacted launch/env/metrics artifacts |
 | Babysitter-agent runtime orchestration | Mock planner/executor run journal | Bounded model-backed process run with no installer commands |
 | Babysitter plugin through agent-mux | Mock plugin command and hook events | Capability-gated `amux run` session where `/babysitter:call` creates and completes a Babysitter run |
 | Hooks mux normalization | Raw hook fixture normalizer tests | Redacted live hook payload replay |
+
+Transport-mux scenario coverage should be reported as separate checklist rows, not collapsed into generic mux coverage:
+
+- supported route/codec matrix for every exposed transport,
+- runtime env injection and proxy auth,
+- agent-mux launch proxy decision matrix,
+- fixture stream cancellation/timeout/reconnect behavior,
+- passthrough path/query/upstream failure behavior,
+- live agent-core stream bridge,
+- live external harness bridge through `amux launch --with-proxy*`.
 
 A coverage summary should show scenario coverage as a checklist, not as a percentage that hides missing live evidence.

@@ -15,9 +15,9 @@ This roadmap turns the strategy into implementation slices. Each slice must land
 | 0. Inventory and naming | CI maintainers | No-model | Every current test command is mapped to a package, lane, scope, and artifact name | Documentation only, then CI workflow comments |
 | 1. Mock and fixture contracts | Runtime maintainers | No-model | Mock Codex, Claude Code, agent-core, and gateway transcripts are shared by unit, integration, and UI tests | PR/push CI |
 | 2. SDK harness/plugin setup smoke | SDK and harness maintainers | No-model | `harness:install --dry-run`, `harness:install-plugin --dry-run`, and plugin discovery produce JSON evidence without claiming babysitter-agent runtime coverage | PR/push CI |
-| 3. Mux integration matrix | Agent-mux maintainers | No-model | Transport-mux, agent-mux gateway, adapters, and WebUI run against the same fixture sessions | PR/push CI and staging |
+| 3. Mux integration matrix | Agent-mux maintainers | No-model | Transport-mux route/runtime/env/launch-plan coverage, agent-mux gateway, adapters, and WebUI run against compatible fixture sessions | PR/push CI and staging |
 | 4. Minimal live harness smoke | Harness maintainers | Model-backed | Codex and Claude Code each return a deterministic sentinel token with redacted artifacts | Scheduled and manual, then staging |
-| 5. Split live E2E smokes | Runtime and mux maintainers | Model-backed | Agent-mux plugin/session smoke uses `amux run` plus plugin preconditions; babysitter-agent runtime smoke uses `babysitter-agent call/create-run` with no installer steps | Staging and release candidate |
+| 5. Split live E2E smokes | Runtime and mux maintainers | Model-backed | Agent-mux plugin/session smoke uses `amux run` plus plugin preconditions; transport-mux bridge smoke proves agent-core and external-harness proxy paths; babysitter-agent runtime smoke uses `babysitter-agent call/create-run` with no installer steps | Staging and release candidate |
 | 6. Coverage aggregation | CI maintainers | Both | Package coverage, Playwright traces, and live-run summaries merge into one workflow summary | PR/push for no-model, scheduled for live |
 
 ## Definition Of Done Per Slice
@@ -37,9 +37,11 @@ A slice is complete only when it includes:
 1. Add labels and artifact naming to current CI jobs without changing behavior.
 2. Add no-model harness dry-run tests for Codex and Claude Code.
 3. Add shared fixture transcript format and migrate one agent-mux test to consume it.
-4. Add transport-mux local integration scenarios for fixture and agent-core event streams.
-5. Add scheduled model-backed workflow behind explicit secret guards.
-6. Promote the smallest stable model-backed smoke into staging preflight.
+4. Add transport-mux local route/codec, env-injection, passthrough, metrics/cache, and launch-plan proxy-decision scenarios.
+5. Add transport-mux fixture and agent-core event stream replay scenarios.
+6. Add scheduled model-backed workflow behind explicit secret guards.
+7. Add credential-gated transport-mux bridge smoke for agent-core and one external harness through `amux launch --with-proxy*`.
+8. Promote the smallest stable model-backed smoke into staging preflight.
 
 ## Stop Conditions
 

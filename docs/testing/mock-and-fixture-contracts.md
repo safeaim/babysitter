@@ -15,9 +15,11 @@ No-model tests are only valuable if their mocks describe the same contracts live
 | Harness discovery | Babysitter CLI | Harness setup tests, docs snippets, CI summaries | Harness name, installed flag, capabilities, version when available, redacted paths |
 | Codex transcript | Codex adapter or fixture generator | Agent-mux adapters, transport-mux, WebUI, babysitter-agent | Prompt, text deltas, final message, status, usage if safe, error envelope |
 | Claude Code transcript | Claude Code adapter or fixture generator | Agent-mux adapters, transport-mux, WebUI, babysitter-agent | Prompt, text deltas, tool-call events, stop reason, final message, error envelope |
-| Agent-core event stream | Agent-core tests | Transport-mux, babysitter-agent, agent-mux gateway | Session start, deltas, tool calls, cancellation, completion, usage |
+| Agent-core event stream | Agent-core tests | Transport-mux, babysitter-agent, agent-mux gateway | Session start, deltas, tool calls, cancellation, completion, usage, transport replay metadata |
 | Run journal | Core SDK and babysitter-agent tests | Journal rebuild/repair, observer, docs reporting, babysitter-agent runtime | Run created, effect requested, task posted, run completed, artifact references |
 | Babysitter plugin session | Agent-mux plugin/session tests | Agent-mux plugin E2E, hooks-mux, SDK run-loop checks | Plugin command text, originating agent, Babysitter run ID, terminal state, stop-hook evidence |
+| Transport-mux route transcript | Transport-mux tests | Transport-mux route/codec tests, agent-mux launch tests, coverage summaries | Exposed transport, route, request class, status, response envelope, streaming flag, auth result, metrics delta, redaction status |
+| Transport-mux launch/env artifact | Agent-mux launch tests | Agent-mux CLI, transport-mux runtime, pipeline summaries | Harness, provider, `proxyNeeded`, `proxyReason`, exposed transport, redacted proxy URL/token fields, changed env keys |
 | Hook event | Hooks mux adapters | Hooks-mux CLI/core, agent-mux UI, plugin compiler | Normalized hook input, adapter raw input, expected normalized output |
 
 ## Contract Rules
@@ -67,8 +69,8 @@ Every promoted model-backed scenario should either update or confirm a no-model 
 | --- | --- |
 | Codex sentinel prompt | Compare emitted event types and final message shape with Codex transcript fixture schema |
 | Claude Code sentinel prompt | Compare text/tool/final event ordering with Claude Code transcript fixture schema |
-| Transport-mux + Claude Code | Save redacted stream metadata and assert it can be replayed through transport-mux parser tests |
-| Transport-mux + agent-core | Compare agent-core event sequence with the committed agent-core event stream fixture |
+| Transport-mux + external harness through agent-mux | Save redacted launch-plan, env diff, route transcript, stream metadata, and metrics snapshot; assert they can be replayed through transport-mux parser tests |
+| Transport-mux + agent-core | Compare agent-core event sequence with the committed agent-core event stream fixture and include transport replay metadata |
 | Babysitter-agent bounded process | Compare journal lifecycle with run journal fixture: create, effect, post, terminal state; confirm no installer commands were part of the runtime test |
 | Babysitter plugin through agent-mux | Compare plugin command, agent-mux session events, Babysitter run ID, and stop-hook evidence with the plugin session fixture |
 | Hooks mux live payload | Redact and replay payload through hooks-mux adapter normalizer tests |

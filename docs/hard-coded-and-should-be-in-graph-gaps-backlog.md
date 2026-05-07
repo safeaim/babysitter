@@ -49,6 +49,23 @@ Discovery specs now read `callerEnvVars` and `configPaths` from Atlas PluginTarg
 
 These are **code dispatches**, not data lookups. Each adapter file (`claude-adapter.ts`, `codex-adapter.ts`) must identify itself. A registry pattern could replace the switch statements but the individual adapter imports would still be hardcoded.
 
+### P5.4 — `BuiltInAgentName` type (packages/agent-mux/core/src/types.ts)
+- **What:** `type BuiltInAgentName = 'claude' | 'codex' | 'droid' | 'amp' | 'gemini' | 'copilot' | 'cursor' | 'opencode' | 'pi' | 'omp' | ...`
+- **Note:** `AgentName = BuiltInAgentName | (string & {})` already accepts any string. The union is for IDE autocomplete only.
+- **Fix:** Could be generated at build time from Atlas. Low priority since the `(string & {})` fallback makes it non-breaking.
+- **Status:** 🟡 Low priority — autocomplete convenience only
+
+### P5.5 — `translateForHarness` switch (packages/agent-mux/adapters/src/translate-for-harness.ts)
+- **What:** Switch on agent name dispatching to per-harness translation functions
+- **Note:** Each translation is different code logic (claude, codex, gemini, opencode each have unique provider translation). Cannot be data-driven.
+- **Status:** ⬜ By design — code dispatch
+
+### P5.6 — Adapter self-identification (packages/agent-mux/adapters/src/*-adapter.ts)
+- **What:** Each adapter class has `readonly agent = 'claude'`, `readonly cliCommand = 'claude'`, etc.
+- **Note:** 26 adapter files with hardcoded identity. Could read from catalog at construction but adds complexity for no functional benefit.
+- **Fix:** Could accept `agent` and `cliCommand` as constructor params sourced from catalog. Marginal value.
+- **Status:** ⬜ By design — adapter self-identity
+
 ## Priority 6: Scripts and CI — 🟡 Mostly Complete
 
 | Item | Status | Note |
@@ -75,7 +92,7 @@ These are **code dispatches**, not data lookups. Each adapter file (`claude-adap
 | P2 — Type definitions | 2 | 2 ✅ | 0 |
 | P3 — Special cases | 4 | 4 ✅ | 0 |
 | P4 — Env vars / paths | 2 | 2 ✅ | 0 |
-| P5 — agent-mux dispatch | 3 | 0 (by design) | 0 |
+| P5 — agent-mux dispatch | 6 | 0 (by design) | 1 low-pri (BuiltInAgentName) |
 | P6 — Scripts / CI | 4 | 3 ✅ | 1 (P6.3) |
 | P7 — Tests | 2 | 2 ✅ | 0 |
 | **Total** | **21** | **17 ✅** | **1 remaining + 3 by-design** |

@@ -4,7 +4,7 @@ attributes:
   displayName: "Explore (Claude Code)"
   provenance: built-in
   dispatchPattern: task-tool
-  subjectId: agent-version:claude-code@1.x
+  subjectId: agentVersion:claude:ge-0-0-0
   roleId: role:explorer
   systemPrompt: |
     Read-only codebase exploration subagent bundled with Claude Code.

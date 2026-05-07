@@ -14,7 +14,7 @@ attributes:
     Platform-wide content rules applied to every agent run.
 edges:
   applied_by:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
   detects_jailbreak:
     - target: jailbreak:dan
     - target: jailbreak:prompt-injection-indirect
@@ -35,7 +35,7 @@ attributes:
     for enterprise tenants.
 edges:
   applied_by:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
 ---
 nodeKind: ContentPolicy
 id: content-policy:eu-ai-act-aligned
@@ -51,4 +51,4 @@ attributes:
     Content rules derived from EU AI Act prohibited and high-risk categories.
 edges:
   applied_by:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0

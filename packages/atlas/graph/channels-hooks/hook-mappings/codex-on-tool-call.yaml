@@ -3,7 +3,7 @@ id: hook-mapping:pre-tool-use-codex
 attributes:
   mappingId: hook-mapping:pre-tool-use-codex
   hookId: hook-surface:pre-tool-use
-  targetId: agent-version:codex@1.x
+  targetId: agentVersion:codex:ge-0-119-0
   nativeName: OnToolCall
   versionRange: ">=1.0.0"
   requiresRuntimeHooks: true
@@ -19,4 +19,4 @@ edges:
   maps_hook:
     - target: hook-surface:pre-tool-use
   emits_hook:
-    - target: agent-version:codex@1.x
+    - target: agentVersion:codex:ge-0-119-0

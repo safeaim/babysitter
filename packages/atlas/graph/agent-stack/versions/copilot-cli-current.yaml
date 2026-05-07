@@ -4,6 +4,7 @@ attributes:
   agentId: "copilot"
   aliases:
     - "github-copilot"
+    - "copilot-cli"
   runtimeFamily: "cli-harness"
   releaseChannel: "stable"
   displayName: "GitHub Copilot CLI"

@@ -35,20 +35,20 @@ aliases:
 
   # ─────────────────────────────────────────────────────────────────
   # NodeKind: AgentVersion
-  # legacy: `agentVersion:<slug>:ge-X-Y-Z[-lt-A-B-C]`
-  # v6:     `agent-version:<slug>@<range>` (kebab + @semver suffix)
+  # legacy: `agent-version:<slug>@<range>` (kebab + @semver suffix)
+  # v6:     `agentVersion:<slug>:ge-X-Y-Z[-lt-A-B-C]`
   # ─────────────────────────────────────────────────────────────────
-  - { legacyId: "agentVersion:babysitter-agent:ge-5-0-0",          v6Id: "agent-version:babysitter-agent@current",  nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:claude:ge-0-0-0",                    v6Id: "agent-version:claude-code@1.x",            nodeKind: AgentVersion, notes: "host rename + range collapse" }
-  - { legacyId: "agentVersion:codex:ge-0-0-0-lt-0-119-0",          v6Id: "agent-version:codex@1.x",                  nodeKind: AgentVersion, notes: "legacy splits codex < 0.119; v6 collapses to 1.x" }
-  - { legacyId: "agentVersion:codex:ge-0-119-0",                   v6Id: "agent-version:codex@1.x",                  nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:copilot:ge-0-0-0",                   v6Id: "agent-version:copilot-cli@current",        nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:cursor:ge-0-0-0",                    v6Id: "agent-version:cursor@current",             nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:gemini:ge-0-0-0",                    v6Id: "agent-version:gemini-cli@current",         nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:omp:ge-0-0-0",                       v6Id: "agent-version:omp@current",                nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:openclaw:ge-0-0-0",                  v6Id: "agent-version:openclaw@current",           nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:opencode:ge-0-0-0",                  v6Id: "agent-version:opencode@1.x",               nodeKind: AgentVersion }
-  - { legacyId: "agentVersion:pi:ge-0-0-0",                        v6Id: "agent-version:pi@current",                 nodeKind: AgentVersion }
+  - { legacyId: "agent-version:babysitter-agent@current",  v6Id: "agentVersion:babysitter-agent:ge-5-0-0",          nodeKind: AgentVersion }
+  - { legacyId: "agent-version:claude-code@1.x",            v6Id: "agentVersion:claude:ge-0-0-0",                    nodeKind: AgentVersion, notes: "host rename + range collapse" }
+  - { legacyId: "agent-version:codex@1.x",                  v6Id: "agentVersion:codex:ge-0-0-0-lt-0-119-0",          nodeKind: AgentVersion, notes: "v6 splits codex < 0.119; legacy collapsed to 1.x" }
+  - { legacyId: "agent-version:codex@1.x",                  v6Id: "agentVersion:codex:ge-0-119-0",                   nodeKind: AgentVersion }
+  - { legacyId: "agent-version:copilot-cli@current",        v6Id: "agentVersion:copilot:ge-0-0-0",                   nodeKind: AgentVersion }
+  - { legacyId: "agent-version:cursor@current",             v6Id: "agentVersion:cursor:ge-0-0-0",                    nodeKind: AgentVersion }
+  - { legacyId: "agent-version:gemini-cli@current",         v6Id: "agentVersion:gemini:ge-0-0-0",                    nodeKind: AgentVersion }
+  - { legacyId: "agent-version:omp@current",                v6Id: "agentVersion:omp:ge-0-0-0",                       nodeKind: AgentVersion }
+  - { legacyId: "agent-version:openclaw@current",           v6Id: "agentVersion:openclaw:ge-0-0-0",                  nodeKind: AgentVersion }
+  - { legacyId: "agent-version:opencode@1.x",               v6Id: "agentVersion:opencode:ge-0-0-0",                  nodeKind: AgentVersion }
+  - { legacyId: "agent-version:pi@current",                 v6Id: "agentVersion:pi:ge-0-0-0",                        nodeKind: AgentVersion }
 
   # ─────────────────────────────────────────────────────────────────
   # NodeKind: PluginTarget (mux generator critical)

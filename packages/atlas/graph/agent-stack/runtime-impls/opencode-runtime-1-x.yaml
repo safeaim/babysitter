@@ -2,7 +2,7 @@ nodeKind: AgentRuntimeImpl
 id: agent-runtime-impl:opencode.runtime@1.x
 attributes:
   displayName: OpenCode Runtime (1.x)
-  agentVersionId: agent-version:opencode@1.x
+  agentVersionId: agentVersion:opencode:ge-0-0-0
   subagentDispatchMechanism: task-tool
   subagentChildSessionPolicy: ephemeral-child-session
   subagentToolScopePolicy: inherit-parent

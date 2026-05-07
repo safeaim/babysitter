@@ -2,7 +2,7 @@ nodeKind: AgentRuntimeImpl
 id: agent-runtime-impl:babysitter-agent.runtime@current
 attributes:
   displayName: "babysitter-agent Runtime (current) — SDK runtime + daemon"
-  agentVersionId: agent-version:babysitter-agent@current
+  agentVersionId: agentVersion:babysitter-agent:ge-5-0-0
   packageRef: source-ref:babysitter-github
   subagentDispatchMechanism: agent-as-tool
   subagentChildSessionPolicy: persistent-child-session

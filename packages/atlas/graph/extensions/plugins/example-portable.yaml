@@ -30,8 +30,8 @@ edges:
   ships_settings:
     - target: settings-template:plugin-defaults
   compiles_to:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
   implements:
     - target: extension-interface:reliability
     - target: extension-interface:reflection

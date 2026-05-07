@@ -2,7 +2,7 @@ nodeKind: AgentPlatformImpl
 id: agent-platform-impl:cursor.platform@current
 attributes:
   displayName: Cursor Platform (current)
-  agentVersionId: agent-version:cursor@current
+  agentVersionId: agentVersion:cursor:ge-0-0-0
   subagentDefinitionFormat: none
   packageRef: source-ref:cursor-binary
   nativeExtensionFormat: none

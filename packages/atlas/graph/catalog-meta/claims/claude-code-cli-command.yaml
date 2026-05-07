@@ -7,7 +7,7 @@ attributes:
   provenanceKind: "vendor-doc"
   evidenceStrength: "strong"
   status: "accepted"
-  subjectId: agent-version:claude-code@1.x
+  subjectId: agentVersion:claude:ge-0-0-0
   attribute: cliCommand
   value: "claude"
   evidenceSourceIds:
@@ -16,6 +16,6 @@ attributes:
   claimedBy: a5c-ai-team
 edges:
   about_subject:
-    - agent-version:claude-code@1.x
+    - agentVersion:claude:ge-0-0-0
   backed_by_evidence:
     - evidence:anthropic-models-doc

@@ -2,7 +2,7 @@ nodeKind: AgentUIImpl
 id: agent-ui-impl:cursor.ui@current
 attributes:
   displayName: "Cursor UI (current) — ide-extension"
-  agentVersionId: agent-version:cursor@current
+  agentVersionId: agentVersion:cursor:ge-0-0-0
   packageRef: source-ref:cursor-binary
   uiKind: ide-extension
   presentationsBundled:

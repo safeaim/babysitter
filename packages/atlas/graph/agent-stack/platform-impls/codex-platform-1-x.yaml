@@ -2,7 +2,7 @@ nodeKind: AgentPlatformImpl
 id: agent-platform-impl:codex.platform@1.x
 attributes:
   displayName: Codex CLI Platform (1.x)
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   subagentDefinitionFormat: none
   packageRef: source-ref:codex-github
   nativeExtensionFormat: codex-extension

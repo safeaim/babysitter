@@ -4,7 +4,7 @@ id: subagent:openai-agents-sdk.triage
 attributes:
   displayName: "Triage Agent (OpenAI Agents SDK example)"
   provenance: built-in
-  subjectId: agent-version:codex@1.x
+  subjectId: agentVersion:codex:ge-0-119-0
   roleId: role:planner
   systemPrompt: |
     Canonical example agent from the OpenAI Agents SDK quickstart. Acts
@@ -28,7 +28,7 @@ id: subagent:openai-agents-sdk.guardrail
 attributes:
   displayName: "Guardrail Agent (OpenAI Agents SDK example)"
   provenance: built-in
-  subjectId: agent-version:codex@1.x
+  subjectId: agentVersion:codex:ge-0-119-0
   roleId: role:code-reviewer
   systemPrompt: |
     Canonical guardrail agent example from the OpenAI Agents SDK. Runs

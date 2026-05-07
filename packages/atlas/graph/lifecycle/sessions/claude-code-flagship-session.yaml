@@ -2,7 +2,7 @@ nodeKind: Session
 id: session:claude-code-flagship-example
 attributes:
   lastActivityAt: "2026-04-30T12:00:00Z"
-  agentVersionId: agent-version:claude-code@1.x
+  agentVersionId: agentVersion:claude:ge-0-0-0
   format: jsonl
   filePath: ".a5c/runs/claude-code-flagship/sessions/01KQEX-FLAGSHIP-001.jsonl"
   createdAt: "2026-04-30T11:30:00Z"
@@ -15,7 +15,7 @@ edges:
   governed_by:
     - state-machine:session
   agent_version:
-    - agent-version:claude-code@1.x
+    - agentVersion:claude:ge-0-0-0
   persists_transcript_to:
     - target: transcript-ingress:claude-code-claude-ai
   has_worktree_session:

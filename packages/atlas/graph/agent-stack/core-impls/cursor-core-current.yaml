@@ -2,7 +2,7 @@ nodeKind: AgentCoreImpl
 id: agent-core-impl:cursor.core@current
 attributes:
   displayName: Cursor Core (current)
-  agentVersionId: agent-version:cursor@current
+  agentVersionId: agentVersion:cursor:ge-0-0-0
   packageRef: source-ref:cursor-binary
   loopIteratorPolicy: tool-use-loop
   loopIteratorNotes: 'Cursor''s Composer/Agent runs a tool-use loop inside the IDE

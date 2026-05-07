@@ -3,14 +3,14 @@ id: eval-run:gaia.claude-code.2025
 attributes:
   benchmarkId: benchmark:gaia
   testSetId: test-set:gaia-validation
-  target: agent-version:claude-code@1.x
-  targetId: agent-version:claude-code@1.x
+  target: agentVersion:claude:ge-0-0-0
+  targetId: agentVersion:claude:ge-0-0-0
   runAt: "2025-06-01T00:00:00Z"
   runBy: "@a5c-ai/team"
   configHash: "sha256:placeholder-claude-code-gaia"
 edges:
   evaluates_target:
-    - agent-version:claude-code@1.x
+    - agentVersion:claude:ge-0-0-0
   uses_test_set:
     - test-set:gaia-validation
   for_benchmark:

@@ -16,6 +16,6 @@ attributes:
     - { key: session_id, envVars: [CURSOR_SESSION, CURSOR_AGENT_SESSION] }
 edges:
   applies_to_version:
-    - target: agent-version:cursor@current
+    - target: agentVersion:cursor:ge-0-0-0
   references_path:
     - target: path:a5c-runs-dir

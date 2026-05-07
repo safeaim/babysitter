@@ -2,7 +2,7 @@ nodeKind: AgentPlatformImpl
 id: agent-platform-impl:babysitter-agent.platform@current
 attributes:
   displayName: "babysitter-agent Platform (current) — defineTask + plugin/skill registry"
-  agentVersionId: agent-version:babysitter-agent@current
+  agentVersionId: agentVersion:babysitter-agent:ge-5-0-0
   packageRef: source-ref:babysitter-github
   subagentDefinitionFormat: js-module-export
   nativeExtensionFormat: babysitter-plugin

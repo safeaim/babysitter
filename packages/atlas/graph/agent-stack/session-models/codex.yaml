@@ -1,7 +1,7 @@
 nodeKind: SessionModel
 id: session-model:codex
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   persistence: file
   controlPlane: self-managed
   structuredTransport: restart-per-turn

@@ -2,7 +2,7 @@ nodeKind: AgentRuntimeImpl
 id: agent-runtime-impl:codex.runtime@1.x
 attributes:
   displayName: Codex CLI Runtime (1.x)
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   subagentDispatchMechanism: handoff
   subagentChildSessionPolicy: ephemeral-child-session
   subagentToolScopePolicy: inherit-parent

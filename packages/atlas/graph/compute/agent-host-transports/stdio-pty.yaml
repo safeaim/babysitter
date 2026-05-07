@@ -29,5 +29,5 @@ attributes:
     characters all behave as on a real terminal.
 edges:
   used_by:
-    - agent-version:claude-code@1.x
-    - agent-version:cursor@current
+    - agentVersion:claude:ge-0-0-0
+    - agentVersion:cursor:ge-0-0-0

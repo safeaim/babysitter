@@ -3,7 +3,7 @@ id: subagent:planner
 attributes:
   displayName: "Planner"
   provenance: built-in
-  subjectId: agent-version:claude-code@1.x
+  subjectId: agentVersion:claude:ge-0-0-0
   roleId: role:planner
   systemPrompt: |
     You convert a goal into a numbered, verifiable plan. Each step has a

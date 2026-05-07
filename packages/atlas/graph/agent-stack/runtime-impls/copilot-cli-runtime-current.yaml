@@ -2,7 +2,7 @@ nodeKind: AgentRuntimeImpl
 id: agent-runtime-impl:copilot-cli.runtime@current
 attributes:
   displayName: GitHub Copilot CLI Runtime (current)
-  agentVersionId: agent-version:copilot-cli@current
+  agentVersionId: agentVersion:copilot:ge-0-0-0
   subagentDispatchMechanism: none
   subagentChildSessionPolicy: inline-no-child-session
   subagentToolScopePolicy: inherit-parent

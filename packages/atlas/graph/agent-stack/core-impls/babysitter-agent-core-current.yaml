@@ -2,7 +2,7 @@ nodeKind: AgentCoreImpl
 id: agent-core-impl:babysitter-agent.core@current
 attributes:
   displayName: "babysitter-agent Core (current) — SDK-backed CLI loop"
-  agentVersionId: agent-version:babysitter-agent@current
+  agentVersionId: agentVersion:babysitter-agent:ge-5-0-0
   packageRef: source-ref:babysitter-github
   loopIteratorPolicy: process-function-driven
   loopIteratorNotes: |

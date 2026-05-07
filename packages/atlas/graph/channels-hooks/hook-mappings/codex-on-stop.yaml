@@ -3,7 +3,7 @@ id: hook-mapping:stop-codex
 attributes:
   mappingId: hook-mapping:stop-codex
   hookId: hook-surface:stop
-  targetId: agent-version:codex@1.x
+  targetId: agentVersion:codex:ge-0-119-0
   nativeName: OnStop
   versionRange: ">=0.119.0"
   requiresRuntimeHooks: true
@@ -19,4 +19,4 @@ edges:
   maps_hook:
     - target: hook-surface:stop
   emits_hook:
-    - target: agent-version:codex@1.x
+    - target: agentVersion:codex:ge-0-119-0

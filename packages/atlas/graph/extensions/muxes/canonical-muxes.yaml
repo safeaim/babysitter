@@ -79,15 +79,15 @@ edges:
   bridges_protocol_type:
     - target: layer:8-execution
   bridges_for:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
-    - target: agent-version:cursor@current
-    - target: agent-version:gemini-cli@current
-    - target: agent-version:opencode@1.x
-    - target: agent-version:copilot-cli@current
-    - target: agent-version:pi@current
-    - target: agent-version:omp@current
-    - target: agent-version:openclaw@current
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
+    - target: agentVersion:cursor:ge-0-0-0
+    - target: agentVersion:gemini:ge-0-0-0
+    - target: agentVersion:opencode:ge-0-0-0
+    - target: agentVersion:copilot:ge-0-0-0
+    - target: agentVersion:pi:ge-0-0-0
+    - target: agentVersion:omp:ge-0-0-0
+    - target: agentVersion:openclaw:ge-0-0-0
     - target: agent-version:hermes@current
     - target: agent-version:qwen@current
     - target: agent-version:droid@current
@@ -134,15 +134,15 @@ edges:
   bridges_protocol_type:
     - target: layer:6-agent-platform
   bridges_for:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
-    - target: agent-version:cursor@current
-    - target: agent-version:gemini-cli@current
-    - target: agent-version:opencode@1.x
-    - target: agent-version:copilot-cli@current
-    - target: agent-version:pi@current
-    - target: agent-version:omp@current
-    - target: agent-version:openclaw@current
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
+    - target: agentVersion:cursor:ge-0-0-0
+    - target: agentVersion:gemini:ge-0-0-0
+    - target: agentVersion:opencode:ge-0-0-0
+    - target: agentVersion:copilot:ge-0-0-0
+    - target: agentVersion:pi:ge-0-0-0
+    - target: agentVersion:omp:ge-0-0-0
+    - target: agentVersion:openclaw:ge-0-0-0
     - target: agent-version:hermes@current
 ---
 nodeKind: Mux
@@ -177,11 +177,11 @@ edges:
   bridges_protocol_type:
     - target: layer:6-agent-platform
   bridges_for:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
-    - target: agent-version:cursor@current
-    - target: agent-version:gemini-cli@current
-    - target: agent-version:opencode@1.x
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
+    - target: agentVersion:cursor:ge-0-0-0
+    - target: agentVersion:gemini:ge-0-0-0
+    - target: agentVersion:opencode:ge-0-0-0
 ---
 nodeKind: Mux
 id: mux:agent-config-mux
@@ -214,12 +214,12 @@ edges:
   bridges_protocol_type:
     - target: layer:6-agent-platform
   bridges_for:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
-    - target: agent-version:cursor@current
-    - target: agent-version:gemini-cli@current
-    - target: agent-version:opencode@1.x
-    - target: agent-version:copilot-cli@current
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
+    - target: agentVersion:cursor:ge-0-0-0
+    - target: agentVersion:gemini:ge-0-0-0
+    - target: agentVersion:opencode:ge-0-0-0
+    - target: agentVersion:copilot:ge-0-0-0
 ---
 nodeKind: Mux
 id: mux:hooks-mux
@@ -258,15 +258,15 @@ edges:
   bridges_protocol_type:
     - target: layer:5-agent-runtime
   bridges_for:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
-    - target: agent-version:cursor@current
-    - target: agent-version:gemini-cli@current
-    - target: agent-version:opencode@1.x
-    - target: agent-version:copilot-cli@current
-    - target: agent-version:pi@current
-    - target: agent-version:omp@current
-    - target: agent-version:openclaw@current
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
+    - target: agentVersion:cursor:ge-0-0-0
+    - target: agentVersion:gemini:ge-0-0-0
+    - target: agentVersion:opencode:ge-0-0-0
+    - target: agentVersion:copilot:ge-0-0-0
+    - target: agentVersion:pi:ge-0-0-0
+    - target: agentVersion:omp:ge-0-0-0
+    - target: agentVersion:openclaw:ge-0-0-0
     - target: agent-version:hermes@current
 ---
 nodeKind: Mux
@@ -303,12 +303,12 @@ edges:
   bridges_protocol_type:
     - target: layer:6-agent-platform
   bridges_for:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
-    - target: agent-version:cursor@current
-    - target: agent-version:opencode@1.x
-    - target: agent-version:pi@current
-    - target: agent-version:omp@current
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
+    - target: agentVersion:cursor:ge-0-0-0
+    - target: agentVersion:opencode:ge-0-0-0
+    - target: agentVersion:pi:ge-0-0-0
+    - target: agentVersion:omp:ge-0-0-0
 ---
 nodeKind: Mux
 id: mux:tool-mux
@@ -346,11 +346,11 @@ edges:
   bridges_protocol_type:
     - target: layer:5-agent-runtime
   bridges_for:
-    - target: agent-version:claude-code@1.x
-    - target: agent-version:codex@1.x
-    - target: agent-version:cursor@current
-    - target: agent-version:gemini-cli@current
-    - target: agent-version:opencode@1.x
+    - target: agentVersion:claude:ge-0-0-0
+    - target: agentVersion:codex:ge-0-119-0
+    - target: agentVersion:cursor:ge-0-0-0
+    - target: agentVersion:gemini:ge-0-0-0
+    - target: agentVersion:opencode:ge-0-0-0
 ---
 nodeKind: Mux
 id: mux:tasks-mux
@@ -390,5 +390,5 @@ edges:
   bridges_protocol_type:
     - target: layer:6-agent-platform
   bridges_for:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
     - target: agent-version:babysitter@current

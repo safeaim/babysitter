@@ -25,7 +25,7 @@ edges:
   targets_tracker:
     - target: issue-tracker:linear
   invokes_agent:
-    - target: agent-version:codex@1.x
+    - target: agentVersion:codex:ge-0-119-0
   applies_secret_policy:
     - target: secret-handling:no-secrets-in-prompts
     - target: secret-handling:explicit-injection
@@ -55,4 +55,4 @@ edges:
   targets_tracker:
     - target: issue-tracker:github-issues
   invokes_agent:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0

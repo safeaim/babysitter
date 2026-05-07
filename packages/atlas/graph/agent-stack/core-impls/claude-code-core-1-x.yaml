@@ -2,7 +2,7 @@ nodeKind: AgentCoreImpl
 id: agent-core-impl:claude-code.core@1.x
 attributes:
   displayName: Claude Code Core (1.x)
-  agentVersionId: agent-version:claude-code@1.x
+  agentVersionId: agentVersion:claude:ge-0-0-0
   packageRef: source-ref:claude-code-github
   loopIteratorPolicy: tool-use-loop
   loopIteratorNotes: 'Tool-use loop: each turn the model emits zero or more `tool_use`

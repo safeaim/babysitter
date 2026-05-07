@@ -3,7 +3,7 @@ id: hook-mapping:pre-tool-use-claude-code
 attributes:
   mappingId: hook-mapping:pre-tool-use-claude-code
   hookId: hook-surface:pre-tool-use
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: PreToolUse
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -27,4 +27,4 @@ edges:
   maps_hook:
     - target: hook-surface:pre-tool-use
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0

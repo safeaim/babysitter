@@ -2,7 +2,7 @@ nodeKind: AgentCoreImpl
 id: agent-core-impl:codex.core@1.x
 attributes:
   displayName: Codex CLI Core (1.x)
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   packageRef: source-ref:codex-github
   loopIteratorPolicy: tool-use-loop
   loopIteratorNotes: 'Tool-use loop driven by the OpenAI Responses API. Each turn

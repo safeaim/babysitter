@@ -44,5 +44,5 @@ attributes:
     `agent-host-transport:stdio-pty` instead.
 edges:
   used_by:
-    - agent-version:claude-code@1.x
-    - agent-version:codex@1.x
+    - agentVersion:claude:ge-0-0-0
+    - agentVersion:codex:ge-0-119-0

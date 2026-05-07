@@ -1,7 +1,7 @@
 nodeKind: CapabilityProfile
 id: capability-profile:cursor.cli-permissive
 attributes:
-  agentVersionId: agent-version:cursor@current
+  agentVersionId: agentVersion:cursor:ge-0-0-0
   displayName: "Cursor (CLI permissive)"
   default: false
   description: |
@@ -18,4 +18,4 @@ attributes:
         trusted, sandboxed environments.
 edges:
   applies_to_version:
-    - agent-version:cursor@current
+    - agentVersion:cursor:ge-0-0-0

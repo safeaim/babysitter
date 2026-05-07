@@ -17,7 +17,7 @@ edges:
   canonicalized_to:
     - target: hook-surface:post-tool-use
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }
 ---
 nodeKind: HookSurface
@@ -36,7 +36,7 @@ edges:
   canonicalized_to:
     - target: hook-surface:stop
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }
 ---
 nodeKind: HookSurface
@@ -56,7 +56,7 @@ edges:
   canonicalized_to:
     - target: hook-surface:subagent-stop
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }
 ---
 nodeKind: HookSurface
@@ -76,7 +76,7 @@ edges:
   canonicalized_to:
     - target: hook-surface:notification
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }
 ---
 nodeKind: HookSurface
@@ -96,7 +96,7 @@ edges:
   canonicalized_to:
     - target: hook-surface:user-prompt-submit
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }
 ---
 nodeKind: HookSurface
@@ -116,7 +116,7 @@ edges:
   canonicalized_to:
     - target: hook-surface:pre-compact
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }
 ---
 nodeKind: HookSurface
@@ -133,7 +133,7 @@ attributes:
     Claude Code's SessionStart hook. Fires when a session begins.
 edges:
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }
 ---
 nodeKind: HookSurface
@@ -150,5 +150,5 @@ attributes:
     Claude Code's SessionEnd hook. Fires when a session terminates.
 edges:
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }

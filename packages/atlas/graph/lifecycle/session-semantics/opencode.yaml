@@ -18,6 +18,6 @@ attributes:
     - { key: run_id,     envVars: [OPENCODE_RUN_ID] }
 edges:
   applies_to_version:
-    - target: agent-version:opencode@1.x
+    - target: agentVersion:opencode:ge-0-0-0
   references_path:
     - target: path:a5c-runs-dir

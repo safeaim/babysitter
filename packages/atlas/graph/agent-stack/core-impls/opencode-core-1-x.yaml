@@ -2,7 +2,7 @@ nodeKind: AgentCoreImpl
 id: agent-core-impl:opencode.core@1.x
 attributes:
   displayName: OpenCode Core (1.x)
-  agentVersionId: agent-version:opencode@1.x
+  agentVersionId: agentVersion:opencode:ge-0-0-0
   packageRef: source-ref:opencode-github
   loopIteratorPolicy: tool-use-loop
   loopIteratorNotes: 'Tool-use loop driven by whichever provider OpenCode is configured

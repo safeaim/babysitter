@@ -1,7 +1,7 @@
 nodeKind: SessionModel
 id: session-model:claude-code
 attributes:
-  agentVersionId: agent-version:claude-code@1.x
+  agentVersionId: agentVersion:claude:ge-0-0-0
   persistence: file
   controlPlane: self-managed
   structuredTransport: persistent

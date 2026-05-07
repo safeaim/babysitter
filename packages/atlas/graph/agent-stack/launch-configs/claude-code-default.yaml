@@ -1,7 +1,7 @@
 nodeKind: LaunchConfig
 id: launch-config:claude-code.default
 attributes:
-  agentVersionId: agent-version:claude-code@1.x
+  agentVersionId: agentVersion:claude:ge-0-0-0
   displayName: "Claude Code (default)"
   model: model:claude-opus-4-7@current
   env: {}

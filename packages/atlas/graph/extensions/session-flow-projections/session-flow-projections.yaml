@@ -35,7 +35,7 @@ id: agent-flow-lane:claude-example--agent-action
 attributes:
   displayName: "Agent-action lane (Claude Code)"
   laneKind: agent-action
-  agentVersionId: agent-version:claude-code@1.x
+  agentVersionId: agentVersion:claude:ge-0-0-0
   description: "Assistant messages and thinking blocks emitted by Claude Code."
 edges:
   lane_of_projection:
@@ -125,7 +125,7 @@ id: agent-flow-lane:codex-example--agent-action
 attributes:
   displayName: "Agent-action lane (Codex)"
   laneKind: agent-action
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
 edges:
   lane_of_projection:
     - target: session-flow:codex-example

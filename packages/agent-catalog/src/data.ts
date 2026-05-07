@@ -348,11 +348,18 @@ function agentPluginTargetIds(agentNodeId: string): string[] {
     .filter(Boolean);
 }
 
-function matchesAgentId(nodeAgentId: string, targetAgentId: string): boolean {
+function matchesAgentId(nodeAgentId: string, targetAgentId: string, targetAliases?: string[]): boolean {
   if (nodeAgentId === targetAgentId) return true;
   // Handle "agent:codex" matching "codex"
-  if (nodeAgentId.startsWith("agent:") && nodeAgentId.slice("agent:".length) === targetAgentId) return true;
-  if (targetAgentId.startsWith("agent:") && targetAgentId.slice("agent:".length) === nodeAgentId) return true;
+  const nodeSlug = nodeAgentId.startsWith("agent:") ? nodeAgentId.slice("agent:".length) : nodeAgentId;
+  const targetSlug = targetAgentId.startsWith("agent:") ? targetAgentId.slice("agent:".length) : targetAgentId;
+  if (nodeSlug === targetSlug) return true;
+  // Handle host renames via aliases (e.g. agentId "gemini" with alias "gemini-cli")
+  if (targetAliases) {
+    for (const alias of targetAliases) {
+      if (nodeSlug === alias) return true;
+    }
+  }
   return false;
 }
 
@@ -362,12 +369,13 @@ function agentSessionNuanceIds(agentNodeId: string): string[] {
     .filter(Boolean);
   if (edgeBased.length > 0) return edgeBased;
 
-  // Fallback: find SessionSemantics nodes whose agentId matches
+  // Fallback: find SessionSemantics nodes whose agentId matches (including aliases)
   const agentNode = getNodeById(agentNodeId);
   const agentId = valueAsString(agentNode?.agentId);
   if (!agentId) return [];
+  const aliases = stringArray(agentNode?.aliases);
   return listNodesByKind("SessionSemantics")
-    .filter((node) => matchesAgentId(valueAsString(node.agentId), agentId))
+    .filter((node) => matchesAgentId(valueAsString(node.agentId), agentId, aliases))
     .map((node) => valueAsString(node.sessionSemanticsId))
     .filter(Boolean);
 }
@@ -378,14 +386,15 @@ function agentLifecycleNuanceIds(agentNodeId: string): string[] {
     .filter(Boolean);
   if (edgeBased.length > 0) return edgeBased;
 
-  // Fallback: find LifecycleSemantics nodes whose agentId and versionRange match
+  // Fallback: find LifecycleSemantics nodes whose agentId and versionRange match (including aliases)
   const agentNode = getNodeById(agentNodeId);
   const agentId = valueAsString(agentNode?.agentId);
   const agentVersionRange = valueAsString(agentNode?.versionRange);
   if (!agentId) return [];
+  const aliases = stringArray(agentNode?.aliases);
   return listNodesByKind("LifecycleSemantics")
     .filter((node) => {
-      if (!matchesAgentId(valueAsString(node.agentId), agentId)) return false;
+      if (!matchesAgentId(valueAsString(node.agentId), agentId, aliases)) return false;
       // If agent has a specific version range, match lifecycle nodes with same or broader range
       if (agentVersionRange) {
         const lcRange = valueAsString(node.versionRange);

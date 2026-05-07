@@ -2,7 +2,7 @@ nodeKind: AgentUIImpl
 id: agent-ui-impl:codex.ui@current
 attributes:
   displayName: "Codex UI (current) — tui-and-cli"
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   packageRef: source-ref:codex-github
   uiKind: tui-and-cli
   presentationsBundled:

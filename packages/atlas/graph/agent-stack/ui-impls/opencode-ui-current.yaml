@@ -2,7 +2,7 @@ nodeKind: AgentUIImpl
 id: agent-ui-impl:opencode.ui@current
 attributes:
   displayName: "OpenCode UI (current) — tui-and-cli"
-  agentVersionId: agent-version:opencode@1.x
+  agentVersionId: agentVersion:opencode:ge-0-0-0
   packageRef: source-ref:opencode-github
   uiKind: tui-and-cli
   presentationsBundled:

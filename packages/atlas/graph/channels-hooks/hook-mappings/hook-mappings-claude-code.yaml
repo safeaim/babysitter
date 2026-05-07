@@ -4,7 +4,7 @@ id: hook-mapping:session-end-claude-code
 attributes:
   mappingId: hook-mapping:session-end-claude-code
   hookId: hook-surface:session-end
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: SessionEnd
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -20,14 +20,14 @@ edges:
   maps_hook:
     - target: hook-surface:session-end
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
 ---
 nodeKind: HookMapping
 id: hook-mapping:post-tool-use-claude-code
 attributes:
   mappingId: hook-mapping:post-tool-use-claude-code
   hookId: hook-surface:post-tool-use
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: PostToolUse
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -43,14 +43,14 @@ edges:
   maps_hook:
     - target: hook-surface:post-tool-use
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
 ---
 nodeKind: HookMapping
 id: hook-mapping:stop-claude-code
 attributes:
   mappingId: hook-mapping:stop-claude-code
   hookId: hook-surface:stop
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: Stop
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -66,14 +66,14 @@ edges:
   maps_hook:
     - target: hook-surface:stop
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
 ---
 nodeKind: HookMapping
 id: hook-mapping:subagent-stop-claude-code
 attributes:
   mappingId: hook-mapping:subagent-stop-claude-code
   hookId: hook-surface:subagent-stop
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: SubagentStop
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -89,14 +89,14 @@ edges:
   maps_hook:
     - target: hook-surface:subagent-stop
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
 ---
 nodeKind: HookMapping
 id: hook-mapping:notification-claude-code
 attributes:
   mappingId: hook-mapping:notification-claude-code
   hookId: hook-surface:notification
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: Notification
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -112,14 +112,14 @@ edges:
   maps_hook:
     - target: hook-surface:notification
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
 ---
 nodeKind: HookMapping
 id: hook-mapping:user-prompt-submit-claude-code
 attributes:
   mappingId: hook-mapping:user-prompt-submit-claude-code
   hookId: hook-surface:user-prompt-submit
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: UserPromptSubmit
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -135,14 +135,14 @@ edges:
   maps_hook:
     - target: hook-surface:user-prompt-submit
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
 ---
 nodeKind: HookMapping
 id: hook-mapping:pre-compact-claude-code
 attributes:
   mappingId: hook-mapping:pre-compact-claude-code
   hookId: hook-surface:pre-compact
-  targetId: agent-version:claude-code@1.x
+  targetId: agentVersion:claude:ge-0-0-0
   nativeName: PreCompact
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -158,4 +158,4 @@ edges:
   maps_hook:
     - target: hook-surface:pre-compact
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0

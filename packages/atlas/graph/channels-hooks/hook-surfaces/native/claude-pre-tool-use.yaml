@@ -24,5 +24,5 @@ edges:
   canonicalized_to:
     - target: hook-surface:pre-tool-use
   emits_hook:
-    - target: agent-version:claude-code@1.x
+    - target: agentVersion:claude:ge-0-0-0
       attrs: { since: "1.0.0" }

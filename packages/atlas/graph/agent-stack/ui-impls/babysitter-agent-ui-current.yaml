@@ -2,7 +2,7 @@ nodeKind: AgentUIImpl
 id: agent-ui-impl:babysitter-agent.ui@current
 attributes:
   displayName: "babysitter-agent UI (current) — CLI binary"
-  agentVersionId: agent-version:babysitter-agent@current
+  agentVersionId: agentVersion:babysitter-agent:ge-5-0-0
   packageRef: source-ref:babysitter-github
   uiKind: cli-only
   presentationsBundled:

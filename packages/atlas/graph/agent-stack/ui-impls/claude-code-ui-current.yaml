@@ -2,7 +2,7 @@ nodeKind: AgentUIImpl
 id: agent-ui-impl:claude-code.ui@current
 attributes:
   displayName: "Claude Code UI (current) — tui-and-cli"
-  agentVersionId: agent-version:claude-code@1.x
+  agentVersionId: agentVersion:claude:ge-0-0-0
   packageRef: source-ref:claude-code-github
   uiKind: tui-and-cli
   presentationsBundled:

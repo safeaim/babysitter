@@ -4,7 +4,7 @@ attributes:
   displayName: "Babysitter defineTask Subagent"
   provenance: custom
   dispatchPattern: subprocess-task
-  subjectId: agent-version:claude-code@1.x
+  subjectId: agentVersion:claude:ge-0-0-0
   systemPrompt: |
     Generic shape covering any `defineTask(id, impl)` export. Every
     babysitter process exports defineTask declarations that become
@@ -34,7 +34,7 @@ attributes:
   displayName: "Babysitter research Task pattern"
   provenance: custom
   dispatchPattern: subprocess-task
-  subjectId: agent-version:claude-code@1.x
+  subjectId: agentVersion:claude:ge-0-0-0
   systemPrompt: |
     Pattern for multi-step research / audit subtasks. Spawns a fresh
     agent subprocess with a workspace + tool allowlist scoped to
@@ -62,7 +62,7 @@ attributes:
   displayName: "Babysitter implementer Task pattern"
   provenance: custom
   dispatchPattern: subprocess-task
-  subjectId: agent-version:claude-code@1.x
+  subjectId: agentVersion:claude:ge-0-0-0
   roleId: role:implementer
   systemPrompt: |
     Pattern for feature-implementation subtasks (TDD / feature

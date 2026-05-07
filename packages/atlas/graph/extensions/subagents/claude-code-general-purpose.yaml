@@ -4,7 +4,7 @@ attributes:
   displayName: "general-purpose (Claude Code)"
   provenance: built-in
   dispatchPattern: task-tool
-  subjectId: agent-version:claude-code@1.x
+  subjectId: agentVersion:claude:ge-0-0-0
   roleId: role:implementer
   systemPrompt: |
     Default Claude Code subagent. Has full tool access and is invoked

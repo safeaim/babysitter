@@ -1,7 +1,7 @@
 nodeKind: CapabilityProfile
 id: capability-profile:cursor.default
 attributes:
-  agentVersionId: agent-version:cursor@current
+  agentVersionId: agentVersion:cursor:ge-0-0-0
   displayName: "Cursor (default)"
   default: true
   description: |
@@ -11,4 +11,4 @@ attributes:
   overrides: {}
 edges:
   applies_to_version:
-    - agent-version:cursor@current
+    - agentVersion:cursor:ge-0-0-0

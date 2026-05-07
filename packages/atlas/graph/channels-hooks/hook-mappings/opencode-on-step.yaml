@@ -3,7 +3,7 @@ id: hook-mapping:post-tool-use-opencode
 attributes:
   mappingId: hook-mapping:post-tool-use-opencode
   hookId: hook-surface:post-tool-use
-  targetId: agent-version:opencode@1.x
+  targetId: agentVersion:opencode:ge-0-0-0
   nativeName: on_step
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: true
@@ -19,4 +19,4 @@ edges:
   maps_hook:
     - target: hook-surface:post-tool-use
   emits_hook:
-    - target: agent-version:opencode@1.x
+    - target: agentVersion:opencode:ge-0-0-0

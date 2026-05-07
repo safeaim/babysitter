@@ -2,7 +2,7 @@ nodeKind: AgentRuntimeImpl
 id: agent-runtime-impl:openclaw.runtime@current
 attributes:
   displayName: OpenClaw Runtime (current)
-  agentVersionId: agent-version:openclaw@current
+  agentVersionId: agentVersion:openclaw:ge-0-0-0
   subagentDispatchMechanism: none
   packageRef: source-ref:openclaw-github
   builtInTools:

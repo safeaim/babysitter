@@ -2,7 +2,7 @@ nodeKind: AgentRuntimeImpl
 id: agent-runtime-impl:omp.runtime@current
 attributes:
   displayName: OMP Runtime (current)
-  agentVersionId: agent-version:omp@current
+  agentVersionId: agentVersion:omp:ge-0-0-0
   subagentDispatchMechanism: none
   packageRef: source-ref:omp-github
   builtInTools:

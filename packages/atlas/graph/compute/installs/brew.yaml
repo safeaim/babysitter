@@ -10,4 +10,4 @@ attributes:
   prerequisiteCheck: "brew --version"
 edges:
   installs:
-    - agent-version:claude-code@1.x
+    - agentVersion:claude:ge-0-0-0

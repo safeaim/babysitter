@@ -1,7 +1,7 @@
 nodeKind: LaunchConfig
 id: launch-config:codex.default
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex CLI default
   env: {}
   commArgs: []
@@ -24,7 +24,7 @@ edges:
 nodeKind: LaunchConfig
 id: launch-config:codex.approval-untrusted
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex CLI untrusted approval-policy launch
   env: {}
   commArgs:
@@ -46,7 +46,7 @@ edges:
 nodeKind: LaunchConfig
 id: launch-config:codex.approval-on-failure
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex CLI deprecated on-failure approval-policy launch
   env: {}
   commArgs:
@@ -65,7 +65,7 @@ edges:
 nodeKind: LaunchConfig
 id: launch-config:codex.ask-for-approval
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex CLI on-request approval-policy launch
   env: {}
   commArgs:
@@ -87,7 +87,7 @@ edges:
 nodeKind: LaunchConfig
 id: launch-config:codex.approval-never
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex CLI never approval-policy launch
   env: {}
   commArgs:
@@ -106,7 +106,7 @@ edges:
 nodeKind: LaunchConfig
 id: launch-config:codex.full-auto
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex CLI full-auto launch
   env: {}
   commArgs:
@@ -124,7 +124,7 @@ edges:
 nodeKind: LaunchConfig
 id: launch-config:codex.dangerously-bypass-approvals-and-sandbox
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex CLI dangerous bypass launch
   env: {}
   commArgs:
@@ -142,7 +142,7 @@ edges:
 nodeKind: LaunchConfig
 id: launch-config:codex.mcp-server
 attributes:
-  agentVersionId: agent-version:codex@1.x
+  agentVersionId: agentVersion:codex:ge-0-119-0
   displayName: Codex MCP server launch
   env: {}
   commArgs:

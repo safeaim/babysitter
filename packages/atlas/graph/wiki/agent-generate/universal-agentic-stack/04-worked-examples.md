@@ -34,6 +34,10 @@ Think of a plain provider API call with no agent loop around it.
 
 This is not an agent platform by itself. It is the lower part of the stack that an agent core can build on top of.
 
+One-sentence placement:
+
+`This product mainly owns Layers 1-3, delegates the agent system and operating boundary to the caller, and exposes a thin API surface.`
+
 ## Example 2: Model gateway
 
 Think of a system that normalizes access to multiple providers.
@@ -46,6 +50,10 @@ Think of a system that normalizes access to multiple providers.
 | 10-11 | May expose a dashboard or API |
 
 The common mistake here is to confuse a gateway with an agent runtime. Routing requests is not the same thing as owning the loop.
+
+One-sentence placement:
+
+`This product mainly owns Layers 2-3, may expose a surface for routing or analytics, and usually delegates the agent loop, workspace, execution, and policy layers.`
 
 ## Example 3: Agent framework library
 
@@ -60,6 +68,10 @@ Think of a graph-based or loop-based builder that developers embed into their ow
 
 This is where many custom-agent builder products live. They are extremely important, but they usually do not own the full operating boundary or surface.
 
+One-sentence placement:
+
+`This product mainly owns Layers 4-5, may touch Layer 6, and usually delegates workspace, execution, sandbox, and presentation to the host application.`
+
 ## Example 4: Coding agent CLI
 
 Think of a local coding agent that edits files, runs commands, asks for approvals, and streams output.
@@ -72,6 +84,10 @@ Think of a local coding agent that edits files, runs commands, asks for approval
 | 1-3 | Delegated to chosen model/provider stack |
 
 This is why coding agents feel like "complete products": they often span more of the stack than framework libraries do.
+
+One-sentence placement:
+
+`This product mainly owns Layers 4-11, while delegating model, provider, and transport choices to an external model stack.`
 
 ## Example 5: Hosted agent platform
 
@@ -86,6 +102,10 @@ Think of a service that hosts agents, gives them deployment surfaces, and expose
 
 The critical question is whether hosted execution and policy are real product layers or just hidden infrastructure. If the user can rely on them, they still belong on the map.
 
+One-sentence placement:
+
+`This product mainly owns Layers 4-11 and may either delegate or bundle Layers 1-3 depending on how model access is offered.`
+
 ## Example 6: IDE extension around an agent
 
 Think of an IDE panel that exposes an agent but depends on another runtime under the hood.
@@ -97,6 +117,10 @@ Think of an IDE panel that exposes an agent but depends on another runtime under
 | 4-9 | Often delegated to a local or remote agent runtime |
 
 Do not over-credit the extension. A polished IDE surface can still be mostly a presentation and interaction layer over someone else's runtime and platform.
+
+One-sentence placement:
+
+`This product mainly owns Layers 10-11, may partly own workspace integration, and usually delegates most of the runtime and platform below it.`
 
 ## Quick pattern summary
 
@@ -113,4 +137,5 @@ Do not over-credit the extension. A polished IDE surface can still be mostly a p
 
 - Use them to get the first rough placement.
 - Then use [`03-placement-checklist.md`](./03-placement-checklist.md) to refine the result.
+- If you need a clean writeup format, continue to [`08-review-template.md`](./08-review-template.md).
 - If the product does not fit neatly, record split ownership instead of forcing a single label.

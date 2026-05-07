@@ -13,6 +13,11 @@
  *   domainContext?: string
  * }
  * @outputs { success: boolean, gaps: Gap[], fixes: Fix[], summary: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing, skill-area:code-analysis-linting]
+ *   topics: [topic:research-methodology, topic:quality-assurance]
+ *   roles: [role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

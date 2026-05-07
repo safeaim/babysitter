@@ -11,6 +11,12 @@
  * @outputs { success, stack, gapsFound, issuesOpened }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/development/feedback-loop-optimizer-agent.prompt.md
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:developer-tooling]
+ *   topics: [topic:developer-experience, topic:build-systems]
+ *   roles: [role:backend-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,11 @@ metadata:
   tools-libraries:
     - Workflow engines
     - Instrument integration APIs
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Characterization Workflow Orchestrator

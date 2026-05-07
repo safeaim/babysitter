@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Support Operations
   id: SK-014
+graph:
+  domains: [domain:customer-experience]
+  skillAreas: [skill-area:customer-success]
+  roles: [role:customer-success-manager]
 ---
 
 # Escalation Workflow Skill

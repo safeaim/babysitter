@@ -15,6 +15,10 @@ metadata:
   domain: business
   category: Stakeholder Management
   id: AG-013
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Stakeholder Engagement Lead Agent

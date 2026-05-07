@@ -19,6 +19,12 @@
  * - CRISPRcleanR: https://github.com/francescojm/CRISPRcleanR
  * - CRISPR-ScreenProcessing: https://github.com/mhegde/CRISPR-Analysis
  * - DepMap: https://depmap.org/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

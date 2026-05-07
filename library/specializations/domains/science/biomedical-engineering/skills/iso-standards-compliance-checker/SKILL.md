@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Regulatory Compliance
   skill-id: BME-SK-003
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # ISO Standards Compliance Checker Skill

@@ -17,6 +17,11 @@
  * - ISO 19011:2018 Guidelines for auditing management systems
  * - ISO 9001:2015 Clause 9.2 Internal Audit
  * - ASQ CQA Body of Knowledge
+ * @graph
+ *   domains: [domain:operations]
+ *   skillAreas: [skill-area:operations-management]
+ *   topics: [topic:process-optimization, topic:operational-excellence]
+ *   roles: [role:operations-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

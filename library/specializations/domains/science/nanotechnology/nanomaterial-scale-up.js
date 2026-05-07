@@ -17,6 +17,12 @@
  * - ISO/TS 80004: Nanotechnologies - Vocabulary: https://www.iso.org/standard/68058.html
  * - NIST Nanotechnology Standards: https://www.nist.gov/nanotechnology/nist-nanotechnology-standards
  * - Microfluidic Nanoparticle Synthesis: https://www.sciencedirect.com/science/article/pii/S2211339816300442
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

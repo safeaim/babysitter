@@ -8,6 +8,11 @@
  * @outputs { success, pagesWritten, prNumber? }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/development/documenter-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:documentation, topic:developer-experience]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -6,6 +6,12 @@
  * @outputs { success: boolean, cdsDesign: object, implementationPlan: object, evaluationPlan: object, artifacts: array }
  * @recommendedSkills SK-HC-014 (clinical-decision-support-rules), SK-HC-006 (health-data-integration), SK-HC-001 (clinical-workflow-analysis)
  * @recommendedAgents AG-HC-005 (clinical-informatics-specialist), AG-HC-001 (quality-improvement-orchestrator)
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

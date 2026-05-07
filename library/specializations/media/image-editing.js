@@ -8,6 +8,11 @@
  * @outputs { success, operation, tool, outputAsset, validation }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/media/image-editing-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:ai-agent-development]
+ *   topics: [topic:image-processing, topic:generative-ai]
+ *   roles: [role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Code Compliance
   skill-id: CIV-SK-032
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # ADA Compliance Checker Skill

@@ -18,6 +18,12 @@
  * - EPA FIRE Database
  * - EPA Emission Inventory Improvement Program (EIIP)
  * - State Emission Inventory Guidelines
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

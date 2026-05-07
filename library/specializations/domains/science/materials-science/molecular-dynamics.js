@@ -18,6 +18,12 @@
  * - ASE: https://wiki.fysik.dtu.dk/ase/
  * - OVITO: https://www.ovito.org/
  * - OpenKIM: https://openkim.org/
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

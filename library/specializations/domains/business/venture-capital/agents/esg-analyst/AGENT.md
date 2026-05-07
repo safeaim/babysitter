@@ -8,6 +8,10 @@ expertise:
   - Governance structure analysis
   - ESG risk identification
   - Sustainability reporting
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # ESG Analyst

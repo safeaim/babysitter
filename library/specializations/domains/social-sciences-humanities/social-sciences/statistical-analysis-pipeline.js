@@ -5,6 +5,12 @@
  * @outputs { success: boolean, analysisResults: object, robustnessChecks: object, qualityScore: number, artifacts: array }
  * @recommendedSkills SK-SS-001 (quantitative-methods)
  * @recommendedAgents AG-SS-001 (quantitative-research-methodologist)
+ *
+ * @graph
+ *   domains: [domain:social-sciences]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

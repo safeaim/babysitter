@@ -3,6 +3,11 @@
  * @description Facilitated process for mapping end-to-end customer journeys, identifying pain points, and designing improvements
  * @inputs { journeyScope: object, customerPersonas: array, touchpointData: object, feedbackData: array }
  * @outputs { success: boolean, journeyMap: object, painPoints: array, improvements: array, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

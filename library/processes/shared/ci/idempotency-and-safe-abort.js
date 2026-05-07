@@ -3,6 +3,12 @@
  * @description Make CI-side effects idempotent; abort early on precondition failure; never retry destructive ops blindly.
  * @inputs { plannedActions: Array<{ kind, description, target }>, currentState?: object }
  * @outputs { success: boolean, actionsToExecute: Array<object>, abortReason?: string }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:cicd-devops]
+ *   topics: [topic:continuous-integration, topic:build-systems]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

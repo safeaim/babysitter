@@ -11,6 +11,10 @@ expertise:
   - Constraint identification
   - Assumption documentation
   - Frame quality assessment
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Decision Framing Specialist

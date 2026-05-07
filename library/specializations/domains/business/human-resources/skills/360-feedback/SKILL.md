@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Survey platforms
     - Statistical analysis tools
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # 360 Feedback Survey Skill

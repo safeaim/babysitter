@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Statistical libraries
     - Compensation data
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Pay Equity Analysis Skill

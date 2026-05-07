@@ -14,6 +14,10 @@ metadata:
   priority: P2
   integration-points:
     - Varicent API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Varicent ICM

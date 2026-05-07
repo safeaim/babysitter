@@ -19,6 +19,12 @@
  * - Colloidal Nanoparticle Synthesis: A Best Practices Guide: https://pubs.acs.org/doi/10.1021/acs.chemmater.0c00095
  * - Sol-Gel Synthesis of Nanoparticles: https://www.sciencedirect.com/topics/chemistry/sol-gel-process
  * - Nanoparticle synthesis methods: A comprehensive review: https://www.sciencedirect.com/science/article/pii/S2352507X21000336
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Geotechnical Analysis
   skill-id: CIV-SK-011
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Pile Capacity Analyzer Skill

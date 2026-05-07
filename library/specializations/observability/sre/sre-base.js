@@ -8,6 +8,11 @@
  * @outputs { success: boolean, diagnosis: object, escalated: boolean }
  *
  * Source: a5c-ai/registry/prompts/sre/sre-base-agent.prompt.md
+ * @graph
+ *   domains: [domain:observability]
+ *   skillAreas: [skill-area:incident-management]
+ *   topics: [topic:slo-sli, topic:incident-management]
+ *   roles: [role:site-reliability-engineer, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

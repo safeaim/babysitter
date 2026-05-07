@@ -18,6 +18,12 @@
  * - Plasmonic nanostructures: from plasmonics to applications: https://www.nature.com/articles/nmat3151
  * - Quantum dots for live cell and in vivo imaging: https://www.sciencedirect.com/science/article/pii/S1748013211001143
  * - NIST Nanotechnology Standards: https://www.nist.gov/nanotechnology/nist-nanotechnology-standards
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

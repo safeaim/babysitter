@@ -3,6 +3,12 @@
  * @description Balance model simplicity and flexibility through systematic analysis of bias-variance tradeoff in prediction and estimation
  * @inputs { model: object, data: object, alternatives: array, validationStrategy: string, outputDir: string }
  * @outputs { success: boolean, tradeoffAnalysis: object, optimalComplexity: object, recommendations: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

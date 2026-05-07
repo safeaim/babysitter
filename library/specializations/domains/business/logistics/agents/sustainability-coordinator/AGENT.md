@@ -13,6 +13,10 @@ required-skills:
   - carbon-footprint-calculator
   - route-optimization-engine
   - network-optimization-modeler
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Sustainability Coordinator

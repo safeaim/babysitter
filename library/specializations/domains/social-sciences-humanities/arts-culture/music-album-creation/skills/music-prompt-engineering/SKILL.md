@@ -3,6 +3,11 @@ name: music-prompt-engineering
 description: Optimize and format prompts specifically for AI music generation platforms like Suno and Udio, including platform-specific syntax and tag optimization
 allowed-tools: Read, Write, Edit, WebSearch, WebFetch
 id: SK-MAC-010
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Music Prompt Engineering

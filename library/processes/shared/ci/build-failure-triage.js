@@ -3,6 +3,12 @@
  * @description Classify a CI build failure and route to the appropriate fix strategy.
  * @inputs { runUrl?: string, failureLogs: string, failedStep?: string, retriesAllowed?: boolean }
  * @outputs { success: boolean, category: string, fixStrategy: string, details: object }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:cicd-devops]
+ *   topics: [topic:continuous-integration, topic:build-systems]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

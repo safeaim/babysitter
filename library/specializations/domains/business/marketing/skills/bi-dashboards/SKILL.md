@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Marketing Analytics
   skill-id: SK-014
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # BI and Dashboard Platform Skill

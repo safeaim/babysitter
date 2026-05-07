@@ -18,6 +18,11 @@ metadata:
     - functional
     - pathway
     - metabolism
+graph:
+  domains: [domain:bioinformatics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:data-engineer, role:tech-lead]
 ---
 
 # HUMAnN Functional Profiler Skill

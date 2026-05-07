@@ -3,6 +3,12 @@
  * @description Design of hydraulic structures including culverts, channels, spillways, and energy dissipation structures
  * @inputs { projectId: string, structureType: string, designFlow: number, siteConditions: object, upstreamConditions: object }
  * @outputs { success: boolean, hydraulicDesign: object, structuralDesign: object, drawings: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

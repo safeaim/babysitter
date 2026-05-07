@@ -14,6 +14,11 @@
  * @references
  * - SiriusDecisions Demand Waterfall: https://www.forrester.com/
  * - Revenue Marketing Alliance: https://www.revenuemarketing.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,10 @@ metadata:
   domain: business
   category: Corporate Communications
   agent-id: AG-012
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # CSR and ESG Communications Expert Agent

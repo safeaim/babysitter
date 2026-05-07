@@ -3,6 +3,11 @@
  * @description End-to-end sourcing + intelligence workflow: discover → monitor → dedupe → filter-signal → per-portfolio impact-assess → synthesize → route alerts → track follow-through. Unifies what was previously split across "sourcing" and "news-impact-assessment" roles.
  * @inputs { portfolio: Array<{ id, name, exposure, stakeholders: string[] }>, sources?: Array<{ kind: "rss"|"api"|"scrape"|"email", ref: string, trust: "high"|"medium"|"low" }>, window: { from: string, to: string }, previousDigest?: object, alertChannels?: Array<{ kind: "slack"|"email"|"issue", target: string, severityFloor: "info"|"warn"|"block" }>, horizon?: "immediate"|"quarter"|"year" }
  * @outputs { success: boolean, digest: object, alertsRouted: Array<object>, followUpIssues: Array<object>, suppressed: boolean, suppressReason?: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:api-integration]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,10 @@ metadata:
     - pyDecision
     - pymcdm
     - electre-py
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # ELECTRE Comparator

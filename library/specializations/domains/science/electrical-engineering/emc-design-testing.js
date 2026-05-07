@@ -18,6 +18,12 @@
  * - IEC 61000 (EMC Standards Series)
  * - FCC Part 15 (Radio Frequency Devices)
  * - CE Marking EMC Directive Requirements
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

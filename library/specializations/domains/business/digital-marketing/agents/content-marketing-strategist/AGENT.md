@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Content Marketing
   agent-id: AG-006
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # Content Marketing Strategist Agent

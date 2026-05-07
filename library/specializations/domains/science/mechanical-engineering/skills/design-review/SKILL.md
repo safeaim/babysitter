@@ -17,6 +17,11 @@ metadata:
     - PLM systems
     - Requirements management tools
     - Presentation tools
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Design Review Management Skill

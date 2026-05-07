@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Campaign Management
   agent-id: AG-003
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Campaign Strategist Agent

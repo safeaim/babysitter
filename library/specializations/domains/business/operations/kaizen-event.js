@@ -18,6 +18,11 @@
  * - Imai, M. (1986). Kaizen: The Key to Japan's Competitive Success
  * - Martin, K. & Osterling, M. (2007). The Kaizen Event Planner
  * - Liker, J. (2004). The Toyota Way
+ * @graph
+ *   domains: [domain:operations]
+ *   skillAreas: [skill-area:operations-management]
+ *   topics: [topic:process-optimization, topic:operational-excellence]
+ *   roles: [role:operations-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

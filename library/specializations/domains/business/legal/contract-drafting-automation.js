@@ -23,6 +23,11 @@
  * - Contract Automation Best Practices: https://www.icertis.com/
  * - Legal Document Assembly: https://www.hotdocs.com/
  * - Thomson Reuters Contract Express: https://legal.thomsonreuters.com/en/products/contract-express
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

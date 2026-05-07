@@ -18,6 +18,12 @@
  * - WEF Manual of Practice: Membrane Bioreactors
  * - AMTA Technology Transfer Workshop Series
  * - EPA Membrane Filtration Guidance Manual
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

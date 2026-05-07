@@ -18,6 +18,12 @@
  * - ISO 14971:2019 Medical devices - Application of risk management to medical devices
  * - ISO/TR 24971:2020 Guidance on the application of ISO 14971
  * - FDA Guidance on Risk Management: https://www.fda.gov/regulatory-information/search-fda-guidance-documents
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

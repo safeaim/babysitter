@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Transportation Analysis
   skill-id: CIV-SK-021
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Signal Timing Optimizer Skill

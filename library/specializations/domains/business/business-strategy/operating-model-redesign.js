@@ -3,6 +3,11 @@
  * @description Comprehensive redesign of organizational structure, processes, governance, and capabilities to support strategic objectives
  * @inputs { strategicObjectives: array, organizationContext: object, currentOperatingModel: object, outputDir: string }
  * @outputs { success: boolean, currentStateAssessment: object, futureOperatingModel: object, transitionPlan: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:competitive-analysis]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -4,6 +4,11 @@ id: SK-FTV-005
 version: 1.0.0
 description: Generate detailed image prompts for storyboard frames optimized for Midjourney, DALL-E, and Stable Diffusion
 specialization: film-tv-production
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Storyboard Prompting Skill

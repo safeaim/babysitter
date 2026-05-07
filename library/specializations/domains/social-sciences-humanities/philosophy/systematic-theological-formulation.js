@@ -5,6 +5,12 @@
  * @outputs { success: boolean, theologicalFormulation: object, sourceIntegration: object, systematicPosition: object, artifacts: array }
  * @recommendedSkills SK-PHIL-008 (theological-synthesis), SK-PHIL-004 (hermeneutical-interpretation), SK-PHIL-010 (philosophical-writing-argumentation)
  * @recommendedAgents AG-PHIL-005 (philosophical-theologian-agent), AG-PHIL-003 (hermeneutics-specialist-agent)
+ *
+ * @graph
+ *   domains: [domain:philosophy]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

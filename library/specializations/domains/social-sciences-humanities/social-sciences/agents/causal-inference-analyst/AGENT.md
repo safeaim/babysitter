@@ -2,6 +2,11 @@
 name: causal-inference-analyst
 description: Apply advanced econometric and statistical methods for causal identification in observational data
 required-skills: causal-inference-methods, quantitative-methods
+graph:
+  domains: [domain:social-sciences]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Causal Inference Analyst Agent

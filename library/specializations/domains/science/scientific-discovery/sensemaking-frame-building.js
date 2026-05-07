@@ -18,6 +18,12 @@
  * - Framing Theory: https://plato.stanford.edu/entries/frame-theory/
  * - Mental Models: https://plato.stanford.edu/entries/mental-representation/
  * - Weick's Sensemaking: https://www.jstor.org/stable/2393553
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

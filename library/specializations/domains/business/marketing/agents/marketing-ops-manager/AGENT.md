@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Campaign Management
   agent-id: AG-011
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Marketing Operations Manager Agent

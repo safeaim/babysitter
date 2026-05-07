@@ -15,6 +15,11 @@
  * @references
  * - Secrets of Sand Hill Road: https://www.amazon.com/Secrets-Sand-Hill-Road-Venture/dp/059308358X
  * - NVCA Model Documents: https://nvca.org/model-legal-documents/
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

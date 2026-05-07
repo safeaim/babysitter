@@ -17,6 +17,11 @@
  * - Lattice Performance Review: https://lattice.com/library/performance-review-process
  * - SHRM Performance Management: https://www.shrm.org/resourcesandtools/tools-and-samples/toolkits/pages/managingemployeeperformance.aspx
  * - Deloitte Performance Management: https://www2.deloitte.com/us/en/insights/focus/human-capital-trends/2017/redesigning-performance-management.html
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

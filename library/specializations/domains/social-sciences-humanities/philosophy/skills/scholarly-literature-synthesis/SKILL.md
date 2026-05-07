@@ -8,6 +8,11 @@ allowed-tools:
   - Grep
   - Glob
   - Bash
+graph:
+  domains: [domain:philosophy]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Scholarly Literature Synthesis Skill

@@ -2,6 +2,11 @@
  * @file annual-budget-development.js
  * @description Comprehensive process for creating organization-wide annual operating budgets including departmental submissions, consolidation, executive review, and board approval
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

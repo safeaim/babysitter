@@ -2,6 +2,11 @@
  * @file ma-financial-due-diligence.js
  * @description Comprehensive financial analysis of acquisition targets including quality of earnings, working capital analysis, and deal structuring
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

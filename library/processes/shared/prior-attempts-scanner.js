@@ -3,6 +3,12 @@
  * @description Composable process component that scans .a5c/runs/ for prior runs
  * matching processId patterns. Designed for injection into retrospect and convergence
  * processes to provide historical context from prior attempts.
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:developer-tooling]
+ *   topics: [topic:developer-experience, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,12 @@
  * - Sterman, J.D. (2000). Business Dynamics: Systems Thinking and Modeling
  * - Senge, P. (1990). The Fifth Discipline
  * - Kim, D.H. (1992). Guidelines for Drawing Causal Loop Diagrams
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

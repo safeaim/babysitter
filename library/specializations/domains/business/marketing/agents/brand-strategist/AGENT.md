@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Brand Strategy
   agent-id: AG-001
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Brand Strategist Agent

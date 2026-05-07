@@ -2,6 +2,11 @@
 name: research-ethics-irb-navigation
 description: Prepare ethics applications, develop informed consent protocols, and navigate institutional review processes for human subjects research
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Research Ethics and IRB Navigation

@@ -2,6 +2,11 @@
 name: exhibition-designer-agent
 description: Exhibition design and installation specialist agent for spatial design, visitor experience, lighting design, graphic design, ADA compliance, and multimedia integration
 required-skills: exhibition-design, accessibility-compliance, digital-engagement-strategy
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Exhibition Designer Agent

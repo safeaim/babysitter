@@ -3,6 +3,12 @@
  * @description Design and verify compiler optimization passes with correctness proofs and performance benchmarks
  * @inputs { optimizationDescription: string, sourceLanguage: object, targetLanguage: object }
  * @outputs { success: boolean, optimizationSpecification: object, correctnessProof: object, performanceBenchmarks: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -5,6 +5,12 @@
  * @outputs { success: boolean, languageDocumentation: object, grammaticalSketch: object, lexicalDatabase: object, artifacts: array }
  * @recommendedSkills SK-HUM-003 (ipa-transcription-phonological-analysis), SK-HUM-012 (morphosyntactic-analysis), SK-HUM-006 (research-ethics-irb-navigation)
  * @recommendedAgents AG-HUM-003 (documentary-linguist), AG-HUM-008 (research-ethics-consultant)
+ *
+ * @graph
+ *   domains: [domain:humanities]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

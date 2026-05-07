@@ -9,6 +9,10 @@ expertise:
   - Data visualization
   - Root cause analysis
   - Management reporting
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Supply Chain Analyst

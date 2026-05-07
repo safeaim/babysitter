@@ -9,6 +9,10 @@ expertise:
   - Visual management implementation
   - Flow interruption analysis
   - Continuous flow kaizen
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Flow Improvement Specialist

@@ -14,6 +14,10 @@ required-skills:
   - safety-stock-calculator
   - dead-stock-identifier
   - logistics-kpi-tracker
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Inventory Analyst

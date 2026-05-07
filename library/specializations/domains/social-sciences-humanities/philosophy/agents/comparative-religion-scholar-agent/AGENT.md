@@ -2,6 +2,11 @@
 name: comparative-religion-scholar-agent
 description: Analyzes similarities and differences among world religious traditions
 required-skills: comparative-religion-analysis, hermeneutical-interpretation, scholarly-literature-synthesis
+graph:
+  domains: [domain:philosophy]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Comparative Religion Scholar Agent

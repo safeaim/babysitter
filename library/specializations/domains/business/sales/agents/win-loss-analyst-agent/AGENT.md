@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Pattern analysis
     - Qualitative synthesis
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Win/Loss Analyst Agent

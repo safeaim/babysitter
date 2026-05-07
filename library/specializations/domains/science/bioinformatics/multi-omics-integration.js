@@ -22,6 +22,12 @@
  * - mixOmics: http://mixomics.org/
  * - iCluster: https://www.mskcc.org/departments/epidemiology-biostatistics/biostatistics/icluster
  * - PathwayCommons: https://www.pathwaycommons.org/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

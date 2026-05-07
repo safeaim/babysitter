@@ -11,6 +11,10 @@ metadata:
   specialization: operations
   domain: business
   category: workflow-automation
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Inventory Optimizer

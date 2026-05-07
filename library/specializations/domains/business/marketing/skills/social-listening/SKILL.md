@@ -17,6 +17,10 @@ metadata:
     - Brandwatch API
     - Sprinklr API
     - Mention API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Social Listening Platform Skill

@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Mentorship
   agent-id: AG-001
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Startup Founder Coach Agent

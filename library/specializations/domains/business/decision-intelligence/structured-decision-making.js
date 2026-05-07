@@ -16,6 +16,11 @@
  * @references
  * - Smart Choices: https://hbr.org/product/smart-choices-a-practical-guide-to-making-better-decisions/8244-HBK-ENG
  * - Decision Analysis Society: https://www.informs.org/Community/DAS
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

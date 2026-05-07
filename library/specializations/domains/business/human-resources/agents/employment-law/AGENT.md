@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Compliance
   agent-id: AG-012
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Employment Law Advisor Agent

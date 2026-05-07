@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Performance Management
   skill-id: SK-008
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # PIP Documentation Skill

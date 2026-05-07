@@ -18,6 +18,12 @@
  * - Genome in a Bottle: https://www.nist.gov/programs-projects/genome-bottle
  * - precisionFDA: https://precision.fda.gov/
  * - CAP/CLIA Guidelines: https://www.cap.org/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

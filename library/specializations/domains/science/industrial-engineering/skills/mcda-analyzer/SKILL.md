@@ -7,6 +7,11 @@ metadata:
   version: "1.0.0"
   category: decision-analysis
   backlog-id: SK-IE-032
+graph:
+  domains: [domain:industrial-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:process-optimization]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # mcda-analyzer

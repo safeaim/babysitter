@@ -17,6 +17,12 @@
  * - ISO 13674 Steering Effort Testing
  * - SAE J1100 Vehicle Dimensions
  * - ISO 7401 Road Vehicle Lateral Response
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

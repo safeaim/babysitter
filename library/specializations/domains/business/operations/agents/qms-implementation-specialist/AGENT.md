@@ -9,6 +9,10 @@ expertise:
   - Internal audit program
   - Management review facilitation
   - Certification preparation
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # QMS Implementation Specialist

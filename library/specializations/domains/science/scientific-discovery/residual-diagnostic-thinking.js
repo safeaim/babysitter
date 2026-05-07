@@ -3,6 +3,12 @@
  * @description Study model residuals to identify where and how the model fails, guiding model improvement
  * @inputs { model: object, data: object, predictions: array, outputDir: string }
  * @outputs { success: boolean, residualAnalysis: object, diagnostics: array, modelFailures: array, improvements: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

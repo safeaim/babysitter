@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Capability Analysis
   skill-id: SK-020
+graph:
+  domains: [domain:strategy]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:strategy-consultant]
 ---
 
 # Core Competency Analysis Skill

@@ -8,6 +8,10 @@ expertise:
   - Findings synthesis and integration
   - Issue escalation and resolution
   - DD timeline and quality management
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # DD Coordinator

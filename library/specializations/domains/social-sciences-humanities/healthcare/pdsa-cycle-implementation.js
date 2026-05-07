@@ -19,6 +19,12 @@
  * - Langley, G.J. et al. (2009). The Improvement Guide
  * - IHI Model for Improvement
  * - Deming, W.E. (1986). Out of the Crisis
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

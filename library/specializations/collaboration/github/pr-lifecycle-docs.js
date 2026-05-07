@@ -3,6 +3,12 @@
  * @description Docs-only PR lifecycle: verify docs-only scope → link check → style/voice audit → technical-accuracy review (if touching technical docs) → merge.
  * @inputs { event: string, pr: object, prDiff?: string, technicalReviewer?: string }
  * @outputs { success: boolean, stages: object, blockers: string[] }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control, skill-area:technical-writing]
+ *   topics: [topic:code-review, topic:documentation]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

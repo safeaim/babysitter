@@ -22,6 +22,12 @@
  * - Abaqus Documentation: https://help.3ds.com/
  * - MSC Nastran: https://hexagon.com/products/msc-nastran
  * - Practical Finite Element Analysis: https://www.wiley.com/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

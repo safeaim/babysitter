@@ -3,6 +3,12 @@
  * @description Evolutionary thinking process for explaining biological features via historical selection pressures, analyzing adaptations, and understanding phylogenetic relationships
  * @inputs { feature: string, organism: string, environment: object, phylogeneticContext: object, outputDir: string }
  * @outputs { success: boolean, evolutionaryExplanation: object, selectionPressures: array, adaptiveValue: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

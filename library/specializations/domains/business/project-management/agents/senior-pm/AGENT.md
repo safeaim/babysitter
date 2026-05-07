@@ -15,6 +15,10 @@ metadata:
   domain: business
   category: Project Management
   id: AG-001
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Senior Project Manager Agent

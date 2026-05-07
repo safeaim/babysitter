@@ -18,6 +18,11 @@ metadata:
     - standards
     - ga4gh
     - interoperability
+graph:
+  domains: [domain:bioinformatics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:data-engineer, role:tech-lead]
 ---
 
 # GA4GH Standards Validator Skill

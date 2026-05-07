@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Organizational Development
   agent-id: AG-011
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Organizational Development Consultant Agent

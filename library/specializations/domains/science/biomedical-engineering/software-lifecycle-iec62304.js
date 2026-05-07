@@ -17,6 +17,12 @@
  * - IEC 62304:2006/AMD1:2015 Medical device software - Software life cycle processes
  * - FDA Guidance on General Principles of Software Validation
  * - IEC 82304-1 Health software - General requirements for product safety
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

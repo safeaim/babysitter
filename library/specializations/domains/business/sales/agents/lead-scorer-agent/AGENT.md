@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - ML scoring
     - Propensity modeling
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Lead Scorer Agent

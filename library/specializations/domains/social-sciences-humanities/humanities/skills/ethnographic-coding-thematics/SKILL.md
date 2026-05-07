@@ -2,6 +2,11 @@
 name: ethnographic-coding-thematics
 description: Code qualitative field data, identify emergent themes, and develop grounded interpretations using NVivo/Atlas.ti methodologies
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Ethnographic Coding and Thematics

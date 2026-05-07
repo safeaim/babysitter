@@ -3,6 +3,12 @@
  * @description Treat missingness and measurement error as structured problems requiring principled statistical handling
  * @inputs { data: object, variables: array, missingPattern: object, errorSources: array, outputDir: string }
  * @outputs { success: boolean, missingAnalysis: object, errorAnalysis: object, handlingStrategy: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

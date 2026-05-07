@@ -5,6 +5,12 @@
  * @outputs { success: boolean, spatialAnalysis: object, maps: array, patterns: object, artifacts: array }
  * @recommendedSkills SK-HUM-011 (gis-mapping-humanities), SK-HUM-014 (metadata-standards-implementation)
  * @recommendedAgents AG-HUM-005 (digital-humanities-technologist)
+ *
+ * @graph
+ *   domains: [domain:humanities]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

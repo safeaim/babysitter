@@ -7,6 +7,11 @@ backlog-id: SK-007
 metadata:
   author: babysitter-sdk
   version: "1.0.0"
+graph:
+  domains: [domain:environmental-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Air Pollution Control Design Skill

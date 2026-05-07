@@ -17,6 +17,12 @@
  * - FDA 21 CFR 820.30(f)(g) Design Verification and Validation
  * - GHTF SG3/N99-10 Quality Management Systems - Process Validation Guidance
  * - ISO 13485:2016 Section 7.3.6 and 7.3.7
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

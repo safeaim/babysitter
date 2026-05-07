@@ -9,6 +9,10 @@ expertise:
   - Currency translation
   - Segment allocation
   - Consolidated reporting
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Consolidation Specialist

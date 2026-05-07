@@ -14,6 +14,10 @@ metadata:
   priority: P2
   integration-points:
     - Conga CPQ API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Conga CPQ

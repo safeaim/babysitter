@@ -8,6 +8,12 @@
  * // Input: { symptoms: ["high latency", "intermittent errors"], context: { system: "API gateway" }, systemDescription: {...} }
  * // Output: { diagnosis: { primary: "...", confidence: 0.85 }, differentialDiagnosis: [...], rootCauseAnalysis: {...} }
  * @references Medical diagnostic reasoning, Root cause analysis, FMEA, 5 Whys methodology
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

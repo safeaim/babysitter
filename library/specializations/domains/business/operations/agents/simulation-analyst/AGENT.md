@@ -9,6 +9,10 @@ expertise:
   - Optimization recommendations
   - Investment justification
   - Change impact assessment
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Simulation Analyst

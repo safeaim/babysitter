@@ -3,6 +3,12 @@
  * @description Resolve merge conflicts correctly: read both sides, prefer rebase, regenerate generated files, verify with full check.
  * @inputs { branch: string, baseBranch: string, conflictFiles: Array<string> }
  * @outputs { success: boolean, resolutions: Array<object>, note?: string }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:cicd-devops]
+ *   topics: [topic:continuous-integration, topic:build-systems]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

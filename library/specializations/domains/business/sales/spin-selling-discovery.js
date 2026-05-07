@@ -17,6 +17,11 @@
  * @references
  * - SPIN Selling by Neil Rackham: https://www.amazon.com/SPIN-Selling-Neil-Rackham/dp/0070511136
  * - Huthwaite International: https://www.huthwaiteinternational.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

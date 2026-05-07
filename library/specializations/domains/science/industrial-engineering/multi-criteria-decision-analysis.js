@@ -17,6 +17,12 @@
  * - Saaty, The Analytic Hierarchy Process
  * - Hwang & Yoon, Multiple Attribute Decision Making
  * - Keeney & Raiffa, Decisions with Multiple Objectives
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

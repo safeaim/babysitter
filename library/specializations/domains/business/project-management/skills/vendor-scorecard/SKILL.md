@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Procurement Management
   id: SK-020
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Vendor Scorecard

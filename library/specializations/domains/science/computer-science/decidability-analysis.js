@@ -3,6 +3,12 @@
  * @description Analyze decidability and computability properties of problems using Turing machine framework and reduction techniques
  * @inputs { problemDescription: string, languageDefinition: string }
  * @outputs { success: boolean, decidabilityClassification: object, proofDocumentation: object, computabilityLandscape: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

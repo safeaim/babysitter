@@ -14,6 +14,10 @@ metadata:
   category: analytics
   priority: lower
   shared-candidate: true
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Carbon Footprint Calculator

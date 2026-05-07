@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Integration
   id: SK-010
+graph:
+  domains: [domain:customer-experience]
+  skillAreas: [skill-area:customer-success]
+  roles: [role:customer-success-manager]
 ---
 
 # CRM Integration Skill

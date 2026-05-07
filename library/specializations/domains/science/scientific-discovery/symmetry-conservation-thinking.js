@@ -3,6 +3,12 @@
  * @description Symmetry-Conservation Thinking process (Physics) - Use symmetries to infer conserved quantities via Noether's theorem and constrain physical behavior
  * @inputs { physicalSystem: string, observedBehavior: object, knownSymmetries: array, outputDir: string }
  * @outputs { success: boolean, symmetries: array, conservedQuantities: array, constraints: array, predictions: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

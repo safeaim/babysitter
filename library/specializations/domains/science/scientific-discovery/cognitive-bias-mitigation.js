@@ -17,6 +17,12 @@
  * - Heuer, R.J. (1999). Psychology of Intelligence Analysis
  * - Fischhoff, B. (1982). Debiasing
  * - Larrick, R.P. (2004). Debiasing
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

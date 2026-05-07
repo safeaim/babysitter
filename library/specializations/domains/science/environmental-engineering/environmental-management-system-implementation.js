@@ -18,6 +18,12 @@
  * - ISO 14004:2016 EMS General Guidelines
  * - EPA EMS Implementation Guide
  * - ISO 14001 Auditing Standards
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

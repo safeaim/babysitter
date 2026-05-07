@@ -3,6 +3,12 @@
  * @description Size and specify major process equipment including vessels, columns, heat exchangers, pumps, and compressors
  * @inputs { processName: string, equipmentType: string, processConditions: object, designBasis: object, outputDir: string }
  * @outputs { success: boolean, specifications: object, datasheet: string, drawings: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

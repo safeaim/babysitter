@@ -9,6 +9,10 @@ expertise:
   - Preserving the SQL string as audit evidence alongside results
 used-by-processes:
   - specializations/domains/business/travel/travel-plan-compose
+graph:
+  domains: [domain:travel]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # SQL Query Composer

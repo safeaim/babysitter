@@ -17,6 +17,11 @@ metadata:
     - GROMACS
     - gmx_MMPBSA
     - MDAnalysis
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # GROMACS MD Executor

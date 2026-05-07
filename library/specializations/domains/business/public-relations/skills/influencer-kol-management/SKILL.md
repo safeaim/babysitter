@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - Analyst relations platforms
     - CRM systems
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Influencer and KOL Management Skill

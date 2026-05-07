@@ -3,6 +3,12 @@
  * @description Choose probability distributions satisfying constraints while minimizing assumptions using maximum entropy principle
  * @inputs { constraints: array, variables: array, priorDistribution: object, evidenceConstraints: array, outputDir: string }
  * @outputs { success: boolean, maxEntDistribution: object, entropyValue: number, constraintSatisfaction: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

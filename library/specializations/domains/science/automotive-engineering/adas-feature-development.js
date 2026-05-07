@@ -19,6 +19,12 @@
  * - FMVSS 127 Low-Speed Alert
  * - ISO 15622 ACC Systems
  * - ISO 11270 Lane Keeping Systems
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

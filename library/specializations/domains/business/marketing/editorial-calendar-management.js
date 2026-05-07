@@ -3,6 +3,11 @@
  * @description Plan, schedule, and coordinate content production across formats (blog, video, podcast, social) with topic clusters and SEO integration.
  * @inputs { contentStrategy: object, contentPillars: array, targetKeywords: array, teamResources: object, publishingChannels: array, planningPeriod: string }
  * @outputs { success: boolean, editorialCalendar: object, topicPlan: array, productionSchedule: object, seoIntegration: object, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

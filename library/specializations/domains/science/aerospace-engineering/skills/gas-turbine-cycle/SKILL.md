@@ -18,6 +18,11 @@ metadata:
     - gas-turbine
     - thermodynamics
     - cycle-analysis
+graph:
+  domains: [domain:aerospace-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Gas Turbine Cycle Analysis Skill

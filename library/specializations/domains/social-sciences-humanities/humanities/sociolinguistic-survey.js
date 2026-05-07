@@ -5,6 +5,12 @@
  * @outputs { success: boolean, surveyDesign: object, samplingPlan: object, dataAnalysis: object, artifacts: array }
  * @recommendedSkills SK-HUM-002 (ethnographic-coding-thematics), SK-HUM-006 (research-ethics-irb-navigation), SK-HUM-009 (topic-modeling-text-mining)
  * @recommendedAgents AG-HUM-003 (documentary-linguist), AG-HUM-002 (ethnographic-methods-advisor)
+ *
+ * @graph
+ *   domains: [domain:humanities]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

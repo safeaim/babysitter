@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-007
   category: Learning & Development
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Training Design Expert Agent

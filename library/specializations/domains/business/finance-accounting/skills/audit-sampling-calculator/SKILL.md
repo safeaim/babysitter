@@ -13,6 +13,10 @@ metadata:
   category: audit
   priority: medium
   shared: true
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Audit Sampling Calculator

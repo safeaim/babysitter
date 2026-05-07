@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Influencer Marketing
   agent-id: AG-010
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # Influencer Marketing Expert Agent

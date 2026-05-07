@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Medical Imaging
   skill-id: BME-SK-032
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Prosthetics Design Optimizer Skill

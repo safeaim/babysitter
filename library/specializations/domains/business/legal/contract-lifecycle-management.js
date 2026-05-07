@@ -25,6 +25,11 @@
  * - DocuSign CLM: https://www.docusign.com/products/clm
  * - WorldCC Contract Management: https://www.worldcc.com/
  * - NCMA Contract Management Body of Knowledge: https://www.ncmahq.org/education-certification/cmbok
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

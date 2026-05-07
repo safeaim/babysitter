@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Process Control
   skill-id: CE-SK-019
+graph:
+  domains: [domain:chemical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Control Strategy Designer Skill

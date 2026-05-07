@@ -18,6 +18,11 @@ metadata:
     - safety
     - arp4761
     - hazard-analysis
+graph:
+  domains: [domain:aerospace-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Safety Assessment (ARP4761) Skill

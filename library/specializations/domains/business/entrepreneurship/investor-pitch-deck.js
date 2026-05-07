@@ -17,6 +17,11 @@
  * - Get Backed: https://www.getbackedbook.com/
  * - Sequoia Pitch Deck Template: https://www.sequoiacap.com/
  * - DocSend Pitch Deck Analysis: https://docsend.com/
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: transportation
   priority: high
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Shipment Visibility Tracker

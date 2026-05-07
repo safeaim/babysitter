@@ -18,6 +18,12 @@
  * - EPA CFR Title 40 Emissions Standards
  * - UN ECE R101 CO2 Emissions
  * - WLTP Test Procedure
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

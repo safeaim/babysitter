@@ -3,6 +3,12 @@
  * @description Design type systems with desired safety and expressiveness properties including typing rules, soundness proofs, and type inference
  * @inputs { languageDescription: string, safetyRequirements: object, expressivenessGoals: array }
  * @outputs { success: boolean, typeSystemSpecification: object, typingRules: array, soundnessProof: object, typeInferenceAlgorithm: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

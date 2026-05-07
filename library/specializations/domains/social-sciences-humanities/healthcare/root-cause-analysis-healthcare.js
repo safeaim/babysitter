@@ -19,6 +19,12 @@
  * - Joint Commission RCA Framework
  * - VA National Center for Patient Safety RCA Tools
  * - AHRQ Root Cause Analysis Resources
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

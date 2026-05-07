@@ -2,6 +2,11 @@
  * @file rolling-forecast-management.js
  * @description Continuous forecasting methodology that extends the planning horizon each period to maintain a constant forward-looking view of financial performance
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

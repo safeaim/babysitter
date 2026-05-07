@@ -16,6 +16,11 @@
  * - Compliance Week: https://www.complianceweek.com/
  * - Thomson Reuters Regulatory Intelligence: https://www.thomsonreuters.com/en/products-services/risk-fraud-and-compliance/regulatory-intelligence.html
  * - Wolters Kluwer Regulatory Change Management: https://www.wolterskluwer.com/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

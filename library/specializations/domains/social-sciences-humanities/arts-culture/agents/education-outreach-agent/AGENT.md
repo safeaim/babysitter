@@ -2,6 +2,11 @@
 name: education-outreach-agent
 description: Education and community engagement specialist agent for curriculum development, program design, community partnerships, accessibility planning, docent training, and visitor evaluation
 required-skills: interpretive-writing, accessibility-compliance, digital-engagement-strategy
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Education Outreach Agent

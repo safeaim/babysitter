@@ -11,6 +11,10 @@ metadata:
   domain: business
   category: Strategy
   skill-id: SK-020
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Pivot Analyzer Skill

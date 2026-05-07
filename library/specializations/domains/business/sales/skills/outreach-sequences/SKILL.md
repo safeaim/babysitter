@@ -14,6 +14,10 @@ metadata:
   priority: P1
   integration-points:
     - Outreach API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Outreach Sequences

@@ -11,6 +11,10 @@ expertise:
   - Business translation
   - Implementation planning
   - What-if scenario execution
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Optimization Specialist

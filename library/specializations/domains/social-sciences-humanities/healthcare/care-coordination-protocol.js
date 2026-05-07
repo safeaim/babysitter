@@ -19,6 +19,12 @@
  * - AHRQ Care Coordination Framework
  * - Coleman, E. (2003). The Care Transitions Intervention
  * - McDonald, K. et al. (2014). Care Coordination Measures Atlas
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

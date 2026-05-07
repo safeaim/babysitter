@@ -14,6 +14,11 @@
  * @references
  * - Xactly Territory Planning: https://www.xactlycorp.com/
  * - Alexander Group Territory Design: https://www.alexandergroup.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

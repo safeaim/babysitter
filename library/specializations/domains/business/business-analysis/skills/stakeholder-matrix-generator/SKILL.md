@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-004
   category: Stakeholder Analysis
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Stakeholder Matrix Generator

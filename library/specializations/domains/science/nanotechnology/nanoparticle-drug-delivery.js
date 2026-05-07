@@ -19,6 +19,12 @@
  * - Lipid nanoparticles for nucleic acid delivery: https://www.nature.com/articles/nrd.2017.243
  * - FDA Guidance for Nanotechnology: https://www.fda.gov/science-research/nanotechnology-programs-fda/nanotechnology-guidance-documents
  * - The emergence of nanotoxicology: https://www.nature.com/articles/nnano.2007.44
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

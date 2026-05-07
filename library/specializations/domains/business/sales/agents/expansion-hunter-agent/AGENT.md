@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Pattern recognition
     - Propensity modeling
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Expansion Hunter Agent

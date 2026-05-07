@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Statistical modeling
     - Fairness analysis
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Quota Analyst Agent

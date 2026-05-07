@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Market Intelligence
   skill-id: SK-006
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Competitor Analysis Skill

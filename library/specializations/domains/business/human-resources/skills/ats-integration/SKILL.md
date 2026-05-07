@@ -18,6 +18,10 @@ metadata:
     - Lever API
     - Workday Recruiting API
     - iCIMS API
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # ATS Integration Skill

@@ -3,6 +3,12 @@
  * @description Represent uncertainty with probability ranges (intervals) when precise probabilities are unavailable
  * @inputs { propositions: array, probabilityBounds: object, constraints: array, evidenceItems: array, outputDir: string }
  * @outputs { success: boolean, intervalProbabilities: object, credalSets: array, robustnessAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

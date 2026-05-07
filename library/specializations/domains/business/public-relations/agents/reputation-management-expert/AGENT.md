@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Reputation Management
   agent-id: AG-004
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Reputation Management Expert Agent

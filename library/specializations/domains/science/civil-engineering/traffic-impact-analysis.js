@@ -3,6 +3,12 @@
  * @description Analysis of traffic impacts from proposed development including trip generation, distribution, and intersection level of service analysis
  * @inputs { projectId: string, developmentType: string, developmentSize: object, studyArea: object, existingTrafficData: object }
  * @outputs { success: boolean, trafficStudy: object, losAnalysis: object, mitigationRecommendations: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

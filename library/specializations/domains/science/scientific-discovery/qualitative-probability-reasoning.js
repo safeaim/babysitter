@@ -3,6 +3,12 @@
  * @description Use ordinal disbelief ranks instead of numeric probabilities for reasoning under uncertainty
  * @inputs { propositions: array, rankingAssignments: object, defaultRules: array, evidenceItems: array, outputDir: string }
  * @outputs { success: boolean, beliefRanks: object, conditionalRanks: object, inferences: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

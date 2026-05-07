@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Biocompatibility and Materials
   skill-id: BME-SK-018
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Biocompatibility Test Selector Skill

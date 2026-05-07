@@ -17,6 +17,12 @@
  * - Principles of Tissue Engineering (Lanza, Langer, Vacanti)
  * - FDA Guidance on Human Cells, Tissues, and Cellular and Tissue-Based Products
  * - ISO 13022 Medical products containing viable human cells
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -17,6 +17,12 @@
  * - NASA Aerodynamic Database Development: https://www.nasa.gov/
  * - DATCOM Handbook: https://www.dtic.mil/
  * - Flight Simulation Database Standards: SAE AS94900
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

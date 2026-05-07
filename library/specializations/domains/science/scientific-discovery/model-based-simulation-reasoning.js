@@ -18,6 +18,12 @@
  * - Kuipers (1994). Qualitative Reasoning: Modeling and Simulation with Incomplete Knowledge
  * - Gentner & Stevens (1983). Mental Models
  * - Johnson-Laird (1983). Mental Models
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

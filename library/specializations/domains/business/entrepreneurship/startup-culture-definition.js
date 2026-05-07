@@ -15,6 +15,11 @@
  * @references
  * - What You Do Is Who You Are (Ben Horowitz): https://www.amazon.com/What-You-Do-Who-Are/dp/0062871331
  * - Powerful (Patty McCord): https://www.amazon.com/Powerful-Building-Culture-Freedom-Responsibility/dp/1939714095
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

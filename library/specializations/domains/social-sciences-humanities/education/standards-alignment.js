@@ -5,6 +5,12 @@
  * @outputs { success: boolean, alignmentMatrix: object, gapAnalysis: object, recommendations: array, artifacts: array }
  * @recommendedSkills SK-EDU-008 (standards-alignment-mapping), SK-EDU-015 (curriculum-gap-analysis), SK-EDU-002 (learning-objectives-writing)
  * @recommendedAgents AG-EDU-002 (curriculum-development-specialist), AG-EDU-009 (quality-assurance-coordinator)
+ *
+ * @graph
+ *   domains: [domain:education]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

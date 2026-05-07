@@ -5,6 +5,11 @@
  * @category Media Relations
  * @inputs { interview: object, spokesperson: object, outlet: object, topic: string, keyMessages: string[] }
  * @outputs { success: boolean, briefingPackage: object, prepSession: object, quality: number }
+ * @graph
+ *   domains: [domain:public-relations]
+ *   skillAreas: [skill-area:communications-strategy]
+ *   topics: [topic:media-relations, topic:brand-management]
+ *   roles: [role:communications-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,11 @@
  * @description Valuation using public company trading multiples and precedent transaction multiples including peer selection, normalization, and multiple application
  * @inputs { companyName: string, financials: object, industry: string, stage: string }
  * @outputs { success: boolean, tradingComps: object, transactionComps: object, valuationRange: object, artifacts: array }
+ * @graph
+ *   domains: [domain:venture-capital]
+ *   skillAreas: [skill-area:investment-analysis]
+ *   topics: [topic:startup-funding, topic:portfolio-management]
+ *   roles: [role:venture-capitalist]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,11 @@
  * @description End-to-end media production: brief → research → script → storyboard → produce → review-gates (editorial, legal, brand) → publish → measure → iterate. Single workflow covering what would otherwise be a dozen role hand-offs.
  * @inputs { brief: { title, objective, audience, channel: "video"|"podcast"|"article"|"social", constraints?: object }, priorAssets?: Array<object>, deadline?: string, reviewers?: { editorial?: string, legal?: string, brand?: string }, publishTargets?: Array<{ platform, handle }> }
  * @outputs { success: boolean, assetUrls: Array<string>, reviewGateStatus: object, publishResults: Array<object>, metrics?: object, blockers?: Array<string> }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:ai-agent-development]
+ *   topics: [topic:generative-ai, topic:content-creation]
+ *   roles: [role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

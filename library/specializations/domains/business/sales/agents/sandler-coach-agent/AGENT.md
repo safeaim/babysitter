@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Consultative questioning
     - Psychology of buying
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Sandler Coach Agent

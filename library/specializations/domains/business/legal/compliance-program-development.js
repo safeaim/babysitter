@@ -23,6 +23,11 @@
  * - COSO Internal Control Framework: https://www.coso.org/guidance-erm
  * - DOJ Evaluation of Corporate Compliance Programs: https://www.justice.gov/criminal-fraud/page/file/937501/download
  * - SCCE Compliance Program Elements: https://www.corporatecompliance.org/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

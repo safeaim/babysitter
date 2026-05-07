@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Communication
   agent-id: AG-SCIDISC-018
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Methodology Documenter Agent

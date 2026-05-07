@@ -14,6 +14,11 @@
  * @references
  * - Cracking the Sales Management Code: https://www.amazon.com/Cracking-Sales-Management-Code-Behaviors/dp/0071765735
  * - WorldatWork Sales Compensation: https://www.worldatwork.org/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

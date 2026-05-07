@@ -16,6 +16,11 @@
  * @references
  * - Gong Deal Intelligence: https://www.gong.io/
  * - Miller Heiman Blue Sheet: https://www.millerheimangroup.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

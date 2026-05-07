@@ -3,6 +3,12 @@
  * @description Every non-trivial commit must trace to an issue; direct commits without an issue reference are rejected in CI.
  * @inputs { commits: Array<{ sha, message, filesChanged: number }>, trivialThreshold?: number }
  * @outputs { success: boolean, rejected: Array<{ sha, reason }>, accepted: Array<string> }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:git-workflow, topic:project-management]
+ *   workflows: [workflow:feature-development]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 const ISSUE_REF = /#(\d+)\b|(?:close|closes|fix|fixes|resolve|resolves|refs?)\s+#\d+/i;

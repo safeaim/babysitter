@@ -3,6 +3,12 @@
  * @description Approximate concepts via lower/upper bounds given limited features - handling vagueness from incomplete information
  * @inputs { informationSystem: object, decisionAttribute: string, targetConcept: string, reductComputation: boolean, outputDir: string }
  * @outputs { success: boolean, lowerApproximation: array, upperApproximation: array, boundaryRegion: array, reducts: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

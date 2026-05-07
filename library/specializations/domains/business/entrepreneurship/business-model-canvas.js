@@ -14,6 +14,11 @@
  * @references
  * - Business Model Generation: https://www.strategyzer.com/books/business-model-generation
  * - Strategyzer: https://www.strategyzer.com/
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

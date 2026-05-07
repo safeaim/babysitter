@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Talent Acquisition
   agent-id: AG-001
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Talent Acquisition Strategist Agent

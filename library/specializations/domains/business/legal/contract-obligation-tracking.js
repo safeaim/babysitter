@@ -17,6 +17,11 @@
  * - NCMA Contract Management Body of Knowledge: https://www.ncmahq.org/education-certification/cmbok
  * - Contract Obligation Management: https://www.worldcc.com/
  * - Icertis Obligation Management: https://www.icertis.com/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

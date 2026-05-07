@@ -2,6 +2,11 @@
  * @file capital-investment-appraisal.js
  * @description Evaluating capital expenditure proposals using NPV, IRR, payback period, and strategic alignment criteria
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

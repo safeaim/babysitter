@@ -2,6 +2,11 @@
 name: conservator-agent
 description: Conservation and preservation specialist agent for condition assessment, treatment planning, preventive conservation, environmental monitoring, collection risk management, and ethical decision-making
 required-skills: conservation-assessment, collection-documentation, risk-mitigation-planning
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Conservator Agent

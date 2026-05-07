@@ -3,6 +3,11 @@
  * @description End-to-end visualization and analysis of material and information flows required to deliver value to customers
  * @inputs { productFamily: string, processScope: object, organizationContext: object, outputDir: string }
  * @outputs { success: boolean, currentStateMap: object, futureStateMap: object, implementationPlan: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:competitive-analysis]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

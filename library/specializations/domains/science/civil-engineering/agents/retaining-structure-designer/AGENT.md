@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Geotechnical Engineering
   agent-id: CIV-AG-009
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Retaining Structure Designer Agent

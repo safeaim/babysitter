@@ -16,6 +16,11 @@ metadata:
   tools-libraries:
     - ISO standards databases
     - Compliance management tools
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # ISO Nanotechnology Compliance Checker

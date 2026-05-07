@@ -9,6 +9,10 @@ expertise:
   - Business impact assessment
   - Scenario construction
   - Research publication
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Economic Analyst

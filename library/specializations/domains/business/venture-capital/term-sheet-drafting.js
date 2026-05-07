@@ -3,6 +3,11 @@
  * @description Structuring key economic and governance terms including valuation, liquidation preferences, anti-dilution provisions, board composition, and protective provisions
  * @inputs { companyName: string, roundDetails: object, investorRequirements: object, existingTerms: object }
  * @outputs { success: boolean, termSheet: object, economicTerms: object, governanceTerms: object, artifacts: array }
+ * @graph
+ *   domains: [domain:venture-capital]
+ *   skillAreas: [skill-area:investment-analysis]
+ *   topics: [topic:startup-funding, topic:portfolio-management]
+ *   roles: [role:venture-capitalist]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

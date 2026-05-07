@@ -17,6 +17,11 @@ metadata:
     - CAD systems
     - Manufacturing databases
     - Cost estimation tools
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # DFM Review Skill

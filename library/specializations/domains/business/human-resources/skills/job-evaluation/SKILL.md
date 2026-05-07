@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Job evaluation methodologies
     - Career frameworks
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Job Evaluation Skill

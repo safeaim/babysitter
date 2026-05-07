@@ -5,6 +5,12 @@
  * @outputs { success: boolean, reasoningProcess: object, moralJudgment: object, justification: string, artifacts: array }
  * @recommendedSkills SK-PHIL-003 (ethical-framework-application), SK-PHIL-012 (bioethics-deliberation), SK-PHIL-007 (evidence-justification-assessment)
  * @recommendedAgents AG-PHIL-002 (ethics-consultant-agent)
+ *
+ * @graph
+ *   domains: [domain:philosophy]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

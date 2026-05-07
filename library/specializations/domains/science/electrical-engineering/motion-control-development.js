@@ -17,6 +17,12 @@
  * - IEC 61800 Series (Adjustable Speed Electrical Power Drive Systems)
  * - Servo System Design Guidelines
  * - Motion Control Best Practices
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

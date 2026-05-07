@@ -2,6 +2,11 @@
 name: policy-research-analyst
 description: Conduct policy analysis and translate research findings for decision-maker audiences
 required-skills: systematic-review, policy-communication, program-evaluation
+graph:
+  domains: [domain:social-sciences]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Policy Research Analyst Agent

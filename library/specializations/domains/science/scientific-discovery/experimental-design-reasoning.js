@@ -8,6 +8,12 @@
  * // Input: { researchQuestion: "Does treatment X improve outcome Y?", hypotheses: [...], variables: {...} }
  * // Output: { experimentalDesign: { type: "RCT", factors: [...] }, protocols: [...], statisticalPlan: {...} }
  * @references Fisher's experimental design principles, Campbell & Stanley validity framework, CONSORT guidelines
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -2,6 +2,11 @@
 name: instructional-video-production
 description: Plan, record, edit, and produce instructional video content including screencasts, demonstrations, and talking-head videos
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Instructional Video Production

@@ -3,6 +3,12 @@
  * @description Enforce PR hygiene: title conventions, scope, description completeness, linked issues, reviewers.
  * @inputs { prNumber: number, repo: string, title: string, body: string, changedFiles: Array<string>, linkedIssues?: Array<string> }
  * @outputs { success: boolean, violations: Array<object>, recommendations: Array<string> }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review, topic:git-workflow]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

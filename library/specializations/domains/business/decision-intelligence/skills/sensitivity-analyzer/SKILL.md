@@ -18,6 +18,10 @@ metadata:
     - openturns
     - sensitivity
     - numpy
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Sensitivity Analyzer

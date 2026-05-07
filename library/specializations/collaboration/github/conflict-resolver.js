@@ -8,6 +8,12 @@
  * @outputs { success, outcome, summary }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/development/conflict-resolver-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:git-workflow, topic:code-review]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:backend-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

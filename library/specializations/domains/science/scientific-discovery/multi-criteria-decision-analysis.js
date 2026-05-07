@@ -18,6 +18,12 @@
  * - Belton & Stewart (2002). Multiple Criteria Decision Analysis
  * - Greco et al. (2016). Multiple Criteria Decision Analysis: State of the Art Surveys
  * - Saaty (1980). The Analytic Hierarchy Process
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

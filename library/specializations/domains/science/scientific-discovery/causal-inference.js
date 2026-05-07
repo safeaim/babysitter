@@ -18,6 +18,12 @@
  * - Imbens & Rubin (2015). Causal Inference for Statistics, Social, and Biomedical Sciences
  * - Peters, Janzing, Scholkopf (2017). Elements of Causal Inference
  * - Hernan & Robins (2020). Causal Inference: What If
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

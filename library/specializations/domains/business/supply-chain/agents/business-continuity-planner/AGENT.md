@@ -9,6 +9,10 @@ expertise:
   - Recovery procedures
   - Scenario testing
   - Plan maintenance
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Business Continuity Planner

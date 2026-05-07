@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Talent Management
   agent-id: AG-015
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Succession Planning Advisor Agent

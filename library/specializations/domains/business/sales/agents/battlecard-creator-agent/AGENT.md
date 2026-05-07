@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Competitive analysis
     - Persuasion tactics
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Battlecard Creator Agent

@@ -9,6 +9,10 @@ expertise:
   - Coverage reconciliation vs expected scope
 used-by-processes:
   - specializations/domains/business/travel/flight-dataset-build
+graph:
+  domains: [domain:travel]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Data Quality Inspector

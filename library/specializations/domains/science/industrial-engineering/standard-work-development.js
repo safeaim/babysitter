@@ -16,6 +16,12 @@
  * - Toyota Production System (Ohno)
  * - Liker & Meier, Toyota Talent
  * - Training Within Industry (TWI) methodology
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

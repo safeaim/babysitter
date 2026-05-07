@@ -18,6 +18,12 @@
  * - NFPA 70E (Electrical Safety in the Workplace)
  * - OSHA 29 CFR 1910 (Electrical Standards)
  * - CSA Z462 (Workplace Electrical Safety)
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

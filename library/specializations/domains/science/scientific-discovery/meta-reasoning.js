@@ -8,6 +8,12 @@
  * // Input: { problem: { type: "complex", domain: "..." }, availableStrategies: [...], constraints: { time: "2h" } }
  * // Output: { strategySelection: { primary: "...", fallbacks: [...] }, resourceAllocation: {...}, monitoringPlan: {...} }
  * @references Bounded rationality, Satisficing theory, Cognitive resource management, Metacognition
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

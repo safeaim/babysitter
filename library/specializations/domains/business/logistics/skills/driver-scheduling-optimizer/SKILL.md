@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: fleet-management
   priority: medium
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Driver Scheduling Optimizer

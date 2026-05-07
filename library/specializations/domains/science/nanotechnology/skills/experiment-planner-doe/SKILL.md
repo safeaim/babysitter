@@ -18,6 +18,11 @@ metadata:
     - Design-Expert
     - Minitab
     - scipy.stats
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Experiment Planner DOE

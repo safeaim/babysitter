@@ -13,6 +13,10 @@ required-skills:
   - cross-dock-orchestrator
   - dock-scheduling-coordinator
   - load-optimization-calculator
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Cross-Dock Coordinator

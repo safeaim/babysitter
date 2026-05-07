@@ -17,6 +17,11 @@
  * @references
  * - MindTickle Sales Readiness: https://www.mindtickle.com/
  * - Sales Onboarding Best Practices: https://www.gartner.com/en/sales
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

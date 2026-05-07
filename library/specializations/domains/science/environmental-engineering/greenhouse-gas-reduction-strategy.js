@@ -18,6 +18,12 @@
  * - Science Based Targets Initiative (SBTi)
  * - EPA Climate Leaders Program
  * - ISO 14064 - GHG Accounting and Verification
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

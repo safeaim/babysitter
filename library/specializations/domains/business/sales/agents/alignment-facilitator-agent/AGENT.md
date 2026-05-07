@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Cross-functional facilitation
     - SLA management
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Alignment Facilitator Agent

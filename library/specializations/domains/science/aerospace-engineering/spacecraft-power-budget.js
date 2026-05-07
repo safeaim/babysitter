@@ -4,6 +4,12 @@
  * solar array sizing and battery management.
  * @inputs { projectName: string, missionProfile: object, loadList: array, orbitParameters?: object }
  * @outputs { success: boolean, powerBudget: object, solarArrayDesign: object, batteryDesign: object }
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

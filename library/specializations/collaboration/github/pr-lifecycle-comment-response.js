@@ -3,6 +3,12 @@
  * @description Lifecycle triggered by @mention on a PR comment: classify intent → route to review-comment-response OR re-run a targeted gate → post reply with fix commit ref.
  * @inputs { event: "pr-comment-mention", pr: object, comment: { author, body, path?, line?, id }, prDiff?: string }
  * @outputs { success: boolean, action: string, responseBody: string, fixCommitSha?: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { process as commentResponse } from './pr-comment-response.js';

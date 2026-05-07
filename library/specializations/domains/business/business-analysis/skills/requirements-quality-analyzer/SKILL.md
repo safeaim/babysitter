@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-001
   category: Requirements Engineering
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Requirements Quality Analyzer

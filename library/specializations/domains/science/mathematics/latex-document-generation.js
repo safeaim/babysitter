@@ -18,6 +18,12 @@
  * - AMS-LaTeX: https://www.ams.org/publications/authors/tex/amslatex
  * - CTAN: https://ctan.org/
  * - Overleaf Documentation: https://www.overleaf.com/learn
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

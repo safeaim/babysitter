@@ -17,6 +17,12 @@
  * - ICAO 9625 Manual of Criteria for Flight Simulation
  * - CS-FSTD(A) Certification Specifications
  * - NASA Flight Simulation Guidelines
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

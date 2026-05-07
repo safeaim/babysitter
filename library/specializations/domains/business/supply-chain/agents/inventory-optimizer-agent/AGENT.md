@@ -9,6 +9,10 @@ expertise:
   - Working capital management
   - SLOB management
   - Multi-echelon optimization
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Inventory Optimizer Agent

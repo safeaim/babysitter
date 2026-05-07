@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Marketing Analytics
   skill-id: SK-018
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # CRM Integration Skill

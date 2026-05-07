@@ -4,6 +4,12 @@
  * weighted criteria evaluation, and decision documentation.
  * @inputs { projectName: string, tradeStudyScope: object, alternatives: array, stakeholders?: array }
  * @outputs { success: boolean, tradeMatrix: object, recommendation: object, sensitivityAnalysis: object }
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

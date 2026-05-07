@@ -13,6 +13,10 @@ required-skills:
   - predictive-maintenance-scheduler
   - fleet-analytics-dashboard
   - driver-scheduling-optimizer
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Fleet Manager

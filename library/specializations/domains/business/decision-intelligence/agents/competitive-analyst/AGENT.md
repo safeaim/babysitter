@@ -11,6 +11,10 @@ expertise:
   - Battlecard creation
   - Threat assessment
   - Strategic recommendation
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Competitive Analyst

@@ -3,6 +3,12 @@
  * @description Understand biological stability through negative and positive feedback loops, regulatory mechanisms, and set-point maintenance
  * @inputs { system: object, variable: string, perturbation: object, outputDir: string }
  * @outputs { success: boolean, homeostaticAnalysis: object, feedbackLoops: array, stabilityAssessment: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,11 @@
  * @references
  * - ASCM SCOR Model: https://www.ascm.org/topics/scor/
  * - Supplier Performance Management: https://www.gartner.com/
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

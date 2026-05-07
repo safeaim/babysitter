@@ -8,6 +8,11 @@ required-skills:
   - SK-FTV-003 (scene-writing)
   - SK-FTV-004 (dialogue-crafting)
   - SK-FTV-011 (screenplay-formatting)
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Screenwriter Agent

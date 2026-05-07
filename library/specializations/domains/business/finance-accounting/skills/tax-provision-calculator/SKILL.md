@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: tax
   priority: high
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Tax Provision Calculator

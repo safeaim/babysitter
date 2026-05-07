@@ -6,6 +6,12 @@
  * @recommendedSkills SK-FTV-001 through SK-FTV-012 (all film-tv-production skills)
  * @recommendedAgents AG-FTV-001 (screenwriter), AG-FTV-002 (visual-director), AG-FTV-003 (character-designer), AG-FTV-004 (world-builder), AG-FTV-005 (story-developer), AG-FTV-006 (production-coordinator)
  * @composedProcesses story-development, character-creation, world-building, screenplay-writing, visual-production, audio-design
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

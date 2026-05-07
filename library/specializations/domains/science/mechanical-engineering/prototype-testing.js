@@ -17,6 +17,12 @@
  *   requirements: { performance: [...], durability: [...] }
  * });
  * @references ASME V&V 10, AIAA Guide for Verification and Validation, NASA-STD-7009
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

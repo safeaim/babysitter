@@ -4,6 +4,11 @@ id: SK-FTV-010
 version: 1.0.0
 description: Create comprehensive audio design including music cues, sound effects, Foley, and score direction
 specialization: film-tv-production
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Sound Design Direction Skill

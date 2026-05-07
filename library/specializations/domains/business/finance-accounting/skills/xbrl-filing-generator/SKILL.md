@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: reporting-analytics
   priority: lower
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # XBRL Filing Generator

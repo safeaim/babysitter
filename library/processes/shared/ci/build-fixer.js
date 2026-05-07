@@ -7,6 +7,12 @@
  * @outputs { success, category, artifact?, skipped? }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/development/build-fixer-agent.prompt.md
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:cicd-devops]
+ *   topics: [topic:continuous-integration, topic:build-systems]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

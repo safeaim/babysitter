@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-013
   category: Measurement
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Performance Measurement Expert Agent

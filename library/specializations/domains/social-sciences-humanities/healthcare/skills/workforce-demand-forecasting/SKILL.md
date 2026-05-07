@@ -2,6 +2,11 @@
 name: workforce-demand-forecasting
 description: Project healthcare workforce requirements based on patient volume trends, acuity levels, productivity standards, and skill mix optimization
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Workforce Demand Forecasting

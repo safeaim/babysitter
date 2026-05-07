@@ -2,6 +2,11 @@
 name: morphosyntactic-analysis
 description: Parse word structure and sentence patterns to document grammatical systems for language description and typology
 allowed-tools: Read, Grep, Write, Edit, Glob
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Morphosyntactic Analysis

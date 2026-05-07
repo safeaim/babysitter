@@ -17,6 +17,12 @@
  *   qualityRequirements: { criticalDimensions: ['bore ID', 'face flatness'], inspection: 'CMM' }
  * });
  * @references DFM Guidelines, APQP, PFMEA, Control Plan Methodology
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

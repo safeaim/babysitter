@@ -2,6 +2,11 @@
 name: program-evaluation-specialist
 description: Design and conduct rigorous evaluations of social programs and policy interventions
 required-skills: program-evaluation, mixed-methods-integration, policy-communication
+graph:
+  domains: [domain:social-sciences]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Program Evaluation Specialist Agent

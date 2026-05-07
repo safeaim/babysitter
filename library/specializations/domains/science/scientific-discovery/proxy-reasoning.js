@@ -3,6 +3,12 @@
  * @description Infer past environmental conditions from indirect proxy measurements, understanding proxy-climate relationships and uncertainty
  * @inputs { proxyData: object, targetVariable: string, calibration: object, timeRange: object, outputDir: string }
  * @outputs { success: boolean, reconstruction: object, proxyInterpretation: object, uncertaintyAssessment: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

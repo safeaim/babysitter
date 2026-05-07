@@ -11,6 +11,12 @@
  * - Simon, H.A. (1956). Rational choice and the structure of the environment
  * - Gigerenzer, G. & Selten, R. (2002). Bounded Rationality: The Adaptive Toolbox
  * - Schwartz, B. (2004). The Paradox of Choice
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

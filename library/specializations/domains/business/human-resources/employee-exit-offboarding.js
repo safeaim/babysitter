@@ -27,6 +27,11 @@
  * - WARN Act Requirements
  * - COBRA Administration Guidelines
  * - State Final Pay Requirements
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

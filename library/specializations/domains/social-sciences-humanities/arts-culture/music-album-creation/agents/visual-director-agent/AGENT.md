@@ -3,6 +3,11 @@ name: visual-director-agent
 description: Visual art director agent for creating text-to-image prompts for album and song cover artwork optimized for Midjourney, DALL-E, and other AI image generators
 required-skills: cover-art-prompting, persona-development, album-conceptualization
 id: AG-MAC-003
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Visual Director Agent

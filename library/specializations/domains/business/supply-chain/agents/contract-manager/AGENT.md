@@ -9,6 +9,10 @@ expertise:
   - Risk identification
   - Compliance monitoring
   - Renewal management
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Contract Manager

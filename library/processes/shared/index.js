@@ -3,6 +3,12 @@
  * @description Re-exports from all shared composable process components.
  * Import individual components from here rather than from their source files
  * to maintain a stable public surface as the library grows.
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:developer-tooling]
+ *   topics: [topic:developer-experience, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 export { priorAttemptsScannerTask, scanPriorAttempts } from './prior-attempts-scanner.js';

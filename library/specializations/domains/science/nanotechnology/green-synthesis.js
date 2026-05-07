@@ -17,6 +17,12 @@
  * - Green Synthesis of Nanomaterials: https://www.frontiersin.org/articles/10.3389/fchem.2019.00187/full
  * - EPA Nanotechnology White Paper: https://www.epa.gov/chemical-research/nanotechnology-white-paper
  * - OECD Guidelines for Testing of Manufactured Nanomaterials: https://www.oecd.org/science/nanotechnology/testing-nanomaterials/
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

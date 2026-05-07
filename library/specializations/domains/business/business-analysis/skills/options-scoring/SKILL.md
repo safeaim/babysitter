@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-014
   category: Decision Analysis
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Options Scoring Calculator

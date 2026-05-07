@@ -19,6 +19,12 @@
  * - ASM Handbook: https://www.asminternational.org/
  * - Cambridge Engineering Selector (CES): https://www.ansys.com/products/materials
  * - MatWeb Materials Database: https://www.matweb.com/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

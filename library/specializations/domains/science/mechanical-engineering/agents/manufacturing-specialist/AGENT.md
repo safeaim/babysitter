@@ -18,6 +18,11 @@ metadata:
   phase: 2
   experience: 12+ years manufacturing engineering
   background: CNC machining, metal fabrication, additive manufacturing
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Manufacturing Engineering Specialist Agent

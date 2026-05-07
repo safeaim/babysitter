@@ -8,6 +8,10 @@ expertise:
   - Allocation negotiation
   - LP co-investment programs
   - Investor communication and coordination
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Syndicate Manager

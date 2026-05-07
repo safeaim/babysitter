@@ -55,6 +55,12 @@
  *   scopeNotes: 'confirmed exoplanets discovered 1995-present',
  * }, ctx);
  * ```
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:backend-api-development]
+ *   topics: [topic:database-management, topic:developer-experience]
+ *   roles: [role:backend-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

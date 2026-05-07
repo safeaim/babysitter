@@ -3,6 +3,11 @@
  * @description Porter's value chain analysis to identify sources of competitive advantage through activity optimization
  * @inputs { organizationName: string, businessModel: object, processData: object, costData: object, competitorBenchmarks: object }
  * @outputs { success: boolean, valueChainMap: object, costDrivers: object, differentiationOpportunities: array, optimizationRecommendations: array, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

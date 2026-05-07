@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Process Simulation
   skill-id: CE-SK-003
+graph:
+  domains: [domain:chemical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Thermodynamic Model Selector Skill

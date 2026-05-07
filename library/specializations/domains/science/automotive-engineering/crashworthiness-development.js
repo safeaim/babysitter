@@ -18,6 +18,12 @@
  * - FMVSS 200 Series Crashworthiness Standards
  * - UN ECE R94/95 Frontal/Side Impact
  * - IIHS Crashworthiness Evaluation
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

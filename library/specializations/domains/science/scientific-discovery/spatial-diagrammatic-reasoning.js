@@ -18,6 +18,12 @@
  * - Qualitative Spatial Reasoning: https://www.sciencedirect.com/topics/computer-science/qualitative-spatial-reasoning
  * - Diagrammatic Reasoning: https://plato.stanford.edu/entries/reasoning-diagrammatic/
  * - Topological Relations: https://www.sciencedirect.com/topics/computer-science/region-connection-calculus
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

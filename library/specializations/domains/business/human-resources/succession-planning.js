@@ -8,6 +8,11 @@
  * @references
  * - SHRM Succession Planning: https://www.shrm.org/resourcesandtools/tools-and-samples/toolkits/pages/practicingsuccessionplanning.aspx
  * - Harvard Business Review: https://hbr.org/2011/04/succession-planning-what-the-research-says
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

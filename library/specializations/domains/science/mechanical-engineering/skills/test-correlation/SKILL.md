@@ -18,6 +18,11 @@ metadata:
     - Python scipy
     - Test data formats
     - FEA/CFD tools
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Test Correlation Skill

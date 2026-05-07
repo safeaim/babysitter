@@ -17,6 +17,12 @@
  * - IEC 62366-1:2015 Medical devices - Application of usability engineering to medical devices
  * - FDA Human Factors Guidance: https://www.fda.gov/regulatory-information/search-fda-guidance-documents/applying-human-factors-and-usability-engineering-medical-devices
  * - AAMI HE75:2009 Human factors engineering - Design of medical devices
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

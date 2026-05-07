@@ -2,6 +2,11 @@
 name: clinical-decision-support-rules
 description: Develop and maintain clinical decision support rules including alerts, reminders, order sets, and evidence-based recommendations within EHR systems
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Clinical Decision Support Rules

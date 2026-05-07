@@ -20,6 +20,12 @@
  * - scVI: https://docs.scvi-tools.org/
  * - CellTypist: https://www.celltypist.org/
  * - Monocle3: https://cole-trapnell-lab.github.io/monocle3/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

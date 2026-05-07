@@ -3,6 +3,11 @@
  * @description Framework for creating uncontested market space through value innovation using the Four Actions Framework and Strategy Canvas
  * @inputs { industry: string, organizationContext: object, currentOffering: object, outputDir: string }
  * @outputs { success: boolean, strategyCanvas: object, fourActionsFramework: object, blueOceanIdeas: array, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:competitive-analysis]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

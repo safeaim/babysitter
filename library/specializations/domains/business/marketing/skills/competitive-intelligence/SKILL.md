@@ -17,6 +17,10 @@ metadata:
     - Semrush API
     - SimilarWeb API
     - Crayon API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Competitive Intelligence Platform Skill

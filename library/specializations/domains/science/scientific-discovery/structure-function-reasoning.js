@@ -3,6 +3,12 @@
  * @description Structure-function reasoning process for inferring biological function from structure and vice versa, analyzing molecular architecture, and understanding form-function relationships
  * @inputs { structure: object, function: string, level: string, context: object, outputDir: string }
  * @outputs { success: boolean, inference: object, structureFunctionMapping: object, predictions: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -15,6 +15,11 @@
  * @references
  * - Lean Analytics: https://leananalyticsbook.com/
  * - SaaS Metrics: https://www.forentrepreneurs.com/
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

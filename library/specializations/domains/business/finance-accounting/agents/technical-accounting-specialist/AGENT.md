@@ -9,6 +9,10 @@ expertise:
   - Complex transaction analysis
   - Disclosure review
   - Position documentation
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Technical Accounting Specialist

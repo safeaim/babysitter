@@ -16,6 +16,11 @@
  * @references
  * - IAPP CIPP Certification: https://iapp.org/certify/cipp/
  * - GDPR DSR Requirements: https://gdpr.eu/right-of-access/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

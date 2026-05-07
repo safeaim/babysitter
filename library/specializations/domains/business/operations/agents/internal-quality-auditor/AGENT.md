@@ -9,6 +9,10 @@ expertise:
   - CAR initiation
   - Effectiveness verification
   - Audit reporting
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Internal Quality Auditor

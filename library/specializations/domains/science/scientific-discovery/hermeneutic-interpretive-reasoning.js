@@ -18,6 +18,12 @@
  * - Gadamer on Understanding: https://plato.stanford.edu/entries/gadamer/
  * - Ricoeur on Interpretation: https://plato.stanford.edu/entries/ricoeur/
  * - Philosophy of Science Interpretation: https://plato.stanford.edu/entries/scientific-knowledge-social/
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

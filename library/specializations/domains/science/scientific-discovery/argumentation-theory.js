@@ -3,6 +3,12 @@
  * @description Evaluate competing arguments via attack/defense relations using formal argumentation frameworks
  * @inputs { arguments: array, attackRelations: array, supportRelations: array, semantics: string, queries: array, outputDir: string }
  * @outputs { success: boolean, acceptedArguments: array, rejectedArguments: array, extensions: array, argumentEvaluations: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

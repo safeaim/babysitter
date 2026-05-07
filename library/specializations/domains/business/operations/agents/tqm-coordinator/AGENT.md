@@ -9,6 +9,10 @@ expertise:
   - Quality circle facilitation
   - Recognition program management
   - Continuous improvement culture
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # TQM Coordinator

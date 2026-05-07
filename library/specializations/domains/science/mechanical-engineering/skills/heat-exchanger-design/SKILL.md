@@ -16,6 +16,11 @@ metadata:
   tools-libraries:
     - HTRI Xchanger Suite
     - Aspen Exchanger Design and Rating
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Heat Exchanger Design Skill

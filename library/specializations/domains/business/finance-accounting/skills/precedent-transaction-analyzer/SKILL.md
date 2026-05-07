@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: investment-analysis
   priority: lower
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Precedent Transaction Analyzer

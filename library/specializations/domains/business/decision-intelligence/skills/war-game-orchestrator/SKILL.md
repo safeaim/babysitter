@@ -16,6 +16,10 @@ metadata:
     - custom workflows
     - collaboration tools
     - documentation generators
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # War Game Orchestrator

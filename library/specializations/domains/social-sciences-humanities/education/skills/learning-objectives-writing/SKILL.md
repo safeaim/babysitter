@@ -2,6 +2,11 @@
 name: learning-objectives-writing
 description: Write measurable, SMART learning objectives using Bloom's Taxonomy cognitive levels aligned with desired outcomes and assessment strategies
 allowed-tools: Read, Grep, Write, Edit, Glob
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Learning Objectives Writing

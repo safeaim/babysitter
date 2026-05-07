@@ -3,6 +3,12 @@
  * @description Prohibit draft PRs for ready-to-merge flows; require ready-for-review state before CI/review gates apply.
  * @inputs { prNumber: number, isDraft: boolean, hasApprovals: boolean, ciStatus: "pending"|"success"|"failure" }
  * @outputs { success: boolean, action: "mark-ready"|"block-merge"|"ok", reason?: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review, topic:git-workflow]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 export async function process(inputs, _ctx) {

@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Corporate Governance
   skill-id: SK-022
+graph:
+  domains: [domain:legal]
+  skillAreas: [skill-area:legal-analysis]
+  roles: [role:legal-counsel]
 ---
 
 # Corporate Records Skill

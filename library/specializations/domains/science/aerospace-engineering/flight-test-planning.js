@@ -4,6 +4,12 @@
  * instrumentation requirements, and flight test safety.
  * @inputs { projectName: string, testObjectives: array, aircraftConfiguration: object, flightEnvelope?: object }
  * @outputs { success: boolean, testPlan: object, testCards: array, safetyAssessment: object }
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

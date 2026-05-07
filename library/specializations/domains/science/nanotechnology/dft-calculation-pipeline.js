@@ -18,6 +18,12 @@
  * - VASP (Vienna Ab initio Simulation Package): https://www.vasp.at/
  * - Quantum ESPRESSO: https://www.quantum-espresso.org/
  * - Gaussian: https://gaussian.com/
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

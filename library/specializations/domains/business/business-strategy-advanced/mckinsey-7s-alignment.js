@@ -3,6 +3,11 @@
  * @description Organizational alignment analysis using McKinsey 7S Framework for strategy implementation
  * @inputs { organizationName: string, strategyContext: object, organizationalData: object, targetState: object }
  * @outputs { success: boolean, sevenSAssessment: object, alignmentGaps: array, remediationPlans: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

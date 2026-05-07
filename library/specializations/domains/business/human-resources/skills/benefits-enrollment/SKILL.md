@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Compensation & Benefits
   skill-id: SK-015
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Benefits Enrollment Skill

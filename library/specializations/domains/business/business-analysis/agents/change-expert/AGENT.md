@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-006
   category: Change Management
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Change Management Expert Agent

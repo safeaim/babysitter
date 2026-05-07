@@ -8,6 +8,12 @@
  * // Input: { target: { type: "argument", content: "..." }, targetType: "argument", context: {...} }
  * // Output: { vulnerabilities: [...], attackVectors: [...], robustnessAssessment: { score: 0.65, weaknesses: [...] } }
  * @references Red teaming methodology, Adversarial analysis, Devil's advocate technique, Pre-mortem analysis
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

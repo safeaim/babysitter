@@ -18,6 +18,12 @@
  * - Keeney, R.L. & Raiffa, H. (1993). Decisions with Multiple Objectives
  * - Saaty, T.L. (1980). The Analytic Hierarchy Process
  * - Greco, S. et al. (2016). Multiple Criteria Decision Analysis: State of the Art Surveys
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

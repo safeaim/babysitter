@@ -5,6 +5,12 @@
  * @outputs { success: boolean, mediaCollection: object, metadataRecords: array, ethicsDocumentation: object, artifacts: array }
  * @recommendedSkills SK-HUM-002 (ethnographic-coding-thematics), SK-HUM-014 (metadata-standards-implementation)
  * @recommendedAgents AG-HUM-002 (ethnographic-methods-advisor), AG-HUM-010 (cultural-heritage-specialist)
+ *
+ * @graph
+ *   domains: [domain:humanities]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - NLP libraries
     - Exit survey data
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Exit Interview Analysis Skill

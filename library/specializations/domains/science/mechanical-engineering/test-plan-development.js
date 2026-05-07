@@ -17,6 +17,12 @@
  *   constraints: { budget: 150000, duration: 12, facility: 'internal' }
  * });
  * @references MIL-STD-810, RTCA DO-160, ISO 16750, SAE J1211
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

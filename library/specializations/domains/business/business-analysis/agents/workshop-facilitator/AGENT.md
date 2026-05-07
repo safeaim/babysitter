@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-009
   category: Facilitation
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Workshop Facilitator Agent

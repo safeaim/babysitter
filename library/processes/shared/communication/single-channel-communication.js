@@ -3,6 +3,12 @@
  * @description Enforce single-channel communication per task — no cross-posting; migrate with one pointer.
  * @inputs { taskTopic: string, availableChannels: Array<string>, activeChannel?: string }
  * @outputs { success: boolean, chosenChannel: string, rules: object }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:developer-experience, topic:documentation]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

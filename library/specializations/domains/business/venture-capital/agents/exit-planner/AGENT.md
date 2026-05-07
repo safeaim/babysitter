@@ -8,6 +8,10 @@ expertise:
   - Buyer universe development
   - Exit path optimization
   - Transaction preparation
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Exit Planner

@@ -17,6 +17,11 @@
  * - 15Five Continuous Performance: https://www.15five.com/blog/continuous-performance-management/
  * - Culture Amp Feedback: https://www.cultureamp.com/blog/continuous-feedback
  * - Lattice One-on-Ones: https://lattice.com/library/one-on-one-meetings
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

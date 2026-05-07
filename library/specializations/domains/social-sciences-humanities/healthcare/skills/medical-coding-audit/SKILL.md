@@ -2,6 +2,11 @@
 name: medical-coding-audit
 description: Review clinical documentation and assigned codes for accuracy, compliance, and optimization, identifying documentation improvement opportunities and coding errors
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Medical Coding Audit

@@ -16,6 +16,11 @@
  * @references
  * - PMI WBS Practice Standard: https://www.pmi.org/pmbok-guide-standards/practice-guides/wbs
  * - WBS Best Practices: https://www.pmi.org/learning/library/applying-work-breakdown-structure-project-lifecycle-6979
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

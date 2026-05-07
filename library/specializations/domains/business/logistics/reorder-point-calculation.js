@@ -15,6 +15,11 @@
  * @references
  * - DDMRP: https://www.amazon.com/Demand-Driven-Material-Requirements-Planning-DDMRP/dp/0831136286
  * - Inventory Optimization: https://www.apics.org/
+ * @graph
+ *   domains: [domain:logistics]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:logistics-management, topic:warehouse-operations]
+ *   roles: [role:logistics-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

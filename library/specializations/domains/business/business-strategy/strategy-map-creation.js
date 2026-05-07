@@ -3,6 +3,11 @@
  * @description Visual articulation of strategic objectives and cause-and-effect relationships across organizational dimensions
  * @inputs { organizationContext: object, strategicObjectives: array, perspectives: array, outputDir: string }
  * @outputs { success: boolean, strategyMap: object, causalChains: array, strategicThemes: array, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:competitive-analysis]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

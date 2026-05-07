@@ -6,6 +6,11 @@ backlog-id: AG-IE-023
 metadata:
   author: babysitter-sdk
   version: "1.0.0"
+graph:
+  domains: [domain:industrial-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:process-optimization]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # decision-analyst

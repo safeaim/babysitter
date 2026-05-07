@@ -16,6 +16,12 @@
  * - Klein, G. (2007). Performing a Project Premortem. Harvard Business Review
  * - Zenko, M. (2015). Red Team: How to Succeed by Thinking Like the Enemy
  * - Kahneman, D. (2011). Thinking, Fast and Slow
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

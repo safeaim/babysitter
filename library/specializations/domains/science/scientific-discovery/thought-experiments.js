@@ -3,6 +3,12 @@
  * @description Thought Experiments process - Design and conduct imagined experiments to explore theoretical consequences and gain insight
  * @inputs { theory: object, question: string, constraints: array, outputDir: string }
  * @outputs { success: boolean, thoughtExperiment: object, conclusions: array, implications: array, paradoxes: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

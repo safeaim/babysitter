@@ -17,6 +17,12 @@
  * - FMVSS 135 Passenger Car Brake Systems
  * - UN ECE R13H Braking Regulation
  * - ISO 26867 ESC Performance Test
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

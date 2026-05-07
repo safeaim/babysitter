@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Corporate Governance
   skill-id: SK-023
+graph:
+  domains: [domain:legal]
+  skillAreas: [skill-area:legal-analysis]
+  roles: [role:legal-counsel]
 ---
 
 # Entity Management Skill

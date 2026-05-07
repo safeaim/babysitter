@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Survey platforms
     - Statistical analysis
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Engagement Survey Skill

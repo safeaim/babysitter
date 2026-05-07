@@ -15,6 +15,11 @@
  * @references
  * - SBA Business Plan Templates: https://www.sba.gov/
  * - Disciplined Entrepreneurship: https://www.amazon.com/Disciplined-Entrepreneurship-Bill-Aulet/dp/1118692284
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

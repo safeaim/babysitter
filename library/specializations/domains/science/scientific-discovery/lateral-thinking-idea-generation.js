@@ -16,6 +16,12 @@
  * - de Bono, E. (1970). Lateral Thinking: Creativity Step by Step
  * - de Bono, E. (1985). Six Thinking Hats
  * - Michalko, M. (2006). Thinkertoys
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

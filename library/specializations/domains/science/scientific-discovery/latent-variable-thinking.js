@@ -3,6 +3,12 @@
  * @description Treat observed measurements as manifestations of hidden constructs, using latent variable models to understand measurement and structure
  * @inputs { observedVariables: array, theoreticalModel: object, data: object, outputDir: string }
  * @outputs { success: boolean, latentStructure: object, measurementModel: object, modelFit: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -21,6 +21,12 @@
  * - Modal Testing: Theory, Practice and Application: https://www.wiley.com/
  * - Vibration of Continuous Systems: https://www.wiley.com/
  * - ANSYS Mechanical Dynamics: https://ansyshelp.ansys.com/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

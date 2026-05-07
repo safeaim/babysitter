@@ -2,6 +2,11 @@
 name: quality-metrics-measurement
 description: Collect, calculate, and report healthcare quality metrics including core measures, HEDIS, patient safety indicators, and value-based purchasing measures
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Quality Metrics Measurement

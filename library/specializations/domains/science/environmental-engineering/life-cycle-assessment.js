@@ -18,6 +18,12 @@
  * - ISO 14044:2006 - LCA Requirements and Guidelines
  * - EPA LCA Resources
  * - openLCA Documentation
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

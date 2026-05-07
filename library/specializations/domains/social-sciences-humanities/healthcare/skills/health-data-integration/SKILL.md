@@ -2,6 +2,11 @@
 name: health-data-integration
 description: Facilitate interoperability between health IT systems including EHR, HIE, and clinical decision support through HL7, FHIR, and other healthcare data standards
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Health Data Integration

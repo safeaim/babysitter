@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Methodology
   agent-id: AG-003
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Lean Startup Practitioner Agent

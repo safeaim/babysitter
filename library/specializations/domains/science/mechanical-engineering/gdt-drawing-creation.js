@@ -18,6 +18,12 @@
  * - ASME Y14.5-2018: https://www.asme.org/codes-standards/find-codes-standards/y14-5-dimensioning-tolerancing
  * - ISO 1101: https://www.iso.org/standard/66777.html
  * - Geometric Dimensioning and Tolerancing Handbook: https://www.asme.org/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

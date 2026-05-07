@@ -2,6 +2,11 @@
 name: standards-alignment-mapping
 description: Systematically map curriculum content to educational standards with vertical and horizontal alignment documentation
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Standards Alignment Mapping

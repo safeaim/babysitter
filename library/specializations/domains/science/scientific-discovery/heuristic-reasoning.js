@@ -11,6 +11,12 @@
  * - Gigerenzer, G. et al. (1999). Simple Heuristics That Make Us Smart
  * - Kahneman, D. (2011). Thinking, Fast and Slow
  * - Todd, P.M. & Gigerenzer, G. (2012). Ecological Rationality
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

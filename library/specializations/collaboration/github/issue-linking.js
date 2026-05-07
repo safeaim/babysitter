@@ -3,6 +3,12 @@
  * @description Ensure PRs and commits link to tracking issues with proper closing keywords.
  * @inputs { prBody: string, commitMessages: Array<string>, openIssues?: Array<{ number, title, labels }>, strictness?: "strict"|"lenient" }
  * @outputs { success: boolean, linkedIssues: Array<number>, missingLinks: Array<string>, suggestions?: Array<string> }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review, topic:project-management]
+ *   workflows: [workflow:code-review, workflow:feature-development]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

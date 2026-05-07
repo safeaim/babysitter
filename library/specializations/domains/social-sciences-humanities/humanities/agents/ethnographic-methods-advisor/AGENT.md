@@ -2,6 +2,11 @@
 name: ethnographic-methods-advisor
 description: Support ethnographic research design and qualitative analysis including participant observation, interview design, field ethics, qualitative coding, and thick description
 required-skills: ethnographic-coding-thematics, research-ethics-irb-navigation, oral-history-interview-technique
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Ethnographic Methods Advisor Agent

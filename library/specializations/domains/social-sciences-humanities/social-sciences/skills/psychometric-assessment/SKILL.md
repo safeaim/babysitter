@@ -8,6 +8,11 @@ allowed-tools:
   - Grep
   - Glob
   - Bash
+graph:
+  domains: [domain:social-sciences]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Psychometric Assessment Skill

@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: research-documentation
   phase: 6
+graph:
+  domains: [domain:computer-science]
+  skillAreas: [skill-area:software-architecture]
+  topics: [topic:algorithm-design, topic:formal-methods]
+  roles: [role:tech-lead, role:backend-engineer]
 ---
 
 # Related Work Analyzer

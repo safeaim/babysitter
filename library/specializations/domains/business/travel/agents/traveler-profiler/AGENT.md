@@ -10,6 +10,10 @@ expertise:
   - Carrier / aircraft exclusion lists
 used-by-processes:
   - specializations/domains/business/travel/travel-plan-compose
+graph:
+  domains: [domain:travel]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Traveler Profiler

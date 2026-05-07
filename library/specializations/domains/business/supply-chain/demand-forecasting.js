@@ -16,6 +16,11 @@
  * @references
  * - ASCM CPIM Certification: https://www.ascm.org/learning-development/certifications-credentials/cpim/
  * - Demand Planning Best Practices: https://www.gartner.com/en/supply-chain
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

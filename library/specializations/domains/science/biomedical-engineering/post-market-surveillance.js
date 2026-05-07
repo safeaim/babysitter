@@ -17,6 +17,12 @@
  * - EU MDR Article 83-86 Post-Market Surveillance
  * - FDA 21 CFR 803 Medical Device Reporting
  * - MDCG 2020-7 PMCF Plan Template
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

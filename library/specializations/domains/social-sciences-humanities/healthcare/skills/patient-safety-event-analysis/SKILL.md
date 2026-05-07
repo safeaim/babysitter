@@ -2,6 +2,11 @@
 name: patient-safety-event-analysis
 description: Investigate patient safety events using RCA, FMEA, and other systematic analysis methods to identify contributing factors and develop corrective actions
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Patient Safety Event Analysis

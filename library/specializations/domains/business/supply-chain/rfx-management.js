@@ -17,6 +17,11 @@
  * @references
  * - Ariba RFx Best Practices: https://www.ariba.com/
  * - Coupa Source-to-Contract: https://www.coupa.com/
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

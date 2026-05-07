@@ -20,6 +20,12 @@
  * - ANSYS Fluent Theory Guide: https://ansyshelp.ansys.com/
  * - Versteeg & Malalasekera: Introduction to CFD
  * - Turbulence Modeling for CFD: https://www.dcwindustries.com/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

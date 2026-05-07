@@ -16,6 +16,11 @@
  * @references
  * - Group Decision Support Systems: DeSanctis & Gallupe
  * - Collective Intelligence: MIT Center for Collective Intelligence
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

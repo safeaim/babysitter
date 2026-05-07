@@ -3,6 +3,12 @@
  * @description Dispatches to the appropriate pr-lifecycle variant based on (event × inferred change type). One entry point; many lifecycles.
  * @inputs { event: "pr-opened"|"pr-synchronize"|"pr-ready-for-review"|"pr-comment-mention"|"pr-merged", pr: { number, repo, title, body, labels: string[], author: { login, isBot }, changedFiles: string[], baseBranch: string, headBranch: string, isDraft: boolean }, comment?: object }
  * @outputs { success: boolean, selectedLifecycle: string, lifecycleResult: object, changeType: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review, topic:git-workflow]
+ *   workflows: [workflow:code-review, workflow:feature-development]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

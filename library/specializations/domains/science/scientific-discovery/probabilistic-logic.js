@@ -3,6 +3,12 @@
  * @description Blend logical structure with probabilistic uncertainty for reasoning under incomplete information
  * @inputs { premises: array, hypotheses: array, priorProbabilities: object, evidenceWeights: object, outputDir: string }
  * @outputs { success: boolean, posteriorProbabilities: object, logicalInferences: array, uncertaintyAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -2,6 +2,11 @@
 name: accreditation-tracer-simulation
 description: Simulate Joint Commission tracer methodology to assess compliance with accreditation standards across patient care processes and support systems
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Accreditation Tracer Simulation

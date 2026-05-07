@@ -5,6 +5,12 @@
  * @outputs { success: boolean, promptBook: object, rehearsalReports: array, showDocumentation: object, artifacts: array }
  * @recommendedSkills SK-AC-005 (production-coordination)
  * @recommendedAgents AG-AC-005 (production-manager-agent)
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

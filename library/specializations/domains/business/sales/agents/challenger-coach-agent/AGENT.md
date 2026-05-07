@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Persuasion modeling
     - Insight generation
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Challenger Coach Agent

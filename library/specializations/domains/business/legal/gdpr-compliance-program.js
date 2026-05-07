@@ -16,6 +16,11 @@
  * - GDPR Official Text: https://gdpr.eu/
  * - ICO GDPR Guidance: https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/
  * - EDPB Guidelines: https://edpb.europa.eu/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

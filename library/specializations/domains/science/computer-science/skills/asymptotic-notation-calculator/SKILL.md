@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: algorithm-analysis
   phase: 6
+graph:
+  domains: [domain:computer-science]
+  skillAreas: [skill-area:software-architecture]
+  topics: [topic:algorithm-design, topic:formal-methods]
+  roles: [role:tech-lead, role:backend-engineer]
 ---
 
 # Asymptotic Notation Calculator

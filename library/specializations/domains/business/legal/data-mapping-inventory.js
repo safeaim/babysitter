@@ -15,6 +15,11 @@
  * @references
  * - NIST Privacy Framework: https://www.nist.gov/privacy-framework
  * - ISO 27701: https://www.iso.org/standard/71670.html
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

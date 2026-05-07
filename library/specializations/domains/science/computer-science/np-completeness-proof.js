@@ -3,6 +3,12 @@
  * @description Establish NP-completeness of computational problems via reduction with gadget library
  * @inputs { problemDescription: string, nPMembershipProof: object }
  * @outputs { success: boolean, npCompletenessProof: object, reductionDetails: object, gadgetLibrary: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,12 @@
  * - INCOSE Requirements Engineering Guide
  * - ASPICE SYS.2 System Requirements Analysis
  * - IEEE 29148 Requirements Engineering
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

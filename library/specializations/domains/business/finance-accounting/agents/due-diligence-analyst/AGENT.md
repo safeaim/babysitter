@@ -9,6 +9,10 @@ expertise:
   - Pro forma adjustments
   - Red flag identification
   - Management Q&A preparation
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Due Diligence Analyst

@@ -17,6 +17,11 @@
  * - Hirano, H. (1995). 5 Pillars of the Visual Workplace
  * - Osada, T. (1991). The 5S's: Five Keys to a Total Quality Environment
  * - Liker, J. (2004). The Toyota Way
+ * @graph
+ *   domains: [domain:operations]
+ *   skillAreas: [skill-area:operations-management]
+ *   topics: [topic:process-optimization, topic:operational-excellence]
+ *   roles: [role:operations-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,11 @@
  * @description Create compelling business cases with problem statements, strategic alignment, options analysis, cost-benefit analysis (ROI, NPV, payback), risk assessment, and implementation recommendations.
  * @inputs { projectName: string, problemStatement: string, strategicContext: object, options: array, financialData: object }
  * @outputs { success: boolean, businessCase: object, financialAnalysis: object, recommendation: object, artifacts: array }
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:business-analysis]
+ *   topics: [topic:business-process-modeling, topic:requirements-engineering]
+ *   roles: [role:business-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

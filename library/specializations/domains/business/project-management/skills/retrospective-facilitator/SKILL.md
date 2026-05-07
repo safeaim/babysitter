@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Agile Management
   id: SK-015
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Retrospective Facilitator

@@ -8,6 +8,10 @@ expertise:
   - Dilution analysis and projections
   - Scenario and sensitivity modeling
   - Option pool and equity planning
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Cap Table Modeler

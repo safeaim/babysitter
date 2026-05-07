@@ -17,6 +17,12 @@
  * - MEDDEV 2.7/1 Rev 4 Clinical Evaluation
  * - EU MDR 2017/745 Article 61 Clinical Evaluation
  * - MDCG 2020-13 Clinical Evaluation Assessment Report Template
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

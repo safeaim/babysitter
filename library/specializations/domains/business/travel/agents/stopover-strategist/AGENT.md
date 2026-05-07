@@ -10,6 +10,10 @@ expertise:
   - Ranking by (leg1+leg2) vs direct-baseline delta
 used-by-processes:
   - specializations/domains/business/travel/travel-plan-compose
+graph:
+  domains: [domain:travel]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Stopover Strategist

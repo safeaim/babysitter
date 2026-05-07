@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: cross-functional
   priority: future
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Supply Chain Digital Twin

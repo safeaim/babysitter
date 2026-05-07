@@ -5,6 +5,12 @@
  *   Layers: 'gitleaks' | 'commitlint' | 'eslint' | 'typos' | 'husky'.
  * @inputs { targetDir: string, layers: string[] }
  * @outputs { success: boolean, copied: string[], skipped: string[], committed: boolean }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:developer-tooling]
+ *   topics: [topic:developer-experience, topic:build-systems]
+ *   roles: [role:backend-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

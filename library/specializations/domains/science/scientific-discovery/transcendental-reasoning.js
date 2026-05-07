@@ -8,6 +8,12 @@
  * // Input: { phenomenon: "scientific inquiry", domain: "epistemology", context: {...} }
  * // Output: { preconditions: [{ condition: "...", necessity: "absolute" }], necessityAnalysis: {...}, constitutiveStructures: {...} }
  * @references Kantian transcendental method, Transcendental argumentation, Conditions of possibility analysis
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

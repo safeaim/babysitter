@@ -46,6 +46,12 @@
  * - REACH Nanomaterials Guidance (ECHA)
  * - NIOSH Nanotechnology Research Center Guidelines
  * - ISO 19007:2018 In vitro cytotoxicity methods
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: strategy-execution
   phase: 6
+graph:
+  domains: [domain:strategy]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:strategy-consultant]
 ---
 
 # OKR Skill

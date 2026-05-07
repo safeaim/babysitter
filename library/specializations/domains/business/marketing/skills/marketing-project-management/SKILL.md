@@ -17,6 +17,10 @@ metadata:
     - Asana API
     - Monday.com API
     - Workfront API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Marketing Project Management Platform Skill

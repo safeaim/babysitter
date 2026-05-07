@@ -13,6 +13,10 @@ required-skills:
   - omnichannel-fulfillment-allocator
   - last-mile-delivery-optimizer
   - logistics-kpi-tracker
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Fulfillment Coordinator

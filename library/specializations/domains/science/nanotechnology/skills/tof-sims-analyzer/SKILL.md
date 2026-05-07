@@ -17,6 +17,11 @@ metadata:
     - ION-TOF software
     - SurfaceLab
     - NESAC/BIO tools
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # ToF-SIMS Analyzer

@@ -7,6 +7,11 @@ metadata:
   version: "1.0.0"
   category: continuous-improvement
   backlog-id: SK-IE-040
+graph:
+  domains: [domain:industrial-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:process-optimization]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # a3-problem-solver

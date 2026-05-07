@@ -18,6 +18,12 @@
  * - Chickering (2002). Optimal Structure Identification With Greedy Search
  * - Zheng et al. (2018). DAGs with NO TEARS
  * - Huang et al. (2020). Causal Discovery from Heterogeneous/Nonstationary Data
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -9,6 +9,10 @@ expertise:
   - Deficiency evaluation
   - Remediation tracking
   - Management certification support
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # SOX Compliance Manager

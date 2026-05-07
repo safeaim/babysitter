@@ -2,6 +2,11 @@
 name: cultural-policy-agent
 description: Cultural policy and planning specialist agent for policy analysis, cultural planning, impact assessment, community consultation, advocacy strategy, and public value articulation
 required-skills: cultural-policy-analysis, arts-advocacy-communication, stakeholder-facilitation
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Cultural Policy Agent

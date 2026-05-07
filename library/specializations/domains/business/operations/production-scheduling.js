@@ -17,6 +17,11 @@
  * - Pinedo, M.L. (2016). Scheduling: Theory, Algorithms, and Systems
  * - Hopp, W.J. & Spearman, M.L. (2011). Factory Physics
  * - APICS CPIM Body of Knowledge
+ * @graph
+ *   domains: [domain:operations]
+ *   skillAreas: [skill-area:operations-management]
+ *   topics: [topic:process-optimization, topic:operational-excellence]
+ *   roles: [role:operations-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

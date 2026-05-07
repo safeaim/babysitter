@@ -18,6 +18,12 @@
  * - Possible Worlds: https://plato.stanford.edu/entries/possible-worlds/
  * - Epistemic Logic: https://plato.stanford.edu/entries/logic-epistemic/
  * - Counterfactual Conditionals: https://plato.stanford.edu/entries/counterfactuals/
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

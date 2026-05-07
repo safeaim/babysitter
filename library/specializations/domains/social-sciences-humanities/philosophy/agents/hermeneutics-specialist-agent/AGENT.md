@@ -2,6 +2,11 @@
 name: hermeneutics-specialist-agent
 description: Interprets philosophical and theological texts using multiple hermeneutical approaches
 required-skills: hermeneutical-interpretation, comparative-religion-analysis, scholarly-literature-synthesis
+graph:
+  domains: [domain:philosophy]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Hermeneutics Specialist Agent

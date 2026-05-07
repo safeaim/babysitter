@@ -28,6 +28,12 @@
  *   "designStandards": ["CMH-17", "MIL-HDBK-17"]
  * }
  * @references CMH-17 Composite Materials Handbook, ASTM D Standards, MIL-HDBK-17
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

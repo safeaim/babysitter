@@ -12,6 +12,11 @@ expertise:
 metadata:
   version: "1.0"
   category: bioinformatics
+graph:
+  domains: [domain:bioinformatics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:data-engineer, role:tech-lead]
 ---
 
 # Multi-Omics Integrator Agent

@@ -2,6 +2,11 @@
  * @file financial-modeling-scenario-planning.js
  * @description Building comprehensive financial models with sensitivity analysis, scenario planning, and Monte Carlo simulations for strategic decision support
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

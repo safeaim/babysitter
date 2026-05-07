@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Fundraising
   agent-id: AG-006
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Pitch Coach Agent

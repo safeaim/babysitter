@@ -9,6 +9,10 @@ expertise:
   - Capability building
   - Progress tracking
   - Sustainability assurance
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # OpEx Program Manager

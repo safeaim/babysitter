@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Medical Device Software
   skill-id: BME-SK-021
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # AI/ML Validation Framework Skill

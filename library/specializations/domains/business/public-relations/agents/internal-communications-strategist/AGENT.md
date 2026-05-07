@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Internal Communications
   agent-id: AG-007
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Internal Communications Strategist Agent

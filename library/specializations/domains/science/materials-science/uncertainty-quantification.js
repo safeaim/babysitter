@@ -31,6 +31,12 @@
  *   "confidenceLevel": 0.95
  * }
  * @references GUM (ISO Guide to Uncertainty), MMPDS Statistical Methods, ASTM E2586, Bayesian UQ
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

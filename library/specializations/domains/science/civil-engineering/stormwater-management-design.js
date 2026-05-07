@@ -3,6 +3,12 @@
  * @description Design of stormwater management systems including hydrology analysis, detention design, conveyance systems, and LID/green infrastructure
  * @inputs { projectId: string, siteCharacteristics: object, watershedData: object, regulatoryRequirements: object }
  * @outputs { success: boolean, stormwaterDesign: object, drainagePlans: array, detentionDesign: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

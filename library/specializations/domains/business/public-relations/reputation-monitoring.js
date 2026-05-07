@@ -5,6 +5,11 @@
  * @category Reputation Management
  * @inputs { organization: object, monitoringScope: object, baselineMetrics: object, alertThresholds: object }
  * @outputs { success: boolean, monitoringFramework: object, dashboards: object, alertSystem: object, quality: number }
+ * @graph
+ *   domains: [domain:public-relations]
+ *   skillAreas: [skill-area:communications-strategy]
+ *   topics: [topic:media-relations, topic:brand-management]
+ *   roles: [role:communications-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

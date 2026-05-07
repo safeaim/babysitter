@@ -17,6 +17,10 @@ metadata:
     - Cision API
     - Meltwater API
     - Brandwatch API
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Media Monitoring Skill

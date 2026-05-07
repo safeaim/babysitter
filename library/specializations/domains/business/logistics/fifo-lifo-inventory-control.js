@@ -14,6 +14,11 @@
  * @references
  * - FDA FSMA: https://www.fda.gov/food/guidance-regulation-food-and-dietary-supplements/food-safety-modernization-act-fsma
  * - Inventory Rotation Best Practices: https://www.apics.org/
+ * @graph
+ *   domains: [domain:logistics]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:logistics-management, topic:warehouse-operations]
+ *   roles: [role:logistics-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

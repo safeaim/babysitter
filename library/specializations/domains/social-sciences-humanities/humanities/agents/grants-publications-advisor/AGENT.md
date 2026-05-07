@@ -2,6 +2,11 @@
 name: grants-publications-advisor
 description: Support competitive funding applications and scholarly publishing including grant writing, proposal development, peer review navigation, publication strategy, and budget justification
 required-skills: grant-narrative-writing, citation-scholarly-apparatus, metadata-standards-implementation
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Grants and Publications Advisor Agent

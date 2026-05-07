@@ -16,6 +16,11 @@
  * @references
  * - Coupa Spend Analysis: https://www.coupa.com/
  * - GEP Spend Management: https://www.gep.com/
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

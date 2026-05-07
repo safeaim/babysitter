@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Corporate Governance
   agent-id: AG-011
+graph:
+  domains: [domain:legal]
+  skillAreas: [skill-area:legal-analysis]
+  roles: [role:legal-counsel]
 ---
 
 # Corporate Secretary Agent

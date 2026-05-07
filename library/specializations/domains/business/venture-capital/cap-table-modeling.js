@@ -3,6 +3,11 @@
  * @description Building detailed capitalization tables modeling option pools, convertible instruments, liquidation preferences, anti-dilution provisions, and waterfall distributions
  * @inputs { companyName: string, currentCapTable: object, proposedTerms: object, scenarios: array }
  * @outputs { success: boolean, capTableModel: object, waterfallAnalysis: object, dilutionAnalysis: object, artifacts: array }
+ * @graph
+ *   domains: [domain:venture-capital]
+ *   skillAreas: [skill-area:investment-analysis]
+ *   topics: [topic:startup-funding, topic:portfolio-management]
+ *   roles: [role:venture-capitalist]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

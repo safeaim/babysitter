@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Strategic planning
     - Relationship modeling
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Account Strategist Agent

@@ -16,6 +16,11 @@
  * @references
  * - Forrester Research: https://www.forrester.com/research/data-analytics/
  * - Gartner Hype Cycle: https://www.gartner.com/en/research/methodologies/gartner-hype-cycle
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

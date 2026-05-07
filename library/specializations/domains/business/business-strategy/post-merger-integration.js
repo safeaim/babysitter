@@ -3,6 +3,11 @@
  * @description Comprehensive planning and execution framework for integrating acquired companies to realize deal synergies and strategic objectives
  * @inputs { dealContext: object, acquiredCompany: object, acquiringCompany: object, synergyTargets: object, outputDir: string }
  * @outputs { success: boolean, integrationPlan: object, synergyCaptureApproach: object, changeManagementPlan: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:competitive-analysis]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

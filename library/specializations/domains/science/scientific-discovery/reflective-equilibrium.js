@@ -8,6 +8,12 @@
  * // Input: { principles: [{ name: "...", statement: "..." }], judgments: [{ case: "...", judgment: "..." }], context: {...} }
  * // Output: { equilibriumState: { achieved: true, coherenceLevel: 0.87 }, adjustments: [...], coherenceAnalysis: {...} }
  * @references Rawlsian reflective equilibrium, Wide reflective equilibrium, Coherentism in epistemology
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

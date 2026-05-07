@@ -16,6 +16,11 @@ metadata:
   tools-libraries:
     - Plate reader analysis software
     - Cell imaging analysis
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Cytotoxicity Assay Analyzer

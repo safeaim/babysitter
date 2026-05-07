@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Performance Management
   agent-id: AG-004
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Performance Management Expert Agent

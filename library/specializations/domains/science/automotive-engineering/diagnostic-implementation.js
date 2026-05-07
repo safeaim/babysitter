@@ -18,6 +18,12 @@
  * - ISO 15765 Diagnostics on CAN
  * - SAE J1979 OBD-II PIDs
  * - ODX (ISO 22901)
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -8,6 +8,12 @@
  * @outputs { success, phase, issuesFiled, techDebtGroups }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/development/producer-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:project-management, topic:git-workflow]
+ *   workflows: [workflow:feature-development]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

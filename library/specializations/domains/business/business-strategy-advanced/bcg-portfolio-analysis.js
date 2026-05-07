@@ -3,6 +3,11 @@
  * @description Portfolio management analysis using BCG Growth-Share Matrix for resource allocation decisions
  * @inputs { organizationName: string, businessUnits: array, marketData: object, financialData: object }
  * @outputs { success: boolean, bcgMatrix: object, portfolioBalance: object, resourceAllocation: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

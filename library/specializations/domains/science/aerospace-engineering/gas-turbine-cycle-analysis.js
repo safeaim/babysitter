@@ -18,6 +18,12 @@
  * - NASA Glenn Research Center: https://www.grc.nasa.gov/
  * - NPSS (Numerical Propulsion System Simulation)
  * - GasTurb Software Documentation
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

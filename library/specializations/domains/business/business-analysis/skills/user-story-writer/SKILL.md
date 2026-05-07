@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-006
   category: Agile Requirements
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # User Story Writer

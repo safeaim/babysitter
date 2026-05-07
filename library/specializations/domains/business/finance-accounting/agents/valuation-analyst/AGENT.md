@@ -9,6 +9,10 @@ expertise:
   - DCF model construction
   - Football field preparation
   - Valuation conclusion synthesis
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Valuation Analyst

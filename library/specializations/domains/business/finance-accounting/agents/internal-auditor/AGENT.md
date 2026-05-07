@@ -9,6 +9,10 @@ expertise:
   - Finding documentation
   - Recommendation development
   - Follow-up coordination
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Internal Auditor

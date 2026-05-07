@@ -3,6 +3,12 @@
  * @description Dependency-bump (dependabot/renovate) lifecycle: verify lock-file-only change → classify semver impact → require green CI → auto-merge patch/minor, require human approval for major.
  * @inputs { event: string, pr: object, ciStatus: "pending"|"success"|"failure", changelogSummary?: string }
  * @outputs { success: boolean, semverImpact: string, mergeAction: string, blockers: string[] }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control, skill-area:dependency-management]
+ *   topics: [topic:code-review, topic:package-management]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

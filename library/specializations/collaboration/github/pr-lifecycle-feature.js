@@ -3,6 +3,12 @@
  * @description Standard feature/bugfix/chore PR lifecycle: branch+PR policies → label taxonomy → issue linking → six-dimension review → merge gate. Composes the individual gate processes into one end-to-end flow.
  * @inputs { event: string, pr: object, prDiff?: string, testsChanged?: string[] }
  * @outputs { success: boolean, stages: object, blockers: string[], readyToMerge: boolean }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review, topic:git-workflow]
+ *   workflows: [workflow:code-review, workflow:feature-development]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { process as prPolicies } from './pr-policies.js';

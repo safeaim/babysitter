@@ -18,6 +18,11 @@ metadata:
     - Gwyddion
     - AFM analysis software
     - ImageJ
+graph:
+  domains: [domain:materials-science]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Surface Analysis Skill

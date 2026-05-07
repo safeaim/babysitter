@@ -3,6 +3,12 @@
  * @description Enforce a canonical label taxonomy (type/area/priority) on issues and PRs.
  * @inputs { appliedLabels: Array<string>, changedFiles?: Array<string>, title?: string, body?: string }
  * @outputs { success: boolean, missing: Array<string>, suggestions: Array<string>, violations?: Array<object> }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:project-management, topic:code-review]
+ *   workflows: [workflow:code-review, workflow:feature-development]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

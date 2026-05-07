@@ -3,6 +3,12 @@
  * @description Structured PR review across six dimensions: correctness, clarity, consistency, coverage, complexity, change-scope.
  * @inputs { prNumber: number, repo: string, diff: string, changedFiles: Array<string>, testsChanged: Array<string>, prBody?: string }
  * @outputs { success: boolean, dimensions: object, blockingFindings: Array<object>, nits: Array<object>, summary: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:code-analysis-linting]
+ *   topics: [topic:code-review, topic:quality-assurance]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

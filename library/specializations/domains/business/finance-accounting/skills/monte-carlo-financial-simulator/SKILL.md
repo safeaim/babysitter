@@ -13,6 +13,10 @@ metadata:
   category: financial-modeling
   priority: medium
   shared: true
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Monte Carlo Financial Simulator

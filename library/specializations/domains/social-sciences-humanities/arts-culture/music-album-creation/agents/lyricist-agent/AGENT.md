@@ -3,6 +3,11 @@ name: lyricist-agent
 description: Professional lyricist agent for writing complete song lyrics with structural annotations, production notes, emotional mapping, and hook development optimized for AI music generation
 required-skills: lyric-writing, persona-development, album-conceptualization
 id: AG-MAC-001
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Lyricist Agent

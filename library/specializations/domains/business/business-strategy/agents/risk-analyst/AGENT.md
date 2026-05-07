@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Risk Management
   agent-id: AG-018
+graph:
+  domains: [domain:strategy]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:strategy-consultant]
 ---
 
 # Risk Analyst Agent

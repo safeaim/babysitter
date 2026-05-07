@@ -15,6 +15,11 @@
  * @references
  * - Kimball Data Warehouse Toolkit: https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/books/
  * - Enterprise Reporting Best Practices
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

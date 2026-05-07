@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Pattern recognition
     - Risk modeling
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Deal Inspector Agent

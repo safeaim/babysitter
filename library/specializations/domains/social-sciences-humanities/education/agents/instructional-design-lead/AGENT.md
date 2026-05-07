@@ -2,6 +2,11 @@
 name: instructional-design-lead
 description: Lead instructional design projects from analysis through evaluation using systematic design methodologies including ADDIE, SAM, and Action Mapping
 required-skills: learning-needs-analysis, learning-objectives-writing, elearning-storyboarding, learning-transfer-design
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Instructional Design Lead Agent

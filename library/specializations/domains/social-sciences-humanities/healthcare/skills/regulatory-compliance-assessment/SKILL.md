@@ -2,6 +2,11 @@
 name: regulatory-compliance-assessment
 description: Evaluate organizational compliance with healthcare regulations including HIPAA, CMS Conditions of Participation, and accreditation standards through gap analysis and audit procedures
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Regulatory Compliance Assessment

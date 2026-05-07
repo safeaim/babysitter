@@ -17,6 +17,10 @@ metadata:
     - HubSpot API
     - Marketo API
     - Salesforce Marketing Cloud API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Marketing Automation Platform Skill

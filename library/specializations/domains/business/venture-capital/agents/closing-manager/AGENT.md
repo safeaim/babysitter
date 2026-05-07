@@ -8,6 +8,10 @@ expertise:
   - Fund flow execution
   - Post-closing administration
   - Closing documentation
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Closing Manager

@@ -15,6 +15,11 @@
  * @references
  * - Supply Chain Strategy: https://www.pearson.com/en-us/subject-catalog/p/supply-chain-management-strategy-planning-and-operation/P200000003281
  * - Network Design: https://www.ascm.org/
+ * @graph
+ *   domains: [domain:logistics]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:logistics-management, topic:warehouse-operations]
+ *   roles: [role:logistics-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

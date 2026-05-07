@@ -16,6 +16,10 @@ metadata:
     - NLP libraries
     - Resume parsing engines
     - Skills taxonomies
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Resume Parsing and Screening Skill

@@ -18,6 +18,11 @@ metadata:
   phase: 6
   experience: 15+ years HVAC design
   background: Commercial buildings, industrial facilities, data centers
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # HVAC Systems Specialist Agent

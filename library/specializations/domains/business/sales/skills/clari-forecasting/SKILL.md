@@ -14,6 +14,10 @@ metadata:
   priority: P0
   integration-points:
     - Clari API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Clari Forecasting

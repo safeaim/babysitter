@@ -14,6 +14,11 @@
  * @references
  * - World Class Warehousing: https://www.mheducation.com/highered/product/world-class-warehousing-material-handling-frazelle/M9780071376006.html
  * - Warehouse Slotting Best Practices: https://www.werc.org/
+ * @graph
+ *   domains: [domain:logistics]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:logistics-management, topic:warehouse-operations]
+ *   roles: [role:logistics-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

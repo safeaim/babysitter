@@ -3,6 +3,12 @@
  * @description Build and validate steady-state process simulation models using tools like Aspen Plus, HYSYS, or DWSIM
  * @inputs { processName: string, pfdData: object, thermodynamicSystem: string, validationData: object, outputDir: string }
  * @outputs { success: boolean, modelPath: string, validationResults: object, sensitivityAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

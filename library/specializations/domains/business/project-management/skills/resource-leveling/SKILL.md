@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Resource Management
   id: SK-003
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Resource Leveling Optimizer

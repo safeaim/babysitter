@@ -16,6 +16,11 @@
  * @references
  * - PRINCE2 Business Case: https://www.axelos.com/certifications/prince2
  * - PMI Business Analysis: https://www.pmi.org/pmbok-guide-standards/foundational/business-analysis
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

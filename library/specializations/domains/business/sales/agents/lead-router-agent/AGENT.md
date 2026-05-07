@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Rule engine logic
     - Optimization algorithms
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Lead Router Agent

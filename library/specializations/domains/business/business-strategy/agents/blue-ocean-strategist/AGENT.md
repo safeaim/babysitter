@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Market Creation
   agent-id: AG-006
+graph:
+  domains: [domain:strategy]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:strategy-consultant]
 ---
 
 # Blue Ocean Strategist Agent

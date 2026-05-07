@@ -9,6 +9,10 @@ expertise:
   - Bias correction
   - New product forecasting
   - Demand sensing integration
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Demand Planning Analyst

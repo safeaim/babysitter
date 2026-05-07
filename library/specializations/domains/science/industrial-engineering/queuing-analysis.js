@@ -18,6 +18,12 @@
  * - Gross & Harris, Fundamentals of Queueing Theory
  * - Hillier & Lieberman, Introduction to Operations Research (Queuing chapters)
  * - Taha, Operations Research: An Introduction
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,12 @@
  * @description Preparation of permit applications including building permits, environmental permits, and regulatory agency submissions
  * @inputs { projectId: string, designDocuments: object, siteInformation: object, environmentalDocumentation: object }
  * @outputs { success: boolean, permitApplications: array, supportingDocuments: array, agencyCorrespondence: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

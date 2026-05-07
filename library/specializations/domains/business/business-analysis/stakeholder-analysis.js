@@ -3,6 +3,11 @@
  * @description Identify, categorize, and analyze stakeholders using Power-Interest grids, Salience model, and influence mapping. Develop tailored engagement strategies for each stakeholder group.
  * @inputs { projectName: string, projectContext: object, knownStakeholders: array, organizationStructure: object }
  * @outputs { success: boolean, stakeholderRegister: object, powerInterestMatrix: object, engagementStrategy: object, artifacts: array }
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:business-analysis]
+ *   topics: [topic:business-process-modeling, topic:requirements-engineering]
+ *   roles: [role:business-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

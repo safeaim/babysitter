@@ -17,6 +17,12 @@
  * - ITK Software Guide: https://itk.org/
  * - FDA Guidance on Clinical Decision Support Software
  * - ACR-AAPM Technical Standards for Medical Imaging
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

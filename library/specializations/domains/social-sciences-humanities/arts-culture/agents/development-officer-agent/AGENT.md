@@ -2,6 +2,11 @@
 name: development-officer-agent
 description: Fundraising and development specialist agent for grant writing, donor cultivation, major gift solicitation, foundation relations, corporate sponsorship, and planned giving
 required-skills: grant-proposal-writing, donor-relationship-management, audience-analytics
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Development Officer Agent

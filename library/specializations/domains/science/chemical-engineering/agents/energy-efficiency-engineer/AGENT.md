@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Sustainability
   agent-id: CE-AG-017
+graph:
+  domains: [domain:chemical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Energy Efficiency Engineer Agent

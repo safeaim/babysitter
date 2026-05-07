@@ -2,6 +2,11 @@
 name: operations-excellence-director
 description: Drive operational efficiency across clinical departments using Lean healthcare principles, capacity management, and throughput optimization
 required-skills: clinical-workflow-analysis, workforce-demand-forecasting, quality-metrics-measurement
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Operations Excellence Director Agent

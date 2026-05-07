@@ -18,6 +18,11 @@ metadata:
     - quantification
     - rna-seq
     - pseudo-alignment
+graph:
+  domains: [domain:bioinformatics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:data-engineer, role:tech-lead]
 ---
 
 # Salmon Quantifier Skill

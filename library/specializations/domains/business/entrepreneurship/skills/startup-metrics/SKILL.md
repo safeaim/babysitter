@@ -11,6 +11,10 @@ metadata:
   domain: business
   category: Analytics
   skill-id: SK-018
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Startup Metrics Dashboard Skill

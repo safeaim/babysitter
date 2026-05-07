@@ -16,6 +16,12 @@
  * - Forrester, J.W. (1961). Industrial Dynamics
  * - Sterman, J.D. (2000). Business Dynamics
  * - Meadows, D.H. (2008). Thinking in Systems
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - HRIS data
     - Statistical models
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Turnover Analytics Skill

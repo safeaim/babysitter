@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Knowledge Organization
   skill-id: SK-020
+graph:
+  domains: [domain:knowledge-management]
+  skillAreas: [skill-area:technical-writing]
+  roles: [role:knowledge-manager]
 ---
 
 # Semantic Similarity Skill

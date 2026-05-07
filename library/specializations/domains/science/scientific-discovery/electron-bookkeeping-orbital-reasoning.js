@@ -3,6 +3,12 @@
  * @description Electron Bookkeeping and Orbital Reasoning process (Chemistry) - Track electrons, charges, oxidation states, and orbital interactions to understand reactivity
  * @inputs { molecule: object, reactionType: string, reagents: array, outputDir: string }
  * @outputs { success: boolean, electronCount: object, orbitalAnalysis: object, mechanisticInsight: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

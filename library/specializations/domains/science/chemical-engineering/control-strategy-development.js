@@ -3,6 +3,12 @@
  * @description Design process control strategies including control loops, cascade controls, and ratio controls for unit operations
  * @inputs { processName: string, processDescription: object, controlObjectives: array, outputDir: string }
  * @outputs { success: boolean, controlPhilosophy: object, controlLoops: array, dcsConfiguration: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

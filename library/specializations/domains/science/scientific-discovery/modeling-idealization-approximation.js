@@ -3,6 +3,12 @@
  * @description Modeling, Idealization and Approximation process - Build simplified models that capture essential features while ignoring irrelevant details
  * @inputs { targetSystem: string, modelingGoal: string, constraints: object, acceptableError: number, outputDir: string }
  * @outputs { success: boolean, model: object, idealizations: array, approximations: array, validityDomain: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

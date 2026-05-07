@@ -3,6 +3,12 @@
  * @description Identify opportunities for waste reduction, recycling, and process modification to minimize environmental impact
  * @inputs { processName: string, wasteStreams: array, processData: object, regulatoryRequirements: object, outputDir: string }
  * @outputs { success: boolean, wasteInventory: object, minimizationPlan: object, economicAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

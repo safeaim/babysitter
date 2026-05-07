@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - BI platform APIs
     - Supermetrics API
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # BI and Reporting Skill

@@ -13,6 +13,10 @@ required-skills:
   - freight-audit-validator
   - transportation-spend-analyzer
   - carrier-selection-optimizer
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Freight Audit Specialist

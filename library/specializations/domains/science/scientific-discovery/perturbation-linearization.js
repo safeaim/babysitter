@@ -3,6 +3,12 @@
  * @description Perturbation and Linearization process (Physics/Engineering) - Treat a system as a small deviation from a known solution
  * @inputs { nonlinearSystem: object, knownSolution: object, perturbationParameter: string, outputDir: string }
  * @outputs { success: boolean, linearizedSystem: object, corrections: array, validityRange: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

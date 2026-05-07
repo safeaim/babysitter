@@ -14,6 +14,11 @@ metadata:
   domain: science
   category: Manufacturing
   agent-id: BME-AG-017
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Sterilization Engineer Agent

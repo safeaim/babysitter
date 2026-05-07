@@ -3,6 +3,11 @@
  * @description Design and coordinate User Acceptance Testing to validate that delivered solutions meet business requirements. Develop test scenarios, acceptance criteria, and defect management processes.
  * @inputs { projectName: string, requirements: array, solution: object, stakeholders: array, testEnvironment: object }
  * @outputs { success: boolean, uatPlan: object, testScenarios: array, acceptanceCriteria: object, defectProcess: object, artifacts: array }
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:business-analysis]
+ *   topics: [topic:business-process-modeling, topic:requirements-engineering]
+ *   roles: [role:business-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

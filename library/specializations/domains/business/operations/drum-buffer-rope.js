@@ -26,6 +26,11 @@
  *   implementationScope: { pilotArea: "Assembly-Line-1", timeline: "12-weeks", integrationRequirements: ["ERP", "MES"] }
  * }
  * @references TOC Handbook, The Goal (Goldratt), DBR Scheduling Best Practices
+ * @graph
+ *   domains: [domain:operations]
+ *   skillAreas: [skill-area:operations-management]
+ *   topics: [topic:process-optimization, topic:operational-excellence]
+ *   roles: [role:operations-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Stakeholder Management
   id: SK-008
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Stakeholder Matrix Generator

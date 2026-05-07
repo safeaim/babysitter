@@ -15,6 +15,10 @@ metadata:
   domain: business
   category: Benefits Management
   id: AG-008
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Benefits Realization Manager Agent

@@ -18,6 +18,12 @@
  * - Gelman et al., Bayesian Data Analysis
  * - Hastie et al., The Elements of Statistical Learning
  * - Agresti, Categorical Data Analysis
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Diversity, Equity & Inclusion
   agent-id: AG-013
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # DEI Program Manager Agent

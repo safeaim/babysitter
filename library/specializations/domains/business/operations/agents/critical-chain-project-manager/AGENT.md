@@ -9,6 +9,10 @@ expertise:
   - Project portfolio synchronization
   - Execution discipline
   - Performance reporting
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Critical Chain Project Manager

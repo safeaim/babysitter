@@ -9,6 +9,10 @@ expertise:
   - Hypothesis development and testing
   - Solution recommendation
   - Control implementation
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Process Improvement Analyst

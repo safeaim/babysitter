@@ -2,6 +2,11 @@
 name: elearning-storyboarding
 description: Create detailed storyboards for interactive digital learning content specifying narration, visuals, interactions, and navigation
 allowed-tools: Read, Grep, Write, Edit, Glob
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # E-Learning Storyboarding

@@ -15,6 +15,10 @@ metadata:
   integration-points:
     - Tableau REST API
     - Tableau Embedding API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Tableau Analytics

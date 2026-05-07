@@ -3,6 +3,11 @@
  * @description Process for capturing knowledge in the workflow, structuring for reuse, and continuous improvement following KCS methodology
  * @inputs { currentState: object, teamStructure: object, tooling: object, supportTickets: array }
  * @outputs { success: boolean, kcsFramework: object, implementationPlan: object, metrics: object, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

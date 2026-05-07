@@ -9,6 +9,10 @@ expertise:
   - Schedule optimization
   - Exception management
   - Schedule performance tracking
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Master Scheduler

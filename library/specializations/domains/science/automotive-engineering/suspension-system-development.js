@@ -17,6 +17,12 @@
  * - SAE J670 Vehicle Dynamics Terminology
  * - ISO 2631 Ride Comfort Evaluation
  * - ISO 4138 Handling Testing Standards
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

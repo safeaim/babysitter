@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Internal Communications
   skill-id: SK-015
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Employee Advocacy Platform Skill

@@ -5,6 +5,12 @@
  * @outputs { success: boolean, preregistration: object, registrationDocument: string, qualityScore: number, artifacts: array }
  * @recommendedSkills SK-SS-011 (academic-writing-publication), SK-SS-014 (research-ethics-irb)
  * @recommendedAgents AG-SS-001 (quantitative-research-methodologist), AG-SS-010 (research-ethics-coordinator)
+ *
+ * @graph
+ *   domains: [domain:social-sciences]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

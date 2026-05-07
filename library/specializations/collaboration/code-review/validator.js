@@ -8,6 +8,12 @@
  * @outputs { success, approved, blockers, deferredFindings, dimensionResults }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/development/validator-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:code-analysis-linting]
+ *   topics: [topic:code-review, topic:quality-assurance]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

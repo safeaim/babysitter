@@ -13,6 +13,10 @@ required-skills:
   - driver-scheduling-optimizer
   - fleet-analytics-dashboard
   - route-optimization-engine
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Driver Operations Coordinator

@@ -17,6 +17,12 @@
  * - ISO 10993-12:2021 Sample preparation and reference materials
  * - ISO 10993-18:2020 Chemical characterization of medical device materials
  * - FDA Guidance on E&L Studies
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

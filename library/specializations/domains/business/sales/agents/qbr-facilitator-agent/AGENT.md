@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Executive communication
     - Value quantification
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # QBR Facilitator Agent

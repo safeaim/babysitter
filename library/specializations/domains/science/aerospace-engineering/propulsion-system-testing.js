@@ -17,6 +17,12 @@
  * - SAE ARP1420: Gas Turbine Engine Test Practices
  * - AIAA S-120: Engine Test Facility Standards
  * - NASA Test Operations Guidelines
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

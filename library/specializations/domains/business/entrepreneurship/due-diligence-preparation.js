@@ -15,6 +15,11 @@
  * @references
  * - Cooley GO Due Diligence Guide: https://www.cooleygo.com/
  * - VC Due Diligence Frameworks
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

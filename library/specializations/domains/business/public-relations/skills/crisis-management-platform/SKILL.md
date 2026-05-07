@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - Crisis management platform APIs
     - Slack/Teams APIs
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Crisis Management Platform Skill

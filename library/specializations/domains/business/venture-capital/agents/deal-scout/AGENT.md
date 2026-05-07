@@ -8,6 +8,10 @@ expertise:
   - Founder outreach and relationship building
   - Investment thesis alignment assessment
   - Deal flow pipeline development
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Deal Scout

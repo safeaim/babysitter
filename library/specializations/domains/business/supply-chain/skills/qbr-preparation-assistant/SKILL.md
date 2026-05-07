@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: supplier-management
   priority: standard
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # QBR Preparation Assistant

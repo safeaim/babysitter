@@ -17,6 +17,12 @@
  * - DFMA Guidelines: https://www.dfma.com/
  * - FDA Quality System Regulation 21 CFR 820
  * - ISO 13485:2016 Section 7.3.3 Design and Development Outputs
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

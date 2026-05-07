@@ -16,6 +16,12 @@
  * - Andersen & Fagerhaug, Root Cause Analysis
  * - Latino, Root Cause Analysis: Improving Performance for Bottom-Line Results
  * - ASQ Root Cause Analysis Handbook
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,10 @@ metadata:
     - Salesforce REST API
     - Bulk API 2.0
     - Streaming API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Salesforce Connector

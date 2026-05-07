@@ -2,6 +2,11 @@
 name: oral-history-interview-technique
 description: Conduct life history and testimonial interviews with appropriate prompting, active listening, and trauma-informed approaches
 allowed-tools: Read, Grep, Write, Edit, Glob
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Oral History Interview Technique

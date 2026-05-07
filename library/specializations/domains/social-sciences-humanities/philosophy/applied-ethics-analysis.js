@@ -5,6 +5,12 @@
  * @outputs { success: boolean, ethicalAnalysis: object, frameworkEvaluations: array, recommendations: array, artifacts: array }
  * @recommendedSkills SK-PHIL-003 (ethical-framework-application), SK-PHIL-014 (socratic-dialogue-facilitation), SK-PHIL-005 (conceptual-analysis)
  * @recommendedAgents AG-PHIL-002 (ethics-consultant-agent), AG-PHIL-007 (critical-thinking-educator-agent)
+ *
+ * @graph
+ *   domains: [domain:philosophy]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

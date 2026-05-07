@@ -20,6 +20,12 @@
  * - STAR Aligner: https://github.com/alexdobin/STAR
  * - Salmon: https://combine-lab.github.io/salmon/
  * - clusterProfiler: https://bioconductor.org/packages/clusterProfiler/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

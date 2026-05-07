@@ -19,6 +19,12 @@
  * - ASME Codes and Standards: https://www.asme.org/codes-standards
  * - INCOSE Systems Engineering Handbook: https://www.incose.org/products-and-publications/se-handbook
  * - NASA Systems Engineering Handbook: https://www.nasa.gov/seh/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,11 @@ metadata:
     - structural-variants
     - cnv
     - sv
+graph:
+  domains: [domain:bioinformatics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:data-engineer, role:tech-lead]
 ---
 
 # Structural Variant Detector Skill

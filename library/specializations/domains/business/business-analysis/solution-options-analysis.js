@@ -3,6 +3,11 @@
  * @description Evaluate alternative solutions against defined criteria including feasibility, cost, risk, strategic fit, and stakeholder impact. Apply structured decision-making frameworks to recommend preferred options.
  * @inputs { projectName: string, problemStatement: string, options: array, evaluationCriteria: array, stakeholders: array }
  * @outputs { success: boolean, evaluatedOptions: array, comparisonMatrix: object, recommendation: object, artifacts: array }
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:business-analysis]
+ *   topics: [topic:business-process-modeling, topic:requirements-engineering]
+ *   roles: [role:business-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

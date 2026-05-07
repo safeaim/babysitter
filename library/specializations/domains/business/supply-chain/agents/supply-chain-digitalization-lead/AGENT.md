@@ -9,6 +9,10 @@ expertise:
   - Implementation management
   - Change management
   - ROI measurement
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Supply Chain Digitalization Lead

@@ -3,6 +3,12 @@
  * @description Retrosynthesis process (Chemistry) - Work backwards from target molecule to available precursors to design synthetic routes
  * @inputs { targetMolecule: object, availableStartingMaterials: array, constraints: object, outputDir: string }
  * @outputs { success: boolean, syntheticRoutes: array, optimalRoute: object, disconnections: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

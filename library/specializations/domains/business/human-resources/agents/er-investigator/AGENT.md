@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Employee Relations
   agent-id: AG-008
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Employee Relations Investigator Agent

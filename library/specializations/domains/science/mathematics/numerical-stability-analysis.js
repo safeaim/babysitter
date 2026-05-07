@@ -18,6 +18,12 @@
  * - Golub & Van Loan, Matrix Computations
  * - IEEE 754 Floating-Point Standard
  * - Trefethen & Bau, Numerical Linear Algebra
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

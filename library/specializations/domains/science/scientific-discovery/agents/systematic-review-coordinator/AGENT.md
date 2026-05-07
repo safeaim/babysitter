@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Problem Formulation
   agent-id: AG-SCIDISC-003
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Systematic Review Coordinator Agent

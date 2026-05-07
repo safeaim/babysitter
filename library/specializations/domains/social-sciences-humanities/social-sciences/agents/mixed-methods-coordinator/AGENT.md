@@ -2,6 +2,11 @@
 name: mixed-methods-coordinator
 description: Integrate quantitative and qualitative approaches in complex research designs
 required-skills: mixed-methods-integration, quantitative-methods, qualitative-analysis
+graph:
+  domains: [domain:social-sciences]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Mixed Methods Research Coordinator Agent

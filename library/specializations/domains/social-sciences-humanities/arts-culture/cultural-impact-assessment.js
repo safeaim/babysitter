@@ -20,6 +20,12 @@
  * }
  * @recommendedSkills SK-AC-010 (cultural-policy-analysis), SK-AC-007 (audience-analytics), SK-AC-015 (arts-advocacy-communication)
  * @recommendedAgents AG-AC-009 (cultural-policy-agent)
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

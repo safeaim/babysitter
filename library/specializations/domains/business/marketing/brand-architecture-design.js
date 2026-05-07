@@ -3,6 +3,11 @@
  * @description Structure the relationship between corporate brand, sub-brands, and product brands. Define naming conventions, visual hierarchy, and brand portfolio strategy.
  * @inputs { corporateBrand: string, existingBrands: array, businessStrategy: object, targetMarkets: array, growthPlans: object }
  * @outputs { success: boolean, brandArchitecture: object, namingConventions: object, visualHierarchy: object, portfolioStrategy: object, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

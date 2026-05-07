@@ -16,6 +16,11 @@
  * - YC SAFE Documents: https://www.ycombinator.com/documents/
  * - Venture Deals: https://www.venturedeals.com/
  * - Art of Startup Fundraising
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

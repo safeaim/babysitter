@@ -2,6 +2,11 @@
 name: literary-critic-theorist
 description: Apply theoretical frameworks to textual analysis including close reading, critical theory, comparative analysis, literary history, and genre studies
 required-skills: literary-close-reading, critical-theory-application, citation-scholarly-apparatus
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Literary Critic and Theorist Agent

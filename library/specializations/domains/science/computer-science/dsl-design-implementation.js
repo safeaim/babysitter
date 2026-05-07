@@ -3,6 +3,12 @@
  * @description Design and implement domain-specific languages for specialized problem domains
  * @inputs { domainDescription: string, domainRequirements: array, implementationApproach: string }
  * @outputs { success: boolean, dslSpecification: object, implementation: object, standardLibrary: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

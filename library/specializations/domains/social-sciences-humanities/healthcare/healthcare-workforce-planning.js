@@ -6,6 +6,12 @@
  * @outputs { success: boolean, workforcePlan: object, staffingModels: array, developmentPlan: object, artifacts: array }
  * @recommendedSkills SK-HC-012 (workforce-demand-forecasting), SK-HC-001 (clinical-workflow-analysis)
  * @recommendedAgents AG-HC-007 (operations-excellence-director), AG-HC-002 (compliance-readiness-manager)
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

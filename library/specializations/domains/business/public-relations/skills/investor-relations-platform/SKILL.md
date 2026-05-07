@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Stakeholder Communications
   skill-id: SK-016
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Investor Relations Platform Skill

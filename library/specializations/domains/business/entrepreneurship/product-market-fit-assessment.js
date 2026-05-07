@@ -15,6 +15,11 @@
  * @references
  * - Sean Ellis PMF Survey: https://www.startup-marketing.com/
  * - Superhuman PMF Engine: https://review.firstround.com/
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -9,6 +9,10 @@ expertise:
   - Quality review coordination
   - Flux analysis
   - Certification preparation
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Close Process Coordinator

@@ -18,6 +18,11 @@ metadata:
   phase: 8
   experience: 15+ years GD&T application
   background: Precision assemblies, automotive, aerospace
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # GD&T and Tolerance Specialist Agent

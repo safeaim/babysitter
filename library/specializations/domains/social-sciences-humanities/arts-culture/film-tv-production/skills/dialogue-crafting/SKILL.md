@@ -4,6 +4,11 @@ id: SK-FTV-004
 version: 1.0.0
 description: Create character-specific dialogue with distinct voices, subtext, and naturalistic speech patterns
 specialization: film-tv-production
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Dialogue Crafting Skill

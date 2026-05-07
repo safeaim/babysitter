@@ -19,6 +19,12 @@
  * - Materials Project: https://materialsproject.org/
  * - NanoHUB Simulation Tools: https://nanohub.org/resources/tools
  * - ASE (Atomic Simulation Environment): https://wiki.fysik.dtu.dk/ase/
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -19,6 +19,12 @@
  * - INCOSE Systems Engineering Handbook
  * - VDA Automotive SPICE
  * - SAE J3061 Cybersecurity Integration
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

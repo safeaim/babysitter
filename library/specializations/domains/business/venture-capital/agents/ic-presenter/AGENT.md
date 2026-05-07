@@ -8,6 +8,10 @@ expertise:
   - Q&A anticipation and preparation
   - Investment thesis articulation
   - Risk and return framing
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # IC Presenter

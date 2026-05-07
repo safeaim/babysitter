@@ -18,6 +18,12 @@
  * - EPA Energy Efficiency in Wastewater Treatment
  * - IWA Activated Sludge Models (ASM1, ASM2, ASM3)
  * - WEF Nutrient Removal Optimization
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

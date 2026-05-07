@@ -3,6 +3,12 @@
  * @description Respond to a PR review comment: classify intent, address the concern, post a reply linking the fix commit.
  * @inputs { prNumber: number, repo: string, comment: { author: string, body: string, path?: string, line?: number }, prDiff?: string }
  * @outputs { success: boolean, intent: string, action: "address"|"clarify"|"dismiss", responseBody: string, fixCommitSha?: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

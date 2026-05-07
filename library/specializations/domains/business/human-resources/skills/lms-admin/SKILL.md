@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Learning & Development
   skill-id: SK-010
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # LMS Administration Skill

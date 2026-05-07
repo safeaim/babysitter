@@ -11,6 +11,10 @@ expertise:
   - Report generation
   - Insight prioritization
   - Recommendation formulation
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # BI Analyst

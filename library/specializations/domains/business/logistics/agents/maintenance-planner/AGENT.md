@@ -12,6 +12,10 @@ expertise:
 required-skills:
   - predictive-maintenance-scheduler
   - fleet-analytics-dashboard
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Maintenance Planner

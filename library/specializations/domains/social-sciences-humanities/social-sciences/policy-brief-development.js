@@ -5,6 +5,12 @@
  * @outputs { success: boolean, policyBrief: object, visualizations: array, qualityScore: number, artifacts: array }
  * @recommendedSkills SK-SS-012 (policy-communication)
  * @recommendedAgents AG-SS-006 (policy-research-analyst)
+ *
+ * @graph
+ *   domains: [domain:social-sciences]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

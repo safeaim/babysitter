@@ -5,6 +5,12 @@
  * @outputs { success: boolean, curriculum: object, deliveryPlan: object, evaluationFramework: object, artifacts: array }
  * @recommendedSkills SK-AC-008 (interpretive-writing), SK-AC-012 (accessibility-compliance), SK-AC-014 (digital-engagement-strategy)
  * @recommendedAgents AG-AC-007 (education-outreach-agent)
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,11 @@ name: genre-analysis
 description: Analyze and classify music genres, subgenres, and micro-genres with deep knowledge of characteristics, history, and relationships for accurate style specification
 allowed-tools: Read, Write, Edit, WebSearch, WebFetch
 id: SK-MAC-006
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Genre Analysis

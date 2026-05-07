@@ -15,6 +15,12 @@
  *   problemSuite: { type: 'optimization', sizes: [4, 8, 12, 16] },
  *   hardwareTargets: ['simulator', 'ibm_brisbane']
  * });
+ *
+ * @graph
+ *   domains: [domain:quantum-computing]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,12 @@
  * - IPC-2223 (Sectional Design Standard for Flexible Printed Boards)
  * - IEEE Signal Integrity Guidelines
  * - JEDEC Memory Interface Standards
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

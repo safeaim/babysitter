@@ -8,6 +8,12 @@
  * // Input: { legalQuestion: "Is this contract enforceable?", jurisdiction: "US-CA", facts: {...} }
  * // Output: { legalAnalysis: { elements: [...], interpretation: {...} }, arguments: [...], conclusions: {...} }
  * @references IRAC method, Canons of statutory construction, Common law precedent doctrine
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

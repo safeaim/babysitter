@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Documentation
   skill-id: CIV-SK-036
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # CSI Specification Writer Skill

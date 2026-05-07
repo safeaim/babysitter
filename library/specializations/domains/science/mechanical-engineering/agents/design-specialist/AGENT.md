@@ -18,6 +18,11 @@ metadata:
   phase: 2
   experience: 15+ years mechanical design
   background: Consumer products, industrial equipment, automotive components
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Mechanical Design Specialist Agent

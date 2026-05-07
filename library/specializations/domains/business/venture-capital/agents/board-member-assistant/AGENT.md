@@ -8,6 +8,10 @@ expertise:
   - Board meeting preparation
   - Follow-up tracking
   - Strategic guidance development
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Board Member Assistant

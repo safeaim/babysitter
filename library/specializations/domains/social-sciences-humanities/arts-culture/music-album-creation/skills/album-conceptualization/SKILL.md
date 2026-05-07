@@ -3,6 +3,11 @@ name: album-conceptualization
 description: Develop cohesive album concepts including themes, motifs, sonic palettes, narrative arcs, track sequencing, and visual direction for unified album experiences
 allowed-tools: Read, Write, Edit, WebSearch
 id: SK-MAC-005
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Album Conceptualization

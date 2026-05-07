@@ -16,6 +16,10 @@ metadata:
     - pyDecision
     - scikit-mcda
     - numpy
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # TOPSIS Ranker

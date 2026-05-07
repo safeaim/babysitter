@@ -5,6 +5,12 @@
  * @outputs { success: boolean, paperDraft: object, structuralOutline: object, argumentMap: object, artifacts: array }
  * @recommendedSkills SK-PHIL-010 (philosophical-writing-argumentation), SK-PHIL-002 (argument-mapping-reconstruction), SK-PHIL-005 (conceptual-analysis)
  * @recommendedAgents AG-PHIL-006 (academic-philosophy-writer-agent), AG-PHIL-001 (logic-analyst-agent)
+ *
+ * @graph
+ *   domains: [domain:philosophy]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

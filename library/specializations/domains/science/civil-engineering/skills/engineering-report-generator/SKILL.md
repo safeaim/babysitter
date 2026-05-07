@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Documentation
   skill-id: CIV-SK-035
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Engineering Report Generator Skill

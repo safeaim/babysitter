@@ -8,6 +8,11 @@
  * @outputs { success, method, model, output?, retries }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/media/video-generation-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:ai-agent-development]
+ *   topics: [topic:generative-ai, topic:video-processing]
+ *   roles: [role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

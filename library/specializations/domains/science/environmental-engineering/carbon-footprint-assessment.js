@@ -18,6 +18,12 @@
  * - GHG Protocol Scope 3 Guidance
  * - ISO 14064-1 - Organization Level GHG Quantification
  * - Product Life Cycle Standard
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -17,6 +17,11 @@
  * - LinkedIn Employer Branding: https://business.linkedin.com/talent-solutions/resources/talent-acquisition/employer-branding
  * - Glassdoor Employer Branding: https://www.glassdoor.com/employers/blog/employer-branding/
  * - Universum Employer Branding: https://universumglobal.com/employer-branding/
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

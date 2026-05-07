@@ -3,6 +3,12 @@
  * @description Design abstract interpretation frameworks for static program analysis with sound abstractions
  * @inputs { programDescription: string, analysisGoals: array, targetLanguage: string }
  * @outputs { success: boolean, abstractInterpretationFramework: object, soundnessProof: object, analysisImplementation: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

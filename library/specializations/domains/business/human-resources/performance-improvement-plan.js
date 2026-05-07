@@ -17,6 +17,11 @@
  * @references
  * - SHRM PIP Guide: https://www.shrm.org/resourcesandtools/tools-and-samples/how-to-guides/pages/performance-improvement-plan.aspx
  * - HR Bartender: https://www.hrbartender.com/2017/training/how-to-write-a-performance-improvement-plan/
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

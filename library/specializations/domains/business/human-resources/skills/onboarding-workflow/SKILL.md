@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - HRIS integration
     - Task management systems
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Onboarding Workflow Skill

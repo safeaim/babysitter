@@ -2,6 +2,11 @@
 name: qualitative-research-specialist
 description: Guide qualitative data collection and analysis using ethnographic and interview-based methods
 required-skills: qualitative-analysis, ethnographic-research, interview-facilitation
+graph:
+  domains: [domain:social-sciences]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Qualitative Research Specialist Agent

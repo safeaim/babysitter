@@ -18,6 +18,12 @@
  * - MathSciNet: https://mathscinet.ams.org/
  * - zbMATH: https://zbmath.org/
  * - Google Scholar: https://scholar.google.com/
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

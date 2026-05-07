@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: demand-forecasting
   priority: medium
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # S&OP Scenario Modeler

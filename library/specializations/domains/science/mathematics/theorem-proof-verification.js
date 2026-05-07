@@ -18,6 +18,12 @@
  * - Coq Proof Assistant: https://coq.inria.fr/
  * - Isabelle: https://isabelle.in.tum.de/
  * - Mathematical Components: https://math-comp.github.io/
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

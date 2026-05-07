@@ -7,6 +7,11 @@
  * @outputs { success, phase, tiers, projections, monitoringGuidance }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/business/revenue-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:revenue-modeling, topic:product-strategy]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

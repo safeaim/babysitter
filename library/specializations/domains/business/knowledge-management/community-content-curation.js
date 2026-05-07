@@ -5,6 +5,11 @@
  * @category Communities of Practice Management
  * @inputs { community: object, contentScope: object, curationGoals: array, outputDir: string }
  * @outputs { success: boolean, curatedContent: array, contentStructure: object, curationGuidelines: object, qualityScore: number, artifacts: array }
+ * @graph
+ *   domains: [domain:knowledge-management]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:documentation]
+ *   roles: [role:knowledge-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

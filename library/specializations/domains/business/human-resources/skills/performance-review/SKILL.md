@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Competency models
     - Rating scales
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Performance Review Generator Skill

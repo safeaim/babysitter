@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: returns
   priority: lower
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Returns Disposition Optimizer

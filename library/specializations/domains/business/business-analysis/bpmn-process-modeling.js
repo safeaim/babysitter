@@ -3,6 +3,11 @@
  * @description Document business processes using BPMN 2.0 notation including flow objects, connecting objects, swimlanes, and artifacts. Create current-state (AS-IS) and future-state (TO-BE) process models.
  * @inputs { projectName: string, processName: string, processContext: object, stakeholders: array, existingDocumentation: array }
  * @outputs { success: boolean, asIsModel: object, toBeModel: object, gapAnalysis: object, artifacts: array }
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:business-analysis]
+ *   topics: [topic:business-process-modeling, topic:requirements-engineering]
+ *   roles: [role:business-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,12 @@
  * @description Design lock-free or wait-free concurrent data structures with linearizability proofs
  * @inputs { dataStructureDescription: string, sequentialSpecification: object, progressGuarantee: string }
  * @outputs { success: boolean, concurrentDesign: object, linearizabilityProof: object, progressAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,12 @@
  * - ASM Handbook Vol. 4: Heat Treating
  * - JMatPro: https://www.sentesoftware.co.uk/jmatpro
  * - DANTE: https://www.deformationsimulation.com/dante/
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,12 @@
  * @description Use interactive theorem provers to verify system or algorithm correctness with machine-checked proofs
  * @inputs { systemDescription: string, specificationsToVerify: array, proverPreference: string }
  * @outputs { success: boolean, formalizedSpecification: object, proofArtifacts: object, extractedImplementation: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

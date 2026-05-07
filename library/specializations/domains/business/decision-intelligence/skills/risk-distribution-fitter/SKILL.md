@@ -17,6 +17,10 @@ metadata:
     - fitter
     - pomegranate
     - distfit
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Risk Distribution Fitter

@@ -9,6 +9,10 @@ expertise:
   - FIN 48 analysis
   - Return-to-provision true-up
   - Tax footnote preparation
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Tax Provision Specialist

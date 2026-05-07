@@ -29,6 +29,12 @@
  *   "dataFormat": "JSON"
  * }
  * @references MMPDS, MatML Standard, ICME Data Standards, Materials Genome Initiative
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

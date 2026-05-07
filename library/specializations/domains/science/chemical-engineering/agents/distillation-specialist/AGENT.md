@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Separation Processes
   agent-id: CE-AG-007
+graph:
+  domains: [domain:chemical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Distillation Specialist Agent

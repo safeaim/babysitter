@@ -3,6 +3,11 @@
  * @description Strategic planning for technology-enabled business transformation including capability assessment, initiative prioritization, and implementation planning
  * @inputs { organizationContext: object, transformationVision: string, currentState: object, outputDir: string }
  * @outputs { success: boolean, maturityAssessment: object, roadmap: object, initiatives: array, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:competitive-analysis]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

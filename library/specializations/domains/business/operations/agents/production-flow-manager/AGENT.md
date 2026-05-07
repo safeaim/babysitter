@@ -9,6 +9,10 @@ expertise:
   - Flow disruption response
   - WIP control
   - Throughput optimization
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Production Flow Manager

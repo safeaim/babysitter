@@ -9,6 +9,10 @@ expertise:
   - Trend identification
   - Strategic implications
   - Benchmarking
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Competitive Intelligence Analyst

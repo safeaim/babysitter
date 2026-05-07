@@ -4,6 +4,12 @@
  * certification basis, and means of compliance documentation.
  * @inputs { projectName: string, productType: string, regulatoryAuthority: string, certificationScope?: object }
  * @outputs { success: boolean, certificationBasis: object, complianceMatrix: object, certificationPlan: object }
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

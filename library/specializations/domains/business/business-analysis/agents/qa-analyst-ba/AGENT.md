@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-011
   category: Quality
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Quality Assurance Analyst Agent (Business Analysis)

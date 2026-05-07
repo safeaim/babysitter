@@ -16,6 +16,11 @@
  * @references
  * - ATD Training Needs Assessment: https://www.td.org/insights/how-to-conduct-a-training-needs-assessment
  * - SHRM Training and Development: https://www.shrm.org/resourcesandtools/tools-and-samples/toolkits/pages/traininganddevelopment.aspx
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

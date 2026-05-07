@@ -27,6 +27,11 @@
  * - Competing Values Framework (Quinn & Cameron)
  * - Kotter 8-Step Change Model
  * - Organizational Culture Inventory (OCI)
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

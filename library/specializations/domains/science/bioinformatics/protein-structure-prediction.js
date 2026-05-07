@@ -17,6 +17,12 @@
  * - RoseTTAFold: https://github.com/RosettaCommons/RoseTTAFold
  * - SWISS-MODEL: https://swissmodel.expasy.org/
  * - MolProbity: http://molprobity.biochem.duke.edu/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

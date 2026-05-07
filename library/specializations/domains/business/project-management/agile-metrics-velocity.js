@@ -20,6 +20,11 @@
  * - Agile Metrics - Mountain Goat Software: https://www.mountaingoatsoftware.com/blog/measuring-agile-team-performance
  * - Kanban Guide: https://kanbanguides.org/
  * - Flow Metrics - ActionableAgile: https://actionableagile.com/
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

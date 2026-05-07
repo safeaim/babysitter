@@ -2,6 +2,11 @@
 name: marketing-communications-agent
 description: Marketing and audience development specialist agent for campaign strategy, audience segmentation, digital marketing, brand management, media relations, and analytics interpretation
 required-skills: audience-analytics, digital-engagement-strategy, interpretive-writing
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Marketing Communications Agent

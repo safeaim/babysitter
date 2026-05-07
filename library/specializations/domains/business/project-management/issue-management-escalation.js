@@ -16,6 +16,11 @@
  * @references
  * - PMI Issue Management: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
  * - ITIL Problem Management: https://www.axelos.com/best-practice-solutions/itil
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

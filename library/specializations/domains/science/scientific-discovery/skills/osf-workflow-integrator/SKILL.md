@@ -11,6 +11,11 @@ metadata:
   domain: science
   category: Reproducibility
   skill-id: SK-SCIDISC-026
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # OSF Workflow Integrator Skill

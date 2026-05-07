@@ -16,6 +16,11 @@
  * @references
  * - PMI Stakeholder Management: https://www.pmi.org/learning/library/stakeholder-analysis-pivotal-practice-projects-8905
  * - Stakeholder Engagement Assessment Matrix: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

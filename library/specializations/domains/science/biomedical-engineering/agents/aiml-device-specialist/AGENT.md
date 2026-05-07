@@ -14,6 +14,11 @@ metadata:
   domain: science
   category: Medical Software
   agent-id: BME-AG-016
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # AI/ML Device Specialist Agent

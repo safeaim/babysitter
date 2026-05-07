@@ -18,6 +18,12 @@
  * - Savage (1954). The Foundations of Statistics
  * - Jeffrey (1983). The Logic of Decision
  * - Peterson (2017). An Introduction to Decision Theory
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

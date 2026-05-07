@@ -2,6 +2,11 @@
 name: learning-experience-designer
 description: Design learner-centered educational experiences applying UX principles, motivation strategies, and engagement design
 required-skills: elearning-storyboarding, multimedia-learning-design, learning-transfer-design
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Learning Experience Designer Agent

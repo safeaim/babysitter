@@ -14,6 +14,11 @@ metadata:
   domain: science
   category: fabrication
   phase: 6
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Nanolithography Engineer

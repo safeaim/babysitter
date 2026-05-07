@@ -3,6 +3,12 @@
  * @description Flood frequency analysis, floodplain mapping, and flood mitigation design including levees, floodwalls, and channel improvements
  * @inputs { projectId: string, studyArea: object, hydrologicData: object, existingConditions: object }
  * @outputs { success: boolean, floodStudy: object, floodplainMaps: array, mitigationDesign: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

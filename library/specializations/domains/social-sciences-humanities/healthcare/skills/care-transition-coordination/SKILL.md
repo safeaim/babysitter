@@ -2,6 +2,11 @@
 name: care-transition-coordination
 description: Manage care transitions between settings including discharge planning, medication reconciliation, follow-up scheduling, and post-acute care coordination
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Care Transition Coordination

@@ -16,6 +16,11 @@ metadata:
   tools-libraries:
     - Binding kinetics analyzers
     - Molecular modeling tools
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Targeting Ligand Designer

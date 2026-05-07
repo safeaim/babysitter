@@ -5,6 +5,12 @@
  * @outputs { success: boolean, reviewReport: object, standardScores: object, recommendations: array, artifacts: array }
  * @recommendedSkills SK-EDU-013 (quality-assurance-review), SK-EDU-010 (accessibility-compliance-auditing)
  * @recommendedAgents AG-EDU-009 (quality-assurance-coordinator), AG-EDU-008 (accessibility-udl-specialist)
+ *
+ * @graph
+ *   domains: [domain:education]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

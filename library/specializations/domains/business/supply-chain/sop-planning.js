@@ -16,6 +16,11 @@
  * @references
  * - Kinaxis S&OP: https://www.kinaxis.com/
  * - ASCM S&OP Best Practices: https://www.ascm.org/
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

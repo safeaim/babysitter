@@ -4,6 +4,11 @@ id: SK-FTV-007
 version: 1.0.0
 description: Build complete character profiles with psychology, backstory, arcs, and visual design for film/TV
 specialization: film-tv-production
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Character Development Skill

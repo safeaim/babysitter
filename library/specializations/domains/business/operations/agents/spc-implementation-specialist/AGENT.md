@@ -9,6 +9,10 @@ expertise:
   - Control plan development
   - Reaction plan creation
   - SPC software configuration
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # SPC Implementation Specialist

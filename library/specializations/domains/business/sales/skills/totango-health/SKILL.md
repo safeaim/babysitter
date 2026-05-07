@@ -14,6 +14,10 @@ metadata:
   priority: P2
   integration-points:
     - Totango API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Totango Health

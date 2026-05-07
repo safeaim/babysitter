@@ -3,6 +3,11 @@
  * @description Analyze content engagement metrics, refresh underperforming content, update evergreen pieces, and implement content scoring for continuous improvement.
  * @inputs { contentInventory: array, performanceData: object, benchmarks: object, seoMetrics: object, conversionData: object }
  * @outputs { success: boolean, performanceAnalysis: object, refreshList: array, optimizationPlan: object, contentScores: object, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

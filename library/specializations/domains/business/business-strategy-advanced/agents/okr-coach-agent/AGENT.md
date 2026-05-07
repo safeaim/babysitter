@@ -11,6 +11,10 @@ expertise:
   - CFR (Conversations, Feedback, Recognition)
   - Change Management for OKR Adoption
   - Performance Management Integration
+graph:
+  domains: [domain:strategy]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:strategy-consultant]
 ---
 
 # OKR Coach Agent

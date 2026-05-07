@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Media Relations
   agent-id: AG-002
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Press Release Writer Agent

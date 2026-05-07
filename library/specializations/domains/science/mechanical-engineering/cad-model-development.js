@@ -18,6 +18,12 @@
  * - SolidWorks Help: https://help.solidworks.com/
  * - CATIA Documentation: https://www.3ds.com/support/documentation/
  * - Siemens NX Documentation: https://docs.plm.automation.siemens.com/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

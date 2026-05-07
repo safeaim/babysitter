@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - OKR frameworks
     - Progress tracking systems
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # OKR/Goal Management Skill

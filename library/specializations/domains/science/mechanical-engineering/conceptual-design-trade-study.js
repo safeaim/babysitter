@@ -18,6 +18,12 @@
  * - Shigley's Mechanical Engineering Design: https://www.mheducation.com/highered/product/shigley-s-mechanical-engineering-design-budynas-nisbett/M9780073398204.html
  * - Pahl and Beitz Engineering Design: https://www.springer.com/gp/book/9781846283185
  * - INCOSE Decision Analysis Guidance: https://www.incose.org/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

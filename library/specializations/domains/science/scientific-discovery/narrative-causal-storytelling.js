@@ -19,6 +19,12 @@
  * - Causal Reasoning: https://plato.stanford.edu/entries/causation-metaphysics/
  * - Historical Explanation: https://plato.stanford.edu/entries/history/
  * - Philosophy of Historiography: https://plato.stanford.edu/entries/history-philosophy/
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,11 @@
  * @description Calculate return on investment by channel and campaign. Build marketing mix models to optimize budget allocation across the portfolio.
  * @inputs { campaignData: object, channelSpend: object, revenueData: object, benchmarks: object }
  * @outputs { success: boolean, roiAnalysis: object, marketingMixModel: object, budgetOptimization: object, recommendations: array, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

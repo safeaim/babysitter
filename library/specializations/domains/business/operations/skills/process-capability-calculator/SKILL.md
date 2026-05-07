@@ -11,6 +11,10 @@ metadata:
   specialization: operations
   domain: business
   category: six-sigma-spc
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Process Capability Calculator

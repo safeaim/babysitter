@@ -6,6 +6,12 @@
  * @outputs { success: boolean, authWorkflow: object, automationPlan: object, metrics: object, artifacts: array }
  * @recommendedSkills SK-HC-007 (revenue-cycle-analytics), SK-HC-001 (clinical-workflow-analysis)
  * @recommendedAgents AG-HC-003 (revenue-integrity-analyst), AG-HC-006 (care-management-coordinator)
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

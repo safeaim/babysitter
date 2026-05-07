@@ -3,6 +3,12 @@
  * @description Perform systematic scale-up from laboratory to pilot to production scale, addressing scale-dependent phenomena
  * @inputs { processName: string, labScaleData: object, targetScale: object, scaleUpCriteria: object, outputDir: string }
  * @outputs { success: boolean, scaleUpPlan: object, pilotDesign: object, riskAssessment: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

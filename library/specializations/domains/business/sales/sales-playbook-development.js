@@ -15,6 +15,11 @@
  * @references
  * - Highspot Sales Enablement: https://www.highspot.com/
  * - Sales Playbook Best Practices: https://www.gartner.com/en/sales
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -11,6 +11,10 @@ expertise:
   - Fallback mechanism design
   - Monitoring setup
   - Continuous improvement
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Real-Time Decision Engineer

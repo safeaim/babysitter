@@ -17,6 +17,10 @@ metadata:
   domain: business
   category: Analytics
   agent-id: AG-010
+graph:
+  domains: [domain:knowledge-management]
+  skillAreas: [skill-area:technical-writing]
+  roles: [role:knowledge-manager]
 ---
 
 # Knowledge Analyst Agent

@@ -2,6 +2,11 @@
  * @file variance-analysis-reporting.js
  * @description Systematic analysis of budget-to-actual variances with root cause identification, trend analysis, and actionable recommendations for management
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

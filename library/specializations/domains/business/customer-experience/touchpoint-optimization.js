@@ -3,6 +3,11 @@
  * @description Systematic process for analyzing and improving individual customer touchpoints based on journey analytics
  * @inputs { touchpoint: object, analyticsData: object, feedbackData: array, benchmarks: object }
  * @outputs { success: boolean, touchpointAnalysis: object, optimizationPlan: object, implementationGuide: object, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

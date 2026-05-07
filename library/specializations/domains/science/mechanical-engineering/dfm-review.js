@@ -23,6 +23,12 @@
  * - DFMA Software: https://www.dfma.com/
  * - ASM Handbook Vol 20 - Materials Selection and Design: https://www.asminternational.org/
  * - Fundamentals of Modern Manufacturing: https://www.wiley.com/en-us/Fundamentals+of+Modern+Manufacturing
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

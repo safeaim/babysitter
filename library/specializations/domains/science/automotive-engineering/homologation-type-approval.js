@@ -19,6 +19,12 @@
  * - EU Type Approval Framework Regulation (EU) 2018/858
  * - GB Standards (China)
  * - TRIAS (Japan)
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

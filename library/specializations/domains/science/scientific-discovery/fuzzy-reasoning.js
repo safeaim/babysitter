@@ -3,6 +3,12 @@
  * @description Truth as degree (0-1) because predicates have blurred boundaries - reasoning with vagueness
  * @inputs { linguisticVariables: array, fuzzyRules: array, crispInputs: object, defuzzificationMethod: string, outputDir: string }
  * @outputs { success: boolean, fuzzyOutputs: object, defuzzifiedOutputs: object, inferenceTrace: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,10 @@ metadata:
     - ortools
     - pyomo
     - cvxpy
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Linear Programming Solver

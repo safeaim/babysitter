@@ -14,6 +14,11 @@
  * @references
  * - FMCSA Regulations: https://www.fmcsa.dot.gov/regulations
  * - ELD Compliance: https://www.fmcsa.dot.gov/hours-service/elds
+ * @graph
+ *   domains: [domain:logistics]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:logistics-management, topic:warehouse-operations]
+ *   roles: [role:logistics-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,12 @@
  * - Bechtel & Abrahamsen (2005). Explanation: A Mechanist Alternative
  * - Craver (2007). Explaining the Brain: Mechanisms and the Mosaic Unity of Neuroscience
  * - Glennan (2017). The New Mechanical Philosophy
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-010
   category: Documentation
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Technical Writer Agent (Business Analysis)

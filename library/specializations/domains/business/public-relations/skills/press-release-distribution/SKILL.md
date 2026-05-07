@@ -17,6 +17,10 @@ metadata:
     - PR Newswire API
     - Business Wire API
     - GlobeNewswire API
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Press Release Distribution Skill

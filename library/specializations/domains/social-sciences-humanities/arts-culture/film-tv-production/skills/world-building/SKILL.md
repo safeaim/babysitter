@@ -4,6 +4,11 @@ id: SK-FTV-008
 version: 1.0.0
 description: Design settings, locations, props, costumes, and production elements for film/TV with visual consistency
 specialization: film-tv-production
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # World Building Skill

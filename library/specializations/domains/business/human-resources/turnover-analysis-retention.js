@@ -27,6 +27,11 @@
  * - Work Institute Retention Report Methodology
  * - Gallup Employee Engagement and Retention Research
  * - Corporate Leadership Council Retention Studies
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

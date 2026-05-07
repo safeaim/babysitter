@@ -11,6 +11,10 @@ metadata:
   specialization: operations
   domain: business
   category: quality-management
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Quality Auditor

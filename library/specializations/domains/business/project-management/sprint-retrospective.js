@@ -16,6 +16,11 @@
  * @references
  * - Agile Retrospectives: https://www.scrumalliance.org/agile-resources/agile-retrospectives
  * - Retrospective Techniques: https://retrospectivewiki.org/
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

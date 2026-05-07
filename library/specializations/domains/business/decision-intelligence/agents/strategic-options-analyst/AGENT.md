@@ -11,6 +11,10 @@ expertise:
   - Hedging strategy development
   - Option exercise triggers
   - Strategy portfolio construction
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Strategic Options Analyst

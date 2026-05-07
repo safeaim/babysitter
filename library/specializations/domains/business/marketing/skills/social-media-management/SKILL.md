@@ -17,6 +17,10 @@ metadata:
     - Sprout Social API
     - Hootsuite API
     - Native platform APIs
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Social Media Management Skill

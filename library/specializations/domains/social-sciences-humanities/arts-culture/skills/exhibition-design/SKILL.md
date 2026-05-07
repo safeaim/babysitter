@@ -2,6 +2,11 @@
 name: exhibition-design
 description: Plan and design exhibition layouts including spatial arrangement, object placement, lighting, graphics, and visitor flow optimization for diverse audiences
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Exhibition Design

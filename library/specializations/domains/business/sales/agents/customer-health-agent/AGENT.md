@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Predictive modeling
     - Signal aggregation
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Customer Health Agent

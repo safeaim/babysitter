@@ -3,6 +3,11 @@
  * @description Comprehensive evaluation of company readiness for exit including financial performance, market positioning, governance maturity, and buyer universe analysis
  * @inputs { companyName: string, companyData: object, exitHorizon: string, exitPreferences: object }
  * @outputs { success: boolean, readinessScore: object, gapAnalysis: object, buyerUniverse: object, artifacts: array }
+ * @graph
+ *   domains: [domain:venture-capital]
+ *   skillAreas: [skill-area:investment-analysis]
+ *   topics: [topic:startup-funding, topic:portfolio-management]
+ *   roles: [role:venture-capitalist]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

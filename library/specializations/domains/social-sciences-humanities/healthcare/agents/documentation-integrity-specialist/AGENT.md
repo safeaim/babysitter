@@ -2,6 +2,11 @@
 name: documentation-integrity-specialist
 description: Improve clinical documentation accuracy and completeness through CDI programs, physician education, and query management processes
 required-skills: clinical-documentation-query, medical-coding-audit, quality-metrics-measurement
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Documentation Integrity Specialist Agent

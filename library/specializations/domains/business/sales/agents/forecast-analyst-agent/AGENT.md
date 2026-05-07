@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Statistical analysis
     - Time series modeling
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Forecast Analyst Agent

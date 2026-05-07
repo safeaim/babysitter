@@ -3,6 +3,12 @@
  * @description Structured arguments for system safety/security using Goal Structuring Notation and similar frameworks
  * @inputs { topLevelGoal: string, context: array, strategies: array, evidence: array, hazards: array, outputDir: string }
  * @outputs { success: boolean, safetyCaseStructure: object, evidenceAssessment: object, gaps: array, overallConfidence: number, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,12 @@
  * - Winston, Operations Research: Applications and Algorithms
  * - Google OR-Tools: https://developers.google.com/optimization
  * - CPLEX Optimization Studio: https://www.ibm.com/products/ilog-cplex-optimization-studio
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

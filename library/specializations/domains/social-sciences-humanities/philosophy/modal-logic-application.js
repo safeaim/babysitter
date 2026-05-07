@@ -5,6 +5,12 @@
  * @outputs { success: boolean, modalAnalysis: object, possibleWorldsSemantics: object, validityResult: object, artifacts: array }
  * @recommendedSkills SK-PHIL-001 (formal-logic-analysis), SK-PHIL-005 (conceptual-analysis)
  * @recommendedAgents AG-PHIL-001 (logic-analyst-agent), AG-PHIL-004 (metaphysics-epistemology-agent)
+ *
+ * @graph
+ *   domains: [domain:philosophy]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

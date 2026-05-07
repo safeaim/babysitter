@@ -13,6 +13,10 @@ required-skills:
   - dead-stock-identifier
   - returns-disposition-optimizer
   - abc-xyz-classifier
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Inventory Disposition Specialist

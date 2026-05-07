@@ -3,6 +3,11 @@
  * @description Time-phased strategic initiative portfolio using McKinsey Three Horizons framework
  * @inputs { organizationName: string, currentBusiness: object, emergingOpportunities: array, futureVision: object }
  * @outputs { success: boolean, horizonPortfolio: object, resourceAllocation: object, governanceFramework: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

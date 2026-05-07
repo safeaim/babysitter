@@ -2,6 +2,11 @@
 name: patient-safety-officer
 description: Lead patient safety programs including event investigation, proactive risk assessment, and safety culture development using HRO principles
 required-skills: patient-safety-event-analysis, quality-metrics-measurement, accreditation-tracer-simulation
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Patient Safety Officer Agent

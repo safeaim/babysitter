@@ -17,6 +17,11 @@ metadata:
     - FluorEssence
     - Edinburgh Instruments F980
     - Custom analysis tools
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Fluorescence Spectroscopy Analyzer

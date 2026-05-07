@@ -5,6 +5,11 @@
  * @category Organizational Learning Processes
  * @inputs { organizationalScope: object, assessmentFramework: string, stakeholders: array, outputDir: string }
  * @outputs { success: boolean, assessment: object, maturityLevel: number, gaps: array, improvementPlan: object, qualityScore: number, artifacts: array }
+ * @graph
+ *   domains: [domain:knowledge-management]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:documentation]
+ *   roles: [role:knowledge-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

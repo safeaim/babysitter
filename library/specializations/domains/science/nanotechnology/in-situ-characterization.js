@@ -19,6 +19,12 @@
  * - Scanning Probe Microscopy for Nanoscience: https://www.nature.com/articles/nnano.2007.300
  * - Raman Spectroscopy of Nanomaterials: https://pubs.rsc.org/en/content/articlelanding/2020/cs/c9cs00621d
  * - DigitalMicrograph (Gatan): https://www.gatan.com/products/tem-analysis/digitalmicrograph-software
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

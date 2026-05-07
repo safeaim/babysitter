@@ -18,6 +18,12 @@
  * - State Stormwater Design Manuals
  * - ASCE/WEF Urban Stormwater Management
  * - Low Impact Development Technical Guidance
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -22,6 +22,12 @@
  * - DeepVariant: https://github.com/google/deepvariant
  * - VEP Documentation: https://www.ensembl.org/info/docs/tools/vep/index.html
  * - Genome in a Bottle: https://www.nist.gov/programs-projects/genome-bottle
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

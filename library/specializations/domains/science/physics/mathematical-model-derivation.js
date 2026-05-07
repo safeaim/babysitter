@@ -18,6 +18,12 @@
  * - Goldstein, Classical Mechanics
  * - Landau & Lifshitz, Mechanics
  * - Arnold, Mathematical Methods of Classical Mechanics
+ *
+ * @graph
+ *   domains: [domain:physics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

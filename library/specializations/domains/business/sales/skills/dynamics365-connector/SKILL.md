@@ -15,6 +15,10 @@ metadata:
   integration-points:
     - Dynamics 365 Web API
     - OData
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Dynamics 365 Connector

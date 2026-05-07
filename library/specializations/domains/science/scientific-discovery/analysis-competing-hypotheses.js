@@ -16,6 +16,12 @@
  * - Heuer, R.J. (1999). Psychology of Intelligence Analysis
  * - Heuer, R.J. & Pherson, R.H. (2010). Structured Analytic Techniques
  * - CIA Tradecraft Primer (2009)
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

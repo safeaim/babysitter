@@ -3,6 +3,12 @@
  * @description Reductionist-Compositional Thinking process - Break complex systems into fundamental parts, understand each part, then recombine to understand the whole
  * @inputs { system: string, currentUnderstanding: object, decompositionDepth: number, outputDir: string }
  * @outputs { success: boolean, components: array, interactions: array, emergentProperties: array, synthesizedUnderstanding: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

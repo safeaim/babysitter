@@ -2,6 +2,11 @@
 name: ipa-transcription-phonological
 description: Transcribe speech using International Phonetic Alphabet and analyze sound systems including phonotactics and phonological rules
 allowed-tools: Read, Grep, Write, Edit, Glob
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # IPA Transcription and Phonological Analysis

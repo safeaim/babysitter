@@ -14,6 +14,10 @@ metadata:
   priority: P2
   integration-points:
     - Lessonly API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Lessonly Training

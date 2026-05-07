@@ -17,6 +17,11 @@ metadata:
     - OMNIC
     - OPUS
     - PerkinElmer Spectrum software
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # FTIR Analyzer

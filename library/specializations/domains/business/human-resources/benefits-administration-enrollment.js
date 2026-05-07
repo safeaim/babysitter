@@ -26,6 +26,11 @@
  * - ERISA Compliance Guidelines
  * - ACA Employer Requirements
  * - IRS Benefits Taxation Rules
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -5,6 +5,11 @@
  * @category Internal Communications
  * @inputs { change: object, organization: object, stakeholders: object[], timeline: object }
  * @outputs { success: boolean, commsPlan: object, leaderToolkit: object, feedbackSystem: object, quality: number }
+ * @graph
+ *   domains: [domain:public-relations]
+ *   skillAreas: [skill-area:communications-strategy]
+ *   topics: [topic:media-relations, topic:brand-management]
+ *   roles: [role:communications-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

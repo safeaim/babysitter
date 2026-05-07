@@ -2,6 +2,11 @@
 name: arts-administrator-agent
 description: Arts administration executive agent for nonprofit management, strategic planning, board governance, organizational development, financial oversight, and stakeholder relations
 required-skills: grant-proposal-writing, donor-relationship-management, stakeholder-facilitation
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Arts Administrator Agent

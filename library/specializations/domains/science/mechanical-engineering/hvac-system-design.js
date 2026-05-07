@@ -19,6 +19,12 @@
  * - ASHRAE Standard 62.1 - Ventilation: https://www.ashrae.org/technical-resources/standards-and-guidelines
  * - ASHRAE Standard 90.1 - Energy: https://www.ashrae.org/technical-resources/standards-and-guidelines
  * - SMACNA Duct Standards: https://www.smacna.org/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

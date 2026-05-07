@@ -3,6 +3,12 @@
  * @description Frame of Reference Reasoning process (Physics) - Choose coordinate systems and reference frames that simplify equations and reveal physical insight
  * @inputs { physicalProblem: string, currentFormulation: object, availableFrames: array, outputDir: string }
  * @outputs { success: boolean, optimalFrame: object, simplifiedEquations: array, transformations: array, insights: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

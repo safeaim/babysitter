@@ -18,6 +18,12 @@
  * - TGA: https://www.netzsch-thermal-analysis.com/en/products-solutions/thermogravimetric-analysis/
  * - DMA: https://www.mettler.com/en-us/library/applications/thermal-analysis/
  * - ASTM E473: Standard Terminology for Thermal Analysis
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

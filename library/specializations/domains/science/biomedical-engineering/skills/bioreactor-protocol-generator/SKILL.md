@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Tissue Engineering
   skill-id: BME-SK-030
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Bioreactor Protocol Generator Skill

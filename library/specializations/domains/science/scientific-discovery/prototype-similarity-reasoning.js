@@ -3,6 +3,12 @@
  * @description Categorize items by similarity to prototypes rather than strict definitions
  * @inputs { prototypes: array, instances: array, features: array, similarityMetric: string, outputDir: string }
  * @outputs { success: boolean, categorizations: array, typicalityScores: object, categoryStructure: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

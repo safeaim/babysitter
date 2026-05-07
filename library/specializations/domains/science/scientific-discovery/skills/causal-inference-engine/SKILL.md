@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: hypothesis-reasoning
   phase: 6
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Causal Inference Engine

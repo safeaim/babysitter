@@ -17,6 +17,12 @@
  * - Brown, T. (2009). Change by Design
  * - Knapp, J. et al. (2016). Sprint: How to Solve Big Problems in Just Five Days
  * - IDEO Design Thinking: https://designthinking.ideo.com/
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

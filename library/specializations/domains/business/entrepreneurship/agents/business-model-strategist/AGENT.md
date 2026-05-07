@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Strategy
   agent-id: AG-012
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Business Model Strategist Agent

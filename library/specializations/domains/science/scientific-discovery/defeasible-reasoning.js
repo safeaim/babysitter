@@ -3,6 +3,12 @@
  * @description Conclusions that can be defeated by counterevidence or stronger rules
  * @inputs { defeasibleRules: array, strictRules: array, facts: array, defeaters: array, outputDir: string }
  * @outputs { success: boolean, supportedConclusions: array, defeatedConclusions: array, argumentStructure: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

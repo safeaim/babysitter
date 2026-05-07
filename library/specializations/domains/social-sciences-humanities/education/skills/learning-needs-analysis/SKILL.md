@@ -2,6 +2,11 @@
 name: learning-needs-analysis
 description: Conduct comprehensive learner audience analysis, identify performance gaps, and determine instructional requirements using surveys, interviews, and data analysis
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Learning Needs Analysis

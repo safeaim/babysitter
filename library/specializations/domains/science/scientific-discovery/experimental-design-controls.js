@@ -18,6 +18,12 @@
  * - Fisher, R.A. (1935). The Design of Experiments
  * - Shadish, W.R. et al. (2002). Experimental and Quasi-Experimental Designs
  * - Schulz, K.F. et al. (2010). CONSORT 2010 Statement
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

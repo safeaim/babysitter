@@ -15,6 +15,10 @@ metadata:
   domain: business
   category: Program Management
   id: AG-010
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Program Manager Agent

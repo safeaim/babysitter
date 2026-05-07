@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Marketing Analytics
   agent-id: AG-013
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # A/B Testing Specialist Agent

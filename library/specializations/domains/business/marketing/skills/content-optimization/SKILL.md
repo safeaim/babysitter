@@ -17,6 +17,10 @@ metadata:
     - Clearscope API
     - Surfer SEO API
     - MarketMuse API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Content Optimization Skill

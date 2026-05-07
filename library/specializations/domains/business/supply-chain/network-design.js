@@ -16,6 +16,11 @@
  * @references
  * - Coupa Supply Chain Design: https://www.coupa.com/products/supply-chain-design
  * - Network Design Best Practices: https://www.llamasoft.com/
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -9,6 +9,10 @@ expertise:
   - Investment justification
   - Scenario modeling
   - Capacity risk assessment
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Capacity Planning Analyst

@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Talent Acquisition
   agent-id: AG-002
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Technical Recruiter Agent

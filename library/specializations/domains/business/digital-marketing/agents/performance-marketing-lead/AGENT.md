@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Paid Advertising
   agent-id: AG-012
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # Performance Marketing Lead Agent

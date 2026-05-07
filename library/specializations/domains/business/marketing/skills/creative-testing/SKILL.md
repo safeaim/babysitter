@@ -15,6 +15,10 @@ metadata:
   skill-id: SK-016
   dependencies:
     - Creative testing platform APIs
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Creative Testing Platform Skill

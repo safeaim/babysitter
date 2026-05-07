@@ -2,6 +2,11 @@
 name: accessibility-compliance
 description: Ensure cultural programs and facilities meet ADA requirements and universal design principles including accommodations, assistive technologies, and inclusive practices
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Accessibility Compliance

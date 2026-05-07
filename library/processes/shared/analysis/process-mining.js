@@ -5,6 +5,12 @@
  *   docs/analysis/process-mining-<date>.md. Pure node tasks — no agent.
  * @inputs { runsDir?: string, outputDir?: string, date?: string }
  * @outputs { success: boolean, reportPath: string, stats: object }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:process-optimization, topic:developer-experience]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

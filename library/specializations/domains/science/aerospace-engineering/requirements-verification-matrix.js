@@ -4,6 +4,12 @@
  * complete traceability from system to component level.
  * @inputs { projectName: string, requirementsSource: object, systemArchitecture?: object }
  * @outputs { success: boolean, rvmMatrix: object, traceability: object, verificationPlan: object }
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

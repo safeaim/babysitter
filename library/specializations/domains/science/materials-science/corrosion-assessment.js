@@ -29,6 +29,12 @@
  *   "sampleSpecifications": { "form": "plate", "surfaceFinish": "2B" }
  * }
  * @references ASTM G Standards, ISO 9227, NACE MR0175, ASTM G48 Pitting Test
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

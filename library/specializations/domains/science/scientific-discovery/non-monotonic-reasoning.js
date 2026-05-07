@@ -3,6 +3,12 @@
  * @description Adding information can retract previous conclusions - reasoning with defeasible inference
  * @inputs { knowledgeBase: array, newInformation: array, priorities: object, skepticalMode: boolean, outputDir: string }
  * @outputs { success: boolean, conclusions: array, retractedConclusions: array, extensionAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,12 @@
  * - IEC 61131-3 (Programmable Controllers)
  * - Control Systems Engineering (Nise)
  * - Modern Control Systems (Dorf & Bishop)
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

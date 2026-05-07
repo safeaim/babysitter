@@ -3,6 +3,11 @@
  * @description Full editorial lifecycle for long-form written work: outline → draft → self-edit → fact-check → developmental-edit (via breakpoint) → copy-edit → legal check → publish → track revision requests. Unified workflow; no fragmented per-role processes.
  * @inputs { topic: string, audience: string, workingTitle?: string, wordTarget?: number, sources?: Array<{ title, url, notes? }>, editors?: { developmental?: string, copy?: string, legal?: string }, publishTarget?: { platform, slug? } }
  * @outputs { success: boolean, finalDraftPath?: string, publishedUrl?: string, editPassStatus: object, revisionLog: Array<object>, blockers?: Array<string> }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:documentation, topic:content-creation]
+ *   roles: [role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

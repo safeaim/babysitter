@@ -17,6 +17,10 @@ metadata:
     - GA4 API
     - Adobe Analytics API
     - Mixpanel API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Marketing Analytics Platform Skill

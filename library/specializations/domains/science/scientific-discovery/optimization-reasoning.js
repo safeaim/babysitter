@@ -18,6 +18,12 @@
  * - Nocedal & Wright (2006). Numerical Optimization
  * - Talbi (2009). Metaheuristics: From Design to Implementation
  * - Rardin (2016). Optimization in Operations Research
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,12 @@
  * - Nosek, B.A. et al. (2018). The preregistration revolution
  * - Chambers, C.D. (2013). Registered Reports: A new publishing initiative
  * - OSF Preregistration Templates: https://osf.io/prereg/
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

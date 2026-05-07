@@ -7,6 +7,11 @@
  * @outputs { success: boolean, report: object }
  *
  * Source: a5c-ai/registry/prompts/sre/azure-sre-engineer-agent.prompt.md
+ * @graph
+ *   domains: [domain:observability]
+ *   skillAreas: [skill-area:incident-management, skill-area:cloud-infrastructure]
+ *   topics: [topic:slo-sli, topic:incident-management, topic:azure]
+ *   roles: [role:site-reliability-engineer, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

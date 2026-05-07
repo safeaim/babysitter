@@ -14,6 +14,10 @@ required-skills:
   - demand-sensing-integrator
   - abc-xyz-classifier
   - safety-stock-calculator
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Demand Planner

@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - Event platform APIs
     - Webinar platform APIs
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Speaking and Events Skill

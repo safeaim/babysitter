@@ -29,6 +29,12 @@
  * @param {Array<{taskNumber: number, taskName: string, summary?: string, filesChanged?: string[], decisions?: string[]}>} [args.buildManifest]
  * @param {null|{peerTasks: Array<{taskNumber:number, task:{name:string}}>, upcomingBatches: Array<Array<{taskNumber:number, task:{name:string}}>>, currentBatchIndex: number}} [args.batchContext]
  * @returns {string} markdown scene context
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:developer-tooling]
+ *   topics: [topic:developer-experience, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 export function buildSceneContext(args) {
   const { task, taskIndex, allTasks, buildManifest = [], batchContext = null } = args;

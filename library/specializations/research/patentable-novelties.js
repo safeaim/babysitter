@@ -7,6 +7,11 @@
  * @outputs { success: boolean, patentabilityScore: number, disclosureYaml: string, recommendation: string }
  *
  * Source: a5c-ai/registry/prompts/research/patentable-novelties-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

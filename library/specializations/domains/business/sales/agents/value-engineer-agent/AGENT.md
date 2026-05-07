@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Financial modeling
     - Business analysis
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Value Engineer Agent

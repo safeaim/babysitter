@@ -17,6 +17,11 @@
  * @references
  * - Gartner Sales Research: https://www.gartner.com/en/sales
  * - Clozd Win-Loss Analysis: https://www.clozd.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

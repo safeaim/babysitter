@@ -17,6 +17,11 @@ metadata:
     - PTC Windchill
     - Siemens Teamcenter
     - Dassault ENOVIA
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Engineering Change Management Skill

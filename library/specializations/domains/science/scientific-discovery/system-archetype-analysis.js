@@ -16,6 +16,12 @@
  * - Senge, P. (1990). The Fifth Discipline
  * - Kim, D.H. & Anderson, V. (1998). Systems Archetype Basics
  * - Braun, W. (2002). The System Archetypes
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

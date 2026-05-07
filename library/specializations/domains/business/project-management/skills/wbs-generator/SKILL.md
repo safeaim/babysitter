@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Scope Management
   id: SK-007
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # WBS Generator

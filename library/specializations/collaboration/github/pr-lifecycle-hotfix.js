@@ -3,6 +3,12 @@
  * @description Fast-path lifecycle for production hotfixes: minimal gates, mandatory incident link, on-call sign-off breakpoint, merge to main + backport to staging/develop.
  * @inputs { event: string, pr: object, prDiff?: string, incidentRef?: string, onCall?: string, backportBranches?: string[] }
  * @outputs { success: boolean, stages: object, mergeAction: string, backportPlan: object[], blockers: string[] }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:code-review, topic:git-workflow, topic:incident-management]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - BuzzStream API
     - Hunter.io API
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # Link Building Outreach Skill

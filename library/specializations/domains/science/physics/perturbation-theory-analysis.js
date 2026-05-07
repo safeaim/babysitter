@@ -18,6 +18,12 @@
  * - Bender & Orszag, Advanced Mathematical Methods for Scientists and Engineers
  * - Sakurai, Modern Quantum Mechanics (perturbation theory chapter)
  * - Weinberg, Lectures on Quantum Mechanics
+ *
+ * @graph
+ *   domains: [domain:physics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

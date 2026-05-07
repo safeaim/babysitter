@@ -8,6 +8,10 @@ expertise:
   - Fair value accounting (ASC 820)
   - Fund audit support
   - Capital account maintenance
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Fund Accountant

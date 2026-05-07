@@ -14,6 +14,11 @@ expertise:
 metadata:
   version: "1.0"
   category: automotive-engineering
+graph:
+  domains: [domain:automotive-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Integration Test Engineer Agent

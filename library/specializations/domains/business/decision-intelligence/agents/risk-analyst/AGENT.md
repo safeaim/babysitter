@@ -11,6 +11,10 @@ expertise:
   - Residual risk evaluation
   - Risk monitoring setup
   - Risk communication
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Risk Analyst

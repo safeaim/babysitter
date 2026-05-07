@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Structured assessment
     - Multi-factor analysis
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # MEDDPICC Qualifier Agent

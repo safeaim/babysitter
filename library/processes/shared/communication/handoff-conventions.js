@@ -3,6 +3,12 @@
  * @description Post an explicit handoff message when transferring work between agents/humans.
  * @inputs { workSummary: string, nextActor: string, whereStateLives: string, condition?: string }
  * @outputs { success: boolean, handoffMessage: string }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:developer-experience, topic:documentation]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

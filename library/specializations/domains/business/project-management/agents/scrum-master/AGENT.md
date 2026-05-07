@@ -15,6 +15,10 @@ metadata:
   domain: business
   category: Agile Management
   id: AG-007
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Scrum Master Agent

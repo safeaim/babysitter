@@ -2,6 +2,11 @@
 name: metadata-standards-implementation
 description: Apply Dublin Core, METS, MODS, and other metadata schemas for digital collections and archival materials
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Metadata Standards Implementation

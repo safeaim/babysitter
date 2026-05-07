@@ -14,6 +14,10 @@ required-skills:
   - last-mile-delivery-optimizer
   - fleet-analytics-dashboard
   - carbon-footprint-calculator
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Route Optimization Analyst

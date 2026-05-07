@@ -9,6 +9,10 @@ expertise:
   - S&OP demand planning support
   - Market intelligence integration
   - Promotional planning
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Demand Planner

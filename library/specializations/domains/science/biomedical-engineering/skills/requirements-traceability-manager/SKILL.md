@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Design Control
   skill-id: BME-SK-005
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Requirements Traceability Manager Skill

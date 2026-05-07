@@ -3,6 +3,12 @@
  * @description Systematically analyze time and space complexity of algorithms using asymptotic notation, recurrence relations, and formal proofs
  * @inputs { algorithmDescription: string, pseudocode: string, computationalModel: string, inputRepresentation: object }
  * @outputs { success: boolean, complexityBounds: object, recurrenceAnalysis: object, proofDocumentation: string, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

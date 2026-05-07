@@ -16,6 +16,11 @@
  * @references
  * - OneTrust Breach Management: https://www.onetrust.com/
  * - GDPR Art 33/34: https://gdpr.eu/article-33-notification-of-a-personal-data-breach/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: BIM Coordination
   skill-id: CIV-SK-014
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # BIM Clash Detection Skill

@@ -10,6 +10,11 @@ metadata:
   domain: science
   category: Data Analysis
   skill-id: SK-SCIDISC-017
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Statistical Test Selector Skill

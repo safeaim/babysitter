@@ -18,6 +18,12 @@
  * - IEC 60255 (Measuring Relays and Protection Equipment)
  * - NFPA 70E (Electrical Safety)
  * - Relay Manufacturer Application Guides
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

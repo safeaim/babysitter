@@ -17,6 +17,12 @@
  * - DICOM Standard: https://www.dicomstandard.org/
  * - IHE Radiology Technical Framework: https://www.ihe.net/
  * - HL7 FHIR: https://www.hl7.org/fhir/
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -19,6 +19,12 @@
  * - Geddes et al., Algorithms for Computer Algebra
  * - Risch Algorithm: https://en.wikipedia.org/wiki/Risch_algorithm
  * - NIST Digital Library of Mathematical Functions
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

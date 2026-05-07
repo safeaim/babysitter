@@ -9,6 +9,10 @@ expertise:
   - Gap analysis
   - Best practice adaptation
   - Implementation tracking
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Benchmarking Coordinator

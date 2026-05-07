@@ -18,6 +18,11 @@ metadata:
     - taxonomy
     - classification
     - kraken
+graph:
+  domains: [domain:bioinformatics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:data-engineer, role:tech-lead]
 ---
 
 # Kraken2 Taxonomic Classifier Skill

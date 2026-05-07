@@ -19,6 +19,12 @@
  * - SAE J2464 EV Battery Abuse Testing
  * - ISO 6469 EV Safety Specifications
  * - GB/T 31485 Chinese EV Battery Standards
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

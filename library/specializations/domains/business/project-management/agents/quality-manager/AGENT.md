@@ -15,6 +15,10 @@ metadata:
   domain: business
   category: Quality Management
   id: AG-012
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Quality Manager Agent

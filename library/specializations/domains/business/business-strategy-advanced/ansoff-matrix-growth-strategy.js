@@ -3,6 +3,11 @@
  * @description Product-market growth strategy development using Ansoff Matrix framework
  * @inputs { organizationName: string, currentProducts: array, currentMarkets: array, capabilities: object, riskAppetite: string }
  * @outputs { success: boolean, ansoffAnalysis: object, growthOptions: array, riskAssessment: object, growthRoadmap: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

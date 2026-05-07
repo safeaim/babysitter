@@ -2,6 +2,11 @@
 name: production-manager-agent
 description: Performance production manager agent for stage management, technical production, event coordination, artist relations, venue operations, and production documentation
 required-skills: production-coordination, risk-mitigation-planning, stakeholder-facilitation
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Production Manager Agent

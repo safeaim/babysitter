@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Financial Analysis
   id: SK-009
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # NPV/IRR Calculator

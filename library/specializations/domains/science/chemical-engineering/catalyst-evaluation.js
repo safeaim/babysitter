@@ -3,6 +3,12 @@
  * @description Evaluate catalyst options, optimize catalyst loading and operating conditions, and predict catalyst lifetime
  * @inputs { processName: string, reactionSystem: object, candidateCatalysts: array, outputDir: string }
  * @outputs { success: boolean, selectedCatalyst: object, optimizedConditions: object, lifetimePrediction: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

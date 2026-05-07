@@ -18,6 +18,12 @@
  * - ASTM E1903 - Phase II Environmental Site Assessment
  * - EPA All Appropriate Inquiries Rule
  * - State Environmental Assessment Guidelines
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

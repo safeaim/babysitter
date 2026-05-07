@@ -9,6 +9,10 @@ expertise:
   - Technology adoption
   - Performance target setting
   - ROI measurement
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Supplier Development Manager

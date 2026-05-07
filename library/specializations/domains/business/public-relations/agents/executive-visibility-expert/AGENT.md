@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Corporate Communications
   agent-id: AG-006
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Executive Visibility Expert Agent

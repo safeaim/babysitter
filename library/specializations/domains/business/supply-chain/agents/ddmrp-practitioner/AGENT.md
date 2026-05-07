@@ -9,6 +9,10 @@ expertise:
   - Dynamic adjustment
   - Net flow execution
   - Flow-based planning
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # DDMRP Practitioner

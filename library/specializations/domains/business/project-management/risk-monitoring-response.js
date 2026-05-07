@@ -16,6 +16,11 @@
  * @references
  * - PMI Risk Management: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
  * - ISO 31000 Risk Management: https://www.iso.org/iso-31000-risk-management.html
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

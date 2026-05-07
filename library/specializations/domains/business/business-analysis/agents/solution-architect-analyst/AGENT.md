@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-008
   category: Solution Assessment
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Solution Architect Analyst Agent

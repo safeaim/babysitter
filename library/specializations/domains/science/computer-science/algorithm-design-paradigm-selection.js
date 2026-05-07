@@ -3,6 +3,12 @@
  * @description Select and apply appropriate algorithm design paradigms for computational problems including divide-and-conquer, dynamic programming, greedy algorithms, and randomization
  * @inputs { problemDescription: string, problemStructure: object, constraints: object }
  * @outputs { success: boolean, selectedParadigm: string, algorithmDesign: object, comparativeAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

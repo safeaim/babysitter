@@ -16,6 +16,11 @@ metadata:
   tools-libraries:
     - Sensor calibration software
     - Data analysis tools
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Nanosensor Calibration Manager

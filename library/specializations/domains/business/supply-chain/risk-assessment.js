@@ -16,6 +16,11 @@
  * @references
  * - Supply Chain Risk Management Book: https://www.koganpage.com/product/supply-chain-risk-management-9780749476298
  * - ISO 31000 Risk Management: https://www.iso.org/iso-31000-risk-management.html
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

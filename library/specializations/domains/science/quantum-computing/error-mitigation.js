@@ -3,6 +3,12 @@
  * @description QC-ERR-001: Implement and configure error mitigation techniques for NISQ devices
  * @inputs { circuit: object, backend: string, mitigationTechniques: array }
  * @outputs { success: boolean, mitigatedResults: object, fidelityImprovement: number, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:quantum-computing]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

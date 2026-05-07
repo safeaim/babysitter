@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Marketing Analytics
   skill-id: SK-015
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Customer Data Platform Skill

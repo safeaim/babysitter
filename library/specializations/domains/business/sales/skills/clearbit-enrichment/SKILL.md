@@ -15,6 +15,10 @@ metadata:
   integration-points:
     - Clearbit Enrichment API
     - Clearbit Reveal API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Clearbit Enrichment

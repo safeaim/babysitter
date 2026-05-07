@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: Integration
   id: SK-011
+graph:
+  domains: [domain:customer-experience]
+  skillAreas: [skill-area:customer-success]
+  roles: [role:customer-success-manager]
 ---
 
 # Support Platform Integration Skill

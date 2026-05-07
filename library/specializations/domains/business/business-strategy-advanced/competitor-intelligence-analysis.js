@@ -3,6 +3,11 @@
  * @description Systematic competitor analysis including identification, profiling, monitoring, and response planning
  * @inputs { organizationName: string, industryContext: object, knownCompetitors: array, marketData: object }
  * @outputs { success: boolean, competitorMap: object, competitorProfiles: array, responsePlaybook: object, earlyWarningSystem: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Risk Management
   id: SK-006
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Risk Register Manager

@@ -7,6 +7,11 @@
  * @outputs { success, mentionsFound, responded, moderated, escalated }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/communication/discord-manager-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:api-integration]
+ *   topics: [topic:developer-experience, topic:community-management]
+ *   roles: [role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

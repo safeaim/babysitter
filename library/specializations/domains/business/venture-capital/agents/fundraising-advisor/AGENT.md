@@ -8,6 +8,10 @@ expertise:
   - Pitch deck and materials review
   - Round positioning and timing
   - Investor relations guidance
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Fundraising Advisor

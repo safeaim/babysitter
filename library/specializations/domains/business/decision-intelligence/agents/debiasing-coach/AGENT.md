@@ -11,6 +11,10 @@ expertise:
   - Reference class forecasting
   - Calibration training
   - Protocol compliance monitoring
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Debiasing Coach

@@ -19,6 +19,12 @@
  * - IEEE 1800 (SystemVerilog)
  * - Xilinx Vivado Design Guidelines
  * - Intel Quartus Prime Documentation
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -5,6 +5,12 @@
  * @outputs { success: boolean, adaptedInstruments: object, invarianceResults: object, qualityScore: number, artifacts: array }
  * @recommendedSkills SK-SS-009 (psychometric-assessment), SK-SS-003 (survey-design-administration)
  * @recommendedAgents AG-SS-007 (measurement-psychometrics-expert), AG-SS-003 (survey-research-director)
+ *
+ * @graph
+ *   domains: [domain:social-sciences]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

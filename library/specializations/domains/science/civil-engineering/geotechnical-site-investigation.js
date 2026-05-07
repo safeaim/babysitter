@@ -3,6 +3,12 @@
  * @description Comprehensive subsurface investigation including boring program design, field testing, laboratory testing, and geotechnical report preparation
  * @inputs { projectId: string, siteLocation: object, projectType: string, structureLoads: object }
  * @outputs { success: boolean, geotechnicalReport: object, boringLogs: array, labResults: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

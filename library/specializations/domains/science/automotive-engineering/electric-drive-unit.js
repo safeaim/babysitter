@@ -18,6 +18,12 @@
  * - ISO 21498 Electric Motor Testing
  * - SAE J2464 Electrical Component Testing
  * - IEC 60034 Rotating Electrical Machines
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

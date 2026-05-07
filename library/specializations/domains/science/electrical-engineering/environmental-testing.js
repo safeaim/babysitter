@@ -19,6 +19,12 @@
  * - MIL-STD-883 (Test Methods for Microelectronics)
  * - JEDEC Standards (JESD22 Series)
  * - IEC 61000 (EMC Standards)
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

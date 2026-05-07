@@ -8,6 +8,10 @@ expertise:
   - Trend identification
   - Anomaly detection
   - Portfolio company comparison
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # KPI Analyst

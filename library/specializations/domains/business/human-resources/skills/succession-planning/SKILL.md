@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Talent assessment data
     - Competency models
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Succession Planning Skill

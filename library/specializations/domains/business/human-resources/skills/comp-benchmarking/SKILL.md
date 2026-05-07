@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Compensation survey data
     - Market pricing tools
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Compensation Benchmarking Skill

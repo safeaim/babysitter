@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: procurement
   priority: medium
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Strategic Sourcing Analyzer

@@ -17,6 +17,11 @@
  * @references
  * - PMI PMBOK Guide: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
  * - Project Charter Best Practices: https://www.pmi.org/learning/library/project-charter-comprehensive-plan-7473
+ * @graph
+ *   domains: [domain:project-management]
+ *   skillAreas: [skill-area:project-management]
+ *   topics: [topic:project-planning, topic:agile-methodology]
+ *   roles: [role:project-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

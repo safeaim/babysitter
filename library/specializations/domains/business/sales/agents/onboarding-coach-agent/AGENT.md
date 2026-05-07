@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Learning optimization
     - Performance tracking
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Onboarding Coach Agent

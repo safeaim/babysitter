@@ -3,6 +3,11 @@
  * @description Develop cross-channel campaign strategy including objectives, target audience, messaging, channel mix (PESO model), budget allocation, timeline, and success metrics.
  * @inputs { campaignName: string, businessObjectives: object, targetAudience: object, budget: number, timeline: object, brandGuidelines: object }
  * @outputs { success: boolean, campaignStrategy: object, channelMix: object, budget: object, timeline: object, kpis: array, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

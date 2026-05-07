@@ -19,6 +19,12 @@
  * - ISO 26262-4 Product Development: System Level
  * - ISO 26262-5 Product Development: Hardware Level
  * - ISO 26262-6 Product Development: Software Level
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

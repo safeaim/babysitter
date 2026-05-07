@@ -17,6 +17,10 @@ metadata:
     - Sprinklr API
     - Talkwalker API
     - Native social APIs
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Social Listening Skill

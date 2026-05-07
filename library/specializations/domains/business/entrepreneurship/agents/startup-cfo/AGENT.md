@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Finance
   agent-id: AG-004
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Startup CFO Agent

@@ -2,6 +2,11 @@
 name: care-management-coordinator
 description: Coordinate care across settings and providers for complex patients, managing transitions, resources, and outcomes through population health approaches
 required-skills: care-transition-coordination, population-health-stratification, clinical-workflow-analysis
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Care Management Coordinator Agent

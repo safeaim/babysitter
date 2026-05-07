@@ -9,6 +9,10 @@ expertise:
   - Identifying "derived" entities that must be computed from primary sources
 used-by-processes:
   - specializations/domains/business/travel/flight-dataset-build
+graph:
+  domains: [domain:travel]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Open-Data Scout

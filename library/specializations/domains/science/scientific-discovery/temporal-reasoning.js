@@ -18,6 +18,12 @@
  * - Time in Physics: https://plato.stanford.edu/entries/time/
  * - Allen's Interval Algebra: https://www.sciencedirect.com/topics/computer-science/allen-algebra
  * - Temporal Reasoning in AI: https://www.sciencedirect.com/topics/computer-science/temporal-reasoning
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

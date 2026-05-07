@@ -18,6 +18,12 @@
  * - ISO 24089 Software Update Engineering
  * - UPTANE Framework
  * - ISO/SAE 21434 Cybersecurity
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

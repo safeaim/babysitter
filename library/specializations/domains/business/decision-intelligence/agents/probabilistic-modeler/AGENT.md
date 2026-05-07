@@ -11,6 +11,10 @@ expertise:
   - Risk metric calculation
   - Sensitivity analysis
   - Communication of uncertainty
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Probabilistic Modeler

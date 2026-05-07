@@ -11,6 +11,10 @@ expertise:
   - Insight extraction
   - Debrief facilitation
   - Strategic recommendation
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # War Game Facilitator

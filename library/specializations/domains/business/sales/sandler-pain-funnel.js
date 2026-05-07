@@ -16,6 +16,11 @@
  * @references
  * - Sandler Training: https://www.sandler.com/
  * - You Cant Teach a Kid to Ride a Bike at a Seminar: https://www.amazon.com/Cant-Teach-Ride-Bike-Seminar/dp/0525942513
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

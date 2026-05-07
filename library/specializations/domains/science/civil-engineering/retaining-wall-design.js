@@ -3,6 +3,12 @@
  * @description Design of earth retaining structures including gravity walls, cantilever walls, MSE walls, and soil nail walls
  * @inputs { projectId: string, wallType: string, retainedHeight: number, soilProperties: object, surchargeLoads: object }
  * @outputs { success: boolean, wallDesign: object, structuralDrawings: array, constructionSpecs: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

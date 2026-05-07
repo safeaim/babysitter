@@ -16,6 +16,11 @@
  * @references
  * - SCCE Training Best Practices: https://www.corporatecompliance.org/resources/books
  * - DOJ Compliance Program Guidance: https://www.justice.gov/criminal-fraud/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

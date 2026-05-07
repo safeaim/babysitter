@@ -13,6 +13,11 @@ metadata:
   author: giladw
   version: "1.0.0"
   category: backend-development
+graph:
+  domains: [domain:software-engineering]
+  skillAreas: [skill-area:tdd-bdd, skill-area:backend-api-development]
+  topics: [topic:test-driven-development, topic:hexagonal-architecture]
+  roles: [role:backend-engineer, role:tech-lead]
   backlog-id: SK-GOIS-001
 ---
 

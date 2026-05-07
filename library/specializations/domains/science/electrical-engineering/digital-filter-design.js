@@ -18,6 +18,12 @@
  * - MATLAB Filter Designer Documentation
  * - Digital Filter Design Methodologies
  * - Fixed-Point Filter Implementation Guidelines
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

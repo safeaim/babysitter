@@ -15,6 +15,11 @@
  * @references
  * - Sales Acceleration Formula: https://www.amazon.com/Sales-Acceleration-Formula-Technology-Inbound/dp/1119047072
  * - RAIN Group Sales Training: https://www.rainsalestraining.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

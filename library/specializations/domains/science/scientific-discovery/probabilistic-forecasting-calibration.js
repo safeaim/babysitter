@@ -18,6 +18,12 @@
  * - Gneiting, T. & Raftery, A.E. (2007). Strictly Proper Scoring Rules, Prediction, and Estimation
  * - Morgan, M.G. & Henrion, M. (1990). Uncertainty: A Guide to Dealing with Uncertainty
  * - Mellers, B. et al. (2014). Psychological Strategies for Winning a Geopolitical Forecasting Tournament
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

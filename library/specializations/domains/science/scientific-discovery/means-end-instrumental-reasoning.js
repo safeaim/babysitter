@@ -18,6 +18,12 @@
  * - Sacerdoti (1974). Planning in a Hierarchy of Abstraction Spaces
  * - Bratman (1987). Intention, Plans, and Practical Reason
  * - Pollock (2006). Thinking About Acting
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

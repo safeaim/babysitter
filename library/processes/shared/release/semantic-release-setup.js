@@ -5,6 +5,12 @@
  *   to main. Pure node tasks — no agent.
  * @inputs { targetDir: string, branches?: string[] }
  * @outputs { success: boolean, copied: string[], workflowWritten: boolean }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:cicd-devops]
+ *   topics: [topic:release-management, topic:continuous-integration]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

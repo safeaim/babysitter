@@ -3,6 +3,12 @@
  * @description Analysis of natural and engineered slopes including limit equilibrium analysis, factor of safety determination, and remediation design
  * @inputs { projectId: string, siteGeometry: object, soilProperties: object, groundwaterConditions: object }
  * @outputs { success: boolean, stabilityReport: object, factorOfSafety: number, remediationRecommendations: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

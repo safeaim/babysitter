@@ -14,6 +14,11 @@ metadata:
   domain: science
   category: Medical Software
   agent-id: BME-AG-015
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Software V&V Specialist Agent

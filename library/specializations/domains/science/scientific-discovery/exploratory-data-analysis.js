@@ -16,6 +16,12 @@
  * - Tukey, J.W. (1977). Exploratory Data Analysis
  * - Wickham, H. & Grolemund, G. (2017). R for Data Science
  * - Cleveland, W.S. (1993). Visualizing Data
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

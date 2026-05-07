@@ -18,6 +18,12 @@
  * - National Instruments VeriStand
  * - ISO 26262 Part 6 Software Verification
  * - ASPICE SWE.4 Software Unit Verification
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

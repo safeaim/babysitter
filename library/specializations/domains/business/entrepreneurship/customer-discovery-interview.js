@@ -16,6 +16,11 @@
  * - The Mom Test: https://www.momtestbook.com/
  * - Steve Blank Customer Development: https://steveblank.com/
  * - Talking to Humans: https://www.talkingtohumans.com/
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

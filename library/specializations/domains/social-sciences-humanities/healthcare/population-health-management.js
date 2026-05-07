@@ -6,6 +6,12 @@
  * @outputs { success: boolean, populationProgram: object, careModels: array, analytics: object, artifacts: array }
  * @recommendedSkills SK-HC-009 (population-health-stratification), SK-HC-008 (care-transition-coordination), SK-HC-002 (quality-metrics-measurement)
  * @recommendedAgents AG-HC-006 (care-management-coordinator), AG-HC-001 (quality-improvement-orchestrator)
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

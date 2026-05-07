@@ -5,6 +5,12 @@
  * @outputs { success: boolean, collectionStatus: object, actions: array, documentation: object, artifacts: array }
  * @recommendedSkills SK-AC-003 (collection-documentation), SK-AC-001 (curatorial-research), SK-AC-006 (conservation-assessment)
  * @recommendedAgents AG-AC-006 (registrar-agent), AG-AC-001 (curator-agent), AG-AC-004 (conservator-agent)
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

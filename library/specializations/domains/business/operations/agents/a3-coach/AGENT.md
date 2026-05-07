@@ -9,6 +9,10 @@ expertise:
   - Countermeasure review
   - PDCA cycle coaching
   - Capability development
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # A3 Coach

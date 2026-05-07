@@ -19,6 +19,12 @@
  * - SpatialDE: https://github.com/Teichlab/SpatialDE
  * - STUtility: https://ludvigla.github.io/STUtility_web_site/
  * - Cell2location: https://cell2location.readthedocs.io/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

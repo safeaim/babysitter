@@ -8,6 +8,10 @@ expertise:
   - Comparable company and transaction analysis
   - Return modeling and scenarios
   - Valuation negotiation support
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Valuation Specialist

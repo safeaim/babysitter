@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Schedule Management
   id: SK-002
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Critical Path Analyzer

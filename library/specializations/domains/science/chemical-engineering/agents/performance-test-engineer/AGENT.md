@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Commissioning
   agent-id: CE-AG-019
+graph:
+  domains: [domain:chemical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Performance Test Engineer Agent

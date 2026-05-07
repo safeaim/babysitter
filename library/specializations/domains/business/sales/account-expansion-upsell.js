@@ -15,6 +15,11 @@
  * @references
  * - The Challenger Customer: https://www.amazon.com/Challenger-Customer-Selling-Hidden-Influencer/dp/1591848156
  * - Expansion Revenue Playbook: https://www.gainsight.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

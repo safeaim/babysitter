@@ -2,6 +2,11 @@
 name: historical-narrator
 description: Construct scholarly historical arguments and narratives including historiography, evidence synthesis, causal analysis, scholarly writing, and peer engagement
 required-skills: primary-source-evaluation, citation-scholarly-apparatus, archival-finding-aid-interpretation
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Historical Narrator Agent

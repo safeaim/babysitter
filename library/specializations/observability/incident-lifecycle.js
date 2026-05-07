@@ -3,6 +3,11 @@
  * @description Full incident lifecycle as a single workflow: detect/intake → triage+severity → comms-cadence → diagnose → mitigate → verify-recovery → postmortem → action-item follow-through. Replaces separate detect/triage/postmortem role-split processes.
  * @inputs { signal: { source: "alert"|"user-report"|"cron"|"synthetic", ref: string, firstSeenAt: string, symptomSummary: string, impactedSurfaces?: string[] }, onCall?: { primary: string, secondary?: string }, commsChannels?: Array<{ kind: "slack"|"status-page"|"email", target: string }>, slo?: { mttdMinutes: number, mttrMinutes: number } }
  * @outputs { success: boolean, severity: "SEV1"|"SEV2"|"SEV3"|"SEV4"|"non-incident", mitigation: object, recoveryVerified: boolean, postmortemUrl?: string, actionItems: Array<object>, slaBreaches?: Array<string> }
+ * @graph
+ *   domains: [domain:observability]
+ *   skillAreas: [skill-area:incident-management]
+ *   topics: [topic:incident-management, topic:slo-sli]
+ *   roles: [role:platform-engineer, role:site-reliability-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

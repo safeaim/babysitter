@@ -8,6 +8,10 @@ expertise:
   - Timeline tracking and milestone management
   - Partner coordination and communication
   - Pipeline analytics and reporting
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Pipeline Coordinator

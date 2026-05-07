@@ -3,6 +3,12 @@
  * @description Reason with qualitative states like "increasing/decreasing" rather than precise numeric values
  * @inputs { quantities: array, qualitativeConstraints: array, causalRelationships: array, initialStates: object, outputDir: string }
  * @outputs { success: boolean, qualitativeStates: object, behaviorPredictions: array, envisioning: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

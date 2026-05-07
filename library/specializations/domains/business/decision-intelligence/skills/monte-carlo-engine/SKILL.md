@@ -19,6 +19,10 @@ metadata:
     - pymc
     - chaospy
     - SALib
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Monte Carlo Engine

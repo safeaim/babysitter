@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-007
   category: Requirements Management
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Traceability Matrix Builder

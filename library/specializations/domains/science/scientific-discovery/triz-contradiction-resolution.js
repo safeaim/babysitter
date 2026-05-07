@@ -18,6 +18,12 @@
  * - Altshuller, G.S. (1984). Creativity as an Exact Science
  * - Savransky, S.D. (2000). Engineering of Creativity
  * - Mann, D. (2001). Hands-On Systematic Innovation
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

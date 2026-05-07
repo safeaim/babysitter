@@ -2,6 +2,11 @@
 name: grant-proposal-writing
 description: Develop compelling funding proposals for foundations, government agencies, and corporations including narrative development, budget creation, and compliance documentation
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch, WebSearch
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Grant Proposal Writing

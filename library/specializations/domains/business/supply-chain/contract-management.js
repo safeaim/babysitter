@@ -16,6 +16,11 @@
  * @references
  * - Vantage Partners Negotiation: https://www.vantagepartners.com/
  * - Contract Management Best Practices: https://www.icertis.com/
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

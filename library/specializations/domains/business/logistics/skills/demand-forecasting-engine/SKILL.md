@@ -14,6 +14,10 @@ metadata:
   category: inventory
   priority: high
   shared-candidate: true
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Demand Forecasting Engine

@@ -2,6 +2,11 @@
 name: gis-mapping-humanities
 description: Create spatial visualizations and geographic analyses for historical and cultural research questions using QGIS/ArcGIS
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash, WebFetch
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # GIS Mapping for Humanities

@@ -15,6 +15,11 @@
  * @references
  * - HubSpot Academy Inbound Sales: https://academy.hubspot.com/courses/inbound-sales
  * - BANT Qualification: https://blog.hubspot.com/sales/bant
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

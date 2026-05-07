@@ -14,6 +14,10 @@ metadata:
   priority: P1
   integration-points:
     - ZoomInfo API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # ZoomInfo Enrichment

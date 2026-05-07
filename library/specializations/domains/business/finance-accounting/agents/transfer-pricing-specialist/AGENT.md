@@ -9,6 +9,10 @@ expertise:
   - Country-by-country reporting
   - Audit defense support
   - Intercompany agreement review
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Transfer Pricing Specialist

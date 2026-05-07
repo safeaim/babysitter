@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Learning & Development
   agent-id: AG-005
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Learning and Development Specialist Agent

@@ -16,6 +16,10 @@ metadata:
     - LLM APIs
     - jinja2
     - markdown
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Scenario Narrative Generator

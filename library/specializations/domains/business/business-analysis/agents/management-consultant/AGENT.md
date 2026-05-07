@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-003
   category: Consulting
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Management Consultant Agent

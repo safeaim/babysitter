@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Strong conversational reasoning
     - Sales domain knowledge
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # SPIN Coach Agent

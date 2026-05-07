@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Water Resources
   skill-id: CIV-SK-024
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Detention Pond Designer Skill

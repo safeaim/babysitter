@@ -14,6 +14,11 @@ metadata:
   domain: science
   category: literature-knowledge
   phase: 6
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # PubMed Literature Miner

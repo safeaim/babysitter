@@ -18,6 +18,12 @@
  * - UL 2580 (Batteries for Electric Vehicles)
  * - ISO 12405 (Lithium-ion Traction Battery Packs)
  * - SAE J2464 (EV Battery Abuse Testing)
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

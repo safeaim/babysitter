@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Project Initiation
   id: SK-017
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Project Charter Generator

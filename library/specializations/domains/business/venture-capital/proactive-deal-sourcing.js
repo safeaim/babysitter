@@ -3,6 +3,11 @@
  * @description Structured outreach to target companies, founders, and ecosystems including accelerators, incubators, universities, and industry conferences to generate proprietary deal flow
  * @inputs { fundName: string, investmentThesis: object, targetSectors: array, geographies: array }
  * @outputs { success: boolean, sourcingPlan: object, targetList: array, outreachCampaigns: array, artifacts: array }
+ * @graph
+ *   domains: [domain:venture-capital]
+ *   skillAreas: [skill-area:investment-analysis]
+ *   topics: [topic:startup-funding, topic:portfolio-management]
+ *   roles: [role:venture-capitalist]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -17,6 +17,10 @@ metadata:
     - anytree
     - graphviz
     - networkx
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Decision Tree Builder

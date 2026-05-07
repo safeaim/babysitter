@@ -18,6 +18,12 @@
  * - IPC-A-610 (Acceptability of Electronic Assemblies)
  * - IPC-7351 (Land Pattern Standard)
  * - DFM Guidelines for Electronics
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -9,6 +9,10 @@ expertise:
   - Impact quantification
   - Decision tree construction
   - Recommendation formulation
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Scenario Planner

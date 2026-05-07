@@ -17,6 +17,10 @@ metadata:
     - RepTrak API
     - YouGov API
     - Review platform APIs
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Reputation Intelligence Skill

@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-009
   category: Change Management
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # ADKAR Assessment

@@ -2,6 +2,11 @@
 name: arts-advocacy-communication
 description: Craft persuasive advocacy messages, coordinate coalition building, and engage with policymakers to advance arts funding and cultural policy priorities
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch, WebSearch
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Arts Advocacy Communication

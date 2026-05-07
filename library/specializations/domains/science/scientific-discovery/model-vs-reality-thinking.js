@@ -3,6 +3,12 @@
  * @description Treat statistical and ML models as approximations of reality, systematically identifying where models fail to capture true data-generating processes
  * @inputs { model: object, data: object, domain: string, assumptions: array, outputDir: string }
  * @outputs { success: boolean, modelReality Gap: object, discrepancies: array, improvements: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

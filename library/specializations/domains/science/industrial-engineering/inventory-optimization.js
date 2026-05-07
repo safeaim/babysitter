@@ -16,6 +16,12 @@
  * - Silver, Pyke & Peterson, Inventory Management and Production Planning
  * - Axsater, Inventory Control
  * - APICS Dictionary (Supply Chain terminology)
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

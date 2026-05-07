@@ -17,6 +17,11 @@
  * - Andersen, B. & Fagerhaug, T. (2006). Root Cause Analysis
  * - Ishikawa, K. (1990). Introduction to Quality Control
  * - Taiichi Ohno - 5 Whys methodology
+ * @graph
+ *   domains: [domain:operations]
+ *   skillAreas: [skill-area:operations-management]
+ *   topics: [topic:process-optimization, topic:operational-excellence]
+ *   roles: [role:operations-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

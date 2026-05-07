@@ -3,6 +3,11 @@
  * @description Define platform priorities, content mix, posting cadence, community management protocols, and engagement programs aligned with brand voice.
  * @inputs { brandGuidelines: object, targetAudience: object, businessGoals: object, competitors: array, existingPresence: object }
  * @outputs { success: boolean, socialStrategy: object, contentPlan: object, communityGuidelines: object, engagementPrograms: array, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

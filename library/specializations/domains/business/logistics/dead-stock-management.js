@@ -14,6 +14,11 @@
  * @references
  * - Inventory Management Essentials: https://www.amacombooks.org/book/essentials-of-inventory-management-third-edition/
  * - Working Capital Optimization: https://www.ascm.org/
+ * @graph
+ *   domains: [domain:logistics]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:logistics-management, topic:warehouse-operations]
+ *   roles: [role:logistics-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

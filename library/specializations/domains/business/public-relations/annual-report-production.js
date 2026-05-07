@@ -5,6 +5,11 @@
  * @category Corporate Communications
  * @inputs { organization: object, fiscalYearData: object, brandGuidelines: object, regulatoryRequirements: object }
  * @outputs { success: boolean, reportPlan: object, contentOutline: object, productionTimeline: object, quality: number }
+ * @graph
+ *   domains: [domain:public-relations]
+ *   skillAreas: [skill-area:communications-strategy]
+ *   topics: [topic:media-relations, topic:brand-management]
+ *   roles: [role:communications-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

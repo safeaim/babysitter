@@ -7,6 +7,11 @@
  * @outputs { success, axesReviewed, issuesFound, reportPath? }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/communication/content-validator-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:documentation, topic:quality-assurance]
+ *   roles: [role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

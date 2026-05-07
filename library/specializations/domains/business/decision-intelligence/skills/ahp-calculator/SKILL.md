@@ -16,6 +16,10 @@ metadata:
     - ahpy
     - pyDecision
     - scipy.linalg
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # AHP Calculator

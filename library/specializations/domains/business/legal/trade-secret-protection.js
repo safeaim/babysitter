@@ -15,6 +15,11 @@
  * @references
  * - Defend Trade Secrets Act: https://www.congress.gov/bill/114th-congress/senate-bill/1890
  * - IP in the New Technological Age: https://www.westacademic.com/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

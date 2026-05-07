@@ -8,6 +8,11 @@
  * @outputs { success, reportPath?, comparisonTablePath?, vendorCount }
  *
  * Source: https://raw.githubusercontent.com/a5c-ai/registry/main/prompts/research/vendor-researcher-agent.prompt.md
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:vendor-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -2,6 +2,11 @@
 name: clinical-workflow-analysis
 description: Analyze clinical workflows to identify inefficiencies, bottlenecks, and improvement opportunities using Lean healthcare principles and value stream mapping techniques
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Clinical Workflow Analysis

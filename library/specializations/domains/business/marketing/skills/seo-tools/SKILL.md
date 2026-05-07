@@ -18,6 +18,10 @@ metadata:
     - Ahrefs API
     - GSC API
     - Moz API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # SEO Tools Platform Skill

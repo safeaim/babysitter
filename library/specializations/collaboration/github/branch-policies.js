@@ -3,6 +3,12 @@
  * @description Enforce branch-naming, target-branch, and no-direct-push-to-protected rules.
  * @inputs { branch: string, targetBranch: string, protectedBranches?: Array<string>, pushContext?: "direct"|"pr" }
  * @outputs { success: boolean, violations: Array<object>, suggestedBranch?: string }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control]
+ *   topics: [topic:git-workflow, topic:code-review]
+ *   workflows: [workflow:code-review, workflow:feature-development]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

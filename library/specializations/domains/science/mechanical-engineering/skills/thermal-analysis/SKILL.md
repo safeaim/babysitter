@@ -18,6 +18,11 @@ metadata:
     - ANSYS Icepak
     - FloTHERM
     - Thermal Desktop
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Thermal Analysis Skill

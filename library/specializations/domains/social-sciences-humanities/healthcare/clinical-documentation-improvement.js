@@ -19,6 +19,12 @@
  * - AHIMA CDI Practice Guidelines
  * - ACDIS CDI Standards
  * - CMS Documentation Requirements
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

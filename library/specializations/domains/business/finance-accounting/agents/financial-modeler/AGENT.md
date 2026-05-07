@@ -9,6 +9,10 @@ expertise:
   - Error checking and validation
   - Scenario structuring
   - Output presentation
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Financial Modeler

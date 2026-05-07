@@ -2,6 +2,11 @@
  * @file lease-accounting-asc842.js
  * @description Proper accounting treatment for operating and finance leases including right-of-use assets and lease liabilities
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

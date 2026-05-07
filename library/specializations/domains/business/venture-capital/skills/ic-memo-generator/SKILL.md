@@ -12,6 +12,10 @@ metadata:
   specialization: venture-capital
   domain: business
   skill-id: vc-skill-031
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # IC Memo Generator

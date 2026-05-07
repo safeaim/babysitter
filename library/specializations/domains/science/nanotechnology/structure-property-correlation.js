@@ -19,6 +19,12 @@
  * - Materials Project: https://materialsproject.org/
  * - AFLOW (Automatic FLOW): http://aflowlib.org/
  * - Crystallography Open Database: https://www.crystallography.net/
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,11 @@
  * @references
  * - ISO 20400 Sustainable Procurement: https://www.iso.org/standard/63026.html
  * - EcoVadis Sustainability Ratings: https://ecovadis.com/
+ * @graph
+ *   domains: [domain:supply-chain]
+ *   skillAreas: [skill-area:supply-chain-management]
+ *   topics: [topic:supply-chain-optimization, topic:procurement]
+ *   roles: [role:supply-chain-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

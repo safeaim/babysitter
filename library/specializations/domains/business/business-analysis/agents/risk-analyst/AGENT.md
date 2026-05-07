@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-012
   category: Risk Management
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Risk Analyst Agent

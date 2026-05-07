@@ -13,6 +13,10 @@ required-skills:
   - returns-authorization-processor
   - returns-disposition-optimizer
   - warranty-claims-processor
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Returns Manager

@@ -18,6 +18,11 @@ metadata:
     - 3DCS
     - VSA
     - Excel
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Tolerance Stack-Up Analysis Skill

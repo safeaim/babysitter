@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - YouTube Data API
     - YouTube Analytics API
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # Video Marketing Skill

@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Marketing Automation
   agent-id: AG-009
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # Marketing Automation Architect Agent

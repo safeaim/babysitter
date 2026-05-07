@@ -5,6 +5,11 @@
  * @category Stakeholder Communications
  * @inputs { organization: object, financialData: object, corporateNarrative: object, upcomingEvents: object[] }
  * @outputs { success: boolean, communicationsPackage: object, presentationSupport: object, alignmentGuidelines: object, quality: number }
+ * @graph
+ *   domains: [domain:public-relations]
+ *   skillAreas: [skill-area:communications-strategy]
+ *   topics: [topic:media-relations, topic:brand-management]
+ *   roles: [role:communications-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

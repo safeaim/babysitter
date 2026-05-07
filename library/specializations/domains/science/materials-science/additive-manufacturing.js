@@ -17,6 +17,12 @@
  * - ASTM F3122: Standard Guide for Evaluating Mechanical Properties of Metal Materials Made via AM
  * - ASTM F3001: Standard Specification for Additive Manufacturing Titanium-6 Aluminum-4 Vanadium
  * - NASA-STD-6030: Additive Manufacturing Requirements
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,12 @@
  * @description Hypothetico-Deductive Reasoning process - Propose hypothesis, deduce predictions, design and run tests to validate or refute
  * @inputs { phenomenon: string, observations: array, existingTheories: array, outputDir: string }
  * @outputs { success: boolean, hypothesis: object, predictions: array, testResults: array, verdict: string, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

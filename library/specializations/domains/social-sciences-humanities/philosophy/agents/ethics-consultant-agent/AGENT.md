@@ -2,6 +2,11 @@
 name: ethics-consultant-agent
 description: Applies ethical frameworks to practical moral problems and facilitates ethical deliberation
 required-skills: ethical-framework-application, bioethics-deliberation, socratic-dialogue-facilitation
+graph:
+  domains: [domain:philosophy]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Ethics Consultant Agent

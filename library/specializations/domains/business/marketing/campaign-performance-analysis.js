@@ -3,6 +3,11 @@
  * @description Track campaign metrics against KPIs, analyze results by channel and audience segment, document learnings, and create optimization recommendations.
  * @inputs { campaignName: string, campaignData: object, kpis: array, channels: array, segments: array, benchmarks: object }
  * @outputs { success: boolean, performanceReport: object, channelAnalysis: object, segmentAnalysis: object, recommendations: array, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

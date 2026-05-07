@@ -20,6 +20,12 @@
  * - Shigley's Mechanical Engineering Design: Chapter 6 - Fatigue Failure
  * - SAE Fatigue Design Handbook: https://www.sae.org/
  * - FKM Guideline: https://www.vdma.org/
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

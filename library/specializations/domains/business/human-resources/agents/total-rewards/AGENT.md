@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Compensation & Benefits
   agent-id: AG-006
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Total Rewards Strategist Agent

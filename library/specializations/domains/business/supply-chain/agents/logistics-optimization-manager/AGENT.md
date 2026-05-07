@@ -9,6 +9,10 @@ expertise:
   - Freight negotiation
   - Logistics KPIs
   - Network efficiency
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Logistics Optimization Manager

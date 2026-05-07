@@ -10,6 +10,11 @@ metadata:
   domain: science
   category: Data Analysis
   skill-id: SK-SCIDISC-020
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Time Series Analyzer Skill

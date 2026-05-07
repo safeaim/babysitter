@@ -3,6 +3,12 @@
  * @description Design distillation systems including column sizing, tray/packing selection, and optimization for energy efficiency
  * @inputs { processName: string, feedSpecification: object, productRequirements: object, outputDir: string }
  * @outputs { success: boolean, columnSpecification: object, internalsDesign: object, energyAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

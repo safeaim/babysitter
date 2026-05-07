@@ -18,6 +18,12 @@
  * - MIL-HDBK-1797 Flying Qualities Handbook
  * - Cooper-Harper Rating Scale
  * - FAR/CS 25.143-175 Controllability and Maneuverability
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

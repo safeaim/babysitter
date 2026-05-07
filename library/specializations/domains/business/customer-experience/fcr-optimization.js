@@ -3,6 +3,11 @@
  * @description Continuous improvement process for increasing First Contact Resolution rates through training, knowledge access, and empowerment
  * @inputs { fcrMetrics: object, ticketSamples: array, agentPerformance: array, knowledgeBase: object }
  * @outputs { success: boolean, fcrAnalysis: object, improvementPlan: object, trainingRecommendations: array, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

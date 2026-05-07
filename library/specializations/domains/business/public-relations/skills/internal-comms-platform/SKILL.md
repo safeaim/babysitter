@@ -17,6 +17,10 @@ metadata:
     - Staffbase API
     - Microsoft Graph API
     - Slack API
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Internal Communications Platform Skill

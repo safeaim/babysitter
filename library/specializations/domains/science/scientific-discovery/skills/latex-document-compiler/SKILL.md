@@ -10,6 +10,11 @@ metadata:
   domain: science
   category: Communication
   skill-id: SK-SCIDISC-028
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # LaTeX Document Compiler Skill

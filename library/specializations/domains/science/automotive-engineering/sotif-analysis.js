@@ -18,6 +18,12 @@
  * - ISO/PAS 21448:2019 Safety of the Intended Functionality
  * - UN ECE R152 AEB
  * - Euro NCAP Assessment Protocol
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

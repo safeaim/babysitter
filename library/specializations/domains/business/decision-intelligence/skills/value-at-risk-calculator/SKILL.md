@@ -17,6 +17,10 @@ metadata:
     - numpy
     - arch
     - riskfolio-lib
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Value at Risk Calculator

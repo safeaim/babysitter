@@ -16,6 +16,10 @@ metadata:
     - custom forms
     - pandas
     - statistical aggregation
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Stakeholder Preference Elicitor

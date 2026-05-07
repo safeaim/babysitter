@@ -17,6 +17,10 @@ metadata:
     - Google Ads API
     - Meta Marketing API
     - LinkedIn Marketing API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Paid Media Platform Skill

@@ -9,6 +9,10 @@ expertise:
   - XBRL tagging review
   - Disclosure checklist completion
   - Filing deadline management
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # SEC Reporting Specialist

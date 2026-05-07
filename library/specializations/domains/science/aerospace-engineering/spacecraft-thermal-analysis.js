@@ -17,6 +17,12 @@
  * - NASA Thermal Analysis Guidelines
  * - Thermal Desktop Documentation
  * - ECSS-E-ST-31C Thermal Control Standard
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

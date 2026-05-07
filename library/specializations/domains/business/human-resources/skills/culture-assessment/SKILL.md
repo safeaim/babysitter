@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Culture frameworks
     - Diagnostic tools
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Culture Assessment Skill

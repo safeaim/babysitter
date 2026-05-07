@@ -18,6 +18,12 @@
  * - FRTR Remediation Technologies Screening Matrix
  * - ITRC Technology Decision Tools
  * - EPA CLU-IN Technology Information
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

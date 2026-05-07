@@ -14,6 +14,10 @@ required-skills:
   - transportation-spend-analyzer
   - fleet-analytics-dashboard
   - supply-chain-visibility-platform
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Logistics Analytics Specialist

@@ -18,6 +18,11 @@ metadata:
   phase: 4
   experience: 12+ years quality engineering
   background: Manufacturing quality, inspection, process control
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Quality Engineering Specialist Agent

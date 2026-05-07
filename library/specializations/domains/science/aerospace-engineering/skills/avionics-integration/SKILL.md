@@ -18,6 +18,11 @@ metadata:
     - integration
     - architecture
     - systems
+graph:
+  domains: [domain:aerospace-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Avionics System Integration Skill

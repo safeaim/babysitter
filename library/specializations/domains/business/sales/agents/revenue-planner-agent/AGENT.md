@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Financial planning
     - Scenario analysis
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Revenue Planner Agent

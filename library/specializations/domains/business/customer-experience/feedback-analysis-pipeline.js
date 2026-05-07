@@ -3,6 +3,11 @@
  * @description Automated process for aggregating feedback from multiple channels, applying sentiment analysis, and prioritizing improvements
  * @inputs { feedbackSources: array, feedbackData: array, analysisConfig: object, prioritizationRules: object }
  * @outputs { success: boolean, aggregatedFeedback: object, sentimentAnalysis: object, prioritizedImprovements: array, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

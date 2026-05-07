@@ -5,6 +5,11 @@
  * @category Knowledge Governance and Strategy
  * @inputs { organizationName: string, existingTaxonomy: object, contentDomains: array, stakeholders: array, governanceRequirements: object, outputDir: string }
  * @outputs { success: boolean, taxonomyGovernance: object, metadataStandards: object, qualityScore: number, artifacts: array }
+ * @graph
+ *   domains: [domain:knowledge-management]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:documentation]
+ *   roles: [role:knowledge-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

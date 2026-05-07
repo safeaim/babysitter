@@ -43,6 +43,12 @@
  * - Nanostructured Catalysts (DOI: 10.1021/acscatal.9b04186)
  * - Descriptor-Based Catalyst Screening (DOI: 10.1126/science.aaf8800)
  * - Operando Catalyst Characterization (DOI: 10.1038/s41578-019-0165-8)
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

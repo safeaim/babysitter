@@ -16,6 +16,11 @@
  * @references
  * - Online Experiments: https://hbr.org/2017/09/the-surprising-power-of-online-experiments
  * - Trustworthy Online Controlled Experiments (Microsoft, Google)
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

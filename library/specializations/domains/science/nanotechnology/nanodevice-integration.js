@@ -19,6 +19,12 @@
  * - National Nanotechnology Coordinated Infrastructure (NNCI): https://nnci.net/
  * - SEMI Standards for Nanoelectronics: https://www.semi.org/
  * - Focused Ion Beam (FIB) Systems: https://www.fei.com/technologies/focused-ion-beam/
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

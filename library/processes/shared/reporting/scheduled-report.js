@@ -3,6 +3,12 @@
  * @description Emit a structured scheduled-run report; suppress output if previous report unread and nothing material changed.
  * @inputs { windowStart: string, windowEnd: string, observations: Array<object>, previousReport?: object, responsibleParty?: string }
  * @outputs { success: boolean, report?: object, suppressed: boolean, suppressReason?: string }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:observability, topic:developer-experience]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

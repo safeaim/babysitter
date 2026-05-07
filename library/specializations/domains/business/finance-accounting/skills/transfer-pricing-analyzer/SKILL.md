@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: tax
   priority: lower
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Transfer Pricing Analyzer

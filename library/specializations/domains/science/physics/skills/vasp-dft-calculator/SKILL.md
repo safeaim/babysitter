@@ -18,6 +18,11 @@ metadata:
     - electronic-structure
     - materials-science
     - band-structure
+graph:
+  domains: [domain:physics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # VASP DFT Calculator Skill

@@ -3,6 +3,12 @@
  * @description Develop reaction kinetics models from experimental data, including rate equations, activation energies, and mechanism validation
  * @inputs { processName: string, experimentalData: object, reactionSystem: object, outputDir: string }
  * @outputs { success: boolean, kineticModel: object, parameters: object, validationResults: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

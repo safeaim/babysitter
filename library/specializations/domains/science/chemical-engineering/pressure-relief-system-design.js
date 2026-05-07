@@ -3,6 +3,12 @@
  * @description Size and design pressure relief systems including relief valves, rupture disks, and flare systems per API 520/521
  * @inputs { processName: string, protectedEquipment: array, reliefScenarios: array, outputDir: string }
  * @outputs { success: boolean, reliefDevices: array, disposalSystem: object, specificationSheets: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

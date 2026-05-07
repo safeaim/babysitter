@@ -2,6 +2,11 @@
 name: revenue-cycle-analytics
 description: Analyze revenue cycle performance metrics including denial rates, days in AR, clean claim rates, and collection efficiency to identify improvement opportunities
 allowed-tools: Read, Grep, Write, Edit, Glob, Bash, WebFetch
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Revenue Cycle Analytics

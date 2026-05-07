@@ -3,6 +3,12 @@
  * @description When citing code, prefer path:line references over pasted snippets; cap quotes at ~10 lines.
  * @inputs { context: string, candidateQuotes: Array<{ path, startLine, endLine, content }> }
  * @outputs { success: boolean, citations: Array<object> }
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:developer-experience, topic:documentation]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

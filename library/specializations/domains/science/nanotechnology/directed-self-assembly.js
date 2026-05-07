@@ -19,6 +19,12 @@
  * - Block Copolymer Lithography: https://www.nature.com/articles/nmat2898
  * - Self-assembly of nanoparticles: https://www.annualreviews.org/doi/10.1146/annurev-physchem-040214-121118
  * - DNA Nanotechnology Resources: https://www.dna-origami.org/
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

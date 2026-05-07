@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Research
   agent-id: AG-007
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Market Research Analyst Agent

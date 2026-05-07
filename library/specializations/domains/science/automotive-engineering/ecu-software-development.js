@@ -17,6 +17,12 @@
  * - Automotive SPICE 3.1
  * - ISO 26262 Software Development
  * - MISRA C:2012 Guidelines
+ *
+ * @graph
+ *   domains: [domain:automotive-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

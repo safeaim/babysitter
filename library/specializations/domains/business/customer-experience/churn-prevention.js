@@ -3,6 +3,11 @@
  * @description Proactive intervention process triggered by health score deterioration or at-risk signals to prevent customer attrition
  * @inputs { customerName: string, healthScore: object, riskSignals: array, accountHistory: object, stakeholders: array }
  * @outputs { success: boolean, riskAssessment: object, interventionPlan: object, rescuePlaybook: object, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

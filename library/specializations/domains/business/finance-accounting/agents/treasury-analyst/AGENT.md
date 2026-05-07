@@ -9,6 +9,10 @@ expertise:
   - Bank relationship management
   - Payment processing oversight
   - Investment placement
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Treasury Analyst

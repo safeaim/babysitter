@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Quality Assurance
   agent-id: CIV-AG-022
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Structural Peer Reviewer Agent

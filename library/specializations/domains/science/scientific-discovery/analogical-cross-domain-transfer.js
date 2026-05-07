@@ -16,6 +16,12 @@
  * - Gentner, D. (1983). Structure-mapping: A theoretical framework for analogy
  * - Holyoak, K.J. & Thagard, P. (1995). Mental Leaps: Analogy in Creative Thought
  * - Gick, M.L. & Holyoak, K.J. (1980). Analogical problem solving
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

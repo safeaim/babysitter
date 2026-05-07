@@ -3,6 +3,11 @@
  * @description Comprehensive macro-environmental scanning using PESTEL framework to identify external factors affecting strategic decisions
  * @inputs { organizationName: string, industryContext: object, geographicScope: array, timeHorizon: string }
  * @outputs { success: boolean, pestelFactors: object, prioritizedFactors: array, strategicImplications: array, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

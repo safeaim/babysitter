@@ -16,6 +16,11 @@
  * @references
  * - Analytics 3.0: https://hbr.org/2013/12/analytics-30
  * - Data-Driven Decision Making
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

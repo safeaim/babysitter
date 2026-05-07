@@ -3,6 +3,11 @@
  * @description Design and execute marketing experiments for ads, landing pages, emails, and CTAs using statistical significance to optimize conversion rates.
  * @inputs { testName: string, hypothesis: string, testType: string, variants: array, targetMetric: string, trafficAllocation: object, duration: string }
  * @outputs { success: boolean, testDesign: object, results: object, statisticalAnalysis: object, recommendations: array, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

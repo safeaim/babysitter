@@ -8,6 +8,12 @@
  * // Input: { claims: [{ statement: "...", initialConfidence: 0.85 }], evidence: [...], calibrationHistory: {...} }
  * // Output: { calibratedAssessments: [{ claim: "...", calibratedConfidence: 0.72, adjustment: -0.13 }], uncertaintyModel: {...} }
  * @references Brier scoring rules, Calibration training, Superforecasting methodology, Epistemic rationality
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

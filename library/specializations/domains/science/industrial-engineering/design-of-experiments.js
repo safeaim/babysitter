@@ -17,6 +17,12 @@
  * - Montgomery, Design and Analysis of Experiments
  * - Box, Hunter & Hunter, Statistics for Experimenters
  * - NIST/SEMATECH e-Handbook of Statistical Methods
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

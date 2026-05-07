@@ -11,6 +11,10 @@ expertise:
   - Executive Dashboard Design
   - Performance Review Facilitation
   - Course Correction Recommendations
+graph:
+  domains: [domain:strategy]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:strategy-consultant]
 ---
 
 # Strategy Monitor Agent

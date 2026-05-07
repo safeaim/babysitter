@@ -17,6 +17,11 @@
  * - Talent Makers by Greenhouse: https://www.amazon.com/Talent-Makers-Organizations-Structured-Inclusive/dp/1119785286
  * - SHRM Structured Interviews: https://www.shrm.org/resourcesandtools/tools-and-samples/toolkits/pages/conductingemploymentinterviews.aspx
  * - Google Re:Work Hiring: https://rework.withgoogle.com/subjects/hiring/
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

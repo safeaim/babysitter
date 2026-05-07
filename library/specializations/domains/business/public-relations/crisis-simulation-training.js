@@ -5,6 +5,11 @@
  * @category Crisis Communications
  * @inputs { crisisPlan: object, participants: object[], scenario: object, objectives: string[] }
  * @outputs { success: boolean, simulation: object, evaluation: object, gaps: object[], quality: number }
+ * @graph
+ *   domains: [domain:public-relations]
+ *   skillAreas: [skill-area:communications-strategy]
+ *   topics: [topic:media-relations, topic:brand-management]
+ *   roles: [role:communications-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

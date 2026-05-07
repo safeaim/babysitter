@@ -21,6 +21,12 @@
  * - Shigley's Mechanical Engineering Design: https://www.mheducation.com/highered/product/shigley-s-mechanical-engineering-design-budynas-nisbett/M9780073398204.html
  * - Mechanics of Materials by Hibbeler
  * - ASME BPVC Section VIII: https://www.asme.org/codes-standards
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

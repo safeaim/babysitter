@@ -3,6 +3,11 @@ name: persona-designer-agent
 description: Artist persona designer agent for creating comprehensive musical artist identities including backstory, artistic voice, visual aesthetic, discography arc, and character traits
 required-skills: persona-development, genre-analysis, album-conceptualization
 id: AG-MAC-004
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Persona Designer Agent

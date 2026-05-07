@@ -17,6 +17,10 @@ metadata:
     - WordPress API
     - Contentful API
     - HubSpot CMS API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Content Management Skill

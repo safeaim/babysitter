@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Process optimization
     - Funnel analysis
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Pipeline Optimizer Agent

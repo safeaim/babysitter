@@ -3,6 +3,11 @@ name: style-specification
 description: Create ultra-detailed musical style specifications including genres, BPM, instrumentation, vocal direction, production aesthetics, and reference tracks for AI music generation
 allowed-tools: Read, Write, Edit, WebSearch, WebFetch
 id: SK-MAC-002
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Style Specification

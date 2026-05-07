@@ -8,6 +8,12 @@
  * // Input: { investigativeQuestion: "What caused this system failure?", evidence: [...], context: {...} }
  * // Output: { reconstruction: { timeline: [...], causalChain: {...} }, evidenceAnalysis: {...}, conclusions: {...} }
  * @references Historical method, Source criticism, Inference to best explanation, Forensic analysis
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

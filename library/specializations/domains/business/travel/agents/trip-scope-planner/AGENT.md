@@ -9,6 +9,10 @@ expertise:
   - Coverage estimation for ingestion reconciliation
 used-by-processes:
   - specializations/domains/business/travel/flight-dataset-build
+graph:
+  domains: [domain:travel]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Trip Scope Planner

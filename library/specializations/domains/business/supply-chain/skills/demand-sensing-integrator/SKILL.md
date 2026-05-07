@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: demand-forecasting
   priority: high
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Demand Sensing Integrator

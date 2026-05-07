@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - Salesforce API
     - HubSpot CRM API
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # CRM Integration Skill

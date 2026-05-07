@@ -2,6 +2,11 @@
  * @file external-audit-coordination.js
  * @description Managing the external audit process including PBC list preparation, interim procedures, year-end testing support, and audit committee presentations
  * @module specializations/domains/business/finance-accounting
+ * @graph
+ *   domains: [domain:finance]
+ *   skillAreas: [skill-area:financial-analysis]
+ *   topics: [topic:financial-modeling, topic:accounting]
+ *   roles: [role:financial-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

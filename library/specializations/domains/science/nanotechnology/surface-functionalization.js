@@ -18,6 +18,12 @@
  * - Lipid nanoparticles for nucleic acid delivery: https://www.nature.com/articles/nrd.2017.243
  * - Self-assembly of nanoparticles: https://www.annualreviews.org/doi/10.1146/annurev-physchem-040214-121118
  * - ISO/TR 13014: Nanotechnologies - Guidance on physicochemical characterization: https://www.iso.org/standard/52334.html
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Stakeholder Communications
   agent-id: AG-008
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Stakeholder Engagement Expert Agent

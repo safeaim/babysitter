@@ -9,6 +9,10 @@ expertise:
   - Throughput improvement
   - Buffer management
   - Policy constraint resolution
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # TOC Practitioner

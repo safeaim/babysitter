@@ -5,6 +5,12 @@
  * @outputs { success: boolean, criticalText: object, apparatus: object, editorialDecisions: array, artifacts: array }
  * @recommendedSkills SK-HUM-004 (tei-text-encoding), SK-HUM-010 (citation-scholarly-apparatus), SK-HUM-005 (literary-close-reading)
  * @recommendedAgents AG-HUM-004 (literary-critic-theorist), AG-HUM-005 (digital-humanities-technologist)
+ *
+ * @graph
+ *   domains: [domain:humanities]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: HR Generalist
   agent-id: AG-003
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # HR Business Partner Agent

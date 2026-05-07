@@ -3,6 +3,11 @@
  * @description Process for tracking, alerting, and ensuring compliance with service level agreements across all support channels
  * @inputs { tickets: array, slaDefinitions: object, customerTiers: object, reportingPeriod: object }
  * @outputs { success: boolean, slaReport: object, complianceMetrics: object, alerts: array, recommendations: array, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,12 @@
  * @description Development and implementation of QA/QC programs including inspection protocols, testing requirements, and acceptance criteria
  * @inputs { projectId: string, projectSpecifications: object, constructionType: string, regulatoryRequirements: object }
  * @outputs { success: boolean, qcPlan: object, inspectionChecklists: array, testingProtocols: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

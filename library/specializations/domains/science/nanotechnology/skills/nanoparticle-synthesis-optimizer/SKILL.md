@@ -17,6 +17,11 @@ metadata:
     - Custom synthesis planners
     - Reaction kinetics models
     - DOE frameworks
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Nanoparticle Synthesis Optimizer

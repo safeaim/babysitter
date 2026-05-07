@@ -9,6 +9,10 @@ expertise:
   - Gemba walk facilitation
   - Lean culture development
   - Transformation progress tracking
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Lean Transformation Leader

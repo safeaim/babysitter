@@ -3,6 +3,12 @@
  * @description Multiple Working Hypotheses process - Develop and maintain several plausible hypotheses in parallel to avoid premature commitment
  * @inputs { phenomenon: string, observations: array, existingHypotheses: array, maxHypotheses: number, outputDir: string }
  * @outputs { success: boolean, hypotheses: array, comparativeAnalysis: object, crucialTests: array, recommendations: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

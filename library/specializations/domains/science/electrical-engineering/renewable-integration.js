@@ -19,6 +19,12 @@
  * - IEC 61850 (Communication Networks)
  * - Regional Grid Codes
  * - NERC Reliability Standards
+ *
+ * @graph
+ *   domains: [domain:electrical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

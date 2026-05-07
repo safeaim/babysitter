@@ -9,6 +9,10 @@ expertise:
   - Pre-S&OP meeting facilitation
   - Executive S&OP preparation
   - Consensus building
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # S&OP Coordinator

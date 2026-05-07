@@ -8,6 +8,12 @@
  * // Input: { ethicalDilemma: "Should AI be used for autonomous weapons?", stakeholders: [...], context: {...} }
  * // Output: { ethicalAnalysis: { consequentialist: {...}, deontological: {...} }, recommendations: [...] }
  * @references Utilitarian calculus, Kantian ethics, Virtue ethics, Rawlsian justice theory, Care ethics
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

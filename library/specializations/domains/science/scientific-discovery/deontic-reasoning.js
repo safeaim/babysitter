@@ -18,6 +18,12 @@
  * - Ethics of Science: https://plato.stanford.edu/entries/scientific-research/
  * - Normative Ethics: https://plato.stanford.edu/entries/ethics-normative/
  * - Research Ethics: https://www.niehs.nih.gov/research/resources/bioethics/index.cfm
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

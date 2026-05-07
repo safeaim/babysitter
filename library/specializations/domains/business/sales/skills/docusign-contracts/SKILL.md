@@ -15,6 +15,10 @@ metadata:
   integration-points:
     - DocuSign eSignature API
     - DocuSign CLM API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # DocuSign Contracts

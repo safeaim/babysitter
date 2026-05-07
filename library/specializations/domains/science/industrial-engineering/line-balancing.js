@@ -16,6 +16,12 @@
  * - Groover, Work Systems and Methods
  * - Meyers & Stewart, Motion and Time Study for Lean Manufacturing
  * - Askin & Goldberg, Design and Analysis of Lean Production Systems
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

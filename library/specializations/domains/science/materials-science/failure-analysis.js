@@ -17,6 +17,12 @@
  * - ASM Handbook Vol. 11: Failure Analysis and Prevention
  * - ASTM E2332: Standard Practice for Investigation and Analysis of Physical Component Failures
  * - ISO 5817: Welding - Fusion-welded joints in steel - Quality levels for imperfections
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

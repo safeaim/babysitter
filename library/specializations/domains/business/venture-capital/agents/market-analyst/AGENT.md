@@ -8,6 +8,10 @@ expertise:
   - Customer research and validation
   - Go-to-market strategy assessment
   - Industry trend analysis
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Market Analyst

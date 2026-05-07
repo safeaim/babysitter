@@ -18,6 +18,12 @@
  * - de Kleer & Williams (1987). Diagnosing Multiple Faults
  * - Peng & Reggia (1990). Abductive Inference Models for Diagnostic Problem-Solving
  * - Lucas (2001). Bayesian Diagnosis in Medicine
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

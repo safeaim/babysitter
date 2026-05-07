@@ -18,6 +18,11 @@ metadata:
   phase: 2
   experience: 15+ years structural analysis
   background: Industrial equipment, pressure vessels, aerospace structures
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Structural Analysis Specialist Agent

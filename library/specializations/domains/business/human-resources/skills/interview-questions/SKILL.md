@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Competency frameworks
     - Question banks
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Interview Question Generator Skill

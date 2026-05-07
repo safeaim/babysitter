@@ -17,6 +17,12 @@
  * - Bertsimas & Tsitsiklis, Introduction to Linear Optimization
  * - Williams, Model Building in Mathematical Programming
  * - AMPL Book: https://ampl.com/resources/the-ampl-book/
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

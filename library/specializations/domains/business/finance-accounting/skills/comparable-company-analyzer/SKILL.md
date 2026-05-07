@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: investment-analysis
   priority: medium
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Comparable Company Analyzer

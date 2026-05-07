@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: BIM Management
   agent-id: CIV-AG-021
+graph:
+  domains: [domain:civil-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # BIM Coordinator Agent

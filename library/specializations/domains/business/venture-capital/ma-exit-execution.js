@@ -3,6 +3,11 @@
  * @description Managing strategic sale process including advisor selection, CIM preparation, buyer outreach, management presentations, and definitive agreement negotiation
  * @inputs { companyName: string, companyData: object, saleParameters: object, buyerPreferences: object }
  * @outputs { success: boolean, processTimeline: object, buyerEngagement: object, transactionTerms: object, artifacts: array }
+ * @graph
+ *   domains: [domain:venture-capital]
+ *   skillAreas: [skill-area:investment-analysis]
+ *   topics: [topic:startup-funding, topic:portfolio-management]
+ *   roles: [role:venture-capitalist]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

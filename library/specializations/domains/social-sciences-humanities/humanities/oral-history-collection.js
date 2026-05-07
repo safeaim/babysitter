@@ -5,6 +5,12 @@
  * @outputs { success: boolean, oralHistoryRecord: object, transcript: object, archivalPackage: object, artifacts: array }
  * @recommendedSkills SK-HUM-008 (oral-history-interview-technique), SK-HUM-006 (research-ethics-irb-navigation), SK-HUM-002 (ethnographic-coding-thematics)
  * @recommendedAgents AG-HUM-006 (oral-historian), AG-HUM-008 (research-ethics-consultant)
+ *
+ * @graph
+ *   domains: [domain:humanities]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

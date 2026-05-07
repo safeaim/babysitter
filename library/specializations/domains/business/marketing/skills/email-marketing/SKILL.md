@@ -17,6 +17,10 @@ metadata:
     - Mailchimp API
     - Klaviyo API
     - SendGrid API
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Email Marketing Platform Skill

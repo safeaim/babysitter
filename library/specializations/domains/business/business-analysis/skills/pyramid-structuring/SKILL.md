@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-010
   category: Communication
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Pyramid Principle Structuring

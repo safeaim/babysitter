@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Measurement and Analytics
   agent-id: AG-010
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # PR Measurement Analyst Agent

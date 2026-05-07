@@ -3,6 +3,12 @@
  * @description Design of shallow and deep foundation systems including spread footings, mat foundations, driven piles, and drilled shafts
  * @inputs { projectId: string, geotechnicalReport: object, structuralLoads: object, foundationType: string }
  * @outputs { success: boolean, foundationDesign: object, foundationPlans: array, pileSpecifications: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

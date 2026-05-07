@@ -8,6 +8,10 @@ expertise:
   - Legal workstream management
   - Closing process coordination
   - Legal budget and timeline management
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Deal Counsel Coordinator

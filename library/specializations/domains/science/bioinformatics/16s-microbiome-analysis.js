@@ -19,6 +19,12 @@
  * - DADA2: https://benjjneb.github.io/dada2/
  * - SILVA Database: https://www.arb-silva.de/
  * - PICRUSt2: https://github.com/picrust/picrust2
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

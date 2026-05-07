@@ -3,6 +3,12 @@
  * @description Model hits, misses, false alarms, and thresholds using Signal Detection Theory for understanding decision-making under uncertainty
  * @inputs { task: object, data: object, stimuli: object, responses: object, outputDir: string }
  * @outputs { success: boolean, sdtAnalysis: object, sensitivity: object, bias: object, thresholdAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -9,6 +9,10 @@ expertise:
   - Effectiveness monitoring
   - Mark-to-market tracking
   - Hedge accounting support
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # FX Risk Manager

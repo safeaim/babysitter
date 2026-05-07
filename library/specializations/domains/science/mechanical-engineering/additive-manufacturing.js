@@ -17,6 +17,12 @@
  *   material: 'Ti-6Al-4V Grade 23'
  * });
  * @references ASTM F3301, ISO/ASTM 52900, NASA-STD-6030, AM Best Practices
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

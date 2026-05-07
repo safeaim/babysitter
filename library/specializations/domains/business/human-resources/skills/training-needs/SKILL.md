@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Competency frameworks
     - Skills taxonomies
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Training Needs Assessment Skill

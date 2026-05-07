@@ -18,6 +18,12 @@
  * - Electron Microscopy of Nanomaterials: https://www.sciencedirect.com/topics/materials-science/transmission-electron-microscopy
  * - Scanning Probe Microscopy for Nanoscience: https://www.nature.com/articles/nnano.2007.300
  * - X-ray Techniques for Nanomaterial Characterization: https://www.sciencedirect.com/topics/engineering/x-ray-diffraction-analysis
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

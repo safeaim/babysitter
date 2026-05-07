@@ -9,6 +9,10 @@ expertise:
   - Evidence documentation
   - Finding reporting
   - Control recommendation
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Fraud Investigator

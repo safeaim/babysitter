@@ -3,6 +3,11 @@
  * @description Brief creative teams, develop concepts, produce assets across formats, ensure brand consistency, and manage approval workflows.
  * @inputs { campaignName: string, creativeBrief: object, brandGuidelines: object, deliverables: array, stakeholders: array, timeline: object }
  * @outputs { success: boolean, creativeAssets: array, conceptDocuments: array, approvalStatus: object, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

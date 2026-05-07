@@ -9,6 +9,10 @@ expertise:
   - Cost driver identification
   - Profitability optimization
   - Cost modeling
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Cost-to-Serve Analyst

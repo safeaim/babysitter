@@ -21,6 +21,12 @@
  * - Cohen, Statistical Power Analysis
  * - Cumming, Understanding The New Statistics
  * - Wasserstein & Lazar, ASA Statement on P-Values
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,11 @@ name: persona-development
 description: Create comprehensive artist personas including identity, backstory, artistic voice, visual aesthetic, discography arc, and character traits for consistent music generation
 allowed-tools: Read, Write, Edit, WebSearch
 id: SK-MAC-004
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Persona Development

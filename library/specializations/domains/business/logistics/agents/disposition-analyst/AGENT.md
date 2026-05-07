@@ -13,6 +13,10 @@ required-skills:
   - returns-disposition-optimizer
   - dead-stock-identifier
   - logistics-kpi-tracker
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Disposition Analyst

@@ -20,6 +20,12 @@
  * - ANSYS Nonlinear Analysis: https://ansyshelp.ansys.com/
  * - Abaqus Analysis User's Manual
  * - The Finite Element Method for Solid and Structural Mechanics: Zienkiewicz
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -5,6 +5,12 @@
  * @outputs { success: boolean, prototype: object, iterationHistory: array, finalDesign: object, artifacts: array }
  * @recommendedSkills SK-EDU-005 (e-learning-storyboarding), SK-EDU-006 (multimedia-learning-design), SK-EDU-011 (instructional-video-production)
  * @recommendedAgents AG-EDU-001 (instructional-design-lead), AG-EDU-004 (e-learning-developer), AG-EDU-010 (learning-experience-designer)
+ *
+ * @graph
+ *   domains: [domain:education]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

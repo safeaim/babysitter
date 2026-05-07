@@ -3,6 +3,12 @@
  * @description Conduct systematic Hazard and Operability studies for new and modified processes with proper documentation
  * @inputs { processName: string, pidDrawings: array, processDescription: object, studyScope: object, outputDir: string }
  * @outputs { success: boolean, hazopReport: object, actionItems: array, riskRegister: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

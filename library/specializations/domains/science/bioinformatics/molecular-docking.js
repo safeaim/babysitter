@@ -18,6 +18,12 @@
  * - GOLD: https://www.ccdc.cam.ac.uk/solutions/csd-discovery/components/gold/
  * - Glide: https://www.schrodinger.com/products/glide
  * - SwissADME: http://www.swissadme.ch/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

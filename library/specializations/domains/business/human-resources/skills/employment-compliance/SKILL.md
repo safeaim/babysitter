@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - Employment law databases
     - Regulatory updates
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Employment Law Compliance Skill

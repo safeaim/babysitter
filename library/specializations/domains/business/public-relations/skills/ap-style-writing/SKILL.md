@@ -16,6 +16,10 @@ metadata:
   dependencies:
     - AP Stylebook API
     - Grammarly Business API
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # AP Style and Writing Skill

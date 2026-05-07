@@ -8,6 +8,10 @@ expertise:
   - Markdown plan export with collapsible SQL-evidence blocks
 used-by-processes:
   - specializations/domains/business/travel/travel-plan-compose
+graph:
+  domains: [domain:travel]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Itinerary Narrator

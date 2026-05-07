@@ -8,6 +8,12 @@
  * @outputs { success, workflowsScanned, regressions, digestIssueUrl?, healStubs }
  *
  * Source: https://github.com/a5c-ai/a5c/tree/main/registry/packages/ci-health
+ *
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:cicd-devops]
+ *   topics: [topic:continuous-integration, topic:build-systems]
+ *   roles: [role:platform-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

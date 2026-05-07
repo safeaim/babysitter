@@ -13,6 +13,10 @@ required-skills:
   - cycle-count-scheduler
   - fifo-lifo-controller
   - abc-xyz-classifier
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Inventory Control Specialist

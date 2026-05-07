@@ -13,6 +13,10 @@ metadata:
   category: economic-analysis
   priority: medium
   shared: true
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Economic Indicator Tracker

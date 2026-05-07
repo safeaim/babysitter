@@ -3,6 +3,11 @@ name: lyric-writing
 description: Write complete song lyrics with structural annotations and production notes optimized for AI music generation platforms like Suno and Udio
 allowed-tools: Read, Write, Edit, WebSearch
 id: SK-MAC-001
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Lyric Writing

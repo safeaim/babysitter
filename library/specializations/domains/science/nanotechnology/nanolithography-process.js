@@ -19,6 +19,12 @@
  * - Electron Beam Lithography: https://www.raith.com/technology/e-beam-lithography/
  * - Nanoimprint Lithography: https://nanoscience.com/techniques/nanoimprint-lithography/
  * - Block Copolymer Lithography: https://www.nature.com/articles/nmat2898
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

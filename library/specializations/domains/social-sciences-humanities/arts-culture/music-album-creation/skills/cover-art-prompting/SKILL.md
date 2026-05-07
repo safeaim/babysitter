@@ -3,6 +3,11 @@ name: cover-art-prompting
 description: Create detailed text-to-image prompts for album and song cover artwork optimized for Midjourney, DALL-E, and other AI image generators
 allowed-tools: Read, Write, Edit, WebSearch
 id: SK-MAC-003
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Cover Art Prompting

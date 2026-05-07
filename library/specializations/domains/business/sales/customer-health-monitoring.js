@@ -16,6 +16,11 @@
  * @references
  * - Totango Customer Health: https://www.totango.com/
  * - ChurnZero Customer Success: https://churnzero.net/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

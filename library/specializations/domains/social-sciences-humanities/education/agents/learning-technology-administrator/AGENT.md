@@ -2,6 +2,11 @@
 name: learning-technology-administrator
 description: Configure and manage learning management systems, integrations, and educational technology infrastructure
 required-skills: lms-configuration-administration, learning-analytics-interpretation, accessibility-compliance-auditing
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Learning Technology Administrator Agent

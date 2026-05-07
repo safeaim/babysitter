@@ -17,6 +17,11 @@ metadata:
     - Quantum ESPRESSO
     - QE-tools
     - Wannier90
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Quantum ESPRESSO Executor

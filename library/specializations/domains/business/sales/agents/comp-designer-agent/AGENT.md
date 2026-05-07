@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Incentive modeling
     - Behavioral economics
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Comp Designer Agent

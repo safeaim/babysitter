@@ -17,6 +17,10 @@ metadata:
     - Qualtrics API
     - SurveyMonkey API
     - Panel provider APIs
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Market Research Platform Skill

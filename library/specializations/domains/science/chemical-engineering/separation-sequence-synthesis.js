@@ -3,6 +3,12 @@
  * @description Develop optimal separation sequences for multi-component mixtures considering energy, cost, and product purity
  * @inputs { processName: string, mixtureCharacterization: object, productRequirements: object, outputDir: string }
  * @outputs { success: boolean, optimalSequence: object, energyAnalysis: object, economicAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

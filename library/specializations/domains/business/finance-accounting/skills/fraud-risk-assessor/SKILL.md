@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: audit
   priority: medium
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Fraud Risk Assessor

@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Reaction Engineering
   agent-id: CE-AG-004
+graph:
+  domains: [domain:chemical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Reaction Engineer Agent

@@ -14,6 +14,12 @@
  *   architecture: { layers: 4, qubits: 8 },
  *   dataset: { X_train, y_train, X_test, y_test }
  * });
+ *
+ * @graph
+ *   domains: [domain:quantum-computing]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

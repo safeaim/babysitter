@@ -18,6 +18,12 @@
  * - Sandve, G.K. et al. (2013). Ten Simple Rules for Reproducible Computational Research
  * - Stodden, V. et al. (2014). Implementing Reproducible Research
  * - The Turing Way Community (2022). The Turing Way: A Handbook for Reproducible Data Science
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

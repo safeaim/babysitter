@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-002
   category: Process Analysis
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Process Improvement Expert Agent

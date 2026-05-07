@@ -19,6 +19,12 @@
  * - MSFragger: https://msfragger.nesvilab.org/
  * - Perseus: https://maxquant.net/perseus/
  * - Proteomics Standards Initiative: http://www.psidev.info/
+ *
+ * @graph
+ *   domains: [domain:bioinformatics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:data-engineer, role:tech-lead]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

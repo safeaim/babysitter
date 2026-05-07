@@ -13,6 +13,10 @@ metadata:
   category: reporting-analytics
   priority: medium
   shared: true
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Financial Dashboard Generator

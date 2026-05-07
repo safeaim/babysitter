@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-002
   category: Process Modeling
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # BPMN Diagram Generator

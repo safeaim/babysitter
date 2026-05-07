@@ -3,6 +3,11 @@ name: track-sequencing
 description: Design optimal track order and album flow including opener/closer strategy, energy curves, transitions, and pacing for cohesive listening experiences
 allowed-tools: Read, Write, Edit
 id: SK-MAC-009
+graph:
+  domains: [domain:arts-culture]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:content-creation, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Track Sequencing

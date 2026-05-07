@@ -12,6 +12,10 @@ expertise:
 required-skills:
   - warranty-claims-processor
   - returns-authorization-processor
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Warranty Claims Coordinator

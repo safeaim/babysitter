@@ -9,6 +9,10 @@ expertise:
   - Risk monitoring
   - Stakeholder communication
   - Governance and reporting
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Supply Chain Risk Manager

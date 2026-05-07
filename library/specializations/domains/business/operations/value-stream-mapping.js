@@ -18,6 +18,11 @@
  * - Rother, M. & Shook, J. (2003). Learning to See: Value Stream Mapping
  * - Womack, J.P. & Jones, D.T. (2003). Lean Thinking
  * - Martin, K. & Osterling, M. (2014). Value Stream Mapping
+ * @graph
+ *   domains: [domain:operations]
+ *   skillAreas: [skill-area:operations-management]
+ *   topics: [topic:process-optimization, topic:operational-excellence]
+ *   roles: [role:operations-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

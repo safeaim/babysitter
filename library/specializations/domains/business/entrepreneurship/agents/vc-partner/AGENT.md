@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Fundraising
   agent-id: AG-002
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Venture Capital Partner Agent

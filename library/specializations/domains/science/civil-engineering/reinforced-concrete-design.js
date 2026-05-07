@@ -3,6 +3,12 @@
  * @description Design of reinforced concrete structural elements per ACI 318 including beams, columns, slabs, walls, and foundations
  * @inputs { projectId: string, loadAnalysis: object, structuralLayout: object, concreteStrength: number, steelGrade: string }
  * @outputs { success: boolean, designCalculations: object, reinforcementSchedules: array, structuralDrawings: array, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:civil-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

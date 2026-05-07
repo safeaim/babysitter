@@ -3,6 +3,11 @@
  * @description Comprehensive framework for conducting thorough due diligence across commercial, financial, legal, operational, and technical dimensions
  * @inputs { targetCompany: object, dealContext: object, diligenceScope: array, outputDir: string }
  * @outputs { success: boolean, diligenceFindings: object, riskAssessment: object, dealRecommendation: object, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:competitive-analysis]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

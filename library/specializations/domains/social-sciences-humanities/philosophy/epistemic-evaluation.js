@@ -5,6 +5,12 @@
  * @outputs { success: boolean, epistemicAssessment: object, justificationAnalysis: object, warrantEvaluation: object, artifacts: array }
  * @recommendedSkills SK-PHIL-007 (evidence-justification-assessment), SK-PHIL-005 (conceptual-analysis), SK-PHIL-002 (argument-mapping-reconstruction)
  * @recommendedAgents AG-PHIL-004 (metaphysics-epistemology-agent), AG-PHIL-001 (logic-analyst-agent)
+ *
+ * @graph
+ *   domains: [domain:philosophy]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

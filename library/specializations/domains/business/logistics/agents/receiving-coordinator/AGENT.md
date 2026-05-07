@@ -13,6 +13,10 @@ required-skills:
   - dock-scheduling-coordinator
   - slotting-optimization-engine
   - cross-dock-orchestrator
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Receiving Coordinator

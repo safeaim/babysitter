@@ -3,6 +3,12 @@
  * @description Allocate mass to possibility sets and combine evidence using Dempster-Shafer theory
  * @inputs { frameOfDiscernment: array, evidenceSources: array, massAssignments: array, conflictThreshold: number, outputDir: string }
  * @outputs { success: boolean, beliefFunctions: object, plausibilityFunctions: object, combinedMass: object, conflictAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

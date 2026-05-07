@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Research
   agent-id: AG-013
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Customer Development Expert Agent

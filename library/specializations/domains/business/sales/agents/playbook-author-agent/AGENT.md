@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Content synthesis
     - Sales domain expertise
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Playbook Author Agent

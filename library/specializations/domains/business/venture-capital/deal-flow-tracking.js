@@ -3,6 +3,11 @@
  * @description Systematic tracking of investment opportunities through the funnel including initial contact, meetings, diligence stages, and outcomes using relationship intelligence tools
  * @inputs { fundName: string, pipelineData: object, trackingPeriod: string, crmIntegration: boolean }
  * @outputs { success: boolean, pipelineMetrics: object, stageAnalysis: object, artifacts: array }
+ * @graph
+ *   domains: [domain:venture-capital]
+ *   skillAreas: [skill-area:investment-analysis]
+ *   topics: [topic:startup-funding, topic:portfolio-management]
+ *   roles: [role:venture-capitalist]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

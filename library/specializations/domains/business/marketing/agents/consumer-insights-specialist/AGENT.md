@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Market Research
   agent-id: AG-010
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Consumer Insights Specialist Agent

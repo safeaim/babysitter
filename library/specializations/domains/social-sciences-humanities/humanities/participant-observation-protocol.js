@@ -5,6 +5,12 @@
  * @outputs { success: boolean, fieldNotes: array, analyticalMemos: array, emergentThemes: array, artifacts: array }
  * @recommendedSkills SK-HUM-002 (ethnographic-coding-thematics), SK-HUM-008 (oral-history-interview-technique)
  * @recommendedAgents AG-HUM-002 (ethnographic-methods-advisor), AG-HUM-006 (oral-historian)
+ *
+ * @graph
+ *   domains: [domain:humanities]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

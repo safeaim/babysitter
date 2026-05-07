@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: risk-management
   priority: standard
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Contingency Plan Builder

@@ -3,6 +3,12 @@
  * @description Review and rationalize process alarms to reduce alarm floods and improve operator response
  * @inputs { processName: string, alarmDatabase: object, alarmHistory: object, performanceTargets: object, outputDir: string }
  * @outputs { success: boolean, rationalizedAlarms: object, performanceMetrics: object, managementPlan: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:chemical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

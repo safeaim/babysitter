@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Biomechanics and Structural Analysis
   skill-id: BME-SK-011
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # FEA Mesh Generator Skill

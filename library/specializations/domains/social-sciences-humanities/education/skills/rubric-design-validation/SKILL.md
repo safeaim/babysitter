@@ -2,6 +2,11 @@
 name: rubric-design-validation
 description: Develop clear scoring rubrics with defined criteria, performance levels, and anchor examples ensuring inter-rater reliability
 allowed-tools: Read, Grep, Write, Edit, Glob
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Rubric Design and Validation

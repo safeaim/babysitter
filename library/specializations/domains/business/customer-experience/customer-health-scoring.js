@@ -3,6 +3,11 @@
  * @description Process for designing, implementing, and monitoring predictive health scores to identify at-risk customers and intervention opportunities
  * @inputs { customerSegments: array, dataPoints: object, businessGoals: array, existingMetrics: object }
  * @outputs { success: boolean, healthScoreModel: object, indicators: array, thresholds: object, playbooks: array, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

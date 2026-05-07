@@ -8,6 +8,10 @@ expertise:
   - Leadership capability evaluation
   - Team dynamics analysis
   - Culture and values assessment
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # People Evaluator

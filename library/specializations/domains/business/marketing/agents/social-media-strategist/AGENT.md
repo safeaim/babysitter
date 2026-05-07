@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Digital Marketing
   agent-id: AG-015
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Social Media Strategist Agent

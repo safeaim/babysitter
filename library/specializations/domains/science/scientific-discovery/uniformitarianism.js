@@ -3,6 +3,12 @@
  * @description Use present-day geological processes to interpret the geological past, applying the principle that processes operating today also operated in the past
  * @inputs { presentProcess: object, geologicalRecord: object, timePeriod: string, outputDir: string }
  * @outputs { success: boolean, interpretation: object, processAnalysis: object, reconstructedConditions: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

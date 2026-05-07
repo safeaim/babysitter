@@ -3,6 +3,12 @@
  * @description Analyze and optimize algorithms and data structures for cache efficiency using external memory model
  * @inputs { algorithmDescription: string, dataStructureDescription: string, targetArchitecture: object }
  * @outputs { success: boolean, cacheAnalysis: object, optimizedDesign: object, benchmarks: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

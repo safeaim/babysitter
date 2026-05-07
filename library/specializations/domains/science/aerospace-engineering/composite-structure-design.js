@@ -18,6 +18,12 @@
  * - CMH-17 (Rev G) Composite Materials Handbook
  * - AC 20-107B Composite Aircraft Structure
  * - ASTM D3039, D3518, D5528 Composite Test Standards
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

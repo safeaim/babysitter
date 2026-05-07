@@ -14,6 +14,10 @@ metadata:
   priority: P1
   integration-points:
     - 6sense API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # 6sense Intent

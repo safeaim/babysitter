@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-011
   category: Problem Solving
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Issue Tree Generator

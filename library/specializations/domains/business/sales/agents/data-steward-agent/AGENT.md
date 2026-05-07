@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Data quality rules
     - Pattern matching
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Data Steward Agent

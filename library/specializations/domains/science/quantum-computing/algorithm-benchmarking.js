@@ -3,6 +3,12 @@
  * @description QC-ALGO-003: Systematically benchmark quantum algorithms against classical alternatives
  * @inputs { algorithms: array, problemSuite: object, hardwareConfigs: array }
  * @outputs { success: boolean, benchmarkReport: object, quantumAdvantage: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:quantum-computing]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

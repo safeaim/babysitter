@@ -17,6 +17,11 @@
  * - Docebo LMS Implementation: https://www.docebo.com/learning-network/blog/lms-implementation/
  * - Brandon Hall LMS Guide: https://www.brandonhall.com/
  * - Josh Bersin LMS Trends: https://joshbersin.com/
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

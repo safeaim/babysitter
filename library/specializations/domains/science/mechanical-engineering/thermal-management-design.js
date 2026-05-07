@@ -19,6 +19,12 @@
  * - Thermal Management Handbook for Electronic Assemblies: https://www.springer.com/
  * - JEDEC Standards for Thermal Characterization
  * - ASHRAE Thermal Guidelines for Data Centers
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -11,6 +11,12 @@
  * - Howard, R.A. (1966). Information value theory
  * - Raiffa, H. & Schlaifer, R. (1961). Applied Statistical Decision Theory
  * - Keisler, J.M. et al. (2014). Value of information analysis: State of the practice
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

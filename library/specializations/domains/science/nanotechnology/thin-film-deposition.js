@@ -20,6 +20,12 @@
  * - Atomic Layer Deposition: An Overview: https://pubs.acs.org/doi/10.1021/cr900056b
  * - Chemical vapor deposition (CVD) for nanotechnology: https://www.sciencedirect.com/topics/materials-science/chemical-vapor-deposition
  * - Molecular Beam Epitaxy (MBE): https://www.veeco.com/products/mbe-systems
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

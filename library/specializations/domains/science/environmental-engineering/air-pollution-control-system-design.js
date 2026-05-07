@@ -18,6 +18,12 @@
  * - AWMA Air Pollution Control Manual
  * - EPA Cost Manual for Air Pollution Control
  * - Industrial Ventilation: A Manual of Recommended Practice
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

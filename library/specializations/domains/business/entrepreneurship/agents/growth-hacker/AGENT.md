@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Growth
   agent-id: AG-005
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Growth Hacker Agent

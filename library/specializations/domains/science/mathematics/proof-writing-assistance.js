@@ -18,6 +18,12 @@
  * - How to Write Mathematical Proofs: https://www.math.utah.edu/~pa/math/proofs.html
  * - LaTeX Math Mode: https://en.wikibooks.org/wiki/LaTeX/Mathematics
  * - AMS Theorem Environments: https://www.ams.org/publications/authors/tex/amslatex
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

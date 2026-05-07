@@ -12,6 +12,10 @@ metadata:
   domain: business
   id: SK-008
   category: Lean Analysis
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Value Stream Mapping

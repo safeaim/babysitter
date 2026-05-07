@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-004
   category: Financial Analysis
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Financial Analyst Agent

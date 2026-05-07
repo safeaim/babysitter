@@ -8,6 +8,10 @@ expertise:
   - Monte Carlo simulation
   - Risk quantification
   - Return distribution analysis
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Sensitivity Analyst

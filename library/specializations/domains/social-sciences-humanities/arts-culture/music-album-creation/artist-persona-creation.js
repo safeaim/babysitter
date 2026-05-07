@@ -5,6 +5,12 @@
  * @outputs { success: boolean, persona: object, artifacts: array }
  * @recommendedSkills SK-MAC-004 (persona-development), SK-MAC-006 (genre-analysis)
  * @recommendedAgents AG-MAC-004 (persona-designer-agent)
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

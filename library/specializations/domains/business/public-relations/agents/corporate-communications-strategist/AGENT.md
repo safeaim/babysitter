@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Corporate Communications
   agent-id: AG-005
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Corporate Communications Strategist Agent

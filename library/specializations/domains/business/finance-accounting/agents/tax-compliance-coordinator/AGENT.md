@@ -9,6 +9,10 @@ expertise:
   - Payment scheduling
   - Authority communication
   - Document retention
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Tax Compliance Coordinator

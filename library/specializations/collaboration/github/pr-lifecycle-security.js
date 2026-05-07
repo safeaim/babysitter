@@ -3,6 +3,12 @@
  * @description Security PR lifecycle: embargo check → restricted-reviewer gate → confidentiality audit (no leaks in title/body/tests/diff) → coordinated disclosure plan → merge window.
  * @inputs { event: string, pr: object, prDiff?: string, advisory?: { id, embargoUntil?: string, severity: "critical"|"high"|"medium"|"low" }, securityReviewers?: string[] }
  * @outputs { success: boolean, stages: object, disclosureWindow?: string, blockers: string[] }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:version-control, skill-area:security-audit]
+ *   topics: [topic:code-review, topic:security-hardening]
+ *   workflows: [workflow:code-review]
+ *   roles: [role:tech-lead, role:security-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

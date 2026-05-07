@@ -19,6 +19,12 @@
  * - HealthIT.gov EHR Implementation Steps
  * - KLAS EHR Implementation Best Practices
  * - HIMSS Stage 7 Framework
+ *
+ * @graph
+ *   domains: [domain:healthcare]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

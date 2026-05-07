@@ -2,6 +2,11 @@
 name: digital-humanities-technologist
 description: Implement computational methods for humanistic inquiry including text mining, TEI encoding, network analysis, data visualization, and GIS mapping
 required-skills: tei-text-encoding, topic-modeling-text-mining, gis-mapping-humanities, metadata-standards-implementation
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Digital Humanities Technologist Agent

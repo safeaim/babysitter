@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Clinical Evidence
   skill-id: BME-SK-023
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Clinical Literature Reviewer Skill

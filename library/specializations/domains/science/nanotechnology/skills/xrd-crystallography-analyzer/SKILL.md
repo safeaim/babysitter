@@ -19,6 +19,11 @@ metadata:
     - GSAS-II
     - FullProf
     - PDFgui
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # XRD Crystallography Analyzer

@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Training design
     - Assessment creation
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Methodology Trainer Agent

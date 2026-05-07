@@ -16,6 +16,12 @@
  * - Bertsimas & Tsitsiklis, Introduction to Linear Optimization
  * - Nocedal & Wright, Numerical Optimization
  * - Gal & Greenberg, Advances in Sensitivity Analysis and Parametric Programming
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

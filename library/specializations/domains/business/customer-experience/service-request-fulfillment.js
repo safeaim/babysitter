@@ -3,6 +3,11 @@
  * @description Streamlined process for handling standard service requests with defined fulfillment workflows and automation
  * @inputs { serviceRequest: object, serviceCatalog: object, approvalRules: object, fulfillmentResources: object }
  * @outputs { success: boolean, fulfillmentRecord: object, fulfillmentStatus: object, automationReport: object, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

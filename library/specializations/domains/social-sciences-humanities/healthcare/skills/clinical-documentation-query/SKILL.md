@@ -2,6 +2,11 @@
 name: clinical-documentation-query
 description: Generate compliant physician queries to clarify clinical documentation for accurate coding, severity of illness, and risk of mortality capture
 allowed-tools: Read, Grep, Write, Edit, Glob
+graph:
+  domains: [domain:healthcare]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Clinical Documentation Query

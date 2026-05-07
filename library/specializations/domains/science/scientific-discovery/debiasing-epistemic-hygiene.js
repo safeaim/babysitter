@@ -8,6 +8,12 @@
  * // Input: { reasoning: { conclusion: "...", premises: [...] }, claims: [...], knownBiases: [...] }
  * // Output: { debiasedAnalysis: {...}, biasesIdentified: [...], corrections: [...], recommendations: [...] }
  * @references Cognitive bias mitigation, Debiasing techniques, Epistemic rationality, Structured analytic techniques
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

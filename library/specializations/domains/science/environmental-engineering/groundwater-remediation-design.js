@@ -18,6 +18,12 @@
  * - ITRC In Situ Remediation Guidance
  * - EPA Monitored Natural Attenuation Guidance
  * - ASCE Groundwater Contamination and Remediation
+ *
+ * @graph
+ *   domains: [domain:environmental-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: hardware-integration
   phase: 6
+graph:
+  domains: [domain:quantum-computing]
+  skillAreas: [skill-area:software-architecture]
+  topics: [topic:algorithm-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:backend-engineer]
 ---
 
 # Qubit Mapper

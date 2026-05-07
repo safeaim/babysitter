@@ -19,6 +19,11 @@
  * - Greenhouse Full-Cycle Recruiting: https://www.greenhouse.io/blog/full-cycle-recruiting
  * - SHRM Talent Acquisition: https://www.shrm.org/resourcesandtools/hr-topics/talent-acquisition
  * - LinkedIn Talent Solutions: https://business.linkedin.com/talent-solutions
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

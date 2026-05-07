@@ -9,6 +9,10 @@ expertise:
   - Data standards
   - Data cleansing
   - Quality monitoring
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Master Data Steward

@@ -9,6 +9,10 @@ expertise:
   - Refinancing analysis
   - Amendment negotiation support
   - Capital structure modeling
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # Debt Portfolio Manager

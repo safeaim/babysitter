@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: Legal
   agent-id: AG-009
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Startup Legal Advisor Agent

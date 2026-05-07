@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: symbolic-computation
   phase: 6
+graph:
+  domains: [domain:mathematics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:formal-methods, topic:algorithm-design]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # SageMath Interface

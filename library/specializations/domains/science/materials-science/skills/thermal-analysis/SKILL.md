@@ -18,6 +18,11 @@ metadata:
     - Netzsch Proteus
     - STARe Software
     - TRIOS
+graph:
+  domains: [domain:materials-science]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Thermal Analysis Skill

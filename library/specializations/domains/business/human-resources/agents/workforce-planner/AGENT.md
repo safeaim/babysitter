@@ -14,6 +14,10 @@ metadata:
   domain: business
   category: HR Analytics
   agent-id: AG-010
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Workforce Planning Strategist Agent

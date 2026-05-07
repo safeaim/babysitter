@@ -16,6 +16,11 @@
  * - Strategyzer Market Sizing: https://www.strategyzer.com/
  * - McKinsey Market Sizing Frameworks: https://www.mckinsey.com/
  * - CB Insights Market Maps: https://www.cbinsights.com/
+ * @graph
+ *   domains: [domain:entrepreneurship]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:startup-strategy, topic:product-market-fit]
+ *   roles: [role:founder]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

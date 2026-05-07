@@ -2,6 +2,11 @@
 name: citation-scholarly-apparatus
 description: Format citations, footnotes, and bibliographies following Chicago, MLA, and disciplinary style guides with accuracy
 allowed-tools: Read, Grep, Write, Edit, Glob, WebFetch
+graph:
+  domains: [domain:humanities]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:research-methodology, topic:knowledge-management]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Citation and Scholarly Apparatus

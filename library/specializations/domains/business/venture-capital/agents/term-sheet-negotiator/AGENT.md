@@ -8,6 +8,10 @@ expertise:
   - Market terms analysis
   - Deal structuring alternatives
   - Founder-investor relationship management
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Term Sheet Negotiator

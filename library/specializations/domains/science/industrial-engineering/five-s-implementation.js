@@ -16,6 +16,12 @@
  * - Hirano, 5 Pillars of the Visual Workplace
  * - Liker, The Toyota Way
  * - Peterson & Smith, The 5S Pocket Guide
+ *
+ * @graph
+ *   domains: [domain:industrial-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:process-optimization]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

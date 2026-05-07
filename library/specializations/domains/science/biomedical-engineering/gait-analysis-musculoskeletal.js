@@ -17,6 +17,12 @@
  * - OpenSim Documentation: https://opensim.stanford.edu/
  * - Winter's Biomechanics and Motor Control of Human Movement
  * - ISB Standards for Reporting Kinematic Data
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

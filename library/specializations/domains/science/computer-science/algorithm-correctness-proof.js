@@ -3,6 +3,12 @@
  * @description Formally prove algorithm correctness using mathematical techniques including loop invariants, induction, and termination proofs
  * @inputs { algorithmDescription: string, pseudocode: string, specification: object }
  * @outputs { success: boolean, correctnessProof: object, invariants: array, terminationProof: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

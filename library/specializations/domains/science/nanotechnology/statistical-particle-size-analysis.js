@@ -18,6 +18,12 @@
  * - Dynamic Light Scattering for Nanoparticle Sizing: https://www.malvernpanalytical.com/en/products/technology/light-scattering/dynamic-light-scattering
  * - ImageJ/Fiji: https://imagej.net/software/fiji/
  * - ASTM E2456: Standard Terminology Relating to Nanotechnology: https://www.astm.org/e2456-06r20.html
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

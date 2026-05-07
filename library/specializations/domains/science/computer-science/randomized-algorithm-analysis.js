@@ -3,6 +3,12 @@
  * @description Design and analyze algorithms using randomization for efficiency or simplicity with probability analysis
  * @inputs { algorithmDescription: string, randomizationType: string, performanceGoals: object }
  * @outputs { success: boolean, algorithmSpecification: object, probabilityAnalysis: object, expectedComplexity: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

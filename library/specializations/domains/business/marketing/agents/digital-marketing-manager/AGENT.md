@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Digital Marketing
   agent-id: AG-007
+graph:
+  domains: [domain:marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:marketing-manager]
 ---
 
 # Digital Marketing Manager Agent

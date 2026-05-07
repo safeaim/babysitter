@@ -5,6 +5,11 @@
  * @category Knowledge Capture and Documentation
  * @inputs { projectContext: object, projectPhase: string, captureScope: object, stakeholders: array, outputDir: string }
  * @outputs { success: boolean, capturedKnowledge: array, lessonsLearned: array, reusableAssets: array, qualityScore: number, artifacts: array }
+ * @graph
+ *   domains: [domain:knowledge-management]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:documentation]
+ *   roles: [role:knowledge-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

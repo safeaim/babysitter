@@ -18,6 +18,11 @@ metadata:
     - Rheometer software
     - FTIR libraries
     - DSC analysis
+graph:
+  domains: [domain:materials-science]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Polymer Characterization Skill

@@ -3,6 +3,11 @@
  * @description Ongoing monitoring and adaptation of strategy execution with governance and performance management
  * @inputs { organizationName: string, strategicPlan: object, currentMetrics: object, reviewCadence: object }
  * @outputs { success: boolean, governanceFramework: object, performanceDashboards: object, adaptationRecommendations: array, artifacts: array }
+ * @graph
+ *   domains: [domain:strategy]
+ *   skillAreas: [skill-area:strategic-planning]
+ *   topics: [topic:corporate-strategy, topic:innovation-management]
+ *   roles: [role:strategy-consultant]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

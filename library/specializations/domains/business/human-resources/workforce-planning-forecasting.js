@@ -27,6 +27,11 @@
  * - Human Capital Institute Planning Models
  * - McKinsey Workforce Planning Methodology
  * - WorldatWork Workforce Analytics Guidelines
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

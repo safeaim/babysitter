@@ -12,6 +12,11 @@ expertise:
 metadata:
   version: "1.0"
   category: physics
+graph:
+  domains: [domain:physics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Data Scientist Agent

@@ -19,6 +19,12 @@
  * - LAPACK: https://www.netlib.org/lapack/
  * - Intel MKL: https://software.intel.com/mkl
  * - SuiteSparse: https://people.engr.tamu.edu/davis/suitesparse.html
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

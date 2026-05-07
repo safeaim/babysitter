@@ -5,6 +5,12 @@
  * @outputs { success: boolean, story: object, artifacts: array }
  * @recommendedSkills SK-FTV-001 (logline-writing), SK-FTV-002 (treatment-writing), SK-FTV-012 (genre-analysis-film)
  * @recommendedAgents AG-FTV-005 (story-developer-agent)
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

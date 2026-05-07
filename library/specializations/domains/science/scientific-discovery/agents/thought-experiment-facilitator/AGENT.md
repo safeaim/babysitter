@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Quality Control
   agent-id: AG-SCIDISC-024
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Thought Experiment Facilitator Agent

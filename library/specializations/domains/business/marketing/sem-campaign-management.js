@@ -3,6 +3,11 @@
  * @description Set up and optimize paid search campaigns in Google Ads including keyword targeting, ad copy, bidding strategies, and quality score improvement.
  * @inputs { businessGoals: object, targetKeywords: array, budget: number, competitors: array, landingPages: array }
  * @outputs { success: boolean, campaignStructure: object, adCopy: array, biddingStrategy: object, qualityScorePlan: object, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

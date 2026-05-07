@@ -16,6 +16,10 @@ metadata:
     - ortools
     - python-constraint
     - minizinc-python
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Constraint Satisfaction Solver

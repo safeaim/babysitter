@@ -3,6 +3,12 @@
  * @description Show that a new problem is equivalent to a known problem, leveraging existing solutions and complexity results
  * @inputs { newProblem: object, knownProblems: array, context: object, outputDir: string }
  * @outputs { success: boolean, reduction: object, equivalenceProof: object, implications: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,11 @@
  * @references
  * - Decision Support Systems: Concepts and Resources: https://dssresources.com/
  * - Power, D.J. - Decision Support Systems
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -15,6 +15,10 @@ metadata:
   dependencies:
     - Workforce data
     - Forecasting models
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # Workforce Planning Skill

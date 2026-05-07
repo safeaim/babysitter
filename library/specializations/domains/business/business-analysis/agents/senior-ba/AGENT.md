@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-001
   category: Requirements
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Senior Business Analyst Agent

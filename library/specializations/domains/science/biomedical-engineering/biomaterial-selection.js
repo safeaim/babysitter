@@ -16,6 +16,12 @@
  * - Biomaterials Science: An Introduction to Materials in Medicine (Ratner et al.)
  * - ISO 10993 Series - Biological Evaluation of Medical Devices
  * - ASTM Standards for Medical Device Materials
+ *
+ * @graph
+ *   domains: [domain:biomedical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -14,6 +14,10 @@ metadata:
   model-requirements:
     - Optimization algorithms
     - Geospatial analysis
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Territory Designer Agent

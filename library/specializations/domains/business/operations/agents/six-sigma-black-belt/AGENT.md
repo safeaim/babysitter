@@ -9,6 +9,10 @@ expertise:
   - Team facilitation
   - Tollgate presentation
   - Green belt coaching
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Six Sigma Black Belt

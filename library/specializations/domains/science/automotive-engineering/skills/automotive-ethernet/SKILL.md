@@ -18,6 +18,11 @@ metadata:
     - ethernet
     - some-ip
     - tsn
+graph:
+  domains: [domain:automotive-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Automotive Ethernet Skill

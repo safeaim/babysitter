@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Sterilization and Manufacturing
   skill-id: BME-SK-027
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Packaging Validation Planner Skill

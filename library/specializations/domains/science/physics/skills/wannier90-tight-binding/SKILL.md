@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: condensed-matter
   phase: 6
+graph:
+  domains: [domain:physics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Wannier90 Tight-Binding

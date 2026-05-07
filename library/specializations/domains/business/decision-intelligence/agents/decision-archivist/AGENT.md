@@ -11,6 +11,10 @@ expertise:
   - Best practice identification
   - Knowledge retrieval
   - Learning synthesis
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:data-analysis]
+  roles: [role:data-analyst]
 ---
 
 # Decision Archivist

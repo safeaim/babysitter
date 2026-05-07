@@ -11,6 +11,10 @@ metadata:
   domain: business
   category: Investor Relations
   skill-id: SK-016
+graph:
+  domains: [domain:entrepreneurship]
+  skillAreas: [skill-area:strategic-planning]
+  roles: [role:founder]
 ---
 
 # Investor Update Generator Skill

@@ -14,6 +14,10 @@ metadata:
   priority: P1
   integration-points:
     - D&B Direct+ API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Dun & Bradstreet Data

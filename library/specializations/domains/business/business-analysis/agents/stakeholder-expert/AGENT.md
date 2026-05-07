@@ -14,6 +14,10 @@ metadata:
   domain: business
   id: AG-005
   category: Stakeholder Analysis
+graph:
+  domains: [domain:business-intelligence]
+  skillAreas: [skill-area:business-analysis]
+  roles: [role:business-analyst]
 ---
 
 # Stakeholder Management Expert Agent

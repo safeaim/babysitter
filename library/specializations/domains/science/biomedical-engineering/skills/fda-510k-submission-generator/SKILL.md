@@ -13,6 +13,11 @@ metadata:
   domain: science
   category: Regulatory Compliance
   skill-id: BME-SK-001
+graph:
+  domains: [domain:biomedical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # FDA 510(k) Submission Generator Skill

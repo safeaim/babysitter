@@ -10,6 +10,11 @@ metadata:
   domain: science
   category: Hypothesis Development
   skill-id: SK-SCIDISC-012
+graph:
+  domains: [domain:scientific-discovery]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:research-methodology, topic:scientific-computing]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Systems Dynamics Modeler Skill

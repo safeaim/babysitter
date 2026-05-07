@@ -9,6 +9,10 @@ expertise:
   - Cost-service tradeoff analysis
   - Network simulation
   - Transformation roadmap development
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Supply Chain Network Designer

@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Change Control
   id: SK-012
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Change Request Analyzer

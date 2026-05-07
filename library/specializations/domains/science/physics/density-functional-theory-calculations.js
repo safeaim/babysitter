@@ -4,6 +4,12 @@
  * @category Physics - Computational Physics
  * @inputs {{ context: object, problem: string }}
  * @outputs {{ analysis: object, conclusions: array, recommendations: array }}
+ *
+ * @graph
+ *   domains: [domain:physics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -17,6 +17,12 @@
  * - MIL-HDBK-516C Airworthiness Certification
  * - ARP94910 Flight Control Design Guidelines
  * - AC 25.1329 Flight Guidance Systems
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

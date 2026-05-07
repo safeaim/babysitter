@@ -26,6 +26,11 @@
  * - SHRM Employee Relations Best Practices
  * - ADR and Mediation Guidelines
  * - EEOC Charge Handling Procedures
+ * @graph
+ *   domains: [domain:human-resources]
+ *   skillAreas: [skill-area:talent-management]
+ *   topics: [topic:employee-development, topic:performance-management]
+ *   roles: [role:hr-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

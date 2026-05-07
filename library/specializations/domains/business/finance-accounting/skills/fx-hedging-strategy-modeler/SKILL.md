@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: treasury
   priority: lower
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # FX Hedging Strategy Modeler

@@ -17,6 +17,11 @@
  * @references
  * - Miller Heiman Strategic Selling: https://www.amazon.com/New-Strategic-Selling-Successful-Complex/dp/0446695190
  * - RAIN Group Key Account Management: https://www.rainsalestraining.com/
+ * @graph
+ *   domains: [domain:sales]
+ *   skillAreas: [skill-area:sales-methodology]
+ *   topics: [topic:pipeline-management, topic:account-management]
+ *   roles: [role:sales-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

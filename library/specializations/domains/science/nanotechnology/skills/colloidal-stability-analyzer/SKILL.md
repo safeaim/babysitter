@@ -17,6 +17,11 @@ metadata:
     - DLS analyzers
     - Zeta potential meters
     - Stability prediction models
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Colloidal Stability Analyzer

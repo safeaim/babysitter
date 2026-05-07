@@ -13,6 +13,10 @@ metadata:
   domain: business
   category: inventory
   priority: high
+graph:
+  domains: [domain:logistics]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:logistics-manager]
 ---
 
 # Safety Stock Calculator

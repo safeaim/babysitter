@@ -8,6 +8,10 @@ expertise:
   - Customer and partner introductions
   - Operational improvement guidance
   - Portfolio company resource coordination
+graph:
+  domains: [domain:venture-capital]
+  skillAreas: [skill-area:investment-analysis]
+  roles: [role:venture-capitalist]
 ---
 
 # Value Creation Lead

@@ -9,6 +9,10 @@ expertise:
   - Root cause investigation
   - Improvement recommendation
   - Executive reporting
+graph:
+  domains: [domain:operations]
+  skillAreas: [skill-area:operations-management]
+  roles: [role:operations-manager]
 ---
 
 # Operations Analyst

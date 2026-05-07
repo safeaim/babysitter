@@ -4,6 +4,12 @@
  * vibration, thermal, EMI/EMC, and combined environment testing.
  * @inputs { projectName: string, productSpecification: object, environmentalRequirements: object, standards?: array }
  * @outputs { success: boolean, testSequence: object, testSpecifications: array, complianceStatus: object }
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

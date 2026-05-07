@@ -14,6 +14,11 @@ metadata:
   domain: science
   category: research-documentation
   phase: 6
+graph:
+  domains: [domain:mathematics]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:formal-methods, topic:algorithm-design]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # Literature Reviewer

@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: HR Analytics
   agent-id: AG-009
+graph:
+  domains: [domain:human-resources]
+  skillAreas: [skill-area:talent-management]
+  roles: [role:hr-manager]
 ---
 
 # People Analytics Expert Agent

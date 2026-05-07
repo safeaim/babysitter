@@ -20,6 +20,12 @@
  * - ASTM E18 - Rockwell Hardness: https://www.astm.org/e0018-22.html
  * - ASTM E23 - Charpy Impact: https://www.astm.org/e0023-18.html
  * - ASTM E466 - Fatigue Testing: https://www.astm.org/e0466-21.html
+ *
+ * @graph
+ *   domains: [domain:mechanical-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:systems-modeling]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

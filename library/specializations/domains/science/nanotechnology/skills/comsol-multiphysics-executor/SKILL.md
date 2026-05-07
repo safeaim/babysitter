@@ -16,6 +16,11 @@ metadata:
   tools-libraries:
     - COMSOL Multiphysics
     - LiveLink interfaces
+graph:
+  domains: [domain:nanotechnology]
+  skillAreas: [skill-area:data-analysis]
+  topics: [topic:scientific-computing, topic:research-methodology]
+  roles: [role:tech-lead, role:data-engineer]
 ---
 
 # COMSOL Multiphysics Executor

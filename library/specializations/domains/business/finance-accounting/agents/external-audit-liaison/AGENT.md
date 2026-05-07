@@ -9,6 +9,10 @@ expertise:
   - Testing support
   - Finding discussion
   - Audit committee presentation support
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # External Audit Liaison

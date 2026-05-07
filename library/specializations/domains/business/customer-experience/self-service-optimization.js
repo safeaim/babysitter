@@ -3,6 +3,11 @@
  * @description Continuous improvement process for enhancing self-service effectiveness through analytics and content optimization
  * @inputs { analyticsData: object, searchData: array, contentMetrics: object, userBehavior: object }
  * @outputs { success: boolean, optimizationPlan: object, improvements: array, metrics: object, artifacts: array }
+ * @graph
+ *   domains: [domain:customer-experience]
+ *   skillAreas: [skill-area:customer-success]
+ *   topics: [topic:customer-journey-mapping, topic:voice-of-customer]
+ *   roles: [role:customer-success-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

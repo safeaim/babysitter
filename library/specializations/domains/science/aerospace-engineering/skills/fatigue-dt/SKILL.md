@@ -18,6 +18,11 @@ metadata:
     - fatigue
     - damage-tolerance
     - certification
+graph:
+  domains: [domain:aerospace-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Fatigue and Damage Tolerance Skill

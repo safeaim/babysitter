@@ -9,6 +9,10 @@ expertise:
   - Signal investigation
   - Risk reporting
   - Trend analysis
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Supplier Risk Analyst

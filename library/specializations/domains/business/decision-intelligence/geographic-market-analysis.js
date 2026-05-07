@@ -16,6 +16,11 @@
  * @references
  * - IDC Regional Market Analysis: https://www.idc.com/
  * - Market Entry Strategy Frameworks
+ * @graph
+ *   domains: [domain:business-intelligence]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:decision-analysis, topic:data-driven-decisions]
+ *   roles: [role:data-analyst]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

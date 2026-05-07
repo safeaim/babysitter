@@ -5,6 +5,12 @@
  * @outputs { success: boolean, protocol: object, observationTools: array, feedbackFramework: object, artifacts: array }
  * @recommendedSkills SK-EDU-012 (facilitation-workshop-delivery)
  * @recommendedAgents AG-EDU-006 (faculty-development-facilitator)
+ *
+ * @graph
+ *   domains: [domain:education]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:knowledge-management, topic:research-methodology]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

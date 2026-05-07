@@ -14,6 +14,10 @@ metadata:
   priority: P2
   integration-points:
     - Pipedrive REST API
+graph:
+  domains: [domain:sales]
+  skillAreas: [skill-area:sales-methodology]
+  roles: [role:sales-manager]
 ---
 
 # Pipedrive Connector

@@ -16,6 +16,11 @@
  * - EDRM Model: https://www.edrm.net/
  * - ACEDS Certification: https://aceds.org/certification/
  * - Relativity: https://www.relativity.com/
+ * @graph
+ *   domains: [domain:legal]
+ *   skillAreas: [skill-area:legal-analysis]
+ *   topics: [topic:contract-management, topic:compliance]
+ *   roles: [role:legal-counsel]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -18,6 +18,11 @@ metadata:
     - rocket
     - combustion
     - nozzle-design
+graph:
+  domains: [domain:aerospace-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Rocket Propulsion Analysis Skill

@@ -9,6 +9,10 @@ expertise:
   - Scenario modeling
   - Cross-functional facilitation
   - Executive communication
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # S&OP Coordinator

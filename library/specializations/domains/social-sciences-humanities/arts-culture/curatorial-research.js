@@ -5,6 +5,12 @@
  * @outputs { success: boolean, researchFindings: object, bibliography: array, provenanceReport: object, artifacts: array }
  * @recommendedSkills SK-AC-001 (curatorial-research), SK-AC-008 (interpretive-writing)
  * @recommendedAgents AG-AC-001 (curator-agent)
+ *
+ * @graph
+ *   domains: [domain:arts-culture]
+ *   skillAreas: [skill-area:technical-writing]
+ *   topics: [topic:content-creation, topic:knowledge-management]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

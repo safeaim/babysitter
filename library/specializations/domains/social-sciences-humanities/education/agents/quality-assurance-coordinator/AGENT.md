@@ -2,6 +2,11 @@
 name: quality-assurance-coordinator
 description: Conduct quality reviews and support accreditation processes using established standards and rubrics
 required-skills: quality-assurance-review, accessibility-compliance-auditing, curriculum-gap-analysis
+graph:
+  domains: [domain:education]
+  skillAreas: [skill-area:technical-writing]
+  topics: [topic:knowledge-management, topic:research-methodology]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Quality Assurance Coordinator Agent

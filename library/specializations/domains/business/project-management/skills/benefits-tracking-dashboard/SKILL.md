@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: Benefits Management
   id: SK-011
+graph:
+  domains: [domain:project-management]
+  skillAreas: [skill-area:project-management]
+  roles: [role:project-manager]
 ---
 
 # Benefits Tracking Dashboard

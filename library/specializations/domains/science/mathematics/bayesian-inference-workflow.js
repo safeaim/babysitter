@@ -18,6 +18,12 @@
  * - McElreath, Statistical Rethinking
  * - Stan User Guide: https://mc-stan.org/users/documentation/
  * - PyMC Documentation: https://www.pymc.io/
+ *
+ * @graph
+ *   domains: [domain:mathematics]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:formal-methods, topic:algorithm-design]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

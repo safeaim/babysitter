@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: financial-modeling
   priority: lower
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # LBO Model Builder

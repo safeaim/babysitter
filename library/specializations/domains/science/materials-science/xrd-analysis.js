@@ -18,6 +18,12 @@
  * - HighScore Plus: https://www.malvernpanalytical.com/en/products/category/software/x-ray-diffraction-software/highscore
  * - ICDD PDF Database: https://www.icdd.com/
  * - Rietveld Method: https://www.iucr.org/resources/commissions/powder-diffraction/rietveld-refinement
+ *
+ * @graph
+ *   domains: [domain:materials-science]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

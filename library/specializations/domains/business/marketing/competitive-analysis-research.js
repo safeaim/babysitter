@@ -3,6 +3,11 @@
  * @description Monitor competitor positioning, messaging, campaigns, and market share. Create competitive battlecards and identify differentiation opportunities.
  * @inputs { competitors: array, market: string, ownBrand: object, dataSource: array }
  * @outputs { success: boolean, competitorProfiles: array, battlecards: array, differentiationOpportunities: array, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -12,6 +12,10 @@ metadata:
   domain: business
   category: risk-management
   priority: medium
+graph:
+  domains: [domain:supply-chain]
+  skillAreas: [skill-area:supply-chain-management]
+  roles: [role:supply-chain-manager]
 ---
 
 # Early Warning Monitor

@@ -17,6 +17,12 @@
  * - AIAA CFD Validation Standards: https://www.aiaa.org/
  * - NASA Wind Tunnel Handbook: https://www.nasa.gov/
  * - AGARD CFD Validation Database: https://www.sto.nato.int/
+ *
+ * @graph
+ *   domains: [domain:aerospace-engineering]
+ *   skillAreas: [skill-area:systems-engineering]
+ *   topics: [topic:engineering-design, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:platform-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

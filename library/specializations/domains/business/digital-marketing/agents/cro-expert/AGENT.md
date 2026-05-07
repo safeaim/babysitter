@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Analytics and Measurement
   agent-id: AG-008
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # Conversion Rate Optimization Expert Agent

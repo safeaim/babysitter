@@ -3,6 +3,12 @@
  * @description Evaluate algorithmic performance under worst-case, average-case, and amortized cost models
  * @inputs { algorithm: object, inputModel: object, operations: array, outputDir: string }
  * @outputs { success: boolean, complexityAnalysis: object, worstCase: object, averageCase: object, amortized: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:scientific-discovery]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:research-methodology, topic:scientific-computing]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

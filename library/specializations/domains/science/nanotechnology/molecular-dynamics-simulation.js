@@ -19,6 +19,12 @@
  * - LAMMPS (Large-scale Atomic/Molecular Massively Parallel Simulator): https://www.lammps.org/
  * - GROMACS: https://www.gromacs.org/
  * - OVITO (Open Visualization Tool): https://www.ovito.org/
+ *
+ * @graph
+ *   domains: [domain:nanotechnology]
+ *   skillAreas: [skill-area:data-analysis]
+ *   topics: [topic:scientific-computing, topic:research-methodology]
+ *   roles: [role:tech-lead, role:data-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

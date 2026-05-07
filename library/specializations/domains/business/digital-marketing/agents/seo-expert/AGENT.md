@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: SEO/SEM
   agent-id: AG-003
+graph:
+  domains: [domain:digital-marketing]
+  skillAreas: [skill-area:marketing-analytics]
+  roles: [role:digital-marketing-manager]
 ---
 
 # SEO Expert Agent

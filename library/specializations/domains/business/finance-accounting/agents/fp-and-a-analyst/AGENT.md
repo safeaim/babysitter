@@ -9,6 +9,10 @@ expertise:
   - Driver identification
   - Management reporting
   - Scenario development
+graph:
+  domains: [domain:finance]
+  skillAreas: [skill-area:financial-analysis]
+  roles: [role:financial-analyst]
 ---
 
 # FP&A Analyst

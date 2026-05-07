@@ -3,6 +3,11 @@
  * @description Create detailed buyer personas through qualitative research including goals, pain points, jobs-to-be-done, and content preferences.
  * @inputs { customerData: object, researchData: object, existingPersonas: array, businessContext: object }
  * @outputs { success: boolean, personas: array, personaDocuments: array, usageGuide: object, artifacts: array }
+ * @graph
+ *   domains: [domain:marketing]
+ *   skillAreas: [skill-area:marketing-analytics]
+ *   topics: [topic:marketing-strategy, topic:customer-segmentation]
+ *   roles: [role:marketing-manager]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -3,6 +3,12 @@
  * @description Apply model checking to verify system properties automatically using temporal logic specifications
  * @inputs { systemDescription: string, propertiesDescription: array, modelCheckerPreference: string }
  * @outputs { success: boolean, modelSpecification: object, verificationResults: object, counterexampleAnalysis: object, artifacts: array }
+ *
+ * @graph
+ *   domains: [domain:computer-science]
+ *   skillAreas: [skill-area:software-architecture]
+ *   topics: [topic:algorithm-design, topic:formal-methods]
+ *   roles: [role:tech-lead, role:backend-engineer]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -16,6 +16,10 @@ metadata:
   domain: business
   category: Crisis Communications
   agent-id: AG-003
+graph:
+  domains: [domain:public-relations]
+  skillAreas: [skill-area:communications-strategy]
+  roles: [role:communications-manager]
 ---
 
 # Crisis Communications Expert Agent

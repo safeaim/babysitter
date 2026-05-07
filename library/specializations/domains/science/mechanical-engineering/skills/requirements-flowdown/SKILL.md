@@ -17,6 +17,11 @@ metadata:
     - IBM DOORS
     - Jama Connect
     - Polarion
+graph:
+  domains: [domain:mechanical-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:systems-modeling]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Requirements Flow-Down Skill

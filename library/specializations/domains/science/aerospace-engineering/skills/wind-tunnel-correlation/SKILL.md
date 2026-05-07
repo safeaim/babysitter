@@ -18,6 +18,11 @@ metadata:
     - wind-tunnel
     - correlation
     - validation
+graph:
+  domains: [domain:aerospace-engineering]
+  skillAreas: [skill-area:systems-engineering]
+  topics: [topic:engineering-design, topic:scientific-computing]
+  roles: [role:tech-lead, role:platform-engineer]
 ---
 
 # Wind Tunnel Data Correlation Skill

@@ -148,9 +148,9 @@ edges:
     - target: hook-surface:user-prompt-submit
 ---
 nodeKind: HookMapping
-id: hook-mapping:pre-tool-use-gemini
+id: hook-mapping:tool-before-gemini
 attributes:
-  mappingId: hook-mapping:pre-tool-use-gemini
+  mappingId: hook-mapping:tool-before-gemini
   hookId: hook-surface:pre-tool-use
   targetId: agent-version:gemini@current
   nativeName: BeforeTool
@@ -169,9 +169,9 @@ edges:
     - target: hook-surface:pre-tool-use
 ---
 nodeKind: HookMapping
-id: hook-mapping:post-tool-use-gemini
+id: hook-mapping:tool-after-gemini
 attributes:
-  mappingId: hook-mapping:post-tool-use-gemini
+  mappingId: hook-mapping:tool-after-gemini
   hookId: hook-surface:post-tool-use
   targetId: agent-version:gemini@current
   nativeName: AfterTool
@@ -253,9 +253,9 @@ edges:
     - target: hook-surface:pre-compact
 ---
 nodeKind: HookMapping
-id: hook-mapping:pre-tool-use-copilot
+id: hook-mapping:tool-before-copilot
 attributes:
-  mappingId: hook-mapping:pre-tool-use-copilot
+  mappingId: hook-mapping:tool-before-copilot
   hookId: hook-surface:pre-tool-use
   targetId: agent-version:copilot@current
   nativeName: preToolUse
@@ -274,9 +274,9 @@ edges:
     - target: hook-surface:pre-tool-use
 ---
 nodeKind: HookMapping
-id: hook-mapping:post-tool-use-copilot
+id: hook-mapping:tool-after-copilot
 attributes:
-  mappingId: hook-mapping:post-tool-use-copilot
+  mappingId: hook-mapping:tool-after-copilot
   hookId: hook-surface:post-tool-use
   targetId: agent-version:copilot@current
   nativeName: postToolUse
@@ -295,9 +295,9 @@ edges:
     - target: hook-surface:post-tool-use
 ---
 nodeKind: HookMapping
-id: hook-mapping:pre-compact-copilot
+id: hook-mapping:compact-before-copilot
 attributes:
-  mappingId: hook-mapping:pre-compact-copilot
+  mappingId: hook-mapping:compact-before-copilot
   hookId: hook-surface:pre-compact
   targetId: agent-version:copilot@current
   nativeName: PreCompact

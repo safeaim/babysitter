@@ -21,10 +21,10 @@ export default function Home() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>Atlas Graph Explorer</h1>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>Agentic AI Atlas</h1>
         <p className="text-sm mt-1" style={{ color: 'var(--fg-2)' }}>
           Browse the Atlas catalog: {stats.totalRecords.toLocaleString()} records across{" "}
-          {stats.totalNodeKinds} NodeKinds and {stats.totalEdgeKinds} EdgeKinds.
+          {stats.totalNodeKinds} node kinds and {stats.totalEdgeKinds} edge kinds.
         </p>
       </div>
 
@@ -110,4 +110,3 @@ function StatCard({ label, value }: { label: string; value: number }) {
     </Card>
   );
 }
-

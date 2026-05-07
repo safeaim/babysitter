@@ -1,5 +1,32 @@
 @import "tailwindcss";
 @import "@a5c-ai/compendium/css";
+@import "@a5c-ai/compendium/css/CodexPrimitives";
+
+:root,
+html[data-theme="vellum"] {
+  --fg: var(--tk-line);
+  --fg-2: color-mix(in oklab, var(--tk-line) 78%, white 22%);
+  --fg-3: var(--tk-line-soft);
+  --bg: color-mix(in oklab, var(--paper) 92%, white 8%);
+  --bg-2: color-mix(in oklab, var(--paper-2) 92%, white 8%);
+  --rule: color-mix(in oklab, var(--tk-line) 14%, white 86%);
+  --edge-fade: color-mix(in oklab, var(--tk-line) 18%, white 82%);
+  --brass: var(--brass);
+  --brass-light: var(--brass-light);
+  --ground-ink: color-mix(in oklab, var(--paper-3) 86%, var(--paper));
+}
+
+html[data-theme="void"] {
+  --fg: var(--glyph-bone);
+  --fg-2: color-mix(in oklab, var(--glyph-bone) 78%, var(--glyph-fade));
+  --fg-3: color-mix(in oklab, var(--glyph-bone) 60%, var(--glyph-fade));
+  --bg: color-mix(in oklab, var(--ground-ink) 84%, var(--ground-void));
+  --bg-2: color-mix(in oklab, var(--ground-ink) 92%, black 8%);
+  --rule: color-mix(in oklab, var(--glyph-fade) 18%, transparent);
+  --edge-fade: color-mix(in oklab, var(--glyph-fade) 24%, transparent);
+  --brass: var(--tkc-danger-hover);
+  --brass-light: var(--tkc-danger-hover);
+}
 
 html,
 body {
@@ -80,8 +107,8 @@ html[data-theme="void"] .atlas-header {
 .atlas-header__inner {
   width: min(100%, 1600px);
   margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 16px 22px;
   padding: 14px clamp(16px, 2.6vw, 34px);
@@ -124,10 +151,11 @@ html[data-theme="void"] .atlas-header__brand span {
 
 .atlas-header__nav {
   display: flex;
-  flex: 1 1 320px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 14px;
+  min-width: 0;
 }
 
 .atlas-header__nav a,
@@ -162,11 +190,15 @@ html[data-theme="void"] .atlas-header__link:focus-visible {
 
 .atlas-header__actions {
   display: flex;
-  flex: 1 1 420px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+}
+
+.atlas-header__actions > * {
+  flex: 0 0 auto;
 }
 
 .atlas-header__link {
@@ -194,7 +226,10 @@ html[data-theme="void"] .atlas-header__link:focus-visible {
 }
 
 .atlas-header__search {
-  width: min(100%, 360px);
+  flex: 1 1 360px;
+  width: 360px;
+  min-width: 260px;
+  max-width: 360px;
 }
 
 .atlas-searchbar {
@@ -403,19 +438,85 @@ html[data-theme="void"] .atlas-docs-note {
   color: color-mix(in oklab, var(--glyph-bone) 74%, var(--glyph-fade));
 }
 
+html[data-theme="void"] .mk-docs {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), transparent 22%),
+    linear-gradient(180deg, #151317 0%, #0f0d11 100%);
+  color: var(--glyph-bone);
+  border-color: color-mix(in oklab, var(--glyph-fade) 28%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 14px 40px rgba(0,0,0,.34);
+}
+
+html[data-theme="void"] .mk-docs__running,
+html[data-theme="void"] .mk-docs__toc,
+html[data-theme="void"] .mk-docs__margin {
+  background: color-mix(in oklab, var(--ground-ink) 86%, var(--ground-void));
+  border-color: color-mix(in oklab, var(--glyph-fade) 24%, transparent);
+}
+
+html[data-theme="void"] .mk-docs__chapter-head strong,
+html[data-theme="void"] .mk-docs__article h2,
+html[data-theme="void"] .mk-docs__columns h3,
+html[data-theme="void"] .mk-docs__columns h4 {
+  color: var(--glyph-bone);
+}
+
+html[data-theme="void"] .mk-docs__running .folio,
+html[data-theme="void"] .mk-docs__chapter-head b,
+html[data-theme="void"] .mk-docs__chapter.current .mk-docs__chapter-head strong,
+html[data-theme="void"] .mk-docs__article h2 em {
+  color: var(--tkc-danger-hover);
+}
+
+html[data-theme="void"] .mk-docs__chapter-head span,
+html[data-theme="void"] .mk-docs__chapter-mark small,
+html[data-theme="void"] .mk-docs__chapter-mark span,
+html[data-theme="void"] .mk-docs__chapter-mark p,
+html[data-theme="void"] .mk-docs__article .lead,
+html[data-theme="void"] .mk-docs__meta span,
+html[data-theme="void"] .mk-docs__columns p,
+html[data-theme="void"] .mk-docs__columns li,
+html[data-theme="void"] .mk-docs__columns td,
+html[data-theme="void"] .mk-docs__columns th {
+  color: color-mix(in oklab, var(--glyph-bone) 72%, var(--glyph-fade));
+}
+
+html[data-theme="void"] .mk-docs__chapter-items a,
+html[data-theme="void"] .mk-docs__margin a {
+  color: color-mix(in oklab, var(--glyph-bone) 72%, var(--glyph-fade));
+}
+
+html[data-theme="void"] .mk-docs__chapter-items a:hover,
+html[data-theme="void"] .mk-docs__chapter-items a:focus-visible,
+html[data-theme="void"] .mk-docs__margin a:hover,
+html[data-theme="void"] .mk-docs__margin a:focus-visible {
+  color: var(--glyph-bone);
+  background: color-mix(in oklab, var(--accent-cinnabar) 18%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent-cinnabar) 28%, transparent);
+}
+
 @media (max-width: 1280px) {
+  .atlas-header__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .atlas-header__nav {
+    justify-content: flex-start;
+  }
+
+  .atlas-header__actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
   .atlas-header__search {
     width: 100%;
+    max-width: none;
   }
 }
 
 @media (max-width: 900px) {
-  .atlas-header__inner,
-  .atlas-header__actions {
-    align-items: flex-start;
-  }
-
-  .atlas-header__actions {
-    justify-content: flex-start;
+  .atlas-main-content {
+    padding-inline: 16px;
   }
 }

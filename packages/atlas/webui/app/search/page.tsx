@@ -7,6 +7,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Fuse from "fuse.js";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { AtlasDocsScaffold } from "@/components/AtlasDocsScaffold";
 
 type SlimRecord = {
   id: string;
@@ -72,6 +73,7 @@ function SearchPageInner() {
 
   const filtered = kind ? allResults.filter((r) => r.item._kind === kind) : allResults;
   const top = filtered.slice(0, 100);
+  const tocKinds = kindCounts.slice(0, 8);
 
   const submit = (newQ: string, newKind?: string) => {
     const u = new URLSearchParams();
@@ -81,114 +83,120 @@ function SearchPageInner() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-xl font-semibold mb-3" style={{ color: 'var(--fg)' }}>Search</h1>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submit(q, kind);
-        }}
-      >
-        <Input
-          autoFocus
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search records by id, name, description, or kind..."
-          className="mb-4"
-        />
-      </form>
+    <AtlasDocsScaffold
+      runningLeft={<><span className="folio">vi</span><span>Search</span></>}
+      runningTitle={<>Agentic AI Atlas · <em>search</em></>}
+      runningRight={<><span>{corpus ? `${corpus.length.toLocaleString()} indexed` : "loading"}</span><span>a5c.ai</span></>}
+      tocSearchLabel="Search the atlas"
+      tocBookLabel="Atlas · search"
+      tocTitle="Query and kind filters"
+      chapters={[
+        {
+          num: "VI.",
+          title: "Current query",
+          pages: "pp. 1 - 1",
+          current: true,
+          items: [
+            { label: q.trim() ? `q: ${q}` : "Ready for a query", current: true },
+            { label: "All kinds", href: q ? `/search?q=${encodeURIComponent(q)}` : "/search" },
+            ...tocKinds.map(([k]) => ({
+              label: k,
+              href: q ? `/search?q=${encodeURIComponent(q)}&kind=${encodeURIComponent(k)}` : `/search?kind=${encodeURIComponent(k)}`,
+            })),
+          ],
+        },
+      ]}
+      chapterMark={{ num: "VI.", subtitle: "Atlas search", context: kind || "All node kinds", readingTime: q.trim() ? `Results · ${top.length}` : "Index · live" }}
+      articleTitle={<>Search <em>records</em></>}
+      lead={q.trim() ? `Results for "${q}" across atlas records, titles, descriptions, and node kinds.` : "Query the atlas index by id, display name, description, or kind."}
+      meta={<><span>Query · {q.trim() || "none"}</span><span>Kind · {kind || "all"}</span><span>Visible · {top.length}</span></>}
+      marginSections={[
+        {
+          title: "Status",
+          items: error
+            ? [<p key="error" className="atlas-docs-note">Failed to load index: {error}</p>]
+            : !corpus
+              ? [<p key="loading" className="atlas-docs-note">Loading search index…</p>]
+              : [
+                  <p key="indexed" className="atlas-docs-note">Indexed · {corpus.length.toLocaleString()} records</p>,
+                  <p key="matches" className="atlas-docs-note">Matches · {filtered.length.toLocaleString()}</p>,
+                ],
+        },
+        {
+          title: "Quick routes",
+          items: [
+            <Link key="home" href="/">Atlas overview</Link>,
+            <Link key="graph" href="/graph">Graph explorer</Link>,
+          ],
+        },
+      ]}
+    >
+      <div className="atlas-docs-stack">
+        <form
+          className="atlas-docs-panel atlas-docs-full"
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit(q, kind);
+          }}
+        >
+          <Input
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search records by id, name, description, or kind..."
+          />
+        </form>
 
-      {error && <div className="text-xs" style={{ color: 'var(--accent-cinnabar)' }}>Failed to load index: {error}</div>}
-      {!corpus && !error && <div className="text-xs" style={{ color: 'var(--fg-3)' }}>Loading index...</div>}
+        {kind && (
+          <div className="atlas-docs-pillrow atlas-docs-full">
+            <Badge variant="outline">{kind}</Badge>
+            <Link href={q ? `/search?q=${encodeURIComponent(q)}` : "/search"}>clear kind filter</Link>
+          </div>
+        )}
 
-      {corpus && (
-        <div className="grid grid-cols-12 gap-4">
-          <aside className="col-span-12 md:col-span-3 space-y-2">
-            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--fg-3)' }}>
-              Filter by NodeKind
+        {corpus && (
+          q.trim() === "" ? (
+            <div className="atlas-docs-panel atlas-docs-full">
+              <p className="atlas-docs-note">Type a query above. {corpus.length.toLocaleString()} records are indexed.</p>
             </div>
-            <ul className="space-y-px">
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setKind("");
-                    submit(q, "");
-                  }}
-                  className={`w-full text-left text-xs px-2 py-1.5 rounded cpd-hover flex justify-between transition-colors ${
-                    kind === "" ? "cpd-filter-active" : ""
-                  }`}
-                  style={kind === "" ? undefined : { color: 'var(--fg)' }}
+          ) : top.length === 0 ? (
+            <div className="atlas-docs-panel atlas-docs-full">
+              <p className="atlas-docs-note">No results for &quot;{q}&quot;.</p>
+            </div>
+          ) : (
+            <ul className="atlas-docs-ledger atlas-docs-full">
+              {top.map((r, idx) => (
+                <li
+                  key={r.item.id}
+                  className="px-3 py-2.5 cpd-row-hover transition-colors"
+                  style={idx > 0 ? { borderTop: '1px solid var(--rule)' } : undefined}
                 >
-                  <span>All</span>
-                  <span className="tabular-nums" style={{ color: kind === "" ? 'var(--glyph-bone)' : 'var(--fg-3)' }}>{allResults.length}</span>
-                </button>
-              </li>
-              {kindCounts.map(([k, c]) => (
-                <li key={k}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setKind(k);
-                      submit(q, k);
-                    }}
-                    className={`w-full text-left text-xs px-2 py-1.5 rounded cpd-hover flex justify-between transition-colors ${
-                      kind === k ? "cpd-filter-active" : ""
-                    }`}
-                    style={kind === k ? undefined : { color: 'var(--fg)' }}
-                  >
-                    <span className="truncate">{k}</span>
-                    <span className="tabular-nums" style={{ color: kind === k ? 'var(--glyph-bone)' : 'var(--fg-3)' }}>{c}</span>
-                  </button>
+                  <Link href={`/n/${encodeURIComponent(r.item.id)}`}>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="font-mono text-[10px]">
+                        {r.item._kind}
+                      </Badge>
+                      <span className="font-mono text-sm truncate hover:underline" style={{ color: 'var(--fg)' }}>
+                        {r.item.id}
+                      </span>
+                    </div>
+                    {r.item.displayName && r.item.displayName !== r.item.id && (
+                      <div className="text-xs mt-0.5 truncate" style={{ color: 'var(--fg-2)' }}>
+                        {r.item.displayName}
+                      </div>
+                    )}
+                    {r.item.description && (
+                      <div className="text-xs line-clamp-2 mt-0.5" style={{ color: 'var(--fg-3)' }}>
+                        {r.item.description}
+                      </div>
+                    )}
+                  </Link>
                 </li>
               ))}
             </ul>
-          </aside>
-
-          <div className="col-span-12 md:col-span-9">
-            {q.trim() === "" ? (
-              <div className="text-sm" style={{ color: 'var(--fg-2)' }}>
-                Type a query above. {corpus.length.toLocaleString()} records indexed.
-              </div>
-            ) : top.length === 0 ? (
-              <div className="text-sm italic" style={{ color: 'var(--fg-2)' }}>
-                No results for &quot;{q}&quot;.
-              </div>
-            ) : (
-              <ul className="rounded-md" style={{ border: '1px solid var(--rule)' }}>
-                {top.map((r, idx) => (
-                  <li
-                    key={r.item.id}
-                    className="px-3 py-2.5 cpd-row-hover transition-colors"
-                    style={idx > 0 ? { borderTop: '1px solid var(--rule)' } : undefined}
-                  >
-                    <Link href={`/n/${encodeURIComponent(r.item.id)}`}>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="font-mono text-[10px]">
-                          {r.item._kind}
-                        </Badge>
-                        <span className="font-mono text-sm truncate hover:underline" style={{ color: 'var(--fg)' }}>
-                          {r.item.id}
-                        </span>
-                      </div>
-                      {r.item.displayName && r.item.displayName !== r.item.id && (
-                        <div className="text-xs mt-0.5 truncate" style={{ color: 'var(--fg-2)' }}>
-                          {r.item.displayName}
-                        </div>
-                      )}
-                      {r.item.description && (
-                        <div className="text-xs line-clamp-2 mt-0.5" style={{ color: 'var(--fg-3)' }}>
-                          {r.item.description}
-                        </div>
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+          )
+        )}
+      </div>
+    </AtlasDocsScaffold>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllRecords, getEdgeKinds, getNodeKinds } from "@a5c-ai/atlas";
+import { AtlasDocsScaffold } from "@/components/AtlasDocsScaffold";
 import { GraphCanvas } from "@/components/GraphCanvas";
 import { Badge } from "@/components/ui/badge";
 
@@ -50,95 +51,77 @@ export default async function GraphPage({
     else out.add(val);
     return out;
   };
+  const activeFilters = [
+    ...(edgeKindFilter ? Array.from(edgeKindFilter).map((k) => `e:${k}`) : []),
+    ...(nodeKindFilter ? Array.from(nodeKindFilter).map((k) => `n:${k}`) : []),
+  ];
 
   return (
-    <div className="max-w-[120rem] mx-auto">
-      <div className="mb-2 flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold" style={{ color: 'var(--fg)' }}>Graph Explorer</h1>
-        <div className="text-xs" style={{ color: 'var(--fg-3)' }}>
-          Use <code className="font-mono px-1 rounded" style={{ background: 'var(--bg-2)' }}>?seed=&lt;id&gt;</code> to start anywhere.
+    <AtlasDocsScaffold
+      runningLeft={<><span className="folio">v</span><span>Graph</span></>}
+      runningTitle={<>Agentic AI Atlas · <em>graph explorer</em></>}
+      runningRight={<><span>{seed}</span><span>a5c.ai</span></>}
+      tocSearchLabel="Search graph filters"
+      tocBookLabel="Atlas · graph"
+      tocTitle="Traversal controls"
+      chapters={[
+        {
+          num: "V.",
+          title: "Current traversal",
+          pages: "pp. 1 - 1",
+          current: true,
+          items: [
+            { label: `Seed · ${seed}`, current: true },
+            { label: `Depth · ${depth}`, href: buildHref({ depth: String(depth) }) },
+            ...edgeKinds.slice(0, 4).map((k) => ({
+              label: k.name,
+              href: buildHref({ edgeKinds: k.name }),
+            })),
+          ],
+        },
+      ]}
+      chapterMark={{ num: "V.", subtitle: "Graph explorer", context: "Traversal", readingTime: `Depth · ${depth}` }}
+      articleTitle={<>Graph <em>explorer</em></>}
+      lead="Traverse the atlas graph from any seed record, narrowing by edge kinds and node kinds when needed."
+      meta={<><span>Seed · {seed}</span><span>Depth · {depth}</span><span>Filters · {activeFilters.length}</span></>}
+      marginSections={[
+        {
+          title: "Active filters",
+          items: activeFilters.length
+            ? activeFilters.map((f) => <p key={f} className="atlas-docs-note">{f}</p>)
+            : [<p key="none" className="atlas-docs-note">No edge or node kind filters applied.</p>],
+        },
+        {
+          title: "Quick routes",
+          items: [
+            <Link key="reset" href="/graph">Reset explorer</Link>,
+            <Link key="search" href="/search">Search for a new seed</Link>,
+          ],
+        },
+      ]}
+    >
+      <div className="atlas-docs-stack">
+        <div className="atlas-docs-panel atlas-docs-full">
+          <div className="atlas-docs-toolbar">
+            {[1, 2, 3].map((d) => (
+              <Link
+                key={d}
+                href={buildHref({ depth: String(d) })}
+                className={depth === d ? "is-active" : undefined}
+              >
+                Depth {d}
+              </Link>
+            ))}
+            <span className="atlas-docs-note">Use <code>?seed=&lt;id&gt;</code> to start anywhere.</span>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-12 gap-4">
-        <aside className="col-span-12 md:col-span-3 space-y-4 text-xs">
-          <div>
-            <div className="font-semibold mb-1" style={{ color: 'var(--fg)' }}>Depth</div>
-            <div className="flex gap-1">
-              {[1, 2, 3].map((d) => (
-                <Link
-                  key={d}
-                  href={buildHref({ depth: String(d) })}
-                  className={`px-2 py-1 rounded cpd-hover transition-colors ${depth === d ? "cpd-filter-active" : ""}`}
-                  style={depth === d ? undefined : { border: '1px solid var(--rule)', color: 'var(--fg)' }}
-                >
-                  {d}
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold mb-1" style={{ color: 'var(--fg)' }}>Seed</div>
-            <div className="font-mono break-all p-2 rounded" style={{ border: '1px solid var(--rule)', background: 'var(--bg-2)', color: 'var(--fg)' }}>{seed}</div>
-          </div>
-          <div>
-            <div className="font-semibold mb-1" style={{ color: 'var(--fg)' }}>EdgeKinds (top 30)</div>
-            <ul className="max-h-64 overflow-y-auto space-y-px">
-              {edgeKinds.map((k) => {
-                const active = edgeKindFilter?.has(k.name);
-                const next = toggleSet(edgeKindFilter, k.name);
-                return (
-                  <li key={k.name}>
-                    <Link
-                      href={buildHref({
-                        edgeKinds: next.size ? Array.from(next).join(",") : undefined,
-                      })}
-                      className={`flex justify-between px-2 py-1 rounded cpd-hover transition-colors ${active ? "cpd-filter-active" : ""}`}
-                    >
-                      <span className="truncate">{k.name}</span>
-                      <span className="tabular-nums" style={{ color: active ? 'var(--glyph-bone)' : 'var(--fg-3)' }}>{k.count}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <div>
-            <div className="font-semibold mb-1" style={{ color: 'var(--fg)' }}>NodeKinds (top 30)</div>
-            <ul className="max-h-64 overflow-y-auto space-y-px">
-              {nodeKinds.map((k) => {
-                const active = nodeKindFilter?.has(k.name);
-                const next = toggleSet(nodeKindFilter, k.name);
-                return (
-                  <li key={k.name}>
-                    <Link
-                      href={buildHref({
-                        nodeKinds: next.size ? Array.from(next).join(",") : undefined,
-                      })}
-                      className={`flex justify-between px-2 py-1 rounded cpd-hover transition-colors ${active ? "cpd-filter-active" : ""}`}
-                    >
-                      <span className="truncate">{k.name}</span>
-                      <span className="tabular-nums" style={{ color: active ? 'var(--glyph-bone)' : 'var(--fg-3)' }}>{k.count}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {edgeKindFilter && Array.from(edgeKindFilter).map((k) => (
-              <Badge key={`e-${k}`} variant="outline">e:{k}</Badge>
-            ))}
-            {nodeKindFilter && Array.from(nodeKindFilter).map((k) => (
-              <Badge key={`n-${k}`} variant="outline">n:{k}</Badge>
-            ))}
-          </div>
-          <Link href="/graph" className="text-xs underline" style={{ color: 'var(--fg-3)' }}>
-            Reset
-          </Link>
-        </aside>
+        <div className="atlas-docs-panel atlas-docs-full">
+          <p className="atlas-docs-note">Seed</p>
+          <p className="font-mono">{seed}</p>
+        </div>
 
-        <div className="col-span-12 md:col-span-9">
+        <div className="atlas-docs-full">
           <GraphCanvas
             seed={seed}
             depth={depth}
@@ -146,7 +129,58 @@ export default async function GraphPage({
             nodeKindFilter={nodeKindFilter}
           />
         </div>
+
+        <div className="atlas-docs-grid atlas-docs-grid--2 atlas-docs-full">
+          <div className="atlas-docs-panel">
+            <h3>EdgeKinds</h3>
+            <div className="atlas-docs-link-list">
+              {edgeKinds.slice(0, 12).map((k) => {
+                const active = edgeKindFilter?.has(k.name);
+                const next = toggleSet(edgeKindFilter, k.name);
+                return (
+                  <Link
+                    key={k.name}
+                    href={buildHref({ edgeKinds: next.size ? Array.from(next).join(",") : undefined })}
+                    style={{ color: active ? "var(--tk-cinnabar)" : undefined }}
+                  >
+                    {k.name} · {k.count}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="atlas-docs-panel">
+            <h3>NodeKinds</h3>
+            <div className="atlas-docs-link-list">
+              {nodeKinds.slice(0, 12).map((k) => {
+                const active = nodeKindFilter?.has(k.name);
+                const next = toggleSet(nodeKindFilter, k.name);
+                return (
+                  <Link
+                    key={k.name}
+                    href={buildHref({ nodeKinds: next.size ? Array.from(next).join(",") : undefined })}
+                    style={{ color: active ? "var(--tk-cinnabar)" : undefined }}
+                  >
+                    {k.name} · {k.count}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {activeFilters.length > 0 && (
+          <div className="atlas-docs-pillrow atlas-docs-full">
+            {edgeKindFilter && Array.from(edgeKindFilter).map((k) => (
+              <Badge key={`e-${k}`} variant="outline">e:{k}</Badge>
+            ))}
+            {nodeKindFilter && Array.from(nodeKindFilter).map((k) => (
+              <Badge key={`n-${k}`} variant="outline">n:{k}</Badge>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </AtlasDocsScaffold>
   );
 }

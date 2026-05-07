@@ -1,31 +1,70 @@
 import Link from "next/link";
 import { getEdgeKinds } from "@a5c-ai/atlas";
 import { Badge } from "@/components/ui/badge";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { AtlasDocsScaffold } from "@/components/AtlasDocsScaffold";
 
 export default function EdgesIndexPage() {
   const ek = getEdgeKinds();
   const sorted = Object.values(ek).sort((a, b) => b.count - a.count);
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "EdgeKinds" }]} />
-      <h1 className="text-xl font-semibold mt-2 mb-4" style={{ color: 'var(--fg)' }}>EdgeKinds ({sorted.length})</h1>
-      <div className="rounded-md overflow-hidden" style={{ border: '1px solid var(--rule)' }}>
-        <table className="w-full text-xs">
-          <thead className="text-left" style={{ background: 'var(--bg-2)', color: 'var(--fg-2)' }}>
+    <AtlasDocsScaffold
+      runningLeft={<><span className="folio">iv</span><span>Edges</span></>}
+      runningTitle={<>Agentic AI Atlas · <em>edge kinds</em></>}
+      runningRight={<><span>{sorted.length} kinds</span><span>a5c.ai</span></>}
+      tocSearchLabel="Search edge kinds"
+      tocBookLabel="Atlas · edge index"
+      tocTitle="Most used edge kinds"
+      chapters={[
+        {
+          num: "IV.",
+          title: "Edge ledger",
+          pages: "pp. 1 - 1",
+          current: true,
+          items: sorted.slice(0, 8).map((k, index) => ({
+            label: `${k.name} · ${k.count}`,
+            href: `/edges/${encodeURIComponent(k.name)}`,
+            current: index === 0 ? undefined : false,
+          })),
+        },
+      ]}
+      chapterMark={{ num: "IV.", subtitle: "Edge catalog", context: "All edge kinds", readingTime: "Index · live" }}
+      articleTitle={<>Edge kind <em>ledger</em></>}
+      lead={`Browse ${sorted.length.toLocaleString()} edge kinds, their domains, and their observed graph counts.`}
+      meta={<><span>EdgeKinds · {sorted.length}</span><span>Sorted by usage</span></>}
+      marginSections={[
+        {
+          title: "Quick routes",
+          items: [
+            <Link key="home" href="/">Atlas overview</Link>,
+            <Link key="graph" href="/graph">Graph explorer</Link>,
+            <Link key="search" href="/search">Search records</Link>,
+          ],
+        },
+        {
+          title: "Notes",
+          items: [
+            <p key="note-1" className="atlas-docs-note">Counts reflect the current graph snapshot.</p>,
+            <p key="note-2" className="atlas-docs-note">Open an edge kind to inspect every connected pair.</p>,
+          ],
+        },
+      ]}
+    >
+      <div className="atlas-docs-ledger atlas-docs-full">
+        <table>
+          <thead>
             <tr>
-              <th className="px-3 py-2.5 font-medium">name</th>
-              <th className="px-3 py-2.5 font-medium">source</th>
-              <th className="px-3 py-2.5 font-medium">target</th>
-              <th className="px-3 py-2.5 font-medium">cardinality</th>
-              <th className="px-3 py-2.5 font-medium text-right">count</th>
+              <th>name</th>
+              <th>source</th>
+              <th>target</th>
+              <th>cardinality</th>
+              <th className="text-right">count</th>
             </tr>
           </thead>
           <tbody>
             {sorted.map((k) => (
-              <tr key={k.name} className="cpd-row-hover transition-colors" style={{ borderTop: '1px solid var(--rule)' }}>
-                <td className="px-3 py-2">
+              <tr key={k.name}>
+                <td>
                   <Link
                     href={`/edges/${encodeURIComponent(k.name)}`}
                     className="font-mono hover:underline"
@@ -34,21 +73,21 @@ export default function EdgesIndexPage() {
                     {k.name}
                   </Link>
                 </td>
-                <td className="px-3 py-2" style={{ color: 'var(--fg-3)' }}>
+                <td style={{ color: 'var(--fg-3)' }}>
                   {Array.isArray(k.source) ? k.source.join(", ") : k.source ?? "—"}
                 </td>
-                <td className="px-3 py-2" style={{ color: 'var(--fg-3)' }}>
+                <td style={{ color: 'var(--fg-3)' }}>
                   {Array.isArray(k.target) ? k.target.join(", ") : k.target ?? "—"}
                 </td>
-                <td className="px-3 py-2" style={{ color: 'var(--fg-3)' }}>
+                <td style={{ color: 'var(--fg-3)' }}>
                   {k.cardinality ? <Badge variant="outline">{k.cardinality}</Badge> : "—"}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums" style={{ color: 'var(--brass)' }}>{k.count}</td>
+                <td className="text-right tabular-nums" style={{ color: 'var(--brass)' }}>{k.count}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
+    </AtlasDocsScaffold>
   );
 }

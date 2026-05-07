@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEdgeKinds, getIndex, getRecord, getDisplayName } from "@a5c-ai/atlas";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { AtlasDocsScaffold } from "@/components/AtlasDocsScaffold";
 
 const PAGE_SIZE = 100;
 
@@ -25,97 +25,108 @@ export default async function EdgeKindPage({
   const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
   const start = (page - 1) * PAGE_SIZE;
   const slice = all.slice(start, start + PAGE_SIZE);
+  const sourceKinds = Array.isArray(def.source) ? def.source.join(", ") : def.source ?? "—";
+  const targetKinds = Array.isArray(def.target) ? def.target.join(", ") : def.target ?? "—";
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "EdgeKinds", href: "/edges" },
-          { label: edgeKind },
-        ]}
-      />
-      <h1 className="text-xl font-semibold mt-2 mb-1 font-mono" style={{ color: 'var(--fg)' }}>{edgeKind}</h1>
-      {def.description && (
-        <p className="text-xs mb-3 max-w-3xl" style={{ color: 'var(--fg-2)' }}>
-          {String(def.description).slice(0, 400)}
-        </p>
-      )}
-      <div className="text-xs mb-4" style={{ color: 'var(--fg-3)' }}>
-        {all.length.toLocaleString()} wired pair{all.length === 1 ? "" : "s"}
-        {def.cardinality ? ` · cardinality ${def.cardinality}` : ""}
-      </div>
-
-      <div className="rounded-md overflow-hidden" style={{ border: '1px solid var(--rule)' }}>
-        <table className="w-full text-xs">
-          <thead className="text-left" style={{ background: 'var(--bg-2)', color: 'var(--fg-2)' }}>
-            <tr>
-              <th className="px-3 py-2.5 font-medium">from</th>
-              <th className="px-3 py-2.5 font-medium">to</th>
-              <th className="px-3 py-2.5 font-medium">to kind</th>
-            </tr>
-          </thead>
-          <tbody>
-            {slice.map((e, i) => {
-              const fromRec = getRecord(e.from);
-              const toRec = getRecord(e.to);
-              return (
-                <tr key={i} className="cpd-row-hover transition-colors" style={{ borderTop: '1px solid var(--rule)' }}>
-                  <td className="px-3 py-2 font-mono">
-                    <Link
-                      href={`/n/${encodeURIComponent(e.from)}`}
-                      className="hover:underline"
-                      style={{ color: 'var(--fg)' }}
-                      title={fromRec ? getDisplayName(fromRec) : ""}
-                    >
-                      {e.from}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-2 font-mono">
-                    <Link
-                      href={`/n/${encodeURIComponent(e.to)}`}
-                      className="hover:underline"
-                      style={{ color: 'var(--fg)' }}
-                      title={toRec ? getDisplayName(toRec) : ""}
-                    >
-                      {e.to}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-2" style={{ color: 'var(--fg-3)' }}>{toRec?._kind ?? "—"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-3 text-xs">
-          <div style={{ color: 'var(--fg-3)' }}>
-            Page {page} of {totalPages}
-          </div>
-          <div className="flex gap-2">
-            {page > 1 && (
-              <Link
-                href={`/edges/${encodeURIComponent(edgeKind)}?page=${page - 1}`}
-                className="px-2 py-1 rounded cpd-hover transition-colors"
-                style={{ border: '1px solid var(--rule)', color: 'var(--fg)' }}
-              >
-                Prev
-              </Link>
-            )}
-            {page < totalPages && (
-              <Link
-                href={`/edges/${encodeURIComponent(edgeKind)}?page=${page + 1}`}
-                className="px-2 py-1 rounded cpd-hover transition-colors"
-                style={{ border: '1px solid var(--rule)', color: 'var(--fg)' }}
-              >
-                Next
-              </Link>
-            )}
-          </div>
+    <AtlasDocsScaffold
+      runningLeft={<><span className="folio">iv</span><span>Edge detail</span></>}
+      runningTitle={<>Agentic AI Atlas · <em>{edgeKind}</em></>}
+      runningRight={<><span>{all.length.toLocaleString()} pairs</span><span>a5c.ai</span></>}
+      tocSearchLabel="Search edge kinds"
+      tocBookLabel="Atlas · edge detail"
+      tocTitle="Current ledger and paging"
+      chapters={[
+        {
+          num: "IV.",
+          title: "Current edge kind",
+          pages: `pp. ${page} - ${page}`,
+          current: true,
+          items: [
+            { label: edgeKind, current: true },
+            ...(page > 1 ? [{ label: "Prev page", href: `/edges/${encodeURIComponent(edgeKind)}?page=${page - 1}` }] : []),
+            ...(page < totalPages ? [{ label: "Next page", href: `/edges/${encodeURIComponent(edgeKind)}?page=${page + 1}` }] : []),
+          ],
+        },
+      ]}
+      chapterMark={{ num: "IV.", subtitle: "Edge detail", context: edgeKind, readingTime: `Page ${page} of ${totalPages}` }}
+      articleTitle={<><span className="font-mono">{edgeKind}</span> <em>ledger</em></>}
+      lead={def.description ? String(def.description).slice(0, 220) : `Inspect every wired pair currently using ${edgeKind}.`}
+      meta={<><span>Pairs · {all.length.toLocaleString()}</span>{def.cardinality ? <span>Cardinality · {def.cardinality}</span> : null}</>}
+      marginSections={[
+        {
+          title: "Definition",
+          items: [
+            <p key="source" className="atlas-docs-note">Source · {sourceKinds}</p>,
+            <p key="target" className="atlas-docs-note">Target · {targetKinds}</p>,
+            <p key="cardinality" className="atlas-docs-note">Cardinality · {def.cardinality ?? "—"}</p>,
+          ],
+        },
+        {
+          title: "Navigate",
+          items: [
+            <Link key="all-edges" href="/edges">Back to edge kinds</Link>,
+            <Link key="graph" href={`/graph?edgeKinds=${encodeURIComponent(edgeKind)}`}>Open filtered graph</Link>,
+          ],
+        },
+      ]}
+    >
+      <div className="atlas-docs-stack">
+        <div className="atlas-docs-ledger atlas-docs-full">
+          <table>
+            <thead>
+              <tr>
+                <th>from</th>
+                <th>to</th>
+                <th>to kind</th>
+              </tr>
+            </thead>
+            <tbody>
+              {slice.map((e, i) => {
+                const fromRec = getRecord(e.from);
+                const toRec = getRecord(e.to);
+                return (
+                  <tr key={i}>
+                    <td className="font-mono">
+                      <Link
+                        href={`/n/${encodeURIComponent(e.from)}`}
+                        className="hover:underline"
+                        style={{ color: 'var(--fg)' }}
+                        title={fromRec ? getDisplayName(fromRec) : ""}
+                      >
+                        {e.from}
+                      </Link>
+                    </td>
+                    <td className="font-mono">
+                      <Link
+                        href={`/n/${encodeURIComponent(e.to)}`}
+                        className="hover:underline"
+                        style={{ color: 'var(--fg)' }}
+                        title={toRec ? getDisplayName(toRec) : ""}
+                      >
+                        {e.to}
+                      </Link>
+                    </td>
+                    <td style={{ color: 'var(--fg-3)' }}>{toRec?._kind ?? "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-      )}
-    </div>
+
+        {totalPages > 1 && (
+          <div className="atlas-docs-toolbar atlas-docs-full">
+            {page > 1 && (
+              <Link href={`/edges/${encodeURIComponent(edgeKind)}?page=${page - 1}`}>Prev</Link>
+            )}
+            <span className="atlas-docs-note">Page {page} of {totalPages}</span>
+            {page < totalPages && (
+              <Link href={`/edges/${encodeURIComponent(edgeKind)}?page=${page + 1}`}>Next</Link>
+            )}
+          </div>
+        )}
+      </div>
+    </AtlasDocsScaffold>
   );
 }

@@ -434,8 +434,212 @@ html[data-theme="void"] .atlas-docs-table-wrap {
   font-size: 12.5px;
 }
 
+.atlas-docs-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.atlas-docs-full {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  column-span: all;
+}
+
+.atlas-docs-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.atlas-docs-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.atlas-docs-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.atlas-docs-panel,
+.atlas-docs-ledger {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  border: 1px solid color-mix(in oklab, var(--tk-line) 16%, transparent);
+  background: color-mix(in oklab, var(--tk-paper-2) 78%, white 22%);
+}
+
+.atlas-docs-panel {
+  padding: 16px 18px;
+}
+
+.atlas-docs-panel h3,
+.atlas-docs-ledger h3 {
+  margin: 0 0 10px;
+}
+
+.atlas-docs-panel p,
+.atlas-docs-panel ul,
+.atlas-docs-panel ol {
+  margin: 0;
+}
+
+.atlas-docs-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 12px;
+}
+
+.atlas-docs-kpi {
+  padding: 14px 16px;
+  border: 1px solid color-mix(in oklab, var(--tk-line) 16%, transparent);
+  background: color-mix(in oklab, var(--tk-paper-2) 74%, white 26%);
+}
+
+.atlas-docs-kpi span {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tk-line-soft);
+}
+
+.atlas-docs-kpi strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--tk-cinnabar);
+}
+
+.atlas-docs-toolbar,
+.atlas-docs-pillrow,
+.atlas-docs-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.atlas-docs-actions a,
+.atlas-docs-actions button,
+.atlas-docs-toolbar a,
+.atlas-docs-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in oklab, var(--tk-line) 18%, transparent);
+  background: transparent;
+  color: var(--tk-line);
+  font-size: 12px;
+  text-decoration: none;
+  transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.atlas-docs-actions a:hover,
+.atlas-docs-actions a:focus-visible,
+.atlas-docs-actions button:hover,
+.atlas-docs-actions button:focus-visible,
+.atlas-docs-toolbar a:hover,
+.atlas-docs-toolbar a:focus-visible,
+.atlas-docs-toolbar button:hover,
+.atlas-docs-toolbar button:focus-visible {
+  outline: none;
+  border-color: color-mix(in oklab, var(--tk-cinnabar) 32%, transparent);
+  background: color-mix(in oklab, var(--tk-cinnabar) 9%, transparent);
+  color: var(--tk-line);
+}
+
+.atlas-docs-toolbar .is-active,
+.atlas-docs-actions .is-active {
+  border-color: color-mix(in oklab, var(--tk-cinnabar) 36%, transparent);
+  background: color-mix(in oklab, var(--tk-cinnabar) 12%, transparent);
+  color: var(--tk-cinnabar);
+}
+
+.atlas-docs-ledger {
+  overflow: hidden;
+}
+
+.atlas-docs-ledger table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.atlas-docs-ledger th,
+.atlas-docs-ledger td {
+  padding: 10px 12px;
+  border-top: 1px solid color-mix(in oklab, var(--tk-line) 12%, transparent);
+  font-size: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.atlas-docs-ledger thead th {
+  border-top: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tk-line-soft);
+  background: color-mix(in oklab, var(--tk-paper-2) 86%, white 14%);
+}
+
+.atlas-docs-ledger tbody tr:hover {
+  background: color-mix(in oklab, var(--tk-cinnabar) 6%, transparent);
+}
+
+.atlas-docs-link-list {
+  display: grid;
+  gap: 8px;
+}
+
+.atlas-docs-link-list a {
+  color: var(--tk-cinnabar);
+  text-decoration: none;
+}
+
+.atlas-docs-link-list a:hover,
+.atlas-docs-link-list a:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
 html[data-theme="void"] .atlas-docs-note {
   color: color-mix(in oklab, var(--glyph-bone) 74%, var(--glyph-fade));
+}
+
+html[data-theme="void"] .atlas-docs-panel,
+html[data-theme="void"] .atlas-docs-ledger,
+html[data-theme="void"] .atlas-docs-kpi {
+  border-color: color-mix(in oklab, var(--glyph-fade) 18%, transparent);
+  background: color-mix(in oklab, var(--ground-ink) 88%, var(--ground-void));
+}
+
+html[data-theme="void"] .atlas-docs-kpi span,
+html[data-theme="void"] .atlas-docs-ledger thead th {
+  color: color-mix(in oklab, var(--glyph-bone) 60%, var(--glyph-fade));
+}
+
+html[data-theme="void"] .atlas-docs-actions a,
+html[data-theme="void"] .atlas-docs-actions button,
+html[data-theme="void"] .atlas-docs-toolbar a,
+html[data-theme="void"] .atlas-docs-toolbar button {
+  border-color: color-mix(in oklab, var(--glyph-fade) 22%, transparent);
+  color: color-mix(in oklab, var(--glyph-bone) 72%, var(--glyph-fade));
+}
+
+html[data-theme="void"] .atlas-docs-actions a:hover,
+html[data-theme="void"] .atlas-docs-actions a:focus-visible,
+html[data-theme="void"] .atlas-docs-actions button:hover,
+html[data-theme="void"] .atlas-docs-actions button:focus-visible,
+html[data-theme="void"] .atlas-docs-toolbar a:hover,
+html[data-theme="void"] .atlas-docs-toolbar a:focus-visible,
+html[data-theme="void"] .atlas-docs-toolbar button:hover,
+html[data-theme="void"] .atlas-docs-toolbar button:focus-visible {
+  color: var(--glyph-bone);
 }
 
 html[data-theme="void"] .mk-docs {

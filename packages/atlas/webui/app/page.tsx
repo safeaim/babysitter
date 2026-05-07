@@ -5,6 +5,7 @@ import {
   getRecordsByKind,
   getStats,
 } from "@a5c-ai/atlas";
+import { AtlasDocsScaffold } from "@/components/AtlasDocsScaffold";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -17,42 +18,108 @@ export default function Home() {
   const sortedClusters = Object.entries(clusters).sort(
     (a, b) => b[1].recordCount - a[1].recordCount
   );
+  const topClusters = sortedClusters.slice(0, 6);
+  const clusterId = (cluster: string) => `cluster-${cluster.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>Agentic AI Atlas</h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--fg-2)' }}>
-          Browse the Atlas catalog: {stats.totalRecords.toLocaleString()} records across{" "}
-          {stats.totalNodeKinds} node kinds and {stats.totalEdgeKinds} edge kinds.
-        </p>
-      </div>
+    <AtlasDocsScaffold
+      runningLeft={
+        <>
+          <span className="folio">i</span>
+          <span>Overview</span>
+        </>
+      }
+      runningTitle={
+        <>
+          Agentic AI Atlas · <em>catalog</em>
+        </>
+      }
+      runningRight={
+        <>
+          <span>{stats.totalRecords.toLocaleString()} records</span>
+          <span>a5c.ai</span>
+        </>
+      }
+      tocSearchLabel="Search the atlas"
+      tocBookLabel="Atlas · overview"
+      tocTitle="Clusters and node kinds"
+      chapters={[
+        {
+          num: "I.",
+          title: "Catalog overview",
+          pages: "pp. 1 - 1",
+          current: true,
+          items: [
+            { label: "Atlas catalog", current: true },
+            ...topClusters.map(([cluster]) => ({
+              label: cluster,
+              href: `#${clusterId(cluster)}`,
+            })),
+          ],
+        },
+      ]}
+      chapterMark={{
+        num: "I.",
+        subtitle: "Atlas catalog",
+        context: "Overview",
+        readingTime: "Index · live",
+      }}
+      articleTitle={
+        <>
+          Agentic AI Atlas <em>overview</em>
+        </>
+      }
+      lead={`Browse ${stats.totalRecords.toLocaleString()} records across ${stats.totalNodeKinds} node kinds and ${stats.totalEdgeKinds} edge kinds.`}
+      meta={
+        <>
+          <span>Clusters · {stats.totalClusters}</span>
+          <span>Wiki pages · {pageCount}</span>
+          <span>Read-only atlas index</span>
+        </>
+      }
+      marginSections={[
+        {
+          title: "Quick routes",
+          items: [
+            <Link key="search" href="/search">Search records</Link>,
+            <Link key="graph" href="/graph">Open graph explorer</Link>,
+            <Link key="edges" href="/edges">Browse edge kinds</Link>,
+            <Link key="wiki" href="/wiki">Open wiki</Link>,
+          ],
+        },
+        {
+          title: "Coverage",
+          items: [
+            <p key="records" className="atlas-docs-note">Records · {stats.totalRecords.toLocaleString()}</p>,
+            <p key="kinds" className="atlas-docs-note">NodeKinds · {stats.totalNodeKinds.toLocaleString()}</p>,
+            <p key="edgeKinds" className="atlas-docs-note">EdgeKinds · {stats.totalEdgeKinds.toLocaleString()}</p>,
+          ],
+        },
+      ]}
+    >
+      <div className="atlas-docs-stack">
+        <div className="atlas-docs-kpis atlas-docs-full">
+          <StatCard label="Records" value={stats.totalRecords} />
+          <StatCard label="NodeKinds" value={stats.totalNodeKinds} />
+          <StatCard label="EdgeKinds" value={stats.totalEdgeKinds} />
+          <StatCard label="Clusters" value={stats.totalClusters} />
+          <StatCard label="Wiki Pages" value={pageCount} />
+        </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <StatCard label="Records" value={stats.totalRecords} />
-        <StatCard label="NodeKinds" value={stats.totalNodeKinds} />
-        <StatCard label="EdgeKinds" value={stats.totalEdgeKinds} />
-        <StatCard label="Clusters" value={stats.totalClusters} />
-        <StatCard label="Wiki Pages" value={pageCount} />
-      </div>
-
-      <div className="space-y-6">
         {sortedClusters.map(([cluster, def]) => (
-          <section key={cluster}>
-            <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--fg-3)' }}>
-              {cluster}
-              <span className="ml-2 text-xs font-normal normal-case tracking-normal">
-                ({def.recordCount.toLocaleString()} records)
-              </span>
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <section key={cluster} id={clusterId(cluster)} className="atlas-docs-full atlas-docs-stack">
+            <div>
+              <h3>{cluster}</h3>
+              <p className="atlas-docs-note">{def.recordCount.toLocaleString()} records across {def.nodeKinds.length} node kinds.</p>
+            </div>
+            <div className="atlas-docs-grid atlas-docs-grid--3">
               {def.nodeKinds.map((nk) => {
                 const def_ = nodeKinds[nk];
                 const samples = getRecordsByKind(nk).slice(0, 3);
                 return (
                   <Card key={nk} className="transition-colors">
                     <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <CardTitle className="text-sm">
                           <Link href={`/kind/${encodeURIComponent(nk)}`} className="hover:underline" style={{ color: 'var(--brass)' }}>
                             {nk}
@@ -90,23 +157,21 @@ export default function Home() {
             </div>
           </section>
         ))}
-      </div>
 
-      <footer className="text-xs pt-4" style={{ borderTop: '1px solid var(--rule)', color: 'var(--fg-3)' }}>
-        Read-only. Graph data, SDK, CLI, and wiki pages are served from{" "}
-        <code className="font-mono px-1 py-0.5 rounded" style={{ background: 'var(--bg-2)' }}>@a5c-ai/atlas</code>.
-      </footer>
-    </div>
+        <footer className="atlas-docs-full text-xs pt-4" style={{ borderTop: '1px solid var(--rule)', color: 'var(--fg-3)' }}>
+          Read-only. Graph data, SDK, CLI, and wiki pages are served from{" "}
+          <code className="font-mono px-1 py-0.5 rounded" style={{ background: 'var(--bg-2)' }}>@a5c-ai/atlas</code>.
+        </footer>
+      </div>
+    </AtlasDocsScaffold>
   );
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="text-xs uppercase tracking-wider" style={{ color: 'var(--fg-3)' }}>{label}</div>
-        <div className="text-2xl font-semibold tabular-nums mt-1" style={{ color: 'var(--brass)' }}>{value.toLocaleString()}</div>
-      </CardContent>
-    </Card>
+    <div className="atlas-docs-kpi">
+      <span>{label}</span>
+      <strong>{value.toLocaleString()}</strong>
+    </div>
   );
 }

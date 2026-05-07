@@ -64,6 +64,12 @@ export default async function RecordPage({
     }
     return t === "overview" ? basePath : `${basePath}?tab=${t}`;
   };
+  const tabItems = (["overview", ...(hasArticle ? ["article"] : []), "json", "graph"] as const).map((t) => ({
+    label: t,
+    href: baseTabHref(t),
+    current: tabActive === t,
+  }));
+  const recordTitle = getDisplayName(rec);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -107,40 +113,55 @@ export default async function RecordPage({
       </div>
 
       {tabActive === "overview" && (
-        <div className="grid grid-cols-12 gap-6">
-          <section className="col-span-12 md:col-span-7">
-            <h2 className="text-sm font-semibold mb-2" style={{ color: 'var(--fg-2)' }}>Attributes</h2>
-            <AttributeTable attributes={rec as Record<string, unknown>} />
-          </section>
-          <section className="col-span-12 md:col-span-5 space-y-4">
-            {relatedPages.length > 0 && (
-              <div>
-                <h2 className="text-sm font-semibold mb-2" style={{ color: 'var(--fg-2)' }}>Wiki pages</h2>
-                <ul className="space-y-1">
-                  {relatedPages.map((page) => (
-                    <li key={page.id} className="text-xs">
-                      <Link href={`/wiki/${String(page.slug ?? "").split("/").map(encodeURIComponent).join("/")}`} className="hover:underline" style={{ color: 'var(--brass)' }}>
-                        {String(page.title ?? page.id)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+        <AtlasDocsScaffold
+          runningLeft={<><span className="folio">ii</span><span>Record</span></>}
+          runningTitle={<>Agentic AI Atlas · <em>{recordTitle}</em></>}
+          runningRight={<><span>{id}</span><span>a5c.ai</span></>}
+          tocSearchLabel="Search record views"
+          tocBookLabel="Record · tabs"
+          tocTitle="Available views"
+          chapters={[{ num: "II.", title: "Record views", pages: "pp. 1 - 1", current: true, items: tabItems }]}
+          chapterMark={{ num: "II.", subtitle: `${rec._kind} overview`, context: id, readingTime: "Reference · live" }}
+          articleTitle={<>{recordTitle} <em>overview</em></>}
+          lead={`Inspect the raw attributes, linked wiki pages, and inbound or outbound graph edges for ${id}.`}
+          meta={<><Badge variant="secondary">{rec._kind}</Badge><span>Outgoing · {out.length}</span><span>Incoming · {inc.length}</span></>}
+          marginSections={[
+            {
+              title: "Related pages",
+              items: relatedPages.length
+                ? relatedPages.slice(0, 8).map((page) => (
+                    <Link key={page.id} href={`/wiki/${String(page.slug ?? "").split("/").map(encodeURIComponent).join("/")}`}>
+                      {String(page.title ?? page.id)}
+                    </Link>
+                  ))
+                : [<p key="no-pages" className="atlas-docs-note">No related wiki pages for this record.</p>],
+            },
+            {
+              title: "Shortcuts",
+              items: [
+                <Link key="graph" href={`/graph?seed=${encodeURIComponent(id)}`}>Open in graph</Link>,
+                <Link key="kind" href={`/kind/${encodeURIComponent(rec._kind)}`}>Browse node kind</Link>,
+              ],
+            },
+          ]}
+        >
+          <div className="atlas-docs-grid atlas-docs-grid--2 atlas-docs-full">
+            <section className="atlas-docs-panel">
+              <h3>Attributes</h3>
+              <AttributeTable attributes={rec as Record<string, unknown>} />
+            </section>
+            <section className="atlas-docs-stack">
+              <div className="atlas-docs-panel">
+                <h3>Outgoing edges</h3>
+                <EdgeList edges={out} direction="outgoing" />
               </div>
-            )}
-            <div>
-              <h2 className="text-sm font-semibold mb-2" style={{ color: 'var(--fg-2)' }}>
-                Outgoing edges <span className="text-xs" style={{ color: 'var(--fg-3)' }}>({out.length})</span>
-              </h2>
-              <EdgeList edges={out} direction="outgoing" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold mb-2" style={{ color: 'var(--fg-2)' }}>
-                Incoming edges <span className="text-xs" style={{ color: 'var(--fg-3)' }}>({inc.length})</span>
-              </h2>
-              <EdgeList edges={inc} direction="incoming" />
-            </div>
-          </section>
-        </div>
+              <div className="atlas-docs-panel">
+                <h3>Incoming edges</h3>
+                <EdgeList edges={inc} direction="incoming" />
+              </div>
+            </section>
+          </div>
+        </AtlasDocsScaffold>
       )}
 
       {tabActive === "article" && articlePage && (
@@ -242,39 +263,84 @@ export default async function RecordPage({
       )}
 
       {tabActive === "json" && (
-        <pre
-          className="text-xs font-mono rounded-md p-4 overflow-x-auto"
-          style={{
-            background: 'var(--ground-ink)',
-            border: '1px solid var(--rule)',
-            color: 'var(--glyph-bone)',
-          }}
-        >
-          {JSON.stringify(
+        <AtlasDocsScaffold
+          runningLeft={<><span className="folio">ii</span><span>Record</span></>}
+          runningTitle={<>Agentic AI Atlas · <em>{recordTitle}</em></>}
+          runningRight={<><span>{id}</span><span>a5c.ai</span></>}
+          tocSearchLabel="Search record views"
+          tocBookLabel="Record · tabs"
+          tocTitle="Available views"
+          chapters={[{ num: "II.", title: "Record views", pages: "pp. 1 - 1", current: true, items: tabItems }]}
+          chapterMark={{ num: "II.", subtitle: `${rec._kind} JSON`, context: id, readingTime: "Structured · live" }}
+          articleTitle={<>{recordTitle} <em>json</em></>}
+          lead="Inspect the normalized record payload exactly as the atlas UI reads it."
+          meta={<><span>File · {rec._file}</span><span>Cluster · {rec._cluster}</span></>}
+          marginSections={[
             {
-              id,
-              _kind: rec._kind,
-              _file: rec._file,
-              _cluster: rec._cluster,
-              attributes: Object.fromEntries(
-                Object.entries(rec).filter(([k]) => !k.startsWith("_") && k !== "id")
-              ),
-              outgoingEdges: out,
-              incomingEdges: inc,
+              title: "Shortcuts",
+              items: [
+                <Link key="overview" href={baseTabHref("overview")}>Back to overview</Link>,
+                <Link key="graph" href={baseTabHref("graph")}>Open graph tab</Link>,
+              ],
             },
-            null,
-            2
-          )}
-        </pre>
+          ]}
+        >
+          <pre
+            className="atlas-docs-pre atlas-docs-full"
+          >
+            <code>
+              {JSON.stringify(
+                {
+                  id,
+                  _kind: rec._kind,
+                  _file: rec._file,
+                  _cluster: rec._cluster,
+                  attributes: Object.fromEntries(
+                    Object.entries(rec).filter(([k]) => !k.startsWith("_") && k !== "id")
+                  ),
+                  outgoingEdges: out,
+                  incomingEdges: inc,
+                },
+                null,
+                2
+              )}
+            </code>
+          </pre>
+        </AtlasDocsScaffold>
       )}
 
       {tabActive === "graph" && (
-        <MiniGraph
-          centerId={id}
-          centerKind={rec._kind}
-          outgoing={out.map((e) => ({ to: e.to, kind: e.kind, toKind: getRecord(e.to)?._kind }))}
-          incoming={inc.map((e) => ({ from: e.from, kind: e.kind, fromKind: getRecord(e.from)?._kind }))}
-        />
+        <AtlasDocsScaffold
+          runningLeft={<><span className="folio">ii</span><span>Record</span></>}
+          runningTitle={<>Agentic AI Atlas · <em>{recordTitle}</em></>}
+          runningRight={<><span>{id}</span><span>a5c.ai</span></>}
+          tocSearchLabel="Search record views"
+          tocBookLabel="Record · tabs"
+          tocTitle="Available views"
+          chapters={[{ num: "II.", title: "Record views", pages: "pp. 1 - 1", current: true, items: tabItems }]}
+          chapterMark={{ num: "II.", subtitle: `${rec._kind} graph`, context: id, readingTime: "Neighborhood · live" }}
+          articleTitle={<>{recordTitle} <em>graph</em></>}
+          lead="View the immediate incoming and outgoing neighborhood around this record without leaving the record detail surface."
+          meta={<><span>Outgoing · {out.length}</span><span>Incoming · {inc.length}</span></>}
+          marginSections={[
+            {
+              title: "Shortcuts",
+              items: [
+                <Link key="full-graph" href={`/graph?seed=${encodeURIComponent(id)}`}>Open full graph explorer</Link>,
+                <Link key="article" href={hasArticle ? baseTabHref("article") : baseTabHref("overview")}>Open reference article</Link>,
+              ],
+            },
+          ]}
+        >
+          <div className="atlas-docs-full">
+            <MiniGraph
+              centerId={id}
+              centerKind={rec._kind}
+              outgoing={out.map((e) => ({ to: e.to, kind: e.kind, toKind: getRecord(e.to)?._kind }))}
+              incoming={inc.map((e) => ({ from: e.from, kind: e.kind, fromKind: getRecord(e.from)?._kind }))}
+            />
+          </div>
+        </AtlasDocsScaffold>
       )}
     </div>
   );

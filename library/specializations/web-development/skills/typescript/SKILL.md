@@ -5,7 +5,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 graph:
   domains: [domain:web-development]
   specializations: [specialization:web-development]
-  skillAreas: [skill-area:react-components, skill-area:code-analysis-linting]
+  skillAreas: [skill-area:typescript-generic-programming, skill-area:code-analysis-linting]
   roles: [role:frontend-engineer, role:fullstack-engineer]
   topics: [topic:design-patterns]
 ---

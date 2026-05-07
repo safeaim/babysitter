@@ -14,7 +14,7 @@ graph:
   domains: [domain:software-engineering]
   specializations: [specialization:software-architecture]
   roles: [role:architect, role:tech-lead]
-  skillAreas: [skill-area:backend-api-design]
+  skillAreas: [skill-area:adr-writing, skill-area:monolith-vs-microservices]
   workflows: [workflow:architecture-decision-record]
   topics: [topic:architecture-decisions, topic:design-patterns]
 

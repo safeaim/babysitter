@@ -5,7 +5,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 graph:
   domains: [domain:web-development]
   specializations: [specialization:web-development]
-  skillAreas: [skill-area:react-components, skill-area:react-state-management]
+  skillAreas: [skill-area:vue-components, skill-area:application-state-management]
   roles: [role:frontend-engineer]
   topics: [topic:component-based-architecture]
 

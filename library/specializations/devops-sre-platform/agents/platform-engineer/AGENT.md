@@ -13,7 +13,7 @@ graph:
   domains: [domain:devops]
   specializations: [specialization:devops-sre-platform]
   roles: [role:platform-engineer]
-  skillAreas: [skill-area:deployment-infrastructure-management, skill-area:configuration-management]
+  skillAreas: [skill-area:gitops, skill-area:cloud-infrastructure]
   workflows: [workflow:release-management, workflow:change-management]
   topics: [topic:platform-engineering-practices, topic:infrastructure-as-code]
 

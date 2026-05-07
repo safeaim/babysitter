@@ -11,7 +11,7 @@ allowed-tools:
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:qa-testing-automation]
-  skillAreas: [skill-area:unit-testing, skill-area:e2e-testing]
+  skillAreas: [skill-area:regression-testing, skill-area:metrics-dashboarding]
   roles: [role:qa-engineer]
   topics: [topic:test-driven-development]
 

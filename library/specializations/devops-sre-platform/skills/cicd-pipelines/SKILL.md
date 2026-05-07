@@ -10,7 +10,7 @@ metadata:
 graph:
   domains: [domain:devops]
   specializations: [specialization:devops-sre-platform]
-  skillAreas: [skill-area:deployment-infrastructure-management]
+  skillAreas: [skill-area:gitops, skill-area:canary-rollouts]
   roles: [role:devops-engineer, role:release-manager]
   workflows: [workflow:release-management]
   topics: [topic:continuous-integration, topic:continuous-deployment]

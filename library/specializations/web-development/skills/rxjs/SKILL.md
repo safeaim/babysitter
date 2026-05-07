@@ -5,7 +5,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 graph:
   domains: [domain:web-development]
   specializations: [specialization:web-development]
-  skillAreas: [skill-area:react-state-management, skill-area:application-state-management]
+  skillAreas: [skill-area:streaming-realtime-processing, skill-area:application-state-management]
   roles: [role:frontend-engineer]
   topics: [topic:observable-pattern, topic:event-driven-architecture]
 

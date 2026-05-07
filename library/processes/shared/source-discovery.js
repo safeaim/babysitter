@@ -1,7 +1,13 @@
 /**
  * @module library/processes/shared/source-discovery
  * @description Generic "discover authoritative open data sources for a domain
- *   and scope" process. Generalized from the `sourceDiscoveryTask` phase of
+ *   and scope" process.
+ * @graph
+ *   domains: [domain:data-science, domain:software-engineering]
+ *   skillAreas: [skill-area:data-analysis, skill-area:data-quality]
+ *   topics: [topic:api-design]
+ *   roles: [role:data-engineer, role:data-scientist, role:backend-engineer]
+ *   workflows: [workflow:data-pipeline-deployment] Generalized from the `sourceDiscoveryTask` phase of
  *   `specializations/domains/business/travel/flight-dataset-build.js` so it
  *   can be reused for any dataset build (travel, science, finance, sports,
  *   civic data, ...).

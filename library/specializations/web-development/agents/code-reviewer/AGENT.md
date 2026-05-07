@@ -9,6 +9,12 @@ expertise:
   - Architecture patterns
   - Performance patterns
   - Security review
+graph:
+  domains: [domain:software-engineering, domain:web-development]
+  skillAreas: [skill-area:code-review-practice, skill-area:code-analysis-linting, skill-area:backend-security]
+  topics: [topic:code-review-best-practices, topic:trunk-based-development]
+  roles: [role:frontend-engineer, role:backend-engineer, role:tech-lead]
+  workflows: [workflow:code-review, workflow:pull-request-lifecycle]
 ---
 
 # Code Reviewer Agent

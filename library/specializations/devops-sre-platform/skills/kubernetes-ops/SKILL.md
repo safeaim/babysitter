@@ -7,6 +7,12 @@ metadata:
   version: "1.0.0"
   category: container-orchestration
   backlog-id: SK-001
+graph:
+  domains: [domain:devops, domain:software-engineering]
+  skillAreas: [skill-area:deployment-infrastructure-management, skill-area:k8s-rbac, skill-area:sli-slo-management]
+  topics: [topic:microservices, topic:blue-green-deployment]
+  roles: [role:devops-engineer, role:sre, role:platform-engineer]
+  workflows: [workflow:release-management, workflow:incident-response]
 ---
 
 # kubernetes-ops

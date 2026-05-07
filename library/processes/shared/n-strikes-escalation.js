@@ -4,6 +4,12 @@
  *   After N failures, open a breakpoint with proper rejection branching: a
  *   rejection with feedback loops back as an additional check "issue" rather
  *   than silently being treated as approval.
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:unit-testing, skill-area:integration-testing]
+ *   topics: [topic:code-review-best-practices]
+ *   roles: [role:backend-engineer, role:qa-engineer, role:tech-lead]
+ *   workflows: [workflow:pull-request-lifecycle, workflow:bug-triage]
  *
  *   Generalized from the spec/quality retry blocks in
  *   joe-habu/superbabysitter/process/subagent-tdd-loop.js (lines 320-359 and

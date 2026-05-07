@@ -6,6 +6,12 @@
  * Rather than tracking actual monetary cost (which, like happiness, is largely
  * unknowable), this module counts journal events and tasks as proxies for the
  * computational effort expended across a set of related runs.
+ * @graph
+ *   domains: [domain:software-engineering, domain:devops]
+ *   skillAreas: [skill-area:performance-monitoring-profiling, skill-area:analytics-tracking]
+ *   topics: [topic:observability-driven-development]
+ *   roles: [role:tech-lead, role:engineering-manager, role:devops-engineer]
+ *   workflows: [workflow:technical-debt-reduction]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

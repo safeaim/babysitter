@@ -8,6 +8,12 @@ allowed-tools:
   - Edit
   - Glob
   - Grep
+graph:
+  domains: [domain:web-development, domain:software-engineering]
+  skillAreas: [skill-area:e2e-testing, skill-area:cross-browser-testing, skill-area:visual-regression-testing]
+  topics: [topic:trunk-based-development]
+  roles: [role:qa-engineer, role:frontend-engineer]
+  workflows: [workflow:pull-request-lifecycle, workflow:feature-development]
 ---
 
 # Playwright E2E Testing Skill

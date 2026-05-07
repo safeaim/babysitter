@@ -6,6 +6,12 @@ backlog-id: AG-SEC-002
 metadata:
   author: babysitter-sdk
   version: "1.0.0"
+graph:
+  domains: [domain:security, domain:software-engineering]
+  skillAreas: [skill-area:threat-modeling, skill-area:backend-security, skill-area:application-security-testing]
+  topics: [topic:defense-in-depth, topic:zero-trust-architecture]
+  roles: [role:security-engineer, role:architect, role:backend-engineer]
+  workflows: [workflow:security-audit, workflow:architecture-decision-record]
 ---
 
 # threat-modeling-agent

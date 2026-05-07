@@ -3,6 +3,12 @@
  * @description Local-dev relaxations — experimental commits OK while iterating, but tighten up before push.
  * @inputs { phase: "iterating"|"pre-push", pendingCommits?: Array<object> }
  * @outputs { success: boolean, relaxationsActive: boolean, tightenUpActions?: Array<string> }
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:code-analysis-linting, skill-area:unit-testing]
+ *   topics: [topic:trunk-based-development, topic:code-review-best-practices]
+ *   roles: [role:backend-engineer, role:frontend-engineer, role:fullstack-engineer]
+ *   workflows: [workflow:pull-request-lifecycle, workflow:feature-development]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

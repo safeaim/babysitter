@@ -3,6 +3,12 @@
  * @description Composable TDD triplet component providing a factory for the three canonical
  * TDD phases: write tests, run tests, validate results. Designed for injection into
  * convergence and quality-gate processes that require a repeatable red-green-validate cycle.
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:unit-testing, skill-area:integration-testing, skill-area:react-testing]
+ *   topics: [topic:trunk-based-development]
+ *   roles: [role:backend-engineer, role:frontend-engineer, role:qa-engineer]
+ *   workflows: [workflow:feature-development, workflow:pull-request-lifecycle]
  *
  * The module exposes two surfaces:
  * - `createTddTriplet(config)` — factory that builds three `defineTask` descriptors for

@@ -8,6 +8,12 @@
  * - `evaluateCompleteness` — synchronous evaluation given explicit issue + resolution data
  * - `checkCompleteness`    — async convenience wrapper that mines a run directory for evidence
  * - `completenessGateTask` — babysitter `defineTask` wrapper for harness-driven execution
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:code-analysis-linting, skill-area:acceptance-testing]
+ *   topics: [topic:code-review-best-practices]
+ *   roles: [role:qa-engineer, role:tech-lead]
+ *   workflows: [workflow:pull-request-lifecycle, workflow:feature-development]
  */
 
 import { defineTask } from '@a5c-ai/babysitter-sdk';

@@ -4,6 +4,12 @@
  * pass/fail verification. Unlike soft agent-prompt-based checks, this module runs shell commands
  * with `expectedExitCode: 0`, producing binary deterministic outcomes that cannot be negotiated
  * or reinterpreted by an agent.
+ * @graph
+ *   domains: [domain:software-engineering, domain:devops]
+ *   skillAreas: [skill-area:code-analysis-linting, skill-area:unit-testing, skill-area:integration-testing]
+ *   topics: [topic:trunk-based-development, topic:feature-flags]
+ *   roles: [role:backend-engineer, role:devops-engineer, role:qa-engineer]
+ *   workflows: [workflow:pull-request-lifecycle, workflow:feature-development]
  *
  * The module exposes three surfaces:
  * - `deterministicGateTask` — standalone `defineTask` descriptor (kind: 'shell') that runs

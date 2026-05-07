@@ -10,6 +10,12 @@ expertise:
   - Data ownership patterns
   - API gateway design
   - Service mesh architecture
+graph:
+  domains: [domain:software-engineering, domain:devops]
+  skillAreas: [skill-area:messaging-queuing, skill-area:api-contract-testing, skill-area:service-mesh-config]
+  topics: [topic:microservices, topic:event-driven-architecture, topic:api-design]
+  roles: [role:architect, role:backend-engineer, role:platform-engineer]
+  workflows: [workflow:architecture-decision-record, workflow:api-design-review]
 ---
 
 # Microservices Architect Agent

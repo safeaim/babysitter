@@ -2,6 +2,12 @@
 name: model-trainer
 description: Agent specialized in model training, hyperparameter tuning, and experiment management for machine learning workflows. Executes training pipelines, manages cross-validation, and tracks experiments.
 required-skills: sklearn-model-trainer, mlflow-experiment-tracker, optuna-hyperparameter-tuner
+graph:
+  domains: [domain:data-science]
+  skillAreas: [skill-area:hyperparameter-tuning-experiment-management, skill-area:model-validation-testing, skill-area:feature-engineering-pipelines]
+  topics: [topic:trunk-based-development]
+  roles: [role:ml-engineer, role:data-scientist]
+  workflows: [workflow:ml-model-lifecycle]
 ---
 
 # Model Trainer Agent

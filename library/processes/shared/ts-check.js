@@ -4,6 +4,12 @@
  * for `tsc --noEmit`. Unlike soft agent-prompt-based checks, this module enforces compilation
  * correctness via a shell task with `expectedExitCode: 0`, making it a deterministic,
  * non-negotiable quality gate.
+ * @graph
+ *   domains: [domain:software-engineering]
+ *   skillAreas: [skill-area:code-analysis-linting, skill-area:typescript-generic-programming]
+ *   topics: [topic:trunk-based-development]
+ *   roles: [role:backend-engineer, role:frontend-engineer, role:fullstack-engineer]
+ *   workflows: [workflow:pull-request-lifecycle, workflow:feature-development]
  *
  * The module exposes three surfaces:
  * - `tsCheckTask` — standalone `defineTask` descriptor (kind: 'shell') for direct use

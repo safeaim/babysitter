@@ -7,6 +7,12 @@ metadata:
   version: "1.0.0"
   category: security-testing
   backlog-id: SK-SEC-004
+graph:
+  domains: [domain:security, domain:devops]
+  skillAreas: [skill-area:dependency-vulnerability-mgmt, skill-area:supply-chain-security]
+  topics: [topic:defense-in-depth]
+  roles: [role:security-engineer, role:devops-engineer, role:backend-engineer]
+  workflows: [workflow:dependency-update, workflow:vulnerability-management]
 ---
 
 # dependency-scanner

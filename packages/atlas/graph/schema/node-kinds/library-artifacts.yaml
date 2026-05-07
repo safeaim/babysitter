@@ -22,6 +22,18 @@ nodeKinds:
   - name: specialization
     type: string
     required: false
+  - name: references
+    type: list<string>
+    required: false
+  - name: example
+    type: markdown
+    required: false
+  - name: usesAgents
+    type: list<string>
+    required: false
+  - name: usesSkills
+    type: list<string>
+    required: false
   incomingEdges: []
   outgoingEdges:
   - applies_to
@@ -48,6 +60,9 @@ nodeKinds:
     required: true
   - name: specialization
     type: string
+    required: false
+  - name: contentSummary
+    type: markdown
     required: false
   incomingEdges: []
   outgoingEdges:
@@ -78,6 +93,9 @@ nodeKinds:
     required: false
   - name: role
     type: string
+    required: false
+  - name: expertise
+    type: list<string>
     required: false
   incomingEdges: []
   outgoingEdges:

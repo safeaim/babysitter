@@ -102,6 +102,52 @@ function yamlString(value) {
   return str;
 }
 
+// ── @references / @example JSDoc parsing ───────────────────────────────────
+
+/**
+ * Parse @references block from JSDoc comment.
+ * Returns a list of reference strings, or null.
+ */
+function parseReferences(content) {
+  const match = content.match(/@references\s*\n([\s\S]*?)(?=\n\s*\*\s*@|\*\/)/);
+  if (!match) return null;
+  return match[1].replace(/^\s*\*\s?/gm, '').trim().split('\n').map(l => l.trim()).filter(l => l);
+}
+
+/**
+ * Parse @example block from JSDoc comment.
+ * Returns the example text as a string, or null.
+ */
+function parseExample(content) {
+  const match = content.match(/@example\s*\n([\s\S]*?)(?=\n\s*\*\s*@[^e]|\*\/)/);
+  if (!match) return null;
+  return match[1].replace(/^\s*\*\s?/gm, '').trim();
+}
+
+// ── Task association extraction ────────────────────────────────────────────
+
+/**
+ * Extract agent/skill task associations from process file body.
+ * Scans for defineTask calls using kind: 'agent' or kind: 'skill'.
+ */
+function extractTaskAssociations(content) {
+  const agents = [];
+  const skills = [];
+  // Match agent name patterns: agent: { name: 'xxx' } or name: 'xxx' near kind: 'agent'
+  const agentMatches = content.matchAll(/kind:\s*['"]agent['"][\s\S]*?(?:agent\s*:\s*\{[^}]*name:\s*['"]([^'"]+)['"]|name:\s*['"]([^'"]+)['"])/g);
+  for (const m of agentMatches) {
+    const name = m[1] || m[2];
+    if (name && !agents.includes(name)) agents.push(name);
+  }
+  // Match skill name patterns
+  const skillMatches = content.matchAll(/kind:\s*['"]skill['"][\s\S]*?(?:skill\s*:\s*\{[^}]*name:\s*['"]([^'"]+)['"]|name:\s*['"]([^'"]+)['"])/g);
+  for (const m of skillMatches) {
+    const name = m[1] || m[2];
+    if (name && !skills.includes(name)) skills.push(name);
+  }
+  return { agents, skills };
+}
+
 // ── @graph JSDoc parsing ────────────────────────────────────────────────────
 
 /**
@@ -240,16 +286,25 @@ function parseFrontmatter(content) {
 
 /**
  * Build applies_to edges from graph metadata.
+ * If specialization is provided, auto-adds an edge to specialization:<slug>.
  */
-function buildEdges(fromId, graphMeta) {
+function buildEdges(fromId, graphMeta, specialization) {
   const edges = [];
-  const edgeTargetKeys = ["skillAreas", "topics", "domains", "roles", "workflows"];
+  const edgeTargetKeys = ["skillAreas", "topics", "domains", "roles", "workflows", "specializations"];
 
   for (const key of edgeTargetKeys) {
     const targets = graphMeta[key];
     if (!Array.isArray(targets)) continue;
     for (const target of targets) {
       edges.push({ kind: "applies_to", to: target });
+    }
+  }
+
+  // Auto-add specialization edge if not already present
+  if (specialization) {
+    const specId = "specialization:" + slugify(specialization);
+    if (!edges.some(e => e.to === specId)) {
+      edges.push({ kind: "applies_to", to: specId });
     }
   }
 
@@ -272,6 +327,39 @@ function generateNodeYaml(node) {
   }
   if (node.role) {
     lines.push(`    role: ${yamlString(node.role)}`);
+  }
+  // New attributes for LibraryProcess
+  if (node.references && node.references.length > 0) {
+    lines.push("    references:");
+    for (const ref of node.references) {
+      lines.push(`    - ${yamlString(ref)}`);
+    }
+  }
+  if (node.example) {
+    lines.push(`    example: ${yamlString(node.example)}`);
+  }
+  if (node.usesAgents && node.usesAgents.length > 0) {
+    lines.push("    usesAgents:");
+    for (const a of node.usesAgents) {
+      lines.push(`    - ${yamlString(a)}`);
+    }
+  }
+  if (node.usesSkills && node.usesSkills.length > 0) {
+    lines.push("    usesSkills:");
+    for (const s of node.usesSkills) {
+      lines.push(`    - ${yamlString(s)}`);
+    }
+  }
+  // New attribute for LibrarySkill
+  if (node.contentSummary) {
+    lines.push(`    contentSummary: ${yamlString(node.contentSummary)}`);
+  }
+  // New attribute for LibraryAgent
+  if (node.expertise && node.expertise.length > 0) {
+    lines.push("    expertise:");
+    for (const e of node.expertise) {
+      lines.push(`    - ${yamlString(e)}`);
+    }
   }
   if (node.edges && node.edges.length > 0) {
     lines.push("    edges:");
@@ -353,7 +441,12 @@ function main() {
           .trim()
       : null;
 
-    const edges = buildEdges(id, graphMeta);
+    // Extract references, example, and task associations
+    const references = parseReferences(content);
+    const example = parseExample(content);
+    const { agents: usesAgents, skills: usesSkills } = extractTaskAssociations(content);
+
+    const edges = buildEdges(id, graphMeta, specialization);
 
     processNodes.push({
       id,
@@ -362,6 +455,10 @@ function main() {
       description,
       libraryPath,
       specialization,
+      references,
+      example,
+      usesAgents: usesAgents.length > 0 ? usesAgents : null,
+      usesSkills: usesSkills.length > 0 ? usesSkills : null,
       edges,
     });
   }
@@ -395,7 +492,17 @@ function main() {
     const displayName = frontmatter.name || dirName;
     const description = frontmatter.description || null;
     const libraryPath = relativeFromRoot(file);
-    const edges = buildEdges(id, graphMeta);
+    const edges = buildEdges(id, graphMeta, specialization);
+
+    // Extract content summary from the body (everything after closing ---)
+    let contentSummary = null;
+    const bodyMatch = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n([\s\S]*)/);
+    if (bodyMatch) {
+      const body = bodyMatch[1].trim();
+      if (body.length > 0) {
+        contentSummary = body.length > 300 ? body.slice(0, 300) : body;
+      }
+    }
 
     skillNodes.push({
       id,
@@ -404,6 +511,7 @@ function main() {
       description,
       libraryPath,
       specialization,
+      contentSummary,
       edges,
     });
   }
@@ -438,7 +546,12 @@ function main() {
     const description = frontmatter.description || null;
     const role = frontmatter.role || null;
     const libraryPath = relativeFromRoot(file);
-    const edges = buildEdges(id, graphMeta);
+    const edges = buildEdges(id, graphMeta, specialization);
+
+    // Extract expertise list from frontmatter
+    const expertise = Array.isArray(frontmatter.expertise) && frontmatter.expertise.length > 0
+      ? frontmatter.expertise
+      : null;
 
     agentNodes.push({
       id,
@@ -448,6 +561,7 @@ function main() {
       libraryPath,
       specialization,
       role,
+      expertise,
       edges,
     });
   }

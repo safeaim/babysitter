@@ -9,7 +9,7 @@ metadata:
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:technical-documentation]
-  skillAreas: [skill-area:docs-as-code, skill-area:reference-docs, skill-area:accessibility-first-design]
+  skillAreas: [skill-area:docs-as-code, skill-area:code-analysis-linting]
   roles: [role:technical-writer, role:documentation-engineer]
   topics: [topic:accessibility]
 ---

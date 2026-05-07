@@ -6,7 +6,7 @@ tags: [winui, wpf, migration, windows-app-sdk, modernization]
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:desktop-development]
-  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:cross-platform-desktop, skill-area:parallel-run-migration]
+  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:parallel-run-migration]
   roles: [role:desktop-developer, role:fullstack-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
 ---

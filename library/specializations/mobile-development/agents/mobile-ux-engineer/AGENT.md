@@ -5,7 +5,7 @@ required-skills: lottie-animations, accessibility-testing
 graph:
   domains: [domain:mobile]
   specializations: [specialization:mobile-development]
-  skillAreas: [skill-area:ios-native, skill-area:android-native, skill-area:cross-platform-desktop]
+  skillAreas: [skill-area:mobile-ui-automation, skill-area:animation-transitions]
   roles: [role:mobile-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility, topic:responsive-design]

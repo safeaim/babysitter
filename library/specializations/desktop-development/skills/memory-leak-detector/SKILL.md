@@ -6,7 +6,7 @@ tags: [performance, memory, leaks, debugging, profiling]
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:desktop-development]
-  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:cross-platform-desktop, skill-area:profiling-memory]
+  skillAreas: [skill-area:profiling-memory, skill-area:performance-monitoring-profiling]
   roles: [role:desktop-developer, role:fullstack-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
 ---

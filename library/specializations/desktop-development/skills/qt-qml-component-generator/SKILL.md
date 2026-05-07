@@ -6,7 +6,7 @@ tags: [qt, qml, quick, ui, components]
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:desktop-development]
-  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:cross-platform-desktop]
+  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:ui-component-libraries]
   roles: [role:desktop-developer, role:fullstack-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
 ---

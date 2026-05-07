@@ -9,7 +9,7 @@ metadata:
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:technical-documentation]
-  skillAreas: [skill-area:docs-as-code, skill-area:reference-docs, skill-area:usability-testing]
+  skillAreas: [skill-area:api-doc-generation, skill-area:tutorial-design]
   roles: [role:technical-writer, role:documentation-engineer]
 ---
 

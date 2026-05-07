@@ -12,7 +12,7 @@ allowed-tools:
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:product-management]
-  skillAreas: [skill-area:product-strategy, skill-area:product-analytics, skill-area:competitive-intelligence]
+  skillAreas: [skill-area:competitive-intelligence, skill-area:market-research]
   roles: [role:product-manager, role:product-analyst]
   workflows: [workflow:product-discovery, workflow:competitive-analysis]
 ---

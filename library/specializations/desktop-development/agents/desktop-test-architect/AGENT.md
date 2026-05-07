@@ -5,7 +5,7 @@ expertise: [testing-strategy, e2e-testing, visual-regression, accessibility, per
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:desktop-development]
-  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:cross-platform-desktop, skill-area:accessibility-first-design]
+  skillAreas: [skill-area:e2e-testing, skill-area:cross-platform-testing]
   roles: [role:desktop-developer, role:fullstack-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility]

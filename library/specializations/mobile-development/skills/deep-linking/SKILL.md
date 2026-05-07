@@ -5,7 +5,7 @@ allowed-tools: Read, Grep, Write, Bash, Edit, Glob, WebFetch
 graph:
   domains: [domain:mobile]
   specializations: [specialization:mobile-development]
-  skillAreas: [skill-area:ios-native, skill-area:android-native, skill-area:deep-linking]
+  skillAreas: [skill-area:deep-linking, skill-area:react-native-development]
   roles: [role:mobile-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility]

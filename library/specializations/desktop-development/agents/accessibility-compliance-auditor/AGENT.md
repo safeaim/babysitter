@@ -5,7 +5,7 @@ expertise: [accessibility, wcag, screen-readers, keyboard-navigation]
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:desktop-development]
-  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:cross-platform-desktop, skill-area:accessibility-first-design]
+  skillAreas: [skill-area:accessibility-testing, skill-area:accessibility-first-design]
   roles: [role:desktop-developer, role:fullstack-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility]

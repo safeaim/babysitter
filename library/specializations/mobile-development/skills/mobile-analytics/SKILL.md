@@ -8,7 +8,7 @@ status: active
 graph:
   domains: [domain:mobile]
   specializations: [specialization:mobile-development]
-  skillAreas: [skill-area:ios-native, skill-area:android-native]
+  skillAreas: [skill-area:analytics-tracking, skill-area:ios-native]
   roles: [role:mobile-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility]

@@ -12,7 +12,7 @@ expertise:
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:product-management]
-  skillAreas: [skill-area:product-strategy, skill-area:product-analytics]
+  skillAreas: [skill-area:growth-strategy, skill-area:a-b-testing]
   roles: [role:product-manager, role:product-analyst, role:growth-pm]
   workflows: [workflow:product-discovery, workflow:competitive-analysis]
 ---

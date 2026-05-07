@@ -9,7 +9,7 @@ role: Senior Flutter Developer
 graph:
   domains: [domain:mobile]
   specializations: [specialization:mobile-development]
-  skillAreas: [skill-area:ios-native, skill-area:android-native, skill-area:flutter-development]
+  skillAreas: [skill-area:flutter-development, skill-area:cross-platform-testing]
   roles: [role:mobile-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility]

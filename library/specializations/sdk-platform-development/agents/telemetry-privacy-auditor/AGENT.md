@@ -10,7 +10,7 @@ expertise:
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:sdk-platform-development]
-  skillAreas: [skill-area:sdk-codegen, skill-area:api-clients-sdks]
+  skillAreas: [skill-area:data-protection-dlp, skill-area:observability-instrumentation]
   roles: [role:platform-engineer]
   topics: [topic:api-design, topic:developer-experience]
 ---

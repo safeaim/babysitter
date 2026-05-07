@@ -8,7 +8,7 @@ status: active
 graph:
   domains: [domain:mobile]
   specializations: [specialization:mobile-development]
-  skillAreas: [skill-area:ios-native, skill-area:android-native, skill-area:flutter-development]
+  skillAreas: [skill-area:flutter-development, skill-area:mobile-state-management]
   roles: [role:mobile-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility]

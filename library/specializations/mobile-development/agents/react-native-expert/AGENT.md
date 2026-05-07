@@ -9,7 +9,7 @@ role: Senior React Native Engineer
 graph:
   domains: [domain:mobile]
   specializations: [specialization:mobile-development]
-  skillAreas: [skill-area:ios-native, skill-area:android-native, skill-area:react-native-development]
+  skillAreas: [skill-area:react-native-development, skill-area:mobile-offline-sync]
   roles: [role:mobile-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
   topics: [topic:accessibility]

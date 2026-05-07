@@ -5,7 +5,7 @@ expertise: [gdpr, ccpa, privacy, compliance, data-protection]
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:desktop-development]
-  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:cross-platform-desktop]
+  skillAreas: [skill-area:data-protection-dlp, skill-area:compliance-automation]
   roles: [role:desktop-developer, role:fullstack-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
 ---

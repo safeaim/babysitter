@@ -11,7 +11,7 @@ allowed-tools:
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:sdk-platform-development]
-  skillAreas: [skill-area:sdk-codegen, skill-area:api-clients-sdks]
+  skillAreas: [skill-area:plugin-systems, skill-area:sdk-codegen]
   roles: [role:platform-engineer]
   workflows: [workflow:product-discovery]
   topics: [topic:api-design, topic:developer-experience]

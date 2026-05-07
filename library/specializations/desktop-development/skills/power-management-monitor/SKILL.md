@@ -6,7 +6,7 @@ tags: [power, battery, system, cross-platform, monitoring]
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:desktop-development]
-  skillAreas: [skill-area:desktop-ui-frameworks, skill-area:cross-platform-desktop]
+  skillAreas: [skill-area:desktop-system-integration, skill-area:performance-monitoring-profiling]
   roles: [role:desktop-developer, role:fullstack-engineer]
   workflows: [workflow:feature-development, workflow:release-management]
 ---

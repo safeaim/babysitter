@@ -5,7 +5,7 @@ required-skills: prioritization-calculator, user-research-synthesis, product-ana
 graph:
   domains: [domain:software-engineering]
   specializations: [specialization:product-management]
-  skillAreas: [skill-area:product-strategy, skill-area:product-analytics, skill-area:prioritization-frameworks]
+  skillAreas: [skill-area:prioritization-frameworks, skill-area:product-strategy]
   roles: [role:product-manager, role:product-analyst]
   workflows: [workflow:product-discovery, workflow:competitive-analysis]
 ---

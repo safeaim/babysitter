@@ -3,6 +3,7 @@ id: role:it-ops-engineer
 attributes:
   displayName: "IT Operations Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Maintains the internal IT infrastructure that keeps the organization running,
     including endpoint management, network configuration, identity services, and
@@ -30,6 +31,7 @@ id: role:release-manager
 attributes:
   displayName: "Release Manager"
   isAgentic: false
+  automatability: 0.9
   description: |
     Coordinates the end-to-end release process across engineering, QA, and operations
     teams to ensure software is delivered to production safely and on schedule. Manages
@@ -57,6 +59,7 @@ id: role:change-manager
 attributes:
   displayName: "Change Manager"
   isAgentic: false
+  automatability: 0.1
   description: |
     Governs the change management process for production systems, evaluating proposed
     changes against risk criteria, facilitating change advisory board reviews, and
@@ -83,6 +86,7 @@ id: role:incident-commander
 attributes:
   displayName: "Incident Commander"
   isAgentic: false
+  automatability: 0.1
   description: |
     Takes command during active high-severity incidents, coordinating all responders,
     driving toward resolution, and serving as the single decision-making authority
@@ -110,6 +114,7 @@ id: role:support-engineer
 attributes:
   displayName: "Support Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Provides technical assistance to customers encountering product issues, diagnosing
     problems through log analysis, reproduction, and collaboration with engineering
@@ -136,6 +141,7 @@ id: role:solutions-architect
 attributes:
   displayName: "Solutions Architect"
   isAgentic: false
+  automatability: 0.5
   description: |
     Designs and validates end-to-end technical solutions for customer or internal
     use cases, bridging business requirements with implementable architectures that

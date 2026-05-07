@@ -3,6 +3,7 @@ id: role:engineering-manager
 attributes:
   displayName: "Engineering Manager"
   isAgentic: false
+  automatability: 0.4
   description: |
     Leads a team of engineers, balancing people management with delivery accountability
     to ensure the team operates at high velocity while maintaining morale and growth.
@@ -33,6 +34,7 @@ id: role:tech-lead
 attributes:
   displayName: "Tech Lead"
   isAgentic: false
+  automatability: 0.6
   description: |
     Provides technical direction for a team or product area, setting coding standards,
     driving architecture decisions, and ensuring engineering quality across deliverables.
@@ -61,6 +63,7 @@ id: role:vp-engineering
 attributes:
   displayName: "VP of Engineering"
   isAgentic: false
+  automatability: 0.1
   description: |
     Owns the engineering organization's health, culture, and delivery capacity across
     multiple teams, translating executive strategy into engineering OKRs and headcount
@@ -91,6 +94,7 @@ id: role:cto
 attributes:
   displayName: "Chief Technology Officer"
   isAgentic: false
+  automatability: 0.1
   description: |
     Sets the long-term technology vision and strategy for the organization, ensuring
     technical investments support business goals and competitive differentiation.
@@ -122,6 +126,7 @@ id: role:architect
 attributes:
   displayName: "Architect"
   isAgentic: false
+  automatability: 0.6
   description: |
     Designs and governs the overarching technical architecture of systems and platforms,
     ensuring decisions optimize for scalability, reliability, maintainability, and
@@ -152,6 +157,7 @@ id: role:principal-engineer
 attributes:
   displayName: "Principal Engineer"
   isAgentic: false
+  automatability: 0.6
   description: |
     Operates as the highest individual-contributor technical role, driving organization-wide
     technical initiatives and solving the most complex engineering challenges without

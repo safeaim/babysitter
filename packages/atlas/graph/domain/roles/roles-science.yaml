@@ -3,6 +3,7 @@ id: role:research-engineer
 attributes:
   displayName: "Research Engineer"
   isAgentic: false
+  automatability: 0.6
   description: |
     Bridges scientific research and production engineering by implementing, validating,
     and scaling experimental findings into robust, reproducible software systems.
@@ -30,6 +31,7 @@ id: role:lab-technician
 attributes:
   displayName: "Lab Technician"
   isAgentic: false
+  automatability: 0.3
   description: |
     Executes laboratory procedures, maintains equipment, and collects high-quality
     experimental data according to established protocols and safety standards.
@@ -51,6 +53,7 @@ id: role:computational-scientist
 attributes:
   displayName: "Computational Scientist"
   isAgentic: false
+  automatability: 0.6
   description: |
     Develops and applies numerical algorithms, simulation frameworks, and
     high-performance computing techniques to solve complex scientific problems
@@ -79,6 +82,7 @@ id: role:biomedical-engineer
 attributes:
   displayName: "Biomedical Engineer"
   isAgentic: false
+  automatability: 0.5
   description: |
     Designs, develops, and validates medical devices, diagnostic systems, and
     clinical software by applying engineering principles to biological and
@@ -106,6 +110,7 @@ id: role:systems-integration-engineer
 attributes:
   displayName: "Systems Integration Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Designs and implements the interfaces, protocols, and middleware that enable
     disparate software systems, hardware components, and external services to
@@ -134,6 +139,7 @@ id: role:technical-program-manager
 attributes:
   displayName: "Technical Program Manager"
   isAgentic: false
+  automatability: 0.4
   description: |
     Drives the planning, execution, and delivery of complex, multi-team technical
     programs by coordinating across engineering, product, and business stakeholders.

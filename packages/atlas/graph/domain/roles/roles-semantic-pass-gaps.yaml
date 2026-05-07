@@ -4,6 +4,7 @@ id: role:organizational-development-specialist
 attributes:
   displayName: "Organizational Development Specialist"
   isAgentic: false
+  automatability: 0.2
   description: |
     Designs and facilitates organizational development interventions including change
     management programs, org design initiatives, and leadership development. Conducts
@@ -26,6 +27,7 @@ id: role:management-consultant
 attributes:
   displayName: "Management Consultant"
   isAgentic: false
+  automatability: 0.3
   description: |
     Provides strategic and operational consulting to organizations on business improvement,
     growth strategy, and performance transformation. Conducts rapid diagnostics, builds
@@ -47,6 +49,7 @@ id: role:people-analytics-specialist
 attributes:
   displayName: "People Analytics Specialist"
   isAgentic: false
+  automatability: 0.2
   description: |
     Applies data analytics to HR and workforce decisions, building dashboards and
     predictive models that inform talent strategy, org health, and performance management.
@@ -67,6 +70,7 @@ id: role:quality-analyst
 attributes:
   displayName: "Quality Analyst"
   isAgentic: false
+  automatability: 0.4
   description: |
     Designs and executes quality assurance processes including test planning, defect
     tracking, and quality gate enforcement across product development and delivery.
@@ -88,6 +92,7 @@ id: role:developer-advocate
 attributes:
   displayName: "Developer Advocate"
   isAgentic: false
+  automatability: 0.5
   description: |
     Builds and nurtures developer communities around products and platforms through
     technical content creation, conference talks, and developer experience programs.
@@ -109,6 +114,7 @@ id: role:technical-artist
 attributes:
   displayName: "Technical Artist"
   isAgentic: false
+  automatability: 0.5
   description: |
     Bridges art and engineering pipelines in games and VFX productions, developing
     shaders, tools, and automated asset workflows that enable artists to create
@@ -129,6 +135,7 @@ id: role:competitive-intelligence-analyst
 attributes:
   displayName: "Competitive Intelligence Analyst"
   isAgentic: false
+  automatability: 0.3
   description: |
     Gathers, synthesizes, and distributes competitive and market intelligence to
     inform strategic decisions across product, sales, and executive functions.
@@ -150,6 +157,7 @@ id: role:solution-architect
 attributes:
   displayName: "Solution Architect"
   isAgentic: false
+  automatability: 0.5
   description: |
     Designs end-to-end technical solutions for complex business problems, evaluating
     technology options and defining integration architectures that meet functional and
@@ -171,6 +179,7 @@ id: role:learning-development-specialist
 attributes:
   displayName: "Learning & Development Specialist"
   isAgentic: false
+  automatability: 0.2
   description: |
     Designs, delivers, and evaluates learning programs that build organizational
     capability and employee skills. Conducts training needs analyses, develops

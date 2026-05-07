@@ -3,6 +3,7 @@ id: role:product-manager
 attributes:
   displayName: "Product Manager"
   isAgentic: false
+  automatability: 0.5
   description: |
     Owns the product vision, strategy, and roadmap for a domain or product area,
     translating market insights and customer feedback into prioritized engineering
@@ -29,6 +30,7 @@ id: role:product-designer
 attributes:
   displayName: "Product Designer"
   isAgentic: false
+  automatability: 0.6
   description: |
     Creates end-to-end design solutions from initial concept through high-fidelity
     prototypes, ensuring that user needs are central to every decision. Collaborates
@@ -52,6 +54,7 @@ id: role:ux-researcher
 attributes:
   displayName: "UX Researcher"
   isAgentic: false
+  automatability: 0.6
   description: |
     Plans and conducts qualitative and quantitative research studies — including
     interviews, usability tests, surveys, and diary studies — to build deep
@@ -77,6 +80,7 @@ id: role:design-lead
 attributes:
   displayName: "Design Lead"
   isAgentic: false
+  automatability: 0.6
   description: |
     Sets the design vision and standards for a product area or organization, mentoring
     designers and ensuring consistency across teams through a shared design system.
@@ -106,6 +110,7 @@ id: role:technical-writer
 attributes:
   displayName: "Technical Writer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Produces clear, accurate, and user-centered documentation for developer APIs,
     SDKs, product features, and internal processes. Works closely with engineers
@@ -130,6 +135,7 @@ id: role:product-analyst
 attributes:
   displayName: "Product Analyst"
   isAgentic: false
+  automatability: 0.5
   description: |
     Monitors and analyzes product usage data to surface insights that drive feature
     decisions and roadmap prioritization. Builds dashboards, funnels, and cohort
@@ -156,6 +162,7 @@ id: role:growth-pm
 attributes:
   displayName: "Growth Product Manager"
   isAgentic: false
+  automatability: 0.5
   description: |
     Owns the product strategy for acquisition, activation, retention, and monetization
     levers, running rapid experimentation cycles to compound growth. Defines and
@@ -181,6 +188,7 @@ id: role:product-ops
 attributes:
   displayName: "Product Operations Manager"
   isAgentic: false
+  automatability: 0.4
   description: |
     Optimizes the systems and processes through which product teams operate, from
     roadmap planning rituals to tooling selection and cross-functional communication

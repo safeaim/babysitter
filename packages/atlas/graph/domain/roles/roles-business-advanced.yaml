@@ -3,6 +3,7 @@ id: role:financial-analyst
 attributes:
   displayName: "Financial Analyst"
   isAgentic: false
+  automatability: 0.3
   description: |
     Models financial performance, evaluates investment opportunities, and produces
     reports that guide capital allocation decisions for business units and senior
@@ -30,6 +31,7 @@ id: role:hr-manager
 attributes:
   displayName: "HR Manager"
   isAgentic: false
+  automatability: 0.2
   description: |
     Oversees the full employee lifecycle from onboarding through offboarding,
     ensuring policies, practices, and benefits programs attract, develop, and
@@ -55,6 +57,7 @@ id: role:talent-recruiter
 attributes:
   displayName: "Talent Recruiter"
   isAgentic: false
+  automatability: 0.2
   description: |
     Sources, screens, and engages candidates across technical and non-technical
     roles, building diverse pipelines through job boards, referrals, and proactive
@@ -77,6 +80,7 @@ id: role:marketing-strategist
 attributes:
   displayName: "Marketing Strategist"
   isAgentic: false
+  automatability: 0.3
   description: |
     Develops comprehensive marketing strategies that align brand positioning,
     audience targeting, and channel mix with business growth objectives. Conducts
@@ -104,6 +108,7 @@ id: role:content-strategist
 attributes:
   displayName: "Content Strategist"
   isAgentic: false
+  automatability: 0.3
   description: |
     Defines the editorial direction, content architecture, and publishing cadence
     that support brand storytelling and audience acquisition across web, social,
@@ -131,6 +136,7 @@ id: role:supply-chain-analyst
 attributes:
   displayName: "Supply Chain Analyst"
   isAgentic: false
+  automatability: 0.3
   description: |
     Analyzes end-to-end supply chain data to identify inefficiencies, cost reduction
     opportunities, and resilience gaps across sourcing, production, and distribution.
@@ -157,6 +163,7 @@ id: role:operations-analyst
 attributes:
   displayName: "Operations Analyst"
   isAgentic: false
+  automatability: 0.3
   description: |
     Examines operational workflows and business processes to uncover bottlenecks,
     redundancies, and improvement opportunities, then models and pilots solutions
@@ -181,6 +188,7 @@ id: role:legal-advisor
 attributes:
   displayName: "Legal Advisor"
   isAgentic: false
+  automatability: 0.2
   description: |
     Provides proactive legal guidance on commercial, regulatory, and operational
     matters, reviewing contracts, policies, and business practices to identify and
@@ -206,6 +214,7 @@ id: role:procurement-manager
 attributes:
   displayName: "Procurement Manager"
   isAgentic: false
+  automatability: 0.3
   description: |
     Leads the strategic sourcing and procurement function, developing supplier
     strategies, managing the vendor lifecycle, and negotiating contracts that
@@ -234,6 +243,7 @@ id: role:strategic-planner
 attributes:
   displayName: "Strategic Planner"
   isAgentic: false
+  automatability: 0.3
   description: |
     Develops and maintains the organization's long-range strategic plans by
     synthesizing market intelligence, competitive dynamics, and internal capability

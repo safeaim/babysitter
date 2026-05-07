@@ -3,6 +3,7 @@ id: role:data-scientist
 attributes:
   displayName: "Data Scientist"
   isAgentic: false
+  automatability: 0.7
   description: |
     Applies statistical modeling, machine learning, and data analysis to generate
     insights that drive product and business decisions. Formulates hypotheses,
@@ -31,6 +32,7 @@ id: role:data-analyst
 attributes:
   displayName: "Data Analyst"
   isAgentic: false
+  automatability: 0.7
   description: |
     Explores and interprets business and product data to answer operational questions
     and surface actionable insights for stakeholders. Builds reports, dashboards, and
@@ -57,6 +59,7 @@ id: role:analytics-engineer
 attributes:
   displayName: "Analytics Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Sits at the intersection of data engineering and analytics, owning the transformation
     layer that turns raw data warehouse tables into clean, reliable, and well-documented
@@ -84,6 +87,7 @@ id: role:bi-developer
 attributes:
   displayName: "BI Developer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Designs and builds business intelligence reports, dashboards, and semantic models
     that empower stakeholders to self-serve their data needs. Translates business
@@ -110,6 +114,7 @@ id: role:research-scientist
 attributes:
   displayName: "Research Scientist"
   isAgentic: false
+  automatability: 0.6
   description: |
     Conducts original research into novel algorithms, models, and techniques relevant
     to the organization's technology domain, publishing results internally and
@@ -139,6 +144,7 @@ id: role:ml-ops-engineer
 attributes:
   displayName: "MLOps Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Builds and maintains the infrastructure and tooling that enables data scientists
     and ML engineers to train, evaluate, deploy, and monitor machine learning models

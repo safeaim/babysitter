@@ -4,6 +4,7 @@ id: role:game-developer
 attributes:
   displayName: "Game Developer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Designs and implements interactive game experiences — from gameplay
     mechanics and AI systems to rendering pipelines and tooling. Works
@@ -30,6 +31,7 @@ id: role:documentation-engineer
 attributes:
   displayName: "Documentation Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Owns the developer documentation platform and information architecture
     for engineering-facing content. Goes beyond traditional technical writing
@@ -53,6 +55,7 @@ id: role:desktop-developer
 attributes:
   displayName: "Desktop Application Developer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Builds native and cross-platform desktop applications — handling window
     management, native OS integration, file-system access, offline
@@ -76,6 +79,7 @@ id: role:observability-engineer
 attributes:
   displayName: "Observability Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Designs and operates the observability platform — telemetry collection,
     storage, querying, and visualization — that gives engineering teams
@@ -103,6 +107,7 @@ id: role:media-engineer
 attributes:
   displayName: "Media Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Builds and optimizes media processing pipelines — video transcoding,
     adaptive streaming, image processing, and real-time media delivery.
@@ -127,6 +132,7 @@ id: role:compliance-engineer
 attributes:
   displayName: "Compliance Engineer"
   isAgentic: false
+  automatability: 0.5
   description: |
     Automates and maintains compliance controls across engineering systems —
     implementing policy-as-code, continuous compliance monitoring, audit
@@ -153,6 +159,7 @@ id: role:site-reliability-engineer
 attributes:
   displayName: "Site Reliability Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Ensures production system reliability, availability, and performance through
     SLO/SLI design, capacity planning, and toil automation. Bridges development
@@ -181,6 +188,7 @@ id: role:on-call
 attributes:
   displayName: "On-Call Engineer"
   isAgentic: false
+  automatability: 0.1
   description: |
     Operational role responsible for responding to production incidents during
     on-call rotation. Triages alerts, coordinates incident response across

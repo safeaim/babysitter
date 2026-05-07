@@ -31,6 +31,10 @@ nodeKinds:
   - name: seniority
     type: string
     required: false
+  - name: automatability
+    type: float
+    required: false
+    notes: "0.0 = never automatable (destructive decisions, legal liability), 0.5 = potentially automatable with advanced AI, 1.0 = fully automatable and commonly automated today"
   incomingEdges:
   - requires_skill
   - delegates_to

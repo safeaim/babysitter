@@ -3,6 +3,7 @@ id: role:ux-writer
 attributes:
   displayName: "UX Writer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Crafts the words, labels, error messages, and microcopy that guide users
     through product experiences with clarity and empathy. Collaborates closely
@@ -29,6 +30,7 @@ id: role:information-architect
 attributes:
   displayName: "Information Architect"
   isAgentic: false
+  automatability: 0.6
   description: |
     Designs the structural organization, labeling systems, navigation, and search
     mechanisms that help users find and understand information within digital
@@ -55,6 +57,7 @@ id: role:creative-director
 attributes:
   displayName: "Creative Director"
   isAgentic: false
+  automatability: 0.3
   description: |
     Sets the creative vision and aesthetic direction for brand, product, and
     marketing work, ensuring visual identity, messaging, and storytelling cohesively
@@ -84,6 +87,7 @@ id: role:brand-manager
 attributes:
   displayName: "Brand Manager"
   isAgentic: false
+  automatability: 0.3
   description: |
     Owns the consistency and evolution of the brand identity across all customer
     and stakeholder touchpoints, from visual assets and tone of voice to

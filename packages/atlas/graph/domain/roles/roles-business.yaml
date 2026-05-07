@@ -3,6 +3,7 @@ id: role:project-manager
 attributes:
   displayName: "Project Manager"
   isAgentic: false
+  automatability: 0.4
   description: |
     Plans, coordinates, and tracks the execution of cross-functional projects from
     initiation through closure, ensuring deliverables are on time, within scope, and
@@ -28,6 +29,7 @@ id: role:scrum-master
 attributes:
   displayName: "Scrum Master"
   isAgentic: false
+  automatability: 0.4
   description: |
     Facilitates the agile ceremonies and coaches the development team and organization
     on Scrum practices, removing impediments that slow delivery. Protects the team's
@@ -52,6 +54,7 @@ id: role:business-analyst
 attributes:
   displayName: "Business Analyst"
   isAgentic: false
+  automatability: 0.3
   description: |
     Elicits, analyzes, and documents business requirements, translating them into
     detailed specifications that engineering and product teams can act upon. Bridges
@@ -79,6 +82,7 @@ id: role:marketing-manager
 attributes:
   displayName: "Marketing Manager"
   isAgentic: false
+  automatability: 0.3
   description: |
     Plans and executes marketing campaigns and programs that build brand awareness,
     generate pipeline, and support product launches. Manages relationships with
@@ -103,6 +107,7 @@ id: role:sales-engineer
 attributes:
   displayName: "Sales Engineer"
   isAgentic: false
+  automatability: 0.3
   description: |
     Serves as the technical counterpart to account executives during the sales cycle,
     demonstrating product capabilities, answering deep technical questions, and
@@ -129,6 +134,7 @@ id: role:customer-success-manager
 attributes:
   displayName: "Customer Success Manager"
   isAgentic: false
+  automatability: 0.3
   description: |
     Owns the post-sale relationship with a portfolio of customers, ensuring they
     realize the intended value from the product and renew or expand their contracts.
@@ -153,6 +159,7 @@ id: role:account-executive
 attributes:
   displayName: "Account Executive"
   isAgentic: false
+  automatability: 0.2
   description: |
     Drives new business revenue by identifying, qualifying, and closing enterprise
     or mid-market customer deals. Manages the full sales cycle from outbound
@@ -177,6 +184,7 @@ id: role:partnerships-manager
 attributes:
   displayName: "Partnerships Manager"
   isAgentic: false
+  automatability: 0.2
   description: |
     Develops and manages strategic relationships with technology partners, resellers,
     and ecosystem integrators that expand market reach and product capabilities.

@@ -3,6 +3,7 @@ id: role:compliance-officer
 attributes:
   displayName: "Compliance Officer"
   isAgentic: false
+  automatability: 0.2
   description: |
     Owns the organization's regulatory compliance program, ensuring adherence to
     applicable laws, industry standards, and contractual obligations such as SOC 2,
@@ -31,6 +32,7 @@ id: role:privacy-engineer
 attributes:
   displayName: "Privacy Engineer"
   isAgentic: false
+  automatability: 0.2
   description: |
     Embeds privacy principles and legal requirements such as GDPR and CCPA into
     product and engineering decisions from design through deployment. Conducts data
@@ -61,6 +63,7 @@ id: role:legal-counsel
 attributes:
   displayName: "Legal Counsel"
   isAgentic: false
+  automatability: 0.2
   description: |
     Provides legal guidance on commercial contracts, intellectual property, regulatory
     obligations, and corporate governance to protect the organization's interests.
@@ -85,6 +88,7 @@ id: role:audit-analyst
 attributes:
   displayName: "Audit Analyst"
   isAgentic: false
+  automatability: 0.2
   description: |
     Executes internal and external audit procedures by collecting evidence, testing
     controls, and documenting findings against applicable frameworks such as SOC 2,

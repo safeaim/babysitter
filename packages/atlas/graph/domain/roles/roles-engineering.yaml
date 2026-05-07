@@ -3,6 +3,7 @@ id: role:backend-engineer
 attributes:
   displayName: "Backend Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Designs, builds, and maintains server-side services, APIs, and data pipelines that
     power product features and internal platforms. Works closely with frontend engineers
@@ -29,6 +30,7 @@ id: role:frontend-engineer
 attributes:
   displayName: "Frontend Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Crafts responsive, accessible, and performant user interfaces that translate product
     designs into working browser and web application experiences. Collaborates tightly
@@ -54,6 +56,7 @@ id: role:fullstack-engineer
 attributes:
   displayName: "Fullstack Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Operates across both client and server layers to deliver complete, end-to-end
     features independently. Comfortable making architectural decisions at every tier
@@ -81,6 +84,7 @@ id: role:devops-engineer
 attributes:
   displayName: "DevOps Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Bridges development and operations by building, automating, and maintaining
     CI/CD pipelines, infrastructure-as-code, and deployment tooling. Works to
@@ -109,6 +113,7 @@ id: role:sre
 attributes:
   displayName: "Site Reliability Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Applies software engineering principles to operations problems, owning system
     reliability, scalability, and efficiency at scale. Defines and tracks error
@@ -138,6 +143,7 @@ id: role:platform-engineer
 attributes:
   displayName: "Platform Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Builds and maintains the internal developer platform — including self-service
     tooling, shared infrastructure abstractions, and golden-path templates — that
@@ -167,6 +173,7 @@ id: role:data-engineer
 attributes:
   displayName: "Data Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Designs and operates the data infrastructure — pipelines, warehouses, and
     streaming systems — that move raw data from source systems to analytics and
@@ -195,6 +202,7 @@ id: role:ml-engineer
 attributes:
   displayName: "Machine Learning Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Develops, trains, and productionizes machine learning models, bridging the gap
     between research prototypes and scalable production systems. Works with data
@@ -223,6 +231,7 @@ id: role:security-engineer
 attributes:
   displayName: "Security Engineer"
   isAgentic: false
+  automatability: 0.7
   description: |
     Protects the organization's systems and data by embedding security practices
     throughout the software development lifecycle. Conducts threat modeling, security
@@ -252,6 +261,7 @@ id: role:qa-engineer
 attributes:
   displayName: "QA Engineer"
   isAgentic: false
+  automatability: 0.9
   description: |
     Designs and executes testing strategies that verify software correctness, reliability,
     and usability before and after release. Builds and maintains automated test suites
@@ -278,6 +288,7 @@ id: role:mobile-engineer
 attributes:
   displayName: "Mobile Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Builds native or cross-platform mobile applications for iOS and Android, optimizing
     for performance, battery life, and offline capability within the constraints of
@@ -304,6 +315,7 @@ id: role:embedded-engineer
 attributes:
   displayName: "Embedded Engineer"
   isAgentic: false
+  automatability: 0.8
   description: |
     Develops firmware and low-level software for constrained hardware platforms such
     as microcontrollers, FPGAs, and real-time systems. Works at the boundary of

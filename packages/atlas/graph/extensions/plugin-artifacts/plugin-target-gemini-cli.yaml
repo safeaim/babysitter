@@ -11,7 +11,7 @@ attributes:
   hookRegistrationFormat: gemini
   hookRegistrationOutputPath: "hooks/hooks.json"
   hookRegistrationAliasPaths: []
-  harnessManifestPath: null
+  harnessManifestPath: "gemini-extension.json"
   pluginRootEnvVarForExtension: null
   marketplacePath: null
   pluginRootEnvVar: GEMINI_EXTENSION_PATH

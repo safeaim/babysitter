@@ -34,9 +34,9 @@ export class GeminiAdapter extends BaseHarnessOutputAdapter {
     const commandPaths = getCommandPaths(sourceDir, manifest);
     files.push({
       path: 'plugin.json',
-      content: generateGeminiManifest(manifest, commandPaths, this.targetName),
+      content: generateGeminiManifest(manifest, commandPaths),
     });
-    const extensionManifestPath = targetProfile.requiredSurfaceFile || `${this.targetName}-extension.json`;
+    const extensionManifestPath = targetProfile.harnessManifestPath || 'gemini-extension.json';
     files.push({
       path: extensionManifestPath,
       content: JSON.stringify(
@@ -66,12 +66,12 @@ export function generateGeminiManifest(
     description: manifest.description,
     author: manifest.author,
     license: manifest.license,
-    harness: `${targetName}-cli`,
+    harness: 'gemini-cli',
     hooks: {},
     commands: commandPaths.map((cmdPath) => `commands/${cmdPath.split(/[\\/]/).pop()?.replace(/\.md$/, '.toml')}`),
     skills: [],
     contextFileName: 'GEMINI.md',
-    extensionManifest: `${targetName}-extension.json`,
+    extensionManifest: 'gemini-extension.json',
   };
 
   if (manifest.hooks) {

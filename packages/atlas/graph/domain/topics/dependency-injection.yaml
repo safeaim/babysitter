@@ -5,4 +5,6 @@ attributes:
   description: |
     Dependency Injection as a cross-cutting topic — constructor / setter /
     container-based wiring, lifetimes, and testability tradeoffs.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering

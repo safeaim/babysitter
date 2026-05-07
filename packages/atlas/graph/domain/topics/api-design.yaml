@@ -6,4 +6,7 @@ attributes:
     API Design as a cross-cutting topic — resource modeling, REST/gRPC/
     GraphQL trade-offs, versioning strategy, idempotency, pagination,
     error semantics, and contract evolution.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering

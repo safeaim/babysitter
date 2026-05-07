@@ -5,4 +5,7 @@ attributes:
   description: |
     Saga pattern for distributed transactions — choreographed and
     orchestrated long-running workflows with compensating actions.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases

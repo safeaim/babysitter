@@ -5,4 +5,7 @@ attributes:
   description: |
     GraphQL schema design — type modeling, pagination conventions,
     federation, persisted queries, and schema evolution.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering

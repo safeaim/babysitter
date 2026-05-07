@@ -5,4 +5,7 @@ attributes:
   description: |
     Command Query Responsibility Segregation — splitting write-side
     command handlers from read-side query models.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases

@@ -12,6 +12,9 @@ attributes:
     - language:javascript
     - language:typescript
 edges:
+  belongs_to_language:
+    - language:javascript
+    - language:typescript
   applies_to_language:
     - target: language:javascript
     - target: language:typescript

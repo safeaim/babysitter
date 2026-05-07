@@ -5,4 +5,7 @@ attributes:
   description: |
     Web/app accessibility — WCAG conformance, screen-reader support,
     keyboard navigation, color contrast.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering

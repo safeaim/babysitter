@@ -6,7 +6,9 @@ attributes:
   description: |
     Clean Architecture as a cross-cutting topic - concentric dependency
     boundaries, use-case orchestration, and infrastructure isolation.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:onion-architecture
@@ -15,7 +17,9 @@ attributes:
   description: |
     Onion Architecture as a cross-cutting topic - domain-centered layering
     with dependencies flowing inward toward the core model.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:microservices-architecture
@@ -24,7 +28,10 @@ attributes:
   description: |
     Microservices Architecture as a cross-cutting topic - service boundaries,
     independently deployable units, and distributed-system tradeoffs.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:devops
 ---
 nodeKind: Topic
 id: topic:serverless-architecture
@@ -33,7 +40,10 @@ attributes:
   description: |
     Serverless Architecture as a cross-cutting topic - event-triggered compute,
     managed platform dependencies, and operational tradeoffs around cold starts.
-edges: {}
+edges:
+  applies_to:
+    - domain:cloud-infra
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:backend-for-frontend
@@ -42,7 +52,10 @@ attributes:
   description: |
     Backend for Frontend as a cross-cutting topic - client-specific backend
     surfaces that shape data, auth, and orchestration for one UI channel.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:retry-pattern
@@ -51,7 +64,9 @@ attributes:
   description: |
     Retry Pattern as a cross-cutting topic - bounded retries, backoff,
     idempotency awareness, and failure classification.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:timeout-pattern
@@ -60,7 +75,9 @@ attributes:
   description: |
     Timeout Pattern as a cross-cutting topic - deadline budgets,
     cancellation, fail-fast behavior, and latency containment.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:single-page-application
@@ -69,7 +86,9 @@ attributes:
   description: |
     Single Page Application as a cross-cutting topic - client-routed apps with
     long-lived browser sessions, incremental data loading, and stateful shells.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:progressive-web-application
@@ -78,7 +97,10 @@ attributes:
   description: |
     Progressive Web Application as a cross-cutting topic - installability,
     offline support, service workers, and app-like web delivery.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:static-site-generation
@@ -87,7 +109,9 @@ attributes:
   description: |
     Static Site Generation as a cross-cutting topic - build-time page
     materialization, CDN-first delivery, and hybrid rendering tradeoffs.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:rest
@@ -96,7 +120,10 @@ attributes:
   description: |
     REST as a cross-cutting topic - resource-oriented APIs, HTTP semantics,
     idempotency, representation design, and cache-aware interaction.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:message-driven-architecture
@@ -105,7 +132,10 @@ attributes:
   description: |
     Message-Driven Architecture as a cross-cutting topic - asynchronous
     communication through queued or brokered messages between services.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:data-engineering
 ---
 nodeKind: Topic
 id: topic:layered-architecture
@@ -114,7 +144,9 @@ attributes:
   description: |
     Layered Architecture as a cross-cutting topic - presentation,
     application, and data-access separation through explicit layers.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:service-oriented-architecture
@@ -123,7 +155,9 @@ attributes:
   description: |
     Service-Oriented Architecture as a cross-cutting topic - coarse-grained
     services, contracts, and integration through shared service boundaries.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:publish-subscribe
@@ -132,7 +166,10 @@ attributes:
   description: |
     Publish-Subscribe as a cross-cutting topic - producers publish events to
     a bus while subscribers react without direct producer coupling.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:data-engineering
 ---
 nodeKind: Topic
 id: topic:request-reply
@@ -141,7 +178,9 @@ attributes:
   description: |
     Request-Reply as a cross-cutting topic - correlated requests and
     responses across service or message boundaries.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:sidecar-pattern
@@ -150,7 +189,10 @@ attributes:
   description: |
     Sidecar Pattern as a cross-cutting topic - colocated helper processes that
     augment an application with networking, policy, or telemetry concerns.
-edges: {}
+edges:
+  applies_to:
+    - domain:devops
+    - domain:cloud-infra
 ---
 nodeKind: Topic
 id: topic:sharding
@@ -159,7 +201,10 @@ attributes:
   description: |
     Sharding as a cross-cutting topic - partitioning data or workload across
     multiple storage or compute partitions for scale.
-edges: {}
+edges:
+  applies_to:
+    - domain:databases
+    - domain:data-engineering
 ---
 nodeKind: Topic
 id: topic:bulkhead-pattern
@@ -168,7 +213,9 @@ attributes:
   description: |
     Bulkhead Pattern as a cross-cutting topic - isolating pools of work or
     resources so one failure domain does not cascade into another.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:client-side-rendering
@@ -177,7 +224,9 @@ attributes:
   description: |
     Client-Side Rendering as a cross-cutting topic - browser-side rendering,
     hydration-free startup, and frontend bootstrapping after asset load.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:incremental-static-regeneration
@@ -186,7 +235,9 @@ attributes:
   description: |
     Incremental Static Regeneration as a cross-cutting topic - time- or event-
     driven static page refresh without rebuilding the full site.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:code-splitting
@@ -195,7 +246,9 @@ attributes:
   description: |
     Code Splitting as a cross-cutting topic - deferring portions of a bundle
     until needed to improve initial load and execution behavior.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:finite-state-machine
@@ -204,7 +257,9 @@ attributes:
   description: |
     Finite State Machine as a cross-cutting topic - explicit states,
     transitions, guards, and side effects in interactive systems.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:micro-frontend-architecture
@@ -213,7 +268,10 @@ attributes:
   description: |
     Micro-Frontend Architecture as a cross-cutting topic - independently
     delivered frontend slices composed into one user-facing experience.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:jamstack-architecture
@@ -222,7 +280,9 @@ attributes:
   description: |
     JAMstack Architecture as a cross-cutting topic - prebuilt frontend assets,
     CDN delivery, and API-backed dynamic behavior.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:offline-first
@@ -231,7 +291,10 @@ attributes:
   description: |
     Offline-First as a cross-cutting topic - local persistence, sync
     reconciliation, and usable degraded behavior without the network.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:oauth-openid-connect
@@ -240,7 +303,10 @@ attributes:
   description: |
     OAuth/OpenID Connect as a cross-cutting topic - delegated authorization,
     identity tokens, scopes, consent flows, and client/server trust boundaries.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:api-key
@@ -249,7 +315,10 @@ attributes:
   description: |
     API Key as a cross-cutting topic - shared-secret client identification,
     issuance, rotation, and abuse-control tradeoffs.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:defense-in-depth
@@ -258,7 +327,10 @@ attributes:
   description: |
     Defense in Depth as a cross-cutting topic - layered controls so no single
     failed safeguard fully compromises the system.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:cybersecurity
 ---
 nodeKind: Topic
 id: topic:zero-trust-architecture
@@ -267,7 +339,10 @@ attributes:
   description: |
     Zero Trust Architecture as a cross-cutting topic - explicit verification,
     least privilege, and continuous trust evaluation across system boundaries.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:cybersecurity
 ---
 nodeKind: Topic
 id: topic:data-at-rest-encryption
@@ -276,7 +351,10 @@ attributes:
   description: |
     Data-at-Rest Encryption as a cross-cutting topic - protecting stored data
     through encrypted persistence and disciplined key custody.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:data-in-transit-encryption
@@ -285,7 +363,10 @@ attributes:
   description: |
     Data-in-Transit Encryption as a cross-cutting topic - protecting
     communication channels with secure transport and endpoint validation.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:networking
 ---
 nodeKind: Topic
 id: topic:secure-token-pattern
@@ -294,7 +375,10 @@ attributes:
   description: |
     Secure Token Pattern as a cross-cutting topic - issuing scoped,
     verifiable tokens with bounded lifetime and audience discipline.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:fallback-pattern
@@ -303,7 +387,9 @@ attributes:
   description: |
     Fallback Pattern as a cross-cutting topic - controlled degraded behavior
     when a dependency or path is unavailable.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:compensating-transaction
@@ -312,7 +398,10 @@ attributes:
   description: |
     Compensating Transaction as a cross-cutting topic - semantically undoing
     prior distributed work when global atomicity is unavailable.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:monolithic-architecture
@@ -321,7 +410,9 @@ attributes:
   description: |
     Monolithic Architecture as a cross-cutting topic - deploying one primary
     application unit while managing modularity and growth boundaries internally.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:load-balancing
@@ -330,7 +421,10 @@ attributes:
   description: |
     Load Balancing as a cross-cutting topic - distributing traffic or work
     across multiple instances to improve resilience and capacity.
-edges: {}
+edges:
+  applies_to:
+    - domain:infrastructure
+    - domain:networking
 ---
 nodeKind: Topic
 id: topic:auto-scaling
@@ -339,7 +433,10 @@ attributes:
   description: |
     Auto-Scaling as a cross-cutting topic - adjusting capacity automatically
     from demand or signal-driven policies.
-edges: {}
+edges:
+  applies_to:
+    - domain:cloud-infra
+    - domain:devops
 ---
 nodeKind: Topic
 id: topic:partitioning
@@ -348,7 +445,10 @@ attributes:
   description: |
     Partitioning as a cross-cutting topic - dividing data or compute into
     bounded segments for scalability, ownership, or isolation.
-edges: {}
+edges:
+  applies_to:
+    - domain:databases
+    - domain:data-engineering
 ---
 nodeKind: Topic
 id: topic:throttling
@@ -357,7 +457,10 @@ attributes:
   description: |
     Throttling as a cross-cutting topic - intentionally reducing throughput
     or concurrency to protect systems under pressure.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:repository-pattern
@@ -366,7 +469,10 @@ attributes:
   description: |
     Repository Pattern as a cross-cutting topic - abstracting persistence
     access behind domain-oriented collection-like interfaces.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:data-mapper
@@ -375,7 +481,10 @@ attributes:
   description: |
     Data Mapper as a cross-cutting topic - separating in-memory domain models
     from persistence mapping and storage concerns.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:unit-of-work
@@ -384,7 +493,10 @@ attributes:
   description: |
     Unit of Work as a cross-cutting topic - tracking related persistence
     changes and committing them as a coordinated boundary.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:database-per-service
@@ -393,7 +505,10 @@ attributes:
   description: |
     Database per Service as a cross-cutting topic - service ownership of its
     own persistence boundary rather than sharing one central store.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:shared-database
@@ -402,7 +517,10 @@ attributes:
   description: |
     Shared Database as a cross-cutting topic - multiple services or modules
     coupling through a common persistence layer.
-edges: {}
+edges:
+  applies_to:
+    - domain:databases
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:event-store
@@ -411,7 +529,10 @@ attributes:
   description: |
     Event Store as a cross-cutting topic - append-only persistence of domain
     events as the durable source of business history.
-edges: {}
+edges:
+  applies_to:
+    - domain:databases
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:mvc
@@ -420,7 +541,10 @@ attributes:
   description: |
     MVC as a cross-cutting topic - Model-View-Controller decomposition of
     state, presentation, and user interaction orchestration.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:mvp
@@ -429,7 +553,10 @@ attributes:
   description: |
     MVP as a cross-cutting topic - Model-View-Presenter separation that moves
     presentation logic out of the view layer.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:mvvm
@@ -438,7 +565,10 @@ attributes:
   description: |
     MVVM as a cross-cutting topic - Model-View-ViewModel composition around
     view state binding and presentation-model logic.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:component-based-architecture
@@ -447,7 +577,10 @@ attributes:
   description: |
     Component-Based Architecture as a cross-cutting topic - encapsulated UI or
     system parts composed into larger experiences and applications.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:atomic-design
@@ -456,7 +589,9 @@ attributes:
   description: |
     Atomic Design as a cross-cutting topic - organizing interface systems into
     atoms, molecules, organisms, templates, and pages.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:context-api-pattern
@@ -465,7 +600,9 @@ attributes:
   description: |
     Context API Pattern as a cross-cutting topic - propagating shared state or
     services through a component tree without prop drilling.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:composition-pattern
@@ -474,7 +611,9 @@ attributes:
   description: |
     Composition Pattern as a cross-cutting topic - building behavior by
     combining parts rather than deep inheritance chains.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:css-modules
@@ -483,7 +622,9 @@ attributes:
   description: |
     CSS Modules as a cross-cutting topic - locally scoped stylesheet modules
     that reduce naming collisions in componentized UI codebases.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:css-in-js
@@ -492,7 +633,9 @@ attributes:
   description: |
     CSS-in-JS as a cross-cutting topic - expressing styling in JavaScript or
     TypeScript runtime/build-time systems close to component definitions.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:utility-first-css
@@ -501,7 +644,9 @@ attributes:
   description: |
     Utility-First CSS as a cross-cutting topic - composing interfaces from
     low-level utility classes rather than bespoke semantic stylesheets.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:lazy-loading
@@ -510,7 +655,10 @@ attributes:
   description: |
     Lazy Loading as a cross-cutting topic - deferring resource or computation
     work until demand makes it necessary.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:service-workers
@@ -519,7 +667,9 @@ attributes:
   description: |
     Service Workers as a cross-cutting topic - browser-side background scripts
     that intercept requests and enable caching, sync, or offline behavior.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:dynamic-imports
@@ -528,7 +678,9 @@ attributes:
   description: |
     Dynamic Imports as a cross-cutting topic - runtime module loading to
     defer code evaluation until execution paths require it.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:tree-shaking
@@ -537,7 +689,9 @@ attributes:
   description: |
     Tree Shaking as a cross-cutting topic - eliminating unused code from build
     outputs through static reachability analysis.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:custom-hooks
@@ -546,7 +700,9 @@ attributes:
   description: |
     Custom Hooks as a cross-cutting topic - packaging reusable stateful logic
     into composable hook abstractions in React-style systems.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:isomorphic-universal-javascript
@@ -555,7 +711,9 @@ attributes:
   description: |
     Isomorphic/Universal JavaScript as a cross-cutting topic - sharing
     execution and rendering logic across server and browser runtimes.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:flux-architecture
@@ -564,7 +722,9 @@ attributes:
   description: |
     Flux Architecture as a cross-cutting topic - unidirectional data flow,
     centralized updates, and explicit action-driven state transitions.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:redux-architecture
@@ -573,7 +733,9 @@ attributes:
   description: |
     Redux Architecture as a cross-cutting topic - store-centric state
     management with reducers, actions, and predictable update flows.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:container-presentational-pattern
@@ -582,7 +744,9 @@ attributes:
   description: |
     Container/Presentational Pattern as a cross-cutting topic - separating
     dataful orchestration components from display-focused components.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:multi-page-application
@@ -591,7 +755,9 @@ attributes:
   description: |
     Multi-Page Application as a cross-cutting topic - page-oriented web
     delivery where navigation reloads distinct server-rendered documents.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:islands-architecture
@@ -600,7 +766,9 @@ attributes:
   description: |
     Islands Architecture as a cross-cutting topic - mostly-static pages with
     isolated interactive islands hydrated only where needed.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:streaming-ssr
@@ -609,7 +777,9 @@ attributes:
   description: |
     Streaming SSR as a cross-cutting topic - progressively sending rendered
     HTML and data so clients can display content before full completion.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:compound-components
@@ -618,7 +788,9 @@ attributes:
   description: |
     Compound Components as a cross-cutting topic - coordinated child
     components sharing parent-managed state and behavior contracts.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:higher-order-components
@@ -627,7 +799,9 @@ attributes:
   description: |
     Higher-Order Components as a cross-cutting topic - wrapping components to
     enhance behavior through composition rather than inheritance.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:render-props
@@ -636,7 +810,9 @@ attributes:
   description: |
     Render Props as a cross-cutting topic - passing rendering functions to
     share logic while leaving output control to consumers.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:provider-pattern
@@ -645,7 +821,10 @@ attributes:
   description: |
     Provider Pattern as a cross-cutting topic - exposing shared dependencies
     or state through tree-scoped providers and consumers.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:controlled-components
@@ -654,7 +833,9 @@ attributes:
   description: |
     Controlled Components as a cross-cutting topic - component state driven
     externally through props with explicit update callbacks.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:uncontrolled-components
@@ -663,7 +844,9 @@ attributes:
   description: |
     Uncontrolled Components as a cross-cutting topic - component state stored
     internally or in the DOM rather than fully controlled by parents.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:smart-dumb-components
@@ -672,7 +855,9 @@ attributes:
   description: |
     Smart/Dumb Components as a cross-cutting topic - separating stateful or
     orchestration-heavy components from mostly presentational ones.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:component-composition
@@ -681,7 +866,9 @@ attributes:
   description: |
     Component Composition as a cross-cutting topic - assembling interfaces
     from small components with well-bounded props and responsibilities.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:slots-pattern
@@ -690,7 +877,9 @@ attributes:
   description: |
     Slots Pattern as a cross-cutting topic - exposing structured insertion
     points so consumers can customize layout or content placement.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:styled-components-pattern
@@ -699,7 +888,9 @@ attributes:
   description: |
     Styled Components as a cross-cutting topic - CSS-in-JS styling attached
     directly to component definitions through styled primitives.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:bem
@@ -708,7 +899,9 @@ attributes:
   description: |
     BEM as a cross-cutting topic - naming CSS classes by block, element, and
     modifier to maintain scalable stylesheet structure.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:oocss
@@ -717,7 +910,9 @@ attributes:
   description: |
     OOCSS as a cross-cutting topic - separating structure and skin while
     treating CSS as reusable visual objects.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:smacss
@@ -726,7 +921,9 @@ attributes:
   description: |
     SMACSS as a cross-cutting topic - categorizing stylesheet concerns into
     scalable layers for modular CSS organization.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:atomic-css
@@ -735,7 +932,9 @@ attributes:
   description: |
     Atomic CSS as a cross-cutting topic - composing UI styles from very small
     single-purpose utility classes.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:css-variables-pattern
@@ -744,7 +943,9 @@ attributes:
   description: |
     CSS Variables Pattern as a cross-cutting topic - tokenizing values with
     custom properties for theming and runtime style adaptation.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:theming-pattern
@@ -753,7 +954,9 @@ attributes:
   description: |
     Theming Pattern as a cross-cutting topic - switching or layering visual
     design systems through tokens, variants, and contextual style control.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:virtual-dom
@@ -762,7 +965,9 @@ attributes:
   description: |
     Virtual DOM as a cross-cutting topic - computing UI diffs in memory before
     applying minimal updates to the host rendering surface.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:infinite-scrolling
@@ -771,7 +976,10 @@ attributes:
   description: |
     Infinite Scrolling as a cross-cutting topic - incrementally loading and
     appending content as users approach the end of a list or feed.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:windowing-virtualization
@@ -780,7 +988,9 @@ attributes:
   description: |
     Windowing/Virtualization as a cross-cutting topic - rendering only the
     visible slice of large collections to control DOM and memory cost.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:active-record
@@ -789,7 +999,10 @@ attributes:
   description: |
     Active Record as a cross-cutting topic - combining domain data and
     persistence behavior in one model-centric abstraction.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:memoization
@@ -798,7 +1011,9 @@ attributes:
   description: |
     Memoization as a cross-cutting topic - caching pure or stable computation
     results to avoid redundant work on repeated inputs.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:resource-prefetching
@@ -807,7 +1022,9 @@ attributes:
   description: |
     Resource Prefetching as a cross-cutting topic - proactively loading assets
     or data likely to be needed in upcoming user or system flows.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:asset-optimization
@@ -816,7 +1033,9 @@ attributes:
   description: |
     Asset Optimization as a cross-cutting topic - reducing transfer and parse
     cost of images, fonts, scripts, and other delivered resources.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:critical-css
@@ -825,7 +1044,9 @@ attributes:
   description: |
     Critical CSS as a cross-cutting topic - prioritizing above-the-fold styles
     so first render is not blocked by the full stylesheet payload.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:hash-based-routing
@@ -834,7 +1055,9 @@ attributes:
   description: |
     Hash-Based Routing as a cross-cutting topic - encoding client route state
     in URL fragments handled entirely in the browser.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:history-api-routing
@@ -843,7 +1066,9 @@ attributes:
   description: |
     History API Routing as a cross-cutting topic - browser navigation managed
     through pushState/replaceState while keeping clean path-based URLs.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:nested-routing
@@ -852,7 +1077,9 @@ attributes:
   description: |
     Nested Routing as a cross-cutting topic - composing route hierarchies so
     parent layouts and child views coordinate in one navigation tree.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:dynamic-routing
@@ -861,7 +1088,9 @@ attributes:
   description: |
     Dynamic Routing as a cross-cutting topic - matching and rendering routes
     from runtime parameters or content-driven path segments.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:protected-routes
@@ -870,7 +1099,10 @@ attributes:
   description: |
     Protected Routes as a cross-cutting topic - enforcing route access checks
     before allowing navigation or data exposure.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:security
 ---
 nodeKind: Topic
 id: topic:route-guards
@@ -879,7 +1111,10 @@ attributes:
   description: |
     Route Guards as a cross-cutting topic - pre-navigation checks that can
     allow, redirect, defer, or block route transitions.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:security
 ---
 nodeKind: Topic
 id: topic:layout-routes
@@ -888,7 +1123,9 @@ attributes:
   description: |
     Layout Routes as a cross-cutting topic - route-aware layout shells that
     wrap one or more child route segments.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:modal-routes
@@ -897,7 +1134,9 @@ attributes:
   description: |
     Modal Routes as a cross-cutting topic - presenting route state in modal
     overlays while preserving underlying page context and deep links.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:parallel-routes
@@ -906,7 +1145,9 @@ attributes:
   description: |
     Parallel Routes as a cross-cutting topic - rendering multiple route
     branches or slots concurrently within one application surface.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:catch-all-routes
@@ -915,7 +1156,9 @@ attributes:
   description: |
     Catch-all Routes as a cross-cutting topic - route matchers that absorb
     variable-depth path segments under one handler.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:controlled-forms
@@ -924,7 +1167,9 @@ attributes:
   description: |
     Controlled Forms as a cross-cutting topic - form input state managed by
     application state rather than direct DOM ownership.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:uncontrolled-forms
@@ -933,7 +1178,9 @@ attributes:
   description: |
     Uncontrolled Forms as a cross-cutting topic - form input state primarily
     owned by the DOM or native widgets rather than app state.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:form-validation
@@ -942,7 +1189,9 @@ attributes:
   description: |
     Form Validation as a cross-cutting topic - enforcing input constraints,
     feedback timing, and submission correctness across form flows.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:command-pattern
@@ -951,7 +1200,9 @@ attributes:
   description: |
     Command Pattern as a cross-cutting topic - encapsulating actions as
     objects or messages that can be queued, undone, or dispatched uniformly.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:observable-pattern
@@ -960,7 +1211,9 @@ attributes:
   description: |
     Observable Pattern as a cross-cutting topic - emitting value changes over
     time to subscribed observers or reactive consumers.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:factory-pattern
@@ -969,7 +1222,9 @@ attributes:
   description: |
     Factory Pattern as a cross-cutting topic - delegating object creation to a
     dedicated construction interface or function.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:singleton-pattern
@@ -978,7 +1233,9 @@ attributes:
   description: |
     Singleton Pattern as a cross-cutting topic - constraining a component to
     one shared instance with global or scoped access.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:observer-pattern
@@ -987,7 +1244,9 @@ attributes:
   description: |
     Observer Pattern as a cross-cutting topic - dependents subscribing to a
     subject and reacting when its state changes.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:strategy-pattern
@@ -996,7 +1255,9 @@ attributes:
   description: |
     Strategy Pattern as a cross-cutting topic - selecting interchangeable
     algorithms or behaviors behind a stable interface.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:decorator-pattern
@@ -1005,7 +1266,9 @@ attributes:
   description: |
     Decorator Pattern as a cross-cutting topic - layering behavior around an
     object without modifying its underlying implementation.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:adapter-pattern
@@ -1014,7 +1277,9 @@ attributes:
   description: |
     Adapter Pattern as a cross-cutting topic - translating one interface into
     another so incompatible components can collaborate.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:builder-pattern
@@ -1023,7 +1288,9 @@ attributes:
   description: |
     Builder Pattern as a cross-cutting topic - constructing complex objects
     through staged or fluent assembly steps.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:proxy-pattern
@@ -1032,7 +1299,9 @@ attributes:
   description: |
     Proxy Pattern as a cross-cutting topic - standing in for another object or
     service to control access, behavior, or indirection.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:soap
@@ -1041,7 +1310,10 @@ attributes:
   description: |
     SOAP as a cross-cutting topic - XML envelope-based service contracts,
     WSDL-described operations, and message-oriented integration semantics.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:event-mesh
@@ -1050,7 +1322,10 @@ attributes:
   description: |
     Event Mesh as a cross-cutting topic - interconnecting multiple brokers or
     event domains so publishers and subscribers span broader topologies.
-edges: {}
+edges:
+  applies_to:
+    - domain:data-engineering
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:horizontal-scaling
@@ -1059,7 +1334,10 @@ attributes:
   description: |
     Horizontal Scaling as a cross-cutting topic - increasing capacity by
     adding more parallel instances rather than enlarging one node.
-edges: {}
+edges:
+  applies_to:
+    - domain:infrastructure
+    - domain:cloud-infra
 ---
 nodeKind: Topic
 id: topic:vertical-scaling
@@ -1068,7 +1346,10 @@ attributes:
   description: |
     Vertical Scaling as a cross-cutting topic - increasing capacity by
     enlarging the resources of one instance or machine.
-edges: {}
+edges:
+  applies_to:
+    - domain:infrastructure
+    - domain:cloud-infra
 ---
 nodeKind: Topic
 id: topic:cache-aside-pattern
@@ -1077,7 +1358,10 @@ attributes:
   description: |
     Cache-Aside Pattern as a cross-cutting topic - loading from the primary
     store on cache miss and populating cache after the read.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:databases
 ---
 nodeKind: Topic
 id: topic:inversion-of-control
@@ -1086,7 +1370,9 @@ attributes:
   description: |
     Inversion of Control as a cross-cutting topic - shifting control of
     creation or execution flow to frameworks, containers, or orchestrators.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:flux-pattern
@@ -1095,7 +1381,9 @@ attributes:
   description: |
     Flux Pattern as a cross-cutting topic - unidirectional updates through
     dispatched actions and centralized state transitions.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:redux-pattern
@@ -1104,7 +1392,9 @@ attributes:
   description: |
     Redux Pattern as a cross-cutting topic - reducer-driven centralized state
     management built around immutable updates and dispatched actions.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:publisher-subscriber-pattern
@@ -1113,7 +1403,10 @@ attributes:
   description: |
     Publisher/Subscriber Pattern as a cross-cutting topic - distributing
     events to subscribers without direct producer-to-consumer coupling.
-edges: {}
+edges:
+  applies_to:
+    - domain:software-engineering
+    - domain:data-engineering
 ---
 nodeKind: Topic
 id: topic:form-state-management
@@ -1122,7 +1415,9 @@ attributes:
   description: |
     Form State Management as a cross-cutting topic - tracking values, touched
     state, dirty state, validation, and submission lifecycle in forms.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:multi-step-forms
@@ -1131,7 +1426,9 @@ attributes:
   description: |
     Multi-step Forms as a cross-cutting topic - splitting complex data entry
     into staged flows with progress, validation, and navigation rules.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:dynamic-forms
@@ -1140,7 +1437,9 @@ attributes:
   description: |
     Dynamic Forms as a cross-cutting topic - generating or changing form
     structure from data, configuration, or user selections.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:form-composition
@@ -1149,7 +1448,9 @@ attributes:
   description: |
     Form Composition as a cross-cutting topic - assembling forms from reusable
     field groups, behaviors, and validation primitives.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:field-array-pattern
@@ -1158,7 +1459,9 @@ attributes:
   description: |
     Field Array Pattern as a cross-cutting topic - managing repeatable groups
     of form inputs that can be added, removed, or reordered.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:form-builder-pattern
@@ -1167,7 +1470,9 @@ attributes:
   description: |
     Form Builder Pattern as a cross-cutting topic - constructing form
     structures from metadata or schema-driven building blocks.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:form-wizard-pattern
@@ -1176,7 +1481,9 @@ attributes:
   description: |
     Form Wizard Pattern as a cross-cutting topic - stepwise form journeys with
     guided progression, branching, and staged validation.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:content-security-policy
@@ -1185,7 +1492,10 @@ attributes:
   description: |
     Content Security Policy as a cross-cutting topic - controlling allowed
     script, style, frame, and resource origins through browser policy.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:xss-prevention
@@ -1194,7 +1504,10 @@ attributes:
   description: |
     XSS Prevention as a cross-cutting topic - output encoding, safe DOM use,
     script loading controls, and untrusted content isolation.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:csrf-protection
@@ -1203,7 +1516,10 @@ attributes:
   description: |
     CSRF Protection as a cross-cutting topic - request authenticity defenses
     such as tokens, same-site cookies, and origin verification.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:secure-authentication-patterns
@@ -1212,7 +1528,10 @@ attributes:
   description: |
     Secure Authentication Patterns as a cross-cutting topic - strong login and
     credential-handling flows with resistance to common abuse modes.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:oauth-integration
@@ -1221,7 +1540,10 @@ attributes:
   description: |
     OAuth Integration as a cross-cutting topic - integrating delegated auth
     providers, token exchange, refresh flows, and consent handling.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:secure-storage-pattern
@@ -1230,7 +1552,9 @@ attributes:
   description: |
     Secure Storage Pattern as a cross-cutting topic - protecting sensitive
     local or remote state with appropriate secrecy and access controls.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
 ---
 nodeKind: Topic
 id: topic:input-sanitization
@@ -1239,7 +1563,10 @@ attributes:
   description: |
     Input Sanitization as a cross-cutting topic - normalizing or filtering
     untrusted input before downstream processing or rendering.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:permission-based-access
@@ -1248,7 +1575,10 @@ attributes:
   description: |
     Permission-Based Access as a cross-cutting topic - enforcing granular
     capabilities or actions through explicit permission models.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:software-engineering
 ---
 nodeKind: Topic
 id: topic:security-headers-implementation
@@ -1257,7 +1587,10 @@ attributes:
   description: |
     Security Headers Implementation as a cross-cutting topic - applying HTTP
     response headers that improve browser-side security posture.
-edges: {}
+edges:
+  applies_to:
+    - domain:security
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:responsive-design
@@ -1266,7 +1599,10 @@ attributes:
   description: |
     Responsive Design as a cross-cutting topic - adapting layout and behavior
     fluidly to changing viewport sizes and device capabilities.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:adaptive-design
@@ -1275,7 +1611,10 @@ attributes:
   description: |
     Adaptive Design as a cross-cutting topic - switching among predefined
     experience variants for distinct device or context classes.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:mobile-first-design
@@ -1284,7 +1623,10 @@ attributes:
   description: |
     Mobile-First Design as a cross-cutting topic - prioritizing constrained
     mobile layouts and progressively enhancing for larger surfaces.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:progressive-disclosure
@@ -1293,7 +1635,9 @@ attributes:
   description: |
     Progressive Disclosure as a cross-cutting topic - revealing complexity
     gradually so interfaces stay understandable at first glance.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:skeleton-screen
@@ -1302,7 +1646,10 @@ attributes:
   description: |
     Skeleton Screen as a cross-cutting topic - placeholder UI that previews
     page structure while content is still loading.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile
 ---
 nodeKind: Topic
 id: topic:pull-to-refresh
@@ -1311,7 +1658,10 @@ attributes:
   description: |
     Pull to Refresh as a cross-cutting topic - gesture-driven refresh that
     reloads content when users pull beyond the top of a surface.
-edges: {}
+edges:
+  applies_to:
+    - domain:mobile
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:modal-dialog
@@ -1320,7 +1670,9 @@ attributes:
   description: |
     Modal Dialog as a cross-cutting topic - focus-stealing overlay UI that
     requires or encourages user resolution before continuing.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
 ---
 nodeKind: Topic
 id: topic:toast-notification
@@ -1329,4 +1681,7 @@ attributes:
   description: |
     Toast Notification as a cross-cutting topic - transient feedback messages
     that surface status without fully interrupting the main flow.
-edges: {}
+edges:
+  applies_to:
+    - domain:web-development
+    - domain:mobile

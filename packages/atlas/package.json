@@ -41,7 +41,8 @@
     "build": "node scripts/generate-library-nodes.mjs && npm run build:index && tsc -p tsconfig.json && node scripts/copy-assets.cjs",
     "prepack": "npm run build",
     "cli": "node dist/cli.js",
-    "verify:library-metadata": "node scripts/verify-library-metadata.mjs"
+    "verify:library-metadata": "node scripts/verify-library-metadata.mjs",
+    "validate:edges": "node scripts/validate-edges.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.1"

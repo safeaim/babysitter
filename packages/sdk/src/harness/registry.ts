@@ -70,15 +70,18 @@ function getDiscoverySpec(name: string): HarnessSpec | undefined {
   return getDiscoverySpecs().get(name);
 }
 
+function nonEmptyArray<T>(value: readonly T[] | undefined, fallback: readonly T[]): T[] {
+  return value && value.length > 0 ? [...value] : [...fallback];
+}
 // Named exports for backward compatibility (consumers import these directly)
 export const CLAUDE_CODE_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("claude-code")?.name ?? "claude-code"; }, get cli() { return getDiscoverySpec("claude-code")?.cli ?? "claude"; }, get callerEnvVars() { return getDiscoverySpec("claude-code")?.callerEnvVars ?? ["CLAUDE_ENV_FILE"]; }, get capabilities() { return getDiscoverySpec("claude-code")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.Mcp, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("claude-code")?.configPaths ?? [".claude"]; } };
 export const PI_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("pi")?.name ?? "pi"; }, get cli() { return getDiscoverySpec("pi")?.cli ?? "pi"; }, get callerEnvVars() { return getDiscoverySpec("pi")?.callerEnvVars ?? ["PI_SESSION_ID"]; }, get capabilities() { return getDiscoverySpec("pi")?.capabilities ?? [Cap.Programmatic, Cap.SessionBinding, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("pi")?.configPaths ?? [".pi"]; } };
-export const CODEX_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("codex")?.name ?? "codex"; }, get cli() { return getDiscoverySpec("codex")?.cli ?? "codex"; }, get callerEnvVars() { return getDiscoverySpec("codex")?.callerEnvVars ?? []; }, get capabilities() { return getDiscoverySpec("codex")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("codex")?.configPaths ?? [".codex"]; } };
-export const CURSOR_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("cursor")?.name ?? "cursor"; }, get cli() { return getDiscoverySpec("cursor")?.cli ?? "cursor"; }, get callerEnvVars() { return getDiscoverySpec("cursor")?.callerEnvVars ?? []; }, get capabilities() { return getDiscoverySpec("cursor")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("cursor")?.configPaths ?? [".cursor"]; } };
-export const GEMINI_CLI_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("gemini")?.name ?? "gemini-cli"; }, get cli() { return getDiscoverySpec("gemini")?.cli ?? "gemini"; }, get callerEnvVars() { return getDiscoverySpec("gemini")?.callerEnvVars ?? []; }, get capabilities() { return getDiscoverySpec("gemini")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("gemini")?.configPaths ?? [".gemini"]; } };
+export const CODEX_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("codex")?.name ?? "codex"; }, get cli() { return getDiscoverySpec("codex")?.cli ?? "codex"; }, get callerEnvVars() { return nonEmptyArray(getDiscoverySpec("codex")?.callerEnvVars, ["CODEX_THREAD_ID", "CODEX_SESSION_ID", "CODEX_PLUGIN_ROOT"]); }, get capabilities() { return getDiscoverySpec("codex")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("codex")?.configPaths ?? [".codex"]; } };
+export const CURSOR_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("cursor")?.name ?? "cursor"; }, get cli() { return getDiscoverySpec("cursor")?.cli ?? "cursor"; }, get callerEnvVars() { return nonEmptyArray(getDiscoverySpec("cursor")?.callerEnvVars, ["CURSOR_PROJECT_DIR", "CURSOR_VERSION"]); }, get capabilities() { return getDiscoverySpec("cursor")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("cursor")?.configPaths ?? [".cursor"]; } };
+export const GEMINI_CLI_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("gemini-cli")?.name ?? "gemini-cli"; }, get cli() { return getDiscoverySpec("gemini-cli")?.cli ?? "gemini"; }, get callerEnvVars() { return nonEmptyArray(getDiscoverySpec("gemini-cli")?.callerEnvVars, ["GEMINI_SESSION_ID", "GEMINI_CWD"]); }, get capabilities() { return getDiscoverySpec("gemini-cli")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("gemini-cli")?.configPaths ?? [".gemini"]; } };
 export const GITHUB_COPILOT_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("github-copilot")?.name ?? "github-copilot"; }, get cli() { return getDiscoverySpec("github-copilot")?.cli ?? "gh"; }, get callerEnvVars() { return getDiscoverySpec("github-copilot")?.callerEnvVars ?? []; }, get capabilities() { return getDiscoverySpec("github-copilot")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("github-copilot")?.configPaths ?? [".github", ".copilot"]; } };
-export const OH_MY_PI_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("oh-my-pi")?.name ?? "oh-my-pi"; }, get cli() { return getDiscoverySpec("oh-my-pi")?.cli ?? "pi"; }, get callerEnvVars() { return getDiscoverySpec("oh-my-pi")?.callerEnvVars ?? []; }, get capabilities() { return getDiscoverySpec("oh-my-pi")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.Programmatic]; }, get configPaths() { return getDiscoverySpec("oh-my-pi")?.configPaths ?? [".omp"]; } };
-export const OPENCODE_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("opencode")?.name ?? "opencode"; }, get cli() { return getDiscoverySpec("opencode")?.cli ?? "opencode"; }, get callerEnvVars() { return getDiscoverySpec("opencode")?.callerEnvVars ?? []; }, get capabilities() { return getDiscoverySpec("opencode")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("opencode")?.configPaths ?? [".opencode"]; } };
+export const OH_MY_PI_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("oh-my-pi")?.name ?? "oh-my-pi"; }, get cli() { return getDiscoverySpec("oh-my-pi")?.cli ?? "pi"; }, get callerEnvVars() { return nonEmptyArray(getDiscoverySpec("oh-my-pi")?.callerEnvVars, ["OMP_SESSION_ID"]); }, get capabilities() { return getDiscoverySpec("oh-my-pi")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.Programmatic]; }, get configPaths() { return getDiscoverySpec("oh-my-pi")?.configPaths ?? [".omp"]; } };
+export const OPENCODE_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("opencode")?.name ?? "opencode"; }, get cli() { return getDiscoverySpec("opencode")?.cli ?? "opencode"; }, get callerEnvVars() { return nonEmptyArray(getDiscoverySpec("opencode")?.callerEnvVars, ["AGENT_SESSION_ID"]); }, get capabilities() { return getDiscoverySpec("opencode")?.capabilities ?? [Cap.SessionBinding, Cap.StopHook, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("opencode")?.configPaths ?? [".opencode"]; } };
 export const OPENCLAW_DISCOVERY_SPEC: HarnessSpec = { get name() { return getDiscoverySpec("openclaw")?.name ?? "openclaw"; }, get cli() { return getDiscoverySpec("openclaw")?.cli ?? "openclaw"; }, get callerEnvVars() { return getDiscoverySpec("openclaw")?.callerEnvVars ?? []; }, get capabilities() { return getDiscoverySpec("openclaw")?.capabilities ?? [Cap.Programmatic, Cap.HeadlessPrompt]; }, get configPaths() { return getDiscoverySpec("openclaw")?.configPaths ?? [".openclaw"]; } };
 
 export type { SessionResolutionDetails } from "./adapters/claude-code";
@@ -155,7 +158,15 @@ const harnessRegistryByName = new Map(
 );
 
 export const KNOWN_HARNESSES: readonly HarnessSpec[] = [
-  ...Array.from(getDiscoverySpecs().values()),
+  CLAUDE_CODE_DISCOVERY_SPEC,
+  CODEX_DISCOVERY_SPEC,
+  PI_DISCOVERY_SPEC,
+  OH_MY_PI_DISCOVERY_SPEC,
+  GEMINI_CLI_DISCOVERY_SPEC,
+  CURSOR_DISCOVERY_SPEC,
+  OPENCODE_DISCOVERY_SPEC,
+  GITHUB_COPILOT_DISCOVERY_SPEC,
+  OPENCLAW_DISCOVERY_SPEC,
   UNIFIED_DISCOVERY_SPEC,
 ];
 

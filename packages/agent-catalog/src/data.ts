@@ -554,7 +554,7 @@ const BABYSITTER_PLUGIN_TARGETS = new Set([
 
 // Atlas uses different IDs for some targets
 const TARGET_ID_ALIASES: Record<string, string> = {
-  "plugin-target:gemini-cli": "gemini",
+  "plugin-target:gemini-cli": "gemini-cli",
   "plugin-target:copilot-cli": "github-copilot",
   "plugin-target:omp": "oh-my-pi",
 };

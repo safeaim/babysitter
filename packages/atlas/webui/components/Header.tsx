@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpenText, GitBranch, Network } from "lucide-react";
+import { BookOpenText, GitBranch, MessageCircle, Network } from "lucide-react";
 import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -37,13 +37,22 @@ export function Header() {
             <span>GitHub</span>
           </a>
           <a
-            href="https://www.a5c.ai"
+            href="https://a5c-ai.github.io/babysitter/docs/user-guide"
             target="_blank"
             rel="noreferrer"
             className="atlas-header__link"
           >
             <BookOpenText style={{ width: 15, height: 15 }} />
             <span>Docs</span>
+          </a>
+          <a
+            href="https://discord.gg/tjgmhJz6fF"
+            target="_blank"
+            rel="noreferrer"
+            className="atlas-header__link"
+          >
+            <MessageCircle style={{ width: 15, height: 15 }} />
+            <span>Discord</span>
           </a>
           <ThemeToggle />
         </div>

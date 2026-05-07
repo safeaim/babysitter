@@ -28,7 +28,7 @@ describe('live stack scenario contract primitives', () => {
     expect(scenario.expectedArtifacts).toContain('provider-trace-redacted');
   });
 
-  it('accepts scenario selection from pipeline env instead of building a code-side matrix', () => {
+  it('accepts the scenario selected by pipeline env without enumerating scenarios in code', () => {
     const scenario = liveStackScenarioFromEnv({
       LIVE_STACK_SCENARIO_ID: 'live.babysitter-agent.internal.foundry-openai.gpt-5.5',
       LIVE_STACK_AGENT_PATH: 'babysitter-agent',

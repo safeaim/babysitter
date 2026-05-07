@@ -4,7 +4,7 @@ import { buildPrimaryLiveStackCommands } from './primary-live-runner';
 import { liveStackScenarioFromEnv } from './scenario-contract';
 
 describe('pipeline-owned live stack scenario contract', () => {
-  it('validates the scenario selected by the Publish workflow matrix', () => {
+  it('validates the scenario selected by the Publish workflow', () => {
     const scenario = liveStackScenarioFromEnv(process.env);
     const commands = buildPrimaryLiveStackCommands(scenario, {
       cwd: process.cwd(),

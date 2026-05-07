@@ -26,6 +26,11 @@ attributes:
     - "babysitter-process"
   evidenceRefs:
     - "repo-process-catalog"
+edges:
+  references_path:
+    - target: path:catalog-app-src-app
+    - target: path:catalog-app-src-lib
+    - target: path:catalog-process-entry
 ---
 nodeKind: ProcessDescriptor
 id: process:agent-mux/model-catalog

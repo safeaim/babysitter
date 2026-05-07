@@ -16,6 +16,9 @@ attributes:
     - "repo-sdk-fallback"
     - "repo-agent-mux-host"
     - "web-anthropic-claude-code"
+edges:
+  has_version:
+    - providerVersion:anthropic:ge-0-0-0
 ---
 nodeKind: ModelProviderProduct
 id: provider:openai
@@ -34,6 +37,9 @@ attributes:
     - "repo-sdk-fallback"
     - "repo-hooks-detector"
     - "web-openai-codex-skills"
+edges:
+  has_version:
+    - providerVersion:openai:ge-0-0-0
 ---
 nodeKind: ModelProviderProduct
 id: provider:google
@@ -51,6 +57,9 @@ attributes:
     - "repo-sdk-fallback"
     - "repo-target-gemini"
     - "web-gemini-hooks"
+edges:
+  has_version:
+    - providerVersion:google:ge-0-0-0
 ---
 nodeKind: ModelProviderProduct
 id: provider:github

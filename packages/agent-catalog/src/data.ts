@@ -10,6 +10,10 @@ import {
   listRelationshipsByRelation,
 } from "./atlas-bridge";
 // Evidence projection — inlined from deleted evidence-projection.ts
+function evidenceIdFromNodeId(nodeId: string): string {
+  return nodeId.startsWith("evidence:") ? nodeId.slice("evidence:".length) : nodeId;
+}
+
 function buildClaimsByEvidence(
   claimNodes: Iterable<GraphNode>,
   evidenceNodes: Iterable<GraphNode>,
@@ -23,7 +27,7 @@ function buildClaimsByEvidence(
     const claimNode = claimsByGraphId.get(rel.from);
     const evidenceNode = evidenceByGraphId.get(rel.to);
     if (!claimNode || !evidenceNode) continue;
-    const evidenceId = valueAsString(evidenceNode.evidenceId);
+    const evidenceId = valueAsString(evidenceNode.evidenceId) || evidenceIdFromNodeId(String(evidenceNode.id));
     const bucket = claimsByEvidence.get(evidenceId);
     if (bucket) bucket.push(claimNode);
     else claimsByEvidence.set(evidenceId, [claimNode]);
@@ -171,7 +175,7 @@ function toModelVersion(node: GraphNode): ModelVersion {
 
 function toTransportDescriptor(node: GraphNode): TransportDescriptor {
   return {
-    transportId: valueAsString(node.runtimeId),
+    transportId: transportRuntimeId(node),
     label: valueAsString(node.label),
     status: effectiveTransportMuxClaimStatus(valueAsString(node.status), nodeEvidenceIds(node)),
     interactive: Boolean(node.persistentSession) || Boolean(node.stdinInjection),
@@ -184,7 +188,7 @@ function toTransportDescriptor(node: GraphNode): TransportDescriptor {
 
 function toCapabilityDescriptor(node: GraphNode): CapabilityDescriptor {
   return {
-    capabilityId: valueAsString(node.capabilityId),
+    capabilityId: valueAsString(node.capabilityId) || String(node.id).replace(/^capability:/, ""),
     namespace: valueAsString(node.namespace),
     label: valueAsString(node.label),
     description: valueAsString(node.description),
@@ -266,21 +270,54 @@ function toProcessDescriptor(node: GraphNode): ProcessDescriptor {
 }
 
 function agentCapabilityIds(agentNodeId: string): string[] {
-  return listOutgoingTargets(agentNodeId, "supports_capability")
+  // First try graph edges
+  const edgeBased = listOutgoingTargets(agentNodeId, "supports_capability")
     .map((supportNode) => valueAsString(supportNode.capabilityId) || valueAsString(listOutgoingTargets(supportNode.id, "for_capability")[0]?.capabilityId))
     .filter(Boolean);
+  if (edgeBased.length > 0) return edgeBased;
+
+  // Fallback: find CapabilitySupport nodes whose subjectId matches
+  return Array.from(new Set(
+    listNodesByKind("CapabilitySupport")
+      .filter((node) => valueAsString(node.subjectId) === agentNodeId)
+      .map((node) => valueAsString(node.capabilityId))
+      .filter(Boolean)
+  ));
 }
 
 function agentHookIds(agentNodeId: string): string[] {
-  return listOutgoingTargets(agentNodeId, "emits_hook")
+  const edgeBased = listOutgoingTargets(agentNodeId, "emits_hook")
     .map((mapping) => valueAsString(mapping.hookId))
     .filter(Boolean);
+  if (edgeBased.length > 0) return edgeBased;
+
+  // Fallback: derive from agent's plugin targets and their hook mappings
+  const targetIds = agentPluginTargetIds(agentNodeId);
+  const hookFamilies = new Set<string>();
+  for (const node of listNodesByKind("PluginTarget")) {
+    const targetId = pluginTargetId(node.id);
+    if (targetIds.includes(targetId)) {
+      const adapterName = valueAsString(node.adapterName);
+      if (adapterName) hookFamilies.add(adapterName);
+      if (targetId !== adapterName) hookFamilies.add(targetId);
+    }
+  }
+  return Array.from(new Set(
+    listNodesByKind("HookMapping")
+      .filter((mapping) => hookFamilies.has(valueAsString(mapping.adapterFamily)))
+      .map((mapping) => valueAsString(mapping.hookId))
+      .filter(Boolean)
+  ));
+}
+
+function transportRuntimeId(node: GraphNode): string {
+  return valueAsString(node.runtimeId) || valueAsString(node.runtimeKind) || String(node.id).replace(/^transport-runtime:/, "");
 }
 
 function agentTransportIds(agentNodeId: string): string[] {
   return listOutgoingTargets(agentNodeId, "uses_transport")
     .filter((node) => node.kind === "TransportRuntime")
-    .map((node) => valueAsString(node.runtimeId))
+    .map((node) => transportRuntimeId(node))
     .filter(Boolean);
 }
 
@@ -311,14 +348,51 @@ function agentPluginTargetIds(agentNodeId: string): string[] {
     .filter(Boolean);
 }
 
+function matchesAgentId(nodeAgentId: string, targetAgentId: string): boolean {
+  if (nodeAgentId === targetAgentId) return true;
+  // Handle "agent:codex" matching "codex"
+  if (nodeAgentId.startsWith("agent:") && nodeAgentId.slice("agent:".length) === targetAgentId) return true;
+  if (targetAgentId.startsWith("agent:") && targetAgentId.slice("agent:".length) === nodeAgentId) return true;
+  return false;
+}
+
 function agentSessionNuanceIds(agentNodeId: string): string[] {
-  return listOutgoingTargets(agentNodeId, "uses_session_semantics")
+  const edgeBased = listOutgoingTargets(agentNodeId, "uses_session_semantics")
+    .map((node) => valueAsString(node.sessionSemanticsId))
+    .filter(Boolean);
+  if (edgeBased.length > 0) return edgeBased;
+
+  // Fallback: find SessionSemantics nodes whose agentId matches
+  const agentNode = getNodeById(agentNodeId);
+  const agentId = valueAsString(agentNode?.agentId);
+  if (!agentId) return [];
+  return listNodesByKind("SessionSemantics")
+    .filter((node) => matchesAgentId(valueAsString(node.agentId), agentId))
     .map((node) => valueAsString(node.sessionSemanticsId))
     .filter(Boolean);
 }
 
 function agentLifecycleNuanceIds(agentNodeId: string): string[] {
-  return listOutgoingTargets(agentNodeId, "uses_lifecycle_semantics")
+  const edgeBased = listOutgoingTargets(agentNodeId, "uses_lifecycle_semantics")
+    .map((node) => valueAsString(node.lifecycleSemanticsId))
+    .filter(Boolean);
+  if (edgeBased.length > 0) return edgeBased;
+
+  // Fallback: find LifecycleSemantics nodes whose agentId and versionRange match
+  const agentNode = getNodeById(agentNodeId);
+  const agentId = valueAsString(agentNode?.agentId);
+  const agentVersionRange = valueAsString(agentNode?.versionRange);
+  if (!agentId) return [];
+  return listNodesByKind("LifecycleSemantics")
+    .filter((node) => {
+      if (!matchesAgentId(valueAsString(node.agentId), agentId)) return false;
+      // If agent has a specific version range, match lifecycle nodes with same or broader range
+      if (agentVersionRange) {
+        const lcRange = valueAsString(node.versionRange);
+        if (lcRange && lcRange !== agentVersionRange) return false;
+      }
+      return true;
+    })
     .map((node) => valueAsString(node.lifecycleSemanticsId))
     .filter(Boolean);
 }
@@ -349,18 +423,25 @@ function toAgentVersion(node: GraphNode): AgentVersion {
   };
 }
 
+function evidenceIdFromNode(node: GraphNode): string {
+  const explicit = valueAsString(node.evidenceId);
+  if (explicit) return explicit;
+  return evidenceIdFromNodeId(String(node.id));
+}
+
 function toEvidenceRecord(node: GraphNode, evidenceClaims: Map<string, GraphNode[]>): EvidenceRecord {
+  const evidenceId = evidenceIdFromNode(node);
   const freshnessWindowDays =
     typeof node.freshnessWindowDays === "number" && Number.isFinite(node.freshnessWindowDays)
       ? node.freshnessWindowDays
       : undefined;
   return {
-    evidenceId: valueAsString(node.evidenceId),
+    evidenceId,
     kind: valueAsString(node.kindLabel) === "web" ? "web" : "repo",
-    sourcePathOrUrl: valueAsString(node.sourcePathOrUrl),
+    sourcePathOrUrl: valueAsString(node.sourcePathOrUrl) || valueAsString(node.filePath),
     excerptLocator: valueAsString(node.locator),
-    claim: getEvidenceClaimStatement(valueAsString(node.evidenceId), evidenceClaims),
-    capturedAt: valueAsString(node.capturedAt),
+    claim: getEvidenceClaimStatement(evidenceId, evidenceClaims),
+    capturedAt: valueAsString(node.capturedAt) || valueAsString(node.observedAt),
     trustLevel: valueAsString(node.trustLevel),
     reviewOwner: valueAsString(node.reviewOwner),
     reviewedAt: valueAsString(node.reviewedAt),
@@ -384,15 +465,95 @@ function toClaimRecord(node: GraphNode): ClaimRecord {
   };
 }
 
+function synthesizeClaimsFromEvidenceRefs(node: GraphNode): ClaimRecord[] {
+  const evidenceIds = nodeEvidenceIds(node);
+  if (evidenceIds.length === 0) return [];
+
+  const repoIds = evidenceIds.filter((id) => id.startsWith("repo-"));
+  const webIds = evidenceIds.filter((id) => id.startsWith("web-"));
+
+  const claims: ClaimRecord[] = [];
+
+  if (repoIds.length > 0) {
+    // Look for an existing Claim node matching a repo evidence ID
+    const matchedRepoClaim = listNodesByKind("Claim").find((claimNode) => {
+      const claimEvidenceIds = stringArray(claimNode.evidenceIds);
+      return claimEvidenceIds.some((id) => repoIds.includes(id)) && valueAsString(claimNode.provenanceKind) === "repo-observation";
+    });
+
+    claims.push(matchedRepoClaim ? toClaimRecord(matchedRepoClaim) : {
+      claimId: repoIds[0],
+      statement: `Repo evidence supports capability: ${valueAsString(node.capabilityId)} for ${valueAsString(node.subjectId)}`,
+      subjectKind: valueAsString(node.subjectKind),
+      subjectId: valueAsString(node.subjectId),
+      confidence: "high",
+      status: "current",
+      provenanceKind: "repo-observation",
+      evidenceStrength: repoIds.length >= 2 ? "corroborated" : "partial",
+      evidenceIds: repoIds,
+      unresolvedGaps: [],
+    });
+  }
+
+  if (webIds.length > 0) {
+    // Look for existing Claim nodes matching web evidence IDs
+    // Prefer claims whose claimId contains the support node's capability ID
+    const capabilityId = valueAsString(node.capabilityId);
+    const allWebClaims = listNodesByKind("Claim").filter((claimNode) => {
+      const claimEvidenceIds = stringArray(claimNode.evidenceIds);
+      return claimEvidenceIds.some((id) => webIds.includes(id)) && valueAsString(claimNode.provenanceKind) !== "repo-observation";
+    });
+
+    // Sort: prefer claims whose claimId contains the capabilityId (more specific)
+    const sortedWebClaims = [...allWebClaims].sort((a, b) => {
+      const aSpecific = valueAsString(a.claimId).includes(capabilityId) ? 1 : 0;
+      const bSpecific = valueAsString(b.claimId).includes(capabilityId) ? 1 : 0;
+      return bSpecific - aSpecific;
+    });
+
+    const matchedWebClaim = sortedWebClaims[0];
+
+    if (matchedWebClaim) {
+      const claim = toClaimRecord(matchedWebClaim);
+      // Ensure partial/inferred vendor claims always have unresolved gaps
+      if (claim.evidenceStrength !== "corroborated" && claim.unresolvedGaps.length === 0) {
+        claim.unresolvedGaps = [`Vendor evidence for ${capabilityId} has not been fully corroborated.`];
+      }
+      claims.push(claim);
+    } else {
+      claims.push({
+        claimId: webIds[0],
+        statement: `Vendor documentation supports capability: ${valueAsString(node.capabilityId)} for ${valueAsString(node.subjectId)}`,
+        subjectKind: valueAsString(node.subjectKind),
+        subjectId: valueAsString(node.subjectId),
+        confidence: webIds.length >= 2 ? "high" : "medium",
+        status: "current",
+        provenanceKind: "vendor-documentation",
+        evidenceStrength: webIds.length >= 2 ? "corroborated" : "partial",
+        evidenceIds: webIds,
+        unresolvedGaps: webIds.length >= 2 ? [] : [`Only ${webIds.length} web evidence source(s) found for this capability.`],
+      });
+    }
+  }
+
+  return claims;
+}
+
 function buildCapabilityAssertions(): CapabilityAssertion[] {
   return listNodesByKind("CapabilitySupport")
     .filter((node) =>
       shouldSurfaceCapabilitySupport(valueAsString(node.subjectKind), valueAsString(node.subjectId), nodeEvidenceIds(node)),
     )
     .map((node) => {
-    const supportingClaims = listOutgoingTargets(node.id, "supported_by_claim")
+    let supportingClaims = listOutgoingTargets(node.id, "supported_by_claim")
       .filter((claim): claim is GraphNode => claim.kind === "Claim")
       .map(toClaimRecord);
+
+    // Fall back to synthesized claims when no explicit claim edges exist
+    if (supportingClaims.length === 0) {
+      supportingClaims = synthesizeClaimsFromEvidenceRefs(node);
+    }
+
     const vendorClaims = supportingClaims.filter((claim) => claim.provenanceKind !== "repo-observation");
     const primaryClaims = vendorClaims.length > 0 ? vendorClaims : supportingClaims;
     const evidenceStrength = primaryClaims.reduce<ClaimEvidenceStrength>(
@@ -744,7 +905,7 @@ function buildDataState(): AgentCatalogDataState {
   const providers = listNodesByKind("ModelProviderVersion").map(toModelProviderVersion);
   const models = listNodesByKind("ModelVersion").map(toModelVersion);
   const transports = listNodesByKind("TransportRuntime")
-    .filter((node) => shouldSurfaceTransportRuntime(valueAsString(node.runtimeId)))
+    .filter((node) => shouldSurfaceTransportRuntime(transportRuntimeId(node)))
     .map(toTransportDescriptor);
   const capabilities = listNodesByKind("Capability").map(toCapabilityDescriptor);
   const modalities = listNodesByKind("Modality")

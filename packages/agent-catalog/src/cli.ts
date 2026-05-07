@@ -1,3 +1,4 @@
+import { atlas } from "@a5c-ai/atlas";
 import { AGENT_CATALOG, GRAPH_DOCUMENT } from "./data";
 import { getNodeById, listGraphEdges, listGraphNodes, listOutgoingTargets } from "./atlas-bridge";
 import { effectiveTransportMuxClaimStatus } from "./transport-mux-cutover";
@@ -255,7 +256,17 @@ function toCliGraphEdgeRow(edge: GraphRelationship): CliGraphEdgeRow {
 }
 
 function claimNodesFor(nodeId: string): GraphNode[] {
-  return listOutgoingTargets(nodeId, "supported_by_claim").filter((node) => node.kind === "Claim");
+  const edgeBased = listOutgoingTargets(nodeId, "supported_by_claim").filter((node) => node.kind === "Claim");
+  if (edgeBased.length > 0) return edgeBased;
+
+  // Fallback: find Claim nodes whose evidenceIds overlap with the node's evidenceRefs
+  const node = getNodeById(nodeId);
+  if (!node) return [];
+  const evidenceIds = stringArray(node.evidenceRefs);
+  if (evidenceIds.length === 0) return [];
+
+  return listGraphNodes()
+    .filter((candidate) => candidate.kind === "Claim" && stringArray(candidate.evidenceIds).some((id) => evidenceIds.includes(id)));
 }
 
 function sourceNodesForClaim(claimNodeId: string): GraphNode[] {
@@ -492,8 +503,8 @@ export function listCliPackageRelations(packageId?: string): CliPackageRelationR
       const processes = listOutgoingTargets(node.id, "surfaces_process");
       const paths = listOutgoingTargets(node.id, "references_path");
       const ciSurfaces = listOutgoingTargets(node.id, "validated_by_ci");
-      const graphIds = listGraphEdges()
-        .filter((edge) => edge.from === node.id && edge.relation === "wraps_graph")
+      const graphIds = atlas.getOutgoing(node.id)
+        .filter((edge) => edge.kind === "wraps_graph")
         .map((edge) => edge.to);
       return {
         nodeId: node.id,

@@ -106,7 +106,7 @@ describe("agent-catalog graph-backed ontology", () => {
   it("exposes plugin hook-name mappings from hook-mapping nodes", () => {
     const hookMap = getHookNameMap();
     expect(hookMap.SessionStart.codex).toBe("SessionStart");
-    expect(hookMap.AfterAgent.gemini).toBe("AfterAgent");
+    expect(hookMap.AfterAgent["gemini-cli"]).toBe("AfterAgent");
   });
 
   it("exposes compiler-facing plugin target descriptors from graph nodes", () => {
@@ -120,7 +120,7 @@ describe("agent-catalog graph-backed ontology", () => {
 
   it("exposes UI cards and harness images from graph-derived wrappers", () => {
     expect(getUiAgentCards().length).toBe(AGENT_CATALOG.agents.length);
-    expect(getUiAgentCards()[0].filePath).toContain("graph/nodes/agents/versions.yaml");
+    expect(getUiAgentCards()[0].filePath).toContain("graph/agent-stack/core-impls");
     expect(lookupHarnessImage("codex")?.image).toContain("codex");
   });
 
@@ -288,7 +288,7 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(codexNode).toBeDefined();
     expect(codexNode!.node.kind).toBe("AgentVersion");
     expect(codexNode!.outgoing.some((edge) => edge.relation === "defaults_to_model")).toBe(true);
-    expect(codexNode!.outgoing.some((edge) => edge.relation === "uses_transport" && edge.relatedNodeId === "transportRuntime:terminal-cli")).toBe(true);
+    expect(codexNode!.outgoing.some((edge) => edge.relation === "uses_transport" && edge.relatedNodeId === "transport-runtime:terminal-cli")).toBe(true);
     expect(codexNode!.outgoing.some((edge) => edge.relation === "supports_modality" && edge.relatedNodeId === "modality:image")).toBe(true);
     expect(codexNode!.incoming.some((edge) => edge.relation === "has_version")).toBe(true);
 
@@ -362,7 +362,7 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(topology!.transportRuntimes.map((transport) => transport.transportId)).toContain("terminal-cli");
     expect(topology!.transportProtocols.map((transport) => transport.transportId)).toContain("shell-hook-runtime");
     expect(topology!.modalities.map((modality) => modality.modalityId)).toContain("image");
-    expect(topology!.sessionSemantics.map((nuance) => nuance.nuanceId)).toContain("sessionSemantics:codex:ge-0-0-0");
+    expect(topology!.sessionSemantics.map((nuance) => nuance.nuanceId)).toContain("session-semantics:codex");
     expect(topology!.lifecycleSemantics.map((nuance) => nuance.versionRange)).toContain(">=0.119.0");
     expect(topology!.discoverySignals.map((signal) => signal.key)).toContain("codex");
     expect(topology!.pluginTargets.map((target) => target.targetId)).toContain("codex");

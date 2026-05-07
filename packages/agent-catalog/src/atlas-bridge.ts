@@ -171,8 +171,12 @@ export function getOntologySchema(): OntologySchema {
   return {
     kind: "OntologySchema",
     id: "schema:agent-catalog-ontology",
+    schemaId: "schema:agent-catalog-ontology",
+    version: "2026.04.agent-catalog-v2",
     nodeKinds,
     edgeKinds,
+    versionScopingRules: [],
+    deprecationRules: [],
   } as unknown as OntologySchema;
 }
 

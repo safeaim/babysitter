@@ -17,6 +17,7 @@ attributes:
 edges:
   references_path:
     - target: path:agent-catalog-graph
-  wraps_graph: []
+  wraps_graph:
+    - target: graph:agent-catalog
   validated_by_ci:
     - target: ci:a5c-ai-agent-catalog

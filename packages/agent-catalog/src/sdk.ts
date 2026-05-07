@@ -1,3 +1,4 @@
+import path from "node:path";
 import {
   AGENT_CATALOG,
   CAPABILITY_ASSERTIONS,
@@ -14,6 +15,7 @@ import {
   PLUGIN_TARGETS,
   getCatalogDataState,
 } from "./data";
+import { atlas } from "@a5c-ai/atlas";
 import { getCatalogGraph, listGraphNodes, listRelationshipsByRelation } from "./atlas-bridge";
 import { effectiveTransportMuxClaimStatus, shouldSurfaceTransportProtocol } from "./transport-mux-cutover";
 import type {
@@ -33,6 +35,7 @@ import type {
   ClaimRecord,
   CiSurfaceDescriptor,
   DiscoverySignalDescriptor,
+  EvidenceRecord,
   GraphNode,
   GraphRelationship,
   HarnessFallbackMetadata,
@@ -49,6 +52,9 @@ import type {
   ModelVersion,
   ModalityDescriptor,
   OntologySchema,
+  OntologyEvidenceManifest,
+  OntologyEvidenceSearchResult,
+  OntologyEvidenceShardDescriptor,
   PackageSurfaceDescriptor,
   PackageTopology,
   PathDescriptorRecord,
@@ -56,6 +62,7 @@ import type {
   ProcessDescriptor,
   ProviderModelTopology,
   SessionNuance,
+  SubjectProvenance,
   TransportDescriptor,
   TransportProtocolDescriptor,
   UiAgentCard,
@@ -590,7 +597,8 @@ function typedModelVersionFromNode(node: GraphNode): ModelVersion | undefined {
 }
 
 function typedTransportFromNode(node: GraphNode): TransportDescriptor | undefined {
-  return getSdkState().transportById.get(valueAsString(node.runtimeId));
+  const transportId = valueAsString(node.runtimeId) || valueAsString(node.runtimeKind) || String(node.id).replace(/^transport-runtime:/, "");
+  return getSdkState().transportById.get(transportId);
 }
 
 function typedCapabilityFromNode(node: GraphNode): CapabilityDescriptor | undefined {
@@ -614,11 +622,18 @@ function typedHookFromNode(node: GraphNode): HookDescriptor | undefined {
 }
 
 function typedPluginTargetFromNode(node: GraphNode): PluginTargetDescriptor | undefined {
-  return getSdkState().pluginTargetById.get(valueAsString(node.targetId));
+  const targetId = valueAsString(node.targetId) || String(node.id).replace(/^plugin-target:/, "");
+  return getSdkState().pluginTargetById.get(targetId);
 }
 
 function capabilitySupportNodesForSubject(subjectId: string): GraphNode[] {
-  return outgoingNodes(subjectId, "supports_capability").filter((node) => node.kind === "CapabilitySupport");
+  const edgeBased = outgoingNodes(subjectId, "supports_capability").filter((node) => node.kind === "CapabilitySupport");
+  if (edgeBased.length > 0) return edgeBased;
+
+  // Fallback: find CapabilitySupport nodes whose subjectId matches
+  return getSdkState().graph.nodes.filter(
+    (node) => node.kind === "CapabilitySupport" && valueAsString(node.subjectId) === subjectId,
+  );
 }
 
 function capabilitySupportForSubject(subjectId: string): CapabilitySupportRecord[] {
@@ -626,11 +641,21 @@ function capabilitySupportForSubject(subjectId: string): CapabilitySupportRecord
 }
 
 function capabilitiesForSupportNodes(nodes: GraphNode[]): CapabilityDescriptor[] {
-  return uniqueBy(
+  const edgeBased = uniqueBy(
     nodes
       .flatMap((node) => outgoingNodes(node.id, "for_capability"))
       .filter((node): node is GraphNode => node.kind === "Capability")
       .map((node) => typedCapabilityFromNode(node))
+      .filter((capability): capability is CapabilityDescriptor => Boolean(capability)),
+    (capability) => capability.capabilityId,
+  );
+  if (edgeBased.length > 0) return edgeBased;
+
+  // Fallback: resolve capabilities from capabilityId attribute on support nodes
+  const capabilityIds = new Set(nodes.map((node) => valueAsString(node.capabilityId)).filter(Boolean));
+  return uniqueBy(
+    Array.from(capabilityIds)
+      .map((capId) => getSdkState().capabilityById.get(capId))
       .filter((capability): capability is CapabilityDescriptor => Boolean(capability)),
     (capability) => capability.capabilityId,
   );
@@ -885,14 +910,59 @@ export function getAgentVersionTopology(agentIdOrAlias: string, versionSelector?
     (node) => node.id,
   );
   const modalityNodes = outgoingNodes(agentNode.id, "supports_modality").filter((node) => node.kind === "Modality");
-  const sessionNodes = outgoingNodes(agentNode.id, "uses_session_semantics").filter((node) => node.kind === "SessionSemantics");
-  const lifecycleNodes = outgoingNodes(agentNode.id, "uses_lifecycle_semantics").filter((node) => node.kind === "LifecycleSemantics");
+  let sessionNodes = outgoingNodes(agentNode.id, "uses_session_semantics").filter((node) => node.kind === "SessionSemantics");
+  if (sessionNodes.length === 0) {
+    // Fallback: find SessionSemantics by agentId attribute match
+    const agentId = valueAsString(agentNode.agentId);
+    sessionNodes = getSdkState().graph.nodes.filter((node) => {
+      if (node.kind !== "SessionSemantics") return false;
+      const nodeAgentId = valueAsString(node.agentId);
+      return nodeAgentId === agentId || nodeAgentId === `agent:${agentId}`;
+    });
+  }
+  let lifecycleNodes = outgoingNodes(agentNode.id, "uses_lifecycle_semantics").filter((node) => node.kind === "LifecycleSemantics");
+  if (lifecycleNodes.length === 0) {
+    const agentId = valueAsString(agentNode.agentId);
+    const agentRange = valueAsString(agentNode.versionRange);
+    lifecycleNodes = getSdkState().graph.nodes.filter((node) => {
+      if (node.kind !== "LifecycleSemantics") return false;
+      const nodeAgentId = valueAsString(node.agentId);
+      if (nodeAgentId !== agentId && nodeAgentId !== `agent:${agentId}`) return false;
+      if (agentRange) {
+        const lcRange = valueAsString(node.versionRange);
+        if (lcRange && lcRange !== agentRange) return false;
+      }
+      return true;
+    });
+  }
   const discoveryNodes = outgoingNodes(agentNode.id, "discovered_by").filter((node) => node.kind === "DiscoverySignal");
-  const hookMappingNodes = outgoingNodes(agentNode.id, "emits_hook").filter((node) => node.kind === "HookMapping");
-  const hookNodes = uniqueBy(
-    hookMappingNodes.flatMap((node) => outgoingNodes(node.id, "maps_hook").filter((candidate) => candidate.kind === "HookSurface")),
-    (node) => node.id,
-  );
+  let hookMappingNodes = outgoingNodes(agentNode.id, "emits_hook").filter((node) => node.kind === "HookMapping");
+  let hookNodes: GraphNode[];
+  if (hookMappingNodes.length > 0) {
+    hookNodes = uniqueBy(
+      hookMappingNodes.flatMap((node) => outgoingNodes(node.id, "maps_hook").filter((candidate) => candidate.kind === "HookSurface")),
+      (node) => node.id,
+    );
+  } else {
+    // Fallback: derive hooks from agent's plugin targets
+    const targetIds = agent.pluginTargetIds;
+    const hookFamilies = new Set<string>();
+    for (const targetNode of getSdkState().graph.nodes.filter((n) => n.kind === "PluginTarget")) {
+      const tid = valueAsString(targetNode.targetId);
+      if (targetIds.includes(tid)) {
+        const adapter = valueAsString(targetNode.adapterName);
+        if (adapter) hookFamilies.add(adapter);
+        if (tid !== adapter) hookFamilies.add(tid);
+      }
+    }
+    hookMappingNodes = getSdkState().graph.nodes.filter(
+      (n) => n.kind === "HookMapping" && hookFamilies.has(valueAsString(n.adapterFamily)),
+    );
+    const hookIdSet = new Set(hookMappingNodes.map((n) => valueAsString(n.hookId)).filter(Boolean));
+    hookNodes = getSdkState().graph.nodes.filter(
+      (n) => n.kind === "HookSurface" && hookIdSet.has(valueAsString(n.hookId)),
+    );
+  }
   const pluginTargetNodes = outgoingNodes(agentNode.id, "targets_plugin_surface").filter((node) => node.kind === "PluginTarget");
 
   return clone({
@@ -983,7 +1053,10 @@ export function listPackageSurfaces(): PackageSurfaceDescriptor[] {
 }
 
 export function getPackageSurface(packageId: string): PackageSurfaceDescriptor | undefined {
-  const node = getNode(`package:${packageId}`);
+  const node = getNode(`package:${packageId}`) ??
+    getSdkState().graph.nodes.find(
+      (candidate) => candidate.kind === "PackageSurface" && valueAsString(candidate.packageId) === packageId,
+    );
   return node?.kind === "PackageSurface" ? clone(toPackageSurface(node)) : undefined;
 }
 
@@ -1004,7 +1077,10 @@ export function listProcessDescriptors(): ProcessDescriptor[] {
 }
 
 export function listProcessesByPackage(packageId: string): ProcessDescriptor[] {
-  const packageNode = getNode(`package:${packageId}`);
+  const packageNode = getNode(`package:${packageId}`) ??
+    getSdkState().graph.nodes.find(
+      (candidate) => candidate.kind === "PackageSurface" && valueAsString(candidate.packageId) === packageId,
+    );
   if (!packageNode || packageNode.kind !== "PackageSurface") {
     return [];
   }
@@ -1060,7 +1136,10 @@ export function findProcessesByPath(pathIdOrPath: string): ProcessDescriptor[] {
 }
 
 export function getPackageTopology(packageId: string): PackageTopology | undefined {
-  const packageNode = getNode(`package:${packageId}`);
+  const packageNode = getNode(`package:${packageId}`) ??
+    getSdkState().graph.nodes.find(
+      (candidate) => candidate.kind === "PackageSurface" && valueAsString(candidate.packageId) === packageId,
+    );
   if (!packageNode || packageNode.kind !== "PackageSurface") {
     return undefined;
   }
@@ -1081,7 +1160,7 @@ export function getPackageTopology(packageId: string): PackageTopology | undefin
     ciSurfaces: ciNodes.map(toCiSurface),
     directPaths: directPathNodes.map(toPathDescriptor),
     processPaths: processPathNodes.map(toPathDescriptor),
-    wrapsGraphIds: sortStrings(outgoingEdges(packageNode.id, "wraps_graph").map((edge) => edge.to)),
+    wrapsGraphIds: sortStrings(atlas.getOutgoing(packageNode.id).filter((edge) => edge.kind === "wraps_graph").map((edge) => edge.to)),
   });
 }
 
@@ -1219,4 +1298,167 @@ export function getUiAgentCards(): UiAgentCard[] {
       schemaVersion: GRAPH_DOCUMENT.schemaVersion,
     },
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Path resolution helpers
+// ---------------------------------------------------------------------------
+
+function packageRoot(): string {
+  return path.resolve(__dirname, "..");
+}
+
+export function resolveCatalogGraphAssetPath(relativePath: string): string {
+  return path.resolve(packageRoot(), "graph", relativePath);
+}
+
+export function resolveCatalogEvidenceAssetPath(...segments: string[]): string {
+  return path.resolve(packageRoot(), "evidence", ...segments);
+}
+
+// ---------------------------------------------------------------------------
+// Evidence manifest / snapshot helpers
+// ---------------------------------------------------------------------------
+
+export function getOntologyEvidenceManifest(): OntologyEvidenceManifest {
+  const evidence = AGENT_CATALOG.evidence;
+  const claims = AGENT_CATALOG.claims;
+
+  const repoEvidence = evidence.filter((entry) => entry.kind === "repo");
+  const webEvidence = evidence.filter((entry) => entry.kind === "web");
+  const repoClaims = claims.filter((claim) => claim.provenanceKind === "repo-observation");
+  const vendorClaims = claims.filter((claim) => claim.provenanceKind !== "repo-observation");
+
+  const shards: OntologyEvidenceShardDescriptor[] = [];
+
+  if (repoEvidence.length > 0) {
+    shards.push({
+      entryKind: "evidence-sources",
+      group: "repo",
+      relativePath: "shards/evidence-sources-repo.json",
+      entryCount: repoEvidence.length,
+    });
+  }
+
+  if (webEvidence.length > 0) {
+    shards.push({
+      entryKind: "evidence-sources",
+      group: "web",
+      relativePath: "shards/evidence-sources-web.json",
+      entryCount: webEvidence.length,
+    });
+  }
+
+  if (repoClaims.length > 0) {
+    shards.push({
+      entryKind: "claims",
+      group: "repo",
+      relativePath: "shards/claims-repo.json",
+      entryCount: repoClaims.length,
+    });
+  }
+
+  if (vendorClaims.length > 0) {
+    shards.push({
+      entryKind: "claims",
+      group: "vendor",
+      relativePath: "shards/claims-vendor.json",
+      entryCount: vendorClaims.length,
+    });
+  }
+
+  return clone({
+    generatedAt: GRAPH_DOCUMENT.generatedAt,
+    graphId: GRAPH_DOCUMENT.graphId,
+    schemaVersion: GRAPH_DOCUMENT.schemaVersion,
+    exportVersion: 2,
+    shards,
+  });
+}
+
+export function getOntologyEvidenceSnapshot(): { evidenceSources: EvidenceRecord[]; claims: ClaimRecord[] } {
+  return clone({
+    evidenceSources: AGENT_CATALOG.evidence,
+    claims: AGENT_CATALOG.claims,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Claims / evidence helpers
+// ---------------------------------------------------------------------------
+
+export function listOntologyClaims(): ClaimRecord[] {
+  return clone(CLAIMS);
+}
+
+export function getOntologyClaim(claimId: string): ClaimRecord | undefined {
+  const claim = CLAIMS.find((entry) => entry.claimId === claimId);
+  return claim ? clone(claim) : undefined;
+}
+
+export function getOntologyEvidenceSource(evidenceId: string): EvidenceRecord | undefined {
+  const entry = AGENT_CATALOG.evidence.find((source) => source.evidenceId === evidenceId);
+  return entry ? clone(entry) : undefined;
+}
+
+export function listClaimsForSubject(subjectId: string): ClaimRecord[] {
+  return clone(CLAIMS.filter((claim) => claim.subjectId === subjectId));
+}
+
+export function listEvidenceForSubject(subjectId: string): EvidenceRecord[] {
+  const claimsForSubject = CLAIMS.filter((claim) => claim.subjectId === subjectId);
+  const evidenceIds = new Set(claimsForSubject.flatMap((claim) => claim.evidenceIds));
+
+  const assertions = CAPABILITY_ASSERTIONS.filter((assertion) => assertion.subjectId === subjectId);
+  for (const assertion of assertions) {
+    for (const id of assertion.evidenceIds) {
+      evidenceIds.add(id);
+    }
+    for (const claim of assertion.supportingClaims) {
+      for (const id of claim.evidenceIds) {
+        evidenceIds.add(id);
+      }
+    }
+  }
+
+  const agents = AGENT_CATALOG.agents.filter(
+    (agent) => agentVersionNodeId(agent) === subjectId,
+  );
+  for (const agent of agents) {
+    for (const id of agent.evidenceIds) {
+      evidenceIds.add(id);
+    }
+  }
+
+  return clone(AGENT_CATALOG.evidence.filter((entry) => evidenceIds.has(entry.evidenceId)));
+}
+
+export function getSubjectProvenance(subjectId: string): SubjectProvenance {
+  return clone({
+    subjectId,
+    claims: listClaimsForSubject(subjectId),
+    evidence: listEvidenceForSubject(subjectId),
+  });
+}
+
+export function listClaimsForEvidence(evidenceId: string): ClaimRecord[] {
+  return clone(CLAIMS.filter((claim) => claim.evidenceIds.includes(evidenceId)));
+}
+
+export function searchOntologyEvidence(query: string): OntologyEvidenceSearchResult {
+  const normalizedQuery = query.trim().toLowerCase();
+  const evidence = AGENT_CATALOG.evidence.filter(
+    (entry) =>
+      entry.evidenceId.toLowerCase().includes(normalizedQuery) ||
+      entry.sourcePathOrUrl.toLowerCase().includes(normalizedQuery) ||
+      entry.claim.toLowerCase().includes(normalizedQuery),
+  );
+  const evidenceIds = new Set(evidence.map((entry) => entry.evidenceId));
+  const claims = CLAIMS.filter(
+    (claim) =>
+      claim.claimId.toLowerCase().includes(normalizedQuery) ||
+      claim.evidenceIds.some((id) => evidenceIds.has(id)),
+  );
+
+  return clone({ query, evidence, claims });
 }

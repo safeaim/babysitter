@@ -77,7 +77,12 @@
     "docs:serve": "docusaurus serve docs-site/build",
     "docs:clear": "docusaurus clear docs-site",
     "sync:external-plugins": "node scripts/sync-external-plugin-repos.mjs",
-    "validate:edges": "node packages/atlas/scripts/validate-edges.mjs"
+    "validate:edges": "node packages/atlas/scripts/validate-edges.mjs",
+    "test:e2e:live-stack:primary": "vitest run --config vitest.config.ts packages/agent-mux/cli/tests/live-stack/primary-live-runner.test.ts",
+    "test:e2e:live-stack:framework": "vitest run --config vitest.config.ts packages/agent-mux/cli/tests/live-stack/scenario-matrix.test.ts",
+    "test:e2e:live-stack:matrix": "vitest run --config vitest.config.ts packages/agent-mux/cli/tests/live-stack/matrix-runner.test.ts",
+    "test:e2e:live-stack": "npm run test:e2e:live-stack:framework && npm run test:e2e:live-stack:primary && npm run test:e2e:live-stack:matrix",
+    "coverage:e2e:live-stack": "node scripts/live-stack-coverage-report.cjs"
   },
   "devDependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.113",

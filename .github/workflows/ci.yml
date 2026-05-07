@@ -128,6 +128,11 @@ jobs:
         run: |
           set -euo pipefail
           npm run build:agent-mux 2>&1 | tee artifacts/test-logs/agent-mux-build.log
+      - name: Live stack contract tests
+        run: |
+          set -euo pipefail
+          npm run test:e2e:live-stack 2>&1 | tee artifacts/test-logs/live-stack-contract-tests.log
+          npm run coverage:e2e:live-stack 2>&1 | tee artifacts/test-logs/live-stack-coverage.log
 
       - name: Build Atlas packages
         run: |
@@ -299,6 +304,10 @@ jobs:
           npm run typecheck --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/workspace-coverage-logs/transport-mux-typecheck.log
           npm run test --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/workspace-coverage-logs/transport-mux-test.log
           npm run scorecard:migration --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/workspace-coverage-logs/transport-mux-scorecard.log
+      - name: Generate live stack coverage summary
+        run: |
+          set -euo pipefail
+          npm run coverage:e2e:live-stack 2>&1 | tee artifacts/workspace-coverage-logs/live-stack-coverage.log
 
       - name: Validate cloud deployment workspace QA surface
         run: |

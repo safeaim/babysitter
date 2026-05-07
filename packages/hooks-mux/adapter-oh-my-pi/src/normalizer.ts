@@ -1,8 +1,16 @@
 import { normalizeEvent, type UnifiedHookEvent, type NormalizeOptions } from '@a5c-ai/hooks-mux-core';
 import { OH_MY_PI_PHASE_MAPPINGS } from './mappings';
 
-/** The adapter identifier used in all normalized events. */
+/** The default adapter identifier used in all normalized events. */
 export const ADAPTER_NAME = 'oh-my-pi';
+
+/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _adapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _adapterName = name;
+}
 
 /**
  * Common fields that may be present on Oh-My-Pi extension event contexts.
@@ -146,7 +154,7 @@ export function normalizeOhMyPiEvent(
   }
 
   const options: NormalizeOptions = {
-    adapter: ADAPTER_NAME,
+    adapter: _adapterName,
     rawEventName,
     stdinPayload: parsed,
     env: enrichedEnv,

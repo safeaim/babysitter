@@ -24,7 +24,7 @@ export class OpenClawAdapter extends BaseHarnessOutputAdapter {
     targetProfile: TargetProfile,
     _diagnostics: Diagnostic[]
   ): TransformedFile | null {
-    const content = generateOpenClawHooksJson(manifest, targetProfile);
+    const content = generateOpenClawHooksJson(manifest, targetProfile, this.targetName);
     return { path: targetProfile.hookRegistrationOutputPath || 'hooks.json', content };
   }
 
@@ -37,14 +37,15 @@ export class OpenClawAdapter extends BaseHarnessOutputAdapter {
     const files: TransformedFile[] = [];
     files.push({
       path: 'package.json',
-      content: generateOpenClawPackageManifest(manifest),
+      content: generateOpenClawPackageManifest(manifest, this.targetName),
     });
     files.push({
       path: 'plugin.json',
       content: generateOpenClawManifest(manifest),
     });
+    const nativePluginManifest = targetProfile.requiredSurfaceFile || `${this.targetName}.plugin.json`;
     files.push({
-      path: 'openclaw.plugin.json',
+      path: nativePluginManifest,
       content: JSON.stringify(
         {
           name: manifest.name,
@@ -104,8 +105,8 @@ function buildNpmBugs(
   return { url: `${base}/issues` };
 }
 
-export function generateOpenClawPackageManifest(manifest: ResolvedManifest): string {
-  const target: Pick<TargetProfile, 'name'> = { name: 'openclaw' };
+export function generateOpenClawPackageManifest(manifest: ResolvedManifest, targetName = 'openclaw'): string {
+  const target: Pick<TargetProfile, 'name'> = { name: targetName };
   const packageName = resolveTargetNpmPackageName(manifest, target);
   const packageJson: Record<string, unknown> = {
     name: packageName,
@@ -121,12 +122,12 @@ export function generateOpenClawPackageManifest(manifest: ResolvedManifest): str
         hooks: 'extensions/index.ts',
       },
     },
-    keywords: ['babysitter', 'openclaw', 'orchestration', 'ai-agent', 'sdk-integration'],
+    keywords: ['babysitter', targetName, 'orchestration', 'ai-agent', 'sdk-integration'],
     dependencies: {
       [resolveSdkConfig(manifest).package]: manifest.version,
     },
     peerDependencies: {
-      openclaw: '*',
+      [targetName]: '*',
     },
     scripts: {
       'plugin:install': 'node bin/install.cjs --global',
@@ -143,7 +144,7 @@ export function generateOpenClawPackageManifest(manifest: ResolvedManifest): str
       'package.json',
       'versions.json',
       'plugin.json',
-      'openclaw.plugin.json',
+      `${targetName}.plugin.json`,
       'hooks/',
       'hooks.json',
       'extensions/',
@@ -157,7 +158,7 @@ export function generateOpenClawPackageManifest(manifest: ResolvedManifest): str
     publishConfig: { access: 'public' },
   };
 
-  const clawPkgName = resolveTargetNpmPackageName(manifest, target);
+  const clawPkgName = packageName;
   packageJson.repository = buildNpmRepository(manifest, clawPkgName);
   packageJson.homepage = buildNpmHomepage(manifest, clawPkgName);
   packageJson.bugs = buildNpmBugs(manifest);
@@ -190,10 +191,11 @@ export function generateOpenClawManifest(manifest: A5cPluginManifest): string {
 
 export function generateOpenClawHooksJson(
   manifest: A5cPluginManifest,
-  _targetProfile: TargetProfile
+  _targetProfile: TargetProfile,
+  targetName = 'openclaw',
 ): string {
   const hooks: Record<string, unknown> = {};
-  const pat = getPattern(manifest, 'openclaw');
+  const pat = getPattern(manifest, targetName);
 
   const sessionStartHandler = manifest.hooks?.SessionStart;
   if (typeof sessionStartHandler === 'string') {

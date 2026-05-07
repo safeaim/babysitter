@@ -10,9 +10,9 @@ import type { AdapterCapabilities } from '@a5c-ai/hooks-mux-core';
  *
  * Spec section 17.3.
  */
-export function createAdapter(): AdapterCapabilities {
+export function createAdapter(name = 'gemini'): AdapterCapabilities {
   return {
-    name: 'gemini',
+    name,
     family: 'shell-hook',
     sessionIdQuality: 'derived',
     supportsOrderedFanout: true,

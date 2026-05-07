@@ -34,14 +34,14 @@ import {
 import { setupClaudeRuntimeHooks } from './claude-code/runtime-hooks/lifecycle.js';
 
 export class ClaudeAdapter extends BaseAgentAdapter {
-  readonly agent = 'claude' as const;
+  readonly agent: string = 'claude';
   readonly displayName = 'Claude Code';
-  readonly cliCommand = 'claude';
+  readonly cliCommand: string = 'claude';
   readonly minVersion = '1.0.0';
   readonly hostEnvSignals = ['CLAUDECODE', 'CLAUDE_CODE_SESSION_ID', 'CLAUDE_CODE', 'CLAUDE_PROJECT_DIR'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'claude',
+    agent: this.agent,
     canResume: true,
     canFork: true,
     supportsMultiTurn: true,
@@ -98,7 +98,7 @@ export class ClaudeAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'claude',
+      agent: this.agent,
       modelId: 'claude-sonnet-4-20250514',
       modelAlias: 'sonnet',
       displayName: 'Claude Sonnet 4',
@@ -126,7 +126,7 @@ export class ClaudeAdapter extends BaseAgentAdapter {
       source: 'bundled',
     },
     {
-      agent: 'claude',
+      agent: this.agent,
       modelId: 'claude-opus-4-20250514',
       modelAlias: 'opus',
       displayName: 'Claude Opus 4',
@@ -158,7 +158,7 @@ export class ClaudeAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'claude-sonnet-4-20250514';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'claude',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.claude', 'settings.json')],
@@ -525,19 +525,19 @@ export class ClaudeAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'claude',
+      agent: this.agent,
       providerName: 'Anthropic',
       steps: [
         { step: 1, description: 'Get an API key from https://console.anthropic.com/settings/keys', url: 'https://console.anthropic.com/settings/keys' },
         { step: 2, description: 'Set the ANTHROPIC_API_KEY environment variable', command: 'export ANTHROPIC_API_KEY=sk-ant-...' },
-        { step: 3, description: 'Alternatively, run `claude` and follow the browser login flow', command: 'claude' },
+        { step: 3, description: `Alternatively, run \`${this.cliCommand}\` and follow the browser login flow`, command: this.cliCommand },
       ],
       envVars: [
         { name: 'ANTHROPIC_API_KEY', description: 'Anthropic API key', required: true, exampleFormat: 'sk-ant-api03-...' },
       ],
       documentationUrls: ['https://docs.anthropic.com/en/docs/claude-code'],
-      loginCommand: 'claude',
-      verifyCommand: 'claude --version',
+      loginCommand: this.cliCommand,
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -546,8 +546,8 @@ export class ClaudeAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseJsonlSessionFile(filePath, 'claude');
-    return { ...parsed, agent: 'claude', title: parsed.sessionId };
+    const parsed = await parseJsonlSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent, title: parsed.sessionId };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -556,9 +556,9 @@ export class ClaudeAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<import('@a5c-ai/agent-mux-core').AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'claude', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'claude', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<import('@a5c-ai/agent-mux-core').AgentConfig>, _cwd?: string): Promise<void> {

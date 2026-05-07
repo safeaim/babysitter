@@ -29,14 +29,14 @@ import {
 } from './session-fs.js';
 
 export class CopilotAdapter extends BaseAgentAdapter {
-  readonly agent = 'copilot' as const;
+  readonly agent: string = 'copilot';
   readonly displayName = 'GitHub Copilot';
-  readonly cliCommand = 'gh copilot';
+  readonly cliCommand: string = 'gh copilot';
   readonly minVersion = '1.0.0';
   readonly hostEnvSignals = ['COPILOT_CLI_SESSION', 'GH_COPILOT_SESSION'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'copilot',
+    agent: this.agent,
     canResume: false,
     canFork: false,
     supportsMultiTurn: false,
@@ -86,7 +86,7 @@ export class CopilotAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'copilot',
+      agent: this.agent,
       modelId: 'gpt-4o',
       displayName: 'GPT-4o',
       deprecated: false,
@@ -113,7 +113,7 @@ export class CopilotAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'gpt-4o';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'copilot',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.config', 'github-copilot', 'settings.json')],
@@ -194,7 +194,7 @@ export class CopilotAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'copilot',
+      agent: this.agent,
       providerName: 'GitHub',
       steps: [
         { step: 1, description: 'Install the GitHub CLI: https://cli.github.com', url: 'https://cli.github.com' },
@@ -206,7 +206,7 @@ export class CopilotAdapter extends BaseAgentAdapter {
       ],
       documentationUrls: ['https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-in-the-command-line'],
       loginCommand: 'gh auth login',
-      verifyCommand: 'gh copilot --version',
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -215,8 +215,8 @@ export class CopilotAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseJsonlSessionFile(filePath, 'copilot');
-    return { ...parsed, agent: 'copilot' };
+    const parsed = await parseJsonlSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -225,9 +225,9 @@ export class CopilotAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'copilot', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'copilot', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<AgentConfig>, _cwd?: string): Promise<void> {

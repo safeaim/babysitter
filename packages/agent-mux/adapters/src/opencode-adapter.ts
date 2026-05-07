@@ -34,14 +34,14 @@ import {
 } from './session-fs.js';
 
 export class OpenCodeAdapter extends BaseAgentAdapter {
-  readonly agent = 'opencode' as const;
+  readonly agent: string = 'opencode';
   readonly displayName = 'OpenCode';
-  readonly cliCommand = 'opencode';
+  readonly cliCommand: string = 'opencode';
   readonly minVersion = '0.1.0';
   readonly hostEnvSignals = ['OPENCODE_SESSION_ID', 'OPENCODE_CONFIG'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'opencode',
+    agent: this.agent,
     canResume: true,
     canFork: true,
     supportsMultiTurn: true,
@@ -93,7 +93,7 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'opencode',
+      agent: this.agent,
       modelId: 'claude-3-5-sonnet-20241022',
       modelAlias: 'claude-sonnet',
       displayName: 'Claude 3.5 Sonnet',
@@ -120,7 +120,7 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
       source: 'bundled',
     },
     {
-      agent: 'opencode',
+      agent: this.agent,
       modelId: 'gpt-4o',
       modelAlias: 'gpt-4o',
       displayName: 'GPT-4o',
@@ -151,7 +151,7 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'claude-3-5-sonnet-20241022';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'opencode',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.config', 'opencode', 'opencode.json')],
@@ -339,7 +339,7 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'opencode',
+      agent: this.agent,
       providerName: 'OpenCode',
       steps: [
         { step: 1, description: 'Configure authentication using OpenCode CLI', command: 'opencode auth' },
@@ -354,8 +354,8 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
         { name: 'GOOGLE_API_KEY', description: 'Google API key', required: false },
       ],
       documentationUrls: ['https://github.com/anomalyco/opencode'],
-      loginCommand: 'opencode auth',
-      verifyCommand: 'opencode --version',
+      loginCommand: `${this.cliCommand} auth`,
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -364,8 +364,8 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseJsonlSessionFile(filePath, 'opencode');
-    return { ...parsed, agent: 'opencode' };
+    const parsed = await parseJsonlSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -374,9 +374,9 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'opencode', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'opencode', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<AgentConfig>, _cwd?: string): Promise<void> {

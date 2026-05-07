@@ -13,9 +13,9 @@ import type { AdapterCapabilities } from '@a5c-ai/hooks-mux-core';
  * - preserve chained context behavior and session-before short-circuit
  * - expose mutability limitations explicitly
  */
-export function createAdapter(): AdapterCapabilities {
+export function createAdapter(name = 'oh-my-pi'): AdapterCapabilities {
   return {
-    name: 'oh-my-pi',
+    name,
     family: 'in-process',
     sessionIdQuality: 'native',
     supportsOrderedFanout: true,

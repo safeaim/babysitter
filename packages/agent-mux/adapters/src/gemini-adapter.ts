@@ -34,14 +34,14 @@ import {
 } from './session-fs.js';
 
 export class GeminiAdapter extends BaseAgentAdapter {
-  readonly agent = 'gemini' as const;
+  readonly agent: string = 'gemini';
   readonly displayName = 'Gemini CLI';
-  readonly cliCommand = 'gemini';
+  readonly cliCommand: string = 'gemini';
   readonly minVersion = '0.1.0';
   readonly hostEnvSignals = ['GEMINI_CLI', 'GEMINI_SESSION_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'gemini',
+    agent: this.agent,
     canResume: true,
     canFork: false,
     supportsMultiTurn: true,
@@ -90,7 +90,7 @@ export class GeminiAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'gemini',
+      agent: this.agent,
       modelId: 'gemini-2.5-pro',
       displayName: 'Gemini 2.5 Pro',
       deprecated: false,
@@ -115,7 +115,7 @@ export class GeminiAdapter extends BaseAgentAdapter {
       source: 'bundled',
     },
     {
-      agent: 'gemini',
+      agent: this.agent,
       modelId: 'gemini-2.5-flash',
       displayName: 'Gemini 2.5 Flash',
       deprecated: false,
@@ -143,7 +143,7 @@ export class GeminiAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'gemini-2.5-pro';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'gemini',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.config', 'gemini', 'settings.json')],
@@ -266,20 +266,20 @@ export class GeminiAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'gemini',
+      agent: this.agent,
       providerName: 'Google',
       steps: [
         { step: 1, description: 'Get an API key from https://aistudio.google.com/apikey', url: 'https://aistudio.google.com/apikey' },
         { step: 2, description: 'Set GOOGLE_API_KEY or GEMINI_API_KEY environment variable', command: 'export GOOGLE_API_KEY=...' },
-        { step: 3, description: 'Alternatively, run `gemini` and follow the browser login flow', command: 'gemini' },
+        { step: 3, description: `Alternatively, run \`${this.cliCommand}\` and follow the browser login flow`, command: this.cliCommand },
       ],
       envVars: [
         { name: 'GOOGLE_API_KEY', description: 'Google API key', required: false, exampleFormat: 'AIza...' },
         { name: 'GEMINI_API_KEY', description: 'Gemini API key (alternative)', required: false, exampleFormat: 'AIza...' },
       ],
       documentationUrls: ['https://github.com/google-gemini/gemini-cli'],
-      loginCommand: 'gemini',
-      verifyCommand: 'gemini --version',
+      loginCommand: this.cliCommand,
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -288,8 +288,8 @@ export class GeminiAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseJsonlSessionFile(filePath, 'gemini');
-    return { ...parsed, agent: 'gemini' };
+    const parsed = await parseJsonlSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -298,9 +298,9 @@ export class GeminiAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'gemini', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'gemini', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<AgentConfig>, _cwd?: string): Promise<void> {

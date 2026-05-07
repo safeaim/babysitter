@@ -35,7 +35,7 @@ export class OpenCodeAdapter extends BaseHarnessOutputAdapter {
     const files: TransformedFile[] = [];
     files.push({
       path: 'plugin.json',
-      content: generateOpenCodeManifest(manifest),
+      content: generateOpenCodeManifest(manifest, this.targetName),
     });
     return files;
   }
@@ -55,14 +55,14 @@ export class OpenCodeAdapter extends BaseHarnessOutputAdapter {
   }
 }
 
-export function generateOpenCodeManifest(manifest: A5cPluginManifest): string {
+export function generateOpenCodeManifest(manifest: A5cPluginManifest, targetName = 'opencode'): string {
   const pluginJson: Record<string, unknown> = {
     name: manifest.name,
     version: manifest.version,
     description: manifest.description,
     author: manifest.author,
     license: manifest.license,
-    harness: 'opencode',
+    harness: targetName,
     hooks: 'hooks/',
     commands: 'commands/',
     skills: 'skills/',

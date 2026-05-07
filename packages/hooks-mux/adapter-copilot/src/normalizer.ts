@@ -3,6 +3,17 @@ import { normalizeEvent } from '@a5c-ai/hooks-mux-core';
 import { COPILOT_PHASE_MAPPINGS } from './mappings';
 import { resolveSyntheticSessionId } from './session-resolver';
 
+/** The default adapter name. */
+export const ADAPTER_NAME = 'copilot';
+
+/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _copilotAdapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _copilotAdapterName = name;
+}
+
 /**
  * Shape of raw Copilot stdin JSON for hook events.
  *
@@ -92,7 +103,7 @@ export function normalizeCopilotEvent(
   delete payload['event'];
 
   return normalizeEvent({
-    adapter: 'copilot',
+    adapter: _copilotAdapterName,
     rawEventName: nativeEventName,
     stdinPayload: payload,
     env: enrichedEnv,

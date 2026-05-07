@@ -35,10 +35,11 @@ import { OPENCODE_PHASE_MAPPINGS } from './mappings';
  * Create a pre-configured hooks engine for the OpenCode adapter.
  * Ready to register handlers and process events.
  */
-export function createConfiguredEngine(options?: { sessionDir?: string }): HooksEngine {
+export function createConfiguredEngine(options?: { sessionDir?: string; adapterName?: string }): HooksEngine {
+  const name = options?.adapterName ?? 'opencode';
   return createHooksEngine({
-    adapter: 'opencode',
-    capabilities: createAdapter(),
+    adapter: name,
+    capabilities: createAdapter(name),
     phaseMappings: OPENCODE_PHASE_MAPPINGS,
     sessionDir: options?.sessionDir,
   });

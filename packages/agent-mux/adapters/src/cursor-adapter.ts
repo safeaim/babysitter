@@ -34,14 +34,14 @@ import {
 } from './session-fs.js';
 
 export class CursorAdapter extends BaseAgentAdapter {
-  readonly agent = 'cursor' as const;
+  readonly agent: string = 'cursor';
   readonly displayName = 'Cursor';
-  readonly cliCommand = 'cursor-agent';
+  readonly cliCommand: string = 'cursor-agent';
   readonly minVersion = '0.40.0';
   readonly hostEnvSignals = ['CURSOR_SESSION', 'CURSOR_AGENT_SESSION'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'cursor',
+    agent: this.agent,
     canResume: true,
     canFork: false,
     supportsMultiTurn: true,
@@ -90,7 +90,7 @@ export class CursorAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'cursor',
+      agent: this.agent,
       modelId: 'cursor-fast',
       displayName: 'Cursor Fast',
       deprecated: false,
@@ -117,7 +117,7 @@ export class CursorAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'cursor-fast';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'cursor',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.cursor', 'settings.json')],
@@ -216,7 +216,7 @@ export class CursorAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'cursor',
+      agent: this.agent,
       providerName: 'Cursor',
       steps: [
         { step: 1, description: 'Download Cursor from https://cursor.com', url: 'https://cursor.com' },
@@ -227,7 +227,7 @@ export class CursorAdapter extends BaseAgentAdapter {
         { name: 'CURSOR_API_KEY', description: 'Cursor API key', required: false },
       ],
       documentationUrls: ['https://cursor.com/docs'],
-      verifyCommand: 'cursor --version',
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -236,8 +236,8 @@ export class CursorAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseJsonlSessionFile(filePath, 'cursor');
-    return { ...parsed, agent: 'cursor' };
+    const parsed = await parseJsonlSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -246,9 +246,9 @@ export class CursorAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'cursor', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'cursor', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<AgentConfig>, _cwd?: string): Promise<void> {

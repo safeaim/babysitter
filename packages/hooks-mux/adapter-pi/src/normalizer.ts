@@ -1,6 +1,17 @@
 import type { UnifiedHookEvent, UnifiedExecutionContext } from '@a5c-ai/hooks-mux-core';
 import { getPiPhaseMapping } from './mappings';
 
+/** The default adapter name. */
+export const ADAPTER_NAME = 'pi';
+
+/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _adapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _adapterName = name;
+}
+
 /**
  * Pi programmatic event payload shapes.
  *
@@ -84,7 +95,7 @@ export function buildExecutionContext(
     sessionId,
     turnId: extensionState['HOOKS_PROXY_TURN_ID'] ?? null,
     conversationId: extensionState['HOOKS_PROXY_CONVERSATION_ID'] ?? null,
-    adapter: 'pi',
+    adapter: _adapterName,
     cwd: (data.cwd as string | undefined) ?? null,
     worktree: extensionState['HOOKS_PROXY_WORKTREE'] ?? null,
     transcriptPath: null,
@@ -182,7 +193,7 @@ export function normalizePi(
 
   return {
     version: 'a5c.hooks.v1',
-    adapter: 'pi',
+    adapter: _adapterName,
     phase,
     rawEventName: nativeEventName,
     supportLevel,

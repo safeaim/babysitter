@@ -1,8 +1,16 @@
 import { normalizeEvent, type UnifiedHookEvent, type NormalizeOptions } from '@a5c-ai/hooks-mux-core';
 import { CODEX_PHASE_MAPPINGS } from './mappings';
 
-/** The adapter identifier used in all normalized events. */
+/** The default adapter identifier used in all normalized events. */
 export const ADAPTER_NAME = 'codex';
+
+/** The mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _adapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _adapterName = name;
+}
 
 /**
  * Shape of a Codex SessionStart stdin payload.
@@ -142,7 +150,7 @@ export function normalizeCodexEvent(
   }
 
   const options: NormalizeOptions = {
-    adapter: ADAPTER_NAME,
+    adapter: _adapterName,
     rawEventName,
     stdinPayload: parsed,
     env: enrichedEnv,

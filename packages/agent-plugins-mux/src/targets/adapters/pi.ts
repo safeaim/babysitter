@@ -20,7 +20,7 @@ export class PiAdapter extends BaseHarnessOutputAdapter {
     const files: TransformedFile[] = [];
     files.push({
       path: 'package.json',
-      content: generatePiManifest(manifest),
+      content: generatePiManifest(manifest, this.targetName),
     });
     return files;
   }
@@ -68,15 +68,15 @@ function buildNpmBugs(
   return { url: `${base}/issues` };
 }
 
-export function generatePiManifest(manifest: ResolvedManifest): string {
-  const target: Pick<TargetProfile, 'name'> = { name: 'pi' };
+export function generatePiManifest(manifest: ResolvedManifest, targetName = 'pi'): string {
+  const target: Pick<TargetProfile, 'name'> = { name: targetName };
   const packageJson: Record<string, unknown> = {
     name: resolveTargetNpmPackageName(manifest, target),
     version: manifest.version,
     type: 'module',
-    description: `${manifest.description} — Pi Coding Agent`,
-    keywords: ['pi', manifest.name, 'orchestration'],
-    pi: {
+    description: `${manifest.description} — ${targetName}`,
+    keywords: [targetName, manifest.name, 'orchestration'],
+    [targetName]: {
       extensions: ['./extensions'],
       skills: ['./skills'],
     },
@@ -108,7 +108,7 @@ export function generatePiManifest(manifest: ResolvedManifest): string {
     publishConfig: { access: 'public' },
   };
 
-  const piPkgName = resolveTargetNpmPackageName(manifest, target);
+  const piPkgName = packageJson.name as string;
   packageJson.repository = buildNpmRepository(manifest, piPkgName);
   packageJson.homepage = buildNpmHomepage(manifest, piPkgName);
   packageJson.bugs = buildNpmBugs(manifest);

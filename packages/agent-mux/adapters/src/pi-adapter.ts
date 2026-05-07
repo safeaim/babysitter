@@ -29,14 +29,14 @@ import {
 } from './session-fs.js';
 
 export class PiAdapter extends BaseAgentAdapter {
-  readonly agent = 'pi' as const;
+  readonly agent: string = 'pi';
   readonly displayName = 'Pi';
-  readonly cliCommand = 'pi';
+  readonly cliCommand: string = 'pi';
   readonly minVersion = '0.1.0';
   readonly hostEnvSignals = ['PI_RUN_ID', 'PI_SESSION_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'pi',
+    agent: this.agent,
     canResume: true,
     canFork: false,
     supportsMultiTurn: true,
@@ -84,7 +84,7 @@ export class PiAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'pi',
+      agent: this.agent,
       modelId: 'default',
       displayName: 'Default Model',
       deprecated: false,
@@ -111,7 +111,7 @@ export class PiAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'default';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'pi',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.pi', 'agent', 'settings.json')],
@@ -196,7 +196,7 @@ export class PiAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'pi',
+      agent: this.agent,
       providerName: 'Pi',
       steps: [
         { step: 1, description: 'Set a provider-specific API key environment variable' },
@@ -206,7 +206,7 @@ export class PiAdapter extends BaseAgentAdapter {
         { name: 'ANTHROPIC_API_KEY', description: 'Anthropic API key', required: false },
         { name: 'OPENAI_API_KEY', description: 'OpenAI API key', required: false },
       ],
-      verifyCommand: 'pi --version',
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -215,8 +215,8 @@ export class PiAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseJsonlSessionFile(filePath, 'pi');
-    return { ...parsed, agent: 'pi' };
+    const parsed = await parseJsonlSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -225,9 +225,9 @@ export class PiAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'pi', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'pi', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<AgentConfig>, _cwd?: string): Promise<void> {

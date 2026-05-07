@@ -22,9 +22,9 @@ import type { AdapterCapabilities } from '@a5c-ai/hooks-mux-core';
  *
  * Spec section 17.9.
  */
-export function createAdapter(): AdapterCapabilities {
+export function createAdapter(name = 'openclaw'): AdapterCapabilities {
   return {
-    name: 'openclaw',
+    name,
     family: 'in-process',
     sessionIdQuality: 'derived',
     supportsOrderedFanout: true,

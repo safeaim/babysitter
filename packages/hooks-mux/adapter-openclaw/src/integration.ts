@@ -39,10 +39,11 @@ import { OPENCLAW_PHASE_MAPPINGS } from './mappings';
  * Create a pre-configured hooks engine for the OpenClaw adapter.
  * Ready to register handlers and process events.
  */
-export function createConfiguredEngine(options?: { sessionDir?: string }): HooksEngine {
+export function createConfiguredEngine(options?: { sessionDir?: string; adapterName?: string }): HooksEngine {
+  const name = options?.adapterName ?? 'openclaw';
   return createHooksEngine({
-    adapter: 'openclaw',
-    capabilities: createAdapter(),
+    adapter: name,
+    capabilities: createAdapter(name),
     phaseMappings: OPENCLAW_PHASE_MAPPINGS,
     sessionDir: options?.sessionDir,
   });

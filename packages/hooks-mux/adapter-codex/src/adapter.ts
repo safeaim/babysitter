@@ -11,9 +11,9 @@ import type { AdapterCapabilities } from '@a5c-ai/hooks-mux-core';
  *
  * Spec section 17.2.
  */
-export function createAdapter(): AdapterCapabilities {
+export function createAdapter(name = 'codex'): AdapterCapabilities {
   return {
-    name: 'codex',
+    name,
     family: 'shell-hook',
     sessionIdQuality: 'native',
     supportsOrderedFanout: true,

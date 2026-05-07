@@ -2,6 +2,17 @@ import type { UnifiedHookEvent, UnifiedExecutionContext } from '@a5c-ai/hooks-mu
 import { getOpenCodePhaseMapping, SHELL_ENV_NATIVE_HOOK } from './mappings';
 import { resolveSessionId } from './session-resolver';
 
+/** The default adapter name. */
+export const ADAPTER_NAME = 'opencode';
+
+/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _adapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _adapterName = name;
+}
+
 /**
  * OpenCode event payload shapes.
  *
@@ -100,7 +111,7 @@ export function buildExecutionContext(
     sessionId,
     turnId: env['HOOKS_PROXY_TURN_ID'] ?? null,
     conversationId: env['HOOKS_PROXY_CONVERSATION_ID'] ?? null,
-    adapter: 'opencode',
+    adapter: _adapterName,
     cwd: (eventData['cwd'] as string | undefined) ?? env['PWD'] ?? null,
     worktree: env['HOOKS_PROXY_WORKTREE'] ?? null,
     transcriptPath: null,
@@ -199,7 +210,7 @@ export function normalizeOpenCode(
 
   return {
     version: 'a5c.hooks.v1',
-    adapter: 'opencode',
+    adapter: _adapterName,
     phase,
     rawEventName: nativeEventName,
     supportLevel,

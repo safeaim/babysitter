@@ -9,9 +9,9 @@ import type { AdapterCapabilities } from '@a5c-ai/hooks-mux-core';
  *
  * Spec section 17.1.
  */
-export function createAdapter(): AdapterCapabilities {
+export function createAdapter(name = 'claude'): AdapterCapabilities {
   return {
-    name: 'claude',
+    name,
     family: 'shell-hook',
     sessionIdQuality: 'native',
     supportsOrderedFanout: true,

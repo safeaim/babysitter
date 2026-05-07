@@ -33,14 +33,14 @@ import {
 } from './session-fs.js';
 
 export class OpenClawAdapter extends BaseAgentAdapter {
-  readonly agent = 'openclaw' as const;
+  readonly agent: string = 'openclaw';
   readonly displayName = 'OpenClaw';
-  readonly cliCommand = 'openclaw';
+  readonly cliCommand: string = 'openclaw';
   readonly minVersion = '0.1.0';
   readonly hostEnvSignals = ['OPENCLAW_SESSION', 'OPENCLAW_RUN_ID'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'openclaw',
+    agent: this.agent,
     canResume: false,
     canFork: false,
     supportsMultiTurn: true,
@@ -88,7 +88,7 @@ export class OpenClawAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'openclaw',
+      agent: this.agent,
       modelId: 'default',
       displayName: 'Default Model',
       deprecated: false,
@@ -115,7 +115,7 @@ export class OpenClawAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'default';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'openclaw',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.openclaw', 'config.json')],
@@ -202,7 +202,7 @@ export class OpenClawAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'openclaw',
+      agent: this.agent,
       providerName: 'OpenClaw',
       steps: [
         { step: 1, description: 'Set a provider-specific API key environment variable' },
@@ -213,7 +213,7 @@ export class OpenClawAdapter extends BaseAgentAdapter {
         { name: 'OPENAI_API_KEY', description: 'OpenAI API key', required: false },
       ],
       documentationUrls: ['https://github.com/openclaw/openclaw'],
-      verifyCommand: 'openclaw --version',
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -222,8 +222,8 @@ export class OpenClawAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseJsonlSessionFile(filePath, 'openclaw');
-    return { ...parsed, agent: 'openclaw' };
+    const parsed = await parseJsonlSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -232,9 +232,9 @@ export class OpenClawAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'openclaw', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'openclaw', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<AgentConfig>, _cwd?: string): Promise<void> {

@@ -246,7 +246,7 @@ export class ClaudeRemoteControlAdapter extends BaseProgrammaticAdapter {
     let remoteUrlAnnounced = false;
     const parseContext: ParseContext = {
       runId,
-      agent: 'claude',
+      agent: this.agent,
       sessionId: undefined,
       turnIndex: 0,
       debug: false,

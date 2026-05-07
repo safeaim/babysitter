@@ -27,17 +27,18 @@ export class GeminiAdapter extends BaseHarnessOutputAdapter {
   generateManifestFiles(
     sourceDir: string,
     manifest: A5cPluginManifest,
-    _targetProfile: TargetProfile,
+    targetProfile: TargetProfile,
     _diagnostics: Diagnostic[]
   ): TransformedFile[] {
     const files: TransformedFile[] = [];
     const commandPaths = getCommandPaths(sourceDir, manifest);
     files.push({
       path: 'plugin.json',
-      content: generateGeminiManifest(manifest, commandPaths),
+      content: generateGeminiManifest(manifest, commandPaths, this.targetName),
     });
+    const extensionManifestPath = targetProfile.requiredSurfaceFile || `${this.targetName}-extension.json`;
     files.push({
-      path: 'gemini-extension.json',
+      path: extensionManifestPath,
       content: JSON.stringify(
         {
           name: manifest.name,
@@ -56,7 +57,8 @@ export class GeminiAdapter extends BaseHarnessOutputAdapter {
 
 export function generateGeminiManifest(
   manifest: A5cPluginManifest,
-  commandPaths: string[] = []
+  commandPaths: string[] = [],
+  targetName = 'gemini',
 ): string {
   const pluginJson: Record<string, unknown> = {
     name: manifest.name,
@@ -64,12 +66,12 @@ export function generateGeminiManifest(
     description: manifest.description,
     author: manifest.author,
     license: manifest.license,
-    harness: 'gemini-cli',
+    harness: `${targetName}-cli`,
     hooks: {},
     commands: commandPaths.map((cmdPath) => `commands/${cmdPath.split(/[\\/]/).pop()?.replace(/\.md$/, '.toml')}`),
     skills: [],
     contextFileName: 'GEMINI.md',
-    extensionManifest: 'gemini-extension.json',
+    extensionManifest: `${targetName}-extension.json`,
   };
 
   if (manifest.hooks) {

@@ -2,6 +2,17 @@ import type { UnifiedHookEvent, UnifiedExecutionContext } from '@a5c-ai/hooks-mu
 import { getOpenClawPhaseMapping, classifyHookOrigin } from './mappings';
 import type { OpenClawHookOrigin } from './mappings';
 
+/** The default adapter name. */
+export const ADAPTER_NAME = 'openclaw';
+
+/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _adapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _adapterName = name;
+}
+
 /**
  * OpenClaw in-process hook payload shapes.
  *
@@ -111,7 +122,7 @@ export function buildExecutionContext(
     sessionId,
     turnId: env['HOOKS_PROXY_TURN_ID'] ?? null,
     conversationId: env['HOOKS_PROXY_CONVERSATION_ID'] ?? null,
-    adapter: 'openclaw',
+    adapter: _adapterName,
     cwd: (eventData.workspace as string | undefined) ?? env['PWD'] ?? null,
     worktree: env['HOOKS_PROXY_WORKTREE'] ?? null,
     transcriptPath: null,
@@ -256,7 +267,7 @@ export function normalizeOpenClaw(
 
   return {
     version: 'a5c.hooks.v1',
-    adapter: 'openclaw',
+    adapter: _adapterName,
     phase,
     rawEventName: nativeEventName,
     supportLevel,

@@ -11,9 +11,9 @@ import type { AdapterCapabilities } from '@a5c-ai/hooks-mux-core';
  * - permissionDecision supports allow|deny|ask in schema but only deny is processed
  * - Many hook outputs are ignored on non-preTool events
  */
-export function createAdapter(): AdapterCapabilities {
+export function createAdapter(name = 'copilot'): AdapterCapabilities {
   return {
-    name: 'copilot',
+    name,
     family: 'shell-hook',
     sessionIdQuality: 'synthetic',
     supportsOrderedFanout: true,

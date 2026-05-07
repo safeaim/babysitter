@@ -36,7 +36,7 @@ export class CodexAdapter extends BaseHarnessOutputAdapter {
     rawManifest?: A5cPluginManifest
   ): TransformedFile[] {
     const files: TransformedFile[] = [];
-    const codexPkg = generateCodexManifest(manifest);
+    const codexPkg = generateCodexManifest(manifest, this.targetName);
     files.push({ path: 'package.json', content: codexPkg });
     if (targetProfile.harnessManifestPath) {
       files.push({ path: targetProfile.harnessManifestPath, content: generateHarnessManifest(rawManifest || manifest, targetProfile) });
@@ -88,8 +88,8 @@ function buildNpmBugs(
   return { url: `${base}/issues` };
 }
 
-export function generateCodexManifest(manifest: ResolvedManifest): string {
-  const target: Pick<TargetProfile, 'name'> = { name: 'codex' };
+export function generateCodexManifest(manifest: ResolvedManifest, targetName = 'codex'): string {
+  const target: Pick<TargetProfile, 'name'> = { name: targetName };
   const packageJson: Record<string, unknown> = {
     name: resolveTargetNpmPackageName(manifest, target),
     version: manifest.version,
@@ -105,7 +105,7 @@ export function generateCodexManifest(manifest: ResolvedManifest): string {
     },
     bin: { [resolveTargetCliName(manifest, target)]: 'bin/cli.js' },
     files: [
-      '.codex-plugin/',
+      `.${targetName}-plugin/`,
       'assets/',
       'hooks/',
       'hooks.json',
@@ -116,7 +116,7 @@ export function generateCodexManifest(manifest: ResolvedManifest): string {
       'plugin.lock.json',
       'README.md',
     ],
-    keywords: [manifest.name, 'codex', 'orchestration'],
+    keywords: [manifest.name, targetName, 'orchestration'],
     author: typeof manifest.author === 'string' ? manifest.author : manifest.author.name,
     license: manifest.license,
     publishConfig: { access: 'public' },

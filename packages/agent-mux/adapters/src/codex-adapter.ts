@@ -30,14 +30,14 @@ import {
 import { readAuthConfigIdentity } from './auth-config.js';
 
 export class CodexAdapter extends BaseAgentAdapter {
-  readonly agent = 'codex' as const;
+  readonly agent: string = 'codex';
   readonly displayName = 'OpenAI Codex';
-  readonly cliCommand = 'codex';
+  readonly cliCommand: string = 'codex';
   readonly minVersion = '0.1.0';
   readonly hostEnvSignals = ['CODEX_SESSION_ID', 'CODEX_RUN_ID', 'CODEX_CLI'] as const;
 
   readonly capabilities: AgentCapabilities = {
-    agent: 'codex',
+    agent: this.agent,
     canResume: true,
     canFork: false,
     supportsMultiTurn: true,
@@ -85,7 +85,7 @@ export class CodexAdapter extends BaseAgentAdapter {
 
   readonly models: ModelCapabilities[] = [
     {
-      agent: 'codex',
+      agent: this.agent,
       modelId: 'o4-mini',
       displayName: 'o4-mini',
       deprecated: false,
@@ -109,7 +109,7 @@ export class CodexAdapter extends BaseAgentAdapter {
       source: 'bundled',
     },
     {
-      agent: 'codex',
+      agent: this.agent,
       modelId: 'codex-mini-latest',
       displayName: 'Codex Mini',
       deprecated: false,
@@ -136,7 +136,7 @@ export class CodexAdapter extends BaseAgentAdapter {
   readonly defaultModelId = 'o4-mini';
 
   readonly configSchema: AgentConfigSchema = {
-    agent: 'codex',
+    agent: this.agent,
     version: 1,
     fields: [],
     configFilePaths: [path.join(os.homedir(), '.codex', 'config.json')],
@@ -358,7 +358,7 @@ export class CodexAdapter extends BaseAgentAdapter {
 
   getAuthGuidance(): AuthSetupGuidance {
     return {
-      agent: 'codex',
+      agent: this.agent,
       providerName: 'OpenAI',
       steps: [
         { step: 1, description: 'Get an API key from https://platform.openai.com/api-keys', url: 'https://platform.openai.com/api-keys' },
@@ -368,7 +368,7 @@ export class CodexAdapter extends BaseAgentAdapter {
         { name: 'OPENAI_API_KEY', description: 'OpenAI API key', required: true, exampleFormat: 'sk-...' },
       ],
       documentationUrls: ['https://github.com/openai/codex'],
-      verifyCommand: 'codex --version',
+      verifyCommand: `${this.cliCommand} --version`,
     };
   }
 
@@ -377,8 +377,8 @@ export class CodexAdapter extends BaseAgentAdapter {
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {
-    const parsed = await parseCodexSessionFile(filePath, 'codex');
-    return { ...parsed, agent: 'codex' };
+    const parsed = await parseCodexSessionFile(filePath, this.agent);
+    return { ...parsed, agent: this.agent };
   }
 
   async listSessionFiles(_cwd?: string): Promise<string[]> {
@@ -387,9 +387,9 @@ export class CodexAdapter extends BaseAgentAdapter {
 
   async readConfig(_cwd?: string): Promise<AgentConfig> {
     const filePath = this.configSchema.configFilePaths?.[0];
-    if (!filePath) return { agent: 'codex', source: 'global' };
+    if (!filePath) return { agent: this.agent, source: 'global' };
     const data = (await readJsonFile<Record<string, unknown>>(filePath)) ?? {};
-    return { agent: 'codex', source: 'global', filePaths: [filePath], ...data };
+    return { agent: this.agent, source: 'global', filePaths: [filePath], ...data };
   }
 
   async writeConfig(config: Partial<AgentConfig>, _cwd?: string): Promise<void> {

@@ -92,6 +92,7 @@ export function buildExecutionContext(
   stdinData: Record<string, unknown>,
   nativeEventName: string,
   env: Record<string, string>,
+  adapterName = 'claude',
 ): UnifiedExecutionContext {
   const persistedEnv: Record<string, string> = {};
   const contextVars: Record<string, string> = {};
@@ -112,7 +113,7 @@ export function buildExecutionContext(
     sessionId,
     turnId: env['HOOKS_PROXY_TURN_ID'] ?? null,
     conversationId: env['HOOKS_PROXY_CONVERSATION_ID'] ?? null,
-    adapter: 'claude',
+    adapter: adapterName,
     cwd: (stdinData.cwd as string | undefined) ?? env['PWD'] ?? null,
     worktree: env['HOOKS_PROXY_WORKTREE'] ?? null,
     transcriptPath: (stdinData.transcript_path as string | undefined) ?? null,
@@ -232,6 +233,7 @@ export function normalizeClaude(
   nativeEventName: string,
   rawStdin: unknown,
   env: Record<string, string> = {},
+  adapterName = 'claude',
 ): UnifiedHookEvent {
   const stdinData = parseStdin(rawStdin);
   const mapping = getClaudePhaseMapping(nativeEventName);
@@ -239,7 +241,7 @@ export function normalizeClaude(
   const phase = mapping?.canonicalPhase ?? 'unknown';
   const supportLevel = mapping?.supportLevel ?? 'unsupported';
 
-  const execution = buildExecutionContext(stdinData, nativeEventName, env);
+  const execution = buildExecutionContext(stdinData, nativeEventName, env, adapterName);
   const payload = buildPayload(nativeEventName, stdinData);
 
   // Split env into input and persisted buckets
@@ -255,7 +257,7 @@ export function normalizeClaude(
 
   return {
     version: 'a5c.hooks.v1',
-    adapter: 'claude',
+    adapter: adapterName,
     phase,
     rawEventName: nativeEventName,
     supportLevel,

@@ -2,8 +2,16 @@ import { normalizeEvent, type UnifiedHookEvent, type NormalizeOptions } from '@a
 import { CURSOR_PHASE_MAPPINGS } from './mappings';
 import { getEventDiagnostics } from './capability-profile';
 
-/** The adapter identifier used in all normalized events. */
+/** The default adapter identifier used in all normalized events. */
 export const ADAPTER_NAME = 'cursor';
+
+/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _adapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _adapterName = name;
+}
 
 /**
  * Common fields that may be present on Cursor hook stdin payloads.
@@ -131,7 +139,7 @@ export function normalizeCursorEvent(
   }
 
   const options: NormalizeOptions = {
-    adapter: ADAPTER_NAME,
+    adapter: _adapterName,
     rawEventName,
     stdinPayload: parsed,
     env: enrichedEnv,

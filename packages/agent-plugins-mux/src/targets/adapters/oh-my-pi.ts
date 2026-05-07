@@ -20,7 +20,7 @@ export class OhMyPiAdapter extends BaseHarnessOutputAdapter {
     const files: TransformedFile[] = [];
     files.push({
       path: 'package.json',
-      content: generateOhMyPiManifest(manifest),
+      content: generateOhMyPiManifest(manifest, this.targetName),
     });
     return files;
   }
@@ -68,14 +68,14 @@ function buildNpmBugs(
   return { url: `${base}/issues` };
 }
 
-export function generateOhMyPiManifest(manifest: ResolvedManifest): string {
-  const target: Pick<TargetProfile, 'name'> = { name: 'oh-my-pi' };
+export function generateOhMyPiManifest(manifest: ResolvedManifest, targetName = 'oh-my-pi'): string {
+  const target: Pick<TargetProfile, 'name'> = { name: targetName };
   const packageJson: Record<string, unknown> = {
     name: resolveTargetNpmPackageName(manifest, target),
     version: manifest.version,
     type: 'module',
-    description: `${manifest.description} — oh-my-pi`,
-    keywords: ['oh-my-pi', manifest.name, 'orchestration'],
+    description: `${manifest.description} — ${targetName}`,
+    keywords: [targetName, manifest.name, 'orchestration'],
     omp: {
       extensions: ['./extensions'],
       skills: ['./skills'],
@@ -106,7 +106,7 @@ export function generateOhMyPiManifest(manifest: ResolvedManifest): string {
     publishConfig: { access: 'public' },
   };
 
-  const ompPkgName = resolveTargetNpmPackageName(manifest, target);
+  const ompPkgName = packageJson.name as string;
   packageJson.repository = buildNpmRepository(manifest, ompPkgName);
   packageJson.homepage = buildNpmHomepage(manifest, ompPkgName);
   packageJson.bugs = buildNpmBugs(manifest);

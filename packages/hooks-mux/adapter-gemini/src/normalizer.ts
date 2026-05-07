@@ -2,6 +2,17 @@ import type { UnifiedHookEvent, UnifiedExecutionContext } from '@a5c-ai/hooks-mu
 import { GEMINI_PHASE_MAPPINGS, getGeminiPhaseMapping } from './mappings';
 import { resolveSessionId } from './session-resolver';
 
+/** The default adapter name. */
+export const ADAPTER_NAME = 'gemini';
+
+/** Mutable adapter name — set via setAdapterName() from the adapter-loader. */
+let _adapterName = ADAPTER_NAME;
+
+/** Override the adapter name used in normalized events. */
+export function setAdapterName(name: string): void {
+  _adapterName = name;
+}
+
 /**
  * Gemini CLI stdin JSON payload shapes.
  *
@@ -136,7 +147,7 @@ export function buildExecutionContext(
     sessionId,
     turnId: env['HOOKS_PROXY_TURN_ID'] ?? null,
     conversationId: env['HOOKS_PROXY_CONVERSATION_ID'] ?? null,
-    adapter: 'gemini',
+    adapter: _adapterName,
     cwd: (stdinData.cwd as string | undefined) ?? env['PWD'] ?? null,
     worktree: env['HOOKS_PROXY_WORKTREE'] ?? null,
     transcriptPath: null,
@@ -259,7 +270,7 @@ export function normalizeGemini(
 
   return {
     version: 'a5c.hooks.v1',
-    adapter: 'gemini',
+    adapter: _adapterName,
     phase,
     rawEventName: nativeEventName,
     supportLevel,

@@ -1,0 +1,316 @@
+# Missing hook mappings for adapter phase coverage (CI fix)
+---
+nodeKind: HookMapping
+id: hook-mapping:session-end-codex
+attributes:
+  mappingId: hook-mapping:session-end-codex
+  hookId: hook-surface:session-end
+  targetId: agent-version:codex@current
+  nativeName: SessionEnd
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: codex
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: session.end
+  blockCapability: false
+  mutationCapability: false
+  scope: session
+edges:
+  maps_hook:
+    - target: hook-surface:session-end
+---
+nodeKind: HookMapping
+id: hook-mapping:post-tool-use-codex
+attributes:
+  mappingId: hook-mapping:post-tool-use-codex
+  hookId: hook-surface:post-tool-use
+  targetId: agent-version:codex@current
+  nativeName: PostToolUse
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: codex
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: tool.after
+  blockCapability: false
+  mutationCapability: false
+  scope: tool
+edges:
+  maps_hook:
+    - target: hook-surface:post-tool-use
+---
+nodeKind: HookMapping
+id: hook-mapping:user-prompt-submit-cursor
+attributes:
+  mappingId: hook-mapping:user-prompt-submit-cursor
+  hookId: hook-surface:user-prompt-submit
+  targetId: agent-version:cursor@current
+  nativeName: UserPromptSubmit
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: cursor
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: turn.user_prompt_submitted
+  blockCapability: false
+  mutationCapability: false
+  scope: turn
+edges:
+  maps_hook:
+    - target: hook-surface:user-prompt-submit
+---
+nodeKind: HookMapping
+id: hook-mapping:pre-tool-use-cursor
+attributes:
+  mappingId: hook-mapping:pre-tool-use-cursor
+  hookId: hook-surface:pre-tool-use
+  targetId: agent-version:cursor@current
+  nativeName: PreToolUse
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: cursor
+  delivery: shell
+  blocking: true
+  supportLevel: supported
+  canonicalPhase: tool.before
+  blockCapability: true
+  mutationCapability: false
+  scope: tool
+edges:
+  maps_hook:
+    - target: hook-surface:pre-tool-use
+---
+nodeKind: HookMapping
+id: hook-mapping:post-tool-use-cursor
+attributes:
+  mappingId: hook-mapping:post-tool-use-cursor
+  hookId: hook-surface:post-tool-use
+  targetId: agent-version:cursor@current
+  nativeName: PostToolUse
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: cursor
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: tool.after
+  blockCapability: false
+  mutationCapability: false
+  scope: tool
+edges:
+  maps_hook:
+    - target: hook-surface:post-tool-use
+---
+nodeKind: HookMapping
+id: hook-mapping:session-end-gemini
+attributes:
+  mappingId: hook-mapping:session-end-gemini
+  hookId: hook-surface:session-end
+  targetId: agent-version:gemini@current
+  nativeName: SessionEnd
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: gemini
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: session.end
+  blockCapability: false
+  mutationCapability: false
+  scope: session
+edges:
+  maps_hook:
+    - target: hook-surface:session-end
+---
+nodeKind: HookMapping
+id: hook-mapping:user-prompt-submit-gemini
+attributes:
+  mappingId: hook-mapping:user-prompt-submit-gemini
+  hookId: hook-surface:user-prompt-submit
+  targetId: agent-version:gemini@current
+  nativeName: UserPromptSubmit
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: gemini
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: turn.user_prompt_submitted
+  blockCapability: false
+  mutationCapability: false
+  scope: turn
+edges:
+  maps_hook:
+    - target: hook-surface:user-prompt-submit
+---
+nodeKind: HookMapping
+id: hook-mapping:pre-tool-use-gemini
+attributes:
+  mappingId: hook-mapping:pre-tool-use-gemini
+  hookId: hook-surface:pre-tool-use
+  targetId: agent-version:gemini@current
+  nativeName: BeforeTool
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: gemini
+  delivery: shell
+  blocking: true
+  supportLevel: supported
+  canonicalPhase: tool.before
+  blockCapability: true
+  mutationCapability: true
+  scope: tool
+edges:
+  maps_hook:
+    - target: hook-surface:pre-tool-use
+---
+nodeKind: HookMapping
+id: hook-mapping:post-tool-use-gemini
+attributes:
+  mappingId: hook-mapping:post-tool-use-gemini
+  hookId: hook-surface:post-tool-use
+  targetId: agent-version:gemini@current
+  nativeName: AfterTool
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: gemini
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: tool.after
+  blockCapability: false
+  mutationCapability: false
+  scope: tool
+edges:
+  maps_hook:
+    - target: hook-surface:post-tool-use
+---
+nodeKind: HookMapping
+id: hook-mapping:session-idle-gemini
+attributes:
+  mappingId: hook-mapping:session-idle-gemini
+  hookId: hook-surface:session-idle
+  targetId: agent-version:gemini@current
+  nativeName: SessionIdle
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: gemini
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: session.idle
+  blockCapability: false
+  mutationCapability: false
+  scope: session
+edges:
+  maps_hook:
+    - target: hook-surface:session-idle
+---
+nodeKind: HookMapping
+id: hook-mapping:shell-env-gemini
+attributes:
+  mappingId: hook-mapping:shell-env-gemini
+  hookId: hook-surface:shell-env
+  targetId: agent-version:gemini@current
+  nativeName: ShellEnv
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: gemini
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: session.shell_env
+  blockCapability: false
+  mutationCapability: false
+  scope: session
+edges:
+  maps_hook:
+    - target: hook-surface:shell-env
+---
+nodeKind: HookMapping
+id: hook-mapping:pre-compact-gemini
+attributes:
+  mappingId: hook-mapping:pre-compact-gemini
+  hookId: hook-surface:pre-compact
+  targetId: agent-version:gemini@current
+  nativeName: PreCompact
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: gemini
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: session.compact.before
+  blockCapability: false
+  mutationCapability: false
+  scope: session
+edges:
+  maps_hook:
+    - target: hook-surface:pre-compact
+---
+nodeKind: HookMapping
+id: hook-mapping:pre-tool-use-copilot
+attributes:
+  mappingId: hook-mapping:pre-tool-use-copilot
+  hookId: hook-surface:pre-tool-use
+  targetId: agent-version:copilot@current
+  nativeName: preToolUse
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: copilot
+  delivery: shell
+  blocking: true
+  supportLevel: supported
+  canonicalPhase: tool.before
+  blockCapability: true
+  mutationCapability: false
+  scope: tool
+edges:
+  maps_hook:
+    - target: hook-surface:pre-tool-use
+---
+nodeKind: HookMapping
+id: hook-mapping:post-tool-use-copilot
+attributes:
+  mappingId: hook-mapping:post-tool-use-copilot
+  hookId: hook-surface:post-tool-use
+  targetId: agent-version:copilot@current
+  nativeName: postToolUse
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: copilot
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: tool.after
+  blockCapability: false
+  mutationCapability: false
+  scope: tool
+edges:
+  maps_hook:
+    - target: hook-surface:post-tool-use
+---
+nodeKind: HookMapping
+id: hook-mapping:pre-compact-copilot
+attributes:
+  mappingId: hook-mapping:pre-compact-copilot
+  hookId: hook-surface:pre-compact
+  targetId: agent-version:copilot@current
+  nativeName: PreCompact
+  versionRange: ">=0.0.0"
+  requiresRuntimeHooks: false
+  adapterFamily: copilot
+  delivery: shell
+  blocking: false
+  supportLevel: supported
+  canonicalPhase: session.compact.before
+  blockCapability: false
+  mutationCapability: false
+  scope: session
+edges:
+  maps_hook:
+    - target: hook-surface:pre-compact

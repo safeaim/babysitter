@@ -70,6 +70,10 @@ export default async function RecordPage({
     current: tabActive === t,
   }));
   const recordTitle = getDisplayName(rec);
+  const overviewLead =
+    typeof rec.description === "string" && rec.description.trim()
+      ? rec.description.trim()
+      : `Inspect the raw attributes, linked wiki pages, and inbound or outbound graph edges for ${id}.`;
 
   return (
     <>
@@ -84,7 +88,7 @@ export default async function RecordPage({
           chapters={[{ num: "II.", title: "Record views", pages: "pp. 1 - 1", current: true, items: tabItems }]}
           chapterMark={{ num: "II.", subtitle: `${rec._kind} overview`, context: id, readingTime: "Reference · live" }}
           articleTitle={<>{recordTitle} <em>overview</em></>}
-          lead={`Inspect the raw attributes, linked wiki pages, and inbound or outbound graph edges for ${id}.`}
+          lead={overviewLead}
           meta={<><Badge variant="secondary">{rec._kind}</Badge><span>Outgoing · {out.length}</span><span>Incoming · {inc.length}</span></>}
           marginSections={[
             {
@@ -146,15 +150,21 @@ export default async function RecordPage({
               <span>a5c.ai</span>
             </>
           }
-          tocSearchLabel="Search related records"
-          tocBookLabel="Record · linked articles"
-          tocTitle="Current article and related pages"
+          tocSearchLabel="Search record views"
+          tocBookLabel="Record · tabs"
+          tocTitle="Available views"
           chapters={[
             {
               num: "II.",
-              title: "Reference article",
+              title: "Record views",
               pages: "pp. 1 - 1",
               current: true,
+              items: tabItems,
+            },
+            {
+              num: "III.",
+              title: "Related pages",
+              pages: "pp. 1 - 1",
               items: [
                 { label: String(articlePage.title ?? articlePage.id), current: true },
                 ...relatedPages
@@ -214,6 +224,14 @@ export default async function RecordPage({
                     </Link>
                   ))
                 : [<p key="no-pages" className="atlas-docs-note">No related wiki pages for this record.</p>],
+            },
+            {
+              title: "Shortcuts",
+              items: [
+                <Link key="overview" href={baseTabHref("overview")}>Open overview</Link>,
+                <Link key="json" href={baseTabHref("json")}>Open JSON</Link>,
+                <Link key="graph" href={baseTabHref("graph")}>Open graph</Link>,
+              ],
             },
           ]}
           articleFlow="columns"

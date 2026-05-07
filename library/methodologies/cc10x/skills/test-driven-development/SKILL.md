@@ -11,6 +11,8 @@ graph:
 2. **GREEN**: Write minimal code to make test pass. Exit code MUST be 0.
 3. **REFACTOR**: Clean up implementation while keeping tests green. Exit code MUST remain 0.
 
+---
+
 ## Non-Negotiable Rules
 
 - Always use run mode (`CI=true npm test` or `--run` flag)

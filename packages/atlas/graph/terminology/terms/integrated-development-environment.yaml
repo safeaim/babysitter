@@ -7,3 +7,5 @@ attributes:
   description: |
     A graphical editor with integrated build, debug, and tooling support.
 edges:
+  applies_to:
+    - target: domain:software-engineering

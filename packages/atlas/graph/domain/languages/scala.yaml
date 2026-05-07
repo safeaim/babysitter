@@ -20,7 +20,5 @@ attributes:
     architecture.
 edges:
   used_by_skill_area:
-    - target: skill-area:spark-jobs
-  used_by_skill_area:
     - target: skill-area:kafka-stream-processing
     - target: skill-area:spark-jobs

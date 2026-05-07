@@ -9,3 +9,5 @@ attributes:
   description: |
     Transition between two phases (gateable)
 edges:
+  applies_to:
+    - target: domain:software-engineering

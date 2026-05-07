@@ -19,5 +19,3 @@ attributes:
 edges:
   used_by_skill_area:
     - target: skill-area:android-native
-  used_by_skill_area:
-    - target: skill-area:android-native

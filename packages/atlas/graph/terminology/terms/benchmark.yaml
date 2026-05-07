@@ -9,3 +9,6 @@ attributes:
   description: |
     Named test/test-suite
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science

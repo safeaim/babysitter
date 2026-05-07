@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Dimension 2 - Security: injection vectors, authentication gaps, data exposure
 - Dimension 3 - Performance: algorithmic complexity, memory leaks, unnecessary allocations
 - Dimension 4 - Maintainability: naming clarity, documentation, test coverage, coupling

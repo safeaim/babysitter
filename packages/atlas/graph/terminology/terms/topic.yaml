@@ -9,3 +9,6 @@ attributes:
   description: |
     Granular topic (oauth-flows, ssl-certs, ...)
 edges:
+  applies_to:
+    - target: domain:computer-science
+    - target: domain:software-engineering

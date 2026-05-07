@@ -9,3 +9,6 @@ attributes:
   description: |
     Text/image/audio/video. Collapsed from a NodeKind into a `list<enum>` attribute on `ModelVersion` in the 2026-04-29 remodel.
 edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:software-engineering

@@ -9,3 +9,6 @@ attributes:
   description: |
     Per-agent session behavior — dir strategy, id sources, resume/fork/prune semantics, concurrency model
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

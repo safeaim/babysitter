@@ -9,3 +9,5 @@ attributes:
   description: |
     InScope/outOfScope declaration with optional evidence
 edges:
+  applies_to:
+    - target: domain:software-engineering

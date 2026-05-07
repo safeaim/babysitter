@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Cross-project pattern recognition and knowledge transfer
 - Resource allocation and agent assignment strategy
 - Risk assessment with proactive mitigation planning

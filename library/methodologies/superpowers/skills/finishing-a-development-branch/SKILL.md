@@ -11,6 +11,8 @@ graph:
 3. Keep the branch as-is
 4. Discard this work (requires typed confirmation)
 
+---
+
 ## Process
 
 1. Verify all tests pass (STOP if they fail)

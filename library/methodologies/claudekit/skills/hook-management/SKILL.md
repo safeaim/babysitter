@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - **file-guard**: Blocks sensitive file access (195+ patterns)
 
 ### PostToolUse Hooks

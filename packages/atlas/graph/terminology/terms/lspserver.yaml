@@ -9,3 +9,5 @@ attributes:
   description: |
     A Language Server Protocol server bundled in a plugin (Claude Code .lsp.json)
 edges:
+  applies_to:
+    - target: domain:software-engineering

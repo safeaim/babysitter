@@ -9,3 +9,6 @@ attributes:
   description: |
     Broad area (web-development, devops, ...)
 edges:
+  applies_to:
+    - target: domain:computer-science
+    - target: domain:software-engineering

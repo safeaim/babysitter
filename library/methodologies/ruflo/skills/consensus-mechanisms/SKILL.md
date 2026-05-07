@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Byzantine fault tolerance is required (untrusted or unreliable agents)
 - State synchronization across distributed agent swarms
 - Conflict-free data merging in concurrent operations

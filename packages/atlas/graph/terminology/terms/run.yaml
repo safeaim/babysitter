@@ -9,3 +9,6 @@ attributes:
   description: |
     A babysitter run; note multiple definitions exist (babysitter-SDK Run vs. older agent-mux Run).
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

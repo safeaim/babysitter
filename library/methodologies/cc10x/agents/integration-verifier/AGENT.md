@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Integration/E2E test execution
 - Exit code collection (zero = success)
 - Warning and deprecation notice detection

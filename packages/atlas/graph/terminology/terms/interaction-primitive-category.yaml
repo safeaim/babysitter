@@ -9,3 +9,6 @@ attributes:
   description: |
     Editorial grouping for InteractionPrimitives (control, navigation, context, approval, voice, telemetry, multimodal, collaborative)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

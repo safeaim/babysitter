@@ -21,5 +21,3 @@ attributes:
 edges:
   used_by_skill_area:
     - target: skill-area:ios-native
-  used_by_skill_area:
-    - target: skill-area:ios-native

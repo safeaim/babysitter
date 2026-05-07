@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Tracking bead progress and status
 - Managing bead dependencies
 - Collecting attribution data for agent evaluation

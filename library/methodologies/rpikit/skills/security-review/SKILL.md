@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Before any code merge involving user-facing changes
 - As part of the /review-security command
 - Mandatory for high-stakes implementations

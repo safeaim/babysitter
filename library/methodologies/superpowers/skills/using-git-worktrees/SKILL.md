@@ -13,6 +13,8 @@ graph:
 5. Verify clean test baseline
 6. Report ready
 
+---
+
 ## Safety
 
 - Always verify worktree directory is gitignored

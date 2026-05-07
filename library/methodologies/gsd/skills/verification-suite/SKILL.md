@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Is this plan structurally valid? (XML task format, required sections, frontmatter)
 - Is this phase complete? (all plans executed, summaries written, state updated)
 - Do all references resolve? (no broken links, missing files, stale references)

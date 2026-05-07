@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Configure one of 7 role packs: Product Manager, Engineering Lead, Engineer, Designer, Founder, Marketer, Custom
 - Set up user profile with interests, domains, and news sources
 - Configure external integrations (GitHub, Linear, Slack, PostHog)

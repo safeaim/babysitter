@@ -9,3 +9,6 @@ attributes:
   description: |
     An LLM wire protocol (Anthropic Messages, OpenAI Responses, Gemini, ...)
 edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:software-engineering

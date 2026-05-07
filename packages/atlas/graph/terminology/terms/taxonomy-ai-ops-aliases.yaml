@@ -9,7 +9,10 @@ attributes:
     - skill-area:retrieval-augmented-generation
   description: |
     Taxonomy alias term for Atlas retrieval-augmented generation practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:prompt-engineering-context-management
@@ -22,7 +25,10 @@ attributes:
     - skill-area:context-management
   description: |
     Taxonomy alias term combining Atlas prompt design and context handling.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:chain-of-thought-prompting-multi-turn-dialogue
@@ -35,7 +41,10 @@ attributes:
     - skill-area:agentic-loops
   description: |
     Taxonomy alias term for iterative prompt design and multi-turn agent flows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:llm-fine-tuning-adaptation
@@ -47,7 +56,10 @@ attributes:
     - specialization:llm-fine-tuning
   description: |
     Taxonomy alias term for the existing Atlas LLM fine-tuning specialization.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:embedding-generation-similarity-search
@@ -59,7 +71,10 @@ attributes:
     - skill-area:retrieval-augmented-generation
   description: |
     Taxonomy alias term for embedding-backed retrieval and similarity workflows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:inference-serving-optimization
@@ -72,7 +87,10 @@ attributes:
     - skill-area:model-serving-operations
   description: |
     Taxonomy alias term for Atlas inference-serving and model-operations work.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:llm-monitoring-logging
@@ -85,7 +103,10 @@ attributes:
     - skill-area:observability-pipeline
   description: |
     Taxonomy alias term for monitoring and telemetry around LLM systems.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:context-window-management
@@ -97,7 +118,10 @@ attributes:
     - skill-area:context-management
   description: |
     Taxonomy alias term for Atlas context-window and memory-management practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:tool-integration-architecture
@@ -109,7 +133,10 @@ attributes:
     - skill-area:tool-use
   description: |
     Taxonomy alias term for structured tool-use design in agent systems.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:state-management-memory-persistence
@@ -121,7 +148,10 @@ attributes:
     - skill-area:context-management
   description: |
     Taxonomy alias term for agent state persistence and context retention.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:multi-agent-coordination-messaging
@@ -133,7 +163,10 @@ attributes:
     - skill-area:multi-agent-coordination
   description: |
     Taxonomy alias term for multi-agent coordination with message passing.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:environment-context-adaptation
@@ -145,7 +178,10 @@ attributes:
     - skill-area:context-management
   description: |
     Taxonomy alias term for adapting agent behavior to context and environment.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:containerization-orchestration
@@ -157,7 +193,10 @@ attributes:
     - skill-area:containerization
   description: |
     Taxonomy alias term for Atlas containerization and orchestration practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:secret-secure-config-management
@@ -170,7 +209,10 @@ attributes:
     - skill-area:configuration-management
   description: |
     Taxonomy alias term spanning secure secret handling and config management.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:observability-monitoring-logging-alerting
@@ -182,7 +224,10 @@ attributes:
     - skill-area:observability-pipeline
   description: |
     Taxonomy alias term for observability pipelines, logging, and alerting.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:incident-on-call-management
@@ -194,7 +239,10 @@ attributes:
     - skill-area:incident-response
   description: |
     Taxonomy alias term for incident handling and on-call operations.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:version-control-gitops
@@ -206,7 +254,10 @@ attributes:
     - skill-area:gitops
   description: |
     Taxonomy alias term for Git-centered operational state management.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:ci-cd-release-orchestration
@@ -218,7 +269,10 @@ attributes:
     - skill-area:deployment-infrastructure-management
   description: |
     Taxonomy alias term for delivery automation and release orchestration.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:infrastructure-as-code-configuration-management
@@ -231,7 +285,10 @@ attributes:
     - skill-area:configuration-management
   description: |
     Taxonomy alias term for infra-as-code and runtime configuration discipline.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:rate-limiting
@@ -244,7 +301,10 @@ attributes:
     - skill-area:rate-limiting
   description: |
     Taxonomy alias term for Atlas rate-limiting concepts across design and ops.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:dependency-injection
@@ -256,7 +316,10 @@ attributes:
     - topic:dependency-injection
   description: |
     Taxonomy alias term for dependency-injection design patterns.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:progressive-enhancement
@@ -268,7 +331,10 @@ attributes:
     - skill-area:progressive-enhancement
   description: |
     Taxonomy alias term for progressively layered application experiences.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:infinite-scroll
@@ -280,7 +346,10 @@ attributes:
     - topic:infinite-scrolling
   description: |
     Taxonomy alias term for the existing Atlas infinite-scrolling topic.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:feature-store-architecture
@@ -293,7 +362,10 @@ attributes:
     - workflow:feature-store-management
   description: |
     Taxonomy alias term for feature-store architecture and operations.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops
 ---
 nodeKind: Term
 id: term:drift-detection
@@ -305,4 +377,7 @@ attributes:
     - skill-area:model-monitoring-drift-detection
   description: |
     Taxonomy alias term for detecting data or concept drift in deployed models.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:devops

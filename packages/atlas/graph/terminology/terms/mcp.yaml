@@ -9,5 +9,6 @@ attributes:
   description: |
     The Model Context Protocol for tool/data access by LLM agents.
 edges:
-
-
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

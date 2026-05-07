@@ -17,6 +17,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Resource leaks: unclosed handles, event listener accumulation, timer leaks
 - Database: N+1 queries, missing indexes, unbounded result sets
 - Caching: missed opportunities, invalid invalidation strategies

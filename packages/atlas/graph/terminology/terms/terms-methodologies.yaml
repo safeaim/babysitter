@@ -10,7 +10,9 @@ attributes:
     a collaborative methodology that captures requirements as concrete
     examples illustrating how a system behaves. The examples become
     executable specifications serving as documentation and tests.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:acceptance-test-driven-development
@@ -23,7 +25,9 @@ attributes:
     feature-level acceptance tests written before implementation.
     Combined with TDD at the unit level, it ensures both external
     quality (right thing) and internal quality (built right).
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:bmad-method
@@ -36,7 +40,9 @@ attributes:
     (github.com/bmad-code-org/BMAD-METHOD). Models software work as a
     collaboration between specialised AI personas (Analyst, Architect,
     Developer, etc.) progressing through agile phases.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:ccpm
@@ -48,7 +54,9 @@ attributes:
     Spec-driven development methodology adapted from
     github.com/automazeio/ccpm. Enforces "every line of code must trace
     back to a specification" via five strict phases with no shortcuts.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:gsd
@@ -61,7 +69,9 @@ attributes:
     github.com/glittercowboy/get-shit-done — focuses on cutting
     ceremony and shipping incrementally; ported as workflows for the
     Babysitter SDK orchestration framework.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:cc10x
@@ -75,7 +85,9 @@ attributes:
     detects intent and dispatches to specialised workflows with
     evidence-first validation, TDD enforcement, and persistent session
     memory.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:everything-claude-code
@@ -88,7 +100,9 @@ attributes:
     from github.com/affaan-m/everything-claude-code. Integrates
     specialised subagents, skills, continuous learning, security
     scanning, and research-first workflows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:superpowers-methodology
@@ -101,7 +115,9 @@ attributes:
     methodology from pcvelz/superpowers (community fork of
     obra/superpowers). Surfaces planning, brainstorming, TDD,
     debugging, and parallel-agent dispatch as composable skills.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:spec-kit
@@ -114,7 +130,9 @@ attributes:
     (github.com/github/spec-kit) — progressive refinement from intent
     to constitution to checklist to implementation. Includes brownfield
     and constitution variants in the babysitter library.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:shape-up
@@ -127,7 +145,9 @@ attributes:
     variable-scope cycles, appetite-driven development, thoughtful
     upfront shaping, strategic betting, and autonomous team execution
     with Hill Charts for visual progress tracking.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:domain-driven-design
@@ -139,7 +159,9 @@ attributes:
     Eric Evans' design methodology centred on a shared ubiquitous
     language between engineering and domain experts, bounded contexts,
     aggregates, and strategic context maps.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:event-storming
@@ -151,7 +173,9 @@ attributes:
     Collaborative modelling workshop technique (Alberto Brandolini) for
     discovering domain events, commands, aggregates, and bounded
     contexts as a precursor to DDD-style implementation.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:scrum
@@ -163,7 +187,9 @@ attributes:
     Agile framework structured around fixed-length sprints, a Scrum
     Master, Product Owner, sprint planning, daily standups, sprint
     review, and retrospective ceremonies.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:kanban
@@ -175,7 +201,9 @@ attributes:
     Pull-based workflow methodology emphasising visualisation of work,
     work-in-progress (WIP) limits, and continuous flow over fixed
     iteration cadence.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:waterfall
@@ -188,7 +216,9 @@ attributes:
     implementation → verification → maintenance). Included in the
     babysitter library for completeness and contrast with iterative
     methodologies.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:spiral-model
@@ -200,7 +230,9 @@ attributes:
     Boehm's risk-driven iterative methodology that interleaves planning,
     risk analysis, engineering, and customer evaluation across
     successively-larger spirals.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:v-model
@@ -212,7 +244,9 @@ attributes:
     Verification-and-validation extension of waterfall: each
     development phase has a corresponding test phase mirrored across
     the V's vertices.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:rup
@@ -224,7 +258,9 @@ attributes:
     Rational/IBM iterative software process organised into Inception,
     Elaboration, Construction, and Transition phases with discipline-
     specific workflows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:extreme-programming
@@ -236,7 +272,9 @@ attributes:
     Kent Beck's agile methodology centred on pair programming, TDD,
     continuous integration, small releases, and on-site customer
     engagement.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:feature-driven-development
@@ -247,7 +285,9 @@ attributes:
   description: |
     Iterative methodology that organises work around a feature list and
     short, design-by-feature / build-by-feature cycles.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:hypothesis-driven-development
@@ -259,7 +299,9 @@ attributes:
     Lean-startup-influenced methodology: each feature is framed as a
     falsifiable hypothesis with a measurable success criterion before
     implementation.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:double-diamond
@@ -271,7 +313,9 @@ attributes:
     Design Council's design-process model: two diamonds of divergence
     and convergence — Discover/Define for the right problem, then
     Develop/Deliver for the right solution.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:jobs-to-be-done
@@ -283,7 +327,9 @@ attributes:
     Christensen-style framework that frames product opportunity as the
     "job" a customer hires a product to do, decoupled from demographic
     or solution-shape framing.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:impact-mapping
@@ -295,7 +341,9 @@ attributes:
     Strategic-planning technique (Gojko Adzic) connecting Goals →
     Actors → Impacts → Deliverables on a single mind-map to align
     delivery with measurable business outcomes.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:example-mapping
@@ -307,7 +355,9 @@ attributes:
     Matt Wynne's lightweight collaborative-discovery technique that
     maps a story to rules, examples, and questions on coloured index
     cards prior to BDD implementation.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:cleanroom
@@ -319,7 +369,9 @@ attributes:
     Statistical-quality methodology developed by IBM/Mills:
     specification-based design, formal verification, and statistical
     usage testing — defects prevented rather than detected.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:adversarial-spec-debates
@@ -331,7 +383,9 @@ attributes:
     Babysitter library methodology in which two or more agents argue
     opposing readings of a spec to surface ambiguity before
     implementation. Source: library/methodologies/adversarial-spec-debates.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:consensus-and-voting-mechanisms
@@ -344,7 +398,9 @@ attributes:
     independently propose solutions and a vote/consensus rule selects
     the canonical output. Source:
     library/methodologies/consensus-and-voting-mechanisms.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:graph-of-thoughts
@@ -357,7 +413,9 @@ attributes:
     a graph (vs Tree-of-Thoughts) so partial results can be merged,
     reused, or pruned. Source:
     library/methodologies/graph-of-thoughts.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:plan-and-execute
@@ -369,7 +427,9 @@ attributes:
     Two-phase agent methodology: a planner emits an explicit task list,
     then an executor agent (or pool) carries out the steps and reports
     back. Source: library/methodologies/plan-and-execute.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:state-machine-orchestration
@@ -382,7 +442,9 @@ attributes:
     progression of a babysitter run, gating transitions on quality
     checks. Source:
     library/methodologies/state-machine-orchestration.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:self-assessment-loop
@@ -394,7 +456,9 @@ attributes:
     Methodology where the agent grades its own output against a rubric
     and re-runs until the rubric clears. Source:
     library/methodologies/self-assessment.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:deep-research
@@ -406,7 +470,9 @@ attributes:
     Long-horizon research methodology in which an agent runs many web
     searches, reads sources, takes notes, and synthesises a structured
     report. Source: library/methodologies/deep-research.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:evolutionary-prototyping
@@ -418,7 +484,9 @@ attributes:
     Methodology that delivers a working partial implementation early
     and grows it iteratively, rather than freezing requirements first.
     Source: library/methodologies/evolutionary.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:bottom-up-decomposition
@@ -429,7 +497,9 @@ attributes:
   description: |
     Methodology that builds from primitive components upward. Source:
     library/methodologies/bottom-up.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:top-down-decomposition
@@ -440,7 +510,9 @@ attributes:
   description: |
     Methodology that decomposes a problem from goal downward into
     concrete subtasks. Source: library/methodologies/top-down.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:quality-gated-six-phase
@@ -453,7 +525,9 @@ attributes:
     (intake → spec → design → implement → verify → ship) with a
     quality gate at every transition. Source:
     library/methodologies/quality-gated-six-phase.js.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:process-hardening
@@ -465,6 +539,8 @@ attributes:
     Meta-methodology — apply retrospect findings back into the process
     library so the next run runs a stricter, hardened variant. Source:
     library/methodologies/process-hardening/.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 
 

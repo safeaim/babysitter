@@ -15,6 +15,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - OWASP Top 10 vulnerability analysis
 - Attack surface enumeration
 - Security architecture patterns

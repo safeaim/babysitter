@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Handing off work between agents
 - Reviving a dead or stuck agent session
 - Managing Polecat identity persistence across sessions

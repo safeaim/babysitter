@@ -18,6 +18,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - SOLID principles: single responsibility, open/closed, dependency inversion
 - Immutability patterns: const, readonly, Object.freeze
 - Dead code removal and unused import cleanup

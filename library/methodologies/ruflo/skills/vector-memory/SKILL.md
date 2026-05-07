@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Building and querying knowledge graphs for project context
 - Managing cross-session memory across project/local/user scopes
 - Fast similarity search for routing decisions

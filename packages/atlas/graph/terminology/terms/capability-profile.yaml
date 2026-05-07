@@ -9,3 +9,6 @@ attributes:
   description: |
     A swappable capability bundle
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - When evaluating technology stack options for a feature
 - When designing system architecture for new components
 - When assessing implementation risks and defining mitigations

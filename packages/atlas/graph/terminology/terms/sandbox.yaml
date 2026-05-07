@@ -9,3 +9,6 @@ attributes:
   description: |
     What work is allowed to do (policy primitive)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:cybersecurity

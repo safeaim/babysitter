@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Load and manage `.planning/config.json` configuration
 - Generate deterministic slugs from descriptions (kebab-case, deduplication)
 - Format timestamps for GSD artifact headers and frontmatter

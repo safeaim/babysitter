@@ -9,3 +9,5 @@ attributes:
   description: |
     Universal plugin (union of skills/MCP/hooks/lsp/monitors/bin)
 edges:
+  applies_to:
+    - target: domain:software-engineering

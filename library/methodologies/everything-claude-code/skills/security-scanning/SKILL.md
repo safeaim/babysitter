@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - AWS access keys (AKIA pattern)
 - GitHub tokens (ghp_, gho_, ghs_, ghr_)
 - Generic API keys and bearer tokens

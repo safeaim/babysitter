@@ -9,3 +9,5 @@ attributes:
   description: |
     Abbreviation expanding to a term
 edges:
+  applies_to:
+    - target: domain:computer-science

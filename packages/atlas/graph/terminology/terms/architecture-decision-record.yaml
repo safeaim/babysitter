@@ -7,3 +7,5 @@ attributes:
   description: |
     A short markdown document recording an architectural decision.
 edges:
+  applies_to:
+    - target: domain:software-engineering

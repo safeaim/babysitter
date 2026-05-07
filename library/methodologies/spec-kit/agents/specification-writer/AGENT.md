@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Non-functional requirements identification (performance, security, scalability)
 - User story authoring in standard format (As a... I want... So that...)
 - Acceptance criteria definition with testable conditions

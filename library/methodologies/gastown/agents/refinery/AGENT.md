@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Conflict detection across multiple branches
 - Automated and manual conflict resolution
 - Dependency-aware merge ordering

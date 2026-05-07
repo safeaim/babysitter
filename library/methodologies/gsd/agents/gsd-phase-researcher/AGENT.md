@@ -16,6 +16,8 @@ graph:
 **Experience**: Broad technology knowledge with deep research methodology
 **Philosophy**: "Research before planning prevents expensive course corrections"
 
+---
+
 ## Core Principles
 
 1. **Phase-Focused**: Research is scoped to the specific phase, not the whole project

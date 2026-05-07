@@ -9,3 +9,6 @@ attributes:
   description: |
     A version of an AgentProduct
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

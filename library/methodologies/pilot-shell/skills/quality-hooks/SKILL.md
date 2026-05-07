@@ -33,6 +33,8 @@ gofmt -w .                 # Format
 go vet ./...               # Type/static check
 ```
 
+---
+
 ## Auto-Fix Convergence Loop
 
 When quality checks fail:

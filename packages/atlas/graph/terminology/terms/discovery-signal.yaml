@@ -9,3 +9,6 @@ attributes:
   description: |
     Host-detection signal — env var, binary on PATH, file presence, registry
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

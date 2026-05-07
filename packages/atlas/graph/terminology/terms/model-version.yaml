@@ -9,3 +9,5 @@ attributes:
   description: |
     A specific versioned model
 edges:
+  applies_to:
+    - target: domain:ml-ai

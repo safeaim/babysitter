@@ -9,3 +9,5 @@ attributes:
   description: |
     A named state in a phase machine
 edges:
+  applies_to:
+    - target: domain:software-engineering

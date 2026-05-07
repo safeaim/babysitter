@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - When processing untrusted inputs
 - Security audits of agent-generated code
 - Compliance verification (OWASP Top 10, CIS)

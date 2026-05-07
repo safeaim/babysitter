@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Logic errors and off-by-one mistakes
 - Edge case handling (null, undefined, empty, boundary)
 - Type safety (no implicit any, proper narrowing)

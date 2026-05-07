@@ -17,6 +17,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Root cause: stack trace analysis, error pattern matching, reproduction steps
 - Agent selection: map file types and error patterns to specialized agents
 - Routing: match problem scope to appropriate workflow (debug, review, research)

@@ -9,3 +9,6 @@ attributes:
   description: |
     Persistence/control-plane/structured-transport triple
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

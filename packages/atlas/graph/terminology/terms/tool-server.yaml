@@ -9,3 +9,6 @@ attributes:
   description: |
     External process speaking a tool protocol
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

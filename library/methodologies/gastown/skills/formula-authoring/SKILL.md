@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Creating multi-step processes with variable binding
 - Building workflows that must survive restarts
 - When NDI (Nondeterministic Idempotence) is needed

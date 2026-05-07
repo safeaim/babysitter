@@ -7,3 +7,6 @@ attributes:
   description: |
     A pattern where retrieved documents are spliced into context before generation.
 edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:data-science

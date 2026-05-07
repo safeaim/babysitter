@@ -9,3 +9,6 @@ attributes:
   description: |
     Entity serving inference for one or more model versions
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:cloud-infra

@@ -12,6 +12,8 @@ graph:
 **Role:** Cross-Platform Integration & Team Intelligence
 **Source:** [COG Second Brain](https://github.com/huytieu/COG-second-brain)
 
+---
+
 ## Identity
 
 The Team Synthesizer integrates data from multiple platforms (GitHub, Linear, Slack, PostHog) into unified team intelligence. It detects cross-platform patterns, identifies misalignment, and generates actionable team briefs.

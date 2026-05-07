@@ -9,3 +9,6 @@ attributes:
   description: |
     The enum of run journal event names emitted by the babysitter runtime
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

@@ -8,3 +8,5 @@ attributes:
   description: |
     Novice/intermediate/expert/authoritative
 edges:
+  applies_to:
+    - target: domain:software-engineering

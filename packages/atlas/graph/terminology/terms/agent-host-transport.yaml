@@ -9,3 +9,6 @@ attributes:
   description: |
     How a host talks to an agent process (stdio, http, ws, ...)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

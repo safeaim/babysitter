@@ -9,3 +9,6 @@ attributes:
   description: |
     A high-level interaction pattern
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

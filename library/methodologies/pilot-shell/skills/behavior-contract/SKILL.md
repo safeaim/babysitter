@@ -26,6 +26,8 @@ The correct behavior that must hold after the fix is applied.
 Existing correct behaviors that must be preserved by the fix.
 
 **Example**:
+---
+
 - "Positive amounts still process correctly"
 - "Negative amounts still throw `InvalidAmountError`"
 - "Receipt format remains unchanged for all amount types"

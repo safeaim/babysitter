@@ -9,3 +9,5 @@ attributes:
   description: |
     A term that means the same as another in a stated context
 edges:
+  applies_to:
+    - target: domain:computer-science

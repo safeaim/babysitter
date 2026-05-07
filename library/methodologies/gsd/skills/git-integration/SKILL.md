@@ -18,6 +18,8 @@ graph:
 
 This corresponds to the patterns in the original `references/git-integration.md` and `references/git-planning-commit.md`.
 
+---
+
 ## Capabilities
 
 ### 1. Atomic Commit Per Task

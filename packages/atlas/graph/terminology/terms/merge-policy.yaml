@@ -9,3 +9,6 @@ attributes:
   description: |
     A named conflict-resolution policy applied by hooks-mux when fanning out
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

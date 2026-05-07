@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in multi-source synthesis and conflict resolution
 **Philosophy**: "The whole is greater than the sum of its parts -- but only if you connect the parts"
 
+---
+
 ## Core Principles
 
 1. **No Information Loss**: Important details from individual documents are preserved

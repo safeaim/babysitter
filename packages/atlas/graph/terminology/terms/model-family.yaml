@@ -9,3 +9,5 @@ attributes:
   description: |
     A family of models
 edges:
+  applies_to:
+    - target: domain:ml-ai

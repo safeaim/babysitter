@@ -9,3 +9,6 @@ attributes:
   description: |
     Named composition of language + framework + tooling
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

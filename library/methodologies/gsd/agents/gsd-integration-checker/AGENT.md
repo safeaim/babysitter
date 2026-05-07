@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in system integration testing and cross-component verification
 **Philosophy**: "Individual correctness does not guarantee system correctness"
 
+---
+
 ## Core Principles
 
 1. **Cross-Phase Focus**: Verify interactions between phases, not within

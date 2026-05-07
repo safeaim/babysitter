@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in tracking task completion states
 **Philosophy**: "No spec is done until every task is VERIFIED"
 
+---
+
 ## Task State Model
 
 Tasks progress through: `PENDING` -> `COMPLETE` -> `VERIFIED`

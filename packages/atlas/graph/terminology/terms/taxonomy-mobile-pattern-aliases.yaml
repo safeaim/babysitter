@@ -9,7 +9,9 @@ attributes:
     - skill-area:hydration
   description: |
     Taxonomy alias term for Atlas hydration practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:bloc-architecture
@@ -22,7 +24,9 @@ attributes:
     - skill-area:mobile-state-management
   description: |
     Taxonomy alias term for BLoC-style state architecture in mobile apps.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:bloc-pattern
@@ -35,7 +39,9 @@ attributes:
     - skill-area:mobile-state-management
   description: |
     Taxonomy alias term for BLoC-style mobile state management.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:sqlite-database
@@ -47,7 +53,9 @@ attributes:
     - skill-area:mobile-local-databases
   description: |
     Taxonomy alias term for on-device relational storage practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:realm-database
@@ -59,7 +67,9 @@ attributes:
     - skill-area:mobile-local-databases
   description: |
     Taxonomy alias term for local mobile database persistence patterns.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:core-data
@@ -71,7 +81,9 @@ attributes:
     - skill-area:mobile-local-databases
   description: |
     Taxonomy alias term for iOS-local persistence patterns in Atlas.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:key-value-storage
@@ -83,7 +95,9 @@ attributes:
     - skill-area:mobile-local-databases
   description: |
     Taxonomy alias term for lightweight local key-value persistence.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:file-system-storage
@@ -95,7 +109,9 @@ attributes:
     - skill-area:file-handling
   description: |
     Taxonomy alias term for file-backed storage management.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:encrypted-storage
@@ -108,7 +124,9 @@ attributes:
     - skill-area:mobile-security-testing
   description: |
     Taxonomy alias term for secure persisted-state storage patterns.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:cache-storage
@@ -120,7 +138,9 @@ attributes:
     - skill-area:caching-strategies
   description: |
     Taxonomy alias term for local or edge cache storage behavior.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:cache-synchronization
@@ -132,7 +152,9 @@ attributes:
     - skill-area:mobile-offline-sync
   description: |
     Taxonomy alias term for sync behavior between cached and remote state.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:queue-based-updates
@@ -145,7 +167,9 @@ attributes:
     - skill-area:background-job-processing
   description: |
     Taxonomy alias term for queued offline or deferred state updates.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:conflict-resolution
@@ -157,7 +181,9 @@ attributes:
     - skill-area:mobile-offline-sync
   description: |
     Taxonomy alias term for merge and reconciliation in offline sync flows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:optimistic-ui-updates
@@ -169,7 +195,9 @@ attributes:
     - skill-area:application-state-management
   description: |
     Taxonomy alias term for optimistic client-side state updates.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:background-synchronization
@@ -182,7 +210,9 @@ attributes:
     - skill-area:background-job-processing
   description: |
     Taxonomy alias term for synchronization work scheduled off the foreground path.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:image-caching
@@ -194,7 +224,9 @@ attributes:
     - skill-area:caching-strategies
   description: |
     Taxonomy alias term for caching media assets in mobile experiences.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:background-processing
@@ -206,7 +238,9 @@ attributes:
     - skill-area:background-job-processing
   description: |
     Taxonomy alias term for background execution outside immediate request or UI flow.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:biometric-authentication
@@ -218,7 +252,9 @@ attributes:
     - skill-area:mobile-biometrics
   description: |
     Taxonomy alias term for biometric identity and device-auth flows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:secure-storage
@@ -230,7 +266,9 @@ attributes:
     - topic:secure-storage-pattern
   description: |
     Taxonomy alias term for secure storage patterns already modeled in Atlas.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:certificate-pinning
@@ -242,7 +280,9 @@ attributes:
     - skill-area:mobile-security-testing
   description: |
     Taxonomy alias term for transport-trust hardening in mobile applications.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:app-signing
@@ -254,7 +294,9 @@ attributes:
     - skill-area:app-store-deployment
   description: |
     Taxonomy alias term for mobile signing and release packaging workflows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:code-obfuscation
@@ -266,7 +308,9 @@ attributes:
     - skill-area:mobile-security-testing
   description: |
     Taxonomy alias term for code-hardening and tamper-resistance techniques.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:data-encryption
@@ -278,7 +322,9 @@ attributes:
     - skill-area:encryption-decryption
   description: |
     Taxonomy alias term for applied data-encryption practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:deep-linking
@@ -290,7 +336,9 @@ attributes:
     - skill-area:deep-linking
   description: |
     Taxonomy alias term for mobile deep-link routing and app-link setup.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:widget-testing
@@ -302,7 +350,9 @@ attributes:
     - skill-area:component-testing
   description: |
     Taxonomy alias term for component- and widget-level UI tests.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:ui-automation-testing
@@ -314,4 +364,6 @@ attributes:
     - skill-area:mobile-ui-automation
   description: |
     Taxonomy alias term for scripted mobile UI automation flows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile

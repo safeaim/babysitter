@@ -7,3 +7,6 @@ attributes:
   description: |
     A signed, base64url-encoded token format for stateless authentication.
 edges:
+  applies_to:
+    - target: domain:cybersecurity
+    - target: domain:backend

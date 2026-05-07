@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Complex task decomposition into bounded work units
 - Interface and API contract definition
 - Dependency graph analysis and conflict detection

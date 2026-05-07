@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Stuck agent detection with configurable thresholds
 - Recovery strategy selection (restart, reassign, escalate)
 - System load analysis and capacity planning

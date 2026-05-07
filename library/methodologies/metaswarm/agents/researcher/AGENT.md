@@ -15,6 +15,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Dependency graph construction
 - Pattern detection and classification
 - Risk area identification (complex code, high change frequency, missing tests)

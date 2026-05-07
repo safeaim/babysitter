@@ -13,6 +13,8 @@ graph:
 | Medium | 7 | Standard research, moderate complexity |
 | Deep | 10 | Comprehensive analysis, complex queries |
 
+---
+
 ## Process Flow
 
 1. **Plan**: Decompose query into independent sub-queries

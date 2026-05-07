@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - For cross-model adversarial review (writer reviewed by different model)
 - When delegating implementation to cheaper external models
 - For escalation chains across tools

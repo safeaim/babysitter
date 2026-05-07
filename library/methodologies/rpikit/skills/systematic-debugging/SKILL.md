@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Unexpected behavior discovered during testing
 - Bug reports require investigation
 - Performance issues need root cause analysis

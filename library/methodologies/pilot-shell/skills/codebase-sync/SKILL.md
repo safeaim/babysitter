@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Scan directory structure for project type identification
 - Detect language, framework, package manager
 - Identify build tools, CI/CD config, test framework

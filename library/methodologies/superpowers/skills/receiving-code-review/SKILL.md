@@ -13,6 +13,8 @@ graph:
 5. RESPOND - Technical acknowledgment or reasoned pushback
 6. IMPLEMENT - One item at a time, test each
 
+---
+
 ## When to Push Back
 
 - Suggestion breaks existing functionality

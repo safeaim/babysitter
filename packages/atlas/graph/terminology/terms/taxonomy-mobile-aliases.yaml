@@ -10,7 +10,9 @@ attributes:
     - skill-area:react-native-development
   description: |
     Taxonomy task alias for reusable mobile UI construction in Atlas mobile stacks.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:authentication-libraries-tools-services-agents
@@ -23,7 +25,9 @@ attributes:
     - skill-area:mobile-biometrics
   description: |
     Taxonomy mobile auth bucket mapped to Atlas authentication and biometrics.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:device-compatibility-testing
@@ -35,7 +39,9 @@ attributes:
     - workflow:mobile-device-compatibility-testing
   description: |
     Taxonomy task alias mapped to Atlas mobile device compatibility workflow.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:push-notifications-task
@@ -47,7 +53,9 @@ attributes:
     - skill-area:push-notifications
   description: |
     Taxonomy task alias for Atlas push notifications skill area.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:offline-mode-testing-task
@@ -59,7 +67,9 @@ attributes:
     - skill-area:offline-mode-testing
   description: |
     Taxonomy task alias for Atlas offline mode testing skill area.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:app-store-deployment-task
@@ -72,7 +82,9 @@ attributes:
     - workflow:mobile-app-store-submission
   description: |
     Taxonomy task alias for Atlas app-store deployment and submission surfaces.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:in-app-purchases-task
@@ -85,7 +97,9 @@ attributes:
     - skill-area:in-app-purchases
   description: |
     Taxonomy payment integration bucket mapped to Atlas in-app purchase/payment work.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
 ---
 nodeKind: Term
 id: term:mobile-offline-sync-task
@@ -97,4 +111,6 @@ attributes:
     - skill-area:mobile-offline-sync
   description: |
     Mobile offline sync alias for Atlas offline sync skill area.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile

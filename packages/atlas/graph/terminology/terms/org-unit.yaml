@@ -9,3 +9,5 @@ attributes:
   description: |
     Team/department/squad
 edges:
+  applies_to:
+    - target: domain:software-engineering

@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Requirements analysis and clarification (up to 4 questions)
 - Minimal implementation (no gold plating)
 - Plan file consumption (plan-to-build continuity)

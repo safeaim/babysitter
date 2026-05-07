@@ -9,3 +9,6 @@ attributes:
   description: |
     Brokered communication surface
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:backend

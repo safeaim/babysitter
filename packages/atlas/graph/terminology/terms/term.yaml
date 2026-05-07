@@ -9,3 +9,5 @@ attributes:
   description: |
     A named term in the ontology
 edges:
+  applies_to:
+    - target: domain:computer-science

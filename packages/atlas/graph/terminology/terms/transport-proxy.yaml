@@ -9,3 +9,6 @@ attributes:
   description: |
     Optional interposer (recording, integrity, multiplexing)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:backend

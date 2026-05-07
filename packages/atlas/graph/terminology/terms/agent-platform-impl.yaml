@@ -9,3 +9,6 @@ attributes:
   description: |
     Concrete platform impl
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

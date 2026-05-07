@@ -8,3 +8,5 @@ attributes:
   description: |
     A registry that publishes Blueprints and Plugins; referenced from
 edges:
+  applies_to:
+    - target: domain:software-engineering

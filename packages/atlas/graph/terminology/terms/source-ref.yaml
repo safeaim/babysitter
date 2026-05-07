@@ -9,3 +9,6 @@ attributes:
   description: |
     Repo+ref+path pointer to source-of-truth for an artifact
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science

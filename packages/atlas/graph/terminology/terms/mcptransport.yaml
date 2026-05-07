@@ -9,3 +9,6 @@ attributes:
   description: |
     An MCP wire transport (stdio, Streamable HTTP, ...)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

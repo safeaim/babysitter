@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Scan for service directories (packages/, services/, apps/)
 - Parse package.json for dependencies and scripts
 - Build dependency graph

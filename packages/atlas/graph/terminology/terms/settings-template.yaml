@@ -9,3 +9,5 @@ attributes:
   description: |
     A plugin-shipped settings.json fragment merged into host settings on install
 edges:
+  applies_to:
+    - target: domain:software-engineering

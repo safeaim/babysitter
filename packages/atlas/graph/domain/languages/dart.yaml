@@ -18,5 +18,3 @@ attributes:
 edges:
   used_by_skill_area:
     - target: skill-area:flutter-development
-  used_by_skill_area:
-    - target: skill-area:flutter-development

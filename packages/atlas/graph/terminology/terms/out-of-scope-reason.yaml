@@ -9,3 +9,5 @@ attributes:
   description: |
     Structured reason for out-of-scope
 edges:
+  applies_to:
+    - target: domain:software-engineering

@@ -9,3 +9,6 @@ attributes:
   description: |
     One execution of a benchmark against a target
 edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:data-science

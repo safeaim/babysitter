@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Load: architecture docs, active code files, test files, recent changes
 - Skip: historical discussions, completed milestones, research notes
 - Priority: implementation speed

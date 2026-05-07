@@ -11,6 +11,8 @@ graph:
 2. **patterns.md** -- Project conventions, architecture decisions, common gotchas, reusable solutions
 3. **progress.md** -- Task completion tracking with verification evidence
 
+---
+
 ## Iron Law
 
 EVERY WORKFLOW MUST:

@@ -12,6 +12,8 @@ graph:
 **Role:** Role Pack Customization & Onboarding
 **Source:** [COG Second Brain](https://github.com/huytieu/COG-second-brain)
 
+---
+
 ## Identity
 
 The Role Advisor guides users through COG onboarding by configuring their workflow based on role pack selection. It personalizes intelligence sources, capture templates, and reflection prompts to match the user's professional context.

@@ -17,6 +17,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Agent assignment: match sub-queries to appropriate research strategies
 - Synthesis: merge findings, identify consensus, flag conflicts
 - Gap analysis: detect under-researched areas requiring further investigation

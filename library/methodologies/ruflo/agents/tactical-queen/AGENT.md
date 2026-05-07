@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Worker agent workload balancing
 - Checkpoint frequency management
 - Anti-drift enforcement at tactical level

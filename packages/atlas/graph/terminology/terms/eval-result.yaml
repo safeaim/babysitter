@@ -9,3 +9,6 @@ attributes:
   description: |
     Scored result of an EvalRun
 edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:data-science

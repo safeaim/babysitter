@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Swallowed exception identification (caught but not logged/re-thrown)
 - Missing async error handling patterns
 - Promise without rejection handling

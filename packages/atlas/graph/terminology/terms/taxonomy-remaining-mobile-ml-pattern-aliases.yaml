@@ -9,7 +9,10 @@ attributes:
     - skill-area:mobile-state-management
   description: |
     Taxonomy alias term for coordinator-style flow control in mobile apps.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:modular-architecture-mobile
@@ -21,7 +24,10 @@ attributes:
     - specialization:mobile-development
   description: |
     Taxonomy alias term for modular composition in mobile application structure.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:gesture-based-interaction
@@ -33,7 +39,10 @@ attributes:
     - specialization:mobile-development
   description: |
     Taxonomy alias term for gesture-centric mobile interaction patterns.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:composable-ui
@@ -45,7 +54,10 @@ attributes:
     - skill-area:ui-component-libraries
   description: |
     Taxonomy alias term for composing interfaces from reusable building blocks.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:declarative-ui
@@ -59,7 +71,10 @@ attributes:
     - skill-area:android-native
   description: |
     Taxonomy alias term for state-driven declarative interface programming.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:bottom-sheet
@@ -71,7 +86,10 @@ attributes:
     - topic:modal-dialog
   description: |
     Taxonomy alias term for bottom-anchored modal or partial-overlay surfaces.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:navigation-drawer
@@ -83,7 +101,10 @@ attributes:
     - skill-area:frontend-routing
   description: |
     Taxonomy alias term for drawer-based navigation shells.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:tab-navigation
@@ -95,7 +116,10 @@ attributes:
     - skill-area:frontend-routing
   description: |
     Taxonomy alias term for tab-scoped navigation structures.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:mobx-pattern
@@ -107,7 +131,10 @@ attributes:
     - skill-area:mobile-state-management
   description: |
     Taxonomy alias term for observable-store style mobile state management.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:riverpod-pattern
@@ -120,7 +147,10 @@ attributes:
     - skill-area:mobile-state-management
   description: |
     Taxonomy alias term for Riverpod-style dependency and state wiring.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:view-recycling
@@ -132,7 +162,10 @@ attributes:
     - topic:windowing-virtualization
   description: |
     Taxonomy alias term for reusing rendered view containers to reduce overhead.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:memory-cache-management
@@ -144,7 +177,10 @@ attributes:
     - skill-area:caching-strategies
   description: |
     Taxonomy alias term for cache sizing, eviction, and in-memory reuse behavior.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:navigation-stack
@@ -156,7 +192,10 @@ attributes:
     - skill-area:frontend-routing
   description: |
     Taxonomy alias term for stack-based navigation transitions and history.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:modal-navigation
@@ -168,7 +207,10 @@ attributes:
     - topic:modal-routes
   description: |
     Taxonomy alias term for navigation flows that present modal route states.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:network-aware-pattern
@@ -180,7 +222,10 @@ attributes:
     - skill-area:network-condition-testing
   description: |
     Taxonomy alias term for adapting behavior to varying network conditions.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:resource-pooling
@@ -192,7 +237,10 @@ attributes:
     - skill-area:concurrency-multithreading
   description: |
     Taxonomy alias term for managed reuse of constrained computational resources.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:lazy-resource-loading
@@ -204,7 +252,10 @@ attributes:
     - topic:lazy-loading
   description: |
     Taxonomy alias term for deferring non-critical resource initialization.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:batch-training
@@ -216,7 +267,10 @@ attributes:
     - skill-area:machine-learning-frameworks
   description: |
     Taxonomy alias term for offline batched model-training workflows.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:online-training
@@ -228,7 +282,10 @@ attributes:
     - skill-area:automated-retraining
   description: |
     Taxonomy alias term for continuously updated or incrementally trained models.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:serverless-deployment
@@ -241,7 +298,10 @@ attributes:
     - skill-area:model-serving-deployment
   description: |
     Taxonomy alias term for serverless deployment surfaces in application or ML serving.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:edge-deployment
@@ -253,7 +313,10 @@ attributes:
     - skill-area:model-serving-deployment
   description: |
     Taxonomy alias term for deploying inference or logic near the edge.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:rolling-updates
@@ -265,7 +328,10 @@ attributes:
     - skill-area:deployment-infrastructure-management
   description: |
     Taxonomy alias term for staged update rollout across live instances.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:shadow-deployment
@@ -277,7 +343,10 @@ attributes:
     - skill-area:model-serving-deployment
   description: |
     Taxonomy alias term for shadow-serving new behavior alongside live traffic.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:feature-importance-analysis
@@ -289,7 +358,10 @@ attributes:
     - skill-area:explainability-interpretation
   description: |
     Taxonomy alias term for ranking feature contributions in model behavior.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:counterfactual-explanations
@@ -301,7 +373,10 @@ attributes:
     - skill-area:explainability-interpretation
   description: |
     Taxonomy alias term for explanation methods based on nearest alternative outcomes.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:partial-dependence-plots
@@ -313,7 +388,10 @@ attributes:
     - skill-area:explainability-interpretation
   description: |
     Taxonomy alias term for visualizing marginal model behavior over feature changes.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai
 ---
 nodeKind: Term
 id: term:surrogate-models-explainability
@@ -325,4 +403,7 @@ attributes:
     - skill-area:explainability-interpretation
   description: |
     Taxonomy alias term for interpretable approximations used to explain complex models.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:mobile
+    - target: domain:ml-ai

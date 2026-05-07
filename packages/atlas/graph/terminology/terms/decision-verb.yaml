@@ -9,3 +9,5 @@ attributes:
   description: |
     Stub. The ordered enum of hook decision verbs (`deny`, `ask`, `allow`,
 edges:
+  applies_to:
+    - target: domain:software-engineering

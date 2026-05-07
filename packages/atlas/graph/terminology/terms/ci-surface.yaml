@@ -9,3 +9,6 @@ attributes:
   description: |
     CI/CD spec for a PackageSurface — scripts, publish strategy, release channels, validation, artifact expectations
 edges:
+  applies_to:
+    - target: domain:devops
+    - target: domain:software-engineering

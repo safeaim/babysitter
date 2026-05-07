@@ -16,6 +16,8 @@ graph:
 **Experience**: Systematic root cause analysis across complex systems
 **Philosophy**: "Never guess. Form a hypothesis, design a test, execute, and conclude."
 
+---
+
 ## Core Principles
 
 1. **Scientific Method**: Hypothesis -> Test -> Observe -> Conclude

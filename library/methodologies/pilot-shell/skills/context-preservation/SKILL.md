@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Serialize current spec state (tasks, statuses, acceptance criteria)
 - Capture quality pipeline state (last lint/format/typecheck results)
 - Save TDD progress (current phase, iteration count, scores)

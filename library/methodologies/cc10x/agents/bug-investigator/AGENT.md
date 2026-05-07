@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Stack trace and error message analysis
 - Git history correlation with bug introduction
 - Regression test creation (TDD RED then GREEN)

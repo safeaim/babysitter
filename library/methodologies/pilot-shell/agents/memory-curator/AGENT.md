@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in knowledge management, pattern recognition, skill extraction
 **Philosophy**: "Every session teaches something; capture it before it is forgotten"
 
+---
+
 ## Capabilities
 
 ### 1. Observation Capture

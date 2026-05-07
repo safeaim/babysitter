@@ -9,3 +9,5 @@ attributes:
   description: |
     Atomic accountable unit
 edges:
+  applies_to:
+    - target: domain:software-engineering

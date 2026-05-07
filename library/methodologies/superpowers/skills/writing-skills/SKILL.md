@@ -14,6 +14,8 @@ graph:
 | GREEN | Agent complies with skill present |
 | REFACTOR | Close loopholes |
 
+---
+
 ## Skill Structure
 
 - YAML frontmatter: `name` and `description` only

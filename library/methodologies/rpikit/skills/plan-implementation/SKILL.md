@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - For medium and high stakes changes (low stakes can proceed inline)
 - When structured execution with verification is needed
 

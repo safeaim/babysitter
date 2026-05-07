@@ -7,3 +7,5 @@ attributes:
   description: |
     An interactive UI rendered inside a terminal emulator.
 edges:
+  applies_to:
+    - target: domain:software-engineering

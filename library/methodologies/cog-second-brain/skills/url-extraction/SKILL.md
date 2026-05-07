@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Extract: title, summary, key takeaways, relevant quotes
 - Assess source credibility and assign confidence levels
 - Classify extracted insights by domain

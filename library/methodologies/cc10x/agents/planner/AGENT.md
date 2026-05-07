@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Alternative approach generation and trade-off analysis
 - Phase-based plan structure with dependencies
 - Risk assessment and mitigation strategies

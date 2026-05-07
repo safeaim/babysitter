@@ -9,3 +9,5 @@ attributes:
   description: |
     Per-agent target spec used by the agent-plugins-mux / extension-mux to know
 edges:
+  applies_to:
+    - target: domain:software-engineering

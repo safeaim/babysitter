@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - When validating code quality against constitution standards
 - When verifying specification requirement coverage
 - When running custom project-specific quality checks

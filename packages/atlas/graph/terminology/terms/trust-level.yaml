@@ -9,3 +9,6 @@ attributes:
   description: |
     Enum — official-web, vendor-doc, community, synthetic, repo
 edges:
+  applies_to:
+    - target: domain:cybersecurity
+    - target: domain:software-engineering

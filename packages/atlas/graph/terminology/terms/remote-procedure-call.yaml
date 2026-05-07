@@ -7,3 +7,6 @@ attributes:
   description: |
     A protocol pattern where a function call crosses a process boundary.
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:backend

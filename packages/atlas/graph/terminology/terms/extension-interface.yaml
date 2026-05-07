@@ -9,3 +9,5 @@ attributes:
   description: |
     A contract an extension fulfills
 edges:
+  applies_to:
+    - target: domain:software-engineering

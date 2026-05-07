@@ -14,6 +14,8 @@ graph:
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
 ```bash
+---
+
 # Create worktree with feature branch
 git worktree add .claude/worktrees/<slug> -b feature/<slug>
 cd .claude/worktrees/<slug>

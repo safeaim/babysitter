@@ -9,3 +9,6 @@ attributes:
   description: |
     Named spawn recipe
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

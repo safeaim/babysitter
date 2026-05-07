@@ -9,3 +9,5 @@ attributes:
   description: |
     Markdown bundle agent reads to install/configure projects (a5c-flavored)
 edges:
+  applies_to:
+    - target: domain:software-engineering

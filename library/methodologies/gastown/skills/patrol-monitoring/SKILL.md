@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - When agents may become stuck or unresponsive
 - For long-running multi-agent workflows
 - When automated recovery is desired

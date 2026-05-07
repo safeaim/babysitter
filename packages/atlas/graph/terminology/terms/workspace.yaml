@@ -9,3 +9,5 @@ attributes:
   description: |
     Project context with sessions+repos
 edges:
+  applies_to:
+    - target: domain:software-engineering

@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - When a goal is too large for a single agent
 - When parallel execution would benefit progress
 - When work needs tracked attribution

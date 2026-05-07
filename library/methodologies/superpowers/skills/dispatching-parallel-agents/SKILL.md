@@ -7,6 +7,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Multiple subsystems broken independently
 - Each problem understood without context from others
 - No shared state between investigations

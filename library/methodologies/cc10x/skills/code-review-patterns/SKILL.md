@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Injection vulnerabilities (SQL, XSS, command)
 - Authentication and authorization patterns
 - Secrets handling (no hardcoded credentials)

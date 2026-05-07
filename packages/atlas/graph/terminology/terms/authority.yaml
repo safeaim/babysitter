@@ -7,3 +7,6 @@ attributes:
   description: |
     Deprecated trust-scoring concept retained for legacy references.
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:cybersecurity

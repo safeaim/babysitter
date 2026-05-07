@@ -9,3 +9,5 @@ attributes:
   description: |
     A definition of a term
 edges:
+  applies_to:
+    - target: domain:computer-science

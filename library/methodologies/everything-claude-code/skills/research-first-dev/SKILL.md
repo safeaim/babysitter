@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Parse the request into specific technical requirements
 - Identify the domain and relevant technology stack
 - List known constraints (time, resources, compatibility)

@@ -7,3 +7,6 @@ attributes:
   description: |
     A neural language model trained at billion+ parameter scale.
 edges:
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:data-science

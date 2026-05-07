@@ -9,7 +9,10 @@ attributes:
     - topic:rest
   description: |
     Taxonomy alias term for the broader REST concept already modeled in Atlas.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:event-driven-architecture-eda
@@ -21,7 +24,10 @@ attributes:
     - topic:event-driven-architecture
   description: |
     Taxonomy alias term for Event-Driven Architecture using the EDA form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:domain-driven-design-ddd
@@ -34,7 +40,10 @@ attributes:
     - skill-area:domain-driven-design
   description: |
     Taxonomy alias term for Domain-Driven Design using the long-form plus acronym.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:cqrs-command-query-responsibility-segregation
@@ -47,7 +56,10 @@ attributes:
     - skill-area:cqrs
   description: |
     Taxonomy alias term for CQRS using its expanded long form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:backend-for-frontend-bff
@@ -59,7 +71,10 @@ attributes:
     - topic:backend-for-frontend
   description: |
     Taxonomy alias term for Backend for Frontend using the BFF form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:service-oriented-architecture-soa
@@ -71,7 +86,10 @@ attributes:
     - topic:service-oriented-architecture
   description: |
     Taxonomy alias term for Service-Oriented Architecture using the SOA form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:publish-subscribe-pubsub
@@ -83,7 +101,10 @@ attributes:
     - topic:publish-subscribe
   description: |
     Taxonomy alias term for Publish-Subscribe using the PubSub form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:mvc-model-view-controller
@@ -95,7 +116,10 @@ attributes:
     - topic:mvc
   description: |
     Taxonomy alias term for MVC using the expanded long form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:mvp-model-view-presenter
@@ -107,7 +131,10 @@ attributes:
     - topic:mvp
   description: |
     Taxonomy alias term for MVP using the expanded long form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:mvvm-model-view-viewmodel
@@ -119,7 +146,10 @@ attributes:
     - topic:mvvm
   description: |
     Taxonomy alias term for MVVM using the expanded long form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:single-page-application-spa
@@ -131,7 +161,10 @@ attributes:
     - topic:single-page-application
   description: |
     Taxonomy alias term for Single Page Application using the SPA form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:progressive-web-application-pwa
@@ -143,7 +176,10 @@ attributes:
     - topic:progressive-web-application
   description: |
     Taxonomy alias term for Progressive Web Application using the PWA form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:client-side-rendering-csr
@@ -155,7 +191,10 @@ attributes:
     - topic:client-side-rendering
   description: |
     Taxonomy alias term for Client-Side Rendering using the CSR form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:server-side-rendering-ssr
@@ -167,7 +206,10 @@ attributes:
     - skill-area:server-side-rendering
   description: |
     Taxonomy alias term for Server-Side Rendering using the SSR form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:static-site-generation-ssg
@@ -179,7 +221,10 @@ attributes:
     - topic:static-site-generation
   description: |
     Taxonomy alias term for Static Site Generation using the SSG form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:incremental-static-regeneration-isr
@@ -191,7 +236,10 @@ attributes:
     - topic:incremental-static-regeneration
   description: |
     Taxonomy alias term for Incremental Static Regeneration using the ISR form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:finite-state-machine-fsm
@@ -203,7 +251,10 @@ attributes:
     - topic:finite-state-machine
   description: |
     Taxonomy alias term for Finite State Machine using the FSM form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:grpc-google-remote-procedure-call
@@ -216,7 +267,10 @@ attributes:
     - term:remote-procedure-call
   description: |
     Taxonomy alias term for gRPC using its expanded long form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:server-sent-events-sse
@@ -229,7 +283,10 @@ attributes:
     - acronym:sse
   description: |
     Taxonomy alias term for Server-Sent Events using the SSE form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:jwt-json-web-tokens
@@ -242,7 +299,10 @@ attributes:
     - acronym:jwt
   description: |
     Taxonomy alias term for JSON Web Token using the JWT form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:circuit-breaker
@@ -254,7 +314,10 @@ attributes:
     - topic:circuit-breakers
   description: |
     Taxonomy singular alias term for Atlas Circuit Breakers topic.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:canary-testing
@@ -267,7 +330,10 @@ attributes:
   description: |
     Taxonomy alias term mapping canary-style testing/release validation to Atlas
     canary rollout practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:rpc-remote-procedure-call
@@ -280,7 +346,10 @@ attributes:
     - acronym:rpc
   description: |
     Taxonomy alias term for RPC using its expanded long form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:authentication
@@ -292,7 +361,10 @@ attributes:
     - skill-area:authentication-authorization
   description: |
     Taxonomy alias term for the authentication aspect of Atlas auth practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:authorization
@@ -304,7 +376,10 @@ attributes:
     - skill-area:authentication-authorization
   description: |
     Taxonomy alias term for the authorization aspect of Atlas auth practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:test-driven-development-tdd
@@ -317,7 +392,10 @@ attributes:
     - acronym:tdd
   description: |
     Taxonomy alias term for Test-Driven Development using the TDD form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:behavior-driven-development-bdd
@@ -330,7 +408,10 @@ attributes:
     - acronym:bdd
   description: |
     Taxonomy alias term for Behavior-Driven Development using the BDD form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science
 ---
 nodeKind: Term
 id: term:multi-page-application-mpa
@@ -342,4 +423,7 @@ attributes:
     - topic:multi-page-application
   description: |
     Taxonomy alias term for Multi-Page Application using the MPA form.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science

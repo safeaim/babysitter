@@ -17,6 +17,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Requirements: functional and non-functional with clear scope and non-goals
 - Acceptance criteria: testable, measurable, unambiguous
 - Architecture: decision records with rationale and alternatives considered

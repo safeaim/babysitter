@@ -9,3 +9,6 @@ attributes:
   description: |
     A single agent CLI process spawn.
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science

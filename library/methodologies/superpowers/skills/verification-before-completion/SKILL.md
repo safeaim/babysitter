@@ -12,6 +12,8 @@ graph:
 4. VERIFY - Does output confirm the claim?
 5. ONLY THEN - Make the claim
 
+---
+
 ## Red Flags
 
 - Using "should", "probably", "seems to"

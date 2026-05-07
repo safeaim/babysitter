@@ -9,3 +9,6 @@ attributes:
   description: |
     Long-running monitor process bundled in a plugin (Claude Code monitors/monitors.json)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

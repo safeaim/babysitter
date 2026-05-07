@@ -11,6 +11,8 @@ graph:
 3. **Hypothesis and Testing** - Form single hypothesis, test minimally, one variable at a time
 4. **Implementation** - Create failing test case, implement single fix, verify
 
+---
+
 ## When 3+ Fixes Fail
 
 Stop and question the architecture. Pattern of repeated failures indicates architectural problems, not implementation bugs.

@@ -13,6 +13,8 @@ graph:
 4. Determine reproduction steps from evidence
 5. Check git log for recent changes correlating with bug introduction
 
+---
+
 ## Pattern-Based Diagnosis
 
 - Check patterns.md for known gotchas matching the error

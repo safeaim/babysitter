@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - GREEN phase: minimal implementation to pass tests (no over-engineering)
 - REFACTOR phase: quality improvement while maintaining green tests
 - Test strategy: unit/integration/E2E pyramid design

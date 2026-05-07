@@ -13,6 +13,8 @@ graph:
 5. **REFACTOR** - Clean up while keeping tests green
 6. **COMMIT** - Frequent small commits
 
+---
+
 ## Red Flags (STOP and Start Over)
 
 - Code before test

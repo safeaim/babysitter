@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Coverage gap detection (requirements without corresponding tasks)
 - Conflict identification (contradictory constraints or requirements)
 - Constitution compliance verification across all artifacts

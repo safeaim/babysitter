@@ -12,6 +12,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Classify content into personal, professional, and project-specific domains
 - Extract embedded URLs for separate processing
 - Route classified content to appropriate vault directories

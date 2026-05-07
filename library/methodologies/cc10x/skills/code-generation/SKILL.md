@@ -13,6 +13,8 @@ graph:
 4. **No gold plating**: Do not add features beyond what is required
 5. **No premature optimization**: Optimize only when performance tests demand it
 
+---
+
 ## Code Quality Checks
 
 - Follow project naming conventions

@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in code review, security analysis, performance assessment
 **Philosophy**: "Every line of code must serve a purpose, meet a requirement, and uphold quality"
 
+---
+
 ## Review Dimensions
 
 ### 1. Compliance Review

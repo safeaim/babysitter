@@ -12,6 +12,8 @@ graph:
 3. **Logs**: error messages, stack traces, resolution confirmation
 4. **Build output**: compilation success/failure with timestamps
 
+---
+
 ## Rules
 
 - Never claim "should work" without evidence

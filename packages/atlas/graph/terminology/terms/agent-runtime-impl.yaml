@@ -9,3 +9,6 @@ attributes:
   description: |
     Concrete runtime+tools+hook-sockets impl
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

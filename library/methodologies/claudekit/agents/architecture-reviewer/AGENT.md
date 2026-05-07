@@ -17,6 +17,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Dependency direction: no circular deps, proper layering, acyclic dependency graph
 - Separation of concerns: business logic vs infrastructure, UI vs data
 - Design patterns: consistency with existing patterns, appropriate pattern selection

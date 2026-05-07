@@ -9,3 +9,5 @@ attributes:
   description: |
     A state in a state machine
 edges:
+  applies_to:
+    - target: domain:software-engineering

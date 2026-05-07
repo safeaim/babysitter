@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - When multiple agents have worked on overlapping areas
 - When integration testing is needed before landing
 - When conflict resolution requires coordination

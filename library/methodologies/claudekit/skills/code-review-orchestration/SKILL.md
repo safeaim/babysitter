@@ -25,6 +25,8 @@ Naming, readability, error handling, type safety, DRY, comments.
 ### Documentation (weight: 10%)
 JSDoc, README updates, changelog, inline comments, type documentation.
 
+---
+
 ## Scoring and Recommendation
 
 - **APPROVE**: overall >= 80 AND zero critical issues

@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Worktree allocation and utilization tracking
 - File, schema, and dependency conflict detection
 - Priority hierarchy enforcement (P0-P4)

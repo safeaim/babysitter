@@ -9,3 +9,6 @@ attributes:
   description: |
     Productized agent (Claude Code, Codex, ...) — the umbrella
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

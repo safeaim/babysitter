@@ -9,3 +9,5 @@ attributes:
   description: |
     Sub-domain (frontend-react, backend-python-django, ...)
 edges:
+  applies_to:
+    - target: domain:software-engineering

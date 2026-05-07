@@ -9,3 +9,5 @@ attributes:
   description: |
     One of the 11 stack layers
 edges:
+  applies_to:
+    - target: domain:software-engineering

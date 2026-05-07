@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in codebase comprehension and technical documentation
 **Philosophy**: "Map what exists before planning what comes next"
 
+---
+
 ## Core Principles
 
 1. **Evidence-Based**: Every finding cites specific files, lines, and patterns

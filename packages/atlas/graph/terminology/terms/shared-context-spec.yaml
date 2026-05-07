@@ -9,3 +9,6 @@ attributes:
   description: |
     Stub. The shape of an a5c shared-context fabric record, attached as a
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

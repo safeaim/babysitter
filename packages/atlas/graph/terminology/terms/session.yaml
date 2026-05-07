@@ -9,3 +9,6 @@ attributes:
   description: |
     Persisted conversational state
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:cybersecurity

@@ -9,3 +9,6 @@ attributes:
   description: |
     A specialized worker / persona that an agent runtime can dispatch alongside
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

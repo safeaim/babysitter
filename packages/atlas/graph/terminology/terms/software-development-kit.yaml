@@ -7,3 +7,5 @@ attributes:
   description: |
     A library and tooling bundle for integrating against a platform.
 edges:
+  applies_to:
+    - target: domain:software-engineering

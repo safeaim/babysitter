@@ -9,3 +9,6 @@ attributes:
   description: |
     A canonical install method (npm, brew, gh-extension, …) referenced by
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

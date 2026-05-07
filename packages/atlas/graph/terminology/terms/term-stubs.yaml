@@ -7,7 +7,9 @@ attributes:
   description: |
     Legacy term for an Invocation in the agent-mux harness; mapped to
     the canonical `Invocation` node kind via terminology/synonyms/.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:agent-to-agent
@@ -17,7 +19,9 @@ attributes:
   kind: concept
   description: |
     Communication pattern between agents; expanded acronym a2a.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:anthropic-skill
@@ -28,7 +32,9 @@ attributes:
   description: |
     The Anthropic-led "Skill" concept — a SKILL.md-driven progressive
     disclosure capability. Mapped to canonical `skill` via synonyms.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:model-context-protocol
@@ -39,7 +45,9 @@ attributes:
   description: |
     The Model Context Protocol — open standard for tool servers and
     elicitation surfaces. Acronym `mcp`.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:evidence-source
@@ -52,7 +60,9 @@ attributes:
   description: |
     Canonical NodeKind label for a discrete piece of evidence (doc page,
     file, package, observation, attestation). See ../../../schema/evidence-model.md.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:gemini-generate-content
@@ -64,6 +74,8 @@ attributes:
     - "NodeKind:ModelTransportProtocol"
   description: |
     Canonical name for the Google Gemini generateContent API transport.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 
 

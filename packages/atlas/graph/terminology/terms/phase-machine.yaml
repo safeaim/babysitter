@@ -9,3 +9,5 @@ attributes:
   description: |
     A finite-state machine over Phase nodes declared by a reliability-interface
 edges:
+  applies_to:
+    - target: domain:software-engineering

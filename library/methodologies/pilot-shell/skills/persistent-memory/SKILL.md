@@ -30,6 +30,8 @@ A bug resolution pattern for future reference.
 { "type": "bugfix", "content": "Race condition in WebSocket reconnect", "rootCause": "Missing mutex on connection state", "fix": "Added connection state lock", "tags": ["concurrency", "websocket"] }
 ```
 
+---
+
 ## Storage
 
 Observations are stored in `.pilot-shell/memory/` as JSON files, one per session:

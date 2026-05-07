@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - When verifying that all specification requirements have corresponding tasks
 - When checking for contradictions between constitution and plan
 - When assessing readiness for the implementation phase

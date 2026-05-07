@@ -9,3 +9,6 @@ attributes:
   description: |
     A concrete hook event name (PreToolUse, PhaseChange, etc.)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

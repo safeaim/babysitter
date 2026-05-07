@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Analyze code changes and implementation approaches
 - Identify recurring patterns and conventions
 - Extract architectural decisions with rationale

@@ -9,3 +9,6 @@ attributes:
   description: |
     Unit of external work in a Run (a5c-flavored)
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:ml-ai

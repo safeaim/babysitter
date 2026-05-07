@@ -9,6 +9,8 @@ graph:
   roles: [role:tech-lead, role:backend-engineer]
 2. **Implementation skills second** - guide execution
 
+---
+
 ## Skill Types
 
 - **Rigid** (TDD, debugging) - Follow exactly

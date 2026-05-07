@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Hook-driven work consumption (GUPP compliant)
 - Self-contained implementation without external dependencies
 - Clean session management (init, execute, teardown)

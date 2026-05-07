@@ -15,6 +15,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Credential and secret scanning
 - Input validation assessment
 - Authentication/authorization review

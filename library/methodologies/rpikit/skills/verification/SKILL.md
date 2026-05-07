@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - At phase checkpoints
 - Before final completion declaration
 - When validating that all acceptance criteria are met

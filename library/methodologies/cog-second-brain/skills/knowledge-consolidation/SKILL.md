@@ -12,6 +12,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Cluster related notes into coherent themes
 - Build structured frameworks: concept maps, key principles, examples, applications
 - Cross-reference with existing frameworks in 05-knowledge

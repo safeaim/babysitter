@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Gather activity data from Linear (issues, cycles, projects)
 - Gather activity data from Slack (discussions, decisions, threads)
 - Gather analytics from PostHog (metrics, feature flags, experiments)

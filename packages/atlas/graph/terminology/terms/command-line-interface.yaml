@@ -7,3 +7,6 @@ attributes:
   description: |
     A text-based interface for invoking programs from a terminal.
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

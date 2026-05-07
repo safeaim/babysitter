@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in context management, codebase indexing, git operations
 **Philosophy**: "Preserve state before it is lost; index before you search"
 
+---
+
 ## Capabilities
 
 ### 1. Context Usage Tracking

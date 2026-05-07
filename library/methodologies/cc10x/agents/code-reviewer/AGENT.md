@@ -16,6 +16,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Quality: naming, structure, patterns, error handling, type safety
 - Performance: algorithmic complexity, resource leaks, caching
 - Maintainability: documentation, test coverage, readability, tech debt

@@ -22,9 +22,5 @@ edges:
   used_by_skill_area:
     - target: skill-area:react-testing
     - target: skill-area:react-native-development
-    - target: skill-area:typescript-generic-programming
-  used_by_skill_area:
-    - target: skill-area:react-testing
-    - target: skill-area:react-native-development
     - target: skill-area:web-scraping
     - target: skill-area:typescript-generic-programming

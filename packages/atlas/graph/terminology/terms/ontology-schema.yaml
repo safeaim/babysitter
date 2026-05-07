@@ -9,3 +9,6 @@ attributes:
   description: |
     Stub. The catalog ontology itself (this `ontology-schema.yaml` plus the
 edges:
+  applies_to:
+    - target: domain:data-science
+    - target: domain:computer-science

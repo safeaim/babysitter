@@ -7,3 +7,6 @@ attributes:
   description: |
     A unidirectional HTTP streaming protocol from server to client.
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:backend

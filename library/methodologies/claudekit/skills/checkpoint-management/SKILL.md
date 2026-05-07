@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Stage all current changes
 - Create commit with [CHECKPOINT] prefix
 - Tag with claudekit-checkpoint-{timestamp}

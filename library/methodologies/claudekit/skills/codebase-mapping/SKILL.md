@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Directory tree with depth-limited enumeration
 - Key file identification (entry points, configs, lock files)
 

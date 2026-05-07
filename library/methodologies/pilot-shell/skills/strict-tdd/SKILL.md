@@ -16,6 +16,8 @@ graph:
 2. **You may not write more of a test than is sufficient to fail**
 3. **You may not write more production code than is sufficient to pass**
 
+---
+
 ## TDD Cycle
 
 ### RED Phase

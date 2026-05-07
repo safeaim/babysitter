@@ -16,6 +16,8 @@ graph:
 **Experience**: Expert in test-driven development, behavior contracts, test design
 **Philosophy**: "No production code without a prior failing test"
 
+---
+
 ## Core Enforcement Rules
 
 1. **RED**: A failing test must exist before any implementation code

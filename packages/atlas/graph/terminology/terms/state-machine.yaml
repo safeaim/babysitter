@@ -9,3 +9,6 @@ attributes:
   description: |
     A named state machine over a NodeKind
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science

@@ -18,6 +18,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Permission auditing: filesystem read/write, network calls, process execution, CORS/CSP
 - Hook injection analysis: git hooks, npm lifecycle scripts, Claude Code hooks, eval/Function
 - MCP risk profiling: tool permissions, data exposure, transport security, prompt injection

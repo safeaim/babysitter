@@ -9,3 +9,6 @@ attributes:
   description: |
     A reactor rule that, on a trigger (timer cron expression or webhook
 edges:
+  applies_to:
+    - target: domain:devops
+    - target: domain:software-engineering

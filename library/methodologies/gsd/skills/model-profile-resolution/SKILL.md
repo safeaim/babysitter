@@ -13,6 +13,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - **balanced**: Mix of high and mid-tier models. Good quality at moderate cost. Default profile.
 - **budget**: Cheapest viable models for all agents. Acceptable quality at minimum cost.
 

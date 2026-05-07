@@ -9,3 +9,6 @@ attributes:
   description: |
     Git-worktree per-branch isolation
 edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:devops

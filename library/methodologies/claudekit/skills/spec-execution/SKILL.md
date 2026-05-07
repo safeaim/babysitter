@@ -8,6 +8,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:tech-lead, role:backend-engineer]
+---
+
 - Read specification for requirements and architecture
 - Implement each requirement following project conventions
 - Add type definitions and JSDoc documentation

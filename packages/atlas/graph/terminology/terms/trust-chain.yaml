@@ -7,3 +7,6 @@ attributes:
   description: |
     Out-of-scope concept for the current catalog version.
 edges:
+  applies_to:
+    - target: domain:cybersecurity
+    - target: domain:software-engineering

@@ -15,6 +15,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Stack Overflow and issue tracker research
 - Library API reference lookup
 - Error message root cause investigation

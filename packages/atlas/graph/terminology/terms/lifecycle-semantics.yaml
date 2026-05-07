@@ -9,3 +9,5 @@ attributes:
   description: |
     Per-agent runtime lifecycle — hook mode, stop-hook mode, background tasks, checkpoints, plugin context
 edges:
+  applies_to:
+    - target: domain:software-engineering

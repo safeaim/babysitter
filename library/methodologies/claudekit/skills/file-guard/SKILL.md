@@ -43,6 +43,8 @@ graph:
 ### 12. Sensitive Configs
 `config/secrets/*`, `.htpasswd`, `shadow`, `gshadow`
 
+---
+
 ## Bash Pipeline Analysis
 
 Detects indirect file access through bash pipes:

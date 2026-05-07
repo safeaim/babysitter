@@ -9,7 +9,9 @@ attributes:
     - skill-area:internationalization
   description: |
     Taxonomy task alias for Atlas Internationalization & Localization.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:routing
@@ -21,7 +23,9 @@ attributes:
     - skill-area:frontend-routing
   description: |
     Taxonomy task alias for frontend routing design and implementation.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:server-side-rendering-frameworks
@@ -33,7 +37,9 @@ attributes:
     - skill-area:server-side-rendering
   description: |
     Taxonomy task alias for Atlas server-side rendering practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:backend-unit-testing
@@ -45,7 +51,9 @@ attributes:
     - skill-area:unit-testing
   description: |
     Taxonomy task alias for unit testing in backend-oriented codepaths.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:backend-integration-testing
@@ -57,7 +65,9 @@ attributes:
     - skill-area:integration-testing
   description: |
     Taxonomy task alias for backend integration testing practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:frontend-e2e-testing
@@ -69,7 +79,9 @@ attributes:
     - skill-area:frontend-e2e-testing
   description: |
     Taxonomy task alias for browser-level end-to-end testing practice.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Term
 id: term:state-management-testing
@@ -81,4 +93,6 @@ attributes:
     - skill-area:state-management-testing
   description: |
     Taxonomy task alias for testing stateful client/application logic.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering

@@ -9,3 +9,5 @@ attributes:
   description: |
     Human or agentic role
 edges:
+  applies_to:
+    - target: domain:software-engineering

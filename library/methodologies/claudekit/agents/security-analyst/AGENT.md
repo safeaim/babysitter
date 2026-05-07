@@ -17,6 +17,8 @@ graph:
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
   roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+---
+
 - Auth: authentication bypass, authorization escalation, session management
 - Secrets: hardcoded credentials, API keys in source, improper env var handling
 - Crypto: weak algorithms, predictable randomness, improper key management

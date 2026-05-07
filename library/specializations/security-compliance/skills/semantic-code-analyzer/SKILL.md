@@ -8,6 +8,10 @@ allowed-tools:
   - Grep
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:sast, skill-area:code-cybersecurity]
+  roles: [role:security-engineer, role:compliance-engineer]
+  workflows: [workflow:security-audit, workflow:vulnerability-management]
 
 ---
 

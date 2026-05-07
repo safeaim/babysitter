@@ -13,6 +13,10 @@ allowed-tools:
   - Bash
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:dbt-modeling, skill-area:etl-pipelines]
+  roles: [role:analytics-engineer, role:data-engineer]
+  workflows: [workflow:data-pipeline-deployment]
 ---
 
 # Incremental Model Strategy Selector

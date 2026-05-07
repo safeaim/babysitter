@@ -4,6 +4,10 @@ description: Reviews AI agents for safety and alignment issues. Audits prompts, 
 role: Safety and Alignment Specialist
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:ml-engineer, role:backend-engineer]
+  workflows: [workflow:ml-model-lifecycle, workflow:feature-development]
 
 ---
 

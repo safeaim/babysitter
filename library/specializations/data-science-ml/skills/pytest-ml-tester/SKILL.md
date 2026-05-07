@@ -9,6 +9,7 @@ allowed-tools:
   - Grep
 graph:
   domains: [domain:data-science, domain:software-engineering]
+  specializations: [specialization:data-science-ml]
   skillAreas: [skill-area:model-validation-testing, skill-area:data-quality-testing, skill-area:unit-testing]
   topics: [topic:trunk-based-development]
   roles: [role:ml-engineer, role:data-scientist, role:qa-engineer]

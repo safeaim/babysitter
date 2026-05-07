@@ -13,6 +13,10 @@ allowed-tools:
   - Bash
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:statistical-analysis, skill-area:data-analytics]
+  roles: [role:analytics-engineer, role:data-analyst]
+  workflows: [workflow:experiment-design]
 ---
 
 # A/B Test Statistical Analyzer

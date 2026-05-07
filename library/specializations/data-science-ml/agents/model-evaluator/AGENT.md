@@ -4,6 +4,10 @@ description: Agent specialized in comprehensive model evaluation, metric calcula
 required-skills: sklearn-model-trainer, mlflow-experiment-tracker, great-expectations-validator
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:model-evaluation, skill-area:statistical-analysis]
+  roles: [role:data-scientist, role:ml-engineer]
+  workflows: [workflow:ml-model-lifecycle]
 
 ---
 

@@ -4,6 +4,10 @@ description: Scikit-learn model training skill with cross-validation, hyperparam
 allowed-tools: Read, Grep, Write, Bash, Edit, Glob
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:machine-learning-frameworks, skill-area:model-evaluation]
+  roles: [role:ml-engineer, role:data-scientist]
+  workflows: [workflow:ml-model-lifecycle]
 
 ---
 

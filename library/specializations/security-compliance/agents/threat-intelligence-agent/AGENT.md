@@ -11,6 +11,10 @@ expertise:
   - Intelligence reporting
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:threat-intelligence-hunting, skill-area:security-monitoring-siem]
+  roles: [role:security-engineer, role:compliance-engineer]
+  workflows: [workflow:vulnerability-management]
 
 ---
 

@@ -11,6 +11,10 @@ expertise:
   - Geopolitical context analysis
 graph:
   domains: [domain:cybersecurity]
+  specializations: [specialization:security-research]
+  skillAreas: [skill-area:vulnerability-management, skill-area:penetration-testing-ethical-hacking]
+  roles: [role:security-engineer]
+  workflows: [workflow:vulnerability-management, workflow:penetration-testing-cycle]
 ---
 
 # Threat Intelligence Analyst Agent

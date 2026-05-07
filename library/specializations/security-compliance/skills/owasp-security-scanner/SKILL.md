@@ -9,6 +9,11 @@ metadata:
   backlog-id: SK-SEC-001
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:application-security-testing, skill-area:web-security]
+  roles: [role:security-engineer, role:backend-engineer]
+  workflows: [workflow:vulnerability-management, workflow:security-audit]
+  topics: [topic:defense-in-depth]
 
 ---
 

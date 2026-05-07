@@ -7,6 +7,10 @@ skill-id: SK-DEA-005
 allowed-tools: Read, Grep, Glob, Bash, WebFetch
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:data-quality, skill-area:data-quality-testing]
+  roles: [role:data-engineer, role:analytics-engineer]
+  workflows: [workflow:data-quality-monitoring]
 ---
 
 # Data Quality Profiler

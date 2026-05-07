@@ -10,6 +10,10 @@ allowed-tools:
   - Grep
 graph:
   domains: [domain:cybersecurity]
+  specializations: [specialization:security-research]
+  skillAreas: [skill-area:fuzz-testing, skill-area:vulnerability-management]
+  roles: [role:security-engineer]
+  workflows: [workflow:penetration-testing-cycle, workflow:vulnerability-management]
 ---
 
 # Fuzzing Operations Skill

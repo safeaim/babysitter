@@ -11,6 +11,10 @@ expertise:
   - Rollback planning
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:vulnerability-management, skill-area:dependency-vulnerability-mgmt]
+  roles: [role:security-engineer, role:compliance-engineer]
+  workflows: [workflow:vulnerability-management]
 
 ---
 

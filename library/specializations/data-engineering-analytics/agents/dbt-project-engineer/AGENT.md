@@ -7,6 +7,10 @@ agent-id: AG-DEA-002
 type: specialist
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:dbt-modeling, skill-area:data-warehouse-modeling]
+  roles: [role:analytics-engineer, role:data-engineer]
+  workflows: [workflow:data-pipeline-deployment]
 ---
 
 # dbt Project Engineer Agent

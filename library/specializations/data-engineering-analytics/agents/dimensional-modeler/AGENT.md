@@ -16,6 +16,10 @@ expertise:
   - Model documentation
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:data-warehouse-modeling, skill-area:dbt-modeling]
+  roles: [role:analytics-engineer, role:data-analyst]
+  workflows: [workflow:data-pipeline-deployment]
 ---
 
 # Dimensional Modeler Agent

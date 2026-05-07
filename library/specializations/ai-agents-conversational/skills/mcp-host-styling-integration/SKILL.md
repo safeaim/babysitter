@@ -4,6 +4,10 @@ description: Integrates MCP App UI with host theming system. Applies host CSS va
 allowed-tools: Read, Write, Edit
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:backend-engineer, role:fullstack-engineer]
+  workflows: [workflow:feature-development]
 
 ---
 

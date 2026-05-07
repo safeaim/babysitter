@@ -13,6 +13,11 @@ allowed-tools:
   - Bash
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:streaming-realtime-processing, skill-area:kafka-stream-processing]
+  roles: [role:data-engineer, role:analytics-engineer]
+  workflows: [workflow:data-pipeline-deployment]
+  topics: [topic:event-driven-architecture]
 ---
 
 # Stream Processing Windowing Designer

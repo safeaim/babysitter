@@ -8,6 +8,10 @@ metadata:
   version: "1.0.0"
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:vulnerability-management, skill-area:compliance-automation]
+  roles: [role:security-engineer, role:compliance-officer]
+  workflows: [workflow:vulnerability-management, workflow:compliance-audit]
 
 ---
 

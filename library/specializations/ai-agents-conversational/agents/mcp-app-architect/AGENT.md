@@ -15,6 +15,11 @@ expertise:
   - Multi-tool resource sharing patterns
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:backend-engineer, role:fullstack-engineer]
+  workflows: [workflow:feature-development]
+  topics: [topic:api-design, topic:design-patterns]
 
 ---
 

@@ -9,6 +9,7 @@ metadata:
   backlog-id: SK-SEC-004
 graph:
   domains: [domain:security, domain:devops]
+  specializations: [specialization:security-compliance]
   skillAreas: [skill-area:dependency-vulnerability-mgmt, skill-area:supply-chain-security]
   topics: [topic:defense-in-depth]
   roles: [role:security-engineer, role:devops-engineer, role:backend-engineer]

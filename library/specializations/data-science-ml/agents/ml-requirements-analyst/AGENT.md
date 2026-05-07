@@ -11,6 +11,10 @@ expertise:
   - Success criteria definition
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:data-science-experimentation, skill-area:data-analysis]
+  roles: [role:data-scientist, role:ml-engineer]
+  workflows: [workflow:ml-model-lifecycle, workflow:experiment-design]
 
 ---
 

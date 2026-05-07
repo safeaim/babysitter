@@ -7,6 +7,10 @@ agent-id: AG-DEA-003
 type: specialist
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:data-quality, skill-area:data-quality-testing]
+  roles: [role:data-engineer, role:analytics-engineer]
+  workflows: [workflow:data-quality-monitoring]
 ---
 
 # Data Quality Engineer Agent

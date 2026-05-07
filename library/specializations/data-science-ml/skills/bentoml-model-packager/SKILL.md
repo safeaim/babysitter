@@ -9,6 +9,10 @@ allowed-tools:
   - Grep
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:model-serving-deployment, skill-area:model-serving-operations]
+  roles: [role:ml-ops-engineer, role:ml-engineer]
+  workflows: [workflow:ml-model-lifecycle]
 
 ---
 

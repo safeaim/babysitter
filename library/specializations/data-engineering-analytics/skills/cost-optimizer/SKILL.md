@@ -13,6 +13,10 @@ allowed-tools:
   - Bash
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:big-data-tools, skill-area:data-warehouse-modeling]
+  roles: [role:data-engineer, role:analytics-engineer]
+  workflows: [workflow:data-pipeline-deployment]
 ---
 
 # Cost Optimizer (Cloud Data Platforms)

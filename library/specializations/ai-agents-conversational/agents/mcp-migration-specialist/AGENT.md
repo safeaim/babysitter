@@ -17,6 +17,11 @@ expertise:
   - CORS configuration for MCP clients
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:backend-engineer, role:fullstack-engineer]
+  workflows: [workflow:feature-development]
+  topics: [topic:api-design]
 
 ---
 

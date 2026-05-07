@@ -7,6 +7,10 @@ skill-id: SK-DEA-004
 allowed-tools: Read, Grep, Glob, Bash, WebFetch
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:data-warehouse-modeling, skill-area:big-data-tools]
+  roles: [role:data-engineer, role:analytics-engineer]
+  workflows: [workflow:data-pipeline-deployment]
 ---
 
 # SQL Query Optimizer

@@ -7,6 +7,11 @@ agent-id: AG-DEA-001
 type: specialist
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:data-warehouse-modeling, skill-area:columnar-storage]
+  roles: [role:data-engineer, role:analytics-engineer]
+  workflows: [workflow:data-pipeline-deployment]
+  topics: [topic:database-sharding, topic:data-mesh]
 ---
 
 # Data Warehouse Architect Agent

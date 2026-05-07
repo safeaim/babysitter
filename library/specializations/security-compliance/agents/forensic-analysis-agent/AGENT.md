@@ -11,6 +11,10 @@ expertise:
   - Forensic reporting
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:incident-response-forensics, skill-area:security-monitoring-siem]
+  roles: [role:security-engineer, role:incident-commander]
+  workflows: [workflow:vulnerability-management, workflow:security-audit]
 
 ---
 

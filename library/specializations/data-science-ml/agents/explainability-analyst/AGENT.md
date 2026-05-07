@@ -4,6 +4,10 @@ description: Agent specialized in model interpretability, explanation generation
 required-skills: sklearn-model-trainer, mlflow-experiment-tracker
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:explainability-interpretation, skill-area:bias-fairness-analysis]
+  roles: [role:data-scientist, role:ml-engineer]
+  workflows: [workflow:ml-model-lifecycle]
 
 ---
 

@@ -4,6 +4,11 @@ description: Designs end-to-end RAG pipeline architecture. Specializes in docume
 role: RAG Systems Architect
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:ml-engineer, role:backend-engineer]
+  workflows: [workflow:ml-model-lifecycle, workflow:feature-development]
+  topics: [topic:design-patterns]
 
 ---
 

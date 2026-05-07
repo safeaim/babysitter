@@ -11,6 +11,10 @@ expertise:
   - Post-incident documentation
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:incident-management, skill-area:model-monitoring-drift-detection]
+  roles: [role:ml-ops-engineer, role:ml-engineer]
+  workflows: [workflow:data-quality-monitoring]
 
 ---
 

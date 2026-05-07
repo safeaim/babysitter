@@ -16,6 +16,11 @@ expertise:
   - Performance tuning
 graph:
   domains: [domain:data-engineering]
+  specializations: [specialization:data-engineering-analytics]
+  skillAreas: [skill-area:streaming-realtime-processing, skill-area:messaging-queuing]
+  roles: [role:data-engineer, role:analytics-engineer]
+  workflows: [workflow:data-pipeline-deployment]
+  topics: [topic:event-sourcing, topic:event-driven-architecture]
 ---
 
 # Streaming Pipeline Engineer Agent

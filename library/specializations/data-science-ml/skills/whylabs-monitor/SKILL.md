@@ -9,6 +9,10 @@ allowed-tools:
   - Grep
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:model-monitoring-drift-detection, skill-area:observability-instrumentation]
+  roles: [role:ml-ops-engineer, role:data-scientist]
+  workflows: [workflow:data-quality-monitoring]
 
 ---
 

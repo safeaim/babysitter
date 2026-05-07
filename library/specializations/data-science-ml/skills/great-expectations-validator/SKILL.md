@@ -4,6 +4,10 @@ description: Data quality validation skill using Great Expectations for schema v
 allowed-tools: Read, Grep, Write, Bash, Edit, Glob
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:data-quality, skill-area:data-pipeline-testing]
+  roles: [role:data-scientist, role:ml-ops-engineer]
+  workflows: [workflow:data-quality-monitoring]
 
 ---
 

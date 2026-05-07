@@ -4,6 +4,11 @@ description: LangGraph StateGraph builder with state schema design. Create state
 allowed-tools: Read, Grep, Write, Edit, Bash, Glob, WebFetch
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:ml-engineer, role:backend-engineer]
+  workflows: [workflow:feature-development, workflow:ml-model-lifecycle]
+  topics: [topic:design-patterns, topic:event-driven-architecture]
 
 ---
 

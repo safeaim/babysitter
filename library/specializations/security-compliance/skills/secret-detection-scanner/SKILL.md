@@ -9,6 +9,10 @@ metadata:
   backlog-id: SK-SEC-007
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:secret-scanning, skill-area:application-security-testing]
+  roles: [role:security-engineer, role:devops-engineer]
+  workflows: [workflow:security-audit, workflow:vulnerability-management]
 
 ---
 

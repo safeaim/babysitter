@@ -4,6 +4,11 @@ description: Scaffolds MCP App project structure with correct directory layout, 
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:backend-engineer, role:fullstack-engineer]
+  workflows: [workflow:feature-development]
+  topics: [topic:api-design, topic:design-patterns]
 
 ---
 

@@ -15,6 +15,10 @@ expertise:
   - CSP configuration in registerAppResource read callback placement
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:backend-engineer, role:fullstack-engineer]
+  workflows: [workflow:feature-development]
 
 ---
 

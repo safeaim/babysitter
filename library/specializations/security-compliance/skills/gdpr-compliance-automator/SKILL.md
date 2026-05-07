@@ -10,6 +10,10 @@ allowed-tools:
   - WebFetch
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:compliance-automation, skill-area:data-protection-dlp]
+  roles: [role:privacy-engineer, role:compliance-officer]
+  workflows: [workflow:compliance-audit, workflow:access-review]
 
 ---
 

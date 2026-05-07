@@ -4,6 +4,11 @@ description: Comprehensive Content Security Policy audit for MCP Apps in sandbox
 allowed-tools: Read, Bash, Glob, Grep
 graph:
   domains: [domain:software-engineering]
+  specializations: [specialization:ai-agents-conversational]
+  skillAreas: [skill-area:natural-language-processing]
+  roles: [role:backend-engineer, role:fullstack-engineer]
+  workflows: [workflow:feature-development]
+  topics: [topic:api-design]
 
 ---
 

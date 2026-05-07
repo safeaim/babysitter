@@ -7,6 +7,10 @@ metadata:
   version: "1.0.0"
 graph:
   domains: [domain:security]
+  specializations: [specialization:security-compliance]
+  skillAreas: [skill-area:sast, skill-area:incident-response-forensics]
+  roles: [role:security-engineer, role:compliance-engineer]
+  workflows: [workflow:security-audit]
 
 ---
 

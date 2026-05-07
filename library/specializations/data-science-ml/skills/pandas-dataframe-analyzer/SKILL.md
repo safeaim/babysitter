@@ -9,6 +9,10 @@ allowed-tools:
   - Grep
 graph:
   domains: [domain:data-science]
+  specializations: [specialization:data-science-ml]
+  skillAreas: [skill-area:data-analysis, skill-area:data-preprocessing]
+  roles: [role:data-scientist, role:data-analyst]
+  workflows: [workflow:experiment-design, workflow:data-quality-monitoring]
 
 ---
 

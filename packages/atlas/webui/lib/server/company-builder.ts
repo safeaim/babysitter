@@ -382,6 +382,65 @@ export async function addCompanyIntegration(userId: string, blueprintId: string,
   }));
 }
 
+export async function deleteCompanyBlueprint(userId: string, blueprintId: string) {
+  await execute(
+    `DELETE FROM atlas_company_blueprints
+      WHERE user_id = $1 AND id = $2`,
+    [userId, blueprintId],
+  );
+}
+
+export async function deleteCompanySystem(userId: string, blueprintId: string, systemId: string) {
+  await updateBlueprintDraft(userId, blueprintId, (draft) => ({
+    ...draft,
+    systems: draft.systems.filter((system) => system.id !== systemId),
+    integrations: draft.integrations.filter((integration) => integration.fromSystemId !== systemId && !(integration.toType === "system" && integration.toId === systemId)),
+  }));
+}
+
+export async function deleteCompanyAsset(userId: string, blueprintId: string, assetId: string) {
+  await updateBlueprintDraft(userId, blueprintId, (draft) => ({
+    ...draft,
+    assets: draft.assets.filter((asset) => asset.id !== assetId),
+    systems: draft.systems.map((system) => ({
+      ...system,
+      assetIds: system.assetIds.filter((id) => id !== assetId),
+    })),
+    integrations: draft.integrations.filter((integration) => !(integration.toType === "asset" && integration.toId === assetId)),
+  }));
+}
+
+export async function deleteCompanySelection(userId: string, blueprintId: string, systemId: string, selectionId: string) {
+  await updateBlueprintDraft(userId, blueprintId, (draft) => ({
+    ...draft,
+    systems: draft.systems.map((system) => system.id !== systemId
+      ? system
+      : {
+          ...system,
+          selections: system.selections.filter((selection) => selection.id !== selectionId),
+        }),
+  }));
+}
+
+export async function removeAssetFromSystem(userId: string, blueprintId: string, systemId: string, assetId: string) {
+  await updateBlueprintDraft(userId, blueprintId, (draft) => ({
+    ...draft,
+    systems: draft.systems.map((system) => system.id !== systemId
+      ? system
+      : {
+          ...system,
+          assetIds: system.assetIds.filter((id) => id !== assetId),
+        }),
+  }));
+}
+
+export async function deleteCompanyIntegration(userId: string, blueprintId: string, integrationId: string) {
+  await updateBlueprintDraft(userId, blueprintId, (draft) => ({
+    ...draft,
+    integrations: draft.integrations.filter((integration) => integration.id !== integrationId),
+  }));
+}
+
 function buildYamlDocuments(blueprint: CompanyBlueprintDraft): string {
   const docs: Array<Record<string, unknown>> = [];
   const blueprintId = `company:${blueprint.company.slug}`;

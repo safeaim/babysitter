@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { AtlasDocsScaffold } from "@/components/AtlasDocsScaffold";
 import { auth } from "@/auth";
 import { listUserGraphUploads } from "@/lib/server/user-graphs";
-import { uploadUserGraphAction } from "./actions";
+import { deleteUserGraphAction, rebuildUserGraphAction, uploadUserGraphAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +60,17 @@ export default async function WorkspaceGraphsPage() {
                 <li key={upload.id} className="px-3 py-2">
                   <div className="font-medium">{upload.title}</div>
                   <div className="text-xs" style={{ color: "var(--fg-3)" }}>
-                    {upload.recordCount} records · {upload.edgeCount} edges · {upload.sourceFilename}
+                    {upload.recordCount} records · {upload.edgeCount} edges · {upload.sourceFilename} · {upload.status}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <form action={rebuildUserGraphAction}>
+                      <input type="hidden" name="uploadId" value={upload.id} />
+                      <button type="submit" className="atlas-header__button">Rebuild</button>
+                    </form>
+                    <form action={deleteUserGraphAction}>
+                      <input type="hidden" name="uploadId" value={upload.id} />
+                      <button type="submit" className="atlas-header__button">Delete</button>
+                    </form>
                   </div>
                 </li>
               ))}

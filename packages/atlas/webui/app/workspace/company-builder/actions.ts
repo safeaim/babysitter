@@ -10,7 +10,13 @@ import {
   addCompanySystem,
   attachAssetToSystem,
   createCompanyBlueprint,
+  deleteCompanyAsset,
+  deleteCompanyBlueprint,
+  deleteCompanyIntegration,
+  deleteCompanySelection,
+  deleteCompanySystem,
   exportCompanyBlueprintYaml,
+  removeAssetFromSystem,
   saveCompanyBlueprintMetadata,
   type CompanyLayerKey,
 } from "@/lib/server/company-builder";
@@ -127,5 +133,48 @@ export async function exportCompanyBlueprintAction(formData: FormData) {
   const userId = await requireUserId();
   const blueprintId = requiredString(formData, "blueprintId");
   await exportCompanyBlueprintYaml(userId, blueprintId);
+  refreshBuilder();
+}
+
+export async function deleteCompanyBlueprintAction(formData: FormData) {
+  const userId = await requireUserId();
+  const blueprintId = requiredString(formData, "blueprintId");
+  await deleteCompanyBlueprint(userId, blueprintId);
+  refreshBuilder();
+  redirect("/workspace/company-builder");
+}
+
+export async function deleteCompanySystemAction(formData: FormData) {
+  const userId = await requireUserId();
+  const blueprintId = requiredString(formData, "blueprintId");
+  await deleteCompanySystem(userId, blueprintId, requiredString(formData, "systemId"));
+  refreshBuilder();
+}
+
+export async function deleteCompanyAssetAction(formData: FormData) {
+  const userId = await requireUserId();
+  const blueprintId = requiredString(formData, "blueprintId");
+  await deleteCompanyAsset(userId, blueprintId, requiredString(formData, "assetId"));
+  refreshBuilder();
+}
+
+export async function deleteCompanySelectionAction(formData: FormData) {
+  const userId = await requireUserId();
+  const blueprintId = requiredString(formData, "blueprintId");
+  await deleteCompanySelection(userId, blueprintId, requiredString(formData, "systemId"), requiredString(formData, "selectionId"));
+  refreshBuilder();
+}
+
+export async function removeAssetFromSystemAction(formData: FormData) {
+  const userId = await requireUserId();
+  const blueprintId = requiredString(formData, "blueprintId");
+  await removeAssetFromSystem(userId, blueprintId, requiredString(formData, "systemId"), requiredString(formData, "assetId"));
+  refreshBuilder();
+}
+
+export async function deleteCompanyIntegrationAction(formData: FormData) {
+  const userId = await requireUserId();
+  const blueprintId = requiredString(formData, "blueprintId");
+  await deleteCompanyIntegration(userId, blueprintId, requiredString(formData, "integrationId"));
   refreshBuilder();
 }

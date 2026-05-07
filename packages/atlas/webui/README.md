@@ -24,6 +24,7 @@ npm install
 set DATABASE_URL=postgres://postgres:postgres@localhost:5432/atlas_webui
 set GITHUB_CLIENT_ID=your-github-oauth-app-client-id
 set GITHUB_CLIENT_SECRET=your-github-oauth-app-client-secret
+set AUTH_SECRET=a-long-random-secret
 npm run db:init -w @a5c-ai/atlas-webui
 npm run dev -w @a5c-ai/atlas-webui
 # open http://localhost:3000
@@ -37,6 +38,19 @@ Authenticated Atlas features now rely on:
 - `AUTH_SECRET`
 
 Anonymous browsing still works without a login, but private workspace routes, user graph uploads, and company builder persistence require the database and GitHub OAuth app to be configured.
+
+## GitHub OAuth and deployment notes
+
+- Configure the GitHub OAuth app callback URL as:
+  - local: `http://localhost:3000/api/auth/callback/github`
+  - hosted: `https://<your-host>/api/auth/callback/github`
+- `AUTH_SECRET` signs the Atlas session cookie and OAuth state cookie. Use a long random value in every deployed environment.
+- The Atlas auth flow derives its origin from `x-forwarded-proto`, `x-forwarded-host`, or the request URL, so your reverse proxy should forward those headers correctly.
+- Recommended rollout order for a new environment:
+  1. provision PostgreSQL and set `DATABASE_URL`
+  2. set `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `AUTH_SECRET`
+  3. run `npm run db:init -w @a5c-ai/atlas-webui`
+  4. deploy the app and verify GitHub sign-in before testing private uploads or company builder flows
 
 ## Graph SDK and CLI
 

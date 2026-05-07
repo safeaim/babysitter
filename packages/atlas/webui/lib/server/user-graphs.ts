@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { IndexShape } from "@a5c-ai/atlas";
 import { buildOverlayIndexFromYaml, mergeManyIndexes } from "./atlas-overlay";
-import { ensureDatabaseSchema, getDbPool, queryRow, queryRows } from "./db";
+import { ensureDatabaseSchema, execute, getDbPool, queryRow, queryRows } from "./db";
 
 type UploadRow = {
   id: string;
@@ -28,6 +28,13 @@ export type UserGraphUpload = {
   edgeCount: number;
   createdAt: string;
   updatedAt: string;
+};
+
+type UploadDocumentRow = {
+  raw_yaml: string;
+  source_filename: string;
+  title: string;
+  description: string | null;
 };
 
 function slugify(value: string): string {
@@ -135,6 +142,76 @@ export async function createUserGraphUpload(input: {
 
   if (!row) {
     throw new Error("Failed to read uploaded graph metadata.");
+  }
+
+  return toUpload(row);
+}
+
+export async function deleteUserGraphUpload(userId: string, uploadId: string): Promise<void> {
+  await ensureDatabaseSchema();
+  await execute(
+    `DELETE FROM atlas_user_graph_uploads
+      WHERE user_id = $1 AND id = $2`,
+    [userId, uploadId],
+  );
+}
+
+export async function rebuildUserGraphUpload(userId: string, uploadId: string): Promise<UserGraphUpload> {
+  const source = await queryRow<UploadDocumentRow>(
+    `SELECT d.raw_yaml, u.source_filename, u.title, u.description
+       FROM atlas_user_graph_documents d
+       INNER JOIN atlas_user_graph_uploads u ON u.id = d.upload_id
+      WHERE u.user_id = $1 AND u.id = $2
+      ORDER BY d.document_order ASC
+      LIMIT 1`,
+    [userId, uploadId],
+  );
+
+  if (!source) {
+    throw new Error("Uploaded graph not found.");
+  }
+
+  const index = buildOverlayIndexFromYaml(source.raw_yaml, source.source_filename);
+  const validationSummary = {
+    totalRecords: index.stats.totalRecords,
+    totalEdges: index.stats.totalEdges,
+    parseErrors: index.stats.parseErrors,
+  };
+
+  await execute(
+    `UPDATE atlas_user_graph_uploads
+        SET status = $3,
+            validation_summary_json = $4::jsonb,
+            index_json = $5::jsonb,
+            updated_at = NOW()
+      WHERE user_id = $1 AND id = $2`,
+    [
+      userId,
+      uploadId,
+      index.stats.parseErrors > 0 ? "warning" : "ready",
+      JSON.stringify(validationSummary),
+      JSON.stringify(index),
+    ],
+  );
+
+  await execute(
+    `UPDATE atlas_user_graph_documents
+        SET parsed_json = $3::jsonb,
+            record_count = $4,
+            edge_count = $5
+      WHERE upload_id = $1 AND document_order = 0`,
+    [uploadId, JSON.stringify(index), index.stats.totalRecords, index.stats.totalEdges],
+  );
+
+  const row = await queryRow<UploadRow>(
+    `SELECT id, user_id, slug, title, description, source_filename, status, validation_summary_json, index_json, created_at, updated_at
+       FROM atlas_user_graph_uploads
+      WHERE user_id = $1 AND id = $2`,
+    [userId, uploadId],
+  );
+
+  if (!row) {
+    throw new Error("Failed to reload uploaded graph metadata.");
   }
 
   return toUpload(row);

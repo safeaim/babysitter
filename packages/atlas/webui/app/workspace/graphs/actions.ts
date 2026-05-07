@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
-import { createUserGraphUpload } from "@/lib/server/user-graphs";
+import { createUserGraphUpload, deleteUserGraphUpload, rebuildUserGraphUpload } from "@/lib/server/user-graphs";
 
 export async function uploadUserGraphAction(formData: FormData) {
   const session = await auth();
@@ -27,6 +27,38 @@ export async function uploadUserGraphAction(formData: FormData) {
     rawYaml,
   });
 
+  revalidatePath("/workspace");
+  revalidatePath("/workspace/graphs");
+}
+
+export async function deleteUserGraphAction(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Authentication required.");
+  }
+
+  const uploadId = String(formData.get("uploadId") ?? "").trim();
+  if (!uploadId) {
+    throw new Error("uploadId is required.");
+  }
+
+  await deleteUserGraphUpload(session.user.id, uploadId);
+  revalidatePath("/workspace");
+  revalidatePath("/workspace/graphs");
+}
+
+export async function rebuildUserGraphAction(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Authentication required.");
+  }
+
+  const uploadId = String(formData.get("uploadId") ?? "").trim();
+  if (!uploadId) {
+    throw new Error("uploadId is required.");
+  }
+
+  await rebuildUserGraphUpload(session.user.id, uploadId);
   revalidatePath("/workspace");
   revalidatePath("/workspace/graphs");
 }

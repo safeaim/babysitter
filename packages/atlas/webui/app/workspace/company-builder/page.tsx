@@ -15,7 +15,13 @@ import {
   addCompanySystemAction,
   attachAssetToSystemAction,
   createCompanyBlueprintAction,
+  deleteCompanyAssetAction,
+  deleteCompanyBlueprintAction,
+  deleteCompanyIntegrationAction,
+  deleteCompanySelectionAction,
+  deleteCompanySystemAction,
   exportCompanyBlueprintAction,
+  removeAssetFromSystemAction,
   saveCompanyBlueprintMetadataAction,
 } from "./actions";
 
@@ -149,6 +155,10 @@ export default async function CompanyBuilderPage({
                   <input type="hidden" name="blueprintId" value={blueprint.id} />
                   <button type="submit" className="atlas-header__button">Generate YAML export</button>
                 </form>
+                <form action={deleteCompanyBlueprintAction} className="atlas-docs-stack">
+                  <input type="hidden" name="blueprintId" value={blueprint.id} />
+                  <button type="submit" className="atlas-header__button">Delete blueprint</button>
+                </form>
                 {blueprint.lastExportYaml ? (
                   <pre className="atlas-docs-pre" style={{ maxHeight: 420, overflow: "auto" }}>
                     <code>{blueprint.lastExportYaml}</code>
@@ -234,6 +244,11 @@ export default async function CompanyBuilderPage({
                       <p className="atlas-docs-note">{system.systemKind} · {system.id}</p>
                       {system.description ? <p>{system.description}</p> : null}
                     </div>
+                    <form action={deleteCompanySystemAction} className="atlas-docs-stack">
+                      <input type="hidden" name="blueprintId" value={blueprint.id} />
+                      <input type="hidden" name="systemId" value={system.id} />
+                      <button type="submit" className="atlas-header__button">Delete system</button>
+                    </form>
 
                     <form action={addCompanySelectionAction} className="atlas-docs-stack">
                       <input type="hidden" name="blueprintId" value={blueprint.id} />
@@ -280,6 +295,12 @@ export default async function CompanyBuilderPage({
                                 {selection.coversLayers.length ? ` · covers ${selection.coversLayers.join(", ")}` : ""}
                                 {selection.notes ? ` · ${selection.notes}` : ""}
                               </p>
+                              <form action={deleteCompanySelectionAction} className="mt-2">
+                                <input type="hidden" name="blueprintId" value={blueprint.id} />
+                                <input type="hidden" name="systemId" value={system.id} />
+                                <input type="hidden" name="selectionId" value={selection.id} />
+                                <button type="submit" className="atlas-header__button">Delete selection</button>
+                              </form>
                             </div>
                           ))}
                         </div>
@@ -293,9 +314,15 @@ export default async function CompanyBuilderPage({
                       ) : (
                         <div className="atlas-docs-link-list">
                           {system.assetIds.map((assetId) => (
-                            <p key={assetId} className="atlas-docs-note">
-                              {assetMap.get(assetId)?.displayName ?? assetId}
-                            </p>
+                            <div key={assetId}>
+                              <p className="atlas-docs-note">{assetMap.get(assetId)?.displayName ?? assetId}</p>
+                              <form action={removeAssetFromSystemAction} className="mt-2">
+                                <input type="hidden" name="blueprintId" value={blueprint.id} />
+                                <input type="hidden" name="systemId" value={system.id} />
+                                <input type="hidden" name="assetId" value={assetId} />
+                                <button type="submit" className="atlas-header__button">Detach asset</button>
+                              </form>
+                            </div>
                           ))}
                         </div>
                       )}
@@ -316,6 +343,11 @@ export default async function CompanyBuilderPage({
                       <div key={asset.id}>
                         <p>{asset.displayName}</p>
                         <p className="atlas-docs-note">{asset.assetKind} · {asset.provider || "provider n/a"} · {asset.environment || "env n/a"}</p>
+                        <form action={deleteCompanyAssetAction} className="mt-2">
+                          <input type="hidden" name="blueprintId" value={blueprint.id} />
+                          <input type="hidden" name="assetId" value={asset.id} />
+                          <button type="submit" className="atlas-header__button">Delete asset</button>
+                        </form>
                       </div>
                     ))}
                   </div>
@@ -342,6 +374,11 @@ export default async function CompanyBuilderPage({
                           {integration.triggerKind ? ` · trigger ${integration.triggerKind}` : ""}
                           {integration.notes ? ` · ${integration.notes}` : ""}
                         </p>
+                        <form action={deleteCompanyIntegrationAction} className="mt-2">
+                          <input type="hidden" name="blueprintId" value={blueprint.id} />
+                          <input type="hidden" name="integrationId" value={integration.id} />
+                          <button type="submit" className="atlas-header__button">Delete integration</button>
+                        </form>
                       </div>
                     ))}
                   </div>

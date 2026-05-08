@@ -1,0 +1,260 @@
+---
+nodeKind: Tool
+id: tool:slack
+attributes:
+  displayName: "Slack"
+  kind: other
+  description: |
+    Team messaging and collaboration platform for real-time communication.
+    Organizes conversations into channels, supports direct messages, file sharing,
+    and integrates with hundreds of third-party apps and services.
+edges:
+  tool_used_by:
+    - target: skill-area:communication
+---
+nodeKind: Tool
+id: tool:discord
+attributes:
+  displayName: "Discord"
+  kind: other
+  description: |
+    Communication platform combining text, voice, and video chat for communities.
+    Organizes conversations into servers and channels, supports bots, roles,
+    and rich media sharing for gaming, developer, and professional communities.
+edges:
+  tool_used_by:
+    - target: skill-area:communication
+---
+nodeKind: Tool
+id: tool:figma
+attributes:
+  displayName: "Figma"
+  kind: other
+  description: |
+    Collaborative interface design tool for building UI and UX workflows.
+    Supports vector editing, component libraries, prototyping, and real-time
+    multi-user collaboration for product design teams.
+edges:
+  tool_used_by:
+    - target: skill-area:ui-ux-design
+---
+nodeKind: Tool
+id: tool:stripe
+attributes:
+  displayName: "Stripe"
+  kind: other
+  description: |
+    Payment processing platform and developer-first financial infrastructure.
+    Provides APIs for accepting payments, managing subscriptions, invoicing,
+    and integrating revenue operations into software products.
+edges:
+  tool_used_by:
+    - target: skill-area:payment-processing
+---
+nodeKind: Tool
+id: tool:zoom
+attributes:
+  displayName: "Zoom"
+  kind: other
+  description: |
+    Video conferencing and online meeting platform for remote collaboration.
+    Supports video calls, webinars, screen sharing, recordings,
+    and AI-powered meeting summaries and transcription.
+edges:
+  tool_used_by:
+    - target: skill-area:communication
+---
+nodeKind: Tool
+id: tool:calendly
+attributes:
+  displayName: "Calendly"
+  kind: other
+  description: |
+    Scheduling automation platform for managing meeting bookings.
+    Eliminates back-and-forth scheduling by sharing availability links,
+    configuring event types, and syncing with calendar and CRM tools.
+edges:
+  tool_used_by:
+    - target: skill-area:communication
+---
+nodeKind: Tool
+id: tool:snyk
+attributes:
+  displayName: "Snyk"
+  kind: other
+  description: |
+    Developer security platform for finding and fixing vulnerabilities.
+    Scans open-source dependencies, container images, IaC configurations,
+    and source code for security issues in CI/CD pipelines.
+edges:
+  tool_used_by:
+    - target: skill-area:application-security
+---
+nodeKind: Tool
+id: tool:sonarqube
+attributes:
+  displayName: "SonarQube"
+  kind: other
+  description: |
+    Static code analysis platform for continuous code quality inspection.
+    Detects bugs, code smells, security vulnerabilities, and technical debt
+    across 30+ programming languages in developer workflows and CI pipelines.
+edges:
+  tool_used_by:
+    - target: skill-area:code-quality
+---
+nodeKind: Tool
+id: tool:intercom
+attributes:
+  displayName: "Intercom"
+  kind: other
+  description: |
+    Customer messaging and engagement platform for support and sales teams.
+    Combines live chat, email, and AI-powered bots to manage customer
+    conversations, onboarding flows, and help center content.
+edges:
+  tool_used_by:
+    - target: skill-area:customer-support
+---
+nodeKind: Tool
+id: tool:shopify
+attributes:
+  displayName: "Shopify"
+  kind: other
+  description: |
+    E-commerce platform for building and managing online stores.
+    Provides storefronts, product catalog, inventory, payments, and shipping
+    management with an extensible app ecosystem and Liquid templating.
+edges:
+  tool_used_by:
+    - target: skill-area:e-commerce
+---
+nodeKind: Tool
+id: tool:outlook
+attributes:
+  displayName: "Microsoft Outlook"
+  kind: other
+  description: |
+    Email client and personal information manager from Microsoft.
+    Integrates email, calendar, contacts, and tasks via Microsoft 365
+    and the Microsoft Graph API for enterprise productivity workflows.
+edges:
+  tool_used_by:
+    - target: skill-area:communication
+---
+nodeKind: Tool
+id: tool:todoist
+attributes:
+  displayName: "Todoist"
+  kind: other
+  description: |
+    Task management and to-do list application for personal productivity.
+    Organizes tasks into projects with labels, priorities, due dates,
+    and recurring schedules, synced across devices and integrated with other apps.
+edges:
+  tool_used_by:
+    - target: skill-area:project-planning
+---
+nodeKind: Tool
+id: tool:airtable
+attributes:
+  displayName: "Airtable"
+  kind: other
+  description: |
+    No-code database and spreadsheet hybrid for building custom apps.
+    Combines the familiarity of spreadsheets with relational database features,
+    offering multiple views, automations, and an extensible API.
+edges:
+  tool_used_by:
+    - target: skill-area:project-planning
+---
+nodeKind: Tool
+id: tool:render
+attributes:
+  displayName: "Render"
+  kind: other
+  description: |
+    Cloud platform for deploying web services, static sites, and databases.
+    Offers automatic deploys from Git, managed PostgreSQL, Redis, and
+    Cron jobs with zero-downtime infrastructure management.
+edges:
+  tool_used_by:
+    - target: skill-area:cloud-deployment
+---
+nodeKind: Tool
+id: tool:pagerduty
+attributes:
+  displayName: "PagerDuty"
+  kind: other
+  description: |
+    Digital operations management platform for incident response.
+    Provides on-call scheduling, alert routing, escalation policies,
+    and post-incident reviews to reduce MTTR and operational risk.
+edges:
+  tool_used_by:
+    - target: skill-area:incident-management
+---
+nodeKind: Tool
+id: tool:storybook
+attributes:
+  displayName: "Storybook"
+  kind: other
+  description: |
+    Open-source tool for building UI components in isolation.
+    Provides a sandbox for developing, documenting, and visually testing
+    React, Vue, Angular, and other frontend components independently.
+edges:
+  tool_used_by:
+    - target: skill-area:frontend-development
+---
+nodeKind: Tool
+id: tool:huggingface
+attributes:
+  displayName: "Hugging Face"
+  kind: other
+  description: |
+    AI model hub and platform for building machine learning applications.
+    Hosts tens of thousands of pre-trained models and datasets, provides
+    Inference API, Spaces hosting, and collaborative ML development tools.
+edges:
+  tool_used_by:
+    - target: skill-area:machine-learning
+---
+nodeKind: Tool
+id: tool:firecrawl
+attributes:
+  displayName: "Firecrawl"
+  kind: other
+  description: |
+    Web scraping and crawling API for extracting structured data from websites.
+    Turns websites into clean markdown or JSON by handling JavaScript rendering,
+    pagination, sitemaps, and structured extraction at scale.
+edges:
+  tool_used_by:
+    - target: skill-area:data-collection
+---
+nodeKind: Tool
+id: tool:context7
+attributes:
+  displayName: "Context7"
+  kind: other
+  description: |
+    Library documentation service providing up-to-date developer documentation.
+    Enables AI coding assistants to retrieve current API references and
+    usage examples for programming libraries and frameworks on demand.
+edges:
+  tool_used_by:
+    - target: skill-area:developer-experience
+---
+nodeKind: Tool
+id: tool:microsoft-teams
+attributes:
+  displayName: "Microsoft Teams"
+  kind: other
+  description: |
+    Enterprise collaboration platform from Microsoft combining chat, meetings, and apps.
+    Integrates with Microsoft 365, enabling teams to chat, video-call, share files,
+    and collaborate within channels and private conversations.
+edges:
+  tool_used_by:
+    - target: skill-area:communication

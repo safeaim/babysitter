@@ -12,6 +12,8 @@ attributes:
   mcpTransports:
   - mcp-transport:stdio
 edges:
+  integrates_with:
+  - target: tool:discord
   lib_applies_to_domain:
   - target: domain:community
   - target: domain:software-engineering
@@ -32,6 +34,8 @@ attributes:
   mcpTransports:
   - mcp-transport:stdio
 edges:
+  integrates_with:
+  - target: tool:microsoft-teams
   lib_applies_to_domain:
   - target: domain:operations
   - target: domain:software-engineering
@@ -116,6 +120,8 @@ attributes:
   mcpTransports:
   - mcp-transport:stdio
 edges:
+  integrates_with:
+  - target: tool:intercom
   lib_applies_to_domain:
   - target: domain:customer-experience
   - target: domain:customer-relations

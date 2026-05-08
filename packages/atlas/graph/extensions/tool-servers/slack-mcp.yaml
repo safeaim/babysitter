@@ -30,6 +30,8 @@ edges:
   - target: tool-descriptor:slack.get-thread-replies
   - target: tool-descriptor:slack.get-users
   - target: tool-descriptor:slack.get-user-profile
+  integrates_with:
+  - target: tool:slack
   implements:
     - target: extension-interface:orchestration
   requires_capability:

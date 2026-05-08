@@ -1158,14 +1158,18 @@ jobs:
                         value: 0.0.0.0
                     readinessProbe:
                       httpGet:
-                        path: /
+                        path: /api/health
                         port: 3000
                       initialDelaySeconds: 10
+                      timeoutSeconds: 5
+                      periodSeconds: 10
                     livenessProbe:
                       httpGet:
-                        path: /
+                        path: /api/health
                         port: 3000
                       initialDelaySeconds: 30
+                      timeoutSeconds: 5
+                      periodSeconds: 20
           ---
           apiVersion: v1
           kind: Service

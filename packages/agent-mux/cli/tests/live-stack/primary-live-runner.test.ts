@@ -194,6 +194,23 @@ describe('primary live stack runner contract', () => {
     expect(artifact).toContain('[REDACTED]');
   });
 
+  it('skips provider-backed live runs when the upstream service reports exhausted credits', async () => {
+    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-skip-'));
+    const result = await runPrimaryLiveStackScenario({
+      cwd: process.cwd(),
+      artifactsDir,
+      executeLiveProvider: true,
+      env: { ANTHROPIC_API_KEY: 'sk-ant-secret', LIVE_STACK_TRACE_ID: 'trace-1', LIVE_STACK_SCENARIO_ID: 'live.agent-mux.claude-code.anthropic-direct.sonnet', LIVE_STACK_AGENT_PATH: 'agent-mux', LIVE_STACK_AGENT: 'claude-code', LIVE_STACK_AMUX_AGENT: 'claude', LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin', LIVE_STACK_INSTALL_MODE: 'vanilla', LIVE_STACK_PROVIDER: 'anthropic-direct', LIVE_STACK_AMUX_PROVIDER: 'anthropic', LIVE_STACK_MODEL: 'sonnet', LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets', LIVE_STACK_REQUIRED_ENV: 'ANTHROPIC_API_KEY', LIVE_STACK_LAYERS: 'agent-mux install,agent-mux invocation,transport-mux route,provider/model trace', LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId', LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,transport-mux-trace,provider-trace-redacted' },
+      executeCommand: async (command) => command.args.includes('install')
+        ? { status: 0, stdout: '{"ok":true}', stderr: '' }
+        : { status: 1, stdout: 'Credit balance is too low', stderr: '' },
+    });
+
+    expect(result.status).toBe('skipped');
+    expect(result.skipReason).toContain('credit balance is too low');
+    expect(result.artifactPath).toBeDefined();
+  });
+
   const liveIt = process.env['LIVE_STACK_RUN_MODEL_TESTS'] === '1' ? it : it.skip;
 
   liveIt('executes the primary live provider scenario when explicitly enabled', async () => {

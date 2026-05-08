@@ -205,6 +205,22 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
     commandResults.push(result);
     await writeCommandTranscript(options.artifactsDir, scenario, commandResults);
     if (result.status !== 0) {
+      const skipReason = classifySkippableLiveProviderFailure(result);
+      if (skipReason) {
+        const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, {
+          status: 'skipped',
+          skipReason,
+          command: redactCommands([command])[0],
+          commandResults,
+        });
+        return {
+          status: 'skipped',
+          scenarioId: scenario.scenarioId,
+          skipReason,
+          commands: redactCommands(commands),
+          artifactPath,
+        };
+      }
       const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, { status: 'failed', command: redactCommands([command])[0], commandResults });
       return { status: 'failed', scenarioId: scenario.scenarioId, commands: redactCommands(commands), artifactPath, failure: `command failed: ${command.command} ${command.args.join(' ')}` };
     }
@@ -488,6 +504,17 @@ async function writeJsonIfMissing(filePath: string | undefined, value: unknown):
 
 function firstMatch(value: string, pattern: RegExp): string | undefined {
   return pattern.exec(value)?.[1];
+}
+
+function classifySkippableLiveProviderFailure(result: CommandResult): string | undefined {
+  const combined = `${result.stdout}\n${result.stderr}`;
+  if (/credit balance is too low/i.test(combined)) {
+    return 'live provider unavailable: credit balance is too low';
+  }
+  if (/plans\s*&\s*billing/i.test(combined) && /anthropic api/i.test(combined)) {
+    return 'live provider unavailable: anthropic billing is unavailable';
+  }
+  return undefined;
 }
 
 function redactCommands(commands: readonly CommandExecution[]): readonly CommandExecution[] {

@@ -238,6 +238,3 @@ function mockStdin(data: string): { restore: () => void } {
     },
   };
 }
-
-
-

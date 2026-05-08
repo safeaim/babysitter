@@ -220,7 +220,7 @@ jobs:
 
   live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
-    name: Live Stack (${{ matrix.scenario.id }}, os=${{ matrix.os }})
+    name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, os=${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -231,59 +231,73 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2022]
+        install_mode:
+          - id: babysitter-plugin
+            layers: agent-mux install,agent-mux invocation,generated Babysitter plugin package,Babysitter SDK installation,plugin babysitter command dispatch,session persistence,native stop hook,hooks-mux normalization,transport-mux route,provider/model trace
+            coverage_layers: agent-mux,plugin,transport-mux,hooks-mux,babysitter-sdk
+            required_trace_ids: agentMuxRunId,agentMuxSessionId,babysitterRunId,babysitterEffectId,hookEventId,hookMuxEventId,transportTraceId
+            expected_artifacts: agent-mux-events,plugin-command-transcript,babysitter-run-summary,babysitter-task-bundle,hooks-mux-normalized-event,hooks-mux-handler-result,transport-mux-trace,provider-trace-redacted
+          - id: vanilla
+            layers: agent-mux install,agent-mux invocation,vanilla agent prompt,transport-mux route,provider/model trace
+            coverage_layers: agent-mux,transport-mux
+            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
+            expected_artifacts: agent-mux-events,transport-mux-trace,provider-trace-redacted
         scenario:
           - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: claude-code
+            amux_agent: claude
             integration_type: third-party-plugin
             provider: foundry-openai
             amux_provider: foundry
             model: gpt-5.5
             credential_mode: github-org-secrets-and-vars
             required_env: AZURE_API_KEY,AMUX_API_BASE
-            layers: agent-mux invocation,harness plugin setup,plugin babysitter command dispatch,session persistence,native stop hook,hooks-mux normalization,transport-mux route,provider/model trace
-            coverage_layers: agent-mux,plugin,transport-mux,hooks-mux,babysitter-sdk,foundry-openai
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,babysitterRunId,babysitterEffectId,hookEventId,hookMuxEventId,transportTraceId
-            expected_artifacts: agent-mux-events,plugin-command-transcript,babysitter-run-summary,babysitter-task-bundle,hooks-mux-normalized-event,hooks-mux-handler-result,transport-mux-trace,provider-trace-redacted
+            coverage_layers: foundry-openai,claude-code
           - id: live.agent-mux.claude-code.anthropic-direct.claude
             agent_path: agent-mux
             agent: claude-code
+            amux_agent: claude
             integration_type: third-party-plugin
             provider: anthropic-direct
             amux_provider: anthropic
             model: claude
             credential_mode: github-org-secrets
             required_env: ANTHROPIC_API_KEY
-            layers: agent-mux invocation,harness plugin setup,plugin babysitter command dispatch,session persistence,native stop hook,hooks-mux normalization,provider/model trace
-            coverage_layers: agent-mux,plugin,hooks-mux,babysitter-sdk,anthropic-direct
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,babysitterRunId,babysitterEffectId,hookEventId,hookMuxEventId
-            expected_artifacts: agent-mux-events,plugin-command-transcript,babysitter-run-summary,babysitter-task-bundle,hooks-mux-normalized-event,hooks-mux-handler-result,provider-trace-redacted
+            coverage_layers: anthropic-direct,claude-code
           - id: live.agent-mux.codex.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: codex
+            amux_agent: codex
             integration_type: third-party-plugin
             provider: foundry-openai
             amux_provider: foundry
             model: gpt-5.5
             credential_mode: github-org-secrets-and-vars
             required_env: AZURE_API_KEY,AMUX_API_BASE
-            layers: agent-mux invocation,harness plugin setup,plugin babysitter command dispatch,session persistence,native stop hook,hooks-mux normalization,transport-mux route,provider/model trace
-            coverage_layers: agent-mux,plugin,transport-mux,hooks-mux,babysitter-sdk,foundry-openai
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,babysitterRunId,babysitterEffectId,hookEventId,hookMuxEventId,transportTraceId
-            expected_artifacts: agent-mux-events,plugin-command-transcript,babysitter-run-summary,babysitter-task-bundle,hooks-mux-normalized-event,hooks-mux-handler-result,transport-mux-trace,provider-trace-redacted
-          - id: live.babysitter-agent.internal.foundry-openai.gpt-5.5
-            agent_path: babysitter-agent
-            agent: internal
-            integration_type: runtime-cli
+            coverage_layers: foundry-openai,codex
+          - id: live.agent-mux.gemini.foundry-openai.gpt-5.5
+            agent_path: agent-mux
+            agent: gemini-cli
+            amux_agent: gemini
+            integration_type: third-party-plugin
             provider: foundry-openai
             amux_provider: foundry
             model: gpt-5.5
             credential_mode: github-org-secrets-and-vars
             required_env: AZURE_API_KEY,AMUX_API_BASE
-            layers: babysitter-agent create-run,agent-core runtime session,Babysitter SDK run:create,Babysitter SDK run:iterate,Babysitter SDK task:post,session persistence,provider/model trace
-            coverage_layers: babysitter-agent,agent-core,babysitter-sdk,foundry-openai
-            required_trace_ids: babysitterRunId,babysitterEffectId
-            expected_artifacts: babysitter-run-summary,babysitter-task-bundle,provider-trace-redacted
+            coverage_layers: foundry-openai,gemini
+          - id: live.agent-mux.pi.foundry-openai.gpt-5.5
+            agent_path: agent-mux
+            agent: pi
+            amux_agent: pi
+            integration_type: third-party-plugin
+            provider: foundry-openai
+            amux_provider: foundry
+            model: gpt-5.5
+            credential_mode: github-org-secrets-and-vars
+            required_env: AZURE_API_KEY,AMUX_API_BASE
+            coverage_layers: foundry-openai,pi
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -329,16 +343,18 @@ jobs:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
           LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
+          LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
           LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
+          LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
           LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
           LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
           LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
           LIVE_STACK_CREDENTIAL_MODE: ${{ matrix.scenario.credential_mode }}
           LIVE_STACK_REQUIRED_ENV: ${{ matrix.scenario.required_env }}
-          LIVE_STACK_LAYERS: ${{ matrix.scenario.layers }}
-          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.coverage_layers }}
-          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.scenario.required_trace_ids }}
-          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.scenario.expected_artifacts }}
+          LIVE_STACK_LAYERS: ${{ matrix.install_mode.layers }}
+          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.coverage_layers }},${{ matrix.install_mode.coverage_layers }}
+          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
+          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
           LIVE_STACK_RUN_MODEL_TESTS: "1"
           LIVE_STACK_REQUIRE_EVIDENCE: "1"
           LIVE_STACK_TEST_TIMEOUT_MS: "1800000"
@@ -357,7 +373,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: publish-live-stack-${{ matrix.scenario.id }}-${{ matrix.os }}
+          name: publish-live-stack-${{ matrix.install_mode.id }}-${{ matrix.scenario.id }}-${{ matrix.os }}
           path: artifacts/live-stack
           if-no-files-found: error
 

@@ -8,7 +8,7 @@ import { buildPrimaryLiveStackCommands, executeChildProcessCommand, runPrimaryLi
 import { primaryLiveStackScenario } from './scenario-contract';
 
 describe('primary live stack runner contract', () => {
-  it('builds the no-mock command chain through harness install, plugin install, and amux launch', () => {
+  it('builds the babysitter-plugin command chain through generated plugin setup, SDK install, and amux launch', () => {
     const scenario = primaryLiveStackScenario();
     const commands = buildPrimaryLiveStackCommands(scenario, {
       cwd: '/repo',
@@ -17,7 +17,9 @@ describe('primary live stack runner contract', () => {
     });
 
     expect(commands.map((command) => [command.command, ...command.args])).toEqual([
-      ['babysitter', 'harness:install', 'claude-code', '--workspace', '/repo', '--json'],
+      ['npm', 'run', 'generate:plugins'],
+      ['amux', 'install', 'claude', '--json'],
+      ['npm', 'install', '--global', './packages/sdk'],
       ['babysitter', 'harness:install-plugin', 'claude-code', '--workspace', '/repo', '--json'],
       [
         'amux',
@@ -39,6 +41,42 @@ describe('primary live stack runner contract', () => {
     ]);
   });
 
+  it('builds the vanilla command chain through agent-mux install and launch only', () => {
+    const scenario = primaryLiveStackScenario();
+    const vanillaScenario = {
+      ...scenario,
+      agent: { ...scenario.agent, installMode: 'vanilla' as const, setupCommands: ['amux install claude', 'amux launch claude'] },
+      requiredTraceIds: ['agentMuxRunId', 'agentMuxSessionId', 'transportTraceId'],
+      expectedArtifacts: ['agent-mux-events', 'transport-mux-trace', 'provider-trace-redacted'],
+    };
+    const commands = buildPrimaryLiveStackCommands(vanillaScenario, {
+      cwd: '/repo',
+      timeoutMs: 1000,
+      env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1' },
+    });
+
+    expect(commands.map((command) => [command.command, ...command.args])).toEqual([
+      ['amux', 'install', 'claude', '--json'],
+      [
+        'amux',
+        'launch',
+        'claude',
+        'foundry',
+        '--model',
+        'gpt-5.5',
+        '--with-proxy-if-needed',
+        '--proxy-log-level',
+        'debug',
+        '--session-id',
+        'trace-1',
+        '--prompt',
+        'Run a tiny vanilla agent-mux proof for live.agent-mux.claude-code.foundry-openai.gpt-5.5. trace=trace-1; print labels agentMuxSessionId and transportTraceId when observable. Do not invoke Babysitter commands.',
+        '--max-turns',
+        '1',
+      ],
+    ]);
+  });
+
   it('skips safely without Foundry credentials and never calls the command executor', async () => {
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
@@ -51,7 +89,7 @@ describe('primary live stack runner contract', () => {
 
     expect(result.status).toBe('skipped');
     expect(result.skipReason).toContain('missing live-model credential env');
-    expect(result.commands[2]?.command).toBe('amux');
+    expect(result.commands.at(-1)?.command).toBe('amux');
   });
 
   it('skips credential-present runs unless the explicit live execution flag is set', async () => {

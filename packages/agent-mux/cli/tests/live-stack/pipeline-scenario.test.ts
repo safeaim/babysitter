@@ -26,7 +26,7 @@ describe('pipeline-owned live stack scenario execution', () => {
       expect(scenario.scenarioId).toBeTruthy();
       expect(scenario.layers.length).toBeGreaterThan(0);
       expect(scenario.expectedArtifacts.length).toBeGreaterThan(0);
-      expect(result.commands.length).toBe(scenario.agent.integrationType === 'runtime-cli' ? 1 : 3);
+      expect(result.commands.length).toBe(scenario.agent.setupCommands.length || (scenario.agent.integrationType === 'runtime-cli' ? 1 : 2));
       return;
     }
 
@@ -48,6 +48,6 @@ describe('pipeline-owned live stack scenario execution', () => {
     });
 
     expect(result.status).toBe('skipped');
-    expect(result.commands.length).toBe(3);
+    expect(result.commands.length).toBe(5);
   });
 });

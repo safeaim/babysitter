@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const scenarioId = process.env.LIVE_STACK_SCENARIO_ID || 'live.agent-mux.claude-code.foundry-openai.gpt-5.5';
+const installMode = process.env.LIVE_STACK_INSTALL_MODE || 'babysitter-plugin';
 const outDir = process.env.LIVE_STACK_ARTIFACTS_DIR || path.join('artifacts', 'live-stack');
 const scenarioArtifact = path.join(outDir, `${scenarioId}.json`);
 const requireEvidence = process.env.LIVE_STACK_REQUIRE_EVIDENCE === '1';
@@ -37,8 +38,10 @@ const missingArtifacts = requiredArtifacts
 const report = {
   generatedAt: new Date().toISOString(),
   scenarioId,
+  installMode,
   agentPath: process.env.LIVE_STACK_AGENT_PATH || 'agent-mux',
   agent: process.env.LIVE_STACK_AGENT || 'claude-code',
+  agentMuxAgent: process.env.LIVE_STACK_AMUX_AGENT || 'claude',
   provider: process.env.LIVE_STACK_PROVIDER || 'foundry-openai',
   model: process.env.LIVE_STACK_MODEL || 'gpt-5.5',
   coveredLayers: [...new Set(coveredLayers)].sort(),
@@ -50,7 +53,7 @@ const report = {
 };
 
 fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(path.join(outDir, `${safeFileName(scenarioId)}-coverage-summary.json`), JSON.stringify(report, null, 2));
+fs.writeFileSync(path.join(outDir, `${safeFileName(installMode)}-${safeFileName(scenarioId)}-coverage-summary.json`), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
 
 if (requireEvidence) {

@@ -16,9 +16,22 @@ This roadmap turns the strategy into implementation slices. Each slice must land
 | 1. Mock and fixture contracts | Next no-model implementation slice | Runtime maintainers | No-model | Mock Codex, Claude Code, agent-core, transport-mux, and gateway transcripts are shared by unit, integration, and UI tests | PR/push CI |
 | 2. SDK harness/plugin setup smoke | Planned | SDK and harness maintainers | No-model | `harness:install --dry-run`, `harness:install-plugin --dry-run`, and plugin discovery produce JSON evidence without claiming babysitter-agent runtime coverage | PR/push CI |
 | 3. Mux integration coverage | Partly covered by current mux validation; transport-mux fixtures remain the largest gap | Agent-mux maintainers | No-model | Transport-mux route/runtime/env/launch-plan coverage, agent-mux gateway, adapters, and WebUI run against compatible fixture sessions | PR/push CI and `publish.yml` validation |
-| 4. Minimal live harness smoke | Implemented as a `publish.yml` scenario/OS matrix smoke, still needs quarantine history and richer assertions | Harness maintainers | Model-backed | Codex and Claude Code live-stack scenarios run from GitHub Actions matrix entries and upload redacted artifacts | `publish.yml` live_stack_e2e |
+| 4. Minimal live harness smoke | Implemented as a `publish.yml` scenario/OS/install-mode matrix smoke, still needs quarantine history and richer assertions | Harness maintainers | Model-backed | Claude Code, Codex, Gemini, and Pi live-stack scenarios run from GitHub Actions matrix entries in `babysitter-plugin` and `vanilla` modes and upload redacted artifacts | `publish.yml` live_stack_e2e |
 | 5. Split live E2E smokes | Partly implemented; deeper path-specific jobs remain | Runtime and mux maintainers | Model-backed | Agent-mux plugin/session smoke uses pipeline-selected plugin preconditions; transport-mux bridge smoke proves agent-core and external-harness proxy paths; babysitter-agent runtime smoke uses runtime path with no installer steps | `publish.yml` staging/release preflight |
 | 6. Coverage aggregation | Partly implemented for live-stack scenario JSON only | CI maintainers | Both | Package coverage, Playwright traces, and live-run summaries merge into one workflow summary | PR/push for no-model, `publish.yml` for live |
+
+
+
+## Live Install-Mode Axis
+
+`publish.yml` owns the live-stack `install_mode` matrix dimension:
+
+| Install mode | Setup path | Launch path | Required proof |
+| --- | --- | --- | --- |
+| `babysitter-plugin` | Generate plugin packages, install the target agent with `amux install`, install the local Babysitter SDK, then install the Babysitter plugin for the target harness | `amux launch <agent> <provider>` with a `/babysitter:call ...` prompt | Agent-mux IDs, Babysitter run/effect IDs, native hook evidence, hooks-mux event evidence, transport trace, redacted provider trace |
+| `vanilla` | Install the target agent with `amux install` only | `amux launch <agent> <provider>` with a normal non-Babysitter prompt | Agent-mux IDs, session ID, transport trace, redacted provider trace |
+
+Both modes use agent-mux for external agent installation and launch. The test code reads the selected mode from workflow env and must not enumerate scenario matrices internally.
 
 ## Definition Of Done Per Slice
 
@@ -34,7 +47,7 @@ A slice is complete only when it includes:
 
 ## Initial PR Sequence
 
-1. Keep `publish.yml` as the owner of live-stack scenario and OS matrices; do not reintroduce code-side matrix runners.
+1. Keep `publish.yml` as the owner of live-stack scenario, OS, and install-mode matrices; do not reintroduce code-side matrix runners.
 2. Add no-model transport-mux local route/codec, env-injection, passthrough, metrics/cache, and launch-plan proxy-decision scenarios.
 3. Add shared fixture transcript format and migrate one agent-mux or transport-mux test to consume it.
 4. Add no-model harness dry-run tests for Codex and Claude Code.

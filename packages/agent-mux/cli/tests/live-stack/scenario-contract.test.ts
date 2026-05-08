@@ -17,9 +17,14 @@ describe('live stack scenario contract primitives', () => {
     expect(scenario.model.amuxProvider).toBe('foundry');
     expect(scenario.lane).toBe('model-backed-live');
     expect(scenario.agent.integrationType).toBe('third-party-plugin');
+    expect(scenario.agent.installMode).toBe('babysitter-plugin');
+    expect(scenario.agent.agentMuxAgent).toBe('claude');
     expect(scenario.agent.setupCommands).toEqual([
-      'babysitter harness:install claude-code',
+      'npm run generate:plugins',
+      'amux install claude',
+      'npm install --global ./packages/sdk',
       'babysitter harness:install-plugin claude-code',
+      'amux launch claude',
     ]);
     expect(scenario.layers).toContain('transport-mux route');
     expect(scenario.layers).toContain('hooks-mux normalization');
@@ -33,7 +38,9 @@ describe('live stack scenario contract primitives', () => {
       LIVE_STACK_SCENARIO_ID: 'live.babysitter-agent.internal.foundry-openai.gpt-5.5',
       LIVE_STACK_AGENT_PATH: 'babysitter-agent',
       LIVE_STACK_AGENT: 'internal',
+      LIVE_STACK_AMUX_AGENT: 'babysitter',
       LIVE_STACK_INTEGRATION_TYPE: 'runtime-cli',
+      LIVE_STACK_INSTALL_MODE: 'babysitter-plugin',
       LIVE_STACK_PROVIDER: 'foundry-openai',
       LIVE_STACK_AMUX_PROVIDER: 'foundry',
       LIVE_STACK_MODEL: 'gpt-5.5',
@@ -47,6 +54,31 @@ describe('live stack scenario contract primitives', () => {
     expect(scenario.agent.integrationType).toBe('runtime-cli');
     expect(scenario.agent.setupCommands).toEqual(['babysitter-agent create-run --harness internal']);
     expect(scenario.requiredTraceIds).toEqual(['babysitterRunId', 'babysitterEffectId']);
+  });
+
+
+  it('accepts pipeline-selected vanilla install mode without Babysitter lifecycle trace requirements', () => {
+    const scenario = liveStackScenarioFromEnv({
+      LIVE_STACK_SCENARIO_ID: 'live.agent-mux.gemini.foundry-openai.gpt-5.5',
+      LIVE_STACK_AGENT_PATH: 'agent-mux',
+      LIVE_STACK_AGENT: 'gemini-cli',
+      LIVE_STACK_AMUX_AGENT: 'gemini',
+      LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+      LIVE_STACK_INSTALL_MODE: 'vanilla',
+      LIVE_STACK_PROVIDER: 'foundry-openai',
+      LIVE_STACK_AMUX_PROVIDER: 'foundry',
+      LIVE_STACK_MODEL: 'gpt-5.5',
+      LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+      LIVE_STACK_REQUIRED_ENV: 'AZURE_API_KEY,AMUX_API_BASE',
+      LIVE_STACK_LAYERS: 'agent-mux install,agent-mux invocation,transport-mux route,provider/model trace',
+      LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+      LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,transport-mux-trace,provider-trace-redacted',
+    });
+
+    expect(scenario.agent.installMode).toBe('vanilla');
+    expect(scenario.agent.agentMuxAgent).toBe('gemini');
+    expect(scenario.agent.setupCommands).toEqual(['amux install gemini', 'amux launch gemini']);
+    expect(scenario.requiredTraceIds).toEqual(['agentMuxRunId', 'agentMuxSessionId', 'transportTraceId']);
   });
 
   it('separates live model capability gates from deterministic no-credential execution', () => {

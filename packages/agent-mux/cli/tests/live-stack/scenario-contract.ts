@@ -2,6 +2,9 @@ export type LiveStackProvider = 'foundry-openai' | 'anthropic-direct';
 export type AgentMuxProviderId = 'foundry' | 'anthropic';
 export type LiveStackAgentPath = 'agent-mux' | 'babysitter-agent';
 export type LiveStackIntegrationType = 'third-party-plugin' | 'runtime-cli';
+export type LiveStackInstallMode = 'babysitter-plugin' | 'vanilla';
+export type LiveStackAgentId = 'claude-code' | 'codex' | 'gemini-cli' | 'pi' | 'internal';
+export type LiveStackAgentMuxAgentId = 'claude' | 'codex' | 'gemini' | 'pi' | 'babysitter';
 
 export interface LiveStackModelEntry {
   readonly provider: LiveStackProvider;
@@ -13,8 +16,10 @@ export interface LiveStackModelEntry {
 
 export interface LiveStackAgentEntry {
   readonly agentPath: LiveStackAgentPath;
-  readonly agent: 'claude-code' | 'codex' | 'internal';
+  readonly agent: LiveStackAgentId;
+  readonly agentMuxAgent: LiveStackAgentMuxAgentId;
   readonly integrationType: LiveStackIntegrationType;
+  readonly installMode: LiveStackInstallMode;
   readonly setupCommands: readonly string[];
 }
 
@@ -53,15 +58,19 @@ export function primaryLiveStackScenario(): LiveStackScenario {
     scenarioId: 'live.agent-mux.claude-code.foundry-openai.gpt-5.5',
     agentPath: 'agent-mux',
     agent: 'claude-code',
+    agentMuxAgent: 'claude',
     integrationType: 'third-party-plugin',
+    installMode: 'babysitter-plugin',
     provider: 'foundry-openai',
     amuxProvider: 'foundry',
     model: 'gpt-5.5',
     credentialMode: 'github-org-secrets-and-vars',
     requiredEnv: ['AZURE_API_KEY', 'AMUX_API_BASE'],
     layers: [
+      'agent-mux install',
       'agent-mux invocation',
-      'harness plugin setup',
+      'generated Babysitter plugin package',
+      'Babysitter SDK installation',
       'plugin babysitter command dispatch',
       'session persistence',
       'native stop hook',
@@ -88,8 +97,10 @@ export function liveStackScenarioFromEnv(env: Record<string, string | undefined>
   return createLiveStackScenario({
     scenarioId: env['LIVE_STACK_SCENARIO_ID'],
     agentPath: requiredEnvValue(env, 'LIVE_STACK_AGENT_PATH') as LiveStackAgentPath,
-    agent: requiredEnvValue(env, 'LIVE_STACK_AGENT') as LiveStackAgentEntry['agent'],
+    agent: requiredEnvValue(env, 'LIVE_STACK_AGENT') as LiveStackAgentId,
+    agentMuxAgent: requiredEnvValue(env, 'LIVE_STACK_AMUX_AGENT') as LiveStackAgentMuxAgentId,
     integrationType: requiredEnvValue(env, 'LIVE_STACK_INTEGRATION_TYPE') as LiveStackIntegrationType,
+    installMode: requiredEnvValue(env, 'LIVE_STACK_INSTALL_MODE') as LiveStackInstallMode,
     provider: requiredEnvValue(env, 'LIVE_STACK_PROVIDER') as LiveStackProvider,
     amuxProvider: requiredEnvValue(env, 'LIVE_STACK_AMUX_PROVIDER') as AgentMuxProviderId,
     model: requiredEnvValue(env, 'LIVE_STACK_MODEL'),
@@ -104,8 +115,10 @@ export function liveStackScenarioFromEnv(env: Record<string, string | undefined>
 export function createLiveStackScenario(input: {
   readonly scenarioId: string;
   readonly agentPath: LiveStackAgentPath;
-  readonly agent: LiveStackAgentEntry['agent'];
+  readonly agent: LiveStackAgentId;
+  readonly agentMuxAgent?: LiveStackAgentMuxAgentId;
   readonly integrationType: LiveStackIntegrationType;
+  readonly installMode: LiveStackInstallMode;
   readonly provider: LiveStackProvider;
   readonly amuxProvider: AgentMuxProviderId;
   readonly model: string;
@@ -115,6 +128,7 @@ export function createLiveStackScenario(input: {
   readonly requiredTraceIds: readonly string[];
   readonly expectedArtifacts: readonly string[];
 }): LiveStackScenario {
+  const agentMuxAgent = input.agentMuxAgent ?? agentMuxAgentFor(input.agent);
   return {
     scenarioId: input.scenarioId,
     lane: 'model-backed-live',
@@ -128,8 +142,10 @@ export function createLiveStackScenario(input: {
     agent: {
       agentPath: input.agentPath,
       agent: input.agent,
+      agentMuxAgent,
       integrationType: input.integrationType,
-      setupCommands: setupCommandsFor(input.agentPath, input.agent),
+      installMode: input.installMode,
+      setupCommands: setupCommandsFor(input.agentPath, input.agent, agentMuxAgent, input.installMode),
     },
     layers: input.layers,
     requiredTraceIds: input.requiredTraceIds,
@@ -175,9 +191,30 @@ export function assertEvidenceBundleComplete(scenario: LiveStackScenario, bundle
   return scenario.requiredTraceIds.filter((traceId) => !bundle[traceId as keyof LiveStackEvidenceBundle]);
 }
 
-function setupCommandsFor(agentPath: LiveStackAgentPath, agent: LiveStackAgentEntry['agent']): readonly string[] {
+function setupCommandsFor(agentPath: LiveStackAgentPath, agent: LiveStackAgentId, agentMuxAgent: LiveStackAgentMuxAgentId, installMode: LiveStackInstallMode): readonly string[] {
   if (agentPath === 'babysitter-agent') return ['babysitter-agent create-run --harness internal'];
-  return [`babysitter harness:install ${agent}`, `babysitter harness:install-plugin ${agent}`];
+  if (installMode === 'vanilla') return [`amux install ${agentMuxAgent}`, `amux launch ${agentMuxAgent}`];
+  return [
+    'npm run generate:plugins',
+    `amux install ${agentMuxAgent}`,
+    'npm install --global ./packages/sdk',
+    `babysitter harness:install-plugin ${agent}`,
+    `amux launch ${agentMuxAgent}`,
+  ];
+}
+
+function agentMuxAgentFor(agent: LiveStackAgentId): LiveStackAgentMuxAgentId {
+  switch (agent) {
+    case 'claude-code':
+      return 'claude';
+    case 'gemini-cli':
+      return 'gemini';
+    case 'codex':
+    case 'pi':
+      return agent;
+    case 'internal':
+      return 'babysitter';
+  }
 }
 
 function requiredEnvValue(env: Record<string, string | undefined>, name: string): string {

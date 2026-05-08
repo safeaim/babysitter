@@ -65,11 +65,22 @@ export function buildPrimaryLiveStackCommands(
     ];
   }
 
-  const launchHarness = scenario.agent.agent === 'claude-code' ? 'claude' : scenario.agent.agent;
+  const installTarget = scenario.agent.agentMuxAgent;
+  const launchCommand = commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['launch', installTarget, scenario.model.amuxProvider, '--model', scenario.model.model, '--with-proxy-if-needed', '--proxy-log-level', 'debug', '--session-id', traceId, '--prompt', prompt, '--max-turns', '1'], options.cwd, timeoutMs);
+
+  if (scenario.agent.installMode === 'vanilla') {
+    return [
+      commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['install', installTarget, '--json'], options.cwd, timeoutMs),
+      launchCommand,
+    ];
+  }
+
   return [
-    commandExecution(commandEnv, 'LIVE_STACK_BABYSITTER_BIN', 'babysitter', ['harness:install', scenario.agent.agent, '--workspace', options.cwd, '--json'], options.cwd, timeoutMs),
+    commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['run', 'generate:plugins'], options.cwd, timeoutMs),
+    commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['install', installTarget, '--json'], options.cwd, timeoutMs),
+    commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['install', '--global', './packages/sdk'], options.cwd, timeoutMs),
     commandExecution(commandEnv, 'LIVE_STACK_BABYSITTER_BIN', 'babysitter', ['harness:install-plugin', scenario.agent.agent, '--workspace', options.cwd, '--json'], options.cwd, timeoutMs),
-    commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['launch', launchHarness, scenario.model.amuxProvider, '--model', scenario.model.model, '--with-proxy-if-needed', '--proxy-log-level', 'debug', '--session-id', traceId, '--prompt', prompt, '--max-turns', '1'], options.cwd, timeoutMs),
+    launchCommand,
   ];
 }
 
@@ -178,9 +189,16 @@ function commandExecution(env: Record<string, string>, overrideKey: string, fall
 }
 
 function buildCommandEnv(env: Record<string, string | undefined>, cwd: string): Record<string, string> {
-  const traceId = env['LIVE_STACK_TRACE_ID'] ?? `live-stack-${Date.now()}`;
+  const traceId = env['LIVE_STACK_TRACE_ID'] ?? randomUUID();
   return Object.fromEntries(
-    Object.entries({ ...env, PATH: withWorkspaceBinOnPath(env, cwd), LIVE_STACK_TRACE_ID: traceId, AGENT_SESSION_ID: env['AGENT_SESSION_ID'] ?? traceId, AGENT_TRUST_ENV_SESSION: '1' }).filter(
+    Object.entries({
+      ...env,
+      PATH: withWorkspaceBinOnPath(env, cwd),
+      LIVE_STACK_TRACE_ID: traceId,
+      LIVE_STACK_GENERATED_PLUGINS_DIR: env['LIVE_STACK_GENERATED_PLUGINS_DIR'] ?? path.join(cwd, 'artifacts', 'generated-plugins'),
+      AGENT_SESSION_ID: env['AGENT_SESSION_ID'] ?? traceId,
+      AGENT_TRUST_ENV_SESSION: '1',
+    }).filter(
       (entry): entry is [string, string] => typeof entry[1] === 'string',
     ),
   );
@@ -193,6 +211,10 @@ function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: st
 }
 
 function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
+  if (scenario.agent.installMode === 'vanilla') {
+    return `Run a tiny vanilla agent-mux proof for ${scenario.scenarioId}. trace=${traceId}; print labels agentMuxSessionId and transportTraceId when observable. Do not invoke Babysitter commands.`;
+  }
+
   const requestedEvidence = `trace=${traceId}; print labels agentMuxSessionId, babysitterRunId, babysitterEffectId, hookEventId, hookMuxEventId, transportTraceId when observable`;
   if (scenario.agent.integrationType === 'runtime-cli') {
     return `Create a tiny Babysitter proof run for ${scenario.scenarioId}. ${requestedEvidence}. Return terminal status.`;

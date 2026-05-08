@@ -94,3 +94,14 @@ The rebuilt strategy should implement these before claiming broad E2E coverage:
 | P12 | Model-backed | Agent-mux external harness + transport-mux proxy | `amux launch` starts transport-mux, harness uses proxy env, sentinel stream completes, metrics snapshot and redacted launch plan are uploaded |
 
 Each implementation slice should name which permutation IDs it covers. If a job covers only setup, it should not be labeled as runtime E2E.
+
+## Agent-Mux Live Install Modes
+
+The live external-harness matrix has two valid agent-mux paths:
+
+| Mode | Valid targets | Installer responsibility | Prompt responsibility | Lifecycle responsibility |
+| --- | --- | --- | --- | --- |
+| `babysitter-plugin` | `claude-code` via `claude`, `codex`, `gemini-cli` via `gemini`, `pi` | `amux install <target>` installs or verifies the harness CLI; the local Babysitter SDK and generated Babysitter plugin package are installed before launch | The launch prompt is a Babysitter command, for example `/babysitter:call ...` | Must prove Babysitter run creation, effects, journals/task artifacts, native stop hook execution, hooks-mux normalization, agent-mux session, transport trace, and provider trace |
+| `vanilla` | `claude`, `codex`, `gemini`, `pi` | `amux install <target>` only | The launch prompt is a normal non-Babysitter sentinel prompt | Must prove agent-mux session/launch, transport trace, and provider trace; it must not claim Babysitter run, journal, or hook coverage |
+
+These are different integration paths. `babysitter-plugin` validates plugin-mediated Babysitter lifecycle behavior through an external harness; `vanilla` validates the same agent-mux install/launch/provider path without Babysitter plugin setup.

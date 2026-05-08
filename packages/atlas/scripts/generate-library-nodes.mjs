@@ -312,6 +312,7 @@ function parseFrontmatter(content) {
  */
 function buildEdges(fromId, graphMeta, specialization) {
   const edges = [];
+  const kindIndex = {};
   const edgeTargetKeys = ["skillAreas", "topics", "domains", "roles", "workflows", "specializations"];
 
   const edgeKindByPrefix = {
@@ -329,7 +330,10 @@ function buildEdges(fromId, graphMeta, specialization) {
     for (const target of targets) {
       const prefix = target.split(':')[0];
       const kind = edgeKindByPrefix[prefix] || 'applies_to';
-      edges.push({ kind, to: target });
+      const idx = kindIndex[kind] ?? 0;
+      kindIndex[kind] = idx + 1;
+      const weight = idx === 0 ? 1.0 : idx === 1 ? 0.7 : 0.5;
+      edges.push({ kind, to: target, weight });
     }
   }
 
@@ -337,7 +341,7 @@ function buildEdges(fromId, graphMeta, specialization) {
   if (specialization) {
     const specId = "specialization:" + slugify(specialization);
     if (!edges.some(e => e.to === specId)) {
-      edges.push({ kind: "lib_belongs_to_specialization", to: specId });
+      edges.push({ kind: "lib_belongs_to_specialization", to: specId, weight: 0.9 });
     }
   }
 
@@ -400,12 +404,17 @@ function generateNodeYaml(node) {
     const byKind = {};
     for (const edge of node.edges) {
       if (!byKind[edge.kind]) byKind[edge.kind] = [];
-      byKind[edge.kind].push(edge.to);
+      byKind[edge.kind].push(edge);
     }
-    for (const [kind, targets] of Object.entries(byKind)) {
+    for (const [kind, kindEdges] of Object.entries(byKind)) {
       lines.push(`      ${kind}:`);
-      for (const target of targets) {
-        lines.push(`      - ${yamlString(target)}`);
+      for (const edge of kindEdges) {
+        if (edge.weight != null) {
+          lines.push(`      - target: ${yamlString(edge.to)}`);
+          lines.push(`        weight: ${edge.weight}`);
+        } else {
+          lines.push(`      - ${yamlString(edge.to)}`);
+        }
       }
     }
   }
@@ -493,14 +502,14 @@ function main() {
     const methodology = extractMethodology(file);
     if (methodology) {
       const methId = "methodology:" + slugify(methodology);
-      edges.push({ kind: "follows_methodology", to: methId });
+      edges.push({ kind: "follows_methodology", to: methId, weight: 1.0 });
     }
 
     // Also parse @graph methodologies: tag
     if (graphMeta && graphMeta.methodologies) {
       for (const m of graphMeta.methodologies) {
         if (!edges.some(e => e.kind === "follows_methodology" && e.to === m)) {
-          edges.push({ kind: "follows_methodology", to: m });
+          edges.push({ kind: "follows_methodology", to: m, weight: 1.0 });
         }
       }
     }
@@ -654,9 +663,9 @@ function main() {
         const specSlug = proc.specialization ? slugify(proc.specialization) : "shared";
         const sameSpecId = `lib-agent:${specSlug}--${agentSlug}`;
         if (knownAgentIds.has(sameSpecId)) {
-          proc.edges.push({ kind: "uses_agent", to: sameSpecId });
+          proc.edges.push({ kind: "uses_agent", to: sameSpecId, weight: 0.8 });
         } else if (agentNameMap.has(agentSlug)) {
-          proc.edges.push({ kind: "uses_agent", to: agentNameMap.get(agentSlug) });
+          proc.edges.push({ kind: "uses_agent", to: agentNameMap.get(agentSlug), weight: 0.8 });
         }
         // Skip if no match — don't create dangling edges
       }
@@ -668,9 +677,9 @@ function main() {
         const specSlug = proc.specialization ? slugify(proc.specialization) : "shared";
         const sameSpecId = `lib-skill:${specSlug}--${skillSlug}`;
         if (knownSkillIds.has(sameSpecId)) {
-          proc.edges.push({ kind: "uses_skill", to: sameSpecId });
+          proc.edges.push({ kind: "uses_skill", to: sameSpecId, weight: 0.8 });
         } else if (skillNameMap.has(skillSlug)) {
-          proc.edges.push({ kind: "uses_skill", to: skillNameMap.get(skillSlug) });
+          proc.edges.push({ kind: "uses_skill", to: skillNameMap.get(skillSlug), weight: 0.8 });
         }
       }
       delete proc._pendingSkillRefs;

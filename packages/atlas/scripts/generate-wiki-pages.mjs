@@ -113,8 +113,34 @@ function main() {
   }
 
   const readmes = [];
-  findReadmes(path.join(libraryDir, "specializations"), readmes);
-  findReadmes(path.join(libraryDir, "methodologies"), readmes);
+  // Only collect top-level specialization READMEs (not from skills/agents/processes subdirs)
+  const specDir = path.join(libraryDir, "specializations");
+  for (const entry of fs.readdirSync(specDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === "node_modules" || entry.name === "domains") continue;
+    const readme = path.join(specDir, entry.name, "README.md");
+    if (fs.existsSync(readme)) readmes.push(readme);
+  }
+  // Domain specializations (one level deeper)
+  const domainsDir = path.join(specDir, "domains");
+  if (fs.existsSync(domainsDir)) {
+    for (const cat of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+      if (!cat.isDirectory()) continue;
+      for (const spec of fs.readdirSync(path.join(domainsDir, cat.name), { withFileTypes: true })) {
+        if (!spec.isDirectory()) continue;
+        const readme = path.join(domainsDir, cat.name, spec.name, "README.md");
+        if (fs.existsSync(readme)) readmes.push(readme);
+      }
+    }
+  }
+  // Methodology READMEs (top-level only)
+  const methDir = path.join(libraryDir, "methodologies");
+  if (fs.existsSync(methDir)) {
+    for (const entry of fs.readdirSync(methDir, { withFileTypes: true })) {
+      if (!entry.isDirectory() || entry.name === "node_modules" || entry.name === "shared") continue;
+      const readme = path.join(methDir, entry.name, "README.md");
+      if (fs.existsSync(readme)) readmes.push(readme);
+    }
+  }
 
   // Track slugs to avoid collisions
   const usedSlugs = new Map();

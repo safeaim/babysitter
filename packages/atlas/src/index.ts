@@ -1,5 +1,11 @@
-import indexJson from "./index.json";
+import * as fs from "fs";
+import * as path from "path";
 import type { AtlasRecord, Edge, IndexShape, NeighborResult, SearchHit } from "./types";
+
+// Load index at runtime to avoid tsc trying to type-check a large JSON literal
+const indexJson: IndexShape = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "index.json"), "utf8")
+);
 
 export type { AtlasRecord, ClusterDef, Edge, EdgeKindDef, IndexShape, NeighborResult, NodeKindDef, Record_, SearchHit } from "./types";
 

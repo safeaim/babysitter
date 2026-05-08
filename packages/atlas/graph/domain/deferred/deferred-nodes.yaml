@@ -149,6 +149,8 @@ attributes:
   reason: "scope and context modeling for graph queries not designed"
   suggestedBy: todo.md
   createdAt: "2026-05-08"
+  resolvedTo: "topic:graph-query-scoping"
+  resolvedAt: "2026-05-08"
 edges:
   deferred_for:
     - domain:software-engineering

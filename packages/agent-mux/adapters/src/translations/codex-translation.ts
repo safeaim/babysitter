@@ -14,6 +14,7 @@ export function translateForCodex(config: ProviderConfig): HarnessProviderTransl
       env['OPENAI_API_KEY'] = 'ollama';
       args.push('--oss');
       return { env, args, proxyRequired: false };
+    case 'foundry':
     case 'custom':
     case 'groq':
     case 'fireworks':
@@ -25,8 +26,10 @@ export function translateForCodex(config: ProviderConfig): HarnessProviderTransl
     case 'openrouter':
       if (config.params['apiBase']) env['OPENAI_BASE_URL'] = String(config.params['apiBase']);
       if (config.auth.apiKey) env['OPENAI_API_KEY'] = config.auth.apiKey;
+      env['ANTHROPIC_API_KEY'] = '';
       return { env, args, proxyRequired: false };
     default:
+      env['ANTHROPIC_API_KEY'] = '';
       return { env, args, proxyRequired: true, proxyExposedTransport: 'openai-responses' };
   }
 }

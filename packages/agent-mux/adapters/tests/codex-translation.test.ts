@@ -123,10 +123,10 @@ describe('translateForCodex', () => {
       expect(result.proxyExposedTransport).toBe('openai-responses');
     });
 
-    it('returns empty env for unsupported providers', () => {
+    it('clears ANTHROPIC_API_KEY for unsupported providers routed through proxy', () => {
       const result = translateForCodex(makeConfig({ provider: 'bedrock', auth: { type: 'iam' } }));
-      expect(result.env).toEqual({});
-      expect(result.args).toEqual([]);
+      expect(result.env).toEqual({ ANTHROPIC_API_KEY: '' });
+      expect(result.proxyRequired).toBe(true);
     });
   });
 });

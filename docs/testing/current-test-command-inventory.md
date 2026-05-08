@@ -136,6 +136,7 @@ Status: Current. This inventory implements roadmap slice 0, "Inventory and namin
 | `babysitter` | `lint:hooks-mux` | No-model | static-check | CI maintainers | `test-logs/babysitter-lint-hooks-mux.log` | ci.yml test/workspace-coverage; publish.yml validate_mux |
 | `babysitter` | `test:agent-catalog-contracts` | No-model | contract | CI maintainers | `test-logs/babysitter-test-agent-catalog-contracts.log` | ci.yml test or package-local validation when package is touched |
 | `babysitter` | `test:agent-mux` | No-model | unit-or-integration | CI maintainers | `test-logs/babysitter-test-agent-mux.log` | ci.yml test/workspace-coverage; publish.yml validate_mux |
+| `babysitter` | `test:e2e:agent-mux-hooks-mux` | No-model | integration | CI maintainers | `e2e/agent-mux-hooks-mux/*.jsonl` | publish.yml agent_mux_hooks_mux_e2e matrix for claude-code, codex, pi |
 | `babysitter` | `test:agent-plugins-mux` | No-model | unit-or-integration | CI maintainers | `test-logs/babysitter-test-agent-plugins-mux.log` | ci.yml test or package-local validation when package is touched |
 | `babysitter` | `test:architecture` | No-model | static-check | CI maintainers | `test-logs/babysitter-test-architecture.log` | ci.yml packages-sdk/test; publish.yml validate_core |
 | `babysitter` | `test:cloud` | No-model | unit-or-integration | CI maintainers | `test-logs/babysitter-test-cloud.log` | ci.yml test or package-local validation when package is touched |

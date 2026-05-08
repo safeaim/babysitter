@@ -92,6 +92,8 @@ The rebuilt strategy should implement these before claiming broad E2E coverage:
 | P10 | Model-backed/capability-gated | Agent-mux + Codex + Babysitter plugin | Only enabled after plugin install support is proven; otherwise assert skip reason from capability gate |
 | P11 | Model-backed | Transport-mux + agent-core stream | live or credential-gated agent-core deltas carried over transport-mux, cancellation/timeout behavior, redacted provider metadata |
 | P12 | Model-backed | Agent-mux external harness + transport-mux proxy | `amux launch` starts transport-mux, harness uses proxy env, sentinel stream completes, metrics snapshot and redacted launch plan are uploaded |
+| P13 | No-model | Agent-mux hooks + hooks-mux bridge for `claude-code`, `codex`, `pi` | `amux hooks add/handle`, `a5c-hooks-mux invoke`, normalized phase evidence, no Babysitter SDK calls, no provider credentials |
+| P14 | No-model | Pipeline-owned mock matrix across mux/runtime fixtures | Per-suite command log and coverage-layer artifact from `no_model_mock_matrix`, with no code-side matrix runner |
 
 Each implementation slice should name which permutation IDs it covers. If a job covers only setup, it should not be labeled as runtime E2E.
 

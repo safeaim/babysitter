@@ -218,6 +218,164 @@ jobs:
           path: artifacts/mux-logs
           if-no-files-found: warn
 
+  agent_mux_hooks_mux_e2e:
+    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    name: Agent Mux Hooks-Mux (${{ matrix.agent.id }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        agent:
+          - id: claude-code
+            amux_agent: claude
+            hooks_adapter: claude
+            hook_type: PreToolUse
+            native_event: PreToolUse
+            expected_phase: tool.before
+            payload_json: '{"session_id":"hmx-claude-1","cwd":"/workspace/claude","model":"sonnet","tool_name":"Bash","tool_call_id":"claude-tool-1","tool_input":{"command":"pwd"}}'
+          - id: codex
+            amux_agent: codex
+            hooks_adapter: codex
+            hook_type: PreToolUse
+            native_event: PreToolUse
+            expected_phase: tool.before
+            payload_json: '{"session_id":"hmx-codex-1","cwd":"/workspace/codex","model":"gpt-5.5","tool_name":"bash","tool_call_id":"codex-tool-1","tool_input":{"command":"pwd"}}'
+          - id: pi
+            amux_agent: pi
+            hooks_adapter: pi
+            hook_type: tool_call
+            native_event: tool_call
+            expected_phase: tool.before
+            payload_json: '{"sessionId":"hmx-pi-1","cwd":"/workspace/pi","model":"gpt-5.5","toolName":"Bash","toolCallId":"pi-tool-1","toolInput":{"command":"pwd"}}'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build agent-mux and hooks-mux CLIs
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/atlas
+          npm run build --workspace=@a5c-ai/agent-catalog
+          for workspace in \
+            @a5c-ai/hooks-mux-core \
+            @a5c-ai/hooks-mux-cli \
+            @a5c-ai/hooks-mux-adapter-claude \
+            @a5c-ai/hooks-mux-adapter-codex \
+            @a5c-ai/hooks-mux-adapter-pi
+          do
+            npm run build --workspace="$workspace"
+          done
+          npm run build:agent-mux:non-realtime
+
+      - name: Run agent-mux hooks-mux lane
+        env:
+          AGENT_MUX_HOOKS_MUX_MATRIX: "1"
+          AGENT_MUX_HOOKS_MUX_AMUX_AGENT: ${{ matrix.agent.amux_agent }}
+          AGENT_MUX_HOOKS_MUX_ADAPTER: ${{ matrix.agent.hooks_adapter }}
+          AGENT_MUX_HOOKS_MUX_HOOK_TYPE: ${{ matrix.agent.hook_type }}
+          AGENT_MUX_HOOKS_MUX_NATIVE_EVENT: ${{ matrix.agent.native_event }}
+          AGENT_MUX_HOOKS_MUX_EXPECTED_PHASE: ${{ matrix.agent.expected_phase }}
+          AGENT_MUX_HOOKS_MUX_PAYLOAD_JSON: ${{ matrix.agent.payload_json }}
+          AGENT_MUX_HOOKS_MUX_ARTIFACT_DIR: artifacts/agent-mux-hooks-mux
+        run: npm run test:e2e:agent-mux-hooks-mux
+
+      - name: Upload agent-mux hooks-mux artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-agent-mux-hooks-mux-${{ matrix.agent.id }}
+          path: artifacts/agent-mux-hooks-mux
+          if-no-files-found: error
+
+  no_model_mock_matrix:
+    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    name: No-Model Mock Matrix (${{ matrix.suite.id }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - id: agent-mux-harness-mock
+            coverage_layers: agent-mux,mock-harness,session-lifecycle
+            command: node scripts/agent-mux-build.cjs test packages/agent-mux/harness-mock
+          - id: agent-mux-runtime-hooks
+            coverage_layers: agent-mux,runtime-hooks,mock-adapters
+            command: npx vitest run --config vitest.config.ts packages/agent-mux/core/tests/hooks.test.ts packages/agent-mux/adapters/tests/hook-integration.test.ts
+          - id: hooks-mux-fixture-e2e
+            coverage_layers: hooks-mux,fixture-payloads,session-store,handler-fanout
+            command: npm run test --workspace=@a5c-ai/hooks-mux-cli -- src/__tests__/e2e/e2e-invoke.test.ts src/__tests__/e2e/e2e-exec.test.ts src/__tests__/e2e/e2e-bootstrap.test.ts src/__tests__/e2e/e2e-adapter-claude.test.ts
+          - id: transport-mux-fixtures
+            coverage_layers: transport-mux,fixture-provider,route-codecs
+            command: npm run test --workspace=@a5c-ai/transport-mux
+          - id: live-stack-contracts-no-provider
+            coverage_layers: pipeline-contracts,live-stack-runner,no-provider-skip-contract
+            command: npm run test:e2e:live-stack
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build no-model prerequisites
+        run: |
+          set -euo pipefail
+          npm run build:runtime
+          npm run build:hooks-mux
+          npm run build:agent-mux:non-realtime
+
+      - name: Run selected no-model mock suite
+        env:
+          NO_MODEL_SUITE_ID: ${{ matrix.suite.id }}
+          NO_MODEL_COVERAGE_LAYERS: ${{ matrix.suite.coverage_layers }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/no-model-mock-matrix
+          echo "suite=${NO_MODEL_SUITE_ID}" | tee "artifacts/no-model-mock-matrix/${NO_MODEL_SUITE_ID}.txt"
+          echo "coverage_layers=${NO_MODEL_COVERAGE_LAYERS}" | tee -a "artifacts/no-model-mock-matrix/${NO_MODEL_SUITE_ID}.txt"
+          ${{ matrix.suite.command }} 2>&1 | tee -a "artifacts/no-model-mock-matrix/${NO_MODEL_SUITE_ID}.log"
+
+      - name: Upload no-model mock artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-no-model-mock-${{ matrix.suite.id }}
+          path: artifacts/no-model-mock-matrix
+          if-no-files-found: error
+
   live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, os=${{ matrix.os }})
@@ -493,6 +651,8 @@ jobs:
     needs:
       - validate_core
       - validate_mux
+      - agent_mux_hooks_mux_e2e
+      - no_model_mock_matrix
       - live_stack_e2e
       - validate_cloud
       - validate_observer_and_compiler

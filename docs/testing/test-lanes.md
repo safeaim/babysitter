@@ -1,7 +1,7 @@
 ---
 title: Test Lanes
 description: Current and proposed no-model and model-backed test lanes for the Babysitter monorepo.
-last_updated: 2026-05-07
+last_updated: 2026-05-08
 ---
 
 # Test Lanes
@@ -22,6 +22,20 @@ No-model tests must run without provider secrets, paid model calls, or installed
 | Docs and generated assets | Existing docs QA and generator checks | Documentation links, snippets, generated plugin bundles, command templates | Every PR and push |
 
 No-model tests should prefer deterministic fixture transcripts and mock harness implementations. They should never skip because an API key is missing; if a test cannot run without a provider key, it belongs in the model-backed lane.
+
+### Implemented No-Model Matrices
+
+`Publish` now has a dedicated `no_model_mock_matrix` job. The matrix is owned by `.github/workflows/publish.yml`, not by a code-side runner. Each lane selects one existing deterministic suite and uploads `publish-no-model-mock-*` evidence:
+
+| Matrix ID | Command owner | Coverage boundary |
+| --- | --- | --- |
+| `agent-mux-harness-mock` | `node scripts/agent-mux-build.cjs test packages/agent-mux/harness-mock` | Mock harness session lifecycle and protocol events |
+| `agent-mux-runtime-hooks` | Focused Vitest files in `agent-mux/core` and `agent-mux/adapters` | Runtime hook manager, dispatcher, and adapter hook integration without provider calls |
+| `hooks-mux-fixture-e2e` | `@a5c-ai/hooks-mux-cli` E2E fixtures | Native payload normalization, session store, handler fan-out, and adapter rendering |
+| `transport-mux-fixtures` | `@a5c-ai/transport-mux` tests | Route/codec/provider fixture behavior without live model credentials |
+| `live-stack-contracts-no-provider` | `test:e2e:live-stack` | Scenario contracts and no-provider skip/evidence behavior without executing live agents |
+
+`Publish` also has an `agent_mux_hooks_mux_e2e` no-model/no-SDK job. It is intentionally separate from the live Babysitter plugin matrix: the GitHub matrix chooses `claude-code`, `codex`, and `pi`; the test only consumes that one selected lane, registers an `amux hooks` command hook, bridges the native payload into `a5c-hooks-mux invoke`, and asserts the hooks-mux normalized phase evidence.
 
 ## Lane 2: Model-Backed Tests
 

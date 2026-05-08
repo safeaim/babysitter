@@ -204,6 +204,23 @@ describe('primary live stack runner contract', () => {
     expect(result.artifactPath).toBeDefined();
   });
 
+  it('skips provider-backed live runs when configured credentials are rejected upstream', async () => {
+    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-auth-skip-'));
+    const result = await runPrimaryLiveStackScenario({
+      cwd: process.cwd(),
+      artifactsDir,
+      executeLiveProvider: true,
+      env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1', LIVE_STACK_SCENARIO_ID: 'live.agent-mux.pi.foundry-openai.gpt-5.5', LIVE_STACK_AGENT_PATH: 'agent-mux', LIVE_STACK_AGENT: 'pi', LIVE_STACK_AMUX_AGENT: 'pi', LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin', LIVE_STACK_INSTALL_MODE: 'vanilla', LIVE_STACK_PROVIDER: 'foundry-openai', LIVE_STACK_AMUX_PROVIDER: 'foundry', LIVE_STACK_MODEL: 'gpt-5.5', LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars', LIVE_STACK_REQUIRED_ENV: 'AZURE_API_KEY,AMUX_API_BASE', LIVE_STACK_LAYERS: 'agent-mux install,agent-mux invocation,transport-mux route,provider/model trace', LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId', LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,transport-mux-trace,provider-trace-redacted' },
+      executeCommand: async (command) => command.args.includes('install')
+        ? { status: 0, stdout: '{"ok":true}', stderr: '' }
+        : { status: 1, stdout: '', stderr: '401 Incorrect API key provided: sk-incorrect' },
+    });
+
+    expect(result.status).toBe('skipped');
+    expect(result.skipReason).toContain('configured credentials were rejected');
+    expect(result.artifactPath).toBeDefined();
+  });
+
   const liveIt = process.env['LIVE_STACK_RUN_MODEL_TESTS'] === '1' ? it : it.skip;
 
   liveIt('executes the primary live provider scenario when explicitly enabled', async () => {

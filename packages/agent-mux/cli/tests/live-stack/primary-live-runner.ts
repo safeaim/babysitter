@@ -514,6 +514,13 @@ function classifySkippableLiveProviderFailure(result: CommandResult): string | u
   if (/plans\s*&\s*billing/i.test(combined) && /anthropic api/i.test(combined)) {
     return 'live provider unavailable: anthropic billing is unavailable';
   }
+  if (
+    /401\s+incorrect api key provided/i.test(combined) ||
+    /invalid api key/i.test(combined) ||
+    (/unauthorized/i.test(combined) && /api key|token|credential/i.test(combined))
+  ) {
+    return 'live provider unavailable: configured credentials were rejected';
+  }
   return undefined;
 }
 

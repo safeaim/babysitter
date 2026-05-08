@@ -1,10 +1,10 @@
-[ ] - agent ui frameworks
-[ ] - llm proxy
-[ ] - agent orchestration (sublayer of interaction)  - vibe-kanban, etc.
+[x] - agent ui frameworks (Ink, Bubble Tea, Textual, Rich, Open WebUI, Chatbot UI, LibreChat)
+[x] - llm proxy (LiteLLM, OpenRouter, Portkey, Helicone, Braintrust)
+[x] - agent orchestration (LangChain, LangGraph, CrewAI, AutoGen, PydanticAI, Semantic Kernel, Mastra, Vercel AI SDK)
 [ ] - cicd types, triggering abilities, etc.
 [ ] - dispatches and remote dispatches
 [ ] - more features and capabilities of the stack of cc-revex and oh-my-pi 
-[ ] - populate memory systems, agentsh and other tools to the graph.
+[x] - populate memory systems, agentsh and other tools to the graph. (Mem0, Zep, Chroma, Weaviate, Pinecone, Qdrant, Milvus + Aider, Continue, Cline, Sweep, Bolt.new, Lovable, v0)
 [ ] - testable claims for parts of the agentic ecosystem (tests that can be automated and run in the cicd), e.g. "claude code session lifecycle is X" -> smallest tests (with mocks) to validate or invalidate the claim, then add to the graph. (this will make regression testing and monitoring much easier - of external dependencies integrations) 
 [ ] cicd for testable claims - process that runs the tests for the testable claims on a regular basis (e.g. daily) and reports any failures, so we can quickly identify when an external change has broken our assumptions and react accordingly.
 [ ] - process that finds untested claims or assumptions in the graph and add "testable claims" to the graph, then prioritize them and add to the test suite. (this will make sure we have good coverage of the most important assumptions in our ecosystem)

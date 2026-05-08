@@ -39,6 +39,7 @@ export const LAUNCH_FLAGS: Record<string, FlagDef> = {
   'resume': { short: 'r', type: 'string' },
   'session-id': { short: 's', type: 'string' },
   'prompt': { short: 'p', type: 'string' },
+  'interactive': { short: 'i', type: 'boolean' },
   'max-turns': { type: 'number' },
   'max-budget-usd': { type: 'number' },
   'dry-run': { type: 'boolean' },
@@ -175,29 +176,31 @@ interface SessionArgs {
   sessionId?: string;
   prompt?: string;
   maxTurns?: number;
+  interactive?: boolean;
 }
 
 function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void {
+  const interactive = session.interactive !== false;
+
   switch (plan.harness) {
     case 'claude':
       if (session.resumeId) plan.args.push('--resume', session.resumeId);
       if (session.sessionId) plan.args.push('--session-id', session.sessionId);
-      if (session.prompt) plan.args.push('--print', session.prompt);
+      if (session.prompt && !interactive) plan.args.push('--print', session.prompt);
       if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
       break;
     case 'codex':
       if (session.resumeId) {
         plan.args.unshift('resume', session.resumeId);
-      } else if (session.prompt) {
+      } else if (session.prompt && !interactive) {
         plan.args.unshift('exec', session.prompt);
       }
       break;
     case 'gemini':
-      if (session.prompt) plan.args.push('--prompt', session.prompt);
+      if (session.prompt && !interactive) plan.args.push('--prompt', session.prompt);
       break;
     case 'opencode':
       if (session.resumeId) plan.args.push('--session', session.resumeId);
-      // OpenCode has no non-interactive prompt flag; prompt delivered via stdin after launch
       break;
   }
 }
@@ -431,6 +434,10 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     launchCwd = resolveWorkspaceDefaultCwd(workspace);
   }
 
+  // Resolve interactive mode (default: true)
+  const interactiveFlag = flagBool(args.flags, 'interactive');
+  const isInteractive = interactiveFlag !== false;
+
   // Append session/prompt args
   const prompt = flagStr(args.flags, 'prompt');
   appendHarnessSessionArgs(plan, {
@@ -438,6 +445,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     sessionId: flagStr(args.flags, 'session-id'),
     prompt,
     maxTurns: flagNum(args.flags, 'max-turns'),
+    interactive: isInteractive,
   });
 
   // Passthrough args after --
@@ -466,13 +474,13 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
   }
 
   // Spawn harness
-  const isInteractive = !prompt;
 
   let child: import('node:child_process').ChildProcess;
   let ptyProcess: any = null;
 
   if (isInteractive) {
-    // Try to use node-pty for TUI harnesses
+    // Interactive mode: full TTY passthrough. If a prompt is provided, it's
+    // injected as initial stdin after the harness starts (like typing it in).
     try {
       const nodePty: any = require('node-pty'); // dynamic require — node-pty is optional
       ptyProcess = nodePty.spawn(plan.command, plan.args, {
@@ -496,19 +504,25 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         ptyProcess.resize(process.stdout.columns || 80, process.stdout.rows || 24);
       });
 
+      // Inject prompt as initial input after a short delay for the harness to start
+      if (prompt && !plan.args.some(a => a === prompt)) {
+        setTimeout(() => ptyProcess.write(prompt + '\n'), 500);
+      }
+
       // Create a fake ChildProcess-like for signal handling
       child = { pid: ptyProcess.pid, kill: (sig: string) => ptyProcess.kill(sig) } as any;
     } catch {
-      // node-pty not available, fall back to stdio inherit
+      // node-pty not available, fall back to stdio inherit with stdin pipe for prompt injection
       const { spawn } = await import('node:child_process');
       child = spawn(plan.command, plan.args, {
-        stdio: 'inherit',
+        stdio: prompt ? ['pipe', 'inherit', 'inherit'] : 'inherit',
         env: { ...process.env, ...plan.env },
         cwd: launchCwd,
         shell: false,
       });
     }
   } else {
+    // Non-interactive: pipe stdin, inherit stdout/stderr
     const { spawn } = await import('node:child_process');
     child = spawn(plan.command, plan.args, {
       stdio: ['pipe', 'inherit', 'inherit'],
@@ -551,9 +565,15 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
   process.on('SIGINT', forwardSignal);
   process.on('SIGTERM', forwardSignal);
 
-  if (!isInteractive && prompt && child.stdin) {
-    child.stdin.write(prompt);
-    child.stdin.end();
+  if (prompt && child.stdin && !ptyProcess) {
+    child.stdin.write(prompt + '\n');
+    if (!isInteractive) {
+      child.stdin.end();
+    } else {
+      // Interactive with stdin pipe (no PTY): reconnect terminal stdin after prompt injection
+      process.stdin.resume();
+      process.stdin.pipe(child.stdin);
+    }
   }
 
   const exitCode = await new Promise<number>((resolve) => {

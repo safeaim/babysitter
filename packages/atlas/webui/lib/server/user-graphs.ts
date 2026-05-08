@@ -89,7 +89,7 @@ export async function createUserGraphUpload(input: {
   };
 
   await ensureDatabaseSchema();
-  const client = await getDbPool().connect();
+  const client = await (await getDbPool()).connect();
   try {
     await client.query("BEGIN");
     await client.query(

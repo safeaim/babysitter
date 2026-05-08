@@ -1,5 +1,7 @@
-import { Pool, type QueryResultRow } from "pg";
 import { ATLAS_WEBUI_SCHEMA_SQL } from "./db-schema";
+
+type Pool = import("pg").Pool;
+type QueryResultRow = import("pg").QueryResultRow;
 
 declare global {
   // eslint-disable-next-line no-var
@@ -12,15 +14,20 @@ export function isDatabaseConfigured(): boolean {
   return typeof process.env.DATABASE_URL === "string" && process.env.DATABASE_URL.length > 0;
 }
 
-export function getDbPool(): Pool {
+async function createPool(): Promise<Pool> {
+  const { Pool: PgPool } = await import("pg");
+  return new PgPool({
+    connectionString: process.env.DATABASE_URL!,
+    max: 10,
+  });
+}
+
+export async function getDbPool(): Promise<Pool> {
   if (!isDatabaseConfigured()) {
     throw new Error("DATABASE_URL is not configured. Private workspace features are unavailable.");
   }
   if (!global.__atlasWebuiPgPool) {
-    global.__atlasWebuiPgPool = new Pool({
-      connectionString: process.env.DATABASE_URL!,
-      max: 10,
-    });
+    global.__atlasWebuiPgPool = await createPool();
   }
   return global.__atlasWebuiPgPool;
 }
@@ -28,7 +35,7 @@ export function getDbPool(): Pool {
 export async function ensureDatabaseSchema(): Promise<void> {
   if (!global.__atlasWebuiSchemaReady) {
     global.__atlasWebuiSchemaReady = getDbPool()
-      .query(ATLAS_WEBUI_SCHEMA_SQL)
+      .then((pool) => pool.query(ATLAS_WEBUI_SCHEMA_SQL))
       .then(() => undefined);
   }
   return global.__atlasWebuiSchemaReady;
@@ -39,7 +46,8 @@ export async function queryRows<T extends QueryResultRow = QueryResultRow>(
   values: unknown[] = [],
 ): Promise<T[]> {
   await ensureDatabaseSchema();
-  const result = await getDbPool().query<T>(text, values);
+  const pool = await getDbPool();
+  const result = await pool.query<T>(text, values);
   return result.rows;
 }
 
@@ -53,5 +61,6 @@ export async function queryRow<T extends QueryResultRow = QueryResultRow>(
 
 export async function execute(text: string, values: unknown[] = []): Promise<void> {
   await ensureDatabaseSchema();
-  await getDbPool().query(text, values);
+  const pool = await getDbPool();
+  await pool.query(text, values);
 }

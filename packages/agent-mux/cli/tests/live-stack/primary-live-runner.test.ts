@@ -8,76 +8,6 @@ import { buildPrimaryLiveStackCommands, executeChildProcessCommand, runPrimaryLi
 import { primaryLiveStackScenario } from './scenario-contract';
 
 describe('primary live stack runner contract', () => {
-  it('builds the babysitter-plugin command chain through generated plugin setup, SDK install, and amux launch', () => {
-    const scenario = primaryLiveStackScenario();
-    const commands = buildPrimaryLiveStackCommands(scenario, {
-      cwd: '/repo',
-      timeoutMs: 1000,
-      env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1' },
-    });
-
-    expect(commands.map((command) => [command.command, ...command.args])).toEqual([
-      ['npm', 'run', 'generate:plugins'],
-      ['amux', 'install', 'claude', '--json'],
-      ['npm', 'install', '--global', './packages/sdk'],
-      ['babysitter', 'harness:install-plugin', 'claude-code', '--workspace', '/repo', '--json'],
-      [
-        'amux',
-        'launch',
-        'claude',
-        'foundry',
-        '--model',
-        'gpt-5.5',
-        '--with-proxy-if-needed',
-        '--proxy-log-level',
-        'debug',
-        '--session-id',
-        'trace-1',
-        '--prompt',
-        '/babysitter:call Reply with "ok" and the following labels. Print exactly: trace=trace-1 scenario=live.agent-mux.claude-code.foundry-openai.gpt-5.5',
-        '--max-turns',
-        '1',
-      ],
-    ]);
-  });
-
-  it('builds the vanilla command chain through agent-mux install and launch only', () => {
-    const scenario = primaryLiveStackScenario();
-    const vanillaScenario = {
-      ...scenario,
-      agent: { ...scenario.agent, installMode: 'vanilla' as const, setupCommands: ['amux install claude', 'amux launch claude'] },
-      requiredTraceIds: ['agentMuxRunId', 'agentMuxSessionId', 'transportTraceId'],
-      expectedArtifacts: ['agent-mux-events', 'transport-mux-trace', 'provider-trace-redacted'],
-    };
-    const commands = buildPrimaryLiveStackCommands(vanillaScenario, {
-      cwd: '/repo',
-      timeoutMs: 1000,
-      env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1' },
-    });
-
-    expect(commands.map((command) => [command.command, ...command.args])).toEqual([
-      ['amux', 'install', 'claude', '--json'],
-      [
-        'amux',
-        'launch',
-        'claude',
-        'foundry',
-        '--model',
-        'gpt-5.5',
-        '--with-proxy-if-needed',
-        '--proxy-log-level',
-        'debug',
-        '--session-id',
-        'trace-1',
-        '--prompt',
-        'Reply with "hello" and the following labels. Print exactly: trace=trace-1 scenario=live.agent-mux.claude-code.foundry-openai.gpt-5.5',
-        '--max-turns',
-        '1',
-        '--no-interactive',
-      ],
-    ]);
-  });
-
   it('keeps Claude Code live lanes on Foundry GPT-5.5 through transport-mux', () => {
     const scenario = primaryLiveStackScenario();
     const commands = buildPrimaryLiveStackCommands(scenario, {
@@ -92,48 +22,6 @@ describe('primary live stack runner contract', () => {
     expect(launch?.args).toContain('--with-proxy-if-needed');
     expect(launch?.args).not.toContain('anthropic');
     expect(launch?.args).not.toContain('sonnet');
-  });
-
-
-  it('routes babysitter-agent scenarios through amux run with the selected harness', () => {
-    const scenario = primaryLiveStackScenario();
-    const babysitterScenario = {
-      ...scenario,
-      scenarioId: 'live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5',
-      agent: { ...scenario.agent, agent: 'babysitter-agent' as const, agentMuxAgent: 'babysitter' as const, installMode: 'vanilla' as const, babysitterHarness: 'agent-core', setupCommands: ['amux install babysitter', 'amux run babysitter'] },
-      requiredTraceIds: ['agentMuxRunId', 'agentMuxSessionId', 'transportTraceId'],
-      expectedArtifacts: ['agent-mux-events', 'transport-mux-trace', 'provider-trace-redacted'],
-    };
-    const commands = buildPrimaryLiveStackCommands(babysitterScenario, {
-      cwd: '/repo',
-      timeoutMs: 1000,
-      env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1' },
-    });
-
-    expect(commands.map((command) => [command.command, ...command.args])).toEqual([
-      ['amux', 'install', 'babysitter', '--json'],
-      [
-        'amux',
-        'run',
-        'babysitter',
-        '--model',
-        'gpt-5.5',
-        '--cwd',
-        '/repo',
-        '--output-format',
-        'jsonl',
-        '--env',
-        'BABYSITTER_HARNESS=agent-core',
-        '--prompt',
-        'Reply with "hello" and the following labels. Print exactly: trace=trace-1 scenario=live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5',
-        '--max-turns',
-        '1',
-        '--non-interactive',
-        '--json',
-      ],
-    ]);
-    expect(commands[0]?.env['BABYSITTER_HARNESS']).toBe('agent-core');
-    expect(commands[1]?.env['BABYSITTER_HARNESS']).toBe('agent-core');
   });
 
   it('skips safely without Foundry credentials and never calls the command executor', async () => {

@@ -611,10 +611,52 @@ jobs:
           path: artifacts/publish-source/publish-source.tgz
           if-no-files-found: error
 
+  publish_atlas:
+    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    name: Publish Atlas
+    needs: prepare_publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download publish workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-source
+          path: artifacts/publish-source
+
+      - name: Extract publish workspace
+        run: |
+          set -euo pipefail
+          tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org/
+          always-auth: true
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build Atlas workspace
+        run: npm run build --workspace=@a5c-ai/atlas
+
+      - name: Publish Atlas
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@a5c-ai/atlas --access public --tag "$NPM_TAG"
+
   publish_foundation:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Foundation - ${{ matrix.name }}
-    needs: prepare_publish
+    needs:
+      - prepare_publish
+      - publish_atlas
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1049,6 +1091,7 @@ jobs:
     name: Deploy Docs Site
     needs:
       - prepare_publish
+      - publish_atlas
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -1095,6 +1138,7 @@ jobs:
     name: Deploy Atlas WebUI To AKS
     needs:
       - prepare_publish
+      - publish_atlas
     runs-on: ubuntu-latest
     env:
       ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
@@ -1338,6 +1382,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Metapackage
     needs:
+      - publish_atlas
       - publish_agent_mux_tui
       - publish_foundation
       - publish_hooks_and_core

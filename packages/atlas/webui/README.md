@@ -83,9 +83,27 @@ node packages/atlas/dist/cli.js reindex --catalog-dir /path/to/graph --out /tmp/
 | `/edges/[edgeKind]` | Wired pairs for an EdgeKind |
 | `/api/search-index.json` | Slim index for client-side search |
 | `/api/graph-index.json` | Slim index for the graph canvas |
+| `/api/mcp` | Streamable HTTP MCP endpoint exposing only the public Atlas surface |
 | `/workspace` | Authenticated private workspace |
 | `/workspace/graphs` | User graph uploads and overlay management |
 | `/workspace/company-builder` | Company builder with persisted drafts and YAML export |
+
+## MCP endpoint
+
+The web UI exposes a public Streamable HTTP MCP endpoint at `/api/mcp`.
+
+- Transport handler: `app/api/[transport]/route.ts`
+- Package: `mcp-handler`
+- Scope: public Atlas data only for now — authenticated workspace overlays and private graph uploads are not exposed through MCP yet
+
+Current MCP tool surface includes:
+
+- public stats and clusters
+- public search
+- public record detail and neighborhood queries
+- public node-kind and edge-kind listings/details
+- public wiki page retrieval
+- public REST OpenAPI/spec discovery
 
 ## Notes
 

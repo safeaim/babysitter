@@ -53,7 +53,7 @@ export function buildPrimaryLiveStackCommands(
   scenario: LiveStackScenario,
   options: Pick<PrimaryLiveRunOptions, 'env' | 'cwd' | 'timeoutMs'>,
 ): readonly CommandExecution[] {
-  const commandEnv = buildCommandEnv(options.env);
+  const commandEnv = buildCommandEnv(options.env, options.cwd);
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const traceId = commandEnv['LIVE_STACK_TRACE_ID'];
   const prompt = buildPrompt(scenario, traceId);
@@ -176,13 +176,19 @@ function commandExecution(env: Record<string, string>, overrideKey: string, fall
     : { command: fallbackCommand, args, env, cwd, timeoutMs };
 }
 
-function buildCommandEnv(env: Record<string, string | undefined>): Record<string, string> {
+function buildCommandEnv(env: Record<string, string | undefined>, cwd: string): Record<string, string> {
   const traceId = env['LIVE_STACK_TRACE_ID'] ?? `live-stack-${Date.now()}`;
   return Object.fromEntries(
-    Object.entries({ ...env, LIVE_STACK_TRACE_ID: traceId, AGENT_SESSION_ID: env['AGENT_SESSION_ID'] ?? traceId, AGENT_TRUST_ENV_SESSION: '1' }).filter(
+    Object.entries({ ...env, PATH: withWorkspaceBinOnPath(env, cwd), LIVE_STACK_TRACE_ID: traceId, AGENT_SESSION_ID: env['AGENT_SESSION_ID'] ?? traceId, AGENT_TRUST_ENV_SESSION: '1' }).filter(
       (entry): entry is [string, string] => typeof entry[1] === 'string',
     ),
   );
+}
+
+function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: string): string {
+  const delimiter = process.platform === 'win32' ? ';' : ':';
+  const workspaceBin = path.join(cwd, 'node_modules', '.bin');
+  return [workspaceBin, env['PATH'] ?? process.env['PATH'] ?? ''].filter(Boolean).join(delimiter);
 }
 
 function buildPrompt(scenario: LiveStackScenario, traceId: string): string {

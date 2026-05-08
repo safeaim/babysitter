@@ -12,7 +12,7 @@ import type {
   HarnessInstallResult,
 } from "./types";
 import { KNOWN_HARNESSES } from "./registry";
-import { runPackageBinaryViaNpx } from "./installSupport";
+import { execFilePromise, installCliViaNpm, renderCommand, runPackageBinaryViaNpx } from "./installSupport";
 
 // ---------------------------------------------------------------------------
 // Agent name mapping (babysitter harness name -> agent-mux adapter name)
@@ -34,6 +34,16 @@ interface HarnessPluginInstaller {
   packageName: string;
   supportsWorkspace: boolean;
 }
+
+interface HarnessCliInstaller {
+  cliCommand: string;
+  packageName: string;
+}
+
+const HARNESS_CLI_INSTALLERS: Readonly<Record<string, HarnessCliInstaller>> = {
+  "claude-code": { cliCommand: "claude", packageName: "@anthropic-ai/claude-code" },
+  "codex": { cliCommand: "codex", packageName: "@openai/codex" },
+};
 
 const HARNESS_PLUGIN_INSTALLERS: Readonly<Record<string, HarnessPluginInstaller>> = {
   "codex": { packageName: "@a5c-ai/babysitter-codex", supportsWorkspace: true },
@@ -178,6 +188,16 @@ export async function installHarnessViaAmux(
   const adapter = client.adapters.get(amuxName);
 
   if (!adapter || !adapter.install) {
+    const installer = HARNESS_CLI_INSTALLERS[harnessName];
+    if (installer) {
+      return await installCliViaNpm({
+        harness: harnessName,
+        cliCommand: installer.cliCommand,
+        packageName: installer.packageName,
+        summary: `Install ${harnessName} CLI from npm`,
+        options,
+      });
+    }
     return {
       harness: harnessName,
       success: false,
@@ -210,6 +230,10 @@ export async function installHarnessPlugin(
   harnessName: string,
   options: HarnessInstallOptions,
 ): Promise<HarnessInstallResult> {
+  if (harnessName === "claude-code") {
+    return await installClaudeCodePlugin(options);
+  }
+
   const installer = HARNESS_PLUGIN_INSTALLERS[harnessName];
   if (!installer) {
     return {
@@ -255,6 +279,60 @@ export async function installHarnessPlugin(
  * Reset the cached client. For testing.
  * @internal
  */
+async function installClaudeCodePlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
+  const commands = [
+    { command: "claude", args: ["plugin", "marketplace", "add", "a5c-ai/babysitter-claude"] },
+    { command: "claude", args: ["plugin", "install", "--scope", options.workspace ? "project" : "user", "babysitter@a5c.ai"] },
+  ];
+  const rendered = commands.map((item) => renderCommand(item.command, item.args)).join(" && ");
+  if (options.dryRun) {
+    return {
+      harness: "claude-code",
+      dryRun: true,
+      success: true,
+      status: "planned",
+      installer: "claude",
+      scope: options.workspace ? "workspace" : "global",
+      summary: "Install Babysitter plugin for Claude Code",
+      command: rendered,
+      location: options.workspace,
+    };
+  }
+
+  const outputs: string[] = [];
+  for (const item of commands) {
+    const result = await execFilePromise(item.command, item.args, { cwd: options.workspace });
+    outputs.push([result.stdout.trim(), result.stderr.trim()].filter(Boolean).join("\n"));
+    if (result.exitCode !== 0) {
+      return {
+        harness: "claude-code",
+        success: false,
+        status: "failed",
+        installer: "claude",
+        scope: options.workspace ? "workspace" : "global",
+        summary: "Failed to install Babysitter plugin for Claude Code",
+        command: renderCommand(item.command, item.args),
+        output: outputs.filter(Boolean).join("\n"),
+        exitCode: result.exitCode,
+        error: [result.stdout.trim(), result.stderr.trim()].filter(Boolean).join("\n") || `${renderCommand(item.command, item.args)} failed`,
+      };
+    }
+  }
+
+  return {
+    harness: "claude-code",
+    success: true,
+    status: "installed",
+    installer: "claude",
+    scope: options.workspace ? "workspace" : "global",
+    summary: "Install Babysitter plugin for Claude Code",
+    command: rendered,
+    location: options.workspace,
+    output: outputs.filter(Boolean).join("\n"),
+    exitCode: 0,
+  };
+}
+
 export function _resetAmuxInstallClientCache(): void {
   _clientPromise = null;
 }

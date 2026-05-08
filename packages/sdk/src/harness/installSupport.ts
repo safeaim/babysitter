@@ -119,18 +119,6 @@ export async function installCliViaNpm(args: {
   summary: string;
   options: HarnessInstallOptions;
 }): Promise<HarnessInstallResult> {
-  const cliInfo = await checkCliAvailable(args.cliCommand);
-  if (cliInfo.available) {
-    return {
-      harness: args.harness,
-      success: true,
-      status: "skipped",
-      installer: "npm",
-      warning: `${args.harness} is already installed; nothing to do.`,
-      location: cliInfo.path,
-    };
-  }
-
   const command = getNpmCommand();
   const commandArgs = ["install", "-g", args.packageName];
   if (args.options.dryRun) {
@@ -142,6 +130,18 @@ export async function installCliViaNpm(args: {
       installer: "npm",
       summary: args.summary,
       command: renderCommand("npm", commandArgs),
+    };
+  }
+
+  const cliInfo = await checkCliAvailable(args.cliCommand);
+  if (cliInfo.available) {
+    return {
+      harness: args.harness,
+      success: true,
+      status: "skipped",
+      installer: "npm",
+      warning: `${args.harness} is already installed; nothing to do.`,
+      location: cliInfo.path,
     };
   }
 

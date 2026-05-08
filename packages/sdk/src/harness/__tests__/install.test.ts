@@ -75,6 +75,50 @@ describe("install amux bridge", () => {
     });
   });
 
+  it("falls back to npm CLI installers when agent-mux has no install hook", async () => {
+    _setAmuxInstallModuleForTesting({
+      createClient: () => ({
+        adapters: {
+          list: () => [],
+          detect: async () => null,
+          installed: async () => [],
+          get: () => ({}),
+        },
+      }),
+    });
+
+    const result = await installHarnessViaAmux("claude-code", { dryRun: true });
+
+    expect(result).toMatchObject({
+      harness: "claude-code",
+      dryRun: true,
+      success: true,
+      status: "planned",
+      installer: "npm",
+      command: "npm install -g @anthropic-ai/claude-code",
+    });
+  });
+
+  it("plans a Claude Code plugin install through Claude plugin commands", async () => {
+    const result = await installHarnessPlugin("claude-code", {
+      workspace: "/tmp/demo",
+      json: true,
+      dryRun: true,
+      verbose: false,
+    });
+
+    expect(result).toMatchObject({
+      harness: "claude-code",
+      dryRun: true,
+      success: true,
+      status: "planned",
+      installer: "claude",
+      scope: "workspace",
+      command: "claude plugin marketplace add a5c-ai/babysitter-claude && claude plugin install --scope project babysitter@a5c.ai",
+      location: "/tmp/demo",
+    });
+  });
+
   it("plans a plugin install through the published package installer", async () => {
     const result = await installHarnessPlugin("codex", {
       workspace: "/tmp/demo",

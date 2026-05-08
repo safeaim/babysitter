@@ -346,8 +346,8 @@ jobs:
           LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
           LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
           LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
-          AZURE_API_KEY: ${{ secrets.AZURE_API_KEY }}
-          AMUX_API_BASE: ${{ vars.AMUX_API_BASE }}
+          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           npm run test:e2e:live-stack:pipeline

@@ -195,5 +195,5 @@ function isSecretKey(key: string): boolean {
 }
 
 function looksLikeSecret(value: string): boolean {
-  return /^(sk-|pat_|ghp_|xox|Bearer\s+)/i.test(value) || value.length > 80;
+  return /^(sk-|pat_|ghp_|xox|Bearer\s+)/i.test(value);
 }

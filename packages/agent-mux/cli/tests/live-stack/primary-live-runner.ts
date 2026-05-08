@@ -55,6 +55,7 @@ export function buildPrimaryLiveStackCommands(
   options: Pick<PrimaryLiveRunOptions, 'env' | 'cwd' | 'timeoutMs'>,
 ): readonly CommandExecution[] {
   const commandEnv = buildCommandEnv(options.env, options.cwd);
+  if (scenario.agent.babysitterHarness) commandEnv['BABYSITTER_HARNESS'] = scenario.agent.babysitterHarness;
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const traceId = commandEnv['LIVE_STACK_TRACE_ID'];
   const prompt = buildPrompt(scenario, traceId);

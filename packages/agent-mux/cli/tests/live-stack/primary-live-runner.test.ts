@@ -77,6 +77,46 @@ describe('primary live stack runner contract', () => {
     ]);
   });
 
+
+  it('passes the selected babysitter-agent harness through the agent-mux environment', () => {
+    const scenario = primaryLiveStackScenario();
+    const babysitterScenario = {
+      ...scenario,
+      scenarioId: 'live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5',
+      agent: { ...scenario.agent, agent: 'babysitter-agent' as const, agentMuxAgent: 'babysitter' as const, installMode: 'vanilla' as const, babysitterHarness: 'agent-core', setupCommands: ['amux install babysitter', 'amux launch babysitter'] },
+      requiredTraceIds: ['agentMuxRunId', 'agentMuxSessionId', 'transportTraceId'],
+      expectedArtifacts: ['agent-mux-events', 'transport-mux-trace', 'provider-trace-redacted'],
+    };
+    const commands = buildPrimaryLiveStackCommands(babysitterScenario, {
+      cwd: '/repo',
+      timeoutMs: 1000,
+      env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1' },
+    });
+
+    expect(commands.map((command) => [command.command, ...command.args])).toEqual([
+      ['amux', 'install', 'babysitter', '--json'],
+      [
+        'amux',
+        'launch',
+        'babysitter',
+        'foundry',
+        '--model',
+        'gpt-5.5',
+        '--with-proxy-if-needed',
+        '--proxy-log-level',
+        'debug',
+        '--session-id',
+        'trace-1',
+        '--prompt',
+        'Run a tiny vanilla agent-mux proof for live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5. trace=trace-1; print labels agentMuxSessionId and transportTraceId when observable. Do not invoke Babysitter commands.',
+        '--max-turns',
+        '1',
+      ],
+    ]);
+    expect(commands[0]?.env['BABYSITTER_HARNESS']).toBe('agent-core');
+    expect(commands[1]?.env['BABYSITTER_HARNESS']).toBe('agent-core');
+  });
+
   it('skips safely without Foundry credentials and never calls the command executor', async () => {
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),

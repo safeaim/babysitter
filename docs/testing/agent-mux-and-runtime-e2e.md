@@ -81,8 +81,8 @@ Transport-mux coverage has to prove the proxy/runtime seam directly before it is
 The `Publish` workflow runs external-harness live E2E through a workflow-owned install-mode axis:
 
 - `babysitter-plugin` generates plugin artifacts, installs the target with `amux install`, installs the local Babysitter SDK, installs the Babysitter plugin for the harness, then launches through `amux launch` with a `/babysitter:call` prompt.
-- `vanilla` installs the target with `amux install`, launches through `amux launch`, and uses a non-Babysitter prompt so it proves agent-mux/transport/provider behavior without lifecycle or hook claims.
-- Both modes use the same target mapping: `claude-code -> claude`, `codex -> codex`, `gemini-cli -> gemini`, and `pi -> pi`.
+- `vanilla` installs the target with `amux install`, launches through `amux launch`, and uses a non-plugin prompt so it proves agent-mux/transport/provider behavior; the vanilla `babysitter-agent` rows use the `babysitter` adapter with `BABYSITTER_HARNESS=agent-core`.
+- Both modes use the same target mapping: `claude-code -> claude`, `codex -> codex`, `gemini-cli -> gemini`, `pi -> pi`, and vanilla-only `babysitter-agent -> babysitter`.
 
 ## Model-Backed Runtime Suite
 

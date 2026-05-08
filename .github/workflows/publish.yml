@@ -247,6 +247,14 @@ jobs:
               id: babysitter-plugin
             scenario:
               id: live.agent-mux.pi.foundry-openai.gpt-5.5
+          - install_mode:
+              id: babysitter-plugin
+            scenario:
+              id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
+          - install_mode:
+              id: babysitter-plugin
+            scenario:
+              id: live.agent-mux.babysitter-agent.anthropic-direct.sonnet
         scenario:
           - id: live.agent-mux.claude-code.anthropic-direct.sonnet
             agent_path: agent-mux
@@ -259,6 +267,30 @@ jobs:
             credential_mode: github-org-secrets
             required_env: ANTHROPIC_API_KEY
             coverage_layers: anthropic-direct,claude-code
+          - id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
+            agent_path: agent-mux
+            agent: babysitter-agent
+            amux_agent: babysitter
+            integration_type: third-party-plugin
+            babysitter_harness: agent-core
+            provider: foundry-openai
+            amux_provider: foundry
+            model: gpt-5.5
+            credential_mode: github-org-secrets-and-vars
+            required_env: AZURE_API_KEY,AMUX_API_BASE
+            coverage_layers: foundry-openai,babysitter-agent,agent-core
+          - id: live.agent-mux.babysitter-agent.anthropic-direct.sonnet
+            agent_path: agent-mux
+            agent: babysitter-agent
+            amux_agent: babysitter
+            integration_type: third-party-plugin
+            babysitter_harness: agent-core
+            provider: anthropic-direct
+            amux_provider: anthropic
+            model: sonnet
+            credential_mode: github-org-secrets
+            required_env: ANTHROPIC_API_KEY
+            coverage_layers: anthropic-direct,babysitter-agent,agent-core
           - id: live.agent-mux.pi.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: pi
@@ -317,6 +349,7 @@ jobs:
           LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
           LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
           LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
+          LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
           LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
           LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
           LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}

@@ -81,6 +81,33 @@ describe('live stack scenario contract primitives', () => {
     expect(scenario.requiredTraceIds).toEqual(['agentMuxRunId', 'agentMuxSessionId', 'transportTraceId']);
   });
 
+
+  it('accepts pipeline-selected babysitter-agent vanilla scenarios through agent-mux', () => {
+    const scenario = liveStackScenarioFromEnv({
+      LIVE_STACK_SCENARIO_ID: 'live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5',
+      LIVE_STACK_AGENT_PATH: 'agent-mux',
+      LIVE_STACK_AGENT: 'babysitter-agent',
+      LIVE_STACK_AMUX_AGENT: 'babysitter',
+      LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+      LIVE_STACK_BABYSITTER_HARNESS: 'agent-core',
+      LIVE_STACK_INSTALL_MODE: 'vanilla',
+      LIVE_STACK_PROVIDER: 'foundry-openai',
+      LIVE_STACK_AMUX_PROVIDER: 'foundry',
+      LIVE_STACK_MODEL: 'gpt-5.5',
+      LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+      LIVE_STACK_REQUIRED_ENV: 'AZURE_API_KEY,AMUX_API_BASE',
+      LIVE_STACK_LAYERS: 'agent-mux install,agent-mux invocation,babysitter-agent runtime,provider/model trace',
+      LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+      LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,transport-mux-trace,provider-trace-redacted',
+    });
+
+    expect(scenario.agent.agent).toBe('babysitter-agent');
+    expect(scenario.agent.agentMuxAgent).toBe('babysitter');
+    expect(scenario.agent.installMode).toBe('vanilla');
+    expect(scenario.agent.babysitterHarness).toBe('agent-core');
+    expect(scenario.agent.setupCommands).toEqual(['amux install babysitter', 'amux launch babysitter']);
+  });
+
   it('separates live model capability gates from deterministic no-credential execution', () => {
     const scenario = primaryLiveStackScenario();
 

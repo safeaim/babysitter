@@ -118,7 +118,7 @@ describe('launchCommand transport-mux integration', () => {
     const code = await launchCommand(
       client,
       parseArgs(
-        ['launch', 'codex', 'bedrock', '--with-proxy-if-needed', '--prompt', 'hello'],
+        ['launch', 'codex', 'bedrock', '--with-proxy-if-needed', '--prompt', 'hello', '--no-interactive'],
         LAUNCH_FLAGS,
       ),
     );
@@ -134,7 +134,7 @@ describe('launchCommand transport-mux integration', () => {
     expect(spawnMock.mock.calls[0]?.[2]?.env['OPENAI_BASE_URL']).toBe('http://127.0.0.1:4010');
     expect(spawnMock.mock.calls[0]?.[2]?.env['OPENAI_API_KEY']).toBe('runtime-token');
     expect(runtimeStop).toHaveBeenCalledTimes(1);
-    expect(child.stdin.write).toHaveBeenCalledWith('hello');
+    expect(child.stdin.write).toHaveBeenCalledWith('hello\n');
     expect(child.stdin.end).toHaveBeenCalledTimes(1);
   });
 });

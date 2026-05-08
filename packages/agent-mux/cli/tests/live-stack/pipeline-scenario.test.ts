@@ -1,28 +1,53 @@
+import * as os from 'node:os';
+import * as path from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
-import { buildPrimaryLiveStackCommands } from './primary-live-runner';
+import { executeChildProcessCommand, runPrimaryLiveStackScenario } from './primary-live-runner';
 import { liveStackScenarioFromEnv } from './scenario-contract';
 
-describe('pipeline-owned live stack scenario contract', () => {
-  it('validates the scenario selected by the Publish workflow', () => {
+describe('pipeline-owned live stack scenario execution', () => {
+  it('executes the scenario selected by the Publish workflow when live execution is required', async () => {
     const scenario = liveStackScenarioFromEnv(process.env);
-    const commands = buildPrimaryLiveStackCommands(scenario, {
+    const requireLiveEvidence = process.env['LIVE_STACK_REQUIRE_EVIDENCE'] === '1';
+    const artifactsDir = process.env['LIVE_STACK_ARTIFACTS_DIR'] ?? path.join('artifacts', 'live-stack');
+
+    const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
+      artifactsDir,
       env: process.env,
-      timeoutMs: 1000,
+      executeLiveProvider: process.env['LIVE_STACK_RUN_MODEL_TESTS'] === '1',
+      requireRunnable: requireLiveEvidence,
+      executeCommand: executeChildProcessCommand,
+      timeoutMs: Number(process.env['LIVE_STACK_COMMAND_TIMEOUT_MS'] ?? 20 * 60 * 1000),
     });
 
-    expect(scenario.scenarioId).toBeTruthy();
-    expect(scenario.layers.length).toBeGreaterThan(0);
-    expect(scenario.expectedArtifacts.length).toBeGreaterThan(0);
-    expect(commands.length).toBe(scenario.agent.integrationType === 'runtime-cli' ? 1 : 3);
-
-    if (scenario.agent.integrationType === 'runtime-cli') {
-      expect(commands[0]?.command).toMatch(/babysitter-agent|node(\.exe)?$/);
-      expect(commands[0]?.args).toContain('create-run');
-      expect(commands[0]?.args).not.toContain('harness:install-plugin');
-    } else {
-      expect(commands.map((command) => command.args[0])).toEqual(['harness:install', 'harness:install-plugin', 'launch']);
+    if (!requireLiveEvidence) {
+      expect(scenario.scenarioId).toBeTruthy();
+      expect(scenario.layers.length).toBeGreaterThan(0);
+      expect(scenario.expectedArtifacts.length).toBeGreaterThan(0);
+      expect(result.commands.length).toBe(scenario.agent.integrationType === 'runtime-cli' ? 1 : 3);
+      return;
     }
+
+    expect(result.status, result.failure ?? result.skipReason).toBe('passed');
+    expect(result.missingTraceIds).toEqual([]);
+    expect(result.artifactPath).toBeDefined();
+  }, Number(process.env['LIVE_STACK_TEST_TIMEOUT_MS'] ?? 25 * 60 * 1000));
+
+  it('keeps local non-live runs cheap and explicit', async () => {
+    if (process.env['LIVE_STACK_REQUIRE_EVIDENCE'] === '1') return;
+
+    const result = await runPrimaryLiveStackScenario({
+      cwd: process.cwd(),
+      artifactsDir: path.join(os.tmpdir(), 'live-stack-pipeline-contract'),
+      env: {},
+      executeCommand: async () => {
+        throw new Error('local contract mode must not execute external commands');
+      },
+    });
+
+    expect(result.status).toBe('skipped');
+    expect(result.commands.length).toBe(3);
   });
 });

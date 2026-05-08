@@ -218,7 +218,7 @@ jobs:
           path: artifacts/mux-logs
           if-no-files-found: warn
 
-  live_stack_contracts:
+  live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Live Stack (${{ matrix.scenario.id }}, os=${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -301,7 +301,12 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Run selected live stack contract
+      - name: Build live stack CLIs
+        run: |
+          npm run build:hooks-mux
+          npm run build:runtime
+
+      - name: Run selected live stack E2E
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
@@ -316,6 +321,16 @@ jobs:
           LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.coverage_layers }}
           LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.scenario.required_trace_ids }}
           LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.scenario.expected_artifacts }}
+          LIVE_STACK_RUN_MODEL_TESTS: "1"
+          LIVE_STACK_REQUIRE_EVIDENCE: "1"
+          LIVE_STACK_TEST_TIMEOUT_MS: "1800000"
+          LIVE_STACK_COMMAND_TIMEOUT_MS: "1500000"
+          LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
+          LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
+          LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
+          AZURE_API_KEY: ${{ secrets.AZURE_API_KEY }}
+          AMUX_API_BASE: ${{ vars.AMUX_API_BASE }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           npm run test:e2e:live-stack:pipeline
           npm run coverage:e2e:live-stack
@@ -439,7 +454,7 @@ jobs:
     needs:
       - validate_core
       - validate_mux
-      - live_stack_contracts
+      - live_stack_e2e
       - validate_cloud
       - validate_observer_and_compiler
     runs-on: ubuntu-latest

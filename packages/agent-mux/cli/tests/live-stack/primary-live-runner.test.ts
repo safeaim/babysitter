@@ -4,7 +4,7 @@ import * as path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { buildPrimaryLiveStackCommands, runPrimaryLiveStackScenario } from './primary-live-runner';
+import { buildPrimaryLiveStackCommands, executeChildProcessCommand, runPrimaryLiveStackScenario } from './primary-live-runner';
 import { primaryLiveStackScenario } from './scenario-contract';
 
 describe('primary live stack runner contract', () => {
@@ -27,8 +27,12 @@ describe('primary live stack runner contract', () => {
         '--model',
         'gpt-5.5',
         '--with-proxy-if-needed',
+        '--proxy-log-level',
+        'debug',
+        '--session-id',
+        'trace-1',
         '--prompt',
-        '/babysitter:call Create a tiny proof run for live.agent-mux.claude-code.foundry-openai.gpt-5.5. trace=trace-1. Return Babysitter run id, effect id, hook status, and stop-hook status.',
+        '/babysitter:call Create a tiny proof run for live.agent-mux.claude-code.foundry-openai.gpt-5.5. trace=trace-1; print labels agentMuxSessionId, babysitterRunId, babysitterEffectId, hookEventId, hookMuxEventId, transportTraceId when observable. Verify the stop hook ran.',
         '--max-turns',
         '1',
       ],
@@ -95,7 +99,7 @@ describe('primary live stack runner contract', () => {
       artifactsDir: 'artifacts/live-stack',
       executeLiveProvider: true,
       env: process.env,
-      executeCommand: executeChildProcess,
+      executeCommand: executeChildProcessCommand,
       timeoutMs: 20 * 60 * 1000,
     });
 
@@ -104,32 +108,4 @@ describe('primary live stack runner contract', () => {
     expect(result.artifactPath).toBeDefined();
   });
 });
-
-async function executeChildProcess(execution: Parameters<typeof runPrimaryLiveStackScenario>[0]['executeCommand'] extends (arg: infer T) => Promise<unknown> ? T : never) {
-  const { spawn } = await import('node:child_process');
-  return await new Promise<{ status: number; stdout: string; stderr: string }>((resolve) => {
-    const child = spawn(execution.command, execution.args, {
-      cwd: execution.cwd,
-      env: { ...process.env, ...execution.env },
-      shell: process.platform === 'win32',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    let stdout = '';
-    let stderr = '';
-    const timer = setTimeout(() => {
-      child.kill('SIGTERM');
-      stderr += `\nTimed out after ${execution.timeoutMs}ms`;
-    }, execution.timeoutMs);
-    child.stdout?.on('data', (chunk) => { stdout += String(chunk); });
-    child.stderr?.on('data', (chunk) => { stderr += String(chunk); });
-    child.on('close', (code) => {
-      clearTimeout(timer);
-      resolve({ status: code ?? 1, stdout, stderr });
-    });
-    child.on('error', (error) => {
-      clearTimeout(timer);
-      resolve({ status: 1, stdout, stderr: `${stderr}\n${error.message}` });
-    });
-  });
-}
 

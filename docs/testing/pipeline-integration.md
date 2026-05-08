@@ -1,7 +1,7 @@
 ---
 title: Pipeline Integration
 description: Where the no-model and model-backed test lanes should run in CI, staging, release, scheduled, and manual workflows.
-last_updated: 2026-05-07
+last_updated: 2026-05-08
 ---
 
 # Pipeline Integration
@@ -10,10 +10,17 @@ The pipeline should add new testing lanes in stages. No-model tests protect ever
 
 ## Workflow Placement
 
+## Current Implementation
+
+The current implementation is consolidated in `.github/workflows/publish.yml`. That workflow owns the live-stack scenario and OS matrix directly under `live_stack_e2e`, exports each selected scenario through `LIVE_STACK_*` environment variables, runs `npm run test:e2e:live-stack:pipeline`, and writes the per-scenario coverage artifact with `npm run coverage:e2e:live-stack`. Test code executes exactly one pipeline-selected scenario when `LIVE_STACK_REQUIRE_EVIDENCE=1`; it must not enumerate the scenario matrix or run a code-side matrix runner.
+
+`Publish` now also owns the branch-aware publish/deploy topology for `develop`, `staging`, and `main`: validation and live-stack jobs precede `Prepare Publish`; package publishes, docs deploy, Atlas WebUI deploy, cloud deploy, release tagging, and external plugin sync depend on that prepared publish ref/version.
+
+
 | Workflow phase | Lanes | Trigger | Required behavior |
 | --- | --- | --- | --- |
 | Pull request / push CI | No-model unit, contract, mock integration, docs QA | Every PR and branch push | Fast, deterministic, no secrets, no live providers |
-| Staging publish preflight | Full no-model suite plus selected model-backed smoke | Push to `staging` before publish jobs | Blocks staging publish if runtime or harness smoke fails |
+| Publish preflight | Full no-model suite plus selected model-backed smoke | Push to `develop`, `staging`, or `main` before publish/deploy jobs | Blocks publish/deploy if runtime or harness smoke fails |
 | Release preflight | Full no-model suite plus model-backed release smoke | Push to `main` before publish/release jobs | Blocks production publish if live Codex/Claude/runtime smoke fails |
 | Scheduled nightly | Full model-backed suite | Nightly or twice daily | Detects provider, harness, CLI, and auth drift outside code changes |
 | Manual diagnostics | Any single lane or provider | `workflow_dispatch` | Lets maintainers rerun one harness/provider without re-running the full matrix |
@@ -22,11 +29,12 @@ The pipeline should add new testing lanes in stages. No-model tests protect ever
 
 Do not resurrect the retired Docker workflow names. Use new workflow names that describe the new strategy:
 
-- `testing-no-model.yml` for deterministic PR/push coverage.
-- `testing-model-backed.yml` for scheduled/manual/staging model-backed coverage.
-- `testing-coverage-report.yml` for repository-wide coverage aggregation if coverage becomes too expensive for the default CI workflow.
+- `publish.yml` currently runs deterministic validation and model-backed live-stack coverage inline.
+- Optional future `testing-no-model.yml` can extract deterministic PR/push coverage if another workflow needs the same contract.
+- Optional future `testing-model-backed.yml` can extract scheduled/manual model-backed coverage if it should run independently from publish.
+- Optional future `testing-coverage-report.yml` can extract repository-wide coverage aggregation if coverage becomes too expensive for the default CI workflow.
 
-These can be introduced incrementally. Existing `.github/workflows/ci.yml`, `.github/workflows/staging-publish.yml`, and `.github/workflows/release.yml` should call or depend on the new lanes once they exist.
+Reusable workflows are optional extraction targets, not the current source of truth. Existing `.github/workflows/ci.yml` can keep fast PR checks, while `.github/workflows/publish.yml` owns publish-time validation, live-stack preflight, deploy, tagging, and plugin sync.
 
 ## Secret Gating
 
@@ -74,9 +82,9 @@ Artifacts must never include raw API keys, token files, home-directory credentia
 
 | Workflow | Inputs | Outputs | Required artifacts | Downstream consumers |
 | --- | --- | --- | --- | --- |
-| `testing-no-model.yml` | `scope`, `changed_packages`, `coverage_mode` | `no_model_status`, `coverage_artifact`, `junit_artifact` | Vitest logs, Playwright traces on failure, package coverage summaries | `ci.yml`, `staging-publish.yml`, `release.yml` |
-| `testing-model-backed.yml` | `provider`, `agent`, `backend`, `path`, `prompt_fixture`, `required` | `model_backed_status`, `skip_reason`, `run_artifact` | Separate artifacts per path: setup JSON, agent-mux session events, transport-mux launch/env/metrics evidence, babysitter-agent run proof, stop-hook evidence | Scheduled workflow, staging preflight, release preflight |
-| `testing-coverage-report.yml` | `coverage_artifacts`, `playwright_artifacts`, `model_backed_artifacts` | `coverage_summary`, `scenario_summary` | Merged markdown summary, raw coverage JSON, trace index | PR summaries, release candidate notes |
+| Optional `testing-no-model.yml` | `scope`, `changed_packages`, `coverage_mode` | `no_model_status`, `coverage_artifact`, `junit_artifact` | Vitest logs, Playwright traces on failure, package coverage summaries | Future extraction for `ci.yml` and `publish.yml` |
+| Optional `testing-model-backed.yml` | `provider`, `agent`, `backend`, `path`, `prompt_fixture`, `required` | `model_backed_status`, `skip_reason`, `run_artifact` | Separate artifacts per path: setup JSON, agent-mux session events, transport-mux launch/env/metrics evidence, babysitter-agent run proof, stop-hook evidence | Future extraction from `publish.yml` live-stack jobs or scheduled workflow |
+| Optional `testing-coverage-report.yml` | `coverage_artifacts`, `playwright_artifacts`, `model_backed_artifacts` | `coverage_summary`, `scenario_summary` | Merged markdown summary, raw coverage JSON, trace index | Future PR summaries and release candidate notes |
 
 Required workflows should expose explicit failure/skip outputs. A publish workflow must depend on `*_status == success`; a scheduled workflow may record `skip_reason` without failing when credentials are intentionally absent.
 
@@ -102,7 +110,7 @@ Roadmap slice 0 keeps current workflow behavior intact and uses [Current Test Co
 
 ## Proposed Command Bundles
 
-Status: Proposed. These command names are not current `package.json` scripts unless and until a follow-up implementation slice adds them.
+Status: Mixed. `test:e2e:live-stack:*` and `coverage:e2e:live-stack` are current scripts; the broader no-model/model-backed bundle names remain proposed until a follow-up slice adds them.
 
 Package owners may initially wire these bundles as workflow steps that call existing package-local scripts, then promote them into root `package.json` scripts when at least two packages share the lane.
 

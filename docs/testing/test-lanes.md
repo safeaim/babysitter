@@ -1,6 +1,6 @@
 ---
 title: Test Lanes
-description: Proposed no-model and model-backed test lanes for the Babysitter monorepo.
+description: Current and proposed no-model and model-backed test lanes for the Babysitter monorepo.
 last_updated: 2026-05-07
 ---
 
@@ -31,9 +31,9 @@ Model-backed tests exercise real provider integrations, real installed harnesses
 | --- | --- | --- | --- |
 | SDK harness/plugin setup smoke | `babysitter harness:install <name>` and `babysitter harness:install-plugin <name>` | Installer delegation, plugin target resolution, idempotent manifests; not babysitter-agent runtime | Scheduled, manual, staging gate |
 | Agent-mux plugin/session E2E | Provider secrets, installed external CLI, and plugin precondition where supported | `amux run` or `createClient().run` starts a session, plugin command creates a Babysitter run, and hooks/process lifecycle are asserted | Scheduled, manual, staging gate |
-| Babysitter-agent live orchestration | Preinstalled/mocked backend plus `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or configured cloud equivalents where needed | `@a5c-ai/babysitter-agent` can plan, execute, post task results, and close a run without executing harness installer commands | Staging, release candidate, manual |
-| Agent-mux live adapters | Provider-specific credentials | Claude Code and Codex adapters produce protocol events that match the mux contracts | Scheduled, manual, release candidate |
-| Transport-mux live transport | Local process ports plus provider/harness credentials | Transport-mux carries real agent-core streams and agent-mux-launched external harness traffic through proxy routes with redacted launch/env/metrics artifacts | Scheduled, manual, staging gate after quarantine, release candidate |
+| Babysitter-agent live orchestration | Preinstalled/mocked backend plus `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or configured cloud equivalents where needed | `@a5c-ai/babysitter-agent` can plan, execute, post task results, and close a run without executing harness installer commands | `publish.yml` staging/main preflight, manual |
+| Agent-mux live adapters | Provider-specific credentials | Claude Code and Codex adapters produce protocol events that match the mux contracts | Scheduled/manual first, then `publish.yml` release preflight after quarantine |
+| Transport-mux live transport | Local process ports plus provider/harness credentials | Transport-mux carries real agent-core streams and agent-mux-launched external harness traffic through proxy routes with redacted launch/env/metrics artifacts | Scheduled/manual first, then `publish.yml` after quarantine |
 
 Model-backed tests must be opt-in by environment detection. A missing credential should mark the lane skipped or not scheduled, not silently pass a test that claims provider coverage.
 

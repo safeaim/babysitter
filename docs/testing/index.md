@@ -1,12 +1,12 @@
 ---
 title: Testing Strategy
 description: Index for the rebuilt Babysitter end-to-end, model-backed, no-model, mux, and coverage testing strategy.
-last_updated: 2026-05-07
+last_updated: 2026-05-08
 ---
 
 # Testing Strategy
 
-This directory defines the replacement testing strategy after the legacy Docker and Docker-E2E workflows were removed. The new plan starts from repository-native package boundaries, Babysitter harness setup commands, the `babysitter-agent` runtime surface, and explicit model/no-model lanes instead of reusing the retired Docker image and `e2e-tests/docker` suite.
+This directory defines the replacement testing strategy after the legacy Docker and Docker-E2E workflows were removed. The current CI implementation lives primarily in `.github/workflows/publish.yml`, with GitHub Actions owning the live-stack scenario and OS matrix. The new plan starts from repository-native package boundaries, Babysitter harness setup commands, the `babysitter-agent` runtime surface, and explicit model/no-model lanes instead of reusing the retired Docker image and `e2e-tests/docker` suite.
 
 ## Documents
 
@@ -38,7 +38,7 @@ This directory defines the replacement testing strategy after the legacy Docker 
 | Status | Meaning |
 | --- | --- |
 | Current | Command, workflow, or package test exists today and can be validated now. |
-| Proposed | Contract name or workflow shape this strategy recommends for a future implementation slice. |
+| Proposed | Contract name or workflow shape this strategy recommends for a future implementation slice; not the current source of truth unless a current workflow or package script is named. |
 | Promotion target | A test exists or is planned in a lower lane and should move only after meeting quality gates. |
 
 Unless a document explicitly says Current, command bundles and workflow names are proposed implementation targets.

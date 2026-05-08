@@ -110,27 +110,31 @@ export function buildPrimaryLiveStackCommands(
   }
 
   const installTarget = scenario.agent.agentMuxAgent;
+  const isInteractive = scenario.agent.installMode === 'babysitter-plugin';
+  const launchArgs = [
+    'launch',
+    installTarget,
+    scenario.model.amuxProvider,
+    '--model',
+    scenario.model.model,
+    '--with-proxy-if-needed',
+    '--proxy-log-level',
+    'debug',
+    '--session-id',
+    traceId,
+    '--prompt',
+    prompt,
+    '--max-turns',
+    String(resolveLaunchMaxTurns(scenario)),
+  ];
+  if (!isInteractive) {
+    launchArgs.push('--no-interactive');
+  }
   const launchCommand = commandExecution(
     commandEnv,
     'LIVE_STACK_AMUX_BIN',
     'amux',
-    [
-      'launch',
-      installTarget,
-      scenario.model.amuxProvider,
-      '--model',
-      scenario.model.model,
-      '--with-proxy-if-needed',
-      '--proxy-log-level',
-      'debug',
-      '--session-id',
-      traceId,
-      '--prompt',
-      prompt,
-      '--max-turns',
-      String(resolveLaunchMaxTurns(scenario)),
-      '--no-interactive',
-    ],
+    launchArgs,
     options.cwd,
     timeoutMs,
   );
@@ -314,15 +318,15 @@ function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: st
 function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
   const evidence = `Print exactly: trace=${traceId} scenario=${scenario.scenarioId}`;
 
-  if (scenario.agent.installMode === 'vanilla') {
-    return `Reply with "hello" and the following labels. ${evidence}`;
+  if (scenario.agent.installMode === 'babysitter-plugin') {
+    return `/babysitter:call Reply with "ok" and the following labels. ${evidence}`;
   }
 
   if (scenario.agent.integrationType === 'runtime-cli') {
     return `Reply with "ok" and the following labels. ${evidence}`;
   }
 
-  return `Reply with "ok" and the following labels. ${evidence}`;
+  return `Reply with "hello" and the following labels. ${evidence}`;
 }
 
 function extractTraceIds(output: string): Partial<LiveStackEvidenceBundle> {

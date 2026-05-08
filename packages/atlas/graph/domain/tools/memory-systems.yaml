@@ -1,0 +1,119 @@
+---
+nodeKind: Tool
+id: tool:mem0
+attributes:
+  displayName: "Mem0"
+  kind: other
+  description: |
+    Memory layer for personalized AI experiences that automatically
+    extracts, stores, and retrieves relevant memories from conversations.
+    Provides user-level, session-level, and agent-level memory with a
+    simple add/search API. Supports multiple vector store backends and
+    integrates with LangChain, CrewAI, and other agent frameworks to
+    give LLM applications persistent context across sessions.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:context-management
+---
+nodeKind: Tool
+id: tool:zep
+attributes:
+  displayName: "Zep"
+  kind: other
+  description: |
+    Long-term memory server for AI assistants that persists, summarizes,
+    and retrieves conversation history and extracted facts. Enriches
+    memory with entity extraction and temporal awareness. Provides a
+    REST API and SDKs for Python and TypeScript. Designed for chat
+    applications where assistants need to recall prior interactions,
+    user preferences, and accumulated knowledge across sessions.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:context-management
+---
+nodeKind: Tool
+id: tool:chromadb
+attributes:
+  displayName: "Chroma"
+  kind: other
+  description: |
+    Open-source embedding database purpose-built for AI applications.
+    Stores documents with embeddings and metadata, supports filtering,
+    and returns nearest-neighbor results. Runs in-memory, as a local
+    persistent store, or as a client-server deployment. First-class
+    integrations with LangChain, LlamaIndex, and OpenAI make it a
+    common default for prototyping RAG pipelines.
+edges:
+  tool_used_by:
+    - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:search-indexing
+---
+nodeKind: Tool
+id: tool:weaviate
+attributes:
+  displayName: "Weaviate"
+  kind: other
+  description: |
+    AI-native vector search engine that combines vector, keyword, and
+    hybrid search with built-in vectorization modules for text, images,
+    and multi-modal data. Supports GraphQL and REST APIs, multi-tenancy,
+    filtering, and horizontal scaling. Weaviate's generative search
+    modules can pipe retrieved context directly into LLM prompts,
+    making it a production-grade backend for RAG architectures.
+edges:
+  tool_used_by:
+    - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:search-indexing
+---
+nodeKind: Tool
+id: tool:pinecone
+attributes:
+  displayName: "Pinecone"
+  kind: other
+  description: |
+    Managed vector database for AI applications that handles indexing,
+    storage, and low-latency similarity search at scale. Provides a
+    serverless tier, metadata filtering, namespaces for multi-tenancy,
+    and sparse-dense hybrid search. Widely used in production RAG
+    systems where operational simplicity and uptime SLAs matter more
+    than self-hosting flexibility.
+edges:
+  tool_used_by:
+    - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:search-indexing
+---
+nodeKind: Tool
+id: tool:qdrant
+attributes:
+  displayName: "Qdrant"
+  kind: other
+  description: |
+    Open-source vector similarity search engine written in Rust with a
+    focus on performance and filtering. Supports payload-based filtering
+    alongside vector search, quantization for memory efficiency, and
+    distributed deployment. Provides gRPC and REST APIs with clients
+    for Python, TypeScript, Go, and Rust. A strong choice for self-hosted
+    vector search where query latency and resource efficiency matter.
+edges:
+  tool_used_by:
+    - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:search-indexing
+---
+nodeKind: Tool
+id: tool:milvus
+attributes:
+  displayName: "Milvus"
+  kind: other
+  description: |
+    Open-source vector database designed for billion-scale similarity
+    search with GPU-accelerated indexing. Supports multiple index types
+    (IVF, HNSW, DiskANN), hybrid scalar-vector queries, and multi-vector
+    search. Runs as a distributed system with separate storage and compute
+    scaling. Zilliz Cloud offers a managed deployment. Common in
+    enterprise AI pipelines requiring high-throughput vector operations.
+edges:
+  tool_used_by:
+    - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:search-indexing

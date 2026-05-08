@@ -37,50 +37,20 @@ unify canonicalized_to edges nodes to compact the graph.
 ----
 library - graph:
 
- Tier 2 — Schema evolution (the decision-making model)
+ Tier 2 — Schema evolution (the decision-making model) — DONE
 
-  #: 5
-  Item: Extend Responsibility with decision-making attributes — add responsibilityKind enum (operational, decision-making, advisory, oversight), ownershipAspect enum
-    (security, compliance, quality, execution, architecture, budget, hiring, strategy, privacy, reliability), and decisionScope (ref to the entity whose decisions
-  this
-     responsibility governs)
-  Details:
-  ────────────────────────────────────────
-  #: 6
-  Item: New node kind: DecisionType — models the type/category of decision (e.g., decision-type:technology-selection, decision-type:architecture-choice,
-    decision-type:vendor-selection, decision-type:hiring-decision, decision-type:budget-allocation, decision-type:security-policy, decision-type:compliance-ruling,
-    decision-type:release-go-no-go, decision-type:priority-call). Attributes: displayName, description, impactLevel (team/org/product/company), reversibility
-    (easily-reversible/costly-to-reverse/irreversible), typicalCadence
-  Details:
-  ────────────────────────────────────────
-  #: 7
-  Item: New edge kinds for the decision model — owns_decision_for (Responsibility → StackPart/Domain/Product entity, scoping what the decision applies to),
-    decision_of_type (Responsibility → DecisionType), escalates_to (Responsibility → Responsibility, for escalation chains), informed_by (DecisionType → SkillArea,
-    what expertise informs this decision type)
-  Details:
-  ────────────────────────────────────────
-  #: 8
-  Item: Populate decision instances — create ~20 DecisionType nodes, update ~30 existing responsibilities to carry the new attributes, create ~15 new decision-making
-    responsibilities (e.g., responsibility:api-contract-decision, responsibility:infrastructure-vendor-decision, responsibility:security-architecture-decision) with
-    ownership edges to stack-parts/domains
-  Details:
+  [x] #5: Extend Responsibility with decision-making attributes (responsibilityKind, ownershipAspect, decisionScope)
+  [x] #6: DecisionType node kind (16 instances, impactLevel, reversibility)
+  [x] #7: Edge kinds (owns_decision_for, decision_of_type, informed_by, resp_escalates_to + inverses)
+  [x] #8: Populate decision instances (16 DecisionTypes, 20 updated + 10 new responsibilities)
 
-  Tier 3 — Structural depth
+  Tier 3 — Structural depth — MOSTLY DONE
 
-  ┌─────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │  #  │                                                                           Item                                                                           │
-  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 9   │ Edge kind diversity for library nodes — currently all library edges are applies_to. Add requires_skill_area, implements_workflow, involves_role as       │
-  │     │ distinct edge kinds in the generator for semantic precision                                                                                              │
-  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 10  │ Methodology graph nodes — 39 methodologies in library but no Methodology node kind. Add schema + instances, connect to workflows and processes           │
-  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 11  │ More stack profiles — only 17 exist. Add LAMP, JAMstack, serverless patterns, data lake, ML inference, event-driven, CQRS stack profiles                 │
-  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 12  │ Wiki pages from library READMEs — generate wiki pages with auto-linked graph context from specialization README.md files                                 │
-  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 13  │ Edge weights/confidence — add confidence attributes to library annotations for search ranking quality                                                    │
-  └─────┴──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+  [x] #9: Edge kind diversity — 6 semantic edge kinds replacing generic applies_to (lib_requires_skill_area, lib_involves_role, etc.)
+  [x] #10: Methodology graph nodes — 56 instances across 8 categories, follows_methodology edges
+  [ ] #11: More stack profiles — 17 exist, could add LAMP, JAMstack, serverless, data lake, etc.
+  [x] #12: Wiki pages from library READMEs — 111 pages auto-generated at build time
+  [x] #13: Edge weights/confidence — 46,732 edges carry weight (1.0/0.7/0.5/0.9/0.8)
 
 
 ---

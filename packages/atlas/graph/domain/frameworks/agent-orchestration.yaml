@@ -1,0 +1,161 @@
+---
+nodeKind: Framework
+id: framework:langchain
+attributes:
+  displayName: "LangChain"
+  belongsToLanguageId: language:python
+  category: agent-orchestration
+  description: |
+    LLM application framework for building chains, agents, and RAG
+    pipelines. Provides abstractions for prompt templates, output parsers,
+    document loaders, vector stores, memory, and tool calling. The Python
+    package is the primary implementation with a TypeScript port
+    (LangChain.js) also available. LangSmith provides observability and
+    evaluation for LangChain applications.
+edges:
+  belongs_to_language:
+    - language:python
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:retrieval-augmented-generation
+---
+nodeKind: Framework
+id: framework:langgraph
+attributes:
+  displayName: "LangGraph"
+  belongsToLanguageId: language:python
+  category: agent-orchestration
+  description: |
+    Graph-based agent orchestration framework from the LangChain team
+    that models agent workflows as stateful, cyclic graphs. Nodes represent
+    computation steps and edges define control flow with conditional
+    branching. Supports human-in-the-loop breakpoints, persistent
+    checkpointing, and multi-agent architectures. Built on top of
+    LangChain primitives but usable independently.
+edges:
+  belongs_to_language:
+    - language:python
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:agentic-loops
+    - target: skill-area:multi-agent-coordination
+---
+nodeKind: Framework
+id: framework:crewai
+attributes:
+  displayName: "CrewAI"
+  belongsToLanguageId: language:python
+  category: agent-orchestration
+  description: |
+    Multi-agent role-playing framework where you define agents with
+    specific roles, goals, and backstories, then compose them into crews
+    that collaborate on tasks. Supports sequential and hierarchical
+    process flows, tool delegation between agents, and memory. Designed
+    for workflows where distinct personas (researcher, writer, reviewer)
+    need to collaborate toward a shared objective.
+edges:
+  belongs_to_language:
+    - language:python
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:multi-agent-coordination
+---
+nodeKind: Framework
+id: framework:autogen
+attributes:
+  displayName: "AutoGen"
+  belongsToLanguageId: language:python
+  category: agent-orchestration
+  description: |
+    Microsoft's multi-agent conversation framework that enables multiple
+    AI agents to communicate with each other and with humans to solve
+    tasks. Agents can be configured with different LLMs, tools, and human
+    input modes. Supports group chat, nested conversations, and teachable
+    agents. AutoGen Studio provides a visual interface for building and
+    debugging multi-agent workflows.
+edges:
+  belongs_to_language:
+    - language:python
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:multi-agent-coordination
+---
+nodeKind: Framework
+id: framework:pydantic-ai
+attributes:
+  displayName: "PydanticAI"
+  belongsToLanguageId: language:python
+  category: agent-orchestration
+  description: |
+    Type-safe agent framework from the Pydantic team that uses Python
+    type hints and Pydantic models to define agent inputs, outputs, and
+    tool signatures with full validation. Supports dependency injection
+    for tools, structured result types, streaming, and multiple model
+    providers. Logfire integration provides observability. Emphasizes
+    production correctness over notebook-style experimentation.
+edges:
+  belongs_to_language:
+    - language:python
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:tool-use
+---
+nodeKind: Framework
+id: framework:semantic-kernel
+attributes:
+  displayName: "Semantic Kernel"
+  belongsToLanguageId: language:csharp
+  category: agent-orchestration
+  description: |
+    Microsoft's AI orchestration SDK for integrating LLMs into enterprise
+    applications. Provides a plugin model for exposing native functions
+    and API endpoints as tools, planners for automatic multi-step task
+    decomposition, and memory connectors for vector stores. Available in
+    C#, Python, and Java. Targets the .NET ecosystem and Azure OpenAI
+    Service deployments.
+edges:
+  belongs_to_language:
+    - language:csharp
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:tool-use
+---
+nodeKind: Framework
+id: framework:mastra
+attributes:
+  displayName: "Mastra"
+  belongsToLanguageId: language:typescript
+  category: agent-orchestration
+  description: |
+    TypeScript-first agent framework for building AI applications with
+    tools, workflows, RAG, and multi-agent systems. Provides a unified
+    API for LLM providers, structured outputs via Zod schemas, and a
+    workflow engine with branching, retries, and human-in-the-loop steps.
+    Designed for TypeScript developers who want agent capabilities without
+    switching to the Python ecosystem.
+edges:
+  belongs_to_language:
+    - language:typescript
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:agentic-loops
+---
+nodeKind: Framework
+id: framework:vercel-ai-sdk
+attributes:
+  displayName: "Vercel AI SDK"
+  belongsToLanguageId: language:typescript
+  category: agent-orchestration
+  description: |
+    Vercel's TypeScript SDK for building AI-powered web applications with
+    streaming UI, tool calling, structured outputs, and multi-step agent
+    workflows. Provides React hooks (useChat, useCompletion) and server
+    actions for seamless frontend-backend AI integration. Supports
+    multiple providers via a unified API. The standard choice for adding
+    AI features to Next.js applications.
+edges:
+  belongs_to_language:
+    - language:typescript
+  used_by_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:server-side-rendering

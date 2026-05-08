@@ -1,0 +1,81 @@
+---
+nodeKind: Tool
+id: tool:litellm
+attributes:
+  displayName: "LiteLLM"
+  kind: other
+  description: |
+    Python proxy and SDK that provides a unified OpenAI-compatible
+    interface to 100+ LLM providers including Anthropic, Azure, Bedrock,
+    Vertex AI, Ollama, and Hugging Face. Features include load balancing,
+    fallbacks, spend tracking, rate limiting, and a proxy server mode
+    that lets any OpenAI-compatible client talk to any backend.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:model-serving-operations
+---
+nodeKind: Tool
+id: tool:openrouter
+attributes:
+  displayName: "OpenRouter"
+  kind: other
+  description: |
+    API gateway service that routes requests to Claude, GPT-4, Llama,
+    Mistral, and dozens of other models through a single OpenAI-compatible
+    endpoint. Handles billing aggregation, model discovery, and automatic
+    fallback routing. Useful for applications that need to switch between
+    providers without code changes or for accessing models not available
+    through direct API accounts.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:model-serving-operations
+---
+nodeKind: Tool
+id: tool:portkey-ai
+attributes:
+  displayName: "Portkey AI"
+  kind: other
+  description: |
+    AI gateway that sits between applications and LLM providers, adding
+    caching, automatic retries, fallback routing, load balancing, and
+    request/response logging. Supports guardrails, budget limits, and
+    A/B testing across model providers. Available as a managed service
+    or self-hosted gateway with an OpenAI-compatible API surface.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:model-serving-operations
+---
+nodeKind: Tool
+id: tool:helicone
+attributes:
+  displayName: "Helicone"
+  kind: other
+  description: |
+    LLM observability and proxy platform that captures requests, latency,
+    cost, and token usage across OpenAI, Anthropic, and other providers.
+    Integrates as a one-line proxy URL change. Provides dashboards for
+    cost analysis, user tracking, prompt versioning, and rate limiting.
+    Open-source core with a managed cloud offering.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:observability-instrumentation
+---
+nodeKind: Tool
+id: tool:braintrust-proxy
+attributes:
+  displayName: "Braintrust Proxy"
+  kind: other
+  description: |
+    AI proxy from the Braintrust evaluation platform that adds logging,
+    caching, and access control to LLM API calls. Captured requests feed
+    directly into Braintrust's evaluation and scoring pipelines, enabling
+    a tight loop between production traffic monitoring and offline evals.
+    Supports OpenAI-compatible routing to multiple providers.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:eval-driven-development

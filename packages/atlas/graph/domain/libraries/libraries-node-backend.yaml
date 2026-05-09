@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:socket-io
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:streaming-realtime-processing
 ---
 nodeKind: Library
 id: library:passport
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:authentication
 ---
 nodeKind: Library
 id: library:bcrypt
@@ -54,6 +60,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:authentication-authorization
 ---
 nodeKind: Library
 id: library:jsonwebtoken
@@ -68,6 +76,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:authentication-authorization
 ---
 nodeKind: Library
 id: library:cors
@@ -82,6 +92,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:helmet
@@ -96,6 +108,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-security
 ---
 nodeKind: Library
 id: library:morgan
@@ -110,6 +124,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:multer
@@ -124,6 +140,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:nodemailer
@@ -138,6 +156,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:bull
@@ -152,6 +172,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:bullmq
@@ -166,6 +188,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:ioredis
@@ -180,6 +204,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:caching-strategies
 ---
 nodeKind: Library
 id: library:redis
@@ -194,6 +220,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:caching-strategies
 ---
 nodeKind: Library
 id: library:mongoose
@@ -208,6 +236,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:winston
@@ -222,6 +252,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:pino
@@ -236,6 +268,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:dotenv
@@ -250,6 +284,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:chalk
@@ -264,6 +300,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:cli-design
 ---
 nodeKind: Library
 id: library:commander
@@ -278,6 +316,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:cli-design
 ---
 nodeKind: Library
 id: library:inquirer
@@ -292,3 +332,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:cli-design

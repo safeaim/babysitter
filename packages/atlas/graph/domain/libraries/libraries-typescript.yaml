@@ -10,6 +10,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:swr
@@ -22,6 +24,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:trpc
@@ -34,6 +38,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:drizzle-orm
@@ -46,6 +52,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:prisma
@@ -58,3 +66,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence

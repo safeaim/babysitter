@@ -11,3 +11,4 @@ edges:
     - language:python
   library_used_by:
     - target: skill-area:python-data-pipelines
+    - target: skill-area:data-analysis

@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:dart
+  library_used_by:
+    - target: skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:bloc
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:dart
+  library_used_by:
+    - target: skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:provider
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:dart
+  library_used_by:
+    - target: skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:get-x
@@ -68,6 +74,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:dart
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:freezed
@@ -110,6 +118,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:dart
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:isar
@@ -124,6 +134,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:dart
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:drift
@@ -138,6 +150,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:dart
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:go-router

@@ -11,6 +11,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:fiber
@@ -24,6 +26,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:gorilla-mux
@@ -37,6 +41,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:pgx
@@ -50,6 +56,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:sqlx-go
@@ -63,6 +71,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:zap
@@ -76,6 +86,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:zerolog
@@ -89,6 +101,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:actix
@@ -102,6 +116,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:warp
@@ -115,6 +131,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:rocket
@@ -128,6 +146,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:sqlx-rust
@@ -141,6 +161,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:sea-query
@@ -154,6 +176,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:tracing-rs
@@ -167,6 +191,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:clap-rs
@@ -193,6 +219,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:crossbeam
@@ -206,3 +234,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-async-processing

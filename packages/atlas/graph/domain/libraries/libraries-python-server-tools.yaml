@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:alembic
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:uvicorn
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:deployment
 ---
 nodeKind: Library
 id: library:gunicorn
@@ -54,6 +60,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:deployment
 ---
 nodeKind: Library
 id: library:pydantic-settings
@@ -96,6 +104,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:technical-documentation
 ---
 nodeKind: Library
 id: library:mako
@@ -110,6 +120,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:technical-documentation
 ---
 nodeKind: Library
 id: library:cookiecutter
@@ -152,6 +164,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:vulnerability-scanning
 ---
 nodeKind: Library
 id: library:safety
@@ -166,6 +180,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:vulnerability-scanning
 ---
 nodeKind: Library
 id: library:pre-commit

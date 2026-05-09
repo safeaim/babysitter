@@ -11,6 +11,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:dramatiq
@@ -24,6 +26,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:redis-py
@@ -50,6 +54,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:websockets
@@ -76,6 +82,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:cli-design
 ---
 nodeKind: Library
 id: library:typer
@@ -89,6 +97,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:cli-design
 ---
 nodeKind: Library
 id: library:rich-lib
@@ -102,6 +112,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:cli-tooling
 ---
 nodeKind: Library
 id: library:textual-lib
@@ -115,6 +127,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:cli-tooling
 ---
 nodeKind: Library
 id: library:structlog
@@ -128,6 +142,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:loguru
@@ -141,6 +157,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:arrow
@@ -180,6 +198,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:image-processing
 ---
 nodeKind: Library
 id: library:opencv-python
@@ -193,6 +213,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:image-processing
 ---
 nodeKind: Library
 id: library:boto3
@@ -206,6 +228,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:cloud-infrastructure
 ---
 nodeKind: Library
 id: library:google-cloud-python
@@ -219,6 +243,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:cloud-infrastructure
 ---
 nodeKind: Library
 id: library:azure-sdk-python
@@ -232,6 +258,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:cloud-infrastructure
 ---
 nodeKind: Library
 id: library:dask
@@ -245,6 +273,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:streaming-realtime-processing
 ---
 nodeKind: Library
 id: library:ray
@@ -258,3 +288,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:streaming-realtime-processing

@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:effect-ts
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:fp-ts
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:code-quality
 ---
 nodeKind: Library
 id: library:io-ts
@@ -54,6 +60,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:data-validation-sanitization
 ---
 nodeKind: Library
 id: library:neverthrow
@@ -68,6 +76,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:code-quality
 ---
 nodeKind: Library
 id: library:zx
@@ -82,6 +92,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:cli-design
 ---
 nodeKind: Library
 id: library:execa
@@ -96,6 +108,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:cli-design
 ---
 nodeKind: Library
 id: library:shelljs
@@ -110,6 +124,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:glob
@@ -124,6 +140,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:fast-glob
@@ -138,6 +156,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:chokidar
@@ -152,6 +172,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:fs-extra
@@ -166,6 +188,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:cli-design
 ---
 nodeKind: Library
 id: library:cross-env
@@ -180,6 +204,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:concurrently
@@ -194,6 +220,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:npm-run-all
@@ -208,6 +236,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:handlebars
@@ -222,6 +252,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:technical-documentation
 ---
 nodeKind: Library
 id: library:ejs
@@ -236,6 +268,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:technical-documentation
 ---
 nodeKind: Library
 id: library:mustache
@@ -250,6 +284,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:technical-documentation
 ---
 nodeKind: Library
 id: library:pug
@@ -264,6 +300,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:technical-documentation
 ---
 nodeKind: Library
 id: library:nunjucks
@@ -278,6 +316,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:technical-documentation
 ---
 nodeKind: Library
 id: library:eta
@@ -292,3 +332,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:technical-documentation

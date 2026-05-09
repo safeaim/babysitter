@@ -10,6 +10,9 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:browser-automation
+    - skill-area:web-scraping
 ---
 nodeKind: Library
 id: library:cheerio
@@ -22,6 +25,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:web-scraping
 ---
 nodeKind: Library
 id: library:sharp
@@ -34,6 +39,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:image-processing
 ---
 nodeKind: Library
 id: library:jest-dom
@@ -46,6 +53,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:component-testing
 ---
 nodeKind: Library
 id: library:msw
@@ -58,6 +67,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:component-testing
 ---
 nodeKind: Library
 id: library:nock
@@ -70,6 +81,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:component-testing
 ---
 nodeKind: Library
 id: library:supertest
@@ -82,6 +95,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:component-testing
 ---
 nodeKind: Library
 id: library:faker
@@ -94,6 +109,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:component-testing
 ---
 nodeKind: Library
 id: library:dayjs
@@ -106,6 +123,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:moment
@@ -118,6 +137,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:immer
@@ -130,6 +151,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:nodemon
@@ -142,6 +165,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:ts-node
@@ -154,6 +179,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:tsx
@@ -166,6 +193,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:tsup
@@ -178,6 +207,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization
 ---
 nodeKind: Library
 id: library:husky
@@ -190,6 +221,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:code-quality
 ---
 nodeKind: Library
 id: library:lint-staged
@@ -202,6 +235,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:code-quality
 ---
 nodeKind: Library
 id: library:commitlint
@@ -214,6 +249,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:code-quality
 ---
 nodeKind: Library
 id: library:changesets
@@ -226,6 +263,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:code-quality
 ---
 nodeKind: Library
 id: library:semantic-release-lib
@@ -238,3 +277,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ci-pipeline-optimization

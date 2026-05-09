@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:sequelize
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:typeorm
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:mikro-orm
@@ -54,6 +60,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:objection
@@ -68,6 +76,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:kysely
@@ -82,6 +92,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:apollo-client
@@ -96,6 +108,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:urql
@@ -110,6 +124,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:relay
@@ -124,6 +140,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:graphql-request
@@ -138,6 +156,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:graphql-tools
@@ -152,6 +172,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:nexus
@@ -166,6 +188,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:type-graphql
@@ -180,6 +204,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:mercurius
@@ -194,6 +220,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:yoga
@@ -208,6 +236,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:next-auth
@@ -222,6 +252,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:authentication
 ---
 nodeKind: Library
 id: library:lucia
@@ -236,6 +268,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:authentication
 ---
 nodeKind: Library
 id: library:trpc-server
@@ -250,6 +284,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:trpc-client
@@ -264,3 +300,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:backend-api-design

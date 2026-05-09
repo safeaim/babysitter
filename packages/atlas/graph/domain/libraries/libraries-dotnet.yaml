@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:aspnet-core
@@ -40,6 +42,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:mediatr
@@ -96,6 +100,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:nlog
@@ -110,6 +116,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:polly
@@ -124,6 +132,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:hangfire
@@ -152,6 +162,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:streaming-realtime-processing
 ---
 nodeKind: Library
 id: library:identity-server
@@ -180,6 +192,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:nunit
@@ -194,6 +208,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:moq
@@ -208,6 +224,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:newtonsoft-json

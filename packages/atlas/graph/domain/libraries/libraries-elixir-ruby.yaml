@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:elixir
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:oban
@@ -54,6 +56,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:elixir
+  library_used_by:
+    - target: skill-area:graphql-schema-design
 ---
 nodeKind: Library
 id: library:broadway
@@ -110,6 +114,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:ruby
+  library_used_by:
+    - target: skill-area:authentication
 ---
 nodeKind: Library
 id: library:sidekiq
@@ -124,6 +130,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:ruby
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:pundit
@@ -180,6 +188,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:ruby
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:capybara

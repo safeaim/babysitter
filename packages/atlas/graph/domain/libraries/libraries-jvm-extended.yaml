@@ -11,6 +11,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:spring-security
@@ -24,6 +26,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:authentication-authorization
 ---
 nodeKind: Library
 id: library:spring-cloud
@@ -37,6 +41,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:micronaut
@@ -50,6 +56,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:quarkus
@@ -63,6 +71,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:ktor
@@ -76,6 +86,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:exposed
@@ -89,6 +101,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:kotest
@@ -102,6 +116,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:arrow-kt
@@ -115,6 +131,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:dagger-java
@@ -128,6 +146,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:solution-architecture
 ---
 nodeKind: Library
 id: library:guice
@@ -141,6 +161,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:solution-architecture
 ---
 nodeKind: Library
 id: library:slf4j
@@ -154,6 +176,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:log4j
@@ -167,6 +191,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: Library
 id: library:netty
@@ -180,3 +206,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:backend-async-processing

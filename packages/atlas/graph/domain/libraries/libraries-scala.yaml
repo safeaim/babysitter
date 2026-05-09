@@ -11,6 +11,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:scala
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:play-framework-lib
@@ -24,6 +26,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:scala
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:cats
@@ -37,6 +41,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:scala
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:cats-effect
@@ -50,6 +56,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:scala
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:zio
@@ -63,6 +71,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:scala
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:http4s
@@ -76,6 +86,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:scala
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:doobie

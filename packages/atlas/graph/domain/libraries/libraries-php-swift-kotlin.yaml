@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:php
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:eloquent
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:php
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:phpunit
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:php
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:pest-php
@@ -54,6 +60,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:php
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:laravel-horizon
@@ -124,6 +132,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:swift
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:kingfisher
@@ -208,6 +218,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:retrofit-kt
@@ -236,3 +248,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  library_used_by:
+    - target: skill-area:backend-async-processing

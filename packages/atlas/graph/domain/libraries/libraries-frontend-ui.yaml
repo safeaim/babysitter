@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:jotai
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:recoil
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:application-state-management
 ---
 nodeKind: Library
 id: library:framer-motion
@@ -54,6 +60,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:animation-transitions
 ---
 nodeKind: Library
 id: library:three
@@ -68,6 +76,9 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:data-visualization
+    - skill-area:animation-transitions
 ---
 nodeKind: Library
 id: library:d3
@@ -82,6 +93,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:data-visualization
 ---
 nodeKind: Library
 id: library:chart-js
@@ -96,6 +109,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:data-visualization
 ---
 nodeKind: Library
 id: library:recharts
@@ -110,6 +125,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:data-visualization
 ---
 nodeKind: Library
 id: library:shadcn
@@ -124,6 +141,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:radix-ui
@@ -138,6 +157,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:headless-ui
@@ -152,6 +173,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:material-ui
@@ -166,6 +189,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:chakra-ui
@@ -180,6 +205,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:mantine
@@ -194,6 +221,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:ant-design
@@ -208,6 +237,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:tailwindcss
@@ -222,6 +253,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ui-styling
 ---
 nodeKind: Library
 id: library:daisyui
@@ -236,6 +269,9 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ui-styling
+    - skill-area:design-systems
 ---
 nodeKind: Library
 id: library:styled-components
@@ -250,6 +286,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:ui-styling
 ---
 nodeKind: Library
 id: library:emotion
@@ -264,6 +302,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_for:
+    - skill-area:ui-styling
 ---
 nodeKind: Library
 id: library:postcss
@@ -278,6 +318,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ui-styling
 ---
 nodeKind: Library
 id: library:sass
@@ -292,3 +334,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_for:
+    - skill-area:ui-styling

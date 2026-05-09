@@ -10,6 +10,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:mockito
@@ -22,6 +24,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:junit
@@ -34,3 +38,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  library_used_by:
+    - target: skill-area:component-testing

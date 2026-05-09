@@ -12,6 +12,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:haskell
+  library_used_by:
+    - target: skill-area:serialization-deserialization
 ---
 nodeKind: Library
 id: library:servant
@@ -26,6 +28,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:haskell
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:yesod
@@ -40,6 +44,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:haskell
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:conduit
@@ -54,6 +60,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:haskell
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:lens
@@ -96,6 +104,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:haskell
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:hspec
@@ -110,6 +120,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:haskell
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:stack-lib
@@ -152,6 +164,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:chi-middleware
@@ -166,6 +180,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:gorm-v2
@@ -181,6 +197,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:go-kit
@@ -195,6 +213,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:fx
@@ -209,6 +229,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:solution-architecture
 ---
 nodeKind: Library
 id: library:wire-go
@@ -223,6 +245,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:solution-architecture
 ---
 nodeKind: Library
 id: library:tower
@@ -237,6 +261,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Library
 id: library:tonic
@@ -251,6 +277,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:sqlx-pg
@@ -265,6 +293,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:diesel-rs
@@ -279,6 +309,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:axum-extra
@@ -293,6 +325,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Library
 id: library:leptos
@@ -307,3 +341,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  library_used_by:
+    - target: skill-area:frontend-development

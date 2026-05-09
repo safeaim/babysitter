@@ -10,6 +10,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:backend-data-persistence
 ---
 nodeKind: Library
 id: library:cobra
@@ -36,3 +38,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:go
+  library_used_by:
+    - target: skill-area:configuration-management

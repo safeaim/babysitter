@@ -22,6 +22,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:hypothesis
@@ -34,6 +36,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:component-testing
 ---
 nodeKind: Library
 id: library:scrapy
@@ -46,6 +50,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:web-scraping
 ---
 nodeKind: Library
 id: library:hf-transformers
@@ -58,6 +64,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:machine-learning
 ---
 nodeKind: Library
 id: library:scikit-learn
@@ -70,6 +78,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:machine-learning
 ---
 nodeKind: Library
 id: library:matplotlib
@@ -82,6 +92,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:data-analysis
 ---
 nodeKind: Library
 id: library:seaborn
@@ -94,6 +106,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:data-analysis
 ---
 nodeKind: Library
 id: library:pytorch
@@ -106,6 +120,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:machine-learning
 ---
 nodeKind: Library
 id: library:tensorflow
@@ -118,6 +134,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:machine-learning
 ---
 nodeKind: Library
 id: library:jax
@@ -130,6 +148,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:python
+  library_used_by:
+    - target: skill-area:machine-learning
 ---
 nodeKind: Library
 id: library:langchain

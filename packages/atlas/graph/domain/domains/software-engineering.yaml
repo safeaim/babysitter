@@ -19,3 +19,21 @@ edges:
     - specialization:ai-agents-conversational
     - specialization:go-microservices
     - specialization:rust-systems
+---
+nodeKind: Domain
+id: domain:api-development
+attributes:
+  displayName: "API Development"
+  description: |
+    Design, implementation, and documentation of APIs — REST, GraphQL,
+    gRPC, and OpenAPI — including versioning, authentication, and rate limiting.
+edges: {}
+---
+nodeKind: Domain
+id: domain:serverless
+attributes:
+  displayName: "Serverless"
+  description: |
+    Serverless computing architectures and functions-as-a-service (FaaS)
+    including AWS Lambda, Cloudflare Workers, and event-driven workflows.
+edges: {}

@@ -770,6 +770,8 @@ edges:
   integrates_with:
   - target: stack-part:cache
   - target: tool:redis-cli
+  - target: library:redis
+  - target: library:redis-py
   lib_applies_to_domain:
   - target: domain:databases
 ---

@@ -81,6 +81,8 @@ export interface ProxyPlan {
   targetModel: string;
   exposedTransport: TransportId;
   port: number;
+  apiBase?: string;
+  apiKey?: string;
 }
 
 export interface LaunchPlan {
@@ -151,6 +153,8 @@ export function resolveLaunchPlan(input: LaunchPlanInput): LaunchPlan {
         targetModel: providerConfig.model,
         exposedTransport: translation.proxyExposedTransport ?? 'openai-chat',
         port: input.proxyPort ?? 0,
+        apiBase: providerConfig.params['apiBase'] ? String(providerConfig.params['apiBase']) : undefined,
+        apiKey: providerConfig.auth.apiKey,
       }
     : undefined;
 
@@ -466,6 +470,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         targetModel: `${plan.proxy.targetProvider}/${plan.proxy.targetModel}`,
         exposedTransport: plan.proxy.exposedTransport,
         port: plan.proxy.port,
+        apiBase: plan.proxy.apiBase,
       });
       proxyRuntime.applyHarnessEnv(plan.env);
     } catch (err: unknown) {

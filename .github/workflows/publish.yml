@@ -632,15 +632,12 @@ jobs:
           path: artifacts/observer-compiler-logs
           if-no-files-found: warn
 
-  prepare_publish:
-    if: ${{ always() && !contains(github.event.head_commit.message, '[skip publish]') && needs.validate_core.result == 'success' && needs.validate_mux.result == 'success' && needs.validate_observer_and_compiler.result == 'success' }}
-    name: Prepare Publish
+  prepare_publish_base:
+    if: ${{ always() && !contains(github.event.head_commit.message, '[skip publish]') && needs.validate_core.result == 'success' && needs.validate_mux.result == 'success' && needs.validate_cloud.result == 'success' && needs.validate_observer_and_compiler.result == 'success' }}
+    name: Prepare Publish Base
     needs:
       - validate_core
       - validate_mux
-      - agent_mux_hooks_mux_e2e
-      - no_model_mock_matrix
-      - live_stack_e2e
       - validate_cloud
       - validate_observer_and_compiler
     runs-on: ubuntu-latest
@@ -763,10 +760,31 @@ jobs:
           path: artifacts/publish-source/publish-source.tgz
           if-no-files-found: error
 
+  prepare_publish:
+    if: ${{ always() && !contains(github.event.head_commit.message, '[skip publish]') && needs.prepare_publish_base.result == 'success' && needs.agent_mux_hooks_mux_e2e.result == 'success' && needs.no_model_mock_matrix.result == 'success' && needs.live_stack_e2e.result == 'success' }}
+    name: Prepare Publish
+    needs:
+      - prepare_publish_base
+      - agent_mux_hooks_mux_e2e
+      - no_model_mock_matrix
+      - live_stack_e2e
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      publish_version: ${{ steps.forward.outputs.publish_version }}
+      publish_ref: ${{ steps.forward.outputs.publish_ref }}
+    steps:
+      - name: Forward publish outputs
+        id: forward
+        run: |
+          echo "publish_version=${{ needs.prepare_publish_base.outputs.publish_version }}" >> "$GITHUB_OUTPUT"
+          echo "publish_ref=${{ needs.prepare_publish_base.outputs.publish_ref }}" >> "$GITHUB_OUTPUT"
+
   publish_atlas:
     if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Atlas
-    needs: prepare_publish
+    needs: prepare_publish_base
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1301,7 +1319,7 @@ jobs:
     if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Deploy Atlas WebUI To AKS
     needs:
-      - prepare_publish
+      - prepare_publish_base
       - publish_atlas
     runs-on: ubuntu-latest
     env:
@@ -1311,7 +1329,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.prepare_publish.outputs.publish_ref }}
+          ref: ${{ needs.prepare_publish_base.outputs.publish_ref }}
 
       - name: Check deployment configuration
         id: config

@@ -6,7 +6,22 @@
  * proxy needs a completion engine to translate between formats.
  */
 
-import type { CompletionEngine, CompletionRequest, CompletionResult } from '@a5c-ai/transport-mux';
+import type { CompletionEngine, CompletionRequest, CompletionResult, CompletionStreamEvent } from '@a5c-ai/transport-mux';
+
+function buildUrl(apiBase: string, model: string): string {
+  return `${apiBase}/openai/deployments/${model}/chat/completions?api-version=2024-12-01-preview`;
+}
+
+function buildHeaders(apiKey: string): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+    'api-key': apiKey,
+  };
+}
+
+function buildBody(messages: Array<{ role: string; content: string }>, model: string, stream: boolean): string {
+  return JSON.stringify({ messages, model, stream });
+}
 
 export function createOpenAICompletionEngine(options: {
   apiBase: string;
@@ -15,22 +30,15 @@ export function createOpenAICompletionEngine(options: {
 }): CompletionEngine {
   return {
     async complete(request: CompletionRequest): Promise<CompletionResult> {
-      const messages = request.messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
-      const response = await fetch(`${options.apiBase}/openai/deployments/${options.targetModel}/chat/completions?api-version=2024-12-01-preview`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': options.apiKey,
+      const messages = request.messages.map((m) => ({ role: m.role, content: m.content }));
+      const response = await fetch(
+        buildUrl(options.apiBase, options.targetModel),
+        {
+          method: 'POST',
+          headers: buildHeaders(options.apiKey),
+          body: buildBody(messages, options.targetModel, false),
         },
-        body: JSON.stringify({
-          messages,
-          model: options.targetModel,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -56,6 +64,75 @@ export function createOpenAICompletionEngine(options: {
           totalTokens: data.usage?.total_tokens ?? 0,
         },
       };
+    },
+
+    async *stream(request: CompletionRequest): AsyncIterable<CompletionStreamEvent> {
+      const messages = request.messages.map((m) => ({ role: m.role, content: m.content }));
+      const response = await fetch(
+        buildUrl(options.apiBase, options.targetModel),
+        {
+          method: 'POST',
+          headers: buildHeaders(options.apiKey),
+          body: buildBody(messages, options.targetModel, true),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`OpenAI API error ${response.status}: ${errorText}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No response body');
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith('data: ')) continue;
+          const payload = trimmed.slice(6);
+          if (payload === '[DONE]') {
+            yield { type: 'done' };
+            return;
+          }
+
+          try {
+            const chunk = JSON.parse(payload) as {
+              choices: Array<{ delta: { content?: string }; finish_reason?: string | null }>;
+              usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+            };
+            const delta = chunk.choices[0]?.delta?.content;
+            if (delta) {
+              yield { type: 'text-delta', text: delta };
+            }
+            if (chunk.choices[0]?.finish_reason) {
+              yield {
+                type: 'done',
+                finishReason: chunk.choices[0].finish_reason,
+                usage: chunk.usage ? {
+                  promptTokens: chunk.usage.prompt_tokens,
+                  completionTokens: chunk.usage.completion_tokens,
+                  totalTokens: chunk.usage.total_tokens,
+                } : undefined,
+              };
+              return;
+            }
+          } catch {
+            // skip malformed chunks
+          }
+        }
+      }
+
+      yield { type: 'done' };
     },
   };
 }

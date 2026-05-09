@@ -11,6 +11,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:mixpanel
@@ -24,6 +27,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:amplitude
@@ -37,6 +43,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:posthog
@@ -50,6 +59,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:heap
@@ -63,6 +75,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:google-analytics
@@ -76,6 +91,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:hotjar
@@ -89,6 +107,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:fullstory
@@ -102,3 +123,6 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:product-analytics
+  used_for:
+    - skill-area:data-collection
+    - skill-area:frontend-performance

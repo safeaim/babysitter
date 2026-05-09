@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:error-tracking
+  used_for:
+    - skill-area:error-tracking
 ---
 nodeKind: Tool
 id: tool:rollbar
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:error-tracking
+  used_for:
+    - skill-area:error-tracking
 ---
 nodeKind: Tool
 id: tool:airbrake
@@ -37,6 +41,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:error-tracking
+  used_for:
+    - skill-area:error-tracking
 ---
 nodeKind: Tool
 id: tool:logrocket
@@ -51,3 +57,6 @@ edges:
   tool_used_by:
     - target: skill-area:error-tracking
     - target: skill-area:frontend-performance
+  used_for:
+    - skill-area:error-tracking
+    - skill-area:frontend-performance

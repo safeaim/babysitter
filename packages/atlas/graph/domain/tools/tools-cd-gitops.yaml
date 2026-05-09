@@ -10,6 +10,10 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:gitops
+  used_for:
+    - target: skill-area:gitops
+    - target: skill-area:ci-cd
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:flux
@@ -22,6 +26,10 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:gitops
+  used_for:
+    - target: skill-area:gitops
+    - target: skill-area:ci-cd
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:tekton
@@ -34,3 +42,6 @@ attributes:
 edges:
   belongs_to_language:
     - target: language:yaml
+  used_for:
+    - target: skill-area:ci-cd
+    - target: skill-area:deployment-automation

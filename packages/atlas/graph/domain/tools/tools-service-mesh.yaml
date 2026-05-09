@@ -10,6 +10,11 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:service-mesh-config
+  used_for:
+    - target: skill-area:service-mesh-config
+    - target: skill-area:networking
+  implements_stack_part:
+    - target: stack-part:service-mesh
 ---
 nodeKind: Tool
 id: tool:linkerd
@@ -22,3 +27,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:service-mesh-config
+  used_for:
+    - target: skill-area:service-mesh-config
+    - target: skill-area:networking
+  implements_stack_part:
+    - target: stack-part:service-mesh

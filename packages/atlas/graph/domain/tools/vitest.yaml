@@ -11,3 +11,5 @@ edges:
     - language:javascript
   tool_used_by:
     - target: skill-area:react-testing
+  used_for:
+    - skill-area:component-testing

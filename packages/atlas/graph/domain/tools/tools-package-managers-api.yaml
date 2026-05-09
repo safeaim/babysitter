@@ -10,6 +10,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:developer-environment
+  used_for:
+    - skill-area:developer-environment
 ---
 nodeKind: Tool
 id: tool:chocolatey
@@ -23,6 +25,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:developer-environment
+  used_for:
+    - skill-area:developer-environment
 ---
 nodeKind: Tool
 id: tool:scoop
@@ -36,6 +40,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:developer-environment
+  used_for:
+    - skill-area:developer-environment
 ---
 nodeKind: Tool
 id: tool:winget
@@ -49,6 +55,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:developer-environment
+  used_for:
+    - skill-area:developer-environment
 ---
 nodeKind: Tool
 id: tool:nix
@@ -63,6 +71,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:developer-environment
+  used_for:
+    - skill-area:developer-environment
 ---
 nodeKind: Tool
 id: tool:apt
@@ -77,6 +87,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:developer-environment
+  used_for:
+    - skill-area:developer-environment
 ---
 nodeKind: Tool
 id: tool:hoppscotch
@@ -91,6 +103,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:api-design
+  used_for:
+    - skill-area:api-testing
+    - skill-area:backend-api-design
 ---
 nodeKind: Tool
 id: tool:httpie
@@ -105,6 +120,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:api-design
+  used_for:
+    - skill-area:api-testing
+    - skill-area:backend-api-design
 ---
 nodeKind: Tool
 id: tool:bruno
@@ -119,6 +137,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:api-design
+  used_for:
+    - skill-area:api-testing
+    - skill-area:backend-api-design
 ---
 nodeKind: Tool
 id: tool:rapidapi
@@ -133,6 +154,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:api-design
+  used_for:
+    - skill-area:api-testing
+    - skill-area:backend-api-design
 ---
 nodeKind: Tool
 id: tool:swagger-editor
@@ -147,3 +171,6 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:api-design
+  used_for:
+    - skill-area:api-testing
+    - skill-area:backend-api-design

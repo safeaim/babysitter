@@ -8,3 +8,7 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:observability-pipeline
+  used_for:
+    - skill-area:observability-instrumentation
+  implements_stack_part:
+    - stack-part:metrics

@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:payment-processing
+  used_for:
+    - skill-area:payment-processing
 ---
 nodeKind: Tool
 id: tool:square
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:payment-processing
+  used_for:
+    - skill-area:payment-processing
 ---
 nodeKind: Tool
 id: tool:paddle
@@ -37,6 +41,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:payment-processing
+  used_for:
+    - skill-area:payment-processing
 ---
 nodeKind: Tool
 id: tool:braintree
@@ -50,3 +56,5 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:payment-processing
+  used_for:
+    - skill-area:payment-processing

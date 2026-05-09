@@ -10,6 +10,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:ripgrep
@@ -22,6 +24,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:fzf
@@ -34,3 +38,5 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience

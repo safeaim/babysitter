@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:feature-management
+  used_for:
+    - skill-area:feature-management
 ---
 nodeKind: Tool
 id: tool:unleash
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:feature-management
+  used_for:
+    - skill-area:feature-management
 ---
 nodeKind: Tool
 id: tool:split-io
@@ -37,3 +41,5 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:feature-management
+  used_for:
+    - skill-area:feature-management

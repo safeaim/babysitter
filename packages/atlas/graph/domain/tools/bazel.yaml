@@ -8,3 +8,5 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:terraform-infrastructure
+  used_for:
+    - target: skill-area:ci-pipeline-optimization

@@ -10,5 +10,7 @@ edges:
     - target: language:hcl
   used_for:
     - target: skill-area:terraform-infrastructure
+    - target: skill-area:deployment-automation
+    - target: skill-area:ci-security
   tool_used_by:
     - target: skill-area:terraform-infrastructure

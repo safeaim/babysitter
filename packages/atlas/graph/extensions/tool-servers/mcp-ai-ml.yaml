@@ -101,6 +101,7 @@ attributes:
 edges:
   integrates_with:
   - target: stack-part:model-serving
+  - target: provider:replicate
   lib_applies_to_domain:
   - target: domain:machine-learning
   - target: domain:data-science

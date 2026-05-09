@@ -10,3 +10,6 @@ attributes:
 edges:
   belongs_to_language:
     - target: language:python
+  used_for:
+    - skill-area:data-science-experimentation
+    - skill-area:ai-evaluation

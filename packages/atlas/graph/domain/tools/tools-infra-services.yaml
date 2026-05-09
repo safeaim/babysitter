@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cdn-edge
+  used_for:
+    - skill-area:cdn-edge
 ---
 nodeKind: Tool
 id: tool:akamai
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cdn-edge
+  used_for:
+    - skill-area:cdn-edge
 ---
 nodeKind: Tool
 id: tool:ngrok
@@ -37,6 +41,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:local-development
+  used_for:
+    - skill-area:networking
 ---
 nodeKind: Tool
 id: tool:tailscale
@@ -50,6 +56,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:networking
+  used_for:
+    - skill-area:networking
 ---
 nodeKind: Tool
 id: tool:cloudflare-workers
@@ -64,3 +72,5 @@ edges:
   tool_used_by:
     - target: skill-area:serverless-compute
     - target: skill-area:cdn-edge
+  used_for:
+    - skill-area:cdn-edge

@@ -8,3 +8,6 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:k8s-operator-development
+  used_for:
+    - target: skill-area:configuration-management
+    - target: skill-area:deployment-automation

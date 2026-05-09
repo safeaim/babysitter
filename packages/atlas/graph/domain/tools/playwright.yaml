@@ -12,3 +12,6 @@ edges:
   tool_used_by:
     - target: skill-area:react-testing
     - target: skill-area:e2e-testing
+  used_for:
+    - skill-area:e2e-testing
+    - skill-area:cross-browser-testing

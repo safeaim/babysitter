@@ -11,6 +11,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  used_for:
+    - target: skill-area:ci-pipeline-optimization
 ---
 nodeKind: Tool
 id: tool:maven
@@ -24,6 +26,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  used_for:
+    - target: skill-area:ci-pipeline-optimization
 ---
 nodeKind: Tool
 id: tool:sbt
@@ -37,3 +41,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:scala
+  used_for:
+    - target: skill-area:ci-pipeline-optimization

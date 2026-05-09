@@ -10,6 +10,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:observability-pipeline
+  used_for:
+    - skill-area:observability-instrumentation
 ---
 nodeKind: Tool
 id: tool:fluent-bit
@@ -22,3 +24,5 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:observability-pipeline
+  used_for:
+    - skill-area:observability-instrumentation

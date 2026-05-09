@@ -2541,7 +2541,7 @@ edgeKinds:
 - id: edge:integrates-with
   name: integrates_with
   origin: universal
-  description: documented integration between platform services, or between a tool server and its backing tool/stack-part/framework
+  description: documented integration between platform services, or between a tool server and the primary entities it connects to (tools, platforms, providers, issue trackers, VCS hosts, etc.)
   source:
   - PlatformService
   - ToolServer
@@ -2550,6 +2550,15 @@ edgeKinds:
   - Tool
   - StackPart
   - Framework
+  - IssueTracker
+  - VCSHost
+  - Provider
+  - ModelProviderProduct
+  - Platform
+  - Library
+  - SkillArea
+  - Specialization
+  - Channel
   cardinality: N:N
   symmetric: false
   attributes:

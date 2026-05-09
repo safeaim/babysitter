@@ -9,3 +9,9 @@ edges:
   tool_used_by:
     - target: skill-area:container-security
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:containerization
+    - target: skill-area:deployment
+    - target: skill-area:configuration-management
+  implements_stack_part:
+    - target: stack-part:container-runtime

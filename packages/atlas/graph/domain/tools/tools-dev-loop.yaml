@@ -10,6 +10,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:local-development
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:skaffold
@@ -22,6 +25,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:local-development
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:colima
@@ -34,3 +40,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:local-development
+    - target: skill-area:containerization
+  implements_stack_part:
+    - target: stack-part:container-runtime

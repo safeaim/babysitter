@@ -11,3 +11,9 @@ edges:
     - target: skill-area:gitops
     - target: skill-area:k8s-rbac
     - target: skill-area:container-security
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:configuration-management
+    - target: skill-area:deployment-automation
+  implements_stack_part:
+    - target: stack-part:kubernetes-cluster

@@ -18,6 +18,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:aws-lambda
+  - target: platform:aws
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:devops
@@ -40,6 +41,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:aws-cloudwatch
+  - target: platform:aws
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:observability
@@ -62,6 +64,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:aws-sqs
+  - target: platform:aws
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:software-engineering
@@ -84,6 +87,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:aws-eventbridge
+  - target: platform:aws
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:software-engineering
@@ -106,6 +110,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:gcp-cloud-run
+  - target: platform:gcp
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:devops
@@ -128,6 +133,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:gcp-pubsub
+  - target: platform:gcp
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:software-engineering
@@ -150,6 +156,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:azure-functions
+  - target: platform:azure
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:devops
@@ -172,6 +179,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:azure-cosmos-db
+  - target: platform:azure
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:data-engineering
@@ -194,6 +202,7 @@ attributes:
 edges:
   integrates_with:
   - target: platform-service:azure-service-bus
+  - target: platform:azure
   lib_applies_to_domain:
   - target: domain:cloud-infra
   - target: domain:software-engineering

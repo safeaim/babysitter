@@ -8,3 +8,6 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:observability-pipeline
+  used_for:
+    - skill-area:metrics-dashboarding
+    - skill-area:observability-instrumentation

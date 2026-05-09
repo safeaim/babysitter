@@ -12,6 +12,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:terraform-infrastructure
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:pulumi-cloud
@@ -25,6 +28,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:terraform-infrastructure
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:crossplane
@@ -38,6 +44,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:gitops
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:backstage
@@ -51,6 +60,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:platform-engineering
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:developer-environment
 ---
 nodeKind: Tool
 id: tool:port-dev
@@ -64,6 +76,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:platform-engineering
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:developer-environment
 ---
 # GitOps tools
 nodeKind: Tool
@@ -78,6 +93,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:gitops
+  used_for:
+    - target: skill-area:gitops
+    - target: skill-area:deployment-automation
 ---
 # Container / local cluster tools
 nodeKind: Tool
@@ -92,6 +110,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:containerization
+    - target: skill-area:local-development
 ---
 nodeKind: Tool
 id: tool:k3s
@@ -105,6 +126,11 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:deployment-automation
+  implements_stack_part:
+    - target: stack-part:kubernetes-cluster
 ---
 nodeKind: Tool
 id: tool:kind
@@ -117,6 +143,9 @@ attributes:
     controllers, operators, and admission webhooks.
 edges:
   tool_used_by:
+    - target: skill-area:containerization
+  used_for:
+    - target: skill-area:local-development
     - target: skill-area:containerization
 ---
 nodeKind: Tool
@@ -131,6 +160,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:local-development
+    - target: skill-area:containerization
 ---
 nodeKind: Tool
 id: tool:rancher
@@ -144,6 +176,11 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:deployment-automation
+  implements_stack_part:
+    - target: stack-part:kubernetes-cluster
 ---
 nodeKind: Tool
 id: tool:nomad
@@ -157,3 +194,6 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:containerization
+  used_for:
+    - target: skill-area:platform-engineering
+    - target: skill-area:deployment-automation

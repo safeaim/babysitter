@@ -11,6 +11,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:software-development
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:local-development
 ---
 nodeKind: Tool
 id: tool:gitpod
@@ -24,6 +27,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:software-development
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:local-development
 ---
 nodeKind: Tool
 id: tool:codespaces
@@ -37,6 +43,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:software-development
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:local-development
 ---
 nodeKind: Tool
 id: tool:stackblitz
@@ -50,6 +59,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:software-development
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:local-development
 ---
 nodeKind: Tool
 id: tool:codesandbox
@@ -63,6 +75,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:software-development
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:local-development
 ---
 nodeKind: Tool
 id: tool:cursor
@@ -76,6 +91,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:software-development
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
 id: tool:windsurf
@@ -89,6 +107,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:software-development
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
 id: tool:buildkite
@@ -102,6 +123,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ci-cd
+  used_for:
+    - target: skill-area:ci-cd
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:drone-ci
@@ -115,6 +139,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ci-cd
+  used_for:
+    - target: skill-area:ci-cd
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:woodpecker
@@ -128,6 +155,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ci-cd
+  used_for:
+    - target: skill-area:ci-cd
+    - target: skill-area:deployment-automation
 ---
 nodeKind: Tool
 id: tool:earthly
@@ -141,6 +171,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ci-cd
+  used_for:
+    - target: skill-area:ci-cd
+    - target: skill-area:ci-pipeline-optimization
 ---
 nodeKind: Tool
 id: tool:dagger
@@ -154,3 +187,6 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ci-cd
+  used_for:
+    - target: skill-area:ci-cd
+    - target: skill-area:ci-pipeline-optimization

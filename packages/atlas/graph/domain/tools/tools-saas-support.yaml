@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:customer-support
+  used_for:
+    - skill-area:customer-support
 ---
 nodeKind: Tool
 id: tool:freshdesk
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:customer-support
+  used_for:
+    - skill-area:customer-support
 ---
 nodeKind: Tool
 id: tool:hubspot
@@ -38,6 +42,8 @@ edges:
   tool_used_by:
     - target: skill-area:customer-support
     - target: skill-area:sales-operations
+  used_for:
+    - skill-area:customer-support
 ---
 nodeKind: Tool
 id: tool:salesforce
@@ -52,6 +58,8 @@ edges:
   tool_used_by:
     - target: skill-area:sales-operations
     - target: skill-area:customer-support
+  used_for:
+    - skill-area:customer-support
 ---
 nodeKind: Tool
 id: tool:servicenow
@@ -66,3 +74,5 @@ edges:
   tool_used_by:
     - target: skill-area:itsm
     - target: skill-area:operations-automation
+  used_for:
+    - skill-area:customer-support

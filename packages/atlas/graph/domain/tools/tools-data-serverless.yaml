@@ -8,6 +8,10 @@ attributes:
     Open-source data integration and ETL platform for syncing data from APIs, databases, and files.
     Provides 300+ pre-built connectors and a low-code connector builder for custom sources and destinations.
     Supports both self-hosted and cloud-managed deployments for modern data stack architectures.
+edges:
+  used_for:
+    - skill-area:etl-pipelines
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:fivetran
@@ -18,6 +22,10 @@ attributes:
     Fully managed data pipeline service for automated data movement and transformation.
     Provides schema drift detection, automatic schema migration, and normalized data delivery to warehouses.
     Offers 500+ connectors and zero-maintenance pipelines with built-in incremental data loading.
+edges:
+  used_for:
+    - skill-area:etl-pipelines
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:dagster
@@ -28,6 +36,10 @@ attributes:
     Cloud-native data orchestration platform for building, testing, and monitoring data pipelines.
     Treats data assets as first-class citizens with Software-Defined Assets for lineage and dependency tracking.
     Supports local development, asset materialization, partitioned datasets, and rich observability.
+edges:
+  used_for:
+    - skill-area:etl-pipelines
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:prefect
@@ -38,6 +50,10 @@ attributes:
     Modern workflow orchestration platform for building, scheduling, and monitoring data workflows.
     Offers a Python-native API for defining flows and tasks with automatic retries, caching, and concurrency.
     Provides a managed cloud UI for visibility into workflow state, runs, and infrastructure.
+edges:
+  used_for:
+    - skill-area:etl-pipelines
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:apache-beam
@@ -48,6 +64,10 @@ attributes:
     Unified programming model for defining and executing batch and streaming data processing pipelines.
     Write once, run anywhere across Apache Flink, Spark, Google Dataflow, and other supported runners.
     Supports Python, Java, and Go SDKs for data transformation, aggregation, and windowing operations.
+edges:
+  used_for:
+    - skill-area:etl-pipelines
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:sst
@@ -58,6 +78,9 @@ attributes:
     Open-source framework for building full-stack serverless applications on AWS.
     Provides a live Lambda development environment, infrastructure as code via Pulumi/CDK, and a component library.
     Supports deploying Next.js, Remix, Astro, and other frameworks with zero-config serverless backends.
+edges:
+  used_for:
+    - skill-area:serverless-compute
 ---
 nodeKind: Tool
 id: tool:serverless-framework
@@ -68,6 +91,9 @@ attributes:
     Open-source CLI and development framework for building and deploying serverless applications.
     Supports AWS Lambda, Azure Functions, Google Cloud Functions, and other FaaS providers via plugins.
     Provides YAML-based service definitions, packaging, deployment, and local development with serverless-offline.
+edges:
+  used_for:
+    - skill-area:serverless-compute
 ---
 nodeKind: Tool
 id: tool:sam-cli
@@ -78,3 +104,6 @@ attributes:
     CLI tool for building, testing, and deploying serverless applications on AWS with SAM templates.
     Enables local Lambda invocation, API Gateway emulation, and step-through debugging with Docker.
     Integrates with CloudFormation for infrastructure-as-code deployment of Lambda, API Gateway, and DynamoDB.
+edges:
+  used_for:
+    - skill-area:serverless-compute

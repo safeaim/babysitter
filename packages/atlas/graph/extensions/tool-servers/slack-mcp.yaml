@@ -32,6 +32,7 @@ edges:
   - target: tool-descriptor:slack.get-user-profile
   integrates_with:
   - target: tool:slack
+  - target: channel:slack-via-mcp
   implements:
     - target: extension-interface:orchestration
   requires_capability:

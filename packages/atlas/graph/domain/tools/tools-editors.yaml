@@ -10,6 +10,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:editor-fluency
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
 id: tool:jetbrains-idea
@@ -21,6 +24,9 @@ attributes:
     ecosystem of language-specific IDEs (PyCharm, GoLand, WebStorm).
 edges:
   tool_used_by:
+    - target: skill-area:editor-fluency
+  used_for:
+    - target: skill-area:developer-environment
     - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
@@ -34,6 +40,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:editor-fluency
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
 id: tool:neovim
@@ -45,6 +54,9 @@ attributes:
     Lua scripting and async plugin host.
 edges:
   tool_used_by:
+    - target: skill-area:editor-fluency
+  used_for:
+    - target: skill-area:developer-environment
     - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
@@ -58,6 +70,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:editor-fluency
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
 id: tool:helix
@@ -69,4 +84,7 @@ attributes:
     syntax, and a multi-selection-first edit model.
 edges:
   tool_used_by:
+    - target: skill-area:editor-fluency
+  used_for:
+    - target: skill-area:developer-environment
     - target: skill-area:editor-fluency

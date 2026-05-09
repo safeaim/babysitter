@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:communication
+  used_for:
+    - skill-area:communication
 ---
 nodeKind: Tool
 id: tool:discord
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:communication
+  used_for:
+    - skill-area:communication
 ---
 nodeKind: Tool
 id: tool:figma
@@ -37,6 +41,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ui-ux-design
+  used_for:
+    - skill-area:ui-ux-design
 ---
 nodeKind: Tool
 id: tool:stripe
@@ -50,6 +56,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:payment-processing
+  used_for:
+    - skill-area:payment-processing
 ---
 nodeKind: Tool
 id: tool:zoom
@@ -63,6 +71,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:communication
+  used_for:
+    - skill-area:communication
 ---
 nodeKind: Tool
 id: tool:calendly
@@ -76,6 +86,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:communication
+  used_for:
+    - skill-area:communication
 ---
 nodeKind: Tool
 id: tool:snyk
@@ -89,6 +101,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:application-security
+  used_for:
+    - skill-area:application-security
 ---
 nodeKind: Tool
 id: tool:sonarqube
@@ -102,6 +116,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:code-quality
+  used_for:
+    - skill-area:code-quality
 ---
 nodeKind: Tool
 id: tool:intercom
@@ -115,6 +131,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:customer-support
+  used_for:
+    - skill-area:customer-support
 ---
 nodeKind: Tool
 id: tool:shopify
@@ -128,6 +146,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:e-commerce
+  used_for:
+    - skill-area:e-commerce
 ---
 nodeKind: Tool
 id: tool:outlook
@@ -141,6 +161,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:communication
+  used_for:
+    - skill-area:communication
 ---
 nodeKind: Tool
 id: tool:todoist
@@ -154,6 +176,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:airtable
@@ -167,6 +191,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:render
@@ -180,6 +206,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cloud-deployment
+  used_for:
+    - skill-area:cloud-deployment
 ---
 nodeKind: Tool
 id: tool:pagerduty
@@ -193,6 +221,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:incident-management
+  used_for:
+    - skill-area:incident-management
 ---
 nodeKind: Tool
 id: tool:storybook
@@ -206,6 +236,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:frontend-development
+  used_for:
+    - skill-area:frontend-development
 ---
 nodeKind: Tool
 id: tool:huggingface
@@ -219,6 +251,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:machine-learning
+  used_for:
+    - skill-area:machine-learning
 ---
 nodeKind: Tool
 id: tool:firecrawl
@@ -232,6 +266,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:data-collection
+  used_for:
+    - skill-area:data-collection
 ---
 nodeKind: Tool
 id: tool:context7
@@ -245,6 +281,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:developer-experience
+  used_for:
+    - skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:microsoft-teams
@@ -258,3 +296,5 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:communication
+  used_for:
+    - skill-area:communication

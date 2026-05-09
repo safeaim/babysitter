@@ -284,6 +284,8 @@ edges:
   - target: source-ref:mcp-servers-registry
   integrates_with:
   - target: stack-part:object-storage
+  - target: platform-service:aws-s3
+  - target: platform:aws
   lib_applies_to_domain:
   - target: domain:cloud-infra
 ---
@@ -450,6 +452,7 @@ edges:
   - target: tool-descriptor:confluence.get-page
   integrates_with:
   - target: tool:confluence
+  - target: issue-tracker:jira
   implements:
   - target: extension-interface:orchestration
   requires_capability:
@@ -599,6 +602,8 @@ edges:
   integrates_with:
   - target: provider:github
   - target: issue-tracker:github-issues
+  - target: vcs-host:github
+  - target: tool:github-actions
   exposes_resource:
   - target: mcp-resource:github-issue
   lib_applies_to_domain:
@@ -646,6 +651,7 @@ edges:
   - target: source-ref:mcp-servers-registry
   integrates_with:
   - target: tool:gitlab-ci
+  - target: vcs-host:gitlab
   lib_applies_to_domain:
   - target: domain:software-engineering
 ---
@@ -774,6 +780,8 @@ edges:
   - target: tool:redis-cli
   - target: library:redis
   - target: library:redis-py
+  - target: library:ioredis
+  - target: specialization:redis-ops
   lib_applies_to_domain:
   - target: domain:databases
 ---
@@ -822,6 +830,7 @@ edges:
   integrates_with:
   - target: tool:kubernetes
   - target: tool:helm
+  - target: platform:kubernetes
   lib_applies_to_domain:
   - target: domain:devops
 ---
@@ -906,6 +915,7 @@ edges:
   - target: source-ref:mcp-servers-registry
   integrates_with:
   - target: provider:aws-bedrock
+  - target: platform:aws
   lib_applies_to_domain:
   - target: domain:data-science
 ---
@@ -1187,6 +1197,7 @@ edges:
     notes: Read-mostly; approval needed when scope token grants write.
   integrates_with:
   - target: tool:figma
+  - target: skill-area:figma-prototyping
   lib_applies_to_domain:
   - target: domain:frontend
 ---

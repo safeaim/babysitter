@@ -11,3 +11,6 @@ edges:
     - language:javascript
   tool_used_by:
     - target: skill-area:e2e-testing
+  used_for:
+    - skill-area:e2e-testing
+    - skill-area:cross-browser-testing

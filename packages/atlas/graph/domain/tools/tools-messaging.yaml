@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:event-driven-architecture
+  used_for:
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:nats
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:event-driven-architecture
+  used_for:
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:pulsar
@@ -37,6 +41,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:event-driven-architecture
+  used_for:
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:zeromq
@@ -50,6 +56,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:event-driven-architecture
+  used_for:
+    - skill-area:event-driven-architecture
 ---
 nodeKind: Tool
 id: tool:mosquitto
@@ -63,3 +71,5 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:event-driven-architecture
+  used_for:
+    - skill-area:event-driven-architecture

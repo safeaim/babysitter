@@ -11,6 +11,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:backend-api-design
+  used_for:
+    - target: skill-area:developer-experience
+    - target: skill-area:ci-pipeline-optimization
 ---
 nodeKind: Tool
 id: tool:flutter-cli
@@ -24,6 +27,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:android-native
+  used_for:
+    - target: skill-area:developer-experience
+    - target: skill-area:ci-pipeline-optimization
 ---
 nodeKind: Tool
 id: tool:xcodebuild
@@ -37,6 +43,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ios-native
+  used_for:
+    - target: skill-area:ci-pipeline-optimization
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:android-studio
@@ -50,6 +59,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:android-native
+  used_for:
+    - target: skill-area:developer-environment
+    - target: skill-area:editor-fluency
 ---
 nodeKind: Tool
 id: tool:jq
@@ -63,6 +75,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
+    - target: skill-area:json-data-wrangling
 ---
 nodeKind: Tool
 id: tool:yq
@@ -76,6 +91,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
+    - target: skill-area:json-data-wrangling
 ---
 nodeKind: Tool
 id: tool:bat
@@ -89,6 +107,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:fd
@@ -102,6 +122,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:delta
@@ -115,6 +137,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:lazygit
@@ -128,6 +152,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
 ---
 nodeKind: Tool
 id: tool:gh-cli
@@ -141,6 +167,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:cli-tooling
+  used_for:
+    - target: skill-area:developer-experience
+    - target: skill-area:ci-cd
 ---
 nodeKind: Tool
 id: tool:act
@@ -154,3 +183,6 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:ci-cd
+  used_for:
+    - target: skill-area:ci-cd
+    - target: skill-area:developer-experience

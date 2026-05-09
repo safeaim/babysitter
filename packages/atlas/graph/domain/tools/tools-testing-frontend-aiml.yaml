@@ -14,6 +14,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:performance-testing
+  used_for:
+    - skill-area:api-testing
 ---
 nodeKind: Tool
 id: tool:locust
@@ -28,6 +30,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:performance-testing
+  used_for:
+    - skill-area:api-testing
 ---
 nodeKind: Tool
 id: tool:artillery
@@ -42,6 +46,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:performance-testing
+  used_for:
+    - skill-area:api-testing
 ---
 nodeKind: Tool
 id: tool:pact
@@ -57,6 +63,8 @@ edges:
   tool_used_by:
     - target: skill-area:integration-testing
     - target: skill-area:api-testing
+  used_for:
+    - skill-area:api-testing
 ---
 nodeKind: Tool
 id: tool:wiremock
@@ -72,6 +80,8 @@ edges:
   tool_used_by:
     - target: skill-area:integration-testing
     - target: skill-area:api-testing
+  used_for:
+    - skill-area:api-testing
 ---
 nodeKind: Tool
 id: tool:testcontainers
@@ -86,6 +96,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:integration-testing
+  used_for:
+    - skill-area:api-testing
 ---
 # Frontend visual-testing tools
 nodeKind: Tool
@@ -102,6 +114,8 @@ edges:
   tool_used_by:
     - target: skill-area:frontend-testing
     - target: skill-area:visual-regression-testing
+  used_for:
+    - skill-area:frontend-testing
 ---
 nodeKind: Tool
 id: tool:percy
@@ -118,6 +132,8 @@ edges:
   tool_used_by:
     - target: skill-area:frontend-testing
     - target: skill-area:visual-regression-testing
+  used_for:
+    - skill-area:frontend-testing
 ---
 # AI / ML inference and evaluation tools
 nodeKind: Tool
@@ -135,6 +151,9 @@ edges:
   tool_used_by:
     - target: skill-area:model-serving
     - target: skill-area:llm-infrastructure
+  used_for:
+    - skill-area:model-serving
+    - skill-area:ai-evaluation
 ---
 nodeKind: Tool
 id: tool:tensorrt
@@ -151,6 +170,9 @@ edges:
   tool_used_by:
     - target: skill-area:model-serving
     - target: skill-area:model-optimisation
+  used_for:
+    - skill-area:model-serving
+    - skill-area:ai-evaluation
 ---
 nodeKind: Tool
 id: tool:triton-inference
@@ -167,6 +189,9 @@ edges:
   tool_used_by:
     - target: skill-area:model-serving
     - target: skill-area:llm-infrastructure
+  used_for:
+    - skill-area:model-serving
+    - skill-area:ai-evaluation
 ---
 nodeKind: Tool
 id: tool:onnx-runtime
@@ -183,6 +208,9 @@ edges:
   tool_used_by:
     - target: skill-area:model-serving
     - target: skill-area:model-optimisation
+  used_for:
+    - skill-area:model-serving
+    - skill-area:ai-evaluation
 ---
 nodeKind: Tool
 id: tool:langsmith
@@ -199,6 +227,8 @@ edges:
   tool_used_by:
     - target: skill-area:llm-observability
     - target: skill-area:ai-evaluation
+  used_for:
+    - skill-area:llm-observability
 ---
 nodeKind: Tool
 id: tool:langfuse
@@ -215,6 +245,8 @@ edges:
   tool_used_by:
     - target: skill-area:llm-observability
     - target: skill-area:ai-evaluation
+  used_for:
+    - skill-area:llm-observability
 ---
 nodeKind: Tool
 id: tool:ragas
@@ -231,3 +263,5 @@ edges:
   tool_used_by:
     - target: skill-area:ai-evaluation
     - target: skill-area:retrieval-augmented-generation
+  used_for:
+    - skill-area:ai-evaluation

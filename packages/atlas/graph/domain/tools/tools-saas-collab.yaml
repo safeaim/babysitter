@@ -11,6 +11,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:technical-documentation
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:trello
@@ -24,6 +26,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:clickup
@@ -37,6 +41,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:shortcut
@@ -50,6 +56,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:basecamp
@@ -63,6 +71,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:asana
@@ -76,6 +86,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:monday
@@ -89,6 +101,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning
 ---
 nodeKind: Tool
 id: tool:notion
@@ -103,3 +117,5 @@ edges:
   tool_used_by:
     - target: skill-area:technical-documentation
     - target: skill-area:project-planning
+  used_for:
+    - skill-area:project-planning

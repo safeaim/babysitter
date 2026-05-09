@@ -10,6 +10,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:profiling-cpu
+  used_for:
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:flamegraph
@@ -22,6 +24,8 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:profiling-cpu
+  used_for:
+    - skill-area:frontend-performance
 ---
 nodeKind: Tool
 id: tool:py-spy
@@ -37,3 +41,5 @@ edges:
     - language:python
   tool_used_by:
     - target: skill-area:profiling-cpu
+  used_for:
+    - skill-area:frontend-performance

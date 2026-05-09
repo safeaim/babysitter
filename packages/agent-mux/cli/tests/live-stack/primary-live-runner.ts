@@ -68,7 +68,7 @@ export function buildPrimaryLiveStackCommands(
 
   if (scenario.agent.agent === 'babysitter-agent') {
     const runCommand = commandExecution(
-      commandEnv,
+      { ...commandEnv, AMUX_PROVIDER: scenario.model.amuxProvider },
       'LIVE_STACK_AMUX_BIN',
       'amux',
       [

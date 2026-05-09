@@ -110,7 +110,6 @@ export function buildPrimaryLiveStackCommands(
   }
 
   const installTarget = scenario.agent.agentMuxAgent;
-  const isInteractive = scenario.agent.installMode === 'babysitter-plugin';
   const launchArgs = [
     'launch',
     installTarget,
@@ -126,10 +125,8 @@ export function buildPrimaryLiveStackCommands(
     prompt,
     '--max-turns',
     String(resolveLaunchMaxTurns(scenario)),
+    '--no-interactive',
   ];
-  if (!isInteractive) {
-    launchArgs.push('--no-interactive');
-  }
   const launchCommand = commandExecution(
     commandEnv,
     'LIVE_STACK_AMUX_BIN',

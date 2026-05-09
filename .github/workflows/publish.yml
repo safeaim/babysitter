@@ -22,8 +22,72 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build_all:
+    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    name: Build All Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
+          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build hooks-mux (all adapters)
+        run: |
+          set -euo pipefail
+          npm run build:hooks-mux
+
+      - name: Build runtime (SDK, agent-mux, agent-core, babysitter-agent)
+        run: |
+          set -euo pipefail
+          npm run build:runtime
+
+      - name: Build remaining mux packages
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-mux-tui
+          npm run build --workspace=@a5c-ai/triggers
+          npm run build --workspace=@a5c-ai/agent-mux-webui
+
+      - name: Build observer and compiler
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-plugins-mux
+          npm run build:observer
+
+      - name: Build cloud
+        run: |
+          set -euo pipefail
+          npm run build:cloud
+
+      - name: Package all dist directories
+        run: |
+          find packages -path '*/dist' -type d | tar czf /tmp/build-all-dist.tar.gz -T -
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp/build-all-dist.tar.gz
+          retention-days: 1
+
   validate_core:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
     name: Validate Core Runtime
     runs-on: ubuntu-latest
     permissions:
@@ -46,6 +110,15 @@ jobs:
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
+      - name: Download pre-built dist directories
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract dist directories
+        run: tar xzf /tmp/build-all-dist.tar.gz
+
       - name: Prepare artifacts directory
         run: |
           set -euo pipefail
@@ -64,14 +137,7 @@ jobs:
       - name: Lint SDK
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/atlas 2>&1 | tee artifacts/core-logs/atlas-build-for-lint.log
-          npm run build --workspace=@a5c-ai/agent-catalog 2>&1 | tee artifacts/core-logs/agent-catalog-build-for-lint.log
           npm run lint --workspace=@a5c-ai/babysitter-sdk 2>&1 | tee artifacts/core-logs/lint.log
-
-      - name: Build runtime graph
-        run: |
-          set -euo pipefail
-          npm run build:runtime 2>&1 | tee artifacts/core-logs/runtime-build.log
 
       - name: SDK tests
         run: |
@@ -99,6 +165,7 @@ jobs:
 
   validate_mux:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
     name: Validate Mux Surfaces
     runs-on: ubuntu-latest
     permissions:
@@ -121,28 +188,19 @@ jobs:
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
+      - name: Download pre-built dist directories
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract dist directories
+        run: tar xzf /tmp/build-all-dist.tar.gz
+
       - name: Prepare artifacts directory
         run: |
           set -euo pipefail
           mkdir -p artifacts/mux-logs
-
-      - name: Build SDK prerequisites
-        run: |
-          set -euo pipefail
-          npm run build:sdk 2>&1 | tee artifacts/mux-logs/sdk-prereqs-build.log
-          for workspace in \
-            @a5c-ai/agent-mux-observability \
-            @a5c-ai/agent-mux-core \
-            @a5c-ai/agent-mux-adapters \
-            @a5c-ai/agent-mux-gateway \
-            @a5c-ai/transport-mux \
-            @a5c-ai/agent-mux-cli \
-            @a5c-ai/agent-mux \
-            @a5c-ai/triggers
-          do
-            npm run build --workspace="$workspace"
-          done 2>&1 | tee artifacts/mux-logs/agent-mux-test-prereqs-build.log
-          npm run build --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/mux-logs/agent-mux-webui-build.log
 
       - name: Hooks-proxy unit tests
         run: |
@@ -163,31 +221,15 @@ jobs:
           npm run test:e2e --workspace=@a5c-ai/triggers 2>&1 | tee artifacts/mux-logs/triggers-e2e.log
           npm run test:coverage --workspace=@a5c-ai/triggers 2>&1 | tee artifacts/mux-logs/triggers-coverage.log
 
-      - name: Build and verify non-realtime agent-mux release artifacts
+      - name: Verify non-realtime agent-mux release artifacts
         run: |
           set -euo pipefail
-          for workspace in \
-            @a5c-ai/atlas \
-            @a5c-ai/agent-catalog \
-            @a5c-ai/agent-mux-observability \
-            @a5c-ai/agent-mux-core \
-            @a5c-ai/agent-mux-adapters \
-            @a5c-ai/agent-mux-gateway \
-            @a5c-ai/transport-mux \
-            @a5c-ai/agent-mux-cli \
-            @a5c-ai/agent-mux \
-            @a5c-ai/agent-mux-tui \
-            @a5c-ai/triggers
-          do
-            npm run build --workspace="$workspace"
-          done 2>&1 | tee artifacts/mux-logs/agent-mux-release-build.log
           npm run verify:release --workspace=@a5c-ai/agent-mux-core 2>&1 | tee artifacts/mux-logs/agent-mux-core-release.log
           npm run verify:release --workspace=@a5c-ai/agent-mux-tui 2>&1 | tee artifacts/mux-logs/agent-mux-tui-release.log
 
       - name: Validate transport-mux runtime owner
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-build.log
           npm run test --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-tests.log
           npm run scorecard:migration --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-scorecard.log
 
@@ -221,6 +263,7 @@ jobs:
 
   agent_mux_hooks_mux_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
     name: Agent Mux Hooks-Mux (${{ matrix.agent.id }})
     runs-on: ubuntu-latest
     permissions:
@@ -270,21 +313,14 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Build agent-mux and hooks-mux CLIs
-        run: |
-          set -euo pipefail
-          npm run build --workspace=@a5c-ai/atlas
-          npm run build --workspace=@a5c-ai/agent-catalog
-          for workspace in \
-            @a5c-ai/hooks-mux-core \
-            @a5c-ai/hooks-mux-cli \
-            @a5c-ai/hooks-mux-adapter-claude \
-            @a5c-ai/hooks-mux-adapter-codex \
-            @a5c-ai/hooks-mux-adapter-pi
-          do
-            npm run build --workspace="$workspace"
-          done
-          npm run build:agent-mux:non-realtime
+      - name: Download pre-built dist directories
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract dist directories
+        run: tar xzf /tmp/build-all-dist.tar.gz
 
       - name: Run agent-mux hooks-mux lane
         env:
@@ -308,6 +344,7 @@ jobs:
 
   no_model_mock_matrix:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
     name: No-Model Stack (${{ matrix.runtime.id }}, ${{ matrix.agent.id }}, hooks=${{ matrix.hooks.id }})
     runs-on: ubuntu-latest
     permissions:
@@ -350,11 +387,14 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Build no-model stack prerequisites
-        run: |
-          set -euo pipefail
-          npm run build:hooks-mux
-          npm run build:agent-mux:non-realtime
+      - name: Download pre-built dist directories
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract dist directories
+        run: tar xzf /tmp/build-all-dist.tar.gz
 
       - name: Run selected no-model stack lane
         env:
@@ -373,69 +413,9 @@ jobs:
           path: artifacts/no-model-stack-matrix
           if-no-files-found: error
 
-  live_stack_build:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
-    name: Build Live Stack CLIs
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
-
-      - name: Build live stack CLIs
-        run: |
-          set -euo pipefail
-          npm run build:sdk
-          for workspace in \
-            @a5c-ai/hooks-mux-core \
-            @a5c-ai/hooks-mux-cli \
-            @a5c-ai/hooks-mux-adapter-claude \
-            @a5c-ai/hooks-mux-adapter-codex \
-            @a5c-ai/hooks-mux-adapter-gemini \
-            @a5c-ai/hooks-mux-adapter-copilot \
-            @a5c-ai/hooks-mux-adapter-cursor \
-            @a5c-ai/hooks-mux-adapter-pi \
-            @a5c-ai/hooks-mux-adapter-oh-my-pi \
-            @a5c-ai/hooks-mux-adapter-opencode \
-            @a5c-ai/hooks-mux-adapter-openclaw
-          do
-            npm run build --workspace="$workspace"
-          done
-          npm run build:agent-mux:non-realtime
-          npx tsc --build --force packages/agent-core/tsconfig.json
-          npx tsc --build packages/babysitter-agent/tsconfig.json
-
-      - name: Package built artifacts
-        run: |
-          find packages -path '*/dist' -type d | tar czf /tmp/live-stack-build.tar.gz -T -
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: live-stack-build
-          path: /tmp/live-stack-build.tar.gz
-          retention-days: 1
-
   live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
-    needs: live_stack_build
+    needs: build_all
     name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, os=${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     permissions:
@@ -526,14 +506,14 @@ jobs:
           npm ci
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Download pre-built artifacts
+      - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
         with:
-          name: live-stack-build
+          name: build-all-dist
           path: /tmp
 
-      - name: Extract built artifacts
-        run: tar xzf /tmp/live-stack-build.tar.gz
+      - name: Extract dist directories
+        run: tar xzf /tmp/build-all-dist.tar.gz
 
       - name: Run selected live stack E2E
         env:
@@ -576,6 +556,7 @@ jobs:
 
   validate_cloud:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
     name: Validate Cloud Workspace
     runs-on: ubuntu-latest
     permissions:
@@ -598,6 +579,15 @@ jobs:
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
+      - name: Download pre-built dist directories
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract dist directories
+        run: tar xzf /tmp/build-all-dist.tar.gz
+
       - name: Prepare artifacts directory
         run: |
           set -euo pipefail
@@ -606,7 +596,6 @@ jobs:
       - name: Validate cloud deployment workspace
         run: |
           set -euo pipefail
-          npm run build:cloud 2>&1 | tee artifacts/cloud-logs/cloud-build.log
           npm run test:cloud 2>&1 | tee artifacts/cloud-logs/cloud-tests.log
           npm run coverage:cloud 2>&1 | tee artifacts/cloud-logs/cloud-coverage.log
           npm run verify:cloud-release 2>&1 | tee artifacts/cloud-logs/cloud-release.log
@@ -621,6 +610,7 @@ jobs:
 
   validate_observer_and_compiler:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
     name: Validate Observer And Compiler
     runs-on: ubuntu-latest
     permissions:
@@ -643,21 +633,23 @@ jobs:
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
+      - name: Download pre-built dist directories
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract dist directories
+        run: tar xzf /tmp/build-all-dist.tar.gz
+
       - name: Prepare artifacts directory
         run: |
           set -euo pipefail
           mkdir -p artifacts/observer-compiler-logs
 
-      - name: Build compiler prerequisites
+      - name: Test agent-plugins-mux
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/atlas 2>&1 | tee artifacts/observer-compiler-logs/atlas-build.log
-          npm run build --workspace=@a5c-ai/agent-catalog 2>&1 | tee artifacts/observer-compiler-logs/agent-catalog-build.log
-
-      - name: Build and test agent-plugins-mux
-        run: |
-          set -euo pipefail
-          npm run build --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/observer-compiler-logs/agent-plugins-mux-build.log
           npm run test --workspace=@a5c-ai/agent-plugins-mux 2>&1 | tee artifacts/observer-compiler-logs/agent-plugins-mux-tests.log
 
       - name: Generate unified plugin bundles
@@ -665,10 +657,9 @@ jobs:
           set -euo pipefail
           npm run generate:plugins 2>&1 | tee artifacts/observer-compiler-logs/generated-plugin-bundles.log
 
-      - name: Build and test observer-dashboard
+      - name: Test observer-dashboard
         run: |
           set -euo pipefail
-          npm run build:observer 2>&1 | tee artifacts/observer-compiler-logs/observer-dashboard-build.log
           npm run test:observer 2>&1 | tee artifacts/observer-compiler-logs/observer-dashboard-tests.log
 
       - name: Upload observer and compiler logs
@@ -808,7 +799,7 @@ jobs:
           if-no-files-found: error
 
   prepare_publish:
-    if: ${{ always() && !contains(github.event.head_commit.message, '[skip publish]') && needs.prepare_publish_base.result == 'success' && needs.agent_mux_hooks_mux_e2e.result == 'success' && needs.no_model_mock_matrix.result == 'success' && needs.live_stack_e2e.result == 'success' }}
+    if: ${{ always() && !contains(github.event.head_commit.message, '[skip publish]') && needs.prepare_publish_base.result == 'success' }}
     name: Prepare Publish
     needs:
       - prepare_publish_base

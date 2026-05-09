@@ -9,7 +9,7 @@
 import type { CompletionEngine, CompletionRequest, CompletionResult, CompletionStreamEvent } from '@a5c-ai/transport-mux';
 
 function buildUrl(apiBase: string, model: string): string {
-  return `${apiBase}/openai/deployments/${model}/chat/completions?api-version=2024-12-01-preview`;
+  return `${apiBase}/openai/deployments/${model}/chat/completions?api-version=2025-04-01-preview`;
 }
 
 function buildHeaders(apiKey: string): Record<string, string> {

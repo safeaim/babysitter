@@ -20,6 +20,7 @@ export function translateForCodex(config: ProviderConfig): HarnessProviderTransl
         args.push('-c', `model_provider=${config.provider}`);
         args.push('-c', `model_providers.${config.provider}.base_url=${apiBase}/openai`);
         args.push('-c', `model_providers.${config.provider}.env_key=AZURE_API_KEY`);
+        args.push('-c', 'model_providers.foundry.query_params.api-version=2025-04-01-preview');
       }
       if (config.auth.apiKey) env['AZURE_API_KEY'] = config.auth.apiKey;
       env['ANTHROPIC_API_KEY'] = '';

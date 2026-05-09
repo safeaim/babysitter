@@ -14,6 +14,7 @@ export function translateForCodex(config: ProviderConfig): HarnessProviderTransl
       env['OPENAI_API_KEY'] = 'ollama';
       args.push('--oss');
       return { env, args, proxyRequired: false };
+    case 'foundry':
     case 'custom':
     case 'groq':
     case 'fireworks':

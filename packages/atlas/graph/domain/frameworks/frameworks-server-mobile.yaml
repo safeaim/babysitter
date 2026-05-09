@@ -53,6 +53,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  used_by_skill_area:
+    - target: skill-area:frontend-development
 ---
 nodeKind: Framework
 id: framework:spring-webflux
@@ -67,6 +69,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  used_by_skill_area:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Framework
 id: framework:dropwizard
@@ -123,6 +127,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:java
+  used_by_skill_area:
+    - target: skill-area:backend-async-processing
 ---
 nodeKind: Framework
 id: framework:swiftui
@@ -137,6 +143,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:swift
+  used_by_skill_area:
+    - target: skill-area:ios-native
 ---
 nodeKind: Framework
 id: framework:jetpack-compose
@@ -151,6 +159,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  used_by_skill_area:
+    - target: skill-area:android-native
 ---
 nodeKind: Framework
 id: framework:compose-multiplatform
@@ -165,6 +175,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  used_by_skill_area:
+    - target: skill-area:android-native
 ---
 nodeKind: Framework
 id: framework:maui
@@ -180,6 +192,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:csharp
+  used_by_skill_area:
+    - target: skill-area:frontend-development
 ---
 nodeKind: Framework
 id: framework:vapor
@@ -194,6 +208,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:swift
+  used_by_skill_area:
+    - target: skill-area:backend-api-design
 ---
 nodeKind: Framework
 id: framework:ktor-server
@@ -208,3 +224,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:kotlin
+  used_by_skill_area:
+    - target: skill-area:backend-api-design

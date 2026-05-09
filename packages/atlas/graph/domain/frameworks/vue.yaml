@@ -12,3 +12,5 @@ edges:
     - language:javascript
   used_by_skill_area:
     - target: skill-area:vue-components
+    - target: skill-area:frontend-development
+    - target: skill-area:design-systems

@@ -39,6 +39,9 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_by_skill_area:
+    - target: skill-area:frontend-development
+    - target: skill-area:frontend-performance
 ---
 nodeKind: Framework
 id: framework:docusaurus
@@ -109,6 +112,9 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_by_skill_area:
+    - target: skill-area:frontend-development
+    - target: skill-area:design-systems
 ---
 nodeKind: Framework
 id: framework:alpine
@@ -123,6 +129,9 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_by_skill_area:
+    - target: skill-area:frontend-development
+    - target: skill-area:design-systems
 ---
 nodeKind: Framework
 id: framework:htmx
@@ -137,6 +146,8 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_by_skill_area:
+    - target: skill-area:frontend-development
 ---
 nodeKind: Framework
 id: framework:slidev
@@ -165,3 +176,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:javascript
+  used_by_skill_area:
+    - target: skill-area:frontend-development

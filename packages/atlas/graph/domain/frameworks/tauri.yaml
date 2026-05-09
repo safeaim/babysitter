@@ -9,3 +9,5 @@ attributes:
 edges:
   belongs_to_language:
     - language:rust
+  used_by_skill_area:
+    - target: skill-area:desktop-ui-frameworks

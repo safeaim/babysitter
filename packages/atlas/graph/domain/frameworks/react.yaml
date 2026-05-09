@@ -13,3 +13,5 @@ edges:
     - target: skill-area:react-state-management
     - target: skill-area:react-testing
     - target: skill-area:react-components
+    - target: skill-area:frontend-development
+    - target: skill-area:design-systems

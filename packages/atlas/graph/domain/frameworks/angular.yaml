@@ -11,3 +11,6 @@ attributes:
 edges:
   belongs_to_language:
     - language:typescript
+  used_by_skill_area:
+    - target: skill-area:frontend-development
+    - target: skill-area:design-systems

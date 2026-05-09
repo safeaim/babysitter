@@ -11,3 +11,4 @@ edges:
     - language:dart
   used_by_skill_area:
     - target: skill-area:flutter-development
+    - target: skill-area:android-native

@@ -22,6 +22,9 @@ edges:
     - target: topic:context-to-fabric-sync
     - target: topic:auto-memory
     - target: topic:memory-scoping
+  alternative_to:
+    - target: tool:zep
+      comparison: "AI memory services — Mem0 focuses on memory extraction; Zep on conversation persistence"
 ---
 nodeKind: Tool
 id: tool:zep
@@ -46,6 +49,9 @@ edges:
     - target: topic:context-to-fabric-sync
     - target: topic:auto-memory
     - target: topic:memory-consolidation
+  alternative_to:
+    - target: tool:mem0
+      comparison: "AI memory services — Zep focuses on conversation persistence; Mem0 on memory extraction"
 ---
 nodeKind: Tool
 id: tool:chromadb
@@ -68,6 +74,15 @@ edges:
   relates_to_topic:
     - target: topic:dense-retrieval
     - target: topic:embedding-pipeline
+  alternative_to:
+    - target: tool:weaviate
+      comparison: "Vector databases — Chroma is lightweight; Weaviate is production-grade"
+    - target: tool:pinecone
+      comparison: "Vector databases — Chroma is self-hosted; Pinecone is managed SaaS"
+    - target: tool:qdrant
+      comparison: "Vector databases — both open-source, Qdrant focuses on performance"
+    - target: tool:milvus
+      comparison: "Vector databases — Chroma targets prototyping; Milvus targets billion-scale"
 ---
 nodeKind: Tool
 id: tool:weaviate
@@ -91,6 +106,15 @@ edges:
     - target: topic:hybrid-retrieval
     - target: topic:dense-retrieval
     - target: topic:embedding-pipeline
+  alternative_to:
+    - target: tool:chromadb
+      comparison: "Vector databases — Weaviate is production-grade; Chroma is lightweight"
+    - target: tool:pinecone
+      comparison: "Vector databases — Weaviate is self-hosted; Pinecone is managed SaaS"
+    - target: tool:qdrant
+      comparison: "Vector databases — both self-hosted, Weaviate has built-in vectorization"
+    - target: tool:milvus
+      comparison: "Vector databases — both production-grade, Milvus focuses on scale"
 ---
 nodeKind: Tool
 id: tool:pinecone
@@ -114,6 +138,15 @@ edges:
     - target: topic:hybrid-retrieval
     - target: topic:dense-retrieval
     - target: topic:embedding-pipeline
+  alternative_to:
+    - target: tool:chromadb
+      comparison: "Vector databases — Pinecone is managed SaaS; Chroma is self-hosted"
+    - target: tool:weaviate
+      comparison: "Vector databases — Pinecone is managed SaaS; Weaviate is self-hosted"
+    - target: tool:qdrant
+      comparison: "Vector databases — Pinecone is managed; Qdrant is self-hosted"
+    - target: tool:milvus
+      comparison: "Vector databases — Pinecone is managed SaaS; Milvus is self-hosted"
 ---
 nodeKind: Tool
 id: tool:qdrant
@@ -136,6 +169,15 @@ edges:
   relates_to_topic:
     - target: topic:dense-retrieval
     - target: topic:embedding-pipeline
+  alternative_to:
+    - target: tool:chromadb
+      comparison: "Vector databases — Qdrant focuses on performance; Chroma on simplicity"
+    - target: tool:weaviate
+      comparison: "Vector databases — both self-hosted, Qdrant is Rust-based"
+    - target: tool:pinecone
+      comparison: "Vector databases — Qdrant is self-hosted; Pinecone is managed"
+    - target: tool:milvus
+      comparison: "Vector databases — both self-hosted, Qdrant is leaner"
 ---
 nodeKind: Tool
 id: tool:milvus
@@ -158,6 +200,15 @@ edges:
   relates_to_topic:
     - target: topic:dense-retrieval
     - target: topic:embedding-pipeline
+  alternative_to:
+    - target: tool:chromadb
+      comparison: "Vector databases — Milvus targets billion-scale; Chroma targets prototyping"
+    - target: tool:weaviate
+      comparison: "Vector databases — both production-grade, Milvus focuses on scale"
+    - target: tool:pinecone
+      comparison: "Vector databases — Milvus is self-hosted; Pinecone is managed SaaS"
+    - target: tool:qdrant
+      comparison: "Vector databases — both self-hosted, Milvus is distributed"
 ---
 nodeKind: Tool
 id: tool:agentmemory

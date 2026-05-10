@@ -18,5 +18,7 @@ edges:
       comparison: "IaC — Terraform uses HCL; Pulumi uses general-purpose languages"
     - target: tool:opentofu
       comparison: "IaC — OpenTofu is an open-source fork of Terraform"
+    - target: tool:crossplane
+      comparison: "IaC — Terraform uses HCL files; Crossplane uses Kubernetes CRDs"
   tool_used_by:
     - target: skill-area:terraform-infrastructure

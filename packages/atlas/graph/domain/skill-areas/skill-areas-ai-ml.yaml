@@ -35,6 +35,9 @@ edges:
     - library:qdrant-client
   uses_stack_part:
     - stack-part:vector-database
+  prerequisite_for_learning:
+    - target: skill-area:ai-agent-development
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:agentic-loops

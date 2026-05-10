@@ -10,3 +10,12 @@ edges:
     - target: language:yaml
   used_for:
     - target: skill-area:ci-cd
+  alternative_to:
+    - target: tool:github-actions
+      comparison: "CI/CD platforms — GitLab CI is GitLab-native; GitHub Actions is GitHub-native"
+    - target: tool:circleci
+      comparison: "CI/CD platforms"
+    - target: tool:buildkite
+      comparison: "CI/CD — GitLab CI is integrated; Buildkite is hybrid"
+    - target: tool:jenkins
+      comparison: "CI/CD — GitLab CI is managed; Jenkins is self-hosted"

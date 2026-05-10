@@ -58,6 +58,9 @@ edges:
     - tool:haystack
     - tool:cognita
     - tool:verba
+  prerequisite_for_learning:
+    - target: skill-area:knowledge-graph-management
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:knowledge-graph-management
@@ -79,6 +82,9 @@ edges:
       confidence: primary
     - target: domain:software-engineering
       confidence: secondary
+  prerequisite_for_learning:
+    - target: skill-area:knowledge-curation
+      strength: helpful
 ---
 nodeKind: SkillArea
 id: skill-area:document-indexing
@@ -102,6 +108,9 @@ edges:
       confidence: secondary
   uses_library:
     - library:llama-index
+  prerequisite_for_learning:
+    - target: skill-area:embedding-optimization
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:organizational-intelligence
@@ -150,6 +159,9 @@ edges:
     - tool:pinecone
     - tool:weaviate
     - tool:chromadb
+  prerequisite_for_learning:
+    - target: skill-area:retrieval-evaluation
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:retrieval-evaluation

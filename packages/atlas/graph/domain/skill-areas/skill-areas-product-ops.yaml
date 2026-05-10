@@ -18,6 +18,9 @@ edges:
       confidence: primary
     - target: specialization:web-development
       confidence: secondary
+  prerequisite_for_learning:
+    - target: skill-area:roadmap-planning
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:user-research
@@ -39,6 +42,9 @@ edges:
       confidence: secondary
     - target: specialization:ux-ui-design
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:a-b-testing
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:a-b-testing
@@ -59,6 +65,9 @@ edges:
       confidence: secondary
     - target: domain:data-science
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:product-analytics
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:product-analytics
@@ -113,3 +122,6 @@ edges:
   applies_to:
     - target: domain:software-engineering
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:cross-team-coordination
+      strength: helpful

@@ -169,6 +169,8 @@ edges:
   prerequisite_for_learning:
     - target: skill-area:distributed-tracing
       strength: recommended
+    - target: skill-area:alerting-oncall
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:alerting-oncall
@@ -187,6 +189,9 @@ edges:
   applies_to:
     - target: specialization:observability
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:incident-management
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:distributed-tracing
@@ -311,6 +316,8 @@ edges:
       strength: recommended
     - target: skill-area:backend-async-processing
       strength: recommended
+    - target: skill-area:api-testing
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:backend-data-persistence
@@ -330,6 +337,8 @@ edges:
       confidence: primary
   prerequisite_for_learning:
     - target: skill-area:caching-strategies
+      strength: recommended
+    - target: skill-area:backend-async-processing
       strength: recommended
 ---
 nodeKind: SkillArea
@@ -436,6 +445,9 @@ edges:
   applies_to:
     - target: specialization:security-compliance
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:ci-security
+      strength: helpful
 ---
 nodeKind: SkillArea
 id: skill-area:vulnerability-management
@@ -488,6 +500,9 @@ edges:
   applies_to:
     - target: specialization:data-science-ml
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:model-evaluation
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:model-evaluation
@@ -505,6 +520,9 @@ edges:
   applies_to:
     - target: specialization:data-science-ml
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:model-serving
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:language-design

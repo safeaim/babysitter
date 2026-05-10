@@ -13,6 +13,11 @@ edges:
     - target: skill-area:communication
   used_for:
     - skill-area:communication
+  alternative_to:
+    - target: tool:discord
+      comparison: "Team chat — Slack targets workplaces; Discord targets communities"
+    - target: tool:microsoft-teams
+      comparison: "Team chat — Slack is standalone; Teams is Microsoft 365-integrated"
 ---
 nodeKind: Tool
 id: tool:discord
@@ -28,6 +33,11 @@ edges:
     - target: skill-area:communication
   used_for:
     - skill-area:communication
+  alternative_to:
+    - target: tool:slack
+      comparison: "Team chat — Discord targets communities; Slack targets workplaces"
+    - target: tool:microsoft-teams
+      comparison: "Team chat — Discord is community-first; Teams is enterprise-first"
 ---
 nodeKind: Tool
 id: tool:figma
@@ -298,3 +308,8 @@ edges:
     - target: skill-area:communication
   used_for:
     - skill-area:communication
+  alternative_to:
+    - target: tool:slack
+      comparison: "Team chat — Teams is Microsoft 365-integrated; Slack is standalone"
+    - target: tool:discord
+      comparison: "Team chat — Teams is enterprise-first; Discord is community-first"

@@ -238,6 +238,11 @@ edges:
     - language:javascript
   used_for:
     - skill-area:backend-data-persistence
+  alternative_to:
+    - target: library:prisma
+      comparison: "JS/TS ORMs — Mongoose is MongoDB-specific; Prisma is multi-database"
+    - target: library:typeorm
+      comparison: "JS/TS ORMs — Mongoose is MongoDB-specific; TypeORM supports SQL and MongoDB"
 ---
 nodeKind: Library
 id: library:winston

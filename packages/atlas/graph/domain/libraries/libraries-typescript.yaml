@@ -54,6 +54,13 @@ edges:
     - language:typescript
   used_for:
     - skill-area:backend-data-persistence
+  alternative_to:
+    - target: library:prisma
+      comparison: "TypeScript ORMs — Drizzle is SQL-centric; Prisma uses a schema DSL"
+    - target: library:typeorm
+      comparison: "TypeScript ORMs"
+    - target: library:knex
+      comparison: "TypeScript SQL query builders / ORMs"
 ---
 nodeKind: Library
 id: library:prisma
@@ -75,3 +82,7 @@ edges:
       comparison: "TypeScript ORMs"
     - target: library:knex
       comparison: "TypeScript ORMs / query builders"
+    - target: library:drizzle-orm
+      comparison: "TypeScript ORMs — Prisma uses a schema DSL; Drizzle is SQL-centric"
+    - target: library:mongoose
+      comparison: "JS/TS ORMs — Prisma is multi-database; Mongoose is MongoDB-specific"

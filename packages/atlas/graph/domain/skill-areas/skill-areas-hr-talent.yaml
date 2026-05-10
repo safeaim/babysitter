@@ -17,6 +17,9 @@ edges:
   applies_to:
     - target: domain:human-resources
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:performance-management
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:performance-management

@@ -13,3 +13,5 @@ edges:
       comparison: "IaC — Pulumi uses general-purpose languages; Terraform uses HCL"
     - target: tool:opentofu
       comparison: "IaC tools"
+    - target: tool:crossplane
+      comparison: "IaC — Pulumi uses programming languages; Crossplane uses Kubernetes CRDs"

@@ -126,6 +126,15 @@ edges:
   used_for:
     - target: skill-area:ci-cd
     - target: skill-area:deployment-automation
+  alternative_to:
+    - target: tool:github-actions
+      comparison: "CI/CD — Buildkite is hybrid; GitHub Actions is fully hosted"
+    - target: tool:gitlab-ci
+      comparison: "CI/CD — Buildkite is hybrid; GitLab CI is integrated"
+    - target: tool:circleci
+      comparison: "CI/CD — Buildkite is hybrid; CircleCI is fully hosted"
+    - target: tool:jenkins
+      comparison: "CI/CD — Buildkite has hosted control-plane; Jenkins is fully self-hosted"
 ---
 nodeKind: Tool
 id: tool:drone-ci

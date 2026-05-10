@@ -14,6 +14,9 @@ edges:
     - target: skill-area:gitops
     - target: skill-area:ci-cd
     - target: skill-area:deployment-automation
+  alternative_to:
+    - target: tool:flux
+      comparison: "GitOps controllers — Argo CD has a built-in UI; Flux is CLI/API-first"
 ---
 nodeKind: Tool
 id: tool:flux
@@ -30,6 +33,9 @@ edges:
     - target: skill-area:gitops
     - target: skill-area:ci-cd
     - target: skill-area:deployment-automation
+  alternative_to:
+    - target: tool:argocd
+      comparison: "GitOps controllers — Flux is CLI/API-first; Argo CD has a built-in UI"
 ---
 nodeKind: Tool
 id: tool:tekton

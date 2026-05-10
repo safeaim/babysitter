@@ -13,6 +13,13 @@ edges:
     - target: skill-area:search-infrastructure
   used_for:
     - skill-area:search-infrastructure
+  alternative_to:
+    - target: tool:typesense
+      comparison: "Search APIs — Algolia is managed SaaS; Typesense is self-hostable"
+    - target: tool:elasticsearch
+      comparison: "Search — Algolia is managed SaaS; Elasticsearch is self-hosted"
+    - target: tool:opensearch
+      comparison: "Search — Algolia is managed SaaS; OpenSearch is self-hosted"
 ---
 nodeKind: Tool
 id: tool:typesense
@@ -28,6 +35,13 @@ edges:
     - target: skill-area:search-infrastructure
   used_for:
     - skill-area:search-infrastructure
+  alternative_to:
+    - target: tool:algolia
+      comparison: "Search — Typesense is self-hostable; Algolia is managed SaaS"
+    - target: tool:elasticsearch
+      comparison: "Search engines — Typesense prioritises simplicity; Elasticsearch is full-featured"
+    - target: tool:meilisearch
+      comparison: "Lightweight search engines"
 ---
 nodeKind: Tool
 id: tool:opensearch
@@ -44,3 +58,8 @@ edges:
     - target: skill-area:observability-pipeline
   used_for:
     - skill-area:search-infrastructure
+  alternative_to:
+    - target: tool:elasticsearch
+      comparison: "Search engines — OpenSearch is the Apache-licensed fork of Elasticsearch"
+    - target: tool:algolia
+      comparison: "Search — OpenSearch is self-hosted; Algolia is managed SaaS"

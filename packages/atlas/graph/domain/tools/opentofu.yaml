@@ -15,3 +15,5 @@ edges:
       comparison: "IaC — OpenTofu is an open-source fork of Terraform"
     - target: tool:pulumi
       comparison: "IaC tools"
+    - target: tool:crossplane
+      comparison: "IaC — OpenTofu uses HCL files; Crossplane uses Kubernetes CRDs"

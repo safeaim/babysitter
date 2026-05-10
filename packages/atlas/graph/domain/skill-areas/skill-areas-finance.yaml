@@ -20,6 +20,9 @@ edges:
       confidence: primary
     - target: domain:venture-capital
       confidence: secondary
+  prerequisite_for_learning:
+    - target: skill-area:valuation-analysis
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:valuation-analysis

@@ -13,6 +13,11 @@ edges:
     - target: skill-area:error-tracking
   used_for:
     - skill-area:error-tracking
+  alternative_to:
+    - target: tool:rollbar
+      comparison: "Error tracking platforms"
+    - target: tool:airbrake
+      comparison: "Error tracking platforms"
 ---
 nodeKind: Tool
 id: tool:rollbar
@@ -28,6 +33,11 @@ edges:
     - target: skill-area:error-tracking
   used_for:
     - skill-area:error-tracking
+  alternative_to:
+    - target: tool:bugsnag
+      comparison: "Error tracking platforms"
+    - target: tool:airbrake
+      comparison: "Error tracking platforms"
 ---
 nodeKind: Tool
 id: tool:airbrake

@@ -40,6 +40,8 @@ edges:
   prerequisite_for_learning:
     - target: skill-area:platform-engineering
       strength: recommended
+    - target: skill-area:ci-cd
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:data-validation-sanitization
@@ -274,6 +276,9 @@ edges:
   applies_to:
     - target: specialization:web-development
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:design-systems
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:component-testing
@@ -360,6 +365,9 @@ edges:
       confidence: primary
     - target: specialization:ai-agents-conversational
       confidence: secondary
+  prerequisite_for_learning:
+    - target: skill-area:retrieval-augmented-generation
+      strength: recommended
 ---
 nodeKind: SkillArea
 id: skill-area:data-quality-testing

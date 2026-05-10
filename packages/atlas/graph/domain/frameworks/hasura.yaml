@@ -13,3 +13,8 @@ edges:
     - language:graphql
   used_by_skill_area:
     - target: skill-area:backend-api-design
+  alternative_to:
+    - target: framework:strapi
+      comparison: "Headless CMS/API — Hasura is data-access-focused; Strapi is content-focused"
+    - target: framework:directus
+      comparison: "Data platforms — Hasura is GraphQL-engine-first; Directus has an admin UI"

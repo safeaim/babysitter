@@ -19,6 +19,9 @@ edges:
   used_for:
     - skill-area:knowledge-fabric-design
     - skill-area:rag-pipeline-engineering
+  alternative_to:
+    - target: tool:dashworks
+      comparison: "Enterprise AI search platforms"
 ---
 nodeKind: Tool
 id: tool:guru
@@ -61,6 +64,11 @@ edges:
   used_for:
     - skill-area:knowledge-fabric-design
     - skill-area:rag-pipeline-engineering
+  alternative_to:
+    - target: tool:quivr
+      comparison: "Open-source RAG platforms"
+    - target: tool:private-gpt
+      comparison: "OSS RAG — Danswer is multi-source enterprise; PrivateGPT is local-only"
 ---
 nodeKind: Tool
 id: tool:quivr
@@ -81,6 +89,11 @@ edges:
   used_for:
     - skill-area:knowledge-fabric-design
     - skill-area:rag-pipeline-engineering
+  alternative_to:
+    - target: tool:danswer
+      comparison: "Open-source RAG platforms"
+    - target: tool:private-gpt
+      comparison: "OSS RAG — Quivr is team-oriented; PrivateGPT is fully local"
 ---
 nodeKind: Tool
 id: tool:private-gpt
@@ -102,6 +115,11 @@ edges:
   used_for:
     - skill-area:knowledge-fabric-design
     - skill-area:rag-pipeline-engineering
+  alternative_to:
+    - target: tool:danswer
+      comparison: "OSS RAG — PrivateGPT is local-only; Danswer is multi-source enterprise"
+    - target: tool:quivr
+      comparison: "OSS RAG — PrivateGPT is fully local; Quivr is team-oriented"
 ---
 nodeKind: Tool
 id: tool:kapa-ai
@@ -143,6 +161,9 @@ edges:
   used_for:
     - skill-area:knowledge-fabric-design
     - skill-area:rag-pipeline-engineering
+  alternative_to:
+    - target: tool:glean
+      comparison: "Enterprise AI search platforms"
 ---
 nodeKind: Tool
 id: tool:haystack

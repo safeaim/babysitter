@@ -19,6 +19,9 @@ edges:
       confidence: primary
     - target: specialization:ux-ui-design
       confidence: secondary
+  prerequisite_for_learning:
+    - target: skill-area:interaction-design
+      strength: helpful
 ---
 nodeKind: SkillArea
 id: skill-area:interaction-design

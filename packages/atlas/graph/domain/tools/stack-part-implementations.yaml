@@ -54,6 +54,15 @@ edges:
     - target: stack-part:search-index
   used_for:
     - target: skill-area:search-infrastructure
+  alternative_to:
+    - target: tool:opensearch
+      comparison: "Search engines — OpenSearch is an open-source fork of Elasticsearch"
+    - target: tool:algolia
+      comparison: "Search — Elasticsearch is self-hosted; Algolia is managed SaaS"
+    - target: tool:typesense
+      comparison: "Search engines — Elasticsearch is full-featured; Typesense prioritises simplicity"
+    - target: tool:meilisearch
+      comparison: "Search engines — Elasticsearch is enterprise-grade; Meilisearch is lightweight"
 ---
 nodeKind: Tool
 id: tool:meilisearch
@@ -68,6 +77,13 @@ edges:
     - target: stack-part:search-index
   used_for:
     - target: skill-area:search-infrastructure
+  alternative_to:
+    - target: tool:typesense
+      comparison: "Lightweight search engines"
+    - target: tool:elasticsearch
+      comparison: "Search engines — Meilisearch is lightweight; Elasticsearch is enterprise-grade"
+    - target: tool:algolia
+      comparison: "Search — Meilisearch is self-hosted; Algolia is managed SaaS"
 ---
 nodeKind: Tool
 id: tool:launchdarkly

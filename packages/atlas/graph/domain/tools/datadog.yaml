@@ -13,3 +13,6 @@ edges:
   used_for:
     - skill-area:observability-instrumentation
     - skill-area:error-tracking
+  alternative_to:
+    - target: tool:grafana
+      comparison: "APM/dashboards — Datadog is all-in-one SaaS; Grafana is open-source visualization"

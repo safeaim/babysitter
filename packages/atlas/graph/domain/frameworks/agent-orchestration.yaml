@@ -19,6 +19,15 @@ edges:
     - target: skill-area:ai-agent-development
     - target: skill-area:retrieval-augmented-generation
     - target: skill-area:rag-pipeline-engineering
+  alternative_to:
+    - target: framework:langgraph
+      comparison: "Agent frameworks — LangChain is chain-based; LangGraph is graph-based"
+    - target: framework:crewai
+      comparison: "Agent frameworks — LangChain is general-purpose; CrewAI is role-based multi-agent"
+    - target: framework:autogen
+      comparison: "Agent frameworks — LangChain is chain/agent; AutoGen is conversation-based"
+    - target: framework:pydantic-ai
+      comparison: "Agent frameworks — LangChain is batteries-included; PydanticAI is type-safe minimal"
 ---
 nodeKind: Framework
 id: framework:langgraph
@@ -40,6 +49,13 @@ edges:
     - target: skill-area:ai-agent-development
     - target: skill-area:agentic-loops
     - target: skill-area:multi-agent-coordination
+  alternative_to:
+    - target: framework:langchain
+      comparison: "Agent frameworks — LangGraph is graph-based; LangChain is chain-based"
+    - target: framework:crewai
+      comparison: "Agent frameworks — LangGraph is graph-based; CrewAI is role-based"
+    - target: framework:autogen
+      comparison: "Agent frameworks — LangGraph is graph-based; AutoGen is conversation-based"
 ---
 nodeKind: Framework
 id: framework:crewai
@@ -60,6 +76,13 @@ edges:
   used_by_skill_area:
     - target: skill-area:ai-agent-development
     - target: skill-area:multi-agent-coordination
+  alternative_to:
+    - target: framework:langchain
+      comparison: "Agent frameworks — CrewAI is role-based multi-agent; LangChain is general-purpose"
+    - target: framework:autogen
+      comparison: "Multi-agent frameworks — CrewAI uses roles; AutoGen uses conversations"
+    - target: framework:pydantic-ai
+      comparison: "Agent frameworks — CrewAI is multi-agent; PydanticAI is single-agent type-safe"
 ---
 nodeKind: Framework
 id: framework:autogen
@@ -80,6 +103,13 @@ edges:
   used_by_skill_area:
     - target: skill-area:ai-agent-development
     - target: skill-area:multi-agent-coordination
+  alternative_to:
+    - target: framework:langchain
+      comparison: "Agent frameworks — AutoGen is conversation-based; LangChain is chain/agent"
+    - target: framework:crewai
+      comparison: "Multi-agent frameworks — AutoGen uses conversations; CrewAI uses roles"
+    - target: framework:langgraph
+      comparison: "Agent frameworks — AutoGen is conversation-based; LangGraph is graph-based"
 ---
 nodeKind: Framework
 id: framework:pydantic-ai
@@ -100,6 +130,11 @@ edges:
   used_by_skill_area:
     - target: skill-area:ai-agent-development
     - target: skill-area:tool-use
+  alternative_to:
+    - target: framework:langchain
+      comparison: "Agent frameworks — PydanticAI is type-safe minimal; LangChain is batteries-included"
+    - target: framework:crewai
+      comparison: "Agent frameworks — PydanticAI is single-agent type-safe; CrewAI is multi-agent"
 ---
 nodeKind: Framework
 id: framework:semantic-kernel
@@ -140,6 +175,9 @@ edges:
   used_by_skill_area:
     - target: skill-area:ai-agent-development
     - target: skill-area:agentic-loops
+  alternative_to:
+    - target: framework:vercel-ai-sdk
+      comparison: "TypeScript agent frameworks — Mastra is workflow-focused; Vercel AI SDK is web-focused"
 ---
 nodeKind: Framework
 id: framework:google-adk
@@ -219,3 +257,6 @@ edges:
   integrates_with:
     - target: presentation:ai-elements
     - target: framework:react
+  alternative_to:
+    - target: framework:mastra
+      comparison: "TypeScript agent frameworks — Vercel AI SDK is web-focused; Mastra is workflow-focused"

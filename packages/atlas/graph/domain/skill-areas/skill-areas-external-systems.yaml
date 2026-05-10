@@ -39,6 +39,8 @@ edges:
   prerequisite_for_learning:
     - target: skill-area:authentication-authorization
       strength: required
+    - target: skill-area:vulnerability-scanning
+      strength: helpful
 ---
 nodeKind: SkillArea
 id: skill-area:transactional-email
@@ -224,6 +226,9 @@ edges:
   applies_to:
     - target: domain:web-development
       confidence: primary
+  prerequisite_for_learning:
+    - target: skill-area:core-web-vitals
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:local-development

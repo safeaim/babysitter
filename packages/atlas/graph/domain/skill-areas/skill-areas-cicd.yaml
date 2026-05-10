@@ -52,6 +52,11 @@ edges:
       confidence: primary
     - target: domain:cloud-infra
       confidence: secondary
+  prerequisite_for_learning:
+    - target: skill-area:platform-engineering
+      strength: recommended
+    - target: skill-area:serverless-compute
+      strength: helpful
 ---
 nodeKind: SkillArea
 id: skill-area:ci-security

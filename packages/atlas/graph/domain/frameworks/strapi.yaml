@@ -13,3 +13,8 @@ edges:
     - language:javascript
   used_by_skill_area:
     - target: skill-area:backend-api-design
+  alternative_to:
+    - target: framework:directus
+      comparison: "Headless CMS — Strapi is code-first; Directus wraps any SQL database"
+    - target: framework:hasura
+      comparison: "Headless CMS/API — Strapi is content-focused; Hasura is data-access-focused"

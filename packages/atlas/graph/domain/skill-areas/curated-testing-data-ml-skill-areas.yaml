@@ -316,6 +316,10 @@ edges:
   prerequisite_for_learning:
     - target: skill-area:machine-learning
       strength: required
+    - target: skill-area:data-visualization
+      strength: recommended
+    - target: skill-area:feature-engineering
+      strength: required
 ---
 nodeKind: SkillArea
 id: skill-area:statistical-analysis

@@ -19,6 +19,9 @@ edges:
       confidence: primary
     - target: specialization:sre
       confidence: secondary
+  prerequisite_for_learning:
+    - target: skill-area:runbook-authoring
+      strength: helpful
 ---
 nodeKind: SkillArea
 id: skill-area:change-management-ops

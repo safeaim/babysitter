@@ -23,6 +23,20 @@ export function translateForPi(config: ProviderConfig): HarnessProviderTranslati
       if (config.auth.apiKey) env['ANTHROPIC_API_KEY'] = config.auth.apiKey;
       args.push('--provider', 'anthropic');
       return { env, args, proxyRequired: false };
+    case 'custom':
+    case 'ollama':
+    case 'local':
+    case 'lmstudio':
+    case 'vllm': {
+      // Custom/local providers: Pi supports baseUrl via models.json or env vars
+      if (config.params['apiBase']) {
+        env['OPENAI_BASE_URL'] = String(config.params['apiBase']);
+        env['OPENAI_API_BASE'] = String(config.params['apiBase']);
+      }
+      if (config.auth.apiKey) env['OPENAI_API_KEY'] = config.auth.apiKey;
+      env['ANTHROPIC_API_KEY'] = '';
+      return { env, args, proxyRequired: false };
+    }
     default:
       // For providers Pi doesn't natively support, route through transport-mux proxy
       if (config.auth.apiKey) env['OPENAI_API_KEY'] = config.auth.apiKey;

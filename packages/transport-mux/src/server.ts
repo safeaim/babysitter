@@ -1083,10 +1083,16 @@ async function writeNodeResponse(res: http.ServerResponse, response: Response): 
     return;
   }
 
-  await pipeline(
-    Readable.fromWeb(response.body as Parameters<typeof Readable.fromWeb>[0]),
-    res,
-  );
+  try {
+    await pipeline(
+      Readable.fromWeb(response.body as Parameters<typeof Readable.fromWeb>[0]),
+      res,
+    );
+  } catch (err: unknown) {
+    if (!res.writableEnded) {
+      res.end();
+    }
+  }
 }
 
 export async function startProxyServer(
@@ -1107,9 +1113,13 @@ export async function startProxyServer(
       const response = await app.fetch(request);
       await writeNodeResponse(res, response);
     })().catch((error: unknown) => {
-      res.statusCode = 500;
-      res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }));
+      if (!res.headersSent) {
+        res.statusCode = 500;
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }));
+      } else if (!res.writableEnded) {
+        res.end();
+      }
     });
   });
 

@@ -73,3 +73,7 @@ edges:
   - target: protocol-message:gemini-part-function-response
   - target: protocol-message:gemini-candidate
   - target: protocol-message:gemini-generate-content-response
+  supports_orchestration_primitive:
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:multi-agent-dispatch
+    - target: orch-primitive:session-handoff

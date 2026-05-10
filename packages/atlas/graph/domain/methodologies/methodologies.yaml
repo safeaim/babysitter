@@ -371,6 +371,7 @@ attributes:
 edges:
   applies_to:
     - domain:software-engineering
+    - topic:agent-orchestration-products
 ---
 nodeKind: Methodology
 id: methodology:maestro
@@ -542,6 +543,7 @@ attributes:
 edges:
   applies_to:
     - domain:software-engineering
+    - topic:agent-orchestration-products
 ---
 nodeKind: Methodology
 id: methodology:shape-up
@@ -899,6 +901,7 @@ attributes:
 edges:
   applies_to:
     - domain:software-engineering
+    - topic:agent-process-library
 ---
 nodeKind: Methodology
 id: methodology:state-machine-orchestration

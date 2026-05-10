@@ -803,7 +803,7 @@ edgeKinds:
 - id: edge:applies-to
   name: applies_to
   origin: universal
-  description: an extension, blueprint, discovery signal, or piece of expertise applies to a domain area or product (source includes Role because Role records author requiredDomains attribute lists in practice; source includes SkillArea because descriptive expertise scope records already author applies_to edges)
+  description: an extension, blueprint, discovery signal, or piece of expertise applies to a domain area or product (source includes Role because Role records author requiredDomains attribute lists in practice; source includes SkillArea because descriptive expertise scope records already author applies_to edges; source includes Methodology because methodologies apply to domains and topics)
   source:
   - Skill
   - SkillArea
@@ -813,6 +813,7 @@ edgeKinds:
   - DiscoverySignal
   - Workflow
   - Role
+  - Methodology
   target:
   - Domain
   - Specialization
@@ -850,6 +851,7 @@ edgeKinds:
   - DiscoverySignal
   - Workflow
   - Role
+  - Methodology
   cardinality: N:N
   inverse: applies_to
 - id: edge:addresses
@@ -5677,3 +5679,68 @@ edgeKinds:
   target: [AgentUIImpl, AgentPlatformImpl, AgentCoreImpl]
   cardinality: N:N
   inverse: supports_orchestration_primitive
+# ── Orchestration Primitive outgoing edges ──────────────────────────────
+- id: edge:orch-applies-to
+  name: orch_applies_to
+  origin: universal
+  description: an orchestration primitive applies to a topic area
+  source: [OrchestrationPrimitive]
+  target: [Topic]
+  cardinality: N:N
+  inverse: orch_applied_by
+- id: edge:orch-applied-by
+  name: orch_applied_by
+  origin: universal
+  description: inverse of orch_applies_to
+  source: [Topic]
+  target: [OrchestrationPrimitive]
+  cardinality: N:N
+  inverse: orch_applies_to
+- id: edge:orch-requires-skill-area
+  name: orch_requires_skill_area
+  origin: universal
+  description: an orchestration primitive requires expertise in a skill area
+  source: [OrchestrationPrimitive]
+  target: [SkillArea]
+  cardinality: N:N
+  inverse: orch_skill_area_required_by
+- id: edge:orch-skill-area-required-by
+  name: orch_skill_area_required_by
+  origin: universal
+  description: inverse of orch_requires_skill_area
+  source: [SkillArea]
+  target: [OrchestrationPrimitive]
+  cardinality: N:N
+  inverse: orch_requires_skill_area
+- id: edge:orch-triggers
+  name: orch_triggers
+  origin: universal
+  description: one orchestration primitive triggers another in a workflow
+  source: [OrchestrationPrimitive]
+  target: [OrchestrationPrimitive]
+  cardinality: N:N
+  inverse: orch_triggered_by
+- id: edge:orch-triggered-by
+  name: orch_triggered_by
+  origin: universal
+  description: inverse of orch_triggers
+  source: [OrchestrationPrimitive]
+  target: [OrchestrationPrimitive]
+  cardinality: N:N
+  inverse: orch_triggers
+- id: edge:orch-implements-workflow
+  name: orch_implements_workflow
+  origin: universal
+  description: an orchestration primitive implements or supports a workflow
+  source: [OrchestrationPrimitive]
+  target: [Workflow]
+  cardinality: N:N
+  inverse: orch_workflow_implemented_by
+- id: edge:orch-workflow-implemented-by
+  name: orch_workflow_implemented_by
+  origin: universal
+  description: inverse of orch_implements_workflow
+  source: [Workflow]
+  target: [OrchestrationPrimitive]
+  cardinality: N:N
+  inverse: orch_implements_workflow

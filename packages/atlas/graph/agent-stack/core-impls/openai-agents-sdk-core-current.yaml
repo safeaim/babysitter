@@ -73,3 +73,7 @@ edges:
     - target: effort-level:medium
     - target: effort-level:high
     - target: effort-level:minimal
+  supports_orchestration_primitive:
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:session-handoff
+    - target: orch-primitive:approval-gate

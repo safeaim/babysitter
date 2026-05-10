@@ -9,7 +9,13 @@ attributes:
     fundamental unit of orchestrated agent work.
   orchestrationKind: dispatch
   trigger: event-driven
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-dispatch
+  orch_requires_skill_area:
+    - target: skill-area:ai-agent-development
+  orch_triggers:
+    - target: orch-primitive:progress-stream
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:multi-agent-dispatch
@@ -22,7 +28,12 @@ attributes:
     code review, and divide-and-conquer workflows.
   orchestrationKind: multi-agent-coordination
   trigger: manual
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:parallel-agent-execution
+    - target: topic:multi-agent-orchestration
+  orch_requires_skill_area:
+    - target: skill-area:multi-agent-coordination
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:task-create
@@ -35,7 +46,13 @@ attributes:
     schema and queues it for assignment.
   orchestrationKind: task-lifecycle
   trigger: event-driven
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-orchestration-products
+  orch_requires_skill_area:
+    - target: skill-area:project-planning
+  orch_triggers:
+    - target: orch-primitive:task-assign
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:task-assign
@@ -48,7 +65,11 @@ attributes:
     checked-out in the orchestrator's state store.
   orchestrationKind: task-lifecycle
   trigger: event-driven
-edges: {}
+edges:
+  orch_requires_skill_area:
+    - target: skill-area:project-planning
+  orch_triggers:
+    - target: orch-primitive:workspace-create
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:task-complete
@@ -61,7 +82,11 @@ attributes:
     concurrency slots held by the agent.
   orchestrationKind: task-lifecycle
   trigger: on-state-change
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-run-lifecycle
+  orch_triggers:
+    - target: orch-primitive:pr-creation
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:workspace-create
@@ -74,7 +99,13 @@ attributes:
     and version-control isolation so agents do not interfere with each other.
   orchestrationKind: workspace-lifecycle
   trigger: event-driven
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-dispatch
+  orch_requires_skill_area:
+    - target: skill-area:local-development
+  orch_triggers:
+    - target: orch-primitive:agent-dispatch
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:workspace-cleanup
@@ -88,7 +119,9 @@ attributes:
     orphaned workspaces during reconciliation.
   orchestrationKind: workspace-lifecycle
   trigger: on-state-change
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-run-lifecycle
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:poll-tick
@@ -102,7 +135,13 @@ attributes:
     to minutes depending on the deployment.
   orchestrationKind: polling
   trigger: periodic
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:event-driven-dispatch
+  orch_requires_skill_area:
+    - target: skill-area:operations-automation
+  orch_triggers:
+    - target: orch-primitive:task-create
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:reconciliation
@@ -116,7 +155,11 @@ attributes:
     consistency before resuming normal operation.
   orchestrationKind: reconciliation
   trigger: on-state-change
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-run-lifecycle
+  orch_requires_skill_area:
+    - target: skill-area:operations-automation
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:retry-with-backoff
@@ -130,7 +173,13 @@ attributes:
     journal for auditability of each retry cycle.
   orchestrationKind: retry
   trigger: on-failure
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:circuit-breakers
+  orch_requires_skill_area:
+    - target: skill-area:backend-async-processing
+  orch_triggers:
+    - target: orch-primitive:agent-dispatch
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:concurrency-control
@@ -143,7 +192,11 @@ attributes:
     tasks queue until a slot is released by a completing or failing agent.
   orchestrationKind: multi-agent-coordination
   trigger: event-driven
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:parallel-agent-execution
+  orch_requires_skill_area:
+    - target: skill-area:multi-agent-coordination
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:workflow-policy-load
@@ -157,7 +210,11 @@ attributes:
     agent executable, and hooks.
   orchestrationKind: workflow-loading
   trigger: manual
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-process-library
+  orch_requires_skill_area:
+    - target: skill-area:deployment-automation
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:progress-stream
@@ -170,7 +227,11 @@ attributes:
     to connected observers via SSE, WebSocket, or polling endpoints.
   orchestrationKind: progress-tracking
   trigger: event-driven
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:observability-driven-development
+  orch_requires_skill_area:
+    - target: skill-area:observability-instrumentation
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:approval-gate
@@ -184,7 +245,13 @@ attributes:
     production deployments, and high-risk code changes.
   orchestrationKind: approval-gate
   trigger: on-state-change
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:human-in-the-loop
+  orch_requires_skill_area:
+    - target: skill-area:project-planning
+  orch_triggers:
+    - target: orch-primitive:agent-dispatch
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:budget-stop
@@ -198,7 +265,11 @@ attributes:
     the task.
   orchestrationKind: budget-control
   trigger: on-state-change
-edges: {}
+edges:
+  orch_requires_skill_area:
+    - target: skill-area:budgeting-forecasting
+  orch_triggers:
+    - target: orch-primitive:session-handoff
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:session-handoff
@@ -212,7 +283,11 @@ attributes:
     shift-change patterns in long-running workflows.
   orchestrationKind: session-lifecycle
   trigger: manual
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:agent-session-management
+  orch_requires_skill_area:
+    - target: skill-area:multi-agent-coordination
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:pr-creation
@@ -226,7 +301,13 @@ attributes:
     traceability.
   orchestrationKind: task-lifecycle
   trigger: on-state-change
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:code-review-best-practices
+  orch_implements_workflow:
+    - target: workflow:pull-request-lifecycle
+  orch_triggers:
+    - target: orch-primitive:workspace-cleanup
 ---
 nodeKind: OrchestrationPrimitive
 id: orch-primitive:branch-management
@@ -240,4 +321,146 @@ attributes:
     version-control isolation for orchestrated agent work.
   orchestrationKind: workspace-lifecycle
   trigger: event-driven
-edges: {}
+edges:
+  orch_applies_to:
+    - target: topic:trunk-based-development
+  orch_requires_skill_area:
+    - target: skill-area:ci-cd
+---
+# ── New orchestration primitives ────────────────────────────────────────
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:cost-tracking
+attributes:
+  displayName: Cost Tracking
+  description: |
+    Track token consumption, API costs, and compute expenses per agent
+    session and aggregate them by task, run, or project. The primitive
+    records per-turn token counts, model pricing tiers, and elapsed
+    wall-clock time. Feeds budget-stop for threshold enforcement and
+    audit-trail for spend accountability.
+  orchestrationKind: cost-tracking
+  trigger: event-driven
+edges:
+  orch_requires_skill_area:
+    - target: skill-area:budgeting-forecasting
+    - target: skill-area:observability-instrumentation
+  orch_triggers:
+    - target: orch-primitive:budget-stop
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:audit-trail
+attributes:
+  displayName: Audit Trail
+  description: |
+    Record all orchestration decisions, dispatches, state changes, and
+    outcomes into an append-only journal for compliance and debugging.
+    Each entry captures timestamp, actor, action, previous state, new
+    state, and metadata. Supports post-mortem analysis, regulatory
+    audit requirements, and run retrospectives.
+  orchestrationKind: audit
+  trigger: event-driven
+edges:
+  orch_applies_to:
+    - target: topic:observability-driven-development
+    - target: topic:agent-run-lifecycle
+  orch_requires_skill_area:
+    - target: skill-area:observability-instrumentation
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:agent-health-check
+attributes:
+  displayName: Agent Health Check
+  description: |
+    Monitor agent process health by checking heartbeat signals, detecting
+    hung or zombie sessions, and auto-restarting failed agents. The
+    primitive runs on a periodic schedule, queries agent process status,
+    and triggers retry-with-backoff or session-handoff when an agent
+    becomes unresponsive.
+  orchestrationKind: health-check
+  trigger: periodic
+edges:
+  orch_applies_to:
+    - target: topic:agent-run-lifecycle
+  orch_requires_skill_area:
+    - target: skill-area:operations-automation
+  orch_triggers:
+    - target: orch-primitive:retry-with-backoff
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:dependency-resolution
+attributes:
+  displayName: Dependency Resolution
+  description: |
+    Resolve task dependencies before dispatch. When task B declares a
+    dependency on task A, this primitive holds B in a waiting state until
+    A completes successfully. Supports DAG-shaped dependency graphs,
+    cycle detection, and partial-order scheduling to maximize parallelism
+    while respecting ordering constraints.
+  orchestrationKind: dependency-resolution
+  trigger: on-state-change
+edges:
+  orch_applies_to:
+    - target: topic:agent-orchestration-products
+  orch_requires_skill_area:
+    - target: skill-area:project-planning
+  orch_triggers:
+    - target: orch-primitive:task-assign
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:priority-queue
+attributes:
+  displayName: Priority Queue
+  description: |
+    Prioritize tasks by urgency, importance, or custom scoring before
+    dispatch. The primitive maintains a sorted queue of pending tasks
+    and dequeues the highest-priority item when a concurrency slot
+    becomes available. Supports priority inversion detection, aging
+    to prevent starvation, and dynamic re-prioritization.
+  orchestrationKind: priority-queue
+  trigger: event-driven
+edges:
+  orch_applies_to:
+    - target: topic:agent-orchestration-products
+  orch_requires_skill_area:
+    - target: skill-area:project-planning
+  orch_triggers:
+    - target: orch-primitive:task-assign
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:rollback
+attributes:
+  displayName: Rollback
+  description: |
+    Revert agent changes when a task fails, is rejected during review,
+    or triggers a policy violation. The primitive resets the workspace
+    branch, reverts commits, closes any open PRs, and restores the
+    repository to its pre-task state. Integrates with branch-management
+    and workspace-cleanup for clean teardown.
+  orchestrationKind: rollback
+  trigger: on-failure
+edges:
+  orch_applies_to:
+    - target: topic:agent-run-lifecycle
+  orch_requires_skill_area:
+    - target: skill-area:ci-cd
+  orch_triggers:
+    - target: orch-primitive:workspace-cleanup
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:notification
+attributes:
+  displayName: Notification
+  description: |
+    Notify humans of task completion, failures, required approvals, or
+    budget warnings through configured channels (Slack, email, webhook,
+    CLI alert, or dashboard toast). The primitive formats the message
+    with task context, links to relevant PRs or logs, and respects
+    notification preferences and quiet hours.
+  orchestrationKind: notification
+  trigger: event-driven
+edges:
+  orch_applies_to:
+    - target: topic:human-in-the-loop
+    - target: topic:observability-driven-development
+  orch_requires_skill_area:
+    - target: skill-area:operations-automation

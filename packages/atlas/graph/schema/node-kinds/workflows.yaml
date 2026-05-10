@@ -33,6 +33,7 @@ nodeKinds:
     required: false
   incomingEdges:
   - applies_to
+  - orch_workflow_implemented_by
   outgoingEdges:
   - involves_role
   - requires_skill_area

@@ -39,3 +39,9 @@ edges:
     - target: agent:agent-mux
       role: core
   speaks: []
+  supports_orchestration_primitive:
+    - target: orch-primitive:multi-agent-dispatch
+    - target: orch-primitive:session-handoff
+    - target: orch-primitive:progress-stream
+    - target: orch-primitive:concurrency-control
+    - target: orch-primitive:approval-gate

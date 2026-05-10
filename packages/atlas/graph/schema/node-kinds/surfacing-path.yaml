@@ -374,14 +374,20 @@ nodeKinds:
     type: markdown
     required: true
   - name: orchestrationKind
-    type: enum<dispatch,reconciliation,polling,retry,workspace-lifecycle,session-lifecycle,task-lifecycle,approval-gate,budget-control,workflow-loading,multi-agent-coordination,progress-tracking>
+    type: enum<dispatch,reconciliation,polling,retry,workspace-lifecycle,session-lifecycle,task-lifecycle,approval-gate,budget-control,workflow-loading,multi-agent-coordination,progress-tracking,cost-tracking,audit,health-check,dependency-resolution,priority-queue,rollback,notification>
     required: false
   - name: trigger
     type: enum<periodic,event-driven,manual,on-state-change,on-failure>
     required: false
   incomingEdges:
   - supports_orchestration_primitive
-  outgoingEdges: []
+  - orch_triggered_by
+  outgoingEdges:
+  - orch_applies_to
+  - orch_requires_skill_area
+  - orch_triggers
+  - orch_implements_workflow
+  - orchestration_primitive_supported_by
   invariants: []
   examples: []
 - id: node:interaction-primitive-category

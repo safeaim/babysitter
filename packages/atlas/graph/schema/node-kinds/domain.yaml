@@ -78,6 +78,7 @@ nodeKinds:
   incomingEdges:
   - contains
   - applies_to
+  - orch_applied_by
   outgoingEdges: []
   invariants: []
   examples: []
@@ -230,6 +231,7 @@ nodeKinds:
   - addresses
   - used_for
   - covered_by_benchmark
+  - orch_skill_area_required_by
   outgoingEdges:
   - applies_to
   - uses_language

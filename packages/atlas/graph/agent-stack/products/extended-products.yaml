@@ -109,6 +109,12 @@ attributes:
 edges:
   has_version:
     - agent-version:devin@current
+  integrates_with:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:multi-agent-coordination
+    - target: topic:agent-orchestration-products
+    - target: topic:agent-dispatch
+    - target: topic:parallel-agent-execution
 ---
 nodeKind: AgentProduct
 id: agent:zed
@@ -181,6 +187,9 @@ attributes:
 edges:
   has_version:
     - agent-version:bolt@current
+  integrates_with:
+    - target: skill-area:ai-agent-development
+    - target: topic:agent-dispatch
 ---
 nodeKind: AgentProduct
 id: agent:v0

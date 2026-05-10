@@ -45,7 +45,8 @@
     "validate:edges": "node scripts/validate-edges.mjs",
     "deferred:list": "node scripts/list-deferred-nodes.mjs",
     "claims:run": "node scripts/run-testable-claims.mjs",
-    "claims:untested": "node scripts/find-untested-claims.mjs"
+    "claims:untested": "node scripts/find-untested-claims.mjs",
+    "quality": "node scripts/graph-quality.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.1"

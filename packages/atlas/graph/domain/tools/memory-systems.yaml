@@ -20,6 +20,8 @@ edges:
   relates_to_topic:
     - target: topic:memory-to-knowledge-bridge
     - target: topic:context-to-fabric-sync
+    - target: topic:auto-memory
+    - target: topic:memory-scoping
 ---
 nodeKind: Tool
 id: tool:zep
@@ -42,6 +44,8 @@ edges:
   relates_to_topic:
     - target: topic:memory-to-knowledge-bridge
     - target: topic:context-to-fabric-sync
+    - target: topic:auto-memory
+    - target: topic:memory-consolidation
 ---
 nodeKind: Tool
 id: tool:chromadb
@@ -154,3 +158,51 @@ edges:
   relates_to_topic:
     - target: topic:dense-retrieval
     - target: topic:embedding-pipeline
+---
+nodeKind: Tool
+id: tool:agentmemory
+attributes:
+  displayName: "agentmemory"
+  kind: other
+  description: |
+    Cross-agent persistent memory library with benchmarked accuracy and
+    a privacy-first processing pipeline. Incoming observations pass through
+    SHA-256 content-addressable deduplication, a configurable privacy filter
+    that strips secrets, credentials, and PII, then LLM compression that
+    extracts structured facts, concepts, and narrative. Memories are vector-
+    embedded and dual-indexed with BM25 (keyword) and vector (semantic)
+    retrieval. Designed for multi-agent deployments where one agent's
+    discoveries should be available to others without duplication or
+    information leakage.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:context-management
+    - target: skill-area:knowledge-fabric-design
+  relates_to_topic:
+    - target: topic:memory-to-knowledge-bridge
+    - target: topic:auto-memory
+    - target: topic:memory-deduplication
+    - target: topic:memory-security
+---
+nodeKind: Tool
+id: tool:memories-sh
+attributes:
+  displayName: "memories.sh"
+  kind: other
+  description: |
+    Durable state management for coding agents. Provides a shell-based
+    interface for agents to persist and retrieve key-value observations
+    across sessions. Memories are stored as plain files organized by
+    project, making them inspectable and version-controllable. The shell
+    interface (source memories.sh) makes it usable from any agent that
+    can execute Bash commands, including Claude Code, Aider, and custom
+    agent harnesses. Focuses on simplicity over sophistication — no vector
+    search, no LLM processing, just reliable key-value persistence.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:context-management
+  relates_to_topic:
+    - target: topic:memory-to-knowledge-bridge
+    - target: topic:auto-memory

@@ -103,6 +103,60 @@ nodeKinds:
   - id starts with retrieval-pipeline: null
   examples: []
 
+- id: node:memory-system
+  name: MemorySystem
+  origin: universal
+  prefix: memory-system
+  cluster: 21-knowledge-fabric
+  purpose: a concrete memory persistence and retrieval system for an agent — how it stores, retrieves, consolidates, and scopes memories across sessions
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: memoryKind
+    type: enum<file-based,vector-backed,api-service,hybrid,proprietary>
+    required: false
+    notes: Primary storage/retrieval paradigm for the memory system.
+  - name: persistence
+    type: enum<session-only,project-scoped,user-scoped,org-scoped,cross-agent>
+    required: false
+    notes: Widest scope at which memories persist.
+  - name: autoExtraction
+    type: bool
+    required: false
+    notes: Whether the system automatically extracts memories from conversations without user action.
+  - name: consolidation
+    type: enum<none,manual,auto-dream,periodic,on-write>
+    required: false
+    notes: Strategy for merging, deduplicating, and pruning memories over time.
+  - name: storageFormat
+    type: enum<markdown,yaml,json,sqlite,vector-db,custom>
+    required: false
+    notes: On-disk or in-service format for persisted memories.
+  - name: privacyFilter
+    type: bool
+    required: false
+    notes: Whether the system strips secrets/credentials before persisting memories.
+  - name: deduplication
+    type: enum<none,sha256,semantic,hybrid>
+    required: false
+    notes: Strategy for detecting and removing duplicate memory entries.
+  incomingEdges:
+  - uses_memory_system
+  outgoingEdges:
+  - memory_system_integrates
+  - realizes
+  invariants:
+  - id starts with memory-system: null
+  examples:
+  - graph/domain/knowledge-fabric/memory-systems.yaml
+
 - id: node:knowledge-fabric-impl
   name: KnowledgeFabricImpl
   origin: universal

@@ -35,6 +35,8 @@ edges:
       role: ui
     - target: knowledge-fabric-impl:claude-code.knowledge@current
       role: knowledge-fabric
+  uses_memory_system:
+    - target: memory-system:claude-code-auto-memory
   uses_vector_store:
     - target: vector-store:weaviate
     - target: vector-store:chroma

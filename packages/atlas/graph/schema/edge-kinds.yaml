@@ -145,6 +145,7 @@ edgeKinds:
   - AgentPlatformImpl
   - AgentUIImpl
   - KnowledgeFabricImpl
+  - MemorySystem
   - AgentVersion
   - Presentation
   - Channel
@@ -175,6 +176,7 @@ edgeKinds:
   - AgentPlatformImpl
   - AgentUIImpl
   - KnowledgeFabricImpl
+  - MemorySystem
   - AgentVersion
   - Presentation
   - Channel
@@ -5794,6 +5796,13 @@ edgeKinds:
   source: [BackgroundConsolidation]
   target: [ConsolidationLock]
   cardinality: N:1
+- id: edge:consolidates-memory-system
+  name: consolidates_memory_system
+  origin: universal
+  description: a background consolidation process maintains and reorganizes a specific memory system
+  source: [BackgroundConsolidation]
+  target: [MemorySystem]
+  cardinality: N:N
 - id: edge:contained-in-plugin
   name: contained_in_plugin
   origin: universal
@@ -5982,6 +5991,20 @@ edgeKinds:
   description: an agent version uses a specific memory hierarchy for context management
   source: [AgentVersion]
   target: [MemoryHierarchy]
+  cardinality: N:N
+- id: edge:uses-memory-system
+  name: uses_memory_system
+  origin: universal
+  description: an agent version, knowledge fabric implementation, or memory hierarchy uses a specific memory system for persistence and retrieval
+  source: [AgentVersion, KnowledgeFabricImpl, MemoryHierarchy]
+  target: [MemorySystem]
+  cardinality: N:N
+- id: edge:memory-system-integrates
+  name: memory_system_integrates
+  origin: universal
+  description: a memory system integrates with a tool, vector store, or external service for storage or retrieval
+  source: [MemorySystem]
+  target: [Tool, VectorStore]
   cardinality: N:N
 - id: edge:uses-transport
   name: uses_transport

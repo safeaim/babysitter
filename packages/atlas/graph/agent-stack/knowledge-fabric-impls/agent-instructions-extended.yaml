@@ -30,6 +30,8 @@ edges:
   composes:
     - target: agent-version:cline@current
       role: knowledge-fabric
+  uses_memory_system:
+    - target: memory-system:cline-memory-bank
 ---
 nodeKind: KnowledgeFabricImpl
 id: knowledge-fabric-impl:windsurf.knowledge@current
@@ -61,6 +63,8 @@ edges:
   composes:
     - target: agent-version:windsurf@current
       role: knowledge-fabric
+  uses_memory_system:
+    - target: memory-system:windsurf-memories
 ---
 nodeKind: KnowledgeFabricImpl
 id: knowledge-fabric-impl:aider.knowledge@current
@@ -162,6 +166,8 @@ edges:
   composes:
     - target: agent-version:roo-code@current
       role: knowledge-fabric
+  uses_memory_system:
+    - target: memory-system:roo-code-memory
 ---
 nodeKind: KnowledgeFabricImpl
 id: knowledge-fabric-impl:amp.knowledge@current
@@ -225,6 +231,8 @@ edges:
   composes:
     - target: agentVersion:openclaw:ge-0-0-0
       role: knowledge-fabric
+  uses_memory_system:
+    - target: memory-system:openclaw-soul-memory
 ---
 nodeKind: KnowledgeFabricImpl
 id: knowledge-fabric-impl:pi.knowledge@current

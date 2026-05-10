@@ -262,3 +262,148 @@ edges:
   applies_to:
     - domain:software-engineering
     - specialization:ai-agents-conversational
+---
+nodeKind: Topic
+id: topic:auto-memory
+attributes:
+  displayName: "Auto-Memory"
+  description: |
+    Auto-Memory as a cross-cutting topic — agent-driven automatic memory
+    extraction and persistence without explicit user action. Covers the
+    mechanisms by which agents identify salient facts, preferences, and
+    decisions during conversations and persist them for future sessions.
+    Includes Claude Code's extract-memories fork that runs at turn-end,
+    Mem0's LLM-driven extraction pipeline, Cline's memory bank updates,
+    and the fundamental design tension between extraction accuracy (avoiding
+    noise) and completeness (not missing important context). Auto-memory
+    transforms ephemeral conversations into durable organizational knowledge
+    automatically, but the quality of extraction determines whether the
+    accumulated memories help or hinder future sessions.
+edges:
+  applies_to:
+    - domain:software-engineering
+    - specialization:ai-agents-conversational
+  related_topics:
+    - topic:memory-to-knowledge-bridge
+    - topic:memory-consolidation
+    - topic:organizational-memory
+---
+nodeKind: Topic
+id: topic:memory-consolidation
+attributes:
+  displayName: "Memory Consolidation"
+  description: |
+    Memory Consolidation as a cross-cutting topic — background processes that
+    merge, deduplicate, prune, and reorganize accumulated agent memories.
+    Covers Claude Code's auto-dream cycle (a forked subagent with restricted
+    tool surface that rewrites the memory directory), periodic consolidation
+    in Zep and Mem0 (time-weighted decay, entity merging), and the general
+    pattern of treating memory as a living document that requires maintenance.
+    Without consolidation, auto-memory systems accumulate noise, contradictions,
+    and redundancy that degrades retrieval quality over time. The key design
+    decisions are frequency (per-session, periodic, on-demand), scope (what
+    memories to touch), and safety (locks to prevent concurrent corruption).
+edges:
+  applies_to:
+    - domain:software-engineering
+    - specialization:ai-agents-conversational
+  related_topics:
+    - topic:auto-memory
+    - topic:organizational-memory
+    - topic:knowledge-freshness
+---
+nodeKind: Topic
+id: topic:memory-scoping
+attributes:
+  displayName: "Memory Scoping"
+  description: |
+    Memory Scoping as a cross-cutting topic — the hierarchy of scopes at
+    which agent memories are stored, retrieved, and isolated. Covers
+    session-only memory (context window, dies with session), project-scoped
+    memory (persists per-project across sessions), user-scoped memory
+    (follows the user across projects), org-scoped memory (shared across
+    team members), and cross-agent memory (shared across different agent
+    products). Each scope level introduces new challenges: project-scoped
+    memory needs project identification, user-scoped needs user identity,
+    org-scoped needs access control, and cross-agent needs format
+    interoperability. Claude Code implements project + user scopes, Mem0
+    adds agent + org scopes, and agentmemory targets cross-agent sharing.
+edges:
+  applies_to:
+    - domain:software-engineering
+    - specialization:ai-agents-conversational
+  related_topics:
+    - topic:auto-memory
+    - topic:knowledge-access-control
+    - topic:memory-consolidation
+---
+nodeKind: Topic
+id: topic:memory-security
+attributes:
+  displayName: "Memory Security"
+  description: |
+    Memory Security as a cross-cutting topic — protecting agent memory from
+    injection attacks, credential leakage, and unauthorized access. Covers
+    path validation (Claude Code rejects traversal, UNC, null-byte, and
+    drive-root paths), privacy filtering (agentmemory strips secrets and
+    PII before persistence), scope isolation (memories from one project
+    should not leak to another), and prompt injection via memory (an
+    attacker plants instructions in a file that gets ingested as memory,
+    hijacking future sessions). Memory security is particularly critical
+    for auto-memory systems where the agent decides what to persist —
+    a compromised extraction step could persist attacker-controlled content.
+edges:
+  applies_to:
+    - domain:software-engineering
+    - specialization:ai-agents-conversational
+  related_topics:
+    - topic:auto-memory
+    - topic:memory-scoping
+    - topic:knowledge-access-control
+---
+nodeKind: Topic
+id: topic:memory-deduplication
+attributes:
+  displayName: "Memory Deduplication"
+  description: |
+    Memory Deduplication as a cross-cutting topic — strategies for detecting
+    and removing duplicate memory entries across extraction cycles. Covers
+    SHA-256 content-addressable dedup (exact match, used by agentmemory),
+    semantic dedup (embedding similarity threshold, used by auto-dream
+    consolidation), and hybrid approaches that combine exact and semantic
+    matching. Without deduplication, auto-memory systems accumulate
+    redundant entries that waste context window space and dilute retrieval
+    quality. The key trade-off is between aggressive dedup (risking loss of
+    subtly different memories) and conservative dedup (accumulating near-
+    duplicates that clutter retrieval results).
+edges:
+  applies_to:
+    - domain:software-engineering
+    - specialization:ai-agents-conversational
+  related_topics:
+    - topic:auto-memory
+    - topic:memory-consolidation
+---
+nodeKind: Topic
+id: topic:instruction-file-standard
+attributes:
+  displayName: "Instruction File Standard"
+  description: |
+    Instruction File Standard as a cross-cutting topic — the convergence
+    and divergence of agent instruction file formats across coding agents.
+    Covers CLAUDE.md (Claude Code, Pi), AGENTS.md (Codex, Amp, OpenCode),
+    .cursorrules and .cursor/rules/*.mdc (Cursor), .clinerules (Cline),
+    .windsurfrules (Windsurf), .roorules (Roo Code), and .continuerules
+    (Continue). The proliferation of agent-specific instruction files
+    creates a maintenance burden for projects that support multiple agents.
+    Cross-agent compatibility is emerging: Cursor added AGENTS.md support,
+    Pi adopted CLAUDE.md. The open question is whether the ecosystem will
+    converge on a single standard or maintain per-agent formats with
+    translation layers.
+edges:
+  applies_to:
+    - domain:software-engineering
+    - specialization:ai-agents-conversational
+  related_topics:
+    - topic:auto-memory
+    - topic:memory-scoping

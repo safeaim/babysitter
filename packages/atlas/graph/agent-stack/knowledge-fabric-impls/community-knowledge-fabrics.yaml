@@ -65,6 +65,8 @@ edges:
     - target: layer:12-knowledge-fabric
   integrates_with:
     - target: tool:mempalace
+  uses_memory_system:
+    - target: memory-system:mempalace-service
 ---
 nodeKind: KnowledgeFabricImpl
 id: knowledge-fabric-impl:graphify-fabric

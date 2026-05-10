@@ -72,6 +72,8 @@ edges:
   composed_of:
   - target: knowledge-fabric-impl:cline.knowledge@current
     role: knowledge-fabric
+  uses_memory_system:
+  - target: memory-system:cline-memory-bank
   sourced_from: []
   supports:
   - target: capability:streaming
@@ -103,6 +105,8 @@ edges:
   composed_of:
   - target: knowledge-fabric-impl:roo-code.knowledge@current
     role: knowledge-fabric
+  uses_memory_system:
+  - target: memory-system:roo-code-memory
   sourced_from: []
   supports:
   - target: capability:streaming
@@ -217,6 +221,8 @@ edges:
   composed_of:
   - target: knowledge-fabric-impl:windsurf.knowledge@current
     role: knowledge-fabric
+  uses_memory_system:
+  - target: memory-system:windsurf-memories
   sourced_from: []
   supports:
   - target: capability:streaming

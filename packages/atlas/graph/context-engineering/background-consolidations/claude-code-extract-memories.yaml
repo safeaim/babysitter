@@ -14,3 +14,6 @@ attributes:
     - tengu_extract_memories_fired
     - tengu_extract_memories_completed
   featureGate: "tengu_passport_quail"
+edges:
+  consolidates_memory_system:
+    - target: memory-system:claude-code-auto-memory

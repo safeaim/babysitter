@@ -21,3 +21,6 @@ attributes:
     - reject-unc
     - reject-null-byte
     - tilde-expansion-settings-only
+edges:
+  uses_memory_system:
+    - target: memory-system:claude-code-auto-memory

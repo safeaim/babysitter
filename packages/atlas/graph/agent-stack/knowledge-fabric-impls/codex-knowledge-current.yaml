@@ -29,3 +29,5 @@ edges:
   composes:
     - target: agentVersion:codex:ge-0-119-0
       role: knowledge-fabric
+  uses_memory_system:
+    - target: memory-system:codex-agents-md

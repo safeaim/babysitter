@@ -38,3 +38,5 @@ edges:
   composes:
     - target: agentVersion:claude:ge-0-0-0
       role: knowledge-fabric
+  uses_memory_system:
+    - target: memory-system:claude-code-auto-memory

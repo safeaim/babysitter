@@ -20,3 +20,5 @@ attributes:
 edges:
   consolidation_guarded_by_lock:
     - target: consolidation-lock:claude-code-auto-dream-default
+  consolidates_memory_system:
+    - target: memory-system:claude-code-auto-memory

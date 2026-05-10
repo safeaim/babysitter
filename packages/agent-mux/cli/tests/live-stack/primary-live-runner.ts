@@ -129,6 +129,7 @@ export function buildPrimaryLiveStackCommands(
           prompt,
           '--max-turns',
           String(resolveLaunchMaxTurns(scenario)),
+          '--non-interactive',
           '--output-format',
           'jsonl',
           '--json',

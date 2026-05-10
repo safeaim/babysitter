@@ -598,7 +598,7 @@ async function validateAgentBehavior(
       // File wasn't created — verify agent at least attempted the operation.
       // Cross-model scenarios (claude+gpt-5.5) can't execute native tools,
       // but should show evidence of trying (command output, tool_call, etc.)
-      const hasToolEvidence = /mkdir|printf|write_file|tool_call|tool_use|\.a5c-live-test|vanilla-verified|babysitter-plugin-verified|create.*file|unable.*create|filesystem.*tool|no.*tool/i.test(output);
+      const hasToolEvidence = /mkdir|printf|write_file|tool_call|tool_use|\.a5c-live-test|vanilla-verified|babysitter-plugin-verified|creat.*file|unable.*creat|filesystem.*tool|no.*tool/i.test(output);
       if (!hasToolEvidence) {
         failures.push(`agent did not create .a5c-live-test/${traceId}.txt and showed no tool awareness in output`);
       }

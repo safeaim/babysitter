@@ -152,11 +152,9 @@ export function buildPrimaryLiveStackCommands(
   ];
 }
 
-function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {
-  if (scenario.model.provider === 'anthropic-direct') {
-    return 3;
-  }
-  return 1;
+function resolveLaunchMaxTurns(_scenario: LiveStackScenario): number {
+  // Tool execution requires multiple turns: user → tool_call → tool_result → response
+  return 5;
 }
 
 
@@ -229,29 +227,37 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
   }
 
   const commandOutput = commandResults.map((result) => `${result.stdout}\n${result.stderr}`).join('\n');
+
+  // Behavioral validation: verify the agent actually used tools (created the requested file)
+  const traceId = commands[0]?.env['LIVE_STACK_TRACE_ID'];
+  const behaviorFailures = await validateAgentBehavior(scenario, options.cwd, commandOutput, traceId);
+
   const captured = mergeTraceIds(
     extractTraceIds(commandOutput),
-    await discoverTraceIdsFromRunArtifacts({ scenario, cwd: options.cwd, artifactsDir: options.artifactsDir, output: commandOutput, traceId: commands[0]?.env['LIVE_STACK_TRACE_ID'], startedAtMs }),
+    await discoverTraceIdsFromRunArtifacts({ scenario, cwd: options.cwd, artifactsDir: options.artifactsDir, output: commandOutput, traceId, startedAtMs }),
   );
   const artifactFiles = await writeExpectedArtifacts(options.artifactsDir, scenario, commandResults, captured);
   const evidence = createEvidenceBundle(scenario, captured, artifactFiles);
   const missingTraceIds = assertEvidenceBundleComplete(scenario, evidence);
+
+  const allFailures = [...missingTraceIds.map((id) => `missing trace: ${id}`), ...behaviorFailures];
   const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, {
-    status: missingTraceIds.length === 0 ? 'passed' : 'failed',
+    status: allFailures.length === 0 ? 'passed' : 'failed',
     commands: redactCommands(commands),
     evidence,
     missingTraceIds,
+    behaviorFailures,
     commandResults,
   });
 
   return {
-    status: missingTraceIds.length === 0 ? 'passed' : 'failed',
+    status: allFailures.length === 0 ? 'passed' : 'failed',
     scenarioId: scenario.scenarioId,
     commands: redactCommands(commands),
     evidence,
     missingTraceIds,
     artifactPath,
-    failure: missingTraceIds.length > 0 ? `missing trace ids: ${missingTraceIds.join(', ')}` : undefined,
+    failure: allFailures.length > 0 ? allFailures.join('; ') : undefined,
   };
 }
 
@@ -313,17 +319,18 @@ function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: st
 }
 
 function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
-  const evidence = `Print exactly: trace=${traceId} scenario=${scenario.scenarioId}`;
+  const traceEvidence = `After completing the task, print on its own line: trace=${traceId} scenario=${scenario.scenarioId}`;
 
   if (scenario.agent.installMode === 'babysitter-plugin') {
-    return `/babysitter:call Reply with "ok" and the following labels. ${evidence}`;
+    return `/babysitter:call Create a file called .a5c-live-test/${traceId}.txt containing "babysitter-plugin-verified". Then ${traceEvidence}`;
   }
 
   if (scenario.agent.integrationType === 'runtime-cli') {
-    return `Reply with "ok" and the following labels. ${evidence}`;
+    return `Create a file called .a5c-live-test/${traceId}.txt containing "runtime-cli-verified". Then ${traceEvidence}`;
   }
 
-  return `Reply with "hello" and the following labels. ${evidence}`;
+  // Vanilla: request tool use (file creation) to validate the agent actually executes tools
+  return `Create a file called .a5c-live-test/${traceId}.txt containing "vanilla-verified". Then ${traceEvidence}`;
 }
 
 function extractTraceIds(output: string): Partial<LiveStackEvidenceBundle> {
@@ -507,6 +514,65 @@ async function writeJsonIfMissing(filePath: string | undefined, value: unknown):
 
 function firstMatch(value: string, pattern: RegExp): string | undefined {
   return pattern.exec(value)?.[1];
+}
+
+async function validateAgentBehavior(
+  scenario: LiveStackScenario,
+  cwd: string,
+  output: string,
+  traceId: string | undefined,
+): Promise<string[]> {
+  const failures: string[] = [];
+
+  // 1. Verify the agent created the requested file (proves tool execution)
+  if (traceId) {
+    const expectedFile = path.join(cwd, '.a5c-live-test', `${traceId}.txt`);
+    try {
+      const content = await fs.readFile(expectedFile, 'utf8');
+      const expectedContent = scenario.agent.installMode === 'babysitter-plugin'
+        ? 'babysitter-plugin-verified'
+        : scenario.agent.integrationType === 'runtime-cli'
+          ? 'runtime-cli-verified'
+          : 'vanilla-verified';
+      if (!content.includes(expectedContent)) {
+        failures.push(`file created but content mismatch: expected "${expectedContent}", got "${content.trim()}"`);
+      }
+    } catch {
+      failures.push(`agent did not create expected file .a5c-live-test/${traceId}.txt (no tool execution detected)`);
+    }
+  }
+
+  // 2. Verify trace labels are in output (proves model responded coherently)
+  if (traceId && !output.includes(`trace=${traceId}`)) {
+    failures.push('trace label not found in output (model did not echo requested evidence)');
+  }
+
+  // 3. Verify tool call evidence in output (proves agent used tools, not just text)
+  const hasToolEvidence = /tool_call|tool_use|execute_code|write_file|Bash|Write|file.*creat/i.test(output);
+  if (!hasToolEvidence) {
+    failures.push('no tool call evidence in output (agent may have only produced text without executing tools)');
+  }
+
+  // 4. Verify token usage is reported (proves transport round-trip completed)
+  const hasUsageEvidence = /tokens?\s*(used|usage)|prompt_tokens|completion_tokens|input_tokens|output_tokens/i.test(output);
+  if (!hasUsageEvidence && scenario.agent.integrationType !== 'runtime-cli') {
+    failures.push('no token usage reported (transport may not have completed properly)');
+  }
+
+  // 5. For babysitter-plugin: verify orchestration artifacts were created
+  if (scenario.agent.installMode === 'babysitter-plugin') {
+    const runsDir = path.join(cwd, '.a5c', 'runs');
+    try {
+      const entries = await fs.readdir(runsDir);
+      if (entries.length === 0) {
+        failures.push('babysitter-plugin: no runs created in .a5c/runs/ (orchestration did not execute)');
+      }
+    } catch {
+      // .a5c/runs/ not existing is acceptable for single-turn plugin invocations
+    }
+  }
+
+  return failures;
 }
 
 function classifySkippableLiveProviderFailure(result: CommandResult): string | undefined {

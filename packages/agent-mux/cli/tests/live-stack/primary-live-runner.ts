@@ -366,9 +366,8 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
   const traceEvidence = `After completing the task, print on its own line: trace=${traceId} scenario=${scenario.scenarioId}`;
 
   if (scenario.agent.installMode === 'babysitter-plugin') {
-    // babysitter-plugin: validate the skill invokes and the orchestration lifecycle works.
-    // Don't ask for file creation — the babysitter skill is a subagent without filesystem tools.
-    return `/babysitter:call Respond with "ok". ${traceEvidence}`;
+    // babysitter-plugin: full orchestration through a babysitter process that writes a file.
+    return `/babysitter:call Create a file at .a5c-live-test/${traceId}.txt with content "babysitter-plugin-verified". ${traceEvidence}`;
   }
 
   if (scenario.agent.agent === 'babysitter-agent') {
@@ -571,28 +570,25 @@ async function validateAgentBehavior(
 ): Promise<string[]> {
   const failures: string[] = [];
 
-  // 1. Validate based on scenario type
+  // 1. Validate tool execution: file must be created on disk
   if (scenario.agent.agent === 'babysitter-agent') {
-    // babysitter-agent: just verify trace echo in output
+    // babysitter-agent: single-turn API call — verify trace echo
     if (traceId && !output.includes(`trace=${traceId}`)) {
       failures.push('babysitter-agent did not echo trace label');
     }
-  } else if (scenario.agent.installMode === 'babysitter-plugin') {
-    // babysitter-plugin: verify the skill was invoked (not file creation)
-    const skillInvoked = /babysitter:babysit|babysitter:call|Using.*skill|orchestrat/i.test(output);
-    if (!skillInvoked) {
-      failures.push('babysitter-plugin: skill was not invoked (no babysitter:babysit evidence in output)');
-    }
   } else if (traceId) {
-    // Vanilla: require actual file creation (tool execution)
+    // Vanilla + babysitter-plugin: require actual file creation
     const expectedFile = path.join(cwd, '.a5c-live-test', `${traceId}.txt`);
+    const expectedContent = scenario.agent.installMode === 'babysitter-plugin'
+      ? 'babysitter-plugin-verified'
+      : 'vanilla-verified';
     try {
       const content = await fs.readFile(expectedFile, 'utf8');
-      if (!content.includes('vanilla-verified')) {
-        failures.push(`file created but content mismatch: expected "vanilla-verified", got "${content.trim().slice(0, 100)}"`);
+      if (!content.includes(expectedContent)) {
+        failures.push(`file content mismatch: expected "${expectedContent}", got "${content.trim().slice(0, 100)}"`);
       }
     } catch {
-      failures.push(`agent did not create .a5c-live-test/${traceId}.txt (tool execution must succeed — verify sandbox is disabled via -- passthrough)`);
+      failures.push(`agent did not create .a5c-live-test/${traceId}.txt (expected "${expectedContent}")`);
     }
   }
 

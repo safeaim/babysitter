@@ -11,13 +11,17 @@ export function translateForPi(config: ProviderConfig): HarnessProviderTranslati
       return { env, args, proxyRequired: false };
     case 'foundry':
     case 'azure': {
-      // Azure AI Services (foundry) requires api-version query params that Pi
-      // can't add natively. Route through the transport-mux proxy which exposes
-      // an OpenAI-compatible endpoint locally. Pi's built-in OpenAI provider
-      // ignores OPENAI_BASE_URL, so we force --provider custom which does read it.
-      args.push('--provider', 'custom');
+      // Pi has native Azure support. The AzureOpenAI SDK constructs paths as
+      // {baseUrl}/openai/deployments/{model}/... so we pass the base URL as-is
+      // (without appending /openai). Pi reads AZURE_OPENAI_BASE_URL and
+      // AZURE_OPENAI_API_KEY directly.
+      const apiBase = config.params['apiBase'] ? String(config.params['apiBase']) : undefined;
+      if (apiBase) env['AZURE_OPENAI_BASE_URL'] = apiBase;
+      if (config.auth.apiKey) env['AZURE_OPENAI_API_KEY'] = config.auth.apiKey;
+      args.push('--provider', 'azure');
       env['ANTHROPIC_API_KEY'] = '';
-      return { env, args, proxyRequired: true, proxyExposedTransport: 'openai-chat' };
+      env['OPENAI_API_KEY'] = '';
+      return { env, args, proxyRequired: false };
     }
     case 'anthropic':
       if (config.auth.apiKey) env['ANTHROPIC_API_KEY'] = config.auth.apiKey;
@@ -28,7 +32,6 @@ export function translateForPi(config: ProviderConfig): HarnessProviderTranslati
     case 'local':
     case 'lmstudio':
     case 'vllm': {
-      // Custom/local providers: Pi supports baseUrl via models.json config
       if (config.params['apiBase']) {
         env['OPENAI_BASE_URL'] = String(config.params['apiBase']);
         env['OPENAI_API_BASE'] = String(config.params['apiBase']);
@@ -38,10 +41,8 @@ export function translateForPi(config: ProviderConfig): HarnessProviderTranslati
       return { env, args, proxyRequired: false };
     }
     default:
-      // For providers Pi doesn't natively support, route through transport-mux proxy.
-      // Force --provider custom so Pi reads OPENAI_BASE_URL from the proxy env.
-      args.push('--provider', 'custom');
-      if (config.auth.apiKey) env['OPENAI_API_KEY'] = config.auth.apiKey;
+      // For unsupported providers, route through transport-mux proxy which
+      // exposes an OpenAI-compatible local endpoint.
       env['ANTHROPIC_API_KEY'] = '';
       return { env, args, proxyRequired: true, proxyExposedTransport: 'openai-chat' };
   }

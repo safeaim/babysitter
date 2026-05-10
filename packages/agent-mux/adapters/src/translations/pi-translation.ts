@@ -11,16 +11,13 @@ export function translateForPi(config: ProviderConfig): HarnessProviderTranslati
       return { env, args, proxyRequired: false };
     case 'foundry':
     case 'azure': {
-      // Pi has native Azure support. The AzureOpenAI SDK constructs paths as
-      // {baseUrl}/openai/deployments/{model}/... so we pass the base URL as-is.
-      const apiBase = config.params['apiBase'] ? String(config.params['apiBase']) : undefined;
-      if (apiBase) env['AZURE_OPENAI_BASE_URL'] = apiBase;
-      if (config.auth.apiKey) env['AZURE_OPENAI_API_KEY'] = config.auth.apiKey;
-      env['AZURE_OPENAI_API_VERSION'] = '2025-04-01-preview';
-      args.push('--provider', 'azure');
+      // Pi's Azure provider uses the Responses API path which isn't supported
+      // by all Azure AI Services deployments. Route through the transport-mux
+      // proxy which exposes standard Chat Completions. Pass --base-url so Pi
+      // connects to the local proxy instead of api.openai.com.
       env['ANTHROPIC_API_KEY'] = '';
       env['OPENAI_API_KEY'] = '';
-      return { env, args, proxyRequired: false };
+      return { env, args, proxyRequired: true, proxyExposedTransport: 'openai-chat' };
     }
     case 'anthropic':
       if (config.auth.apiKey) env['ANTHROPIC_API_KEY'] = config.auth.apiKey;
@@ -40,9 +37,8 @@ export function translateForPi(config: ProviderConfig): HarnessProviderTranslati
       return { env, args, proxyRequired: false };
     }
     default:
-      // For unsupported providers, route through transport-mux proxy which
-      // exposes an OpenAI-compatible local endpoint.
       env['ANTHROPIC_API_KEY'] = '';
+      env['OPENAI_API_KEY'] = '';
       return { env, args, proxyRequired: true, proxyExposedTransport: 'openai-chat' };
   }
 }

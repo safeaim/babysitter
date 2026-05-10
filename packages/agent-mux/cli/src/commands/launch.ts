@@ -486,6 +486,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         completionEngine,
       });
       proxyRuntime.applyHarnessEnv(plan.env);
+
+      // Pi ignores OPENAI_BASE_URL env var — pass proxy URL via --base-url arg
+      if (plan.harness === 'pi') {
+        plan.args.push('--base-url', proxyRuntime.url);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (jsonMode) printJsonError('SPAWN_ERROR', `Failed to launch transport runtime: ${msg}`);

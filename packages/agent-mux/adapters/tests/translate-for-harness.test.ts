@@ -118,14 +118,11 @@ describe('translateForHarness', () => {
   });
 
   describe('dispatches to pi translator', () => {
-    it('returns proxyRequired=false for pi with foundry using native Azure', () => {
+    it('returns proxyRequired=true for pi with foundry (uses proxy for chat completions)', () => {
       const config = makeConfig({ provider: 'foundry' as any, transport: 'openai-chat' as any, auth: { type: 'api_key' as const, apiKey: 'azkey' }, params: { apiBase: 'https://myres.services.ai.azure.com' } });
       const r = translateForHarness('pi' as AgentName, config);
-      expect(r.proxyRequired).toBe(false);
-      expect(r.env['AZURE_OPENAI_BASE_URL']).toBe('https://myres.services.ai.azure.com');
-      expect(r.env['AZURE_OPENAI_API_KEY']).toBe('azkey');
-      expect(r.args).toContain('--provider');
-      expect(r.args).toContain('azure');
+      expect(r.proxyRequired).toBe(true);
+      expect(r.proxyExposedTransport).toBe('openai-chat');
     });
 
     it('returns proxyRequired=false for pi with custom provider', () => {

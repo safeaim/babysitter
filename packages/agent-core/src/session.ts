@@ -6,38 +6,8 @@ import type {
 } from "./types";
 
 const DEFAULT_TIMEOUT_MS = 900_000;
-const DEFAULT_BACKEND = "codex-sdk";
-const SDK_BACKEND_SUFFIX = "-sdk";
-
-type AgentMuxModule = typeof import("@a5c-ai/agent-mux");
-type RunHandle = import("@a5c-ai/agent-mux").RunHandle;
 
 export type AgentCoreEventListener = (event: AgentCoreSessionEvent) => void;
-
-let agentMuxPromise: Promise<AgentMuxModule> | null = null;
-let agentMuxClientPromise: Promise<import("@a5c-ai/agent-mux").AgentMuxClient> | null = null;
-
-async function loadAgentMux(): Promise<AgentMuxModule> {
-  if (!agentMuxPromise) {
-    agentMuxPromise = import("@a5c-ai/agent-mux");
-  }
-  return agentMuxPromise;
-}
-
-async function getAgentMuxClient(): Promise<import("@a5c-ai/agent-mux").AgentMuxClient> {
-  if (!agentMuxClientPromise) {
-    agentMuxClientPromise = (async () => {
-      const agentMux = await loadAgentMux();
-      const client = agentMux.createClient({
-        approvalMode: "prompt",
-        stream: true,
-      });
-      agentMux.registerBuiltInAdapters(client);
-      return client;
-    })();
-  }
-  return agentMuxClientPromise;
-}
 
 function buildSystemPrompt(options: AgentCoreSessionOptions): string | undefined {
   const segments: string[] = [];
@@ -57,56 +27,105 @@ function buildSystemPrompt(options: AgentCoreSessionOptions): string | undefined
   return segments.join("\n\n");
 }
 
-function mapThinkingLevel(
-  thinkingLevel: AgentCoreSessionOptions["thinkingLevel"],
-): import("@a5c-ai/agent-mux").RunOptions["thinkingEffort"] | undefined {
-  switch (thinkingLevel) {
-    case "minimal":
-    case "low":
-      return "low";
-    case "medium":
-      return "medium";
-    case "high":
-      return "high";
-    case "xhigh":
-      return "max";
-    default:
-      return undefined;
-  }
+interface ResolvedEndpoint {
+  apiBase: string;
+  apiKey: string;
+  model: string;
+  isAzure: boolean;
 }
 
-function mapEventPayload(event: unknown): AgentCoreSessionEvent {
-  if (!event || typeof event !== "object") {
-    return { type: "unknown", value: event };
+function resolveEndpoint(options: AgentCoreSessionOptions): ResolvedEndpoint {
+  const model = options.model ?? "gpt-4o";
+
+  const amuxProvider = process.env["AMUX_PROVIDER"];
+  const amuxApiBase = process.env["AMUX_API_BASE"];
+  const amuxApiKey = process.env["AMUX_API_KEY"];
+  const azureApiKey = process.env["AZURE_API_KEY"];
+  const openaiApiKey = process.env["OPENAI_API_KEY"];
+  const anthropicApiKey = process.env["ANTHROPIC_API_KEY"];
+
+  if (amuxProvider === "foundry" || amuxProvider === "azure") {
+    const apiBase = amuxApiBase ?? "";
+    const apiKey = amuxApiKey ?? azureApiKey ?? "";
+    return { apiBase: `${apiBase}/openai`, apiKey, model, isAzure: true };
   }
-  const typed = event as Record<string, unknown>;
-  return {
-    type: typeof typed.type === "string" ? typed.type : "unknown",
-    ...typed,
-  };
+
+  if (amuxApiBase) {
+    const apiKey = amuxApiKey ?? openaiApiKey ?? "";
+    return { apiBase: amuxApiBase, apiKey, model, isAzure: false };
+  }
+
+  if (openaiApiKey) {
+    return { apiBase: "https://api.openai.com/v1", apiKey: openaiApiKey, model, isAzure: false };
+  }
+
+  if (anthropicApiKey) {
+    return { apiBase: "https://api.anthropic.com", apiKey: anthropicApiKey, model, isAzure: false };
+  }
+
+  return { apiBase: "https://api.openai.com/v1", apiKey: amuxApiKey ?? "", model, isAzure: false };
 }
 
-function resolveRunBackend(
-  _client: import("@a5c-ai/agent-mux").AgentMuxClient,
-  options: AgentCoreSessionOptions,
-): string {
-  const configuredBackend = options.backend ?? process.env.AGENT_CORE_BACKEND;
-  if (configuredBackend) {
-    return configuredBackend;
-  }
+async function callCompletionApi(
+  endpoint: ResolvedEndpoint,
+  messages: Array<{ role: string; content: string }>,
+  timeout: number,
+): Promise<{ text: string; usage?: { promptTokens: number; completionTokens: number } }> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
 
-  // Always use the in-process SDK backend. The model registry is for discovery
-  // only — the SDK can call any model the provider supports regardless of
-  // whether it's in the static model list.
-  return DEFAULT_BACKEND;
+  try {
+    let url: string;
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+    if (endpoint.isAzure) {
+      url = `${endpoint.apiBase}/deployments/${endpoint.model}/chat/completions?api-version=2025-04-01-preview`;
+      headers["api-key"] = endpoint.apiKey;
+    } else {
+      url = `${endpoint.apiBase}/chat/completions`;
+      headers["Authorization"] = `Bearer ${endpoint.apiKey}`;
+    }
+
+    const body = JSON.stringify({
+      model: endpoint.model,
+      messages,
+      max_tokens: 16384,
+    });
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed (${response.status}): ${errorText}`);
+    }
+
+    const data = await response.json() as {
+      choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
+
+    const text = data.choices?.[0]?.message?.content ?? "";
+    const usage = data.usage
+      ? { promptTokens: data.usage.prompt_tokens ?? 0, completionTokens: data.usage.completion_tokens ?? 0 }
+      : undefined;
+
+    return { text, usage };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export class AgentCoreSessionHandle {
   private readonly options: AgentCoreSessionOptions;
   private readonly listeners = new Set<AgentCoreEventListener>();
-  private activeHandle: RunHandle | null = null;
   private queuedFollowUps: string[] = [];
   private currentSessionId: string | undefined;
+  private isActive = false;
 
   constructor(options: AgentCoreSessionOptions = {}) {
     this.options = options;
@@ -117,15 +136,12 @@ export class AgentCoreSessionHandle {
   }
 
   async prompt(text: string, timeout?: number): Promise<AgentCorePromptResult> {
-    if (this.activeHandle) {
+    if (this.isActive) {
       throw new Error("Agent core session is already processing a prompt");
     }
 
-    const agentMux = await loadAgentMux();
-    const client = await getAgentMuxClient();
+    this.isActive = true;
     const effectiveTimeout = timeout ?? this.options.timeout ?? DEFAULT_TIMEOUT_MS;
-    const backend = resolveRunBackend(client, this.options);
-    const thinkingEffort = mapThinkingLevel(this.options.thinkingLevel);
     const start = Date.now();
 
     const followUps = this.queuedFollowUps;
@@ -134,64 +150,58 @@ export class AgentCoreSessionHandle {
       ? [text, ...followUps.map((item) => `Follow-up instruction:\n${item}`)].join("\n\n")
       : text;
 
-    const handle = client.run({
-      agent: backend as import("@a5c-ai/agent-mux").AgentName,
-      prompt: promptText,
-      cwd: this.options.workspace,
-      model: this.options.model,
-      timeout: effectiveTimeout,
-      sessionId: this.currentSessionId,
-      systemPrompt: buildSystemPrompt(this.options),
-      systemPromptMode: this.options.systemPrompt ? "replace" : "append",
-      approvalMode: this.options.uiContext ? "prompt" : "yolo",
-      ...(thinkingEffort ? { thinkingEffort } : {}),
-      collectEvents: true,
-    });
+    try {
+      const endpoint = resolveEndpoint(this.options);
+      const messages: Array<{ role: string; content: string }> = [];
 
-    this.activeHandle = handle;
-    const pump = (async () => {
-      for await (const event of handle) {
-        const mapped = mapEventPayload(event);
-        if (mapped.type === "session_start" && typeof mapped.sessionId === "string") {
-          this.currentSessionId = mapped.sessionId;
-        }
-        for (const listener of this.listeners) {
-          listener(mapped);
-        }
+      const systemPrompt = buildSystemPrompt(this.options);
+      if (systemPrompt) {
+        messages.push({ role: "system", content: systemPrompt });
       }
-    })();
+      messages.push({ role: "user", content: promptText });
 
-    const result = await handle;
-    await pump;
-    this.activeHandle = null;
+      const sessionId = this.currentSessionId ?? `agent-core-${Date.now()}`;
+      this.currentSessionId = sessionId;
 
-    if (result.sessionId) {
-      this.currentSessionId = result.sessionId;
+      this.emit({ type: "session_start", sessionId });
+
+      const result = await callCompletionApi(endpoint, messages, effectiveTimeout);
+
+      this.emit({ type: "text_delta", delta: result.text });
+      this.emit({ type: "session_end", sessionId });
+
+      return {
+        output: result.text,
+        duration: Date.now() - start,
+        success: true,
+        exitCode: 0,
+      };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emit({ type: "error", message });
+      return {
+        output: message,
+        duration: Date.now() - start,
+        success: false,
+        exitCode: 1,
+      };
+    } finally {
+      this.isActive = false;
     }
+  }
 
-    const output = result.text || result.error?.message || "";
-    return {
-      output,
-      duration: Date.now() - start,
-      success: result.exitReason === "completed" && !result.error,
-      exitCode: result.exitCode ?? (result.error ? 1 : 0),
-    };
+  private emit(event: AgentCoreSessionEvent): void {
+    for (const listener of this.listeners) {
+      listener(event);
+    }
   }
 
   async steer(text: string): Promise<void> {
-    if (!this.activeHandle) {
-      this.queuedFollowUps.push(text);
-      return;
-    }
-    await this.activeHandle.send(text);
+    this.queuedFollowUps.push(text);
   }
 
   async followUp(text: string): Promise<void> {
-    if (!this.activeHandle) {
-      this.queuedFollowUps.push(text);
-      return;
-    }
-    await this.activeHandle.queue(text, { when: "after-response" });
+    this.queuedFollowUps.push(text);
   }
 
   subscribe(listener: AgentCoreEventListener): () => void {
@@ -250,16 +260,10 @@ export class AgentCoreSessionHandle {
   }
 
   async abort(): Promise<void> {
-    if (this.activeHandle) {
-      await this.activeHandle.abort();
-    }
+    // Direct API calls don't support mid-request abort easily
   }
 
   dispose(): void {
-    if (this.activeHandle) {
-      void this.activeHandle.abort().catch(() => undefined);
-      this.activeHandle = null;
-    }
     this.listeners.clear();
     this.queuedFollowUps = [];
   }
@@ -269,7 +273,7 @@ export class AgentCoreSessionHandle {
   }
 
   get isStreaming(): boolean {
-    return this.activeHandle !== null;
+    return this.isActive;
   }
 }
 

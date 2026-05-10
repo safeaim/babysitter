@@ -1,277 +1,147 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createAgentCoreSession } from "./session";
 
-type MockRunResult = {
-  text?: string;
-  error?: { message?: string };
-  exitReason?: string;
-  exitCode?: number;
-  sessionId?: string;
-};
-
-function createHandle(result: MockRunResult, events: unknown[] = []) {
-  const handle = Object.assign(Promise.resolve(result), {
-    send: vi.fn(async () => undefined),
-    queue: vi.fn(async () => undefined),
-    abort: vi.fn(async () => undefined),
-    async *[Symbol.asyncIterator]() {
-      for (const event of events) {
-        yield event;
-      }
-    },
-  });
-
-  return handle;
-}
-
-function createPendingHandle(events: unknown[] = []) {
-  let resolveResult: ((result: MockRunResult) => void) | undefined;
-  const promise = new Promise<MockRunResult>((resolve) => {
-    resolveResult = resolve;
-  });
-
-  const handle = Object.assign(promise, {
-    send: vi.fn(async () => undefined),
-    queue: vi.fn(async () => undefined),
-    abort: vi.fn(async () => undefined),
-    async *[Symbol.asyncIterator]() {
-      for (const event of events) {
-        yield event;
-      }
-    },
-  });
-
-  return {
-    handle,
-    resolve(result: MockRunResult) {
-      resolveResult?.(result);
-    },
-  };
-}
-
-async function loadSessionModule(args: {
-  handleResult?: MockRunResult;
-  events?: unknown[];
-  runImplementation?: (options: Record<string, unknown>) => ReturnType<typeof createHandle>;
-  modelImplementation?: (agent: string, modelId: string) => Record<string, unknown> | null;
-  adapterImplementation?: (agent: string) => Record<string, unknown> | undefined;
-}) {
-  vi.resetModules();
-
-  const run = vi.fn((options: Record<string, unknown>) => args.runImplementation?.(options) ?? createHandle(
-    args.handleResult ?? { text: "ok", exitReason: "completed", exitCode: 0, sessionId: "session-1" },
-    args.events,
-  ));
-  const models = {
-    model: vi.fn((agent: string, modelId: string) => args.modelImplementation?.(agent, modelId) ?? null),
-  };
-  const adapters = {
-    get: vi.fn((agent: string) => args.adapterImplementation?.(agent)),
-  };
-  const createClient = vi.fn(() => ({ run, models, adapters }));
-  const registerBuiltInAdapters = vi.fn();
-
-  vi.doMock("@a5c-ai/agent-mux", () => ({
-    createClient,
-    registerBuiltInAdapters,
-  }));
-
-  const sessionModule = await import("./session");
-  return { ...sessionModule, createClient, registerBuiltInAdapters, run, models, adapters };
-}
+const mockFetch = vi.fn();
 
 describe("AgentCoreSessionHandle", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", mockFetch);
+    vi.stubEnv("OPENAI_API_KEY", "test-key");
+  });
+
   afterEach(() => {
-    vi.resetModules();
-    vi.clearAllMocks();
+    vi.unstubAllGlobals();
     vi.unstubAllEnvs();
+    vi.clearAllMocks();
   });
 
-  it("forwards the supported run options and translates thinkingLevel", async () => {
-    const sessionModule = await loadSessionModule({
-      events: [{ type: "session_start", sessionId: "started-session" }],
+  function mockApiResponse(text: string) {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: text } }],
+        usage: { prompt_tokens: 10, completion_tokens: 5 },
+      }),
     });
+  }
 
-    const session = sessionModule.createAgentCoreSession({
-      workspace: "/tmp/workspace",
-      model: "gpt-5.4",
-      timeout: 12_345,
-      thinkingLevel: "xhigh",
-      uiContext: { interactive: true },
-      systemPrompt: "Base prompt",
-      appendSystemPrompt: ["More context"],
-      backend: "codex",
-      toolsMode: "coding",
-      customTools: [{ name: "ignored-tool" }],
-      isolated: true,
-      ephemeral: true,
-      bashSandbox: "secure",
-      enableCompaction: true,
-      agentDir: "/tmp/agents",
-    });
+  it("makes a direct API call with the prompt", async () => {
+    mockApiResponse("hello world");
+    const session = createAgentCoreSession({ model: "gpt-5.5" });
 
-    await session.prompt("Implement the change");
+    const result = await session.prompt("Say hello");
 
-    expect(sessionModule.createClient).toHaveBeenCalledWith({
-      approvalMode: "prompt",
-      stream: true,
-    });
-    expect(sessionModule.registerBuiltInAdapters).toHaveBeenCalledTimes(1);
-    expect(sessionModule.run).toHaveBeenCalledWith({
-      agent: "codex",
-      prompt: "Implement the change",
-      cwd: "/tmp/workspace",
-      model: "gpt-5.4",
-      timeout: 12_345,
-      sessionId: undefined,
-      systemPrompt: "Base prompt\n\nMore context",
-      systemPromptMode: "replace",
-      approvalMode: "prompt",
-      thinkingEffort: "max",
-      collectEvents: true,
-    });
-    const firstCall = sessionModule.run.mock.calls[0];
-    expect(firstCall).toBeDefined();
-    const forwarded = firstCall?.[0] as Record<string, unknown>;
-    expect(forwarded).not.toHaveProperty("toolsMode");
-    expect(forwarded).not.toHaveProperty("customTools");
-    expect(forwarded).not.toHaveProperty("isolated");
-    expect(forwarded).not.toHaveProperty("ephemeral");
-    expect(forwarded).not.toHaveProperty("bashSandbox");
-    expect(forwarded).not.toHaveProperty("enableCompaction");
-    expect(forwarded).not.toHaveProperty("agentDir");
+    expect(result.success).toBe(true);
+    expect(result.output).toBe("hello world");
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    const [url, options] = mockFetch.mock.calls[0]!;
+    expect(url).toBe("https://api.openai.com/v1/chat/completions");
+    const body = JSON.parse(options.body);
+    expect(body.model).toBe("gpt-5.5");
+    expect(body.messages).toEqual([{ role: "user", content: "Say hello" }]);
   });
 
-  it("uses append mode and yolo approval when no interactive UI context is provided", async () => {
-    const sessionModule = await loadSessionModule({});
-    const session = sessionModule.createAgentCoreSession({
-      appendSystemPrompt: ["Line one", "Line two"],
+  it("includes system prompt when provided", async () => {
+    mockApiResponse("ok");
+    const session = createAgentCoreSession({
+      systemPrompt: "You are helpful",
+      appendSystemPrompt: ["Be concise"],
     });
 
-    await session.prompt("Review this");
+    await session.prompt("Do something");
 
-    expect(sessionModule.run).toHaveBeenCalledWith({
-      agent: "codex-sdk",
-      prompt: "Review this",
-      cwd: undefined,
-      model: undefined,
-      timeout: 900_000,
-      sessionId: undefined,
-      systemPrompt: "Line one\n\nLine two",
-      systemPromptMode: "append",
-      approvalMode: "yolo",
-      collectEvents: true,
-    });
+    const body = JSON.parse(mockFetch.mock.calls[0]![1].body);
+    expect(body.messages[0]).toEqual({ role: "system", content: "You are helpful\n\nBe concise" });
+    expect(body.messages[1]).toEqual({ role: "user", content: "Do something" });
   });
 
-  it("falls back from the implicit sdk backend to the paired subprocess backend for unsupported models", async () => {
-    const sessionModule = await loadSessionModule({
-      modelImplementation: () => null,
-      adapterImplementation: (agent) => (agent === "codex" ? { agent } : undefined),
-    });
-    const session = sessionModule.createAgentCoreSession({
-      model: "gpt-5.4",
-    });
+  it("routes to Azure foundry when AMUX_PROVIDER=foundry", async () => {
+    vi.stubEnv("AMUX_PROVIDER", "foundry");
+    vi.stubEnv("AMUX_API_BASE", "https://myresource.services.ai.azure.com");
+    vi.stubEnv("AZURE_API_KEY", "az-key-123");
 
-    await session.prompt("Plan the run");
+    mockApiResponse("azure response");
+    const session = createAgentCoreSession({ model: "gpt-5.5" });
 
-    expect(sessionModule.models.model).toHaveBeenCalledWith("codex-sdk", "gpt-5.4");
-    expect(sessionModule.adapters.get).toHaveBeenCalledWith("codex");
-    expect(sessionModule.run).toHaveBeenCalledWith({
-      agent: "codex",
-      prompt: "Plan the run",
-      cwd: undefined,
-      model: "gpt-5.4",
-      timeout: 900_000,
-      sessionId: undefined,
-      systemPrompt: undefined,
-      systemPromptMode: "append",
-      approvalMode: "yolo",
-      collectEvents: true,
-    });
+    await session.prompt("Hello");
+
+    const [url, options] = mockFetch.mock.calls[0]!;
+    expect(url).toBe("https://myresource.services.ai.azure.com/openai/deployments/gpt-5.5/chat/completions?api-version=2025-04-01-preview");
+    expect(options.headers["api-key"]).toBe("az-key-123");
+    expect(options.headers["Authorization"]).toBeUndefined();
   });
 
-  it("reuses the session id learned from the prior run", async () => {
-    const sessionModule = await loadSessionModule({
-      handleResult: { text: "ok", exitReason: "completed", exitCode: 0, sessionId: "persisted-session" },
-    });
-    const session = sessionModule.createAgentCoreSession();
+  it("uses OPENAI_API_KEY with Bearer auth for OpenAI", async () => {
+    mockApiResponse("openai response");
+    const session = createAgentCoreSession({});
 
-    await session.prompt("First prompt");
-    await session.prompt("Second prompt");
+    await session.prompt("Test");
 
-    const firstCall = sessionModule.run.mock.calls[0];
-    const secondCall = sessionModule.run.mock.calls[1];
-    expect(firstCall).toBeDefined();
-    expect(secondCall).toBeDefined();
-
-    expect(firstCall?.[0]).toMatchObject({
-      sessionId: undefined,
-    });
-    expect(secondCall?.[0]).toMatchObject({
-      sessionId: "persisted-session",
-    });
+    const [, options] = mockFetch.mock.calls[0]!;
+    expect(options.headers["Authorization"]).toBe("Bearer test-key");
+    expect(options.headers["api-key"]).toBeUndefined();
   });
 
   it("appends queued follow-up instructions to the next prompt only once", async () => {
-    const sessionModule = await loadSessionModule({});
-    const session = sessionModule.createAgentCoreSession();
+    mockApiResponse("first");
+    mockApiResponse("second");
+    const session = createAgentCoreSession({});
 
     await session.steer("Use the session export path");
     await session.followUp("Add the registry regression");
     await session.prompt("Implement tests");
     await session.prompt("Verify again");
 
-    expect(sessionModule.run.mock.calls[0]?.[0]).toMatchObject({
-      prompt: [
-        "Implement tests",
-        "Follow-up instruction:\nUse the session export path",
-        "Follow-up instruction:\nAdd the registry regression",
-      ].join("\n\n"),
-    });
-    expect(sessionModule.run.mock.calls[1]?.[0]).toMatchObject({
-      prompt: "Verify again",
-    });
+    const firstBody = JSON.parse(mockFetch.mock.calls[0]![1].body);
+    const secondBody = JSON.parse(mockFetch.mock.calls[1]![1].body);
+    expect(firstBody.messages[0].content).toContain("Implement tests");
+    expect(firstBody.messages[0].content).toContain("Follow-up instruction:\nUse the session export path");
+    expect(secondBody.messages[0].content).toBe("Verify again");
   });
 
-  it("normalizes unknown event payloads for subscribers", async () => {
-    const sessionModule = await loadSessionModule({
-      events: [null, { foo: "bar" }, { type: "session_start", sessionId: "event-session" }],
-      handleResult: { text: "ok", exitReason: "completed", exitCode: 0, sessionId: "event-session" },
-    });
-    const session = sessionModule.createAgentCoreSession();
-    const received: Array<Record<string, unknown>> = [];
+  it("emits events to subscribers", async () => {
+    mockApiResponse("streamed text");
+    const session = createAgentCoreSession({});
+    const events: Array<Record<string, unknown>> = [];
+    session.subscribe((event) => events.push(event as Record<string, unknown>));
 
-    session.subscribe((event) => {
-      received.push(event as Record<string, unknown>);
-    });
+    await session.prompt("Test events");
 
-    await session.prompt("Inspect event flow");
-
-    expect(received).toEqual([
-      { type: "unknown", value: null },
-      { type: "unknown", foo: "bar" },
-      { type: "session_start", sessionId: "event-session" },
-    ]);
-    expect(session.sessionId).toBe("event-session");
-    expect(session.isStreaming).toBe(false);
+    expect(events.some((e) => e.type === "session_start")).toBe(true);
+    expect(events.some((e) => e.type === "text_delta" && e.delta === "streamed text")).toBe(true);
+    expect(events.some((e) => e.type === "session_end")).toBe(true);
   });
 
-  it("rejects concurrent prompt attempts while a prompt is active", async () => {
-    const pending = createPendingHandle();
-    const sessionModule = await loadSessionModule({
-      runImplementation: () => pending.handle,
-    });
-    const session = sessionModule.createAgentCoreSession();
+  it("rejects concurrent prompt attempts", async () => {
+    let resolveResponse!: (value: unknown) => void;
+    mockFetch.mockReturnValueOnce(new Promise((resolve) => { resolveResponse = resolve; }));
 
-    const firstPrompt = session.prompt("First prompt");
+    const session = createAgentCoreSession({});
+    const firstPrompt = session.prompt("First");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await expect(session.prompt("Second prompt")).rejects.toThrow(
+    await expect(session.prompt("Second")).rejects.toThrow(
       "Agent core session is already processing a prompt",
     );
 
-    pending.resolve({ text: "done", exitReason: "completed", exitCode: 0, sessionId: "session-1" });
+    resolveResponse({ ok: true, json: async () => ({ choices: [{ message: { content: "done" } }] }) });
     await firstPrompt;
     expect(session.isStreaming).toBe(false);
+  });
+
+  it("handles API errors gracefully", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      text: async () => "Unauthorized",
+    });
+    const session = createAgentCoreSession({});
+
+    const result = await session.prompt("Will fail");
+
+    expect(result.success).toBe(false);
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain("401");
   });
 });

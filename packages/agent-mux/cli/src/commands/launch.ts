@@ -205,8 +205,8 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
       if (session.prompt && !interactive) plan.args.push('--prompt', session.prompt);
       break;
     case 'pi':
-      if (session.prompt && !interactive) plan.args.push('--prompt', session.prompt);
-      if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
+      // Pi doesn't accept --prompt or --max-turns flags.
+      // Prompt is passed via stdin after spawn.
       break;
     case 'opencode':
       if (session.resumeId) plan.args.push('--session', session.resumeId);

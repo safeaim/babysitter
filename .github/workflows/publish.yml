@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
@@ -126,7 +126,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline
+        run: npm ci --prefer-offline --legacy-peer-deps
 
       - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
@@ -211,7 +211,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline
+        run: npm ci --prefer-offline --legacy-peer-deps
 
       - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
@@ -344,7 +344,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline
+        run: npm ci --prefer-offline --legacy-peer-deps
 
       - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
@@ -426,7 +426,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline
+        run: npm ci --prefer-offline --legacy-peer-deps
 
       - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
@@ -562,7 +562,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline
+        run: npm ci --prefer-offline --legacy-peer-deps
 
       - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
@@ -659,7 +659,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline
+        run: npm ci --prefer-offline --legacy-peer-deps
 
       - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
@@ -720,7 +720,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline
+        run: npm ci --prefer-offline --legacy-peer-deps
 
       - name: Download pre-built dist directories
         uses: actions/download-artifact@v4
@@ -799,7 +799,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Set publish version
@@ -956,7 +956,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build Atlas workspace
@@ -1039,7 +1039,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
@@ -1117,7 +1117,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build hooks and agent-mux workspaces
@@ -1207,7 +1207,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
@@ -1272,7 +1272,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
@@ -1324,7 +1324,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux CLI workspace
@@ -1389,7 +1389,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux root workspace
@@ -1455,7 +1455,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux TUI workspace
@@ -1518,7 +1518,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Run docs QA
@@ -1786,7 +1786,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build cloud workspace
@@ -1882,7 +1882,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nm.outputs.cache-hit != 'true'
         run: |
-          npm ci --prefer-offline
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Publish babysitter metapackage to npm ($NPM_TAG tag)

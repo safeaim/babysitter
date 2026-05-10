@@ -14,7 +14,7 @@ graph:
   skillAreas: [skill-area:agentic-loops, skill-area:prompt-engineering, skill-area:multi-agent-coordination]
   workflows: [workflow:feature-development]
   topics: [topic:developer-experience]
-  roles: [role:backend-engineer, role:platform-engineer, role:tech-lead]
+  roles: [role:backend-engineer, role:platform-engineer, role:tech-lead, role:debugger]
 ---
 
 - Stack trace interpretation

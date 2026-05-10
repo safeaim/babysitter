@@ -12,7 +12,7 @@ expertise:
 graph:
   domains: [domain:devops]
   specializations: [specialization:devops-sre-platform]
-  roles: [role:sre, role:incident-commander]
+  roles: [role:sre, role:incident-commander, role:on-call, role:sre-runbook-author]
   skillAreas: [skill-area:incident-management, skill-area:alerting-oncall]
   workflows: [workflow:incident-response, workflow:post-mortem-review]
   topics: [topic:chaos-engineering]

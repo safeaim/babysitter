@@ -12,7 +12,7 @@ graph:
   domains: [domain:software-engineering]
   specializations: [specialization:ai-agents-conversational]
   skillAreas: [skill-area:context-management, skill-area:model-monitoring-drift-detection]
-  roles: [role:ml-engineer, role:backend-engineer]
+  roles: [role:ml-engineer, role:backend-engineer, role:cost-tracker]
   workflows: [workflow:ml-model-lifecycle, workflow:feature-development]
 
 ---

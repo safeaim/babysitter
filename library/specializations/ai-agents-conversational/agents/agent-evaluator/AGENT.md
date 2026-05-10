@@ -12,7 +12,7 @@ graph:
   domains: [domain:software-engineering]
   specializations: [specialization:ai-agents-conversational]
   skillAreas: [skill-area:eval-driven-development, skill-area:agent-simulation-testing]
-  roles: [role:ml-engineer, role:backend-engineer]
+  roles: [role:ml-engineer, role:backend-engineer, role:ai-champion]
   workflows: [workflow:ml-model-lifecycle, workflow:feature-development]
 
 ---

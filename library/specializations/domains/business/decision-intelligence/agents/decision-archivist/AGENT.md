@@ -14,7 +14,7 @@ expertise:
 graph:
   domains: [domain:business-intelligence]
   skillAreas: [skill-area:strategic-analysis, skill-area:business-analysis, skill-area:data-governance]
-  roles: [role:business-analyst, role:information-architect, role:data-analyst]
+  roles: [role:business-analyst, role:information-architect, role:data-analyst, role:adr-writer]
 ---
 
 # Decision Archivist

@@ -6,7 +6,7 @@ graph:
   domains: [domain:gaming]
   specializations: [specialization:game-development]
   skillAreas: [skill-area:asset-pipeline, skill-area:graphics-rendering]
-  roles: [role:game-developer]
+  roles: [role:game-developer, role:technical-artist]
 ---
 
 # 3D Modeler Agent

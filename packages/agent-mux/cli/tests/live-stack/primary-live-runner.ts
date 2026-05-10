@@ -182,11 +182,11 @@ export function buildPrimaryLiveStackCommands(
 function harnessApprovalPassthrough(harness: string): string[] {
   switch (harness) {
     case 'codex':
-      return ['--', '--full-auto', '--sandbox', 'none'];
+      return ['--', '--full-auto', '--sandbox', 'danger-full-access'];
     case 'claude':
       return ['--', '--dangerously-skip-permissions'];
     case 'pi':
-      return ['--', '--yolo'];
+      return [];
     default:
       return [];
   }

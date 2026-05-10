@@ -11,6 +11,7 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:technical-documentation
+    - target: skill-area:knowledge-fabric-design
   used_for:
     - skill-area:project-planning
 ---
@@ -117,5 +118,6 @@ edges:
   tool_used_by:
     - target: skill-area:technical-documentation
     - target: skill-area:project-planning
+    - target: skill-area:knowledge-fabric-design
   used_for:
     - skill-area:project-planning

@@ -166,6 +166,7 @@ edges:
     - language:python
   library_used_by:
     - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:rag-pipeline-engineering
 ---
 nodeKind: Library
 id: library:llama-index
@@ -180,6 +181,8 @@ edges:
     - language:python
   library_used_by:
     - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:rag-pipeline-engineering
+    - target: skill-area:document-indexing
 ---
 nodeKind: Library
 id: library:chromadb

@@ -34,4 +34,5 @@ nodeKindFiles:
 - schema/node-kinds/methodologies.yaml
 - schema/node-kinds/deferred.yaml
 - schema/node-kinds/testable-claims.yaml
+- schema/node-kinds/knowledge-fabric.yaml
 edgeKindFile: schema/edge-kinds.yaml

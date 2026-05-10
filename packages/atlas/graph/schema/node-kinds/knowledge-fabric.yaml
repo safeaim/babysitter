@@ -1,0 +1,104 @@
+# NodeKinds for cluster 21-knowledge-fabric.
+# Loaded by tools/validator/validate.py via the manifest in ../ontology-schema.yaml.
+# DO NOT add backward-compat shims — catalog pass 37 policy.
+
+nodeKinds:
+- id: node:knowledge-source
+  name: KnowledgeSource
+  origin: universal
+  prefix: knowledge-source
+  cluster: 21-knowledge-fabric
+  purpose: a source of organizational knowledge that feeds the knowledge fabric
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: sourceKind
+    type: enum<document-store,code-repository,conversation-archive,decision-log,wiki,crm,issue-tracker,design-system,api-docs,runbook,incident-history,meeting-notes,slack-archive>
+    required: false
+  - name: updateFrequency
+    type: enum<real-time,hourly,daily,weekly,manual>
+    required: false
+  - name: indexingMethod
+    type: enum<vector-embedding,full-text,graph-linked,structured-query,hybrid>
+    required: false
+  incomingEdges:
+  - retrieves_from
+  outgoingEdges:
+  - feeds_knowledge
+  invariants:
+  - id starts with knowledge-source: null
+  examples: []
+
+- id: node:knowledge-domain
+  name: KnowledgeDomain
+  origin: universal
+  prefix: knowledge-domain
+  cluster: 21-knowledge-fabric
+  purpose: a bounded area of organizational knowledge (product, engineering, legal, customer, etc.)
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: trustLevel
+    type: enum<authoritative,verified,inferred,unverified>
+    required: false
+  - name: staleness
+    type: enum<fresh,recent,aging,stale>
+    required: false
+  incomingEdges:
+  - feeds_knowledge
+  outgoingEdges:
+  - provides_knowledge_to
+  invariants:
+  - id starts with knowledge-domain: null
+  examples: []
+
+- id: node:retrieval-pipeline
+  name: RetrievalPipeline
+  origin: universal
+  prefix: retrieval-pipeline
+  cluster: 21-knowledge-fabric
+  purpose: a concrete pipeline for retrieving knowledge from the fabric (RAG, semantic search, graph query)
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: pipelineKind
+    type: enum<rag,semantic-search,graph-traversal,keyword-search,hybrid,multi-hop>
+    required: false
+  - name: embeddingModel
+    type: string
+    required: false
+  - name: vectorStore
+    type: string
+    required: false
+  - name: chunkingStrategy
+    type: enum<fixed-size,semantic,document-level,hierarchical,sentence-level>
+    required: false
+  incomingEdges:
+  - provides_knowledge_to
+  outgoingEdges:
+  - retrieves_from
+  - uses_vector_store
+  invariants:
+  - id starts with retrieval-pipeline: null
+  examples: []

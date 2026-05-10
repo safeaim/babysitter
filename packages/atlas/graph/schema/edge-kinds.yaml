@@ -3288,9 +3288,10 @@ edgeKinds:
 - id: edge:uses-vector-store
   name: uses_vector_store
   origin: universal
-  description: an AgentVersion uses a VectorStore for retrieval
+  description: an AgentVersion or RetrievalPipeline uses a VectorStore for retrieval
   source:
   - AgentVersion
+  - RetrievalPipeline
   target:
   - VectorStore
   cardinality: N:N
@@ -3303,6 +3304,7 @@ edgeKinds:
   - VectorStore
   target:
   - AgentVersion
+  - RetrievalPipeline
   cardinality: N:N
   inverse: uses_vector_store
 - id: edge:embeds-with
@@ -5600,3 +5602,52 @@ edgeKinds:
   target: [DeferredNode]
   cardinality: N:N
   inverse: deferred_for
+# ── Knowledge Fabric edges (cluster 21) ──────────────────────────────
+- id: edge:feeds-knowledge
+  name: feeds_knowledge
+  origin: universal
+  description: a KnowledgeSource feeds knowledge into a KnowledgeDomain
+  source: [KnowledgeSource]
+  target: [KnowledgeDomain]
+  cardinality: N:N
+  inverse: knowledge_fed_by
+- id: edge:knowledge-fed-by
+  name: knowledge_fed_by
+  origin: universal
+  description: inverse of feeds_knowledge
+  source: [KnowledgeDomain]
+  target: [KnowledgeSource]
+  cardinality: N:N
+  inverse: feeds_knowledge
+- id: edge:provides-knowledge-to
+  name: provides_knowledge_to
+  origin: universal
+  description: a KnowledgeDomain provides knowledge to a RetrievalPipeline
+  source: [KnowledgeDomain]
+  target: [RetrievalPipeline]
+  cardinality: N:N
+  inverse: knowledge_provided_by
+- id: edge:knowledge-provided-by
+  name: knowledge_provided_by
+  origin: universal
+  description: inverse of provides_knowledge_to
+  source: [RetrievalPipeline]
+  target: [KnowledgeDomain]
+  cardinality: N:N
+  inverse: provides_knowledge_to
+- id: edge:retrieves-from
+  name: retrieves_from
+  origin: universal
+  description: a RetrievalPipeline retrieves knowledge from a KnowledgeSource
+  source: [RetrievalPipeline]
+  target: [KnowledgeSource]
+  cardinality: N:N
+  inverse: retrieved_by
+- id: edge:retrieved-by
+  name: retrieved_by
+  origin: universal
+  description: inverse of retrieves_from
+  source: [KnowledgeSource]
+  target: [RetrievalPipeline]
+  cardinality: N:N
+  inverse: retrieves_from

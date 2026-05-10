@@ -18,6 +18,7 @@ edges:
   used_by_skill_area:
     - target: skill-area:ai-agent-development
     - target: skill-area:retrieval-augmented-generation
+    - target: skill-area:rag-pipeline-engineering
 ---
 nodeKind: Framework
 id: framework:langgraph

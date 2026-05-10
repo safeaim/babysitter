@@ -15,6 +15,8 @@ edges:
   tool_used_by:
     - target: skill-area:ai-agent-development
     - target: skill-area:context-management
+    - target: skill-area:knowledge-fabric-design
+    - target: skill-area:organizational-intelligence
 ---
 nodeKind: Tool
 id: tool:zep
@@ -32,6 +34,8 @@ edges:
   tool_used_by:
     - target: skill-area:ai-agent-development
     - target: skill-area:context-management
+    - target: skill-area:knowledge-fabric-design
+    - target: skill-area:organizational-intelligence
 ---
 nodeKind: Tool
 id: tool:chromadb
@@ -49,6 +53,8 @@ edges:
   tool_used_by:
     - target: skill-area:retrieval-augmented-generation
     - target: skill-area:search-indexing
+    - target: skill-area:knowledge-fabric-design
+    - target: skill-area:rag-pipeline-engineering
 ---
 nodeKind: Tool
 id: tool:weaviate
@@ -66,6 +72,8 @@ edges:
   tool_used_by:
     - target: skill-area:retrieval-augmented-generation
     - target: skill-area:search-indexing
+    - target: skill-area:knowledge-fabric-design
+    - target: skill-area:rag-pipeline-engineering
 ---
 nodeKind: Tool
 id: tool:pinecone
@@ -83,6 +91,8 @@ edges:
   tool_used_by:
     - target: skill-area:retrieval-augmented-generation
     - target: skill-area:search-indexing
+    - target: skill-area:knowledge-fabric-design
+    - target: skill-area:rag-pipeline-engineering
 ---
 nodeKind: Tool
 id: tool:qdrant
@@ -100,6 +110,8 @@ edges:
   tool_used_by:
     - target: skill-area:retrieval-augmented-generation
     - target: skill-area:search-indexing
+    - target: skill-area:knowledge-fabric-design
+    - target: skill-area:rag-pipeline-engineering
 ---
 nodeKind: Tool
 id: tool:milvus
@@ -117,3 +129,5 @@ edges:
   tool_used_by:
     - target: skill-area:retrieval-augmented-generation
     - target: skill-area:search-indexing
+    - target: skill-area:knowledge-fabric-design
+    - target: skill-area:rag-pipeline-engineering

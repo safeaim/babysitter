@@ -1,0 +1,116 @@
+---
+nodeKind: SkillArea
+id: skill-area:knowledge-fabric-design
+attributes:
+  displayName: "Knowledge Fabric Design"
+  description: |
+    Designing organizational knowledge systems — architecting the
+    knowledge layer that connects vector stores, knowledge graphs,
+    document indexes, and retrieval pipelines into a unified fabric.
+    Covers source integration, domain partitioning, trust models,
+    and cross-agent knowledge sharing.
+  domains:
+    - specialization:ai-agents-conversational
+  expertiseLevels: [intermediate, expert]
+edges:
+  applies_to:
+    - target: specialization:ai-agents-conversational
+      confidence: primary
+  uses_tool:
+    - tool:chromadb
+    - tool:weaviate
+    - tool:pinecone
+    - tool:qdrant
+    - tool:milvus
+---
+nodeKind: SkillArea
+id: skill-area:rag-pipeline-engineering
+attributes:
+  displayName: "RAG Pipeline Engineering"
+  description: |
+    Building retrieval-augmented generation pipelines end-to-end —
+    document ingestion, chunking, embedding, vector indexing, retrieval,
+    re-ranking, context assembly, and evaluation. Covers both
+    prototyping with lightweight tools and production-grade pipelines
+    with monitoring and quality metrics.
+  domains:
+    - specialization:ai-agents-conversational
+  expertiseLevels: [intermediate, expert]
+edges:
+  applies_to:
+    - target: specialization:ai-agents-conversational
+      confidence: primary
+  uses_framework:
+    - framework:langchain
+    - framework:langgraph
+  uses_library:
+    - library:llama-index
+  uses_tool:
+    - tool:chromadb
+    - tool:pinecone
+    - tool:weaviate
+---
+nodeKind: SkillArea
+id: skill-area:knowledge-graph-management
+attributes:
+  displayName: "Knowledge Graph Management"
+  description: |
+    Building, querying, and maintaining knowledge graphs — entity
+    extraction, relation linking, graph schema design, traversal
+    queries, and incremental updates. Covers graph databases,
+    ontology alignment, and using knowledge graphs for multi-hop
+    reasoning in AI applications.
+  domains:
+    - specialization:ai-agents-conversational
+    - domain:software-engineering
+  expertiseLevels: [intermediate, expert]
+edges:
+  applies_to:
+    - target: specialization:ai-agents-conversational
+      confidence: primary
+    - target: domain:software-engineering
+      confidence: secondary
+---
+nodeKind: SkillArea
+id: skill-area:document-indexing
+attributes:
+  displayName: "Document Indexing"
+  description: |
+    Document processing, chunking, and embedding for search and
+    retrieval — parsing PDFs/HTML/markdown, semantic boundary
+    detection, embedding model selection, index construction,
+    and metadata extraction. The foundation layer that feeds
+    all retrieval pipelines in the knowledge fabric.
+  domains:
+    - specialization:ai-agents-conversational
+    - domain:software-engineering
+  expertiseLevels: [novice, intermediate, expert]
+edges:
+  applies_to:
+    - target: specialization:ai-agents-conversational
+      confidence: primary
+    - target: domain:software-engineering
+      confidence: secondary
+  uses_library:
+    - library:llama-index
+---
+nodeKind: SkillArea
+id: skill-area:organizational-intelligence
+attributes:
+  displayName: "Organizational Intelligence"
+  description: |
+    Extracting actionable insights from organizational data —
+    pattern recognition across conversations, decisions, incidents,
+    and metrics. Covers trend detection, knowledge gap identification,
+    decision support, and proactive surfacing of relevant organizational
+    context to agents and humans.
+  domains:
+    - specialization:ai-agents-conversational
+  expertiseLevels: [expert]
+edges:
+  applies_to:
+    - target: specialization:ai-agents-conversational
+      confidence: primary
+  uses_tool:
+    - tool:mem0
+    - tool:zep

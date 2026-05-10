@@ -1,0 +1,35 @@
+nodeKind: Layer
+id: layer:12-knowledge-fabric
+attributes:
+  displayName: Knowledge Fabric
+  position: 12
+  path: knowledge
+  scope: Organizational knowledge, memory, and intelligence layer spanning all agents and humans.
+  summary: |
+    The knowledge fabric is the organizational brain — a centralized, living
+    knowledge and intelligence layer that captures, organizes, updates, and
+    makes queryable everything the company knows. Unlike per-agent context
+    (Layer 5 runtime), this layer persists across agents, sessions, and users.
+    It encompasses vector stores, knowledge graphs, document indexes, decision
+    logs, process memory, and semantic search — serving both humans and AI agents.
+  responsibilities:
+    - Persist and retrieve organizational knowledge across agent sessions
+    - Index and embed documents, code, decisions, conversations
+    - Provide semantic search and context-aware retrieval
+    - Maintain knowledge graph of entities, relationships, and decisions
+    - Track provenance and confidence of information
+    - Synchronize knowledge across multiple agents and human users
+  examples:
+    - Vector databases (Pinecone, Weaviate, Chroma, Qdrant, Milvus)
+    - Knowledge management platforms (Notion, Confluence as knowledge sources)
+    - RAG pipelines (LangChain, LlamaIndex retrieval chains)
+    - Memory services (Mem0, Zep, Motorhead)
+    - Organizational knowledge graphs
+    - Decision logs and ADR repositories
+  fitNotes: |
+    This layer sits above individual agent concerns. Where Layer 5 (runtime)
+    manages per-session context and compaction, Layer 12 manages persistent
+    organizational knowledge that any agent or human can query. The boundary
+    is persistence scope: runtime context dies with the session, knowledge
+    fabric persists indefinitely.
+edges: {}

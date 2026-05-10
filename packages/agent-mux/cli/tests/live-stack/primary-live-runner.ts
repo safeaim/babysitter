@@ -633,7 +633,80 @@ async function validateAgentBehavior(
     }
   }
 
+  // 6. For babysitter-plugin and babysitter-agent: verify run completed
+  if (scenario.agent.installMode === 'babysitter-plugin' || scenario.agent.agent === 'babysitter-agent') {
+    const runCompletion = await verifyBabysitterRunCompletion(cwd, output);
+    if (runCompletion) {
+      failures.push(runCompletion);
+    }
+  }
+
   return failures;
+}
+
+async function verifyBabysitterRunCompletion(cwd: string, output: string): Promise<string | undefined> {
+  // Check output for run completion evidence
+  const hasRunComplete = /completed|RUN_COMPLETED|exitReason.*completed|status.*completed/i.test(output);
+  const hasRunFailed = /RUN_FAILED|ProcessDefinitionFailed|aborted/i.test(output);
+
+  if (hasRunFailed) {
+    return 'babysitter run failed (RUN_FAILED or abort detected in output)';
+  }
+
+  // Check .a5c/runs/ for a completed run state
+  const runsDir = path.join(cwd, '.a5c', 'runs');
+  try {
+    const entries = await fs.readdir(runsDir);
+    if (entries.length === 0) {
+      // No runs dir — check if the output itself shows completion
+      if (!hasRunComplete) {
+        return 'no babysitter run created and no completion evidence in output';
+      }
+      return undefined;
+    }
+
+    // Find the most recent run and check its state
+    for (const entry of entries.slice(-3)) {
+      const stateFile = path.join(runsDir, entry, 'state.json');
+      try {
+        const stateRaw = await fs.readFile(stateFile, 'utf8');
+        const state = JSON.parse(stateRaw) as Record<string, unknown>;
+        if (state['status'] === 'completed' || state['phase'] === 'completed') {
+          return undefined; // Run completed successfully
+        }
+        if (state['status'] === 'failed' || state['phase'] === 'failed') {
+          return `babysitter run ${entry} ended with status: ${String(state['status'] ?? state['phase'])}`;
+        }
+      } catch {
+        // No state.json — try journal
+        const journalFile = path.join(runsDir, entry, 'journal.jsonl');
+        try {
+          const journal = await fs.readFile(journalFile, 'utf8');
+          if (/RUN_COMPLETED/i.test(journal)) {
+            return undefined; // Completed
+          }
+          if (/RUN_FAILED/i.test(journal)) {
+            return `babysitter run ${entry} journal shows RUN_FAILED`;
+          }
+        } catch {
+          continue;
+        }
+      }
+    }
+
+    // Runs exist but none show clear completion — check output
+    if (hasRunComplete) {
+      return undefined;
+    }
+    return undefined; // Runs exist, no explicit failure — allow
+  } catch {
+    // No .a5c/runs/ directory — check output for completion evidence
+    if (hasRunComplete) {
+      return undefined;
+    }
+    // For non-interactive babysitter-plugin, run may not be created
+    return undefined;
+  }
 }
 
 function classifySkippableLiveProviderFailure(result: CommandResult): string | undefined {

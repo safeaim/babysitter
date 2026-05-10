@@ -26,6 +26,7 @@ edges:
     - target: tool-server:mcp-n8n
     - target: skill-area:multi-agent-coordination
     - target: skill-area:communication
+    - target: topic:agent-orchestration-products
 ---
 nodeKind: Tool
 id: tool:zapier

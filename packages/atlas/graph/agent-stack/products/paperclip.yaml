@@ -23,6 +23,7 @@ edges:
   integrates_with:
     - target: skill-area:ai-agent-development
     - target: skill-area:multi-agent-coordination
+    - target: topic:agent-orchestration-products
 ---
 nodeKind: AgentVersion
 id: agent-version:paperclip@current

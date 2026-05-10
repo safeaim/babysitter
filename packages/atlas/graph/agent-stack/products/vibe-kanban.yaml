@@ -22,3 +22,4 @@ edges:
     - target: skill-area:multi-agent-coordination
     - target: topic:vibe-kanban
     - target: topic:parallel-agent-execution
+    - target: topic:agent-orchestration-products

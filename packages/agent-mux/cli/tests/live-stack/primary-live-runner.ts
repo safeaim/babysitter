@@ -110,36 +110,61 @@ export function buildPrimaryLiveStackCommands(
   }
 
   const installTarget = scenario.agent.agentMuxAgent;
-  const launchArgs = [
-    'launch',
-    installTarget,
-    scenario.model.amuxProvider,
-    '--model',
-    scenario.model.model,
-    '--with-proxy-if-needed',
-    '--proxy-log-level',
-    'debug',
-    '--session-id',
-    traceId,
-    '--prompt',
-    prompt,
-    '--max-turns',
-    String(resolveLaunchMaxTurns(scenario)),
-    '--no-interactive',
-  ];
-  const launchCommand = commandExecution(
-    commandEnv,
-    'LIVE_STACK_AMUX_BIN',
-    'amux',
-    launchArgs,
-    options.cwd,
-    timeoutMs,
-  );
+  const useAmuxRun = options.env['LIVE_STACK_USE_AMUX_RUN'] === 'true';
+
+  // structured-run mode: uses `amux run` which handles the full agent lifecycle
+  // (hooks, sessions, multi-turn) without needing a TTY.
+  // non-interactive mode: uses `amux launch --no-interactive` for single-shot execution.
+  const executionCommand = useAmuxRun
+    ? commandExecution(
+        commandEnv,
+        'LIVE_STACK_AMUX_BIN',
+        'amux',
+        [
+          'run',
+          installTarget,
+          '--model',
+          scenario.model.model,
+          '--prompt',
+          prompt,
+          '--max-turns',
+          String(resolveLaunchMaxTurns(scenario)),
+          '--output-format',
+          'jsonl',
+          '--json',
+        ],
+        options.cwd,
+        timeoutMs,
+      )
+    : commandExecution(
+        commandEnv,
+        'LIVE_STACK_AMUX_BIN',
+        'amux',
+        [
+          'launch',
+          installTarget,
+          scenario.model.amuxProvider,
+          '--model',
+          scenario.model.model,
+          '--with-proxy-if-needed',
+          '--proxy-log-level',
+          'debug',
+          '--session-id',
+          traceId,
+          '--prompt',
+          prompt,
+          '--max-turns',
+          String(resolveLaunchMaxTurns(scenario)),
+          '--no-interactive',
+        ],
+        options.cwd,
+        timeoutMs,
+      );
 
   if (scenario.agent.installMode === 'vanilla') {
     return [
       commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['install', installTarget, '--json'], options.cwd, timeoutMs),
-      launchCommand,
+      executionCommand,
     ];
   }
 
@@ -148,7 +173,7 @@ export function buildPrimaryLiveStackCommands(
     commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['install', installTarget, '--json'], options.cwd, timeoutMs),
     commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['install', '--global', './packages/sdk'], options.cwd, timeoutMs),
     generatedPluginInstallCommand(commandEnv, scenario, options.cwd, timeoutMs),
-    launchCommand,
+    executionCommand,
   ];
 }
 

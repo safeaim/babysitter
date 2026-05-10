@@ -457,7 +457,7 @@ jobs:
   live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
-    name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, os=${{ matrix.os }})
+    name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -468,6 +468,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest-l]
+        interaction_mode:
+          - id: non-interactive
+            use_amux_run: false
+          - id: structured-run
+            use_amux_run: true
         install_mode:
           - id: babysitter-plugin
             layers: agent-mux install,agent-mux invocation,generated Babysitter plugin package,Babysitter SDK installation,plugin babysitter command dispatch,session persistence,native stop hook,hooks-mux normalization,transport-mux route,provider/model trace
@@ -484,6 +489,10 @@ jobs:
               id: babysitter-plugin
             scenario:
               id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
+          - install_mode:
+              id: vanilla
+            interaction_mode:
+              id: structured-run
         scenario:
           - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
             agent_path: agent-mux
@@ -588,6 +597,8 @@ jobs:
           LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
           LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
           LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
+          LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
+          LIVE_STACK_USE_AMUX_RUN: ${{ matrix.interaction_mode.use_amux_run }}
           LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
           LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
           LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
@@ -614,7 +625,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: publish-live-stack-${{ matrix.install_mode.id }}-${{ matrix.scenario.id }}-${{ matrix.os }}
+          name: publish-live-stack-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}-${{ matrix.os }}
           path: artifacts/live-stack
           if-no-files-found: error
 

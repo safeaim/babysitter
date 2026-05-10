@@ -204,6 +204,10 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
     case 'gemini':
       if (session.prompt && !interactive) plan.args.push('--prompt', session.prompt);
       break;
+    case 'pi':
+      if (session.prompt && !interactive) plan.args.push('--prompt', session.prompt);
+      if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
+      break;
     case 'opencode':
       if (session.resumeId) plan.args.push('--session', session.resumeId);
       break;
@@ -455,6 +459,12 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     interactive: isInteractive,
   });
 
+  // Add --model for harnesses that accept it as a CLI arg
+  const modelFlag = flagStr(args.flags, 'model');
+  if (modelFlag && ['pi', 'gemini', 'opencode'].includes(plan.harness)) {
+    plan.args.push('--model', modelFlag);
+  }
+
   // Passthrough args after --
   const dashDashIdx = process.argv.indexOf('--');
   if (dashDashIdx >= 0) {
@@ -512,8 +522,10 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
             },
           },
         };
-        writeFileSync(join(piConfigDir, 'models.json'), JSON.stringify(modelsConfig, null, 2));
+        const modelsPath = join(piConfigDir, 'models.json');
+        writeFileSync(modelsPath, JSON.stringify(modelsConfig, null, 2));
         plan.args.push('--provider', 'amux-proxy');
+        console.error(`[amux launch] Pi proxy config written to ${modelsPath}, proxy at ${proxyRuntime.url}`);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

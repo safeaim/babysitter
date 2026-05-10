@@ -82,3 +82,7 @@ edges:
   fires_hook:
   - target: hook-surface:codex.on-tool-call
   - target: hook-surface:codex.on-stop
+  # GAP: No CLI flag for thinking/reasoning level (openai/codex#9381).
+  # Claude Code exposes --thinking via effort-level nodes; Codex profiles
+  # can set it but there is no --thinking-level CLI flag for scripted use.
+  # Missing supports_effort_level edges (unlike Claude Code core which has them).

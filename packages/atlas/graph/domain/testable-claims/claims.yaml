@@ -339,3 +339,22 @@ attributes:
 edges:
   asserts_about:
     - domain:software-engineering
+---
+nodeKind: TestableClaim
+id: claim:codex-cli-lacks-thinking-flag
+attributes:
+  displayName: "Codex CLI lacks --thinking-level flag"
+  description: |
+    Codex CLI does not expose a --thinking-level or --reasoning-effort
+    parameter for controlling reasoning depth from scripts or automation.
+    Unlike Claude Code which supports effort-level:low/medium/high via CLI,
+    Codex requires profile switching for thinking configuration. This makes
+    integration into orchestration loops (e.g., PRD at high, code at medium)
+    more complex than necessary. Tracked as openai/codex#9381 (closed).
+  testStatus: passing
+  testType: manual
+  category: compatibility
+  priority: medium
+edges:
+  asserts_about:
+    - agent-core-impl:codex.core@1.x

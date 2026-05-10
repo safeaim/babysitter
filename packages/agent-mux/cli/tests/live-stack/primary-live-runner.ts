@@ -117,7 +117,7 @@ export function buildPrimaryLiveStackCommands(
   // non-interactive mode: uses `amux launch --no-interactive` for single-shot execution.
   const executionCommand = useAmuxRun
     ? commandExecution(
-        commandEnv,
+        { ...commandEnv, AMUX_PROVIDER: scenario.model.amuxProvider },
         'LIVE_STACK_AMUX_BIN',
         'amux',
         [
@@ -177,7 +177,11 @@ export function buildPrimaryLiveStackCommands(
   ];
 }
 
-function resolveLaunchMaxTurns(_scenario: LiveStackScenario): number {
+function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {
+  // babysitter-agent: use 1 turn to invoke single-shot mode (avoids full orchestration)
+  if (scenario.agent.agent === 'babysitter-agent') {
+    return 1;
+  }
   // Tool execution requires multiple turns: user → tool_call → tool_result → response
   return 5;
 }

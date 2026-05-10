@@ -109,3 +109,22 @@ edges:
     - target: topic:agent-orchestration-products
     - target: orch-primitive:agent-dispatch
     - target: orch-primitive:retry-with-backoff
+---
+nodeKind: AgentProduct
+id: agent:nanoclaw
+attributes:
+  displayName: "NanoClaw"
+  vendor: "qwibitai"
+  homepageUrl: "https://github.com/qwibitai/nanoclaw"
+  primarySurface: cli
+  supportTier: none
+  productKind: agent-framework
+  stackScope: full
+  description: |
+    Containerized AI agent framework providing sandboxed execution
+    environments. Agents run in isolated containers with controlled
+    file system and network access, enabling safe autonomous operation.
+edges:
+  integrates_with:
+    - target: skill-area:ai-agent-development
+    - target: topic:agent-orchestration-products

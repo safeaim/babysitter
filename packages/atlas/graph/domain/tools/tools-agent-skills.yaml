@@ -13,6 +13,9 @@ attributes:
 edges:
   tool_used_by:
     - target: skill-area:operations-automation
+  relates_to_topic:
+    - target: topic:agent-session-management
+    - target: orch-primitive:retry-with-backoff
 ---
 nodeKind: Tool
 id: tool:micro-skills
@@ -30,6 +33,8 @@ edges:
   tool_used_by:
     - target: skill-area:ai-agent-development
     - target: skill-area:code-quality
+  relates_to_topic:
+    - target: topic:agent-plugin-system
 ---
 nodeKind: Tool
 id: tool:dev-browser
@@ -47,6 +52,9 @@ edges:
   tool_used_by:
     - target: skill-area:browser-automation
     - target: skill-area:e2e-testing
+  relates_to_topic:
+    - target: topic:agent-tool-use
+    - target: skill-area:web-scraping
 ---
 nodeKind: Tool
 id: tool:cctop
@@ -64,3 +72,104 @@ edges:
   tool_used_by:
     - target: skill-area:observability-instrumentation
     - target: skill-area:developer-experience
+  relates_to_topic:
+    - target: topic:agent-session-management
+    - target: orch-primitive:progress-stream
+---
+nodeKind: Tool
+id: tool:caveman
+attributes:
+  displayName: "Caveman"
+  kind: other
+  description: |
+    Terminal-based task runner for AI agents. Provides minimal structure
+    for managing agent work items with a simple, keyboard-driven TUI.
+    Favors direct terminal interaction over complex configuration, making
+    it easy to queue, run, and track agent tasks without ceremony.
+edges:
+  tool_used_by:
+    - target: skill-area:developer-experience
+    - target: skill-area:operations-automation
+---
+nodeKind: Tool
+id: tool:auto-research-claw
+attributes:
+  displayName: "AutoResearchClaw"
+  kind: other
+  description: |
+    23-stage autonomous research pipeline for AI agents. Orchestrates
+    end-to-end research workflows from initial query through web search,
+    source evaluation, content extraction, cross-referencing, and final
+    synthesis. Each stage is a discrete, auditable step enabling reliable
+    autonomous research without human intervention at intermediate steps.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:knowledge-fabric-design
+---
+nodeKind: Tool
+id: tool:skillachi
+attributes:
+  displayName: "Skillachi"
+  kind: other
+  description: |
+    Benchmark suite for evaluating AI coding skill quality and
+    effectiveness. Provides standardized test harnesses, scoring rubrics,
+    and comparative metrics for measuring how well AI agent skills perform
+    across a range of tasks. Useful for skill authors validating new
+    skills and teams selecting skills for their agent workflows.
+edges:
+  tool_used_by:
+    - target: skill-area:ai-evaluation
+    - target: skill-area:retrieval-evaluation
+---
+nodeKind: Tool
+id: tool:imptokens
+attributes:
+  displayName: "imptokens"
+  kind: other
+  description: |
+    Compress input tokens to save time and money in AI agent sessions.
+    Detects ghost tokens — invisible or redundant tokens consuming context
+    budget without contributing meaning — and strips or collapses them.
+    Reduces effective prompt size while preserving semantic content,
+    lowering per-request cost and extending available context for long
+    agent runs.
+edges:
+  tool_used_by:
+    - target: skill-area:context-management
+    - target: skill-area:embedding-optimization
+---
+nodeKind: Tool
+id: tool:snyk-agent-scan
+attributes:
+  displayName: "snyk/agent-scan"
+  kind: other
+  description: |
+    Security scanning skill for AI coding agents powered by Snyk.
+    Integrates Snyk vulnerability detection into agent workflows,
+    enabling agents to surface dependency vulnerabilities, license
+    issues, and code security findings during development. Provides
+    structured scan results that agents can reason about and act on
+    without leaving their coding context.
+edges:
+  tool_used_by:
+    - target: skill-area:vulnerability-scanning
+    - target: skill-area:application-security
+---
+nodeKind: Tool
+id: tool:cisco-skill-scanner
+attributes:
+  displayName: "cisco-ai-defense/skill-scanner"
+  kind: other
+  description: |
+    Multi-engine security scanner for AI agent skills and code from
+    Cisco AI Defense. Runs skills and generated code through multiple
+    security analysis engines to detect prompt injection risks,
+    insecure code patterns, supply-chain threats, and compliance
+    violations. Designed to harden AI agent skill pipelines against
+    adversarial inputs and unsafe code generation.
+edges:
+  tool_used_by:
+    - target: skill-area:vulnerability-scanning
+    - target: skill-area:compliance-scanning

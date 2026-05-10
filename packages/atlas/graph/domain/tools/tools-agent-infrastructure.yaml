@@ -18,6 +18,8 @@ edges:
   relates_to_topic:
     - target: topic:multi-agent-knowledge-sharing
     - target: topic:agent-dispatch
+    - target: topic:a2a-protocol
+    - target: orch-primitive:session-handoff
 ---
 nodeKind: Tool
 id: tool:utcp-code-mode
@@ -37,6 +39,8 @@ edges:
     - target: skill-area:tool-use
   relates_to_topic:
     - target: topic:agent-tool-use
+    - target: topic:agent-effect-system
+    - target: topic:claude-code-mcp
 ---
 nodeKind: Tool
 id: tool:napkin
@@ -99,6 +103,7 @@ edges:
     - target: skill-area:llm-observability
   relates_to_topic:
     - target: topic:agent-context-management
+    - target: topic:proxy-pattern
 ---
 nodeKind: Tool
 id: tool:token-optimizer
@@ -116,6 +121,9 @@ edges:
   tool_used_by:
     - target: skill-area:context-management
     - target: skill-area:embedding-optimization
+  relates_to_topic:
+    - target: topic:semantic-chunking
+    - target: topic:knowledge-fabric-architecture
 ---
 nodeKind: Tool
 id: tool:graphify

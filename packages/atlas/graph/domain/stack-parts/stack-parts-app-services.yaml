@@ -8,6 +8,12 @@ attributes:
     experiments, and ramp rollouts. Examples: LaunchDarkly, Unleash,
     Flagsmith, PostHog feature flags.
 edges:
+  implemented_by:
+    - target: tool:launchdarkly
+    - target: tool:flagsmith
+    - target: tool:split-io
+    - target: tool:unleash
+    - target: tool:posthog
   stack_part_used_by:
     - target: skill-area:canary-rollouts
     - target: skill-area:strangler-fig-pattern
@@ -33,6 +39,10 @@ attributes:
     transactional and operational notifications. Examples: Twilio,
     SendGrid, AWS SNS, Courier.
 edges:
+  implemented_by:
+    - target: tool:twilio
+    - target: tool:sendgrid
+    - target: tool:aws-ses
   stack_part_used_by:
     - target: skill-area:push-notifications
 ---
@@ -44,6 +54,11 @@ attributes:
     Time- or event-driven orchestrator for batch and ETL jobs.
     Examples: Apache Airflow, Prefect, Dagster, Temporal cron schedules.
 edges:
+  implemented_by:
+    - target: tool:airflow
+    - target: tool:temporal
+    - target: tool:dagster
+    - target: tool:prefect
   stack_part_used_by:
     - target: skill-area:etl-pipelines
 ---

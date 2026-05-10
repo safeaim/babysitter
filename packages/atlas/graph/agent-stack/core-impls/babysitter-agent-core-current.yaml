@@ -38,3 +38,7 @@ edges:
   depends_on:
     - target: source-ref:babysitter-github
   speaks: []
+  supports_orchestration_primitive:
+    - target: orch-primitive:workflow-policy-load
+    - target: orch-primitive:task-create
+    - target: orch-primitive:context-injection

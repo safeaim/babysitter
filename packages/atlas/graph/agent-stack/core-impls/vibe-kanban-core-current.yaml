@@ -75,3 +75,9 @@ edges:
       versionRange: '>=0.1.0'
       level: full
       notes: Per-task git worktree isolation via the git crate.
+  supports_orchestration_primitive:
+    - target: orch-primitive:task-create
+    - target: orch-primitive:workspace-create
+    - target: orch-primitive:human-review-gate
+    - target: orch-primitive:auto-merge
+    - target: orch-primitive:issue-tracker-sync

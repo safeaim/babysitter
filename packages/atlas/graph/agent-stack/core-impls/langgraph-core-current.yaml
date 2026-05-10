@@ -61,3 +61,7 @@ edges:
     - target: capability:can-resume
       versionRange: ">=0.0.0"
       level: full
+  supports_orchestration_primitive:
+    - target: orch-primitive:multi-agent-dispatch
+    - target: orch-primitive:dependency-resolution
+    - target: orch-primitive:result-validation

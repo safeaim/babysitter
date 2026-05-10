@@ -77,3 +77,7 @@ edges:
   - target: hook-surface:cursor.stop
   - target: hook-surface:cursor.session-start
   - target: hook-surface:cursor.session-end
+  supports_orchestration_primitive:
+    - target: orch-primitive:context-injection
+    - target: orch-primitive:human-review-gate
+    - target: orch-primitive:workspace-snapshot

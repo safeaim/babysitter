@@ -62,3 +62,6 @@ edges:
   - target: capability:supports-tool-use
     versionRange: '*'
     level: full
+  supports_orchestration_primitive:
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:result-validation

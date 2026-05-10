@@ -42,3 +42,7 @@ edges:
   - target: capability:parallel-tool-calls
     versionRange: '*'
     level: full
+  supports_orchestration_primitive:
+    - target: orch-primitive:multi-agent-dispatch
+    - target: orch-primitive:concurrency-control
+    - target: orch-primitive:agent-failover

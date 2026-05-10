@@ -38,3 +38,6 @@ edges:
     - target: agent:agent-mux-remote
       role: core
   speaks: []
+  supports_orchestration_primitive:
+    - target: orch-primitive:progress-stream
+    - target: orch-primitive:telemetry-collection

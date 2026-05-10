@@ -150,3 +150,7 @@ edges:
   - target: effort-level:high
   - target: effort-level:xhigh
   - target: effort-level:max
+  supports_orchestration_primitive:
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:budget-stop
+    - target: orch-primitive:result-validation

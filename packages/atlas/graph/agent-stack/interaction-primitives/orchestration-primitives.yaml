@@ -464,3 +464,235 @@ edges:
     - target: topic:observability-driven-development
   orch_requires_skill_area:
     - target: skill-area:operations-automation
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:issue-tracker-sync
+attributes:
+  displayName: Issue Tracker Sync
+  description: |
+    Synchronize task state with an external issue tracker (GitHub Issues,
+    Linear, Jira, etc.). The primitive pushes status updates, comments,
+    labels, and assignee changes from the orchestrator's internal state
+    to the tracker, and pulls back human edits such as priority changes
+    or re-assignments. Keeps the tracker as the canonical human-readable
+    record of work in flight.
+  orchestrationKind: task-lifecycle
+  trigger: event-driven
+edges:
+  orch_applies_to:
+    - target: topic:agent-orchestration-products
+    - target: topic:event-driven-dispatch
+  orch_requires_skill_area:
+    - target: skill-area:project-planning
+    - target: skill-area:operations-automation
+  orch_triggers:
+    - target: orch-primitive:task-create
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:agent-selection
+attributes:
+  displayName: Agent Selection
+  description: |
+    Select the most appropriate agent or harness for a given task based on
+    capability matching, cost profile, availability, and workflow policy.
+    The primitive evaluates registered agents against the task's required
+    capabilities (tool-use, thinking, specific model tier) and returns the
+    best-fit agent identifier for the downstream dispatch primitive.
+  orchestrationKind: dispatch
+  trigger: event-driven
+edges:
+  orch_applies_to:
+    - target: topic:agent-dispatch
+    - target: topic:multi-agent-orchestration
+  orch_requires_skill_area:
+    - target: skill-area:ai-agent-development
+    - target: skill-area:multi-agent-coordination
+  orch_triggers:
+    - target: orch-primitive:agent-dispatch
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:context-injection
+attributes:
+  displayName: Context Injection
+  description: |
+    Inject relevant context into an agent's system prompt or initial user
+    message before dispatch. The primitive assembles codebase summaries,
+    prior run transcripts, relevant documentation excerpts, and
+    environment variables, then merges them into the agent's prompt
+    template. Ensures the agent starts with the right information
+    without requiring tool calls for basic orientation.
+  orchestrationKind: dispatch
+  trigger: event-driven
+edges:
+  orch_applies_to:
+    - target: topic:agent-dispatch
+    - target: topic:agent-process-library
+  orch_requires_skill_area:
+    - target: skill-area:ai-agent-development
+  orch_triggers:
+    - target: orch-primitive:agent-dispatch
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:result-validation
+attributes:
+  displayName: Result Validation
+  description: |
+    Validate agent output against expected schemas, quality criteria, or
+    policy rules before marking a task complete. The primitive runs
+    configured validators (lint, tests, structured-output schema checks,
+    security scans) against the agent's artifacts. On validation failure
+    it triggers a retry or escalates to human review rather than
+    propagating bad output downstream.
+  orchestrationKind: task-lifecycle
+  trigger: on-state-change
+edges:
+  orch_applies_to:
+    - target: topic:agent-run-lifecycle
+    - target: topic:code-review-best-practices
+  orch_requires_skill_area:
+    - target: skill-area:ci-cd
+    - target: skill-area:observability-instrumentation
+  orch_triggers:
+    - target: orch-primitive:task-complete
+    - target: orch-primitive:retry-with-backoff
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:human-review-gate
+attributes:
+  displayName: Human Review Gate
+  description: |
+    Pause the task pipeline at a designated review checkpoint and surface
+    the agent's diff or output to a human reviewer. The primitive
+    attaches the PR or output artifact to a review request (via Slack,
+    email, GitHub PR review, or dashboard), waits for an explicit
+    approve/request-changes decision, and either continues the workflow
+    or triggers result-validation and retry based on the reviewer's
+    feedback.
+  orchestrationKind: approval-gate
+  trigger: on-state-change
+edges:
+  orch_applies_to:
+    - target: topic:human-in-the-loop
+    - target: topic:code-review-best-practices
+  orch_requires_skill_area:
+    - target: skill-area:project-planning
+    - target: skill-area:operations-automation
+  orch_triggers:
+    - target: orch-primitive:auto-merge
+    - target: orch-primitive:result-validation
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:auto-merge
+attributes:
+  displayName: Auto Merge
+  description: |
+    Automatically merge a pull request when all configured merge criteria
+    are satisfied — CI green, required review approvals obtained,
+    branch up to date, and no merge conflicts. The primitive polls or
+    subscribes to status checks, triggers a merge (squash, merge commit,
+    or rebase) according to policy, and then fires workspace-cleanup to
+    retire the task branch.
+  orchestrationKind: task-lifecycle
+  trigger: on-state-change
+edges:
+  orch_applies_to:
+    - target: topic:trunk-based-development
+    - target: topic:agent-run-lifecycle
+  orch_requires_skill_area:
+    - target: skill-area:ci-cd
+  orch_triggers:
+    - target: orch-primitive:workspace-cleanup
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:cost-budget-allocation
+attributes:
+  displayName: Cost Budget Allocation
+  description: |
+    Allocate a token or monetary budget to a task or batch of tasks before
+    dispatch. The primitive computes per-task budget ceilings from a
+    global run budget, per-model pricing, estimated task complexity, and
+    historical cost data. Allocated budgets are handed to the budget-stop
+    primitive which enforces them at runtime, and to cost-tracking which
+    accounts actuals against the allocation.
+  orchestrationKind: budget-control
+  trigger: manual
+edges:
+  orch_applies_to:
+    - target: topic:agent-orchestration-products
+  orch_requires_skill_area:
+    - target: skill-area:budgeting-forecasting
+  orch_triggers:
+    - target: orch-primitive:budget-stop
+    - target: orch-primitive:cost-tracking
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:agent-failover
+attributes:
+  displayName: Agent Failover
+  description: |
+    Redirect a failing or unavailable agent's workload to a standby agent
+    or alternate harness. When the primary agent is unhealthy, rate-limited,
+    or exhausted after retries, agent-failover transparently re-assigns the
+    task to the next eligible agent from the fallback roster. Preserves
+    workspace state so the standby agent resumes from the last known-good
+    checkpoint rather than restarting from scratch.
+  orchestrationKind: dispatch
+  trigger: on-failure
+edges:
+  orch_applies_to:
+    - target: topic:circuit-breakers
+    - target: topic:agent-dispatch
+  orch_requires_skill_area:
+    - target: skill-area:multi-agent-coordination
+    - target: skill-area:operations-automation
+  orch_triggers:
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:workspace-snapshot
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:workspace-snapshot
+attributes:
+  displayName: Workspace Snapshot
+  description: |
+    Capture a point-in-time snapshot of an active workspace for recovery,
+    handoff, or archival purposes. The primitive commits all in-progress
+    changes to a snapshot branch (or container image layer), records the
+    snapshot reference in the orchestrator journal, and makes it available
+    for agent-failover, session-handoff, or post-mortem inspection. Snapshots
+    can be taken on demand, on a schedule, or automatically before
+    high-risk operations.
+  orchestrationKind: workspace-lifecycle
+  trigger: manual
+edges:
+  orch_applies_to:
+    - target: topic:agent-run-lifecycle
+    - target: topic:trunk-based-development
+  orch_requires_skill_area:
+    - target: skill-area:local-development
+    - target: skill-area:operations-automation
+  orch_triggers:
+    - target: orch-primitive:session-handoff
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:telemetry-collection
+attributes:
+  displayName: Telemetry Collection
+  description: |
+    Collect structured telemetry from agent sessions and the orchestration
+    runtime — turn latencies, tool-call counts, error rates, model response
+    times, and queue depths. The primitive emits spans and metrics to
+    configured backends (OpenTelemetry, Datadog, Prometheus, or a local
+    SQLite store) for real-time dashboards, SLO alerting, and capacity
+    planning. Complements audit-trail (which is append-only per-event)
+    with aggregated time-series observability.
+  orchestrationKind: progress-tracking
+  trigger: event-driven
+edges:
+  orch_applies_to:
+    - target: topic:observability-driven-development
+    - target: topic:agent-run-lifecycle
+  orch_requires_skill_area:
+    - target: skill-area:observability-instrumentation
+    - target: skill-area:operations-automation
+  orch_triggers:
+    - target: orch-primitive:audit-trail

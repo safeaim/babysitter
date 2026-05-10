@@ -81,3 +81,7 @@ edges:
   - target: capability:supports-tool-use
     versionRange: '>=1.0.0 <2.0.0'
     level: full
+  supports_orchestration_primitive:
+    - target: orch-primitive:workspace-snapshot
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:progress-stream

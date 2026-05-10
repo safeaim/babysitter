@@ -129,5 +129,9 @@ edges:
     - target: hook-surface:stop
     - target: hook-surface:pre-tool-use
     - target: hook-surface:post-tool-use
+  supports_orchestration_primitive:
+    - target: orch-primitive:agent-selection
+    - target: orch-primitive:context-injection
+    - target: orch-primitive:telemetry-collection
 
 

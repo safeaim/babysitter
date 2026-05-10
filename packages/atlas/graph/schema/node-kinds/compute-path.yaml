@@ -1069,5 +1069,132 @@ nodeKinds:
   - id starts with transcript-ingress:
   examples:
   - graph/compute/transcript-ingress-endpoints/claude-code-claude-ai-ingress.yaml
-
+# --- Legacy NodeKinds (pre-remodel data files still emit these) ---
+- id: node:model-provider-product
+  name: ModelProviderProduct
+  origin: universal
+  prefix: provider
+  cluster: 2-compute-path
+  purpose: |
+    (LEGACY) a model provider as a commercial product entity. Superseded by
+    Provider NodeKind (cluster 2-compute-path). Retained so legacy data in
+    capabilities-and-models/model-provider-product.yaml validates.
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: providerId
+    type: string
+    required: false
+  - name: displayName
+    type: string
+    required: true
+  - name: kindLabel
+    type: string
+    required: false
+  - name: vendor
+    type: string
+    required: false
+  - name: homepage
+    type: url
+    required: false
+  - name: apiFamilies
+    type: list<string>
+    required: false
+  - name: authKinds
+    type: list<string>
+    required: false
+  - name: evidenceRefs
+    type: list<string>
+    required: false
+  incomingEdges: []
+  outgoingEdges:
+  - has_version
+  invariants: []
+  examples: []
+- id: node:model-provider-version
+  name: ModelProviderVersion
+  origin: universal
+  prefix: providerVersion
+  cluster: 2-compute-path
+  purpose: |
+    (LEGACY) a versioned release of a model provider's API. Superseded by
+    ProviderVersion NodeKind (cluster 2-compute-path). Retained so legacy data
+    in capabilities-and-models/model-provider-version.yaml validates.
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: providerVersionId
+    type: string
+    required: false
+  - name: providerId
+    type: string
+    required: false
+  - name: versionRange
+    type: string
+    required: false
+  - name: apiBasePatterns
+    type: list<string>
+    required: false
+  - name: authSignals
+    type: list<string>
+    required: false
+  - name: envSignals
+    type: list<string>
+    required: false
+  - name: regionConstraints
+    type: list<string>
+    required: false
+  - name: evidenceRefs
+    type: list<string>
+    required: false
+  incomingEdges:
+  - has_version
+  outgoingEdges: []
+  invariants: []
+  examples: []
+- id: node:transport-protocol
+  name: TransportProtocol
+  origin: universal
+  prefix: transportProtocol
+  cluster: 2-compute-path
+  purpose: |
+    (LEGACY) a transport protocol for agent communication (terminal-cli,
+    shell-hook-runtime, etc.). Superseded by ModelTransportProtocol,
+    MCPTransport, and AgentHostTransport NodeKinds. Retained so legacy data
+    in capabilities-and-models/transport-protocol.yaml validates.
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: transportId
+    type: string
+    required: false
+  - name: label
+    type: string
+    required: false
+  - name: protocolKind
+    type: string
+    required: false
+  - name: interactive
+    type: string
+    required: false
+  - name: streaming
+    type: string
+    required: false
+  - name: requestShape
+    type: string
+    required: false
+  - name: responseShape
+    type: string
+    required: false
+  - name: evidenceRefs
+    type: list<string>
+    required: false
+  incomingEdges:
+  - uses_transport
+  outgoingEdges: []
+  invariants: []
+  examples: []
 

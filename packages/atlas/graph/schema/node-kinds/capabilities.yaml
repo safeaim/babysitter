@@ -95,4 +95,89 @@ nodeKinds:
   - graph/capabilities/install-methods/nix.yaml
   - graph/capabilities/install-methods/cargo.yaml
   - graph/capabilities/install-methods/go-install.yaml
+# --- Legacy NodeKinds (catalog pass 9c remodel 2026-04-29) ---
+# These NodeKinds were collapsed into edges/enums but legacy data files
+# still emit instances. Schema entries here prevent validator warnings
+# and document the migration path.
+- id: node:capability-support
+  name: CapabilitySupport
+  origin: universal
+  prefix: capabilitySupport
+  cluster: 8-capabilities
+  purpose: |
+    (LEGACY — catalog pass 9c remodel 2026-04-29) binding of (entity, capability,
+    version-range, support-level). Collapsed into the direct `supports` edge;
+    retained here as schema so legacy data files validate. New data MUST use
+    the `supports` edge instead.
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: supportId
+    type: string
+    required: false
+  - name: capabilityId
+    type: string
+    required: true
+  - name: supportLevel
+    type: enum<native,partial,via-extension,none>
+    required: false
+  - name: subjectKind
+    type: string
+    required: false
+  - name: subjectId
+    type: id
+    required: false
+  - name: versionRange
+    type: string
+    required: false
+  - name: notes
+    type: markdown
+    required: false
+  - name: evidenceRefs
+    type: list<string>
+    required: false
+  incomingEdges: []
+  outgoingEdges:
+  - references_capability
+  - references_entity
+  invariants: []
+  examples: []
+- id: node:modality
+  name: Modality
+  origin: universal
+  prefix: modality
+  cluster: 8-capabilities
+  purpose: |
+    (LEGACY — remodel 2026-04-29) an input/output modality (text, image, audio, etc.).
+    Collapsed into list<enum<text,image,audio,...>> attribute on ModelVersion.
+    Retained here as schema so legacy data files validate. New data MUST use
+    the ModelVersion.modalities enum attribute instead.
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: modalityId
+    type: string
+    required: true
+  - name: direction
+    type: enum<input,output,bidirectional>
+    required: false
+  - name: label
+    type: string
+    required: false
+  - name: mediaType
+    type: string
+    required: false
+  - name: semanticCategory
+    type: string
+    required: false
+  - name: evidenceRefs
+    type: list<string>
+    required: false
+  incomingEdges:
+  - supports_modality
+  outgoingEdges: []
+  invariants: []
+  examples: []
 

@@ -1,0 +1,44 @@
+# NodeKinds for cluster 15-testable-claims.
+nodeKinds:
+- id: node:testable-claim
+  name: TestableClaim
+  origin: universal
+  prefix: claim
+  cluster: 15-testable-claims
+  purpose: a verifiable assertion about the ecosystem that can be automated as a test
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: testStatus
+    type: enum<untested,passing,failing,stale,skipped>
+    required: false
+  - name: testType
+    type: enum<unit,integration,e2e,smoke,manual>
+    required: false
+  - name: testCommand
+    type: string
+    required: false
+  - name: lastTestedAt
+    type: iso-date
+    required: false
+  - name: confidence
+    type: float
+    required: false
+  - name: category
+    type: enum<api-contract,behavior,lifecycle,integration,performance,security,compatibility>
+    required: false
+  - name: priority
+    type: enum<low,medium,high,critical>
+    required: false
+  incomingEdges: []
+  outgoingEdges:
+  - asserts_about
+  invariants: []
+  examples: []

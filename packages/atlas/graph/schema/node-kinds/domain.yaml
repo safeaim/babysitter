@@ -130,7 +130,7 @@ nodeKinds:
     type: id
     required: false
   - name: category
-    type: string
+    type: enum<web-frontend,web-backend,web-framework,web-fullstack,fullstack,mobile,mobile-framework,desktop,agent-orchestration,agent-ui,static-site,presentation,game-engine,testing,other>
     required: false
   - name: description
     type: markdown
@@ -294,7 +294,7 @@ nodeKinds:
     type: string
     required: true
   - name: kind
-    type: enum<build-tool,package-manager,linter,formatter,transpiler,bundler,container,orchestrator,iac,debugger,profiler,test-runner,ci,secrets-manager,observability,sql-tool,api-tool,config-mgmt,other>
+    type: enum<build-tool,build,package-manager,linter,formatter,transpiler,bundler,container,orchestrator,iac,debugger,profiler,test-runner,ci,secrets-manager,observability,sql-tool,api-tool,config-mgmt,security,llm-proxy,memory-system,ai-dev-tool,workflow-automation,knowledge-platform,agent-skill,other>
     required: false
   - name: description
     type: markdown

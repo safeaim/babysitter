@@ -1202,3 +1202,54 @@ nodeKinds:
   - name: documents
     type: list<ref<NodeKind>>
     required: false
+# --- Legacy NodeKind (pre-remodel data files still emit these) ---
+- id: node:process-descriptor
+  name: ProcessDescriptor
+  origin: universal
+  prefix: process
+  cluster: 13-catalog-meta
+  purpose: |
+    (LEGACY) a babysitter process definition referenced by PackageSurface
+    edges. Distinct from WorkflowDefinition (repo-versioned WORKFLOW.md) and
+    the modern Workflow/Process NodeKinds. Retained so legacy data in
+    capabilities-and-models/process-descriptor.yaml validates.
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: processId
+    type: string
+    required: false
+  - name: displayName
+    type: string
+    required: true
+  - name: category
+    type: string
+    required: false
+  - name: description
+    type: markdown
+    required: false
+  - name: paths
+    type: list<string>
+    required: false
+  - name: inputs
+    type: list<string>
+    required: false
+  - name: outputs
+    type: list<string>
+    required: false
+  - name: ownerPackage
+    type: string
+    required: false
+  - name: executionKinds
+    type: list<string>
+    required: false
+  - name: evidenceRefs
+    type: list<string>
+    required: false
+  incomingEdges:
+  - surfaces_process
+  outgoingEdges:
+  - references_path
+  invariants: []
+  examples: []

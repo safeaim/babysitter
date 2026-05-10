@@ -5744,3 +5744,263 @@ edgeKinds:
   target: [OrchestrationPrimitive]
   cardinality: N:N
   inverse: orch_implements_workflow
+# --- Edge kinds discovered from data (schema gap-fill) ---
+- id: edge:asserts-about
+  name: asserts_about
+  origin: universal
+  description: a testable claim asserts something about a domain entity (topic, domain, tool, etc.)
+  source: [TestableClaim]
+  target: [Topic, Domain, Tool, Specialization, SkillArea, Framework, Library]
+  cardinality: N:N
+- id: edge:attempt-of-run
+  name: attempt_of_run
+  origin: universal
+  description: a run attempt belongs to a specific run
+  source: [RunAttempt]
+  target: [Run]
+  cardinality: N:1
+- id: edge:client-targets-provider
+  name: client_targets_provider
+  origin: universal
+  description: a transport client targets a specific model provider for inference requests
+  source: [TransportClient]
+  target: [Provider]
+  cardinality: N:1
+- id: edge:client-uses-retry-policy
+  name: client_uses_retry_policy
+  origin: universal
+  description: a transport client employs a specific retry policy for failed requests
+  source: [TransportClient]
+  target: [RetryPolicy]
+  cardinality: N:1
+- id: edge:client-uses-token-budget
+  name: client_uses_token_budget
+  origin: universal
+  description: a transport client operates within a specific token budget
+  source: [TransportClient]
+  target: [TokenBudget]
+  cardinality: N:N
+- id: edge:compaction-policy-applied-by
+  name: compaction_policy_applied_by
+  origin: universal
+  description: an agent runtime applies a specific compaction policy for context management
+  source: [AgentRuntimeImpl]
+  target: [CompactionPolicy]
+  cardinality: N:N
+- id: edge:consolidation-guarded-by-lock
+  name: consolidation_guarded_by_lock
+  origin: universal
+  description: a background consolidation process is guarded by a concurrency lock
+  source: [BackgroundConsolidation]
+  target: [ConsolidationLock]
+  cardinality: N:1
+- id: edge:contained-in-plugin
+  name: contained_in_plugin
+  origin: universal
+  description: a component (skill, subagent, tool, monitor, etc.) is contained within a plugin package
+  source: [BackgroundMonitor, BinaryProvider, LSPServer, SettingsTemplate, Skill, Subagent, ToolDescriptor]
+  target: [Plugin]
+  cardinality: N:1
+- id: edge:defaults-to-model
+  name: defaults_to_model
+  origin: universal
+  description: an agent version defaults to a specific model version when no explicit model is configured
+  source: [AgentVersion]
+  target: [ModelVersion]
+  cardinality: N:1
+- id: edge:denied-by-reason
+  name: denied_by_reason
+  origin: universal
+  description: a tool descriptor can be denied invocation for a specific reason
+  source: [ToolDescriptor]
+  target: [PermissionDenialReason]
+  cardinality: N:N
+- id: edge:discovered-by
+  name: discovered_by
+  origin: universal
+  description: an agent version is discovered by a specific discovery signal (environment detection)
+  source: [AgentVersion]
+  target: [DiscoverySignal]
+  cardinality: N:N
+- id: edge:dispatch-policy-for-tool
+  name: dispatch_policy_for_tool
+  origin: universal
+  description: a tool dispatch policy governs the dispatch behavior of a specific tool
+  source: [ToolDispatchPolicy]
+  target: [ToolDescriptor]
+  cardinality: N:1
+- id: edge:emits-api-error
+  name: emits_api_error
+  origin: universal
+  description: a transport client can emit a specific class of API error
+  source: [TransportClient]
+  target: [ApiErrorClass]
+  cardinality: N:N
+- id: edge:emits-cascade-signal
+  name: emits_cascade_signal
+  origin: universal
+  description: a transport client emits a capacity cascade signal under specific failure conditions
+  source: [TransportClient]
+  target: [CapacityCascadeSignal]
+  cardinality: N:N
+- id: edge:emitted-mode-change
+  name: emitted_mode_change
+  origin: universal
+  description: a session emitted a mode change event (e.g. entering plan mode)
+  source: [Session]
+  target: [OutputModeChange]
+  cardinality: N:N
+- id: edge:exposes-proactive-surface
+  name: exposes_proactive_surface
+  origin: universal
+  description: an agent runtime or version exposes proactive user-facing surfaces (prompt suggestions, etc.)
+  source: [AgentRuntimeImpl, AgentVersion]
+  target: [ProactiveSurface]
+  cardinality: N:N
+- id: edge:exposes-tool
+  name: exposes_tool
+  origin: universal
+  description: a tool server exposes a specific tool descriptor to clients
+  source: [ToolServer]
+  target: [ToolDescriptor]
+  cardinality: N:N
+- id: edge:has-connection-state
+  name: has_connection_state
+  origin: universal
+  description: a tool server has a specific MCP connection state
+  source: [ToolServer]
+  target: [MCPConnectionState]
+  cardinality: N:N
+- id: edge:has-dispatch-policy
+  name: has_dispatch_policy
+  origin: universal
+  description: an agent runtime has a specific tool dispatch policy
+  source: [AgentRuntimeImpl]
+  target: [ToolDispatchPolicy]
+  cardinality: N:N
+- id: edge:has-output-style
+  name: has_output_style
+  origin: universal
+  description: an agent version has a named output style (learning, bare, etc.)
+  source: [AgentVersion]
+  target: [OutputStyle]
+  cardinality: N:N
+- id: edge:has-worktree-session
+  name: has_worktree_session
+  origin: universal
+  description: a session has an associated git worktree session for isolated feature work
+  source: [Session]
+  target: [WorktreeSession]
+  cardinality: N:N
+- id: edge:in-category
+  name: in_category
+  origin: universal
+  description: an interaction primitive belongs to a specific category
+  source: [InteractionPrimitive]
+  target: [InteractionPrimitiveCategory]
+  cardinality: N:N
+- id: edge:mcp-config-scoped-to
+  name: mcp_config_scoped_to
+  origin: universal
+  description: a tool server's MCP configuration is scoped to a specific level (project, enterprise, etc.)
+  source: [ToolServer]
+  target: [MCPConfigScope]
+  cardinality: N:N
+- id: edge:mode-change-triggered-by-tool
+  name: mode_change_triggered_by_tool
+  origin: universal
+  description: an output mode change was triggered by a specific tool invocation
+  source: [OutputModeChange]
+  target: [ToolDescriptor]
+  cardinality: N:1
+- id: edge:operates-in-control-mode
+  name: operates_in_control_mode
+  origin: universal
+  description: an agent runtime operates in a specific control mode (coordinator, background, etc.)
+  source: [AgentRuntimeImpl]
+  target: [AgentControlMode]
+  cardinality: N:N
+- id: edge:output-guard-applied-by
+  name: output_guard_applied_by
+  origin: universal
+  description: an agent core or runtime applies a specific output guard (content filtering, schema enforcement, etc.)
+  source: [AgentCoreImpl, AgentRuntimeImpl]
+  target: [OutputGuard]
+  cardinality: N:N
+- id: edge:persists-transcript-to
+  name: persists_transcript_to
+  origin: universal
+  description: a session persists its transcript to a specific ingress endpoint
+  source: [Session]
+  target: [TranscriptIngress]
+  cardinality: N:N
+- id: edge:related-topics
+  name: related_topics
+  origin: universal
+  description: a topic is related to other topics (symmetric relationship)
+  source: [Topic]
+  target: [Topic]
+  cardinality: N:N
+- id: edge:relates-to-topic
+  name: relates_to_topic
+  origin: universal
+  description: an entity (retrieval pipeline, tool, etc.) relates to a specific topic
+  source: [RetrievalPipeline, Tool]
+  target: [Topic]
+  cardinality: N:N
+- id: edge:schedules-consolidation
+  name: schedules_consolidation
+  origin: universal
+  description: an agent runtime schedules background consolidation processes
+  source: [AgentRuntimeImpl]
+  target: [BackgroundConsolidation]
+  cardinality: N:N
+- id: edge:supports-modality
+  name: supports_modality
+  origin: universal
+  description: an agent version supports a specific modality (legacy Modality NodeKind reference)
+  source: [AgentVersion]
+  target: [Modality]
+  cardinality: N:N
+- id: edge:surfaces-process
+  name: surfaces_process
+  origin: universal
+  description: a package surface exposes a process descriptor
+  source: [PackageSurface]
+  target: [ProcessDescriptor]
+  cardinality: N:N
+- id: edge:targets-plugin-surface
+  name: targets_plugin_surface
+  origin: universal
+  description: an agent version can target a specific plugin surface
+  source: [AgentVersion]
+  target: [PluginTarget]
+  cardinality: N:N
+- id: edge:uses-memory-hierarchy
+  name: uses_memory_hierarchy
+  origin: universal
+  description: an agent version uses a specific memory hierarchy for context management
+  source: [AgentVersion]
+  target: [MemoryHierarchy]
+  cardinality: N:N
+- id: edge:uses-transport
+  name: uses_transport
+  origin: universal
+  description: an agent version uses a specific transport protocol or transport runtime
+  source: [AgentVersion]
+  target: [TransportProtocol, ModelTransportProtocol, AgentHostTransport]
+  cardinality: N:N
+- id: edge:uses-transport-client
+  name: uses_transport_client
+  origin: universal
+  description: an agent runtime uses a specific transport client implementation
+  source: [AgentRuntimeImpl]
+  target: [TransportClient]
+  cardinality: N:N
+- id: edge:wraps-graph
+  name: wraps_graph
+  origin: universal
+  description: a package surface wraps (provides access to) a specific graph document
+  source: [PackageSurface]
+  target: [Graph]
+  cardinality: N:N

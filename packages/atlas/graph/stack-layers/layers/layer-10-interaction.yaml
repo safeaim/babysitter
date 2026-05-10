@@ -1,26 +1,49 @@
 nodeKind: Layer
 id: layer:10-interaction
 attributes:
-  displayName: Interaction
+  displayName: "Orchestration & Interaction"
   position: 10
   path: surfacing
-  scope: Atomic user-agent and agent-system actions exposed by a surface.
+  scope: >-
+    Orchestration patterns (dispatch, reconcile, poll, retry, workspace
+    lifecycle, approval gates, budget controls) AND atomic user-agent /
+    agent-system interaction primitives exposed by a surface.
   summary: |
-    The interaction layer contains the actions exposed through an agent
-    surface: slash commands, keybindings, prompt controls, editor widgets,
-    voice or multimodal triggers, review/approve/resume gates, collaborative
-    actions, operational triggers, and telemetry affordances. Realized by
-    `InteractionPrimitive` nodes and related trigger/command records.
+    This layer captures two complementary vocabularies that sit between the
+    runtime/platform and the presentation shell:
+
+    **Orchestration primitives** — the control-plane actions an orchestrator
+    uses to manage agent work: dispatching tasks, creating and cleaning up
+    workspaces, polling issue trackers, reconciling state on restart, retrying
+    with backoff, gating on human approval, enforcing budget limits, streaming
+    progress, and coordinating multi-agent workflows.
+
+    **Interaction primitives** — the user-facing actions exposed through an
+    agent surface: slash commands, keybindings, prompt controls, editor
+    widgets, voice/multimodal triggers, review/approve/resume gates,
+    collaborative actions, operational triggers, and telemetry affordances.
+
+    Both vocabularies are realized by dedicated node kinds
+    (`OrchestrationPrimitive`, `InteractionPrimitive`) and connected to the
+    implementations that support them via typed edges.
   responsibilities:
-    - Expose commands, controls, triggers, approvals, and resumable interrupts.
-    - Translate human/system gestures into runtime or platform actions.
-    - Surface task state, telemetry, collaboration, and handoff controls.
+    - Expose orchestration actions (dispatch, poll, reconcile, retry, workspace lifecycle, approval gates, budget controls).
+    - Expose user-facing commands, controls, triggers, approvals, and resumable interrupts.
+    - Translate human/system gestures and orchestrator decisions into runtime or platform actions.
+    - Surface task state, progress, telemetry, collaboration, and handoff controls.
+    - Coordinate multi-agent dispatch, concurrency limits, and session handoffs.
   examples:
+    - Agent dispatch, multi-agent parallel dispatch, poll-tick, reconciliation on restart.
+    - Workspace create/cleanup, branch management, PR creation from agent work.
+    - Approval gate, budget stop, retry with backoff, concurrency control.
     - Slash commands, keybindings, prompt controls, approve/reject interrupt.
     - GitHub Action trigger, webhook trigger, editor widget, dashboard button.
     - LangGraph human-in-the-loop review, edit, approve, resume controls.
   fitNotes: |
-    Interaction primitives are not presentation widgets by themselves; they are
-    the action vocabulary that a TUI, CLI, web UI, IDE, API, or automation host
-    renders and invokes.
+    Orchestration primitives are the control-plane vocabulary that an
+    orchestrator (Symphony, Paperclip, Babysitter, Vibe Kanban) invokes to
+    manage agent work. Interaction primitives are the user-facing action
+    vocabulary that a TUI, CLI, web UI, IDE, API, or automation host renders
+    and invokes. Neither is a presentation widget; both are abstract actions
+    that implementations support and surfaces render.
 edges: {}

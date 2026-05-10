@@ -50,3 +50,9 @@ edges:
   depends_on:
     - target: source-ref:babysitter-github
   speaks: []
+  supports_orchestration_primitive:
+    - target: orch-primitive:approval-gate
+    - target: orch-primitive:progress-stream
+    - target: orch-primitive:workflow-policy-load
+    - target: orch-primitive:retry-with-backoff
+    - target: orch-primitive:task-complete

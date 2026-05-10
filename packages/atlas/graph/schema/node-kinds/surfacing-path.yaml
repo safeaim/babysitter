@@ -357,6 +357,33 @@ nodeKinds:
   - in_category
   invariants: []
   examples: []
+- id: node:orchestration-primitive
+  name: OrchestrationPrimitive
+  origin: universal
+  prefix: orch-primitive
+  cluster: 4-surfacing-path
+  purpose: an orchestration-level action or pattern (dispatch, reconcile, poll, retry, workspace lifecycle)
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: orchestrationKind
+    type: enum<dispatch,reconciliation,polling,retry,workspace-lifecycle,session-lifecycle,task-lifecycle,approval-gate,budget-control,workflow-loading,multi-agent-coordination,progress-tracking>
+    required: false
+  - name: trigger
+    type: enum<periodic,event-driven,manual,on-state-change,on-failure>
+    required: false
+  incomingEdges:
+  - supports_orchestration_primitive
+  outgoingEdges: []
+  invariants: []
+  examples: []
 - id: node:interaction-primitive-category
   name: InteractionPrimitiveCategory
   origin: universal

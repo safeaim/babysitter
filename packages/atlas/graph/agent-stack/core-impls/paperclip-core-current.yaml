@@ -75,3 +75,12 @@ edges:
     - target: capability:can-multi-turn
       versionRange: '>=0.1.0'
       level: full
+  supports_orchestration_primitive:
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:task-create
+    - target: orch-primitive:task-assign
+    - target: orch-primitive:approval-gate
+    - target: orch-primitive:budget-stop
+    - target: orch-primitive:concurrency-control
+    - target: orch-primitive:session-handoff
+    - target: orch-primitive:task-complete

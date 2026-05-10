@@ -44,3 +44,14 @@ edges:
     - target: interaction-primitive:vibe-kanban-multi-agent-dispatch
       attributes:
         mechanism: ui-control
+  supports_orchestration_primitive:
+    - target: orch-primitive:agent-dispatch
+    - target: orch-primitive:multi-agent-dispatch
+    - target: orch-primitive:task-create
+    - target: orch-primitive:task-assign
+    - target: orch-primitive:task-complete
+    - target: orch-primitive:workspace-create
+    - target: orch-primitive:progress-stream
+    - target: orch-primitive:pr-creation
+    - target: orch-primitive:branch-management
+    - target: orch-primitive:concurrency-control

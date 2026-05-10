@@ -5661,3 +5661,19 @@ edgeKinds:
   target: [RetrievalPipeline]
   cardinality: N:N
   inverse: retrieves_from
+- id: edge:supports-orchestration-primitive
+  name: supports_orchestration_primitive
+  origin: universal
+  description: a UI impl or platform impl supports an orchestration primitive
+  source: [AgentUIImpl, AgentPlatformImpl, AgentCoreImpl]
+  target: [OrchestrationPrimitive]
+  cardinality: N:N
+  inverse: orchestration_primitive_supported_by
+- id: edge:orchestration-primitive-supported-by
+  name: orchestration_primitive_supported_by
+  origin: universal
+  description: inverse of supports_orchestration_primitive
+  source: [OrchestrationPrimitive]
+  target: [AgentUIImpl, AgentPlatformImpl, AgentCoreImpl]
+  cardinality: N:N
+  inverse: supports_orchestration_primitive

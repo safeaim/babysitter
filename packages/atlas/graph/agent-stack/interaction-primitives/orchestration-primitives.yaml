@@ -1,0 +1,243 @@
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:agent-dispatch
+attributes:
+  displayName: Agent Dispatch
+  description: |
+    Dispatch work to a coding agent in an isolated workspace. The orchestrator
+    prepares the task prompt, selects the target agent, creates (or reuses) a
+    workspace, and spawns the agent process. The dispatch primitive is the
+    fundamental unit of orchestrated agent work.
+  orchestrationKind: dispatch
+  trigger: event-driven
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:multi-agent-dispatch
+attributes:
+  displayName: Multi-Agent Dispatch
+  description: |
+    Dispatch work to multiple agents in parallel, each operating in its own
+    workspace and branch. The orchestrator fans out tasks, enforces concurrency
+    limits, and collects results. Used for parallel issue processing, batch
+    code review, and divide-and-conquer workflows.
+  orchestrationKind: multi-agent-coordination
+  trigger: manual
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:task-create
+attributes:
+  displayName: Task Create
+  description: |
+    Create a new task or issue for agent execution. The task may originate from
+    an issue tracker poll, a manual user action, or an upstream orchestration
+    event. The primitive normalizes the task into the orchestrator's internal
+    schema and queues it for assignment.
+  orchestrationKind: task-lifecycle
+  trigger: event-driven
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:task-assign
+attributes:
+  displayName: Task Assign
+  description: |
+    Assign a task to a specific agent with atomic checkout semantics. The
+    assignment is transactional — no two agents can claim the same task. The
+    primitive handles agent selection, capacity checks, and marks the task as
+    checked-out in the orchestrator's state store.
+  orchestrationKind: task-lifecycle
+  trigger: event-driven
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:task-complete
+attributes:
+  displayName: Task Complete
+  description: |
+    Mark a task as completed and trigger downstream actions such as PR creation,
+    human review requests, or status updates to the issue tracker. The primitive
+    transitions the task to a terminal state and releases any workspace or
+    concurrency slots held by the agent.
+  orchestrationKind: task-lifecycle
+  trigger: on-state-change
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:workspace-create
+attributes:
+  displayName: Workspace Create
+  description: |
+    Create an isolated per-task workspace for agent execution. Depending on the
+    orchestrator, this may involve creating a git branch, a worktree directory,
+    a Docker container, or a cloud sandbox. The workspace provides filesystem
+    and version-control isolation so agents do not interfere with each other.
+  orchestrationKind: workspace-lifecycle
+  trigger: event-driven
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:workspace-cleanup
+attributes:
+  displayName: Workspace Cleanup
+  description: |
+    Clean up a completed or abandoned task workspace. The primitive deletes
+    temporary branches, removes worktree directories, stops containers, and
+    releases any resources held by the workspace. Triggered automatically
+    when a task reaches a terminal state or when the orchestrator detects
+    orphaned workspaces during reconciliation.
+  orchestrationKind: workspace-lifecycle
+  trigger: on-state-change
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:poll-tick
+attributes:
+  displayName: Poll Tick
+  description: |
+    Periodic poll of an issue tracker or task source for new eligible work
+    items. The orchestrator queries the tracker at a configurable interval,
+    filters for actionable issues matching the workflow policy, and feeds
+    them into the task-create pipeline. Poll cadence is typically seconds
+    to minutes depending on the deployment.
+  orchestrationKind: polling
+  trigger: periodic
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:reconciliation
+attributes:
+  displayName: Reconciliation
+  description: |
+    Reconcile in-memory orchestrator state with the external source of truth
+    on restart or after a crash. The primitive replays journal entries, checks
+    issue-tracker state for tasks that completed or failed while the
+    orchestrator was down, and brings the in-memory model back into
+    consistency before resuming normal operation.
+  orchestrationKind: reconciliation
+  trigger: on-state-change
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:retry-with-backoff
+attributes:
+  displayName: Retry with Backoff
+  description: |
+    Retry failed agent work with exponential backoff and a configurable
+    maximum attempt count. The primitive captures the failure reason, waits
+    an increasing delay between attempts, and eventually marks the task as
+    permanently failed if retries are exhausted. Integrates with the
+    journal for auditability of each retry cycle.
+  orchestrationKind: retry
+  trigger: on-failure
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:concurrency-control
+attributes:
+  displayName: Concurrency Control
+  description: |
+    Limit the number of concurrent agent sessions to a configurable maximum.
+    The primitive maintains a semaphore or token-bucket that dispatch must
+    acquire before spawning a new agent. When the limit is reached, new
+    tasks queue until a slot is released by a completing or failing agent.
+  orchestrationKind: multi-agent-coordination
+  trigger: event-driven
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:workflow-policy-load
+attributes:
+  displayName: Workflow Policy Load
+  description: |
+    Load a process or workflow definition from a file (WORKFLOW.md, process
+    definition .js/.ts, CLAUDE.md, or equivalent). The primitive parses
+    front-matter configuration, extracts the prompt template, and configures
+    the orchestrator's runtime behavior — polling intervals, active states,
+    agent executable, and hooks.
+  orchestrationKind: workflow-loading
+  trigger: manual
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:progress-stream
+attributes:
+  displayName: Progress Stream
+  description: |
+    Stream real-time agent output and progress to the orchestration UI or
+    dashboard. The primitive captures stdout, structured events, tool-use
+    logs, and state transitions from the agent subprocess and relays them
+    to connected observers via SSE, WebSocket, or polling endpoints.
+  orchestrationKind: progress-tracking
+  trigger: event-driven
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:approval-gate
+attributes:
+  displayName: Approval Gate
+  description: |
+    A gate requiring explicit human approval before orchestrated work
+    proceeds. The primitive pauses the task pipeline, surfaces the pending
+    action to the human operator (via UI, Slack, email, or CLI prompt), and
+    resumes or aborts based on the response. Used for governed actions,
+    production deployments, and high-risk code changes.
+  orchestrationKind: approval-gate
+  trigger: on-state-change
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:budget-stop
+attributes:
+  displayName: Budget Stop
+  description: |
+    Auto-pause agent execution when a budget or cost threshold is reached.
+    The primitive tracks cumulative token usage, API cost, or wall-clock
+    time per task or per run, and halts the agent when the configured limit
+    is exceeded. The operator can raise the limit and resume, or terminate
+    the task.
+  orchestrationKind: budget-control
+  trigger: on-state-change
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:session-handoff
+attributes:
+  displayName: Session Handoff
+  description: |
+    Hand off work between agents (agent-to-agent) or from agent to human.
+    The primitive serializes the current session context — conversation
+    history, workspace state, partial results — and transfers it to the
+    receiving party. Used for escalation, specialization routing, and
+    shift-change patterns in long-running workflows.
+  orchestrationKind: session-lifecycle
+  trigger: manual
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:pr-creation
+attributes:
+  displayName: PR Creation
+  description: |
+    Create a pull request from an agent's completed work in its isolated
+    workspace. The primitive commits staged changes, pushes the branch,
+    opens the PR against the target branch with a generated title and
+    description, and links back to the originating task or issue for
+    traceability.
+  orchestrationKind: task-lifecycle
+  trigger: on-state-change
+edges: {}
+---
+nodeKind: OrchestrationPrimitive
+id: orch-primitive:branch-management
+attributes:
+  displayName: Branch Management
+  description: |
+    Create, switch, and merge git branches for agent work isolation. The
+    primitive handles branch naming conventions, conflict detection, and
+    cleanup of merged or abandoned branches. It integrates with the
+    workspace-create and workspace-cleanup primitives to provide end-to-end
+    version-control isolation for orchestrated agent work.
+  orchestrationKind: workspace-lifecycle
+  trigger: event-driven
+edges: {}

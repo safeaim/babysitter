@@ -2,6 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { resetLocalDevelopmentSqliteForTests } from "../lib/server/local-dev-sqlite";
 
 const getAtlasViewForUserMock = vi.fn();
 
@@ -39,6 +40,7 @@ describe("company builder local fallback", () => {
   });
 
   afterEach(async () => {
+    resetLocalDevelopmentSqliteForTests();
     delete process.env.ATLAS_LOCAL_STORAGE_DIR;
     delete process.env.DATABASE_URL;
     await rm(storageDir, { recursive: true, force: true });
@@ -62,21 +64,49 @@ describe("company builder local fallback", () => {
       description: "Handles customer requests",
       systemKind: "customer-ops",
     });
-    await mod.addCompanyAsset("user-1", blueprint.id, {
+    await mod.addCompanyResource("user-1", blueprint.id, {
       displayName: "GitHub org",
-      assetKind: "vcs-host",
+      resourceClass: "workspace",
       environment: "production",
       provider: "GitHub",
+      atlasRecordId: "tool:github",
+      externalId: "acme/github",
       notes: "Main repository host",
+    });
+    const loadedOnce = await mod.getCompanyBlueprint("user-1", blueprint.id);
+    const systemId = loadedOnce?.draft.systems[0]?.id;
+    const resourceId = loadedOnce?.draft.resources[0]?.id;
+    expect(systemId).toBeTruthy();
+    expect(resourceId).toBeTruthy();
+
+    await mod.addCompanyLayerBinding("user-1", blueprint.id, {
+      systemId: systemId!,
+      primaryLayerId: "layer:5-agent-runtime",
+      atlasRecordId: "agent:codex",
+      selectionRole: "Primary runtime",
+      rationale: "Main coding engine",
+      coverageLayerIds: ["layer:5-agent-runtime", "layer:10-interaction"],
+    });
+    await mod.addCompanyResourceBinding("user-1", blueprint.id, {
+      systemId: systemId!,
+      resourceId: resourceId!,
+      bindingKind: "uses",
+      environmentStage: "production",
+      criticality: "critical",
+      notes: "Primary workspace",
     });
 
     const loaded = await mod.getCompanyBlueprint("user-1", blueprint.id);
     expect(loaded?.name).toBe("Acme Agentic Atlas");
     expect(loaded?.draft.systems).toHaveLength(1);
-    expect(loaded?.draft.assets).toHaveLength(1);
+    expect(loaded?.draft.resources).toHaveLength(1);
+    expect(loaded?.draft.systems[0]?.layerBindings).toHaveLength(1);
+    expect(loaded?.draft.resourceBindings).toHaveLength(1);
 
     const yaml = await mod.exportCompanyBlueprintYaml("user-1", blueprint.id);
-    expect(yaml).toContain("nodeKind: CompanyBlueprint");
+    expect(yaml).toContain("nodeKind: CompanyGraph");
+    expect(yaml).toContain("nodeKind: CompanyLayerBinding");
+    expect(yaml).toContain("nodeKind: CompanyEnvironmentResource");
     expect(yaml).toContain("displayName: Acme Agentic Atlas");
 
     const reloaded = await mod.getCompanyBlueprint("user-1", blueprint.id);
@@ -92,7 +122,7 @@ describe("company builder local fallback", () => {
 
     const palette = await mod.getCompanyLayerPalette("user-1");
 
-    expect(palette.find((layer) => layer.key === "agents")?.options[0]?.label).toBe("Codex");
-    expect(palette.find((layer) => layer.key === "tools")?.options[0]?.label).toBe("GitHub");
+    expect(palette.find((layer) => layer.key === "layer:5-agent-runtime")?.options[0]?.label).toBe("Codex");
+    expect(palette.find((layer) => layer.key === "layer:10-interaction")?.options[0]?.label).toBe("GitHub");
   });
 });

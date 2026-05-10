@@ -4,19 +4,19 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import {
-  addCompanyAsset,
   addCompanyIntegration,
-  addCompanySelection,
+  addCompanyLayerBinding,
+  addCompanyResource,
+  addCompanyResourceBinding,
   addCompanySystem,
-  attachAssetToSystem,
   createCompanyBlueprint,
-  deleteCompanyAsset,
   deleteCompanyBlueprint,
   deleteCompanyIntegration,
-  deleteCompanySelection,
+  deleteCompanyLayerBinding,
+  deleteCompanyResource,
+  deleteCompanyResourceBinding,
   deleteCompanySystem,
   exportCompanyBlueprintYaml,
-  removeAssetFromSystem,
   saveCompanyBlueprintMetadata,
   type CompanyLayerKey,
 } from "@/lib/server/company-builder";
@@ -37,6 +37,10 @@ function requiredString(formData: FormData, key: string): string {
   return value;
 }
 
+function optionalString(formData: FormData, key: string): string {
+  return String(formData.get(key) ?? "").trim();
+}
+
 function refreshBuilder() {
   revalidatePath("/workspace");
   revalidatePath("/workspace/company-builder");
@@ -46,7 +50,7 @@ export async function createCompanyBlueprintAction(formData: FormData) {
   const userId = await requireUserId();
   const blueprint = await createCompanyBlueprint(userId, {
     name: requiredString(formData, "name"),
-    description: String(formData.get("description") ?? "").trim(),
+    description: optionalString(formData, "description"),
   });
   refreshBuilder();
   redirect(`/workspace/company-builder?blueprint=${encodeURIComponent(blueprint.id)}`);
@@ -57,8 +61,8 @@ export async function saveCompanyBlueprintMetadataAction(formData: FormData) {
   const blueprintId = requiredString(formData, "blueprintId");
   await saveCompanyBlueprintMetadata(userId, blueprintId, {
     displayName: requiredString(formData, "displayName"),
-    description: String(formData.get("description") ?? "").trim(),
-    status: String(formData.get("status") ?? "draft").trim() || "draft",
+    description: optionalString(formData, "description"),
+    status: optionalString(formData, "status") || "draft",
   });
   refreshBuilder();
 }
@@ -68,49 +72,63 @@ export async function addCompanySystemAction(formData: FormData) {
   const blueprintId = requiredString(formData, "blueprintId");
   await addCompanySystem(userId, blueprintId, {
     displayName: requiredString(formData, "displayName"),
-    description: String(formData.get("description") ?? "").trim(),
+    description: optionalString(formData, "description"),
     systemKind: requiredString(formData, "systemKind"),
+    outcome: optionalString(formData, "outcome"),
+    lifecycleStage: optionalString(formData, "lifecycleStage") || "draft",
   });
   refreshBuilder();
 }
 
-export async function addCompanyAssetAction(formData: FormData) {
+export async function addCompanyResourceAction(formData: FormData) {
   const userId = await requireUserId();
   const blueprintId = requiredString(formData, "blueprintId");
-  await addCompanyAsset(userId, blueprintId, {
+  await addCompanyResource(userId, blueprintId, {
     displayName: requiredString(formData, "displayName"),
-    assetKind: requiredString(formData, "assetKind"),
-    environment: String(formData.get("environment") ?? "").trim(),
-    provider: String(formData.get("provider") ?? "").trim(),
-    notes: String(formData.get("notes") ?? "").trim(),
+    resourceClass: requiredString(formData, "resourceClass"),
+    provider: optionalString(formData, "provider"),
+    environment: optionalString(formData, "environment"),
+    atlasRecordId: optionalString(formData, "atlasRecordId"),
+    externalId: optionalString(formData, "externalId"),
+    notes: optionalString(formData, "notes"),
   });
   refreshBuilder();
 }
 
-export async function addCompanySelectionAction(formData: FormData) {
+export async function addCompanyLayerBindingAction(formData: FormData) {
   const userId = await requireUserId();
   const blueprintId = requiredString(formData, "blueprintId");
-  const coversLayers = String(formData.get("coversLayers") ?? "")
+  const repeatedCoverage = formData
+    .getAll("coverageLayerIds")
+    .map((item) => String(item).trim())
+    .filter(Boolean) as CompanyLayerKey[];
+  const fallbackCoverage = String(formData.get("coverageLayerIds") ?? "")
     .split(",")
     .map((item) => item.trim())
-    .filter(Boolean);
-  await addCompanySelection(userId, blueprintId, {
+    .filter(Boolean) as CompanyLayerKey[];
+  const coverageLayerIds = repeatedCoverage.length > 0 ? repeatedCoverage : fallbackCoverage;
+  await addCompanyLayerBinding(userId, blueprintId, {
     systemId: requiredString(formData, "systemId"),
-    layerKey: requiredString(formData, "layerKey") as CompanyLayerKey,
+    primaryLayerId: requiredString(formData, "primaryLayerId") as CompanyLayerKey,
     atlasRecordId: requiredString(formData, "atlasRecordId"),
-    selectionRole: String(formData.get("selectionRole") ?? "").trim(),
-    notes: String(formData.get("notes") ?? "").trim(),
-    coversLayers,
+    selectionRole: optionalString(formData, "selectionRole"),
+    rationale: optionalString(formData, "rationale"),
+    coverageLayerIds,
+    importance: (optionalString(formData, "importance") as "primary" | "supporting") || "primary",
   });
   refreshBuilder();
 }
 
-export async function attachAssetToSystemAction(formData: FormData) {
+export async function addCompanyResourceBindingAction(formData: FormData) {
   const userId = await requireUserId();
   const blueprintId = requiredString(formData, "blueprintId");
-  await attachAssetToSystem(userId, blueprintId, {
+  await addCompanyResourceBinding(userId, blueprintId, {
     systemId: requiredString(formData, "systemId"),
-    assetId: requiredString(formData, "assetId"),
+    resourceId: requiredString(formData, "resourceId"),
+    bindingKind: requiredString(formData, "bindingKind"),
+    environmentStage: optionalString(formData, "environmentStage"),
+    criticality: optionalString(formData, "criticality"),
+    notes: optionalString(formData, "notes"),
   });
   refreshBuilder();
 }
@@ -119,62 +137,63 @@ export async function addCompanyIntegrationAction(formData: FormData) {
   const userId = await requireUserId();
   const blueprintId = requiredString(formData, "blueprintId");
   await addCompanyIntegration(userId, blueprintId, {
-    fromSystemId: requiredString(formData, "fromSystemId"),
-    toType: requiredString(formData, "toType") as "system" | "asset",
-    toId: requiredString(formData, "toId"),
+    sourceType: requiredString(formData, "sourceType") as "system" | "resource",
+    sourceId: requiredString(formData, "sourceId"),
+    targetType: requiredString(formData, "targetType") as "system" | "resource",
+    targetId: requiredString(formData, "targetId"),
     integrationKind: requiredString(formData, "integrationKind"),
-    triggerKind: String(formData.get("triggerKind") ?? "").trim(),
-    notes: String(formData.get("notes") ?? "").trim(),
+    triggerKind: optionalString(formData, "triggerKind"),
+    interfaceKind: optionalString(formData, "interfaceKind"),
+    direction: optionalString(formData, "direction") || "outbound",
+    notes: optionalString(formData, "notes"),
   });
   refreshBuilder();
 }
 
 export async function exportCompanyBlueprintAction(formData: FormData) {
   const userId = await requireUserId();
-  const blueprintId = requiredString(formData, "blueprintId");
-  await exportCompanyBlueprintYaml(userId, blueprintId);
+  await exportCompanyBlueprintYaml(userId, requiredString(formData, "blueprintId"));
   refreshBuilder();
 }
 
 export async function deleteCompanyBlueprintAction(formData: FormData) {
   const userId = await requireUserId();
-  const blueprintId = requiredString(formData, "blueprintId");
-  await deleteCompanyBlueprint(userId, blueprintId);
+  await deleteCompanyBlueprint(userId, requiredString(formData, "blueprintId"));
   refreshBuilder();
   redirect("/workspace/company-builder");
 }
 
 export async function deleteCompanySystemAction(formData: FormData) {
   const userId = await requireUserId();
-  const blueprintId = requiredString(formData, "blueprintId");
-  await deleteCompanySystem(userId, blueprintId, requiredString(formData, "systemId"));
+  await deleteCompanySystem(userId, requiredString(formData, "blueprintId"), requiredString(formData, "systemId"));
   refreshBuilder();
 }
 
-export async function deleteCompanyAssetAction(formData: FormData) {
+export async function deleteCompanyResourceAction(formData: FormData) {
   const userId = await requireUserId();
-  const blueprintId = requiredString(formData, "blueprintId");
-  await deleteCompanyAsset(userId, blueprintId, requiredString(formData, "assetId"));
+  await deleteCompanyResource(userId, requiredString(formData, "blueprintId"), requiredString(formData, "resourceId"));
   refreshBuilder();
 }
 
-export async function deleteCompanySelectionAction(formData: FormData) {
+export async function deleteCompanyLayerBindingAction(formData: FormData) {
   const userId = await requireUserId();
-  const blueprintId = requiredString(formData, "blueprintId");
-  await deleteCompanySelection(userId, blueprintId, requiredString(formData, "systemId"), requiredString(formData, "selectionId"));
+  await deleteCompanyLayerBinding(
+    userId,
+    requiredString(formData, "blueprintId"),
+    requiredString(formData, "systemId"),
+    requiredString(formData, "bindingId"),
+  );
   refreshBuilder();
 }
 
-export async function removeAssetFromSystemAction(formData: FormData) {
+export async function deleteCompanyResourceBindingAction(formData: FormData) {
   const userId = await requireUserId();
-  const blueprintId = requiredString(formData, "blueprintId");
-  await removeAssetFromSystem(userId, blueprintId, requiredString(formData, "systemId"), requiredString(formData, "assetId"));
+  await deleteCompanyResourceBinding(userId, requiredString(formData, "blueprintId"), requiredString(formData, "bindingId"));
   refreshBuilder();
 }
 
 export async function deleteCompanyIntegrationAction(formData: FormData) {
   const userId = await requireUserId();
-  const blueprintId = requiredString(formData, "blueprintId");
-  await deleteCompanyIntegration(userId, blueprintId, requiredString(formData, "integrationId"));
+  await deleteCompanyIntegration(userId, requiredString(formData, "blueprintId"), requiredString(formData, "integrationId"));
   refreshBuilder();
 }

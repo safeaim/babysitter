@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const authMock = vi.fn();
+const isDevelopmentMockLoginEnabledMock = vi.fn();
 const isDatabaseConfiguredMock = vi.fn();
 const listUserGraphUploadsMock = vi.fn();
 const listCompanyBlueprintsMock = vi.fn();
@@ -46,6 +47,7 @@ vi.mock("@/components/AtlasDocsScaffold", () => ({
 
 vi.mock("@/auth", () => ({
   auth: authMock,
+  isDevelopmentMockLoginEnabled: isDevelopmentMockLoginEnabledMock,
 }));
 
 vi.mock("@/lib/server/db", () => ({
@@ -57,9 +59,17 @@ vi.mock("@/lib/server/user-graphs", () => ({
 }));
 
 vi.mock("@/lib/server/company-builder", () => ({
+  COMPANY_STACK_LAYERS: [
+    { key: "layer:5-agent-runtime", label: "Agent Runtime" },
+    { key: "layer:10-interaction", label: "Interaction" },
+  ],
+  COMPANY_COMPOSITION_FACETS: [
+    { key: "facet:roles-and-teams", label: "Roles and Teams" },
+  ],
   COMPANY_LAYER_DEFS: [
-    { key: "agents", label: "Agents" },
-    { key: "tools", label: "Tools" },
+    { key: "layer:5-agent-runtime", label: "Agent Runtime" },
+    { key: "layer:10-interaction", label: "Interaction" },
+    { key: "facet:roles-and-teams", label: "Roles and Teams" },
   ],
   listCompanyBlueprints: listCompanyBlueprintsMock,
   getCompanyBlueprint: getCompanyBlueprintMock,
@@ -68,6 +78,7 @@ vi.mock("@/lib/server/company-builder", () => ({
 
 function resetWorkspaceMocks() {
   authMock.mockReset();
+  isDevelopmentMockLoginEnabledMock.mockReset();
   isDatabaseConfiguredMock.mockReset();
   listUserGraphUploadsMock.mockReset();
   listCompanyBlueprintsMock.mockReset();
@@ -99,6 +110,7 @@ beforeEach(() => {
   vi.resetModules();
   resetWorkspaceMocks();
   isDatabaseConfiguredMock.mockReturnValue(true);
+  isDevelopmentMockLoginEnabledMock.mockReturnValue(false);
 });
 
 describe("private workspace pages", () => {
@@ -107,6 +119,14 @@ describe("private workspace pages", () => {
 
     await expect(renderWorkspaceOverview()).rejects.toThrow("REDIRECT:/");
     expect(redirectMock).toHaveBeenCalledWith("/");
+  });
+
+  it("auto-redirects unauthenticated workspace overview requests into mock login when enabled", async () => {
+    authMock.mockResolvedValue(null);
+    isDevelopmentMockLoginEnabledMock.mockReturnValue(true);
+
+    await expect(renderWorkspaceOverview()).rejects.toThrow("REDIRECT:/api/auth/github?callbackUrl=%2Fworkspace");
+    expect(redirectMock).toHaveBeenCalledWith("/api/auth/github?callbackUrl=%2Fworkspace");
   });
 
   it("renders authenticated workspace overview content", async () => {
@@ -135,7 +155,7 @@ describe("private workspace pages", () => {
     expect(html).toContain("12 records");
   });
 
-  it("renders workspace overview with company builder available in local mock mode", async () => {
+  it("renders workspace overview with local SQLite-backed private tools when postgres is unavailable", async () => {
     authMock.mockResolvedValue({
       user: {
         id: "user-1",
@@ -144,13 +164,23 @@ describe("private workspace pages", () => {
       },
     });
     isDatabaseConfiguredMock.mockReturnValue(false);
+    listUserGraphUploadsMock.mockResolvedValue([
+      {
+        id: "upload-1",
+        title: "Local Overlay",
+        recordCount: 4,
+        edgeCount: 2,
+        status: "ready",
+      },
+    ]);
 
     const html = await renderWorkspaceOverview();
 
-    expect(html).toContain("company builder now uses local file-backed storage");
-    expect(html).toContain("Company builder remains available with local file-backed storage");
-    expect(html).toContain("User graph uploads are still disabled");
-    expect(html).toContain("Builder local fallback");
+    expect(html).toContain("Private workspace data persists in local SQLite");
+    expect(html).toContain("Private workspace data is persisting in local SQLite because `DATABASE_URL` is not configured.");
+    expect(html).toContain("User graph uploads and company builder remain available locally.");
+    expect(html).toContain("SQLite-backed local dev");
+    expect(html).toContain("Local Overlay");
   });
 
   it("redirects unauthenticated workspace graph requests", async () => {
@@ -158,6 +188,14 @@ describe("private workspace pages", () => {
 
     await expect(renderWorkspaceGraphs()).rejects.toThrow("REDIRECT:/");
     expect(redirectMock).toHaveBeenCalledWith("/");
+  });
+
+  it("auto-redirects unauthenticated workspace graph requests into mock login when enabled", async () => {
+    authMock.mockResolvedValue(null);
+    isDevelopmentMockLoginEnabledMock.mockReturnValue(true);
+
+    await expect(renderWorkspaceGraphs()).rejects.toThrow("REDIRECT:/api/auth/github?callbackUrl=%2Fworkspace%2Fgraphs");
+    expect(redirectMock).toHaveBeenCalledWith("/api/auth/github?callbackUrl=%2Fworkspace%2Fgraphs");
   });
 
   it("renders authenticated workspace graph upload controls and entries", async () => {
@@ -187,11 +225,46 @@ describe("private workspace pages", () => {
     expect(html).toContain("Delete");
   });
 
+  it("renders workspace graph uploads in local SQLite mode when postgres is unavailable", async () => {
+    authMock.mockResolvedValue({
+      user: {
+        id: "user-1",
+      },
+    });
+    isDatabaseConfiguredMock.mockReturnValue(false);
+    listUserGraphUploadsMock.mockResolvedValue([
+      {
+        id: "upload-1",
+        title: "Ops Overlay",
+        recordCount: 7,
+        edgeCount: 3,
+        sourceFilename: "ops.yaml",
+        status: "warning",
+      },
+    ]);
+
+    const html = await renderWorkspaceGraphs();
+
+    expect(html).toContain("Private YAML uploads are stored in local SQLite during development");
+    expect(html).toContain("Private workspace uploads are persisting in local SQLite because `DATABASE_URL` is not configured.");
+    expect(html).toContain("SQLite-backed local dev");
+    expect(html).toContain("Ops Overlay");
+    expect(html).toContain("Upload graph");
+  });
+
   it("redirects unauthenticated company builder requests", async () => {
     authMock.mockResolvedValue(null);
 
     await expect(renderCompanyBuilder()).rejects.toThrow("REDIRECT:/");
     expect(redirectMock).toHaveBeenCalledWith("/");
+  });
+
+  it("auto-redirects unauthenticated company builder requests into mock login when enabled", async () => {
+    authMock.mockResolvedValue(null);
+    isDevelopmentMockLoginEnabledMock.mockReturnValue(true);
+
+    await expect(renderCompanyBuilder()).rejects.toThrow("REDIRECT:/api/auth/github?callbackUrl=%2Fworkspace%2Fcompany-builder");
+    expect(redirectMock).toHaveBeenCalledWith("/api/auth/github?callbackUrl=%2Fworkspace%2Fcompany-builder");
   });
 
   it("renders authenticated company builder blueprint and palette content", async () => {
@@ -210,7 +283,7 @@ describe("private workspace pages", () => {
       id: "bp-1",
       slug: "acme-agentic-stack",
       name: "Acme Agentic Stack",
-      lastExportYaml: "nodeKind: CompanyBlueprint",
+      lastExportYaml: "nodeKind: CompanyGraph",
       draft: {
         company: {
           displayName: "Acme Agentic Stack",
@@ -224,46 +297,67 @@ describe("private workspace pages", () => {
             displayName: "Customer Ops",
             description: "Handles customer requests",
             systemKind: "customer-ops",
-            selections: [
+            outcome: "Resolve inbound customer requests",
+            lifecycleStage: "production",
+            layerBindings: [
               {
-                id: "selection-1",
-                layerKey: "agents",
+                id: "binding-1",
+                primaryLayerId: "layer:5-agent-runtime",
                 atlasRecordId: "agent:codex",
                 selectionRole: "primary coding agent",
-                notes: "Main operator",
-                coversLayers: ["agents", "tools"],
+                rationale: "Main operator",
+                coverageLayerIds: ["layer:5-agent-runtime", "layer:10-interaction"],
+                importance: "primary",
               },
             ],
-            assetIds: ["asset-1"],
           },
         ],
-        assets: [
+        resources: [
           {
-            id: "asset-1",
+            id: "resource-1",
             displayName: "GitHub org",
-            assetKind: "vcs-host",
+            resourceClass: "workspace",
             environment: "production",
             provider: "GitHub",
+            atlasRecordId: "tool:github",
+            externalId: "",
             notes: "",
+          },
+        ],
+        resourceBindings: [
+          {
+            id: "resource-binding-1",
+            systemId: "system-1",
+            resourceId: "resource-1",
+            bindingKind: "uses",
+            environmentStage: "production",
+            criticality: "critical",
+            notes: "Primary workspace",
           },
         ],
         integrations: [
           {
             id: "integration-1",
-            fromSystemId: "system-1",
-            toType: "asset",
-            toId: "asset-1",
+            sourceType: "system",
+            sourceId: "system-1",
+            targetType: "resource",
+            targetId: "resource-1",
             integrationKind: "syncs-to",
             triggerKind: "webhook",
+            interfaceKind: "api",
+            direction: "outbound",
             notes: "Syncs changes",
           },
         ],
+        teamCells: [],
+        roleAssignments: [],
       },
     });
     getCompanyLayerPaletteMock.mockResolvedValue([
       {
-        key: "agents",
-        label: "Agents",
+        key: "layer:5-agent-runtime",
+        label: "Agent Runtime",
+        kind: "stack-layer",
         options: [
           {
             id: "agent:codex",
@@ -274,8 +368,9 @@ describe("private workspace pages", () => {
         ],
       },
       {
-        key: "tools",
-        label: "Tools",
+        key: "layer:10-interaction",
+        label: "Interaction",
+        kind: "stack-layer",
         options: [
           {
             id: "tool:github",
@@ -296,9 +391,20 @@ describe("private workspace pages", () => {
     expect(html).toContain("syncs-to");
     expect(html).toContain("Layer palette");
     expect(html).toContain("Codex");
+    expect(html).toContain("Choose a starter pattern");
+    expect(html).toContain("Customer operations team");
+    expect(html).toContain("Layer roadmap");
+    expect(html).toContain("Choose a resource starter");
+    expect(html).toContain("GitHub workspace");
+    expect(html).toContain("Reusable integration target");
+    expect(html).toContain("Choose a dependency pattern");
+    expect(html).toContain("Workspace tool surface");
+    expect(html).toContain("Reusable system dependency");
+    expect(html).toContain("Search Atlas entities");
+    expect(html).toContain("Extra coverage");
   });
 
-  it("renders company builder in local mock mode when the database is unavailable", async () => {
+  it("renders company builder in local SQLite mode when the database is unavailable", async () => {
     authMock.mockResolvedValue({
       user: {
         id: "user-1",
@@ -308,8 +414,9 @@ describe("private workspace pages", () => {
     listCompanyBlueprintsMock.mockResolvedValue([]);
     getCompanyLayerPaletteMock.mockResolvedValue([
       {
-        key: "agents",
-        label: "Agents",
+        key: "layer:5-agent-runtime",
+        label: "Agent Runtime",
+        kind: "stack-layer",
         options: [
           {
             id: "agent:codex",
@@ -323,9 +430,9 @@ describe("private workspace pages", () => {
 
     const html = await renderCompanyBuilder();
 
-    expect(html).toContain("Local mock mode is active");
-    expect(html).toContain("Create blueprint");
-    expect(html).toContain("File-backed storage");
+    expect(html).toContain("Company builder blueprints are persisting in local SQLite because `DATABASE_URL` is not configured.");
+    expect(html).toContain("Create company graph");
+    expect(html).toContain("SQLite-backed local dev");
     expect(html).toContain("Layer palette");
     expect(html).toContain("Codex");
   });

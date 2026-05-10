@@ -59,3 +59,23 @@ library - graph:
 ---
 [x] - ToolServer - model it better- how to run/use it if, where is the repo, etc. then enrich the graph with that information and connect it to the relevant entities (most imprortantly, the frameworks,systems,services,tools,libs it provides integrations for, and the relevant skills, skill areas). then enrich the catalog of tools by search mcp servers for existing components in the graph (that represent functionality that a mcp server could provide an interface for) and add the relevant toolserver to the graph (with connectivity)
     DONE: 107 ToolServers total (39 enriched + 68 new). Schema enhanced with description, repoUrl, installCommand, category, maintainer, npmPackage. 50+ integrates_with edges to domain entities. 9 categories: databases, cloud/devops, monitoring, dev-tools, AI/ML, productivity, communication, CMS, security.
+
+
+
+  1. Clean up legacy cruft — migrate or remove the 100 disconnected CapabilitySupport nodes, 7 Modality nodes, 10 TransportProtocol nodes. These
+   are artifacts from earlier catalog passes that should be consolidated into their parent nodes as attributes.
+  2. Connect orphan languages — 25 Language nodes with zero edges. Frameworks/libraries point TO them via belongs_to_language, but the languages
+   themselves have no outgoing edges to domains, topics, or paradigm-related skill-areas.
+  3. Fix wiki page orphans — 63 wiki Pages with broken documents edges. The wiki generator creates pages linking to specialization IDs that
+  don't exist.
+  4. Add reverse edges — Many node kinds are "source-only" because the graph models outgoing relationships but not incoming. For example, a Tool
+   has used_for → skill-area:xxx but the skill-area has no used_by_tool back. The schema defines inverses but instances don't always have both
+  directions.
+  5. Richer cross-layer connections — Agent products connect to their layer implementations but not to the domain entities (tools, frameworks,
+  libraries) they USE. E.g., Claude Code uses Node.js, TypeScript, React — but agent:claude-code has no edge to language:typescript or
+  framework:react.
+  6. Temporal modeling — No concept of versioning, deprecation timelines, or when things were added. The yearIntroduced attribute on Methodology
+   is a start but most entities lack temporal context.
+  7. Competitive/alternative edges — No "alternative to" or "competes with" relationships. E.g., Vite vs Webpack, Prisma vs TypeORM, Pino vs
+  Winston.
+  8. Learning path modeling — No concept of "learn X before Y" or difficulty progression across skill-areas.

@@ -92,3 +92,5 @@ legacy/
 .claude/skills/welcome/SKILL.md
 tmp-e2e-artifact*/**
 tmp-*/**
+packages/atlas/webui/.atlas-local/atlas-webui/local-dev.db
+coverage/

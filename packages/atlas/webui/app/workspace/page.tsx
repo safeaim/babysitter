@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AtlasDocsScaffold } from "@/components/AtlasDocsScaffold";
-import { auth } from "@/auth";
+import { auth, isDevelopmentMockLoginEnabled } from "@/auth";
 import { isDatabaseConfigured } from "@/lib/server/db";
 import { listUserGraphUploads } from "@/lib/server/user-graphs";
 
@@ -10,11 +10,15 @@ export const dynamic = "force-dynamic";
 export default async function WorkspacePage() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/");
+    redirect(
+      isDevelopmentMockLoginEnabled()
+        ? "/api/auth/github?callbackUrl=%2Fworkspace"
+        : "/",
+    );
   }
 
   const databaseConfigured = isDatabaseConfigured();
-  const uploads = databaseConfigured ? await listUserGraphUploads(session.user.id) : [];
+  const uploads = await listUserGraphUploads(session.user.id);
 
   return (
     <AtlasDocsScaffold
@@ -42,21 +46,16 @@ export default async function WorkspacePage() {
       lead={
         databaseConfigured
           ? "Upload private graph overlays, inspect your authenticated Atlas state, and author company blueprints."
-          : "Local mock login is active. Public Atlas browsing still works, and company builder now uses local file-backed storage until PostgreSQL is configured."
+          : "Private workspace data persists in local SQLite during development until PostgreSQL is configured."
       }
-      meta={<><span>User graphs · {uploads.length}</span><span>GitHub login</span><span>{databaseConfigured ? "PostgreSQL-backed" : "Builder local fallback"}</span></>}
+      meta={<><span>User graphs · {uploads.length}</span><span>GitHub login</span><span>{databaseConfigured ? "PostgreSQL-backed" : "SQLite-backed local dev"}</span></>}
       marginSections={[
         {
           title: "Routes",
-          items: databaseConfigured
-            ? [
-                <Link key="graphs" href="/workspace/graphs">Manage user graphs</Link>,
-                <Link key="builder" href="/workspace/company-builder">Open company builder</Link>,
-              ]
-            : [
-                <p key="graphs-disabled" className="atlas-docs-note">User graphs disabled until `DATABASE_URL` is configured.</p>,
-                <Link key="builder" href="/workspace/company-builder">Open company builder</Link>,
-              ],
+          items: [
+            <Link key="graphs" href="/workspace/graphs">Manage user graphs</Link>,
+            <Link key="builder" href="/workspace/company-builder">Open company builder</Link>,
+          ],
         },
       ]}
     >
@@ -67,15 +66,28 @@ export default async function WorkspacePage() {
         </section>
 
         <section className="atlas-docs-panel atlas-docs-full">
-          <h3>{databaseConfigured ? "User graph overlays" : "Local mock mode"}</h3>
+          <h3>User graph overlays</h3>
           {!databaseConfigured ? (
             <div className="atlas-docs-stack">
               <p className="atlas-docs-note">
-                Mock login is working. User graph uploads are still disabled because `DATABASE_URL` is not configured.
+                Private workspace data is persisting in local SQLite because `DATABASE_URL` is not configured.
               </p>
               <p className="atlas-docs-note">
-                Company builder remains available with local file-backed storage. Set `DATABASE_URL`, run `npm run db:init -w @a5c-ai/atlas-webui`, then restart the web UI to enable PostgreSQL-backed uploads and persistence.
+                User graph uploads and company builder remain available locally. Set `DATABASE_URL`, run `npm run db:init -w @a5c-ai/atlas-webui`, then restart the web UI to enable shared PostgreSQL-backed persistence.
               </p>
+              {uploads.length === 0 ? <p className="atlas-docs-note">No private graph uploads yet.</p> : null}
+              {uploads.length > 0 ? (
+                <ul className="atlas-docs-ledger">
+                  {uploads.map((upload) => (
+                    <li key={upload.id} className="px-3 py-2">
+                      <div className="font-medium">{upload.title}</div>
+                      <div className="text-xs" style={{ color: "var(--fg-3)" }}>
+                        {upload.recordCount} records · {upload.edgeCount} edges · {upload.status}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           ) : uploads.length === 0 ? (
             <p className="atlas-docs-note">No private graph uploads yet.</p>

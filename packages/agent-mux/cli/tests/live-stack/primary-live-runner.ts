@@ -110,6 +110,7 @@ export function buildPrimaryLiveStackCommands(
   }
 
   const installTarget = scenario.agent.agentMuxAgent;
+  const isInteractive = scenario.agent.installMode === 'babysitter-plugin';
   const launchArgs = [
     'launch',
     installTarget,
@@ -125,7 +126,7 @@ export function buildPrimaryLiveStackCommands(
     prompt,
     '--max-turns',
     String(resolveLaunchMaxTurns(scenario)),
-    '--no-interactive',
+    ...(isInteractive ? [] : ['--no-interactive']),
   ];
   const launchCommand = commandExecution(
     commandEnv,
@@ -559,8 +560,15 @@ async function validateAgentBehavior(
     failures.push('no token usage reported (transport may not have completed properly)');
   }
 
-  // 5. For babysitter-plugin: verify orchestration artifacts were created
+  // 5. For babysitter-plugin: verify stop hooks fired and orchestration ran
   if (scenario.agent.installMode === 'babysitter-plugin') {
+    // Check hooks-mux stop event in logs
+    const hasStopHookEvidence = /hook:run.*stop|stop.*hook|AGENT_SESSION_ID/i.test(output);
+    if (!hasStopHookEvidence) {
+      failures.push('babysitter-plugin: no stop hook evidence in output (hooks may not be configured or firing)');
+    }
+
+    // Check .a5c/runs/ for orchestration artifacts
     const runsDir = path.join(cwd, '.a5c', 'runs');
     try {
       const entries = await fs.readdir(runsDir);
@@ -569,6 +577,29 @@ async function validateAgentBehavior(
       }
     } catch {
       // .a5c/runs/ not existing is acceptable for single-turn plugin invocations
+    }
+
+    // Check hooks-mux session logs for evidence the hook infrastructure ran
+    const hooksLogDir = path.join(cwd, '.a5c', 'logs', 'hooks');
+    try {
+      const logEntries = await fs.readdir(hooksLogDir);
+      if (logEntries.length === 0) {
+        failures.push('babysitter-plugin: no hooks-mux logs found (hook infrastructure did not execute)');
+      }
+    } catch {
+      // Hooks log dir not existing — check XDG state dir too
+      const xdgHooksDir = path.join(
+        process.env['XDG_STATE_HOME'] ?? path.join(process.env['HOME'] ?? '/tmp', '.local', 'state'),
+        'a5c-hooks', 'logs',
+      );
+      try {
+        const xdgEntries = await fs.readdir(xdgHooksDir);
+        if (xdgEntries.length === 0) {
+          failures.push('babysitter-plugin: no hooks-mux logs in XDG state dir (hook infrastructure did not execute)');
+        }
+      } catch {
+        // Neither location has logs — hooks might write elsewhere
+      }
     }
   }
 

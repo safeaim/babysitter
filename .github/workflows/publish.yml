@@ -581,7 +581,7 @@ jobs:
 
       - name: Install node-pty for interactive tests
         if: matrix.interaction_mode.interactive == true
-        run: npm install node-pty --no-save
+        run: npm install node-pty --no-save --legacy-peer-deps
 
       - name: Link workspace CLIs to PATH
         run: |

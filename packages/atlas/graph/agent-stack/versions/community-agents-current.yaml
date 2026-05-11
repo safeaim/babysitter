@@ -9,6 +9,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:claude-sh.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:claude-sh
   sourced_from: []

@@ -133,6 +133,9 @@ attributes:
   - install:brew
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:goose.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:goose
   uses_memory_system:
@@ -162,6 +165,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:devin.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:devin
   uses_memory_system:
@@ -188,6 +194,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:zed.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:zed
   sourced_from: []
@@ -275,6 +284,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:replit-agent.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:replit-agent
   sourced_from: []
@@ -305,6 +317,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:bolt.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:bolt
   sourced_from: []
@@ -335,6 +350,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:v0.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:v0
   sourced_from: []
@@ -365,6 +383,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:lovable.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:lovable
   sourced_from: []
@@ -395,6 +416,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:openhands.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:openhands
   sourced_from: []
@@ -441,6 +465,9 @@ attributes:
   - install:manual
   minSchemaVersion: 6.0.0
 edges:
+  composed_of:
+  - target: knowledge-fabric-impl:warp.knowledge@current
+    role: knowledge-fabric
   version_of:
   - agent:warp
   sourced_from: []

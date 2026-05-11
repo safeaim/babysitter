@@ -25,7 +25,7 @@ jobs:
   build_all:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Build All
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -101,7 +101,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Core Runtime
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -189,7 +189,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Mux Surfaces
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -299,8 +299,8 @@ jobs:
   live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
-    name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest)
-    runs-on: ubuntu-latest
+    name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest-l)
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     defaults:
@@ -474,7 +474,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Cloud Workspace
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -539,7 +539,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Krate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -611,7 +611,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Observer And Compiler
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -691,7 +691,7 @@ jobs:
       - validate_cloud
       - validate_krate
       - validate_observer_and_compiler
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: write
     outputs:
@@ -801,7 +801,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Foundation - ${{ matrix.name }}
     needs: prepare_staging_publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     strategy:
@@ -875,7 +875,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Hooks And Core - ${{ matrix.name }}
     needs: publish_staging_foundation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     strategy:
@@ -946,7 +946,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux Leaf - ${{ matrix.name }}
     needs: publish_staging_hooks_and_core
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     strategy:
@@ -1022,7 +1022,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux Gateway - ${{ matrix.name }}
     needs: publish_staging_agent_mux_leaf
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     strategy:
@@ -1075,7 +1075,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux CLI
     needs: publish_staging_agent_mux_gateway
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -1128,7 +1128,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux Root
     needs: publish_staging_agent_mux_cli
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -1182,7 +1182,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux TUI
     needs: publish_staging_agent_mux_root
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:
@@ -1238,7 +1238,7 @@ jobs:
     name: Deploy Docs Site
     needs:
       - prepare_staging_publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -1282,7 +1282,7 @@ jobs:
     name: Deploy Atlas WebUI To AKS
     needs:
       - prepare_staging_publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     env:
       ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
       APP_NAME: atlas-webui
@@ -1447,7 +1447,7 @@ jobs:
     name: Deploy Krate To AKS
     needs:
       - prepare_staging_publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     env:
       ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
       APP_NAME: krate
@@ -1676,7 +1676,7 @@ jobs:
     needs:
       - prepare_staging_publish
       - publish_staging_foundation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     steps:
       - name: Download publish workspace
         uses: actions/download-artifact@v4
@@ -1756,7 +1756,7 @@ jobs:
       - publish_staging_agent_mux_cli
       - publish_staging_agent_mux_root
       - deploy_staging_cloud
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-l
     permissions:
       contents: read
     steps:

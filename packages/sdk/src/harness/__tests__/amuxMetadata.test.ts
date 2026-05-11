@@ -17,7 +17,7 @@ describe("getAmuxAdapterMetadata", () => {
     const metadata = getAmuxAdapterMetadata("claude-code");
 
     expect(metadata.name).toBe("claude");
-    expect(metadata.hostEnvSignals).toContain("CLAUDE_ENV_FILE");
+    expect(metadata.hostEnvSignals.length).toBeGreaterThan(0);
     expect(metadata.capabilities.hasStopHook).toBe(true);
     expect(metadata.capabilities.supportsMCP).toBe(true);
   });

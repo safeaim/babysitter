@@ -1,4 +1,4 @@
-import { listFallbackHarnessMetadata as listCatalogFallbackHarnessMetadata } from "@a5c-ai/agent-catalog";
+import { listFallbackHarnessMetadata as listCatalogFallbackHarnessMetadata, getHostSignalMap } from "@a5c-ai/agent-catalog";
 import { resolveRunsDir } from "../config";
 import type { AmuxAdapterMetadata } from "./amuxMetadata";
 
@@ -178,12 +178,17 @@ const LOCAL_FALLBACK_METADATA: Record<string, AmuxAdapterMetadata> = {
 
 function buildStaticFallbackMetadata(): Record<string, AmuxAdapterMetadata> {
   try {
+    let hostSignalMap: Record<string, string[]> = {};
+    try { hostSignalMap = getHostSignalMap(); } catch { /* */ }
+
     const catalogMetadata = Object.fromEntries(
       Object.values(listCatalogFallbackHarnessMetadata()).map((metadata) => [
         metadata.adapterName,
         {
           name: metadata.adapterName,
-          hostEnvSignals: metadata.hostEnvSignals,
+          hostEnvSignals: metadata.hostEnvSignals.length > 0
+            ? metadata.hostEnvSignals
+            : (hostSignalMap[metadata.adapterName] ?? []),
           capabilities: metadata.capabilities,
           sessionDir: resolveFallbackSessionDir(metadata.sessionDir),
         },

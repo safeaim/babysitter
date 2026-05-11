@@ -60,6 +60,10 @@ const packageFamilies = {
   "atlas-family": [
     "@a5c-ai/atlas-webui",
   ],
+  "krate-family": [
+    "@a5c-ai/krate",
+    "@a5c-ai/krate-web",
+  ],
 };
 
 const familyRules = {
@@ -98,6 +102,11 @@ const familyRules = {
     allow: new Set(["support-systems", "atlas-family"]),
     rationale:
       "atlas packages form a self-contained graph SDK family; may depend on support systems but not orchestration core",
+  },
+  "krate-family": {
+    allow: new Set(["support-systems", "krate-family"]),
+    rationale:
+      "krate packages form a self-contained Kubernetes forge family; may depend on support systems but not orchestration core",
   },
 };
 

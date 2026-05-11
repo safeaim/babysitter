@@ -109,10 +109,12 @@ const evidenceWithUrl = evidenceSources.filter(e => e.url || e.repoUrl || e.sour
 const evidenceUrlCoverage = pct(evidenceWithUrl.length, evidenceSources.length);
 
 // Claims per product (how many products have at least one claim about them?)
-const claimTargets = new Set(edges.filter(e => e.kind === 'backed_by_evidence' || e.kind === 'claims' || e.kind === 'tests_claim').flatMap(e => [e.from, e.to]));
+const claimEdgeKinds = ['has_testable_claim', 'tests_claim', 'asserts_about'];
 const productsWithClaims = products.filter(p => {
-  const productEdges = edges.filter(e => (e.from === p.id || e.to === p.id) && (e.kind === 'has_testable_claim' || e.kind === 'tests_claim'));
-  return productEdges.length > 0;
+  return edges.some(e =>
+    (e.to === p.id && claimEdgeKinds.includes(e.kind)) ||
+    (e.from === p.id && claimEdgeKinds.includes(e.kind))
+  );
 });
 const productClaimCoverage = pct(productsWithClaims.length, products.length);
 

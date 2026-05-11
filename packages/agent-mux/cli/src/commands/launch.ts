@@ -470,6 +470,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
   if (dashDashIdx >= 0) {
     plan.args.push(...process.argv.slice(dashDashIdx + 1));
   }
+  // Also check parsed positionals for -- separator (handles spawn() without shell)
+  const argsDashIdx = args.positionals.indexOf('--');
+  if (argsDashIdx >= 0) {
+    plan.args.push(...args.positionals.slice(argsDashIdx + 1));
+  }
 
   // Launch runtime if needed
   let proxyRuntime: TransportMuxRuntime | undefined;

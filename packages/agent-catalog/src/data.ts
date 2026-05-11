@@ -348,18 +348,11 @@ function agentPluginTargetIds(agentNodeId: string): string[] {
     .filter(Boolean);
 }
 
-function matchesAgentId(nodeAgentId: string, targetAgentId: string, targetAliases?: string[]): boolean {
+function matchesAgentId(nodeAgentId: string, targetAgentId: string): boolean {
   if (nodeAgentId === targetAgentId) return true;
   // Handle "agent:codex" matching "codex"
-  const nodeSlug = nodeAgentId.startsWith("agent:") ? nodeAgentId.slice("agent:".length) : nodeAgentId;
-  const targetSlug = targetAgentId.startsWith("agent:") ? targetAgentId.slice("agent:".length) : targetAgentId;
-  if (nodeSlug === targetSlug) return true;
-  // Handle host renames via aliases (e.g. agentId "gemini" with alias "gemini-cli")
-  if (targetAliases) {
-    for (const alias of targetAliases) {
-      if (nodeSlug === alias) return true;
-    }
-  }
+  if (nodeAgentId.startsWith("agent:") && nodeAgentId.slice("agent:".length) === targetAgentId) return true;
+  if (targetAgentId.startsWith("agent:") && targetAgentId.slice("agent:".length) === nodeAgentId) return true;
   return false;
 }
 
@@ -369,13 +362,12 @@ function agentSessionNuanceIds(agentNodeId: string): string[] {
     .filter(Boolean);
   if (edgeBased.length > 0) return edgeBased;
 
-  // Fallback: find SessionSemantics nodes whose agentId matches (including aliases)
+  // Fallback: find SessionSemantics nodes whose agentId matches
   const agentNode = getNodeById(agentNodeId);
   const agentId = valueAsString(agentNode?.agentId);
   if (!agentId) return [];
-  const aliases = stringArray(agentNode?.aliases);
   return listNodesByKind("SessionSemantics")
-    .filter((node) => matchesAgentId(valueAsString(node.agentId), agentId, aliases))
+    .filter((node) => matchesAgentId(valueAsString(node.agentId), agentId))
     .map((node) => valueAsString(node.sessionSemanticsId))
     .filter(Boolean);
 }
@@ -386,15 +378,14 @@ function agentLifecycleNuanceIds(agentNodeId: string): string[] {
     .filter(Boolean);
   if (edgeBased.length > 0) return edgeBased;
 
-  // Fallback: find LifecycleSemantics nodes whose agentId and versionRange match (including aliases)
+  // Fallback: find LifecycleSemantics nodes whose agentId and versionRange match
   const agentNode = getNodeById(agentNodeId);
   const agentId = valueAsString(agentNode?.agentId);
   const agentVersionRange = valueAsString(agentNode?.versionRange);
   if (!agentId) return [];
-  const aliases = stringArray(agentNode?.aliases);
   return listNodesByKind("LifecycleSemantics")
     .filter((node) => {
-      if (!matchesAgentId(valueAsString(node.agentId), agentId, aliases)) return false;
+      if (!matchesAgentId(valueAsString(node.agentId), agentId)) return false;
       // If agent has a specific version range, match lifecycle nodes with same or broader range
       if (agentVersionRange) {
         const lcRange = valueAsString(node.versionRange);
@@ -505,28 +496,17 @@ function synthesizeClaimsFromEvidenceRefs(node: GraphNode): ClaimRecord[] {
   }
 
   if (webIds.length > 0) {
-    // Look for existing Claim nodes matching web evidence IDs
-    // Prefer claims whose claimId contains the support node's capability ID
-    const capabilityId = valueAsString(node.capabilityId);
-    const allWebClaims = listNodesByKind("Claim").filter((claimNode) => {
+    // Look for an existing Claim node matching a web evidence ID
+    const matchedWebClaim = listNodesByKind("Claim").find((claimNode) => {
       const claimEvidenceIds = stringArray(claimNode.evidenceIds);
       return claimEvidenceIds.some((id) => webIds.includes(id)) && valueAsString(claimNode.provenanceKind) !== "repo-observation";
     });
 
-    // Sort: prefer claims whose claimId contains the capabilityId (more specific)
-    const sortedWebClaims = [...allWebClaims].sort((a, b) => {
-      const aSpecific = valueAsString(a.claimId).includes(capabilityId) ? 1 : 0;
-      const bSpecific = valueAsString(b.claimId).includes(capabilityId) ? 1 : 0;
-      return bSpecific - aSpecific;
-    });
-
-    const matchedWebClaim = sortedWebClaims[0];
-
     if (matchedWebClaim) {
       const claim = toClaimRecord(matchedWebClaim);
-      // Ensure partial/inferred vendor claims always have unresolved gaps
+      // Ensure partial vendor claims always have unresolved gaps
       if (claim.evidenceStrength !== "corroborated" && claim.unresolvedGaps.length === 0) {
-        claim.unresolvedGaps = [`Vendor evidence for ${capabilityId} has not been fully corroborated.`];
+        claim.unresolvedGaps = [`Vendor evidence for ${valueAsString(node.capabilityId)} has not been fully corroborated.`];
       }
       claims.push(claim);
     } else {

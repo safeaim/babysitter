@@ -16,6 +16,11 @@ jobs:
           cache: npm
       - run: npm ci --prefer-offline --legacy-peer-deps
       - run: npm run build -w packages/atlas
+      - run: npm run build -w packages/hooks-mux/core -w packages/hooks-mux/cli
+        continue-on-error: true
+      - name: Stop-hook control claims (vitest)
+        run: npx vitest run packages/atlas/tests/claims/stop-hook-control.test.ts --reporter=verbose
+        continue-on-error: true
       - name: Run testable claims
         run: node packages/atlas/scripts/run-testable-claims.mjs
       - name: Find untested claims

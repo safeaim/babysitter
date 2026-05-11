@@ -192,8 +192,6 @@ function harnessApprovalPassthrough(harness: string): string[] {
       return ['--', '--full-auto', '--sandbox', 'danger-full-access'];
     case 'claude':
       return ['--', '--dangerously-skip-permissions'];
-    case 'pi':
-      return [];
     default:
       return [];
   }

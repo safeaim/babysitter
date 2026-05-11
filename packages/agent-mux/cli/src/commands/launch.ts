@@ -51,6 +51,7 @@ export const LAUNCH_FLAGS: Record<string, FlagDef> = {
   'workspace-mode': { type: 'string' },
   'workspace-repo': { type: 'string', repeatable: true },
   'workspace-name': { type: 'string' },
+  'yolo': { type: 'boolean' },
 };
 
 // ---------------------------------------------------------------------------
@@ -463,6 +464,18 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
   const modelFlag = flagStr(args.flags, 'model');
   if (modelFlag && ['pi', 'gemini', 'opencode'].includes(plan.harness)) {
     plan.args.push('--model', modelFlag);
+  }
+
+  // --yolo: add harness-specific auto-approve/sandbox-disable flags
+  if (flagBool(args.flags, 'yolo')) {
+    switch (plan.harness) {
+      case 'codex':
+        plan.args.push('--full-auto', '--sandbox', 'danger-full-access');
+        break;
+      case 'claude':
+        plan.args.push('--dangerously-skip-permissions');
+        break;
+    }
   }
 
   // Passthrough args after --

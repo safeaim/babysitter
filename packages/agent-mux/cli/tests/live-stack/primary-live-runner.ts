@@ -186,15 +186,9 @@ export function buildPrimaryLiveStackCommands(
   ];
 }
 
-function harnessApprovalPassthrough(harness: string): string[] {
-  switch (harness) {
-    case 'codex':
-      return ['--', '--full-auto', '--sandbox', 'danger-full-access'];
-    case 'claude':
-      return ['--', '--dangerously-skip-permissions'];
-    default:
-      return [];
-  }
+function harnessApprovalPassthrough(_harness: string): string[] {
+  // Use --yolo on amux launch which maps to harness-specific approval flags
+  return ['--yolo'];
 }
 
 function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {

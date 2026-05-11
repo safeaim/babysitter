@@ -28,8 +28,10 @@ export const orgNavigationGroups = [
     items: [
       ['/agents', 'Agents', 'Agent stacks and dispatch'],
       ['/agents/stacks', 'Stacks', 'Agent stack configurations'],
+      ['/agents/sessions', 'Sessions', 'Agent chat sessions'],
       ['/agents/runs', 'Dispatch runs', 'Agent dispatch runs'],
-      ['/agents/rules', 'Trigger rules', 'Trigger rule definitions']
+      ['/agents/rules', 'Trigger rules', 'Trigger rule definitions'],
+      ['/agents/approvals', 'Approvals', 'Pending agent approvals']
     ]
   },
   {
@@ -197,7 +199,7 @@ export async function AgentsDashboardPage({ org = null } = {}) {
       </div>
       <div className="card">
         <div className="cardTitle"><h2>Recent activity</h2><StatusPill tone={agentView.runs.active?.length ? 'warn' : 'neutral'}>{agentView.runs.active?.length || 0} active</StatusPill></div>
-        {agentView.runs.items?.length ? <ul className="resourceList">{agentView.runs.items.slice(0, 5).map((run) => <li key={run.metadata?.name}><a href={orgHref(activeOrg, '/agents/runs')}><strong>{run.metadata?.name}</strong></a><span>{run.spec?.stackRef || 'unassigned'} {run.spec?.repository ? `/ ${run.spec.repository}` : ''}</span><small>Phase: {run.status?.phase || 'Pending'}{run.status?.startedAt ? ` / Started: ${run.status.startedAt}` : ''}</small></li>)}</ul> : <EmptyState title="No dispatch runs yet" text="Dispatch runs appear when agent stacks are triggered by rules or manual dispatch." />}
+        {agentView.runs.items?.length ? <ul className="resourceList">{agentView.runs.items.slice(0, 5).map((run) => <li key={run.metadata?.name}><a href={orgHref(activeOrg, `/agents/runs/${run.metadata?.name}`)}><strong>{run.metadata?.name}</strong></a><span>{run.spec?.stackRef || 'unassigned'} {run.spec?.repository ? `/ ${run.spec.repository}` : ''}</span><small>Phase: {run.status?.phase || 'Pending'}{run.status?.startedAt ? ` / Started: ${run.status.startedAt}` : ''}</small></li>)}</ul> : <EmptyState title="No dispatch runs yet" text="Dispatch runs appear when agent stacks are triggered by rules or manual dispatch." />}
       </div>
     </section>
   </PageFrame>;
@@ -257,7 +259,7 @@ export async function AgentStackDetailPage({ org = null, name } = {}) {
   </PageFrame>;
 }
 
-export async function AgentRunsPage({ org = null } = {}) {
+export async function AgentRunsPage({ org = null, linkToDetail = false } = {}) {
   const ui = await loadKrateUi(org);
   const activeOrg = ui.model.org?.slug || org || 'default';
   const agentView = ui.model.agents || { runs: { count: 0, items: [] } };
@@ -274,12 +276,110 @@ export async function AgentRunsPage({ org = null } = {}) {
     <div className="card">
       <div className="cardTitle"><h2>Dispatch runs</h2><StatusPill tone={runs.length ? 'good' : 'neutral'}>{runs.length} runs</StatusPill></div>
       {runs.length ? <ul className="resourceList runList">{runs.map((run) => <li key={run.metadata?.name}>
-        <strong>{run.metadata?.name}</strong>
+        {linkToDetail ? <a href={orgHref(activeOrg, `/agents/runs/${run.metadata?.name}`)}><strong>{run.metadata?.name}</strong></a> : <strong>{run.metadata?.name}</strong>}
         <StatusPill tone={phaseTone(run.status?.phase)}>{run.status?.phase || 'Pending'}</StatusPill>
         <span>{run.spec?.stackRef || 'unassigned'} / {run.spec?.repository || 'no repository'}</span>
         <small>Phase: {run.status?.phase || 'Pending'}{run.status?.startedAt ? ` / Started: ${run.status.startedAt}` : ''}</small>
       </li>)}</ul> : <EmptyState title="No dispatch runs" text="Dispatch runs appear when agent stacks are triggered by rules or manual dispatch. Configure trigger rules or dispatch manually to create runs." />}
     </div>
+  </PageFrame>;
+}
+
+export async function AgentRunDetailPage({ org = null, runId } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { runs: { items: [] }, stacks: { items: [] }, sessions: { items: [] } };
+  const run = (agentView.runs.items || []).find((r) => r.metadata?.name === runId) || null;
+  const stackName = run?.spec?.stackRef || run?.spec?.targetStack || null;
+  const attempts = (agentView.attempts?.items || []).filter((a) => a.spec?.dispatchRun === runId || a.spec?.runRef === runId);
+  const contextDigest = run?.spec?.contextBundle?.digest || run?.status?.contextDigest || null;
+  const contextSourceCount = run?.spec?.contextBundle?.sourceCount ?? run?.spec?.contextBundle?.sources?.length ?? null;
+  const permissionDecision = run?.spec?.permission?.decision || run?.status?.permissionDecision || null;
+  const repository = run?.spec?.repository || null;
+  const phases = run?.status?.phaseTransitions || run?.status?.history || [];
+  const phaseTone = (phase) => {
+    if (!phase || phase === 'Queued' || phase === 'Pending') return 'neutral';
+    if (phase === 'Running') return 'warn';
+    if (phase === 'Completed' || phase === 'Succeeded') return 'good';
+    if (phase === 'Failed') return 'danger';
+    return 'neutral';
+  };
+  const permissionTone = (decision) => {
+    if (!decision) return 'neutral';
+    if (decision === 'allowed' || decision === 'Allowed') return 'good';
+    if (decision === 'denied' || decision === 'Denied') return 'danger';
+    if (decision === 'requires-approval' || decision === 'RequiresApproval') return 'warn';
+    return 'neutral';
+  };
+  const attemptStatusTone = (status) => {
+    if (!status) return 'neutral';
+    if (status === 'Running' || status === 'Active') return 'warn';
+    if (status === 'Completed' || status === 'Succeeded') return 'good';
+    if (status === 'Failed' || status === 'Errored') return 'danger';
+    return 'neutral';
+  };
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`dispatch run / ${runId}`} title={runId || 'Run detail'} text={run ? `Dispatch run on ${stackName || 'unknown stack'} with phase ${run.status?.phase || 'Pending'}.` : 'This dispatch run was not found in the current workspace.'} actions={[['/agents/runs', 'All runs'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/runs', 'Dispatch runs'], [`/agents/runs/${runId}`, runId || 'Detail']]}>
+    <DegradedBanner model={ui.model} />
+    {run ? <>
+      <section className="routeGrid two">
+        <div className="card">
+          <div className="cardTitle"><h3>{runId}</h3><StatusPill tone={phaseTone(run.status?.phase)}>{run.status?.phase || 'Pending'}</StatusPill></div>
+          {stackName ? <p>Agent stack: <a href={orgHref(activeOrg, `/agents/stacks/${stackName}`)}>{stackName}</a></p> : <p>Agent stack: not assigned</p>}
+        </div>
+      </section>
+      <section className="routeGrid two">
+        <div className="card">
+          <div className="cardTitle"><h3>Context bundle</h3><StatusPill tone={contextDigest ? 'good' : 'neutral'}>{contextDigest ? 'available' : 'none'}</StatusPill></div>
+          <dl className="kv">
+            <dt>Digest</dt><dd>{contextDigest ? contextDigest.substring(0, 12) : 'not available'}</dd>
+            <dt>Source count</dt><dd>{contextSourceCount != null ? contextSourceCount : 'not available'}</dd>
+          </dl>
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Permission</h3><StatusPill tone={permissionTone(permissionDecision)}>{permissionDecision || 'not evaluated'}</StatusPill></div>
+          <dl className="kv">
+            <dt>Decision</dt><dd>{permissionDecision || 'not evaluated'}</dd>
+          </dl>
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Agent</h3><StatusPill tone={stackName ? 'good' : 'neutral'}>{stackName ? 'linked' : 'unassigned'}</StatusPill></div>
+          <dl className="kv">
+            <dt>Stack</dt><dd>{stackName ? <a href={orgHref(activeOrg, `/agents/stacks/${stackName}`)}>{stackName}</a> : 'not assigned'}</dd>
+          </dl>
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Repository</h3><StatusPill tone={repository ? 'good' : 'neutral'}>{repository ? 'linked' : 'none'}</StatusPill></div>
+          <dl className="kv">
+            <dt>Repository</dt><dd>{repository || 'not specified'}</dd>
+          </dl>
+        </div>
+      </section>
+      <section className="routeGrid two">
+        <div className="card">
+          <div className="cardTitle"><h3>Attempts</h3><StatusPill tone={attempts.length ? 'good' : 'neutral'}>{attempts.length} attempts</StatusPill></div>
+          {attempts.length ? <ul className="resourceList">{attempts.map((attempt, index) => {
+            const attemptNumber = attempt.spec?.attemptNumber ?? (index + 1);
+            const reason = attempt.spec?.reason || 'initial';
+            const status = attempt.status?.phase || attempt.status?.status || 'Pending';
+            const queuedAt = attempt.status?.queuedAt || attempt.metadata?.creationTimestamp || null;
+            const startedAt = attempt.status?.startedAt || null;
+            const completedAt = attempt.status?.completedAt || null;
+            const sessionRef = attempt.spec?.sessionRef || attempt.status?.sessionRef || null;
+            return <li key={attempt.metadata?.name || index}>
+              <strong>Attempt {attemptNumber}</strong>
+              <StatusPill tone={attemptStatusTone(status)}>{status}</StatusPill>
+              <span>Reason: {reason}</span>
+              <small>{queuedAt ? `Queued: ${queuedAt}` : ''}{startedAt ? ` / Started: ${startedAt}` : ''}{completedAt ? ` / Completed: ${completedAt}` : ''}</small>
+              {sessionRef ? <small>Session: <a href={orgHref(activeOrg, `/agents/sessions/${sessionRef}`)}>{sessionRef}</a></small> : null}
+            </li>;
+          })}</ul> : <p className="emptyText">No attempt records found for this dispatch run.</p>}
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Timeline</h3><StatusPill tone={phases.length ? 'good' : 'neutral'}>{phases.length} transitions</StatusPill></div>
+          {phases.length ? <ul className="compactList">{phases.map((entry, index) => <li key={index}>{entry.timestamp || entry.time || 'unknown'}: {entry.phase || entry.status || 'unknown'}{entry.reason ? ` / ${entry.reason}` : ''}</li>)}</ul> : <p className="emptyText">No phase transitions recorded. Transitions appear as the run progresses through its lifecycle.</p>}
+        </div>
+      </section>
+    </> : <EmptyState title={`Run ${runId} not found`} text="This dispatch run does not exist in the current workspace. Dispatch runs are created when agent stacks are triggered by rules or manual dispatch." />}
   </PageFrame>;
 }
 
@@ -301,6 +401,199 @@ export async function AgentRulesPage({ org = null } = {}) {
       </div>)}</div> : <EmptyState title="No trigger rules configured" text="Trigger rules are created through Krate resource definitions. When rules are available, they appear here with their sources, target stack, and task kind." />}
     </div>
   </PageFrame>;
+}
+
+export async function AgentApprovalsPage({ org = null } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { approvals: { count: 0, items: [], pending: [] } };
+  const allApprovals = agentView.approvals?.items || [];
+  const pending = agentView.approvals?.pending || allApprovals.filter(a => !a.status?.phase || a.status.phase === 'Pending');
+  const resolved = allApprovals.filter(a => a.status?.phase && a.status.phase !== 'Pending');
+  const approvedCount = resolved.filter(a => a.status?.phase === 'Approved').length;
+  const deniedCount = resolved.filter(a => a.status?.phase === 'Denied').length;
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent approvals" title="Approval inbox" text="Review and act on pending agent approval requests. Agents pause here when they need human authorization for tools, secrets, write-back, or release actions." actions={[['/agents', 'Overview'], ['/agents/runs', 'Dispatch runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/approvals', 'Approvals']]}>
+    <DegradedBanner model={ui.model} />
+    <section className="routeGrid three">
+      <div className="card"><div className="cardTitle"><h3>Pending</h3><StatusPill tone={pending.length ? 'warn' : 'neutral'}>{pending.length}</StatusPill></div><p className="emptyText">Awaiting human decision</p></div>
+      <div className="card"><div className="cardTitle"><h3>Approved</h3><StatusPill tone={approvedCount ? 'good' : 'neutral'}>{approvedCount}</StatusPill></div><p className="emptyText">Actions authorized</p></div>
+      <div className="card"><div className="cardTitle"><h3>Denied</h3><StatusPill tone={deniedCount ? 'danger' : 'neutral'}>{deniedCount}</StatusPill></div><p className="emptyText">Actions rejected</p></div>
+    </section>
+    <div className="card" style={{ borderLeft: pending.length ? '3px solid var(--color-warn, #e8a735)' : undefined }}>
+      <div className="cardTitle"><h2>Pending approvals</h2><StatusPill tone={pending.length ? 'warn' : 'neutral'}>{pending.length} pending</StatusPill></div>
+      {pending.length ? <div className="stack">{pending.map((approval) => {
+        const name = approval.metadata?.name || 'unknown';
+        const action = approval.spec?.action || 'Unknown action';
+        const requestedBy = approval.spec?.requestedBy || approval.spec?.stackRef || 'unknown agent';
+        const dispatchRun = approval.spec?.dispatchRun || null;
+        const requestedAt = approval.metadata?.creationTimestamp || approval.spec?.requestedAt || null;
+        const description = approval.spec?.description || approval.spec?.reason || `Agent requests permission to perform: ${action}`;
+        return <div key={name} className="card" style={{ background: 'var(--surface-warn, #fffbeb)', border: '1px solid var(--border-warn, #f5d060)' }}>
+          <div className="cardTitle"><h3>{action}</h3><StatusPill tone="warn">pending</StatusPill></div>
+          <dl className="kv">
+            <dt>Requesting agent</dt><dd>{requestedBy}</dd>
+            {dispatchRun ? <><dt>Dispatch run</dt><dd><a href={orgHref(activeOrg, `/agents/runs/${dispatchRun}`)}>{dispatchRun}</a></dd></> : null}
+            {requestedAt ? <><dt>Requested</dt><dd><time dateTime={requestedAt}>{relativeTime(requestedAt)}</time></dd></> : null}
+            <dt>Description</dt><dd>{description}</dd>
+          </dl>
+          <div className="heroActions" style={{ justifyContent: 'flex-start', gap: '0.5rem', marginTop: '0.75rem' }}>
+            <button type="button" title="Approval actions coming in Slice 7" style={{ background: 'var(--color-good, #22863a)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'not-allowed', opacity: 0.85, fontWeight: 600 }} disabled>Approve</button>
+            <button type="button" title="Approval actions coming in Slice 7" style={{ background: 'var(--color-danger, #cb2431)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'not-allowed', opacity: 0.85, fontWeight: 600 }} disabled>Deny</button>
+          </div>
+        </div>;
+      })}</div> : <EmptyState title="No pending approvals" text="All agent approval requests have been resolved. When an agent needs human authorization, pending items appear here." />}
+    </div>
+    <ResolvedApprovalsSection resolved={resolved} />
+  </PageFrame>;
+}
+
+function ResolvedApprovalsSection({ resolved }) {
+  // Client component not available in server render — use <details> for toggle
+  const decisionTone = (phase) => {
+    if (phase === 'Approved') return 'good';
+    if (phase === 'Denied') return 'danger';
+    return 'neutral';
+  };
+  return <details className="card">
+    <summary style={{ cursor: 'pointer', padding: '0.75rem 0' }}><span><h3 style={{ display: 'inline' }}>Resolved approvals</h3> <StatusPill tone="neutral">{resolved.length} resolved</StatusPill></span></summary>
+    {resolved.length ? <div className="resourceTable" style={{ marginTop: '0.5rem' }}>{resolved.map((approval) => {
+      const name = approval.metadata?.name || 'unknown';
+      const action = approval.spec?.action || 'Unknown action';
+      const decision = approval.status?.phase || 'Unknown';
+      const decidedBy = approval.status?.decidedBy || approval.status?.approvedBy || approval.status?.deniedBy || '--';
+      const decidedAt = approval.status?.decidedAt || approval.status?.updatedAt || approval.metadata?.creationTimestamp || '';
+      return <div key={name} className="resourceRow">
+        <strong>{action}</strong>
+        <StatusPill tone={decisionTone(decision)}>{decision.toLowerCase()}</StatusPill>
+        <span>{decidedBy}</span>
+        <small>{decidedAt ? relativeTime(decidedAt) : '--'}</small>
+      </div>;
+    })}</div> : <p className="emptyText" style={{ padding: '0.5rem 0' }}>No resolved approvals yet.</p>}
+  </details>;
+}
+
+function relativeTime(timestamp) {
+  if (!timestamp) return '';
+  try {
+    const now = Date.now();
+    const then = new Date(timestamp).getTime();
+    const diffMs = now - then;
+    if (diffMs < 0) return 'just now';
+    const seconds = Math.floor(diffMs / 1000);
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
+    const months = Math.floor(days / 30);
+    return `${months} month${months === 1 ? '' : 's'} ago`;
+  } catch { return String(timestamp); }
+}
+
+export async function AgentSessionsPage({ org = null } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { sessions: { count: 0, items: [] } };
+  const sessions = agentView.sessions?.items || [];
+  const phaseTone = (phase) => {
+    if (!phase || phase === 'Pending') return 'neutral';
+    if (phase === 'Active' || phase === 'Running') return 'warn';
+    if (phase === 'Completed' || phase === 'Succeeded') return 'good';
+    if (phase === 'Failed' || phase === 'Errored') return 'danger';
+    return 'neutral';
+  };
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent sessions" title="Agent chat sessions" text="Each session represents an Agent Mux chat with lifecycle state, transcript, and cost tracking." actions={[['/agents', 'Overview'], ['/agents/stacks', 'Stacks'], ['/agents/runs', 'Dispatch runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/sessions', 'Sessions']]}>
+    <DegradedBanner model={ui.model} />
+    <div className="card">
+      <div className="cardTitle"><h2>Sessions</h2><StatusPill tone={sessions.length ? 'good' : 'neutral'}>{sessions.length} sessions</StatusPill></div>
+      {sessions.length ? <div className="resourceTable">{sessions.map((session) => <a key={session.metadata?.name} href={orgHref(activeOrg, `/agents/sessions/${session.metadata?.name}`)} className="resourceRow" style={{ textDecoration: 'none' }}>
+        <strong>{session.metadata?.name}</strong>
+        <span>{session.spec?.agentStack || session.spec?.stackRef || 'unassigned'}</span>
+        <StatusPill tone={phaseTone(session.status?.phase)}>{session.status?.phase || 'Pending'}</StatusPill>
+        <span>{session.spec?.dispatchRun || 'no run'}</span>
+        <small>{session.status?.updatedAt || session.metadata?.creationTimestamp || ''}</small>
+      </a>)}</div> : <EmptyState title="No agent sessions" text="Agent sessions appear when dispatch runs create Agent Mux chat sessions. Configure agent stacks and trigger rules to start sessions." />}
+    </div>
+  </PageFrame>;
+}
+
+export async function AgentSessionDetailPage({ org = null, sessionId } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { sessions: { items: [] }, transcripts: { items: [] }, runs: { items: [] }, stacks: { items: [] } };
+  const session = (agentView.sessions?.items || []).find((s) => s.metadata?.name === sessionId) || null;
+  const transcriptRecord = (agentView.transcripts?.items || []).find((t) => t.spec?.sessionRef === sessionId);
+  const messages = transcriptRecord?.spec?.messages || [];
+  const dispatchRunName = session?.spec?.dispatchRun || null;
+  const stackName = session?.spec?.agentStack || session?.spec?.stackRef || null;
+  const phaseTone = (phase) => {
+    if (!phase || phase === 'Pending') return 'neutral';
+    if (phase === 'Active' || phase === 'Running') return 'warn';
+    if (phase === 'Completed' || phase === 'Succeeded') return 'good';
+    if (phase === 'Failed' || phase === 'Errored') return 'danger';
+    return 'neutral';
+  };
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`agent session / ${sessionId}`} title={sessionId || 'Session detail'} text={session ? `Agent session on ${stackName || 'unknown stack'} with phase ${session.status?.phase || 'Pending'}.` : 'This agent session was not found in the current workspace.'} actions={[['/agents/sessions', 'All sessions'], ['/agents/runs', 'Dispatch runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/sessions', 'Sessions'], [`/agents/sessions/${sessionId}`, sessionId || 'Detail']]}>
+    <DegradedBanner model={ui.model} />
+    <section className="routeGrid wideLeft">
+      <div className="card">
+        <div className="cardTitle"><h3>Transcript</h3><StatusPill tone={messages.length ? 'good' : 'neutral'}>{messages.length} messages</StatusPill></div>
+        {messages.length ? <div className="sessionTranscript">{messages.map((msg, index) => <TranscriptMessage key={`${msg.role}-${index}`} message={msg} />)}</div> : <EmptyState title="No transcript available" text="Session transcript available when Agent Mux is connected and the session has exchanged messages." />}
+      </div>
+      <div className="stack">
+        <div className="card">
+          <div className="cardTitle"><h3>Session details</h3><StatusPill tone={session ? phaseTone(session.status?.phase) : 'warn'}>{session?.status?.phase || 'not found'}</StatusPill></div>
+          {session ? <dl className="kv">
+            <dt>Name</dt><dd>{session.metadata?.name}</dd>
+            <dt>Agent stack</dt><dd>{stackName ? <a href={orgHref(activeOrg, `/agents/stacks/${stackName}`)}>{stackName}</a> : 'not specified'}</dd>
+            <dt>Model</dt><dd>{session.spec?.model || session.status?.model || 'default'}</dd>
+            <dt>Dispatch run</dt><dd>{dispatchRunName ? <a href={orgHref(activeOrg, `/agents/runs/${dispatchRunName}`)}>{dispatchRunName}</a> : 'none'}</dd>
+            <dt>Workspace</dt><dd>{session.spec?.workspace ? <a href={orgHref(activeOrg, '/agents')}>{session.spec.workspace}</a> : 'none'}</dd>
+            <dt>Phase</dt><dd>{session.status?.phase || 'Pending'}</dd>
+            <dt>Cost</dt><dd>{session.status?.cost != null ? `$${session.status.cost}` : transcriptRecord?.status?.totalCost != null ? `$${transcriptRecord.status.totalCost}` : 'not tracked'}</dd>
+            <dt>Agent Mux session</dt><dd>{session.spec?.agentMuxSessionId || 'not assigned'}</dd>
+            <dt>Started</dt><dd>{session.status?.startedAt || session.metadata?.creationTimestamp || 'unknown'}</dd>
+            <dt>Updated</dt><dd>{session.status?.updatedAt || 'unknown'}</dd>
+          </dl> : <EmptyState title={`Session ${sessionId} not found`} text="This agent session does not exist in the current workspace." />}
+        </div>
+        {transcriptRecord ? <div className="card">
+          <div className="cardTitle"><h3>Transcript metadata</h3><StatusPill tone="neutral">record</StatusPill></div>
+          <dl className="kv">
+            <dt>Transcript</dt><dd>{transcriptRecord.metadata?.name}</dd>
+            <dt>Messages</dt><dd>{messages.length}</dd>
+            <dt>Cost per turn</dt><dd>{transcriptRecord.status?.costPerTurn != null ? `$${transcriptRecord.status.costPerTurn}` : 'not tracked'}</dd>
+          </dl>
+        </div> : null}
+      </div>
+    </section>
+  </PageFrame>;
+}
+
+function TranscriptMessage({ message }) {
+  const role = message.role || 'unknown';
+  if (role === 'tool' || role === 'tool_use' || role === 'tool_result') {
+    return <div className="transcriptMessage transcriptTool">
+      <div className="transcriptToolHeader">
+        <small className="transcriptRole">tool</small>
+        <strong>{message.toolName || message.name || 'tool call'}</strong>
+        {message.status ? <StatusPill tone={message.status === 'success' ? 'good' : message.status === 'error' ? 'danger' : 'neutral'}>{message.status}</StatusPill> : null}
+      </div>
+      {message.content ? <pre className="transcriptToolContent"><code>{typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)}</code></pre> : null}
+    </div>;
+  }
+  if (role === 'system' || role === 'thinking') {
+    return <div className="transcriptMessage transcriptSystem">
+      <small className="transcriptRole">{role}</small>
+      <p>{typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}</p>
+    </div>;
+  }
+  const isUser = role === 'user';
+  return <div className={`transcriptMessage ${isUser ? 'transcriptUser' : 'transcriptAssistant'}`}>
+    <small className="transcriptRole">{role}</small>
+    <div className="transcriptContent">{typeof message.content === 'string' ? message.content : Array.isArray(message.content) ? message.content.map((block, i) => <span key={i}>{typeof block === 'string' ? block : block.text || block.content || JSON.stringify(block)}</span>) : JSON.stringify(message.content)}</div>
+  </div>;
 }
 
 export async function RepositoryCodePage({ org = null, repo }) { return <RepositorySectionPage org={org} repo={repo} section="code" />; }

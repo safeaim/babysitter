@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 
-import { AgentRunsPage } from '../../../../ui-shell.jsx';
+import { AgentApprovalsPage } from '../../../../ui-shell.jsx';
 
 export default async function Page({ params }) {
   const routeParams = await params;
   const org = routeParams.org;
-  return <AgentRunsPage org={org} linkToDetail />;
+  return <AgentApprovalsPage org={org} />;
 }

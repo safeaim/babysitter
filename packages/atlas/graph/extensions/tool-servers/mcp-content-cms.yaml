@@ -8,6 +8,7 @@ attributes:
     media uploads, and configure site settings.
   protocol: mcp
   category: cms
+  repoUrl: https://github.com/developer-jeong/wordpress-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -30,6 +31,7 @@ attributes:
     entries, query assets, and publish content across spaces.
   protocol: mcp
   category: cms
+  repoUrl: https://github.com/contentful/mcp-server
   maintainer: Contentful
   mcpTransports:
   - mcp-transport:stdio
@@ -97,6 +99,7 @@ attributes:
     CMS content through the Webflow Data API.
   protocol: mcp
   category: cms
+  repoUrl: https://github.com/webflow/mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -118,6 +121,7 @@ attributes:
     entries, handle media, and configure API endpoints.
   protocol: mcp
   category: cms
+  repoUrl: https://github.com/strapi-community/strapi-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

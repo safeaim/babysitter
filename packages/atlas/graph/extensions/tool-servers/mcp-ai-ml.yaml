@@ -8,6 +8,7 @@ attributes:
     manage model parameters, and leverage advanced reasoning capabilities.
   protocol: mcp
   category: ai
+  repoUrl: https://github.com/anthropics/anthropic-mcp-server
   maintainer: Anthropic
   mcpTransports:
   - mcp-transport:stdio
@@ -29,6 +30,7 @@ attributes:
     create images with DALL-E, and use speech-to-text capabilities.
   protocol: mcp
   category: ai
+  repoUrl: https://github.com/openai/openai-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -139,6 +141,7 @@ attributes:
     metrics, manage artifacts, and track model lineage.
   protocol: mcp
   category: ai
+  repoUrl: https://github.com/mlflow/mlflow-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

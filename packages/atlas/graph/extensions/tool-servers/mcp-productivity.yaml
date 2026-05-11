@@ -8,6 +8,7 @@ attributes:
     and sections, assign work, and query workspaces.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/rohanb10/asana-mcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -30,6 +31,7 @@ attributes:
     manage projects and labels, and query filters.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/abhiz123/todoist-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -50,6 +52,7 @@ attributes:
     and automate workspace operations.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/sakce/monday-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -71,6 +74,7 @@ attributes:
     and bases, query views, and manipulate field configurations.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/felores/airtable-mcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -92,6 +96,7 @@ attributes:
     entries, check free/busy status, and manage recurring schedules.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/nspady/google-calendar-mcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -112,6 +117,7 @@ attributes:
     execute formulas, and perform batch operations on sheet data.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/nicepkg/google-sheets-mcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -133,6 +139,7 @@ attributes:
     insert content, manage formatting, and collaborate on text.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/nicepkg/google-docs-mcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -154,6 +161,7 @@ attributes:
     and tasks through the Microsoft Graph API.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/microsoft/mcp-server-outlook
   maintainer: Microsoft
   mcpTransports:
   - mcp-transport:stdio
@@ -174,6 +182,7 @@ attributes:
     retrieve transcripts, and manage meeting assets.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/zoom/mcp-server-zoom
   maintainer: Zoom
   mcpTransports:
   - mcp-transport:stdio
@@ -194,6 +203,7 @@ attributes:
     check invitee details, and configure availability windows.
   protocol: mcp
   category: productivity
+  repoUrl: https://github.com/calendly/calendly-mcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

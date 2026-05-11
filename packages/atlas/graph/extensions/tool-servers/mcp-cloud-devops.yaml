@@ -162,6 +162,7 @@ attributes:
     groups, and databases hosted on Render.
   protocol: mcp
   category: cloud
+  repoUrl: https://github.com/render-oss/render-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

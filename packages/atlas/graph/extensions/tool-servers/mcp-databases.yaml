@@ -190,6 +190,7 @@ attributes:
     describe schemas, and manage data in Cassandra clusters.
   protocol: mcp
   category: database
+  repoUrl: https://github.com/datastax/cassandra-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

@@ -74,6 +74,7 @@ attributes:
     policies, and interact with dynamic credential backends.
   protocol: mcp
   category: security
+  repoUrl: https://github.com/hashicorp/vault-mcp-server
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

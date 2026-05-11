@@ -20,6 +20,8 @@ edges:
   applies_to:
     - target: specialization:k8s-ops
       confidence: primary
+    - target: specialization:k8s-operator
+      confidence: primary
   uses_language:
     - language:go
     - target: language:go

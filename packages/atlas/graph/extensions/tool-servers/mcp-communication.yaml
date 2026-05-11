@@ -8,6 +8,7 @@ attributes:
     handle reactions, and work with file attachments via the Discord API.
   protocol: mcp
   category: communication
+  repoUrl: https://github.com/v-3/discordmcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio
@@ -95,6 +96,7 @@ attributes:
     manage labels, and organize email workflows.
   protocol: mcp
   category: communication
+  repoUrl: https://github.com/anthropics/anthropic-quickstarts/tree/main/mcp-servers/gmail
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

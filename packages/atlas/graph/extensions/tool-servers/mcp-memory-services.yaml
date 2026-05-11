@@ -36,6 +36,7 @@ attributes:
     Zep Cloud and self-hosted Zep deployments.
   protocol: mcp
   category: memory
+  repoUrl: https://github.com/getzep/zep-mcp
   maintainer: Zep
   mcpTransports:
     - mcp-transport:stdio
@@ -57,6 +58,7 @@ attributes:
     namespace. Runs as a Cloudflare Worker with stdio or HTTP transport.
   protocol: mcp
   category: memory
+  repoUrl: https://github.com/cloudflare/mcp-server-cloudflare
   maintainer: Cloudflare
   mcpTransports:
     - mcp-transport:stdio

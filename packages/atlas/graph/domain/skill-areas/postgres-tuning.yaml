@@ -18,5 +18,7 @@ edges:
       confidence: primary
     - target: domain:databases
       confidence: secondary
+    - target: specialization:postgres-tuning
+      confidence: primary
   uses_stack_part:
     - stack-part:relational-database

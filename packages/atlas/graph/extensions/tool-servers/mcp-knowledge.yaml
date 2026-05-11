@@ -13,6 +13,7 @@ attributes:
     indexed by Glean.
   protocol: mcp
   category: knowledge
+  repoUrl: https://github.com/nicepkg/glean-mcp
   maintainer: Community
   mcpTransports:
   - mcp-transport:stdio

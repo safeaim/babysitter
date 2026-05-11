@@ -17,7 +17,9 @@
     "packages/hooks-mux/adapter-pi",
     "packages/hooks-mux/adapter-oh-my-pi",
     "packages/hooks-mux/adapter-opencode",
-    "packages/hooks-mux/adapter-openclaw"
+    "packages/hooks-mux/adapter-openclaw",
+    "packages/krate/core",
+    "packages/krate/web"
   ],
   "scripts": {
     "check:library-syntax": "node ./scripts/validate-library-js-syntax.cjs",

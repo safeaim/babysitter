@@ -1,0 +1,20 @@
+apiVersion: v2
+name: krate
+description: Kubernetes-native forge MVP package for local and production-shaped installs.
+type: application
+version: 0.1.0
+appVersion: 0.1.0
+kubeVersion: ">=1.27.0-0"
+home: https://a5c.ai/krate
+maintainers:
+  - name: a5c.ai
+    url: https://a5c.ai
+keywords:
+  - git
+  - forge
+  - kubernetes
+  - ci
+  - rbac
+annotations:
+  krate.a5c.ai/package-surface: mvp-model
+  krate.a5c.ai/release-gate: npm-run-check

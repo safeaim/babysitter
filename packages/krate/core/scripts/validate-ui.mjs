@@ -1,0 +1,207 @@
+import { readFileSync } from 'node:fs';
+import { createControllerUiModel } from '../src/index.js';
+
+const required = [
+  'apps/web/app/layout.jsx',
+  'apps/web/app/page.jsx',
+  'apps/web/app/ui-shell.jsx',
+  'apps/web/proxy.js',
+  'apps/web/app/components/code-editor.jsx',
+  'apps/web/app/components/resource-actions.jsx',
+  'apps/web/app/api/controller/route.js',
+  'apps/web/app/api/orgs/[org]/resources/route.js',
+  'apps/web/app/api/orgs/[org]/resources/[kind]/[name]/route.js',
+  'apps/web/app/api/orgs/[org]/repositories/route.js',
+  'apps/web/app/api/orgs/[org]/repositories/[name]/route.js',
+  'apps/web/app/api/orgs/[org]/policies/route.js',
+  'apps/web/app/api/orgs/[org]/policy-reports/route.js',
+  'apps/web/app/api/orgs/[org]/policy-exception-requests/route.js',
+  'apps/web/app/api/watch/[[...resource]]/route.js',
+  'apps/web/app/api/git-proxy/route.js',
+  'apps/web/app/api/auth/[provider]/route.js',
+  'apps/web/app/api/auth/callback/[provider]/route.js',
+  'apps/web/app/api/auth/logout/route.js',
+  'apps/web/app/api/auth/delegated/route.js',
+  'src/api-controller.js',
+  'src/kubernetes-resource-gateway.js',
+  'src/kubernetes-controller.js',
+  'src/controller-client.js',
+  'src/controller-ui.js',
+  'src/http-server.js'
+];
+const files = Object.fromEntries(required.map((file) => [file, readFileSync(file, 'utf8')]));
+const failures = [];
+
+for (const [file, source] of Object.entries(files)) {
+  if (!source.trim()) failures.push(`${file} is empty`);
+}
+for (const file of ['apps/web/app/api/controller/route.js', 'apps/web/app/api/watch/[[...resource]]/route.js', 'src/controller-client.js']) {
+  if (files[file].includes('createKrateUiDemoRuntime')) failures.push(`${file} imports or calls createKrateUiDemoRuntime`);
+  if (files[file].includes('createKrateRuntime()')) failures.push(`${file} creates an in-memory runtime fallback`);
+}
+for (const file of ['apps/web/app/page.jsx', 'apps/web/app/ui-shell.jsx']) {
+  if (files[file].includes('krate-demo')) failures.push(`${file} hardcodes krate-demo demo navigation`);
+}
+for (const [file, source] of Object.entries(files)) {
+  if (source.includes('sampleResource') || source.includes('exampleResource')) failures.push(`${file} synthesizes sample/example Krate resources`);
+  if (source.includes('new-repository') && file !== 'apps/web/app/components/resource-actions.jsx') failures.push(`${file} hardcodes synthetic Repository data`);
+}
+for (const token of ['export function proxy', 'NextResponse.redirect', 'KRATE_AUTH_COOKIE_NAME', 'krate_session', '/login', '/api/auth', 'matcher']) {
+  if (!files['apps/web/proxy.js'].includes(token)) failures.push(`web proxy missing ${token}`);
+}
+for (const token of ['spawnSync', 'spawn(', 'kubectl', 'getControllerSnapshot', 'listResource', 'getResource', 'applyResource', 'deleteResource', 'createRepository', 'watchResource', 'auth', 'can-i']) {
+  if (!files['src/kubernetes-controller.js'].includes(token)) failures.push(`kubernetes controller missing ${token}`);
+}
+for (const token of ['createKubernetesResourceGateway', 'controller.snapshot()', 'createControllerUiModel']) {
+  if (!files['src/controller-client.js'].includes(token)) failures.push(`controller client missing ${token}`);
+}
+for (const token of ['createKrateApiController', 'resourceGateway', 'withArchitecture', 'krate-api-controller', 'kubernetes-resource-gateway', 'kubernetes-resource-client', 'git-data-plane', 'never owns Kubernetes reconciliation loops', 'KRATE_API_CONTROLLER_BOUNDARY', 'listRepositoriesForForge', 'getRepositoryForgeView', 'krate-kubernetes-reconciler']) {
+  if (!files['src/api-controller.js'].includes(token)) failures.push(`api controller boundary missing ${token}`);
+}
+for (const token of ['createKubernetesResourceClient', 'repositoryManifest', 'async list', 'async get', 'async apply', 'async delete', 'watch(resourcePath', 'KUBERNETES_RESOURCE_GATEWAY_BOUNDARY', 'mustNotOwn']) {
+  if (!files['src/kubernetes-resource-gateway.js'].includes(token)) failures.push(`kubernetes resource gateway missing ${token}`);
+}
+for (const token of ['GET', 'POST', 'DELETE', 'controller.listResource', 'controller.getResource', 'controller.applyResource', 'controller.deleteResource', 'controller.createRepository']) {
+  const joinedRoutes = files['apps/web/app/api/orgs/[org]/resources/route.js'] + files['apps/web/app/api/orgs/[org]/resources/[kind]/[name]/route.js'] + files['apps/web/app/api/orgs/[org]/repositories/route.js'] + files['apps/web/app/api/orgs/[org]/repositories/[name]/route.js'];
+  if (!joinedRoutes.includes(token)) failures.push(`resource management routes missing ${token}`);
+}
+const policyRoutes = files['apps/web/app/api/orgs/[org]/policies/route.js'] + files['apps/web/app/api/orgs/[org]/policy-reports/route.js'] + files['apps/web/app/api/orgs/[org]/policy-exception-requests/route.js'];
+for (const token of ['GET', 'POST', 'createKrateApiController', 'createControllerUiModel', 'policyEngine', 'controller.applyResource', 'PolicyBinding', 'PolicyExceptionRequest']) {
+  if (!policyRoutes.includes(token)) failures.push(`policy management routes missing ${token}`);
+}
+for (const token of ['--watch', 'text/event-stream', 'controller.watchResource', 'krate-error', 'request.signal']) {
+  if (!files['apps/web/app/api/watch/[[...resource]]/route.js'].includes(token)) failures.push(`watch route missing ${token}`);
+}
+for (const token of ['RepositoryManager', 'DeploymentManager', 'ResourceApplyPanel', '/api/orgs/${org}/repositories', '/api/orgs/${org}/resources', 'fetch(', 'Save changes', 'InviteReviewList', 'UserReviewList', 'PermissionReviewList', 'Mark accepted', 'Revoke invite', 'Disable user', 'Restore user', 'Revoke grant', 'SshKeyReviewList', 'Save SSH key', 'Revoke SSH key', 'Create deployment', 'Prepare deployment']) {
+  if (!(files['apps/web/app/components/resource-actions.jsx'] + files['apps/web/app/ui-shell.jsx']).includes(token)) failures.push(`UI management surface missing ${token}`);
+}
+for (const token of ['DegradedBanner', 'No repositories are available yet.', 'No resource selected yet.', 'Access checks', 'KRATE_CONTROLLER_URL', 'Krate repositories']) {
+  if (!(files['apps/web/app/ui-shell.jsx'] + files['apps/web/app/components/resource-actions.jsx']).includes(token)) failures.push(`truthful degraded/empty UI missing ${token}`);
+}
+for (const token of ['duplex', 'KRATE_GITEA_HTTP_URL', 'fetch(target', 'degraded']) {
+  if (!files['apps/web/app/api/git-proxy/route.js'].includes(token)) failures.push(`git proxy route missing ${token}`);
+}
+for (const token of ['orgResourceCollectionMatch', 'orgRepositoryCollectionMatch', 'orgNamespaceName', 'createKubernetesResourceGateway', 'scopedController.listResource', 'scopedController.getResource', 'scopedController.applyResource', 'scopedController.deleteResource']) {
+  if (!files['src/http-server.js'].includes(token)) failures.push(`http controller missing ${token}`);
+}
+const pageContracts = {
+  'apps/web/app/orgs/[org]/controller-api/page.jsx': 'ControllerApiPage',
+  'apps/web/app/orgs/[org]/repositories/page.jsx': 'RepositoriesPage',
+  'apps/web/app/orgs/[org]/inbox/page.jsx': 'InboxPage',
+  'apps/web/app/orgs/[org]/runs/page.jsx': 'RunsPage',
+  'apps/web/app/orgs/[org]/runners-ci/page.jsx': 'RunnersCiPage',
+  'apps/web/app/orgs/[org]/hooks-events/page.jsx': 'HooksEventsPage',
+  'apps/web/app/orgs/[org]/insights/page.jsx': 'InsightsPage',
+  'apps/web/app/orgs/[org]/operations-install/page.jsx': 'OperationsInstallPage',
+  'apps/web/app/orgs/[org]/advanced-plans/page.jsx': 'AdvancedPlansPage',
+  'apps/web/app/orgs/[org]/people/page.jsx': 'PeoplePage',
+  'apps/web/app/login/page.jsx': 'LoginPage',
+  'apps/web/app/logout/page.jsx': 'LogoutPage',
+  'apps/web/app/orgs/[org]/repositories/[repo]/code/page.jsx': 'RepositoryCodePage',
+  'apps/web/app/orgs/[org]/repositories/[repo]/pull-requests/page.jsx': 'RepositoryPullRequestsPage',
+  'apps/web/app/orgs/[org]/repositories/[repo]/issues/page.jsx': 'RepositoryIssuesPage',
+  'apps/web/app/orgs/[org]/repositories/[repo]/runs/page.jsx': 'RepositoryRunsPage',
+  'apps/web/app/orgs/[org]/repositories/[repo]/hooks/page.jsx': 'RepositoryHooksPage',
+  'apps/web/app/orgs/[org]/repositories/[repo]/settings/page.jsx': 'RepositorySettingsPage'
+};
+for (const file of Object.keys(pageContracts)) {
+  files[file] = readFileSync(file, 'utf8');
+}
+for (const [file, component] of Object.entries(pageContracts)) {
+  if (!files[file].includes(component)) failures.push(`${file} does not use dedicated ${component} route component`);
+}
+if (required.some((file) => file.includes('/pipelines'))) failures.push('legacy pipelines route is still required');
+for (const token of ['ControllerApiPage', 'RepositoriesPage', 'InboxPage', 'RunsPage', 'RunnersCiPage', 'HooksEventsPage', 'InsightsPage', 'OperationsInstallPage', 'AdvancedPlansPage', 'PeoplePage', 'LoginPage', 'LogoutPage', 'RepositoryCodePage', 'RepositoryPullRequestsPage', 'RepositoryIssuesPage', 'RepositoryRunsPage', 'RepositoryHooksPage', 'RepositorySettingsPage']) {
+  if (!files['apps/web/app/ui-shell.jsx'].includes(token)) failures.push(`ui shell missing dedicated flow component ${token}`);
+}
+for (const token of ['Invite people', 'identity links', 'repository permissions', 'Access overview', 'Access readiness', 'Use workspace identity', 'Sign in to Krate', 'Repository home', 'Review inbox', 'Run debugger', 'Capacity designer', 'Automation inspector', 'Clone and refs', 'Repository settings map', 'Advanced architecture details', 'ResourceList', 'PlanCard', 'ForgeFlowRail', 'RepositoryCommandBar', 'breadcrumbs', 'Create → review → merge → deploy', 'Advanced resource details']) {
+  if (!files['apps/web/app/ui-shell.jsx'].includes(token)) failures.push(`ui shell missing forge UX affordance ${token}`);
+}
+
+const model = createControllerUiModel({
+  source: 'kubernetes',
+  namespace: 'krate-org-default',
+  generatedAt: 'test-time',
+  correlationId: 'validation',
+  kubectl: { available: true, context: 'kind-krate', clientVersion: 'v1.test', errors: [] },
+  apiService: { metadata: { name: 'v1alpha1.krate.a5c.ai' } },
+  crds: [{ metadata: { name: 'repositories.krate.a5c.ai' } }],
+  storage: { etcd: 'etcd', postgres: 'postgres', repositories: 'rwx', objects: 'object' },
+  commands: [],
+  permissions: [],
+  events: [],
+  resources: {
+    Organization: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'Organization', metadata: { name: 'default', namespace: 'krate-system' }, spec: { slug: 'default', namespaceName: 'krate-org-default', displayName: 'Default org' } }],
+    Repository: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'Repository', metadata: { name: 'live-repo', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', visibility: 'internal', defaultBranch: 'main' }, status: { phase: 'Ready' } }],
+    User: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'User', metadata: { name: 'alice', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', email: 'alice@example.com', username: 'alice' }, status: { phase: 'Active' } }],
+    RepositoryPermission: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'RepositoryPermission', metadata: { name: 'live-repo-alice', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', repository: 'live-repo', subject: 'alice', subjectKind: 'user', permission: 'write' }, status: { phase: 'Synced' } }],
+    SSHKey: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'SSHKey', metadata: { name: 'alice-laptop', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', owner: 'alice', title: 'laptop', scope: 'user', key: 'ssh-ed25519 AAAA' }, status: { phase: 'Synced' } }],
+    PolicyProfile: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'PolicyProfile', metadata: { name: 'default-profile', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', displayName: 'Default profile', mode: 'audit' }, status: { phase: 'Ready' } }],
+    PolicyTemplate: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'PolicyTemplate', metadata: { name: 'require-pr-description', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', displayName: 'Require PR description', targetKinds: ['PullRequest'], kyverno: { kind: 'ValidatingPolicy' } }, status: { phase: 'Ready' } }],
+    PolicyBinding: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'PolicyBinding', metadata: { name: 'require-pr-description-audit', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', templateRef: 'require-pr-description', mode: 'audit' }, status: { phase: 'Bound' } }],
+    PolicyExceptionRequest: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'PolicyExceptionRequest', metadata: { name: 'temporary-bypass', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', policyRef: { name: 'require-pr-description' }, justification: 'migration window', expiresAt: '2026-06-01T00:00:00Z' }, status: { phase: 'Requested' } }],
+    PullRequest: [],
+    Pipeline: [],
+    RunnerPool: [],
+    WebhookSubscription: []
+  },
+  kyverno: {
+    enabled: true,
+    detected: true,
+    mode: 'byo',
+    namespace: 'kyverno',
+    policyNamespace: 'krate-system',
+    health: 'ready',
+    degraded: [],
+    reports: {
+      policyReports: [{ metadata: { name: 'repo-policy', namespace: 'krate-org-default' }, results: [{ policy: 'require-pr-description', rule: 'description', result: 'fail', message: 'description required', resources: [{ kind: 'PullRequest', name: 'pr-1' }] }] }],
+      clusterPolicyReports: [],
+      results: [{ report: 'repo-policy', namespace: 'krate-org-default', policy: 'require-pr-description', rule: 'description', result: 'fail', message: 'description required', resource: { kind: 'PullRequest', name: 'pr-1' } }],
+      violations: [{ report: 'repo-policy', namespace: 'krate-org-default', policy: 'require-pr-description', rule: 'description', result: 'fail', message: 'description required', resource: { kind: 'PullRequest', name: 'pr-1' } }]
+    },
+    resources: { PolicyReport: [], ClusterPolicyReport: [], KyvernoPolicyException: [] }
+  }
+});
+if (model.controller.mode !== 'krate-workspace') failures.push('controller mode is not krate-workspace');
+if (model.status !== 'ready') failures.push('model did not become ready for available Krate snapshot');
+if (!model.resources.find((resource) => resource.kind === 'User')) failures.push('model missing User identity resource');
+if (!model.identity || typeof model.identity.counts?.users !== 'number') failures.push('model missing identity admin projection');
+if (model.identity.counts.sshKeys !== 1) failures.push('model missing SSH key identity projection');
+if (!model.identity.reconciliation?.statuses?.some((status) => status.kind === 'SSHKey' && status.phase === 'Synced')) failures.push('model missing identity reconciliation projection');
+if (!model.resources.find((resource) => resource.kind === 'Repository')?.action?.list?.includes('Open Repository records')) failures.push('repository model missing Krate action list command');
+if (!model.controller.endpoints.some((endpoint) => endpoint.method === 'GET' && endpoint.path === '/api/orgs/:org/resources')) failures.push('model missing resource list endpoint');
+if (!model.controller.endpoints.some((endpoint) => endpoint.method === 'POST' && endpoint.path === '/api/orgs/:org/resources')) failures.push('model missing resource apply endpoint');
+if (!model.controller.endpoints.some((endpoint) => endpoint.method === 'GET' && endpoint.path === '/api/orgs/:org/policies')) failures.push('model missing policy center endpoint');
+if (!model.controller.endpoints.some((endpoint) => endpoint.method === 'GET' && endpoint.path === '/api/orgs/:org/policy-exception-requests')) failures.push('model missing policy exception list endpoint');
+if (model.controller.architecture?.apiController?.role !== 'krate-api-controller') failures.push('model missing API controller architecture boundary');
+if (model.controller.architecture?.resourceGateway?.role !== 'krate-resource-gateway') failures.push('model missing resource gateway architecture boundary');
+if (model.controller.architecture?.resourceClient?.role !== 'krate-resource-client') failures.push('model missing Krate client architecture boundary');
+if (model.controller.architecture?.deliveryReconciler?.role !== 'krate-delivery-reconciler') failures.push('model missing delivery reconciler architecture boundary');
+if (!model.controller.architecture?.apiController?.delegatesTo?.includes('krate-resource-gateway')) failures.push('API controller does not delegate to resource gateway');
+if (model.resources.find((resource) => resource.kind === 'Repository')?.items?.[0]?.metadata?.name !== 'live-repo') failures.push('repository model missing live items');
+if (!model.validation.some((item) => item.evidence.includes('/api/orgs/:org/repositories'))) failures.push('validation missing repository management evidence');
+if (model.policyEngine.health !== 'ready') failures.push('policy engine did not project ready Kyverno health');
+if (model.policyEngine.violations.length !== 1) failures.push('policy engine did not normalize Kyverno violations');
+if (!model.policyEngine.exceptionRequests.some((request) => request.name === 'temporary-bypass')) failures.push('policy engine missing exception request projection');
+const emptyModel = createControllerUiModel({ source: 'kubernetes', namespace: 'krate-org-default', kubectl: { available: true, context: 'kind-krate', errors: [] }, apiService: { metadata: { name: 'v1alpha1.krate.a5c.ai' } }, crds: [{ metadata: { name: 'repositories.krate.a5c.ai' } }], resources: { Repository: [] }, commands: [], events: [], permissions: [], storage: {} });
+if (emptyModel.resources.find((resource) => resource.kind === 'Repository')?.yaml !== null) failures.push('empty Krate repository model synthesized plan');
+
+if (failures.length) fail(failures);
+console.log(JSON.stringify({
+  status: 'success',
+  checked: required,
+  contract: 'krate-task-led-controller-ui',
+  resources: model.metrics.resources,
+  endpoints: model.controller.endpoints.length,
+  validations: model.metrics.totalChecks
+}, null, 2));
+
+function fail(failures) {
+  console.error(JSON.stringify({ status: 'failed', failures }, null, 2));
+  process.exit(1);
+}
+
+
+
+
+

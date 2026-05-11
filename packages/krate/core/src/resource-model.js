@@ -1,0 +1,172 @@
+export const CONFIG_KINDS = new Set(['Organization', 'OrgNamespaceBinding', 'User', 'Team', 'Invite', 'IdentityMapping', 'AuthProvider', 'Repository', 'SSHKey', 'RepositoryPermission', 'WebhookSubscription', 'RefPolicy', 'BranchProtection', 'PolicyProfile', 'PolicyTemplate', 'PolicyBinding', 'PolicyExceptionRequest', 'RunnerPool', 'View', 'Selector']);
+export const AGGREGATED_KINDS = new Set(['PullRequest', 'Issue', 'Review', 'Pipeline', 'Job', 'WebhookDelivery']);
+export const ALL_KINDS = new Set([...CONFIG_KINDS, ...AGGREGATED_KINDS]);
+
+export const RESOURCE_DEFINITIONS = Object.freeze({
+  Organization: { storage: 'etcd', context: 'identity', plural: 'organizations', purpose: 'Krate organization identity in the platform namespace with a bound tenant namespace', requiredSpec: ['displayName', 'namespaceName'] },
+  OrgNamespaceBinding: { storage: 'etcd', context: 'identity', plural: 'orgnamespacebindings', purpose: 'Binding from one organization to exactly one tenant namespace for resources and side effects', requiredSpec: ['organizationRef', 'namespace'] },
+  User: { storage: 'etcd', context: 'identity', plural: 'users', purpose: 'Human account profile, sign-in state, admin flag, and linked identities', requiredSpec: ['organizationRef', 'displayName', 'email'] },
+  Team: { storage: 'etcd', context: 'identity', plural: 'teams', purpose: 'Team membership, maintainers, and repository permission grants', requiredSpec: ['organizationRef', 'displayName'] },
+  Invite: { storage: 'etcd', context: 'identity', plural: 'invites', purpose: 'Pending user invitation with requested teams and expiry', requiredSpec: ['organizationRef', 'email', 'role'] },
+  IdentityMapping: { storage: 'etcd', context: 'identity', plural: 'identitymappings', purpose: 'Mapping between Krate users, sign-in subjects, workspace identities, and repository accounts', requiredSpec: ['organizationRef', 'user', 'provider', 'subject'] },
+  AuthProvider: { storage: 'etcd', context: 'identity', plural: 'authproviders', purpose: 'Installation sign-in provider visibility and delegated identity settings', requiredSpec: ['organizationRef', 'type'] },
+  Repository: { storage: 'etcd', context: 'data-plane', plural: 'repositories', purpose: 'Repository identity, visibility, repository hosting integration, object storage, and search settings', requiredSpec: ['organizationRef', 'visibility'] },
+  SSHKey: { storage: 'etcd', context: 'data-plane', plural: 'sshkeys', purpose: 'User, deploy, and automation SSH keys reconciled into repository key APIs', requiredSpec: ['organizationRef', 'scope', 'key'] },
+  RepositoryPermission: { storage: 'etcd', context: 'data-plane', plural: 'repositorypermissions', purpose: 'Repository collaborators and teams synced with repository permissions', requiredSpec: ['organizationRef', 'repository', 'subject', 'permission'] },
+  WebhookSubscription: { storage: 'etcd', context: 'hooks-events', plural: 'webhooksubscriptions', purpose: 'Endpoint, event filters, signing reference, delivery mode, and retry policy', requiredSpec: ['organizationRef', 'url', 'events'] },
+  RefPolicy: { storage: 'etcd', context: 'data-plane', plural: 'refpolicies', purpose: 'Reference deny rules, force-push policy, signing policy, and future custom hook gates', requiredSpec: ['organizationRef'] },
+  BranchProtection: { storage: 'etcd', context: 'control-plane', plural: 'branchprotections', purpose: 'Protected ref rules such as pull-request requirements', requiredSpec: ['organizationRef', 'refs'] },
+  PolicyProfile: { storage: 'etcd', context: 'policy', plural: 'policyprofiles', purpose: 'Organization policy posture, default templates, rollout mode, and exception approval rules', requiredSpec: ['organizationRef', 'displayName', 'mode'] },
+  PolicyTemplate: { storage: 'etcd', context: 'policy', plural: 'policytemplates', purpose: 'Curated Kyverno policy template metadata, parameters, rollout defaults, and remediation guidance', requiredSpec: ['displayName', 'targetKinds', 'kyverno'] },
+  PolicyBinding: { storage: 'etcd', context: 'policy', plural: 'policybindings', purpose: 'Binding from a policy template to org, repository, environment, or resource selectors with audit/enforce rollout state', requiredSpec: ['organizationRef', 'templateRef', 'mode'] },
+  PolicyExceptionRequest: { storage: 'etcd', context: 'policy', plural: 'policyexceptionrequests', purpose: 'Auditable request and approval workflow for temporary Kyverno PolicyException resources', requiredSpec: ['organizationRef', 'policyRef', 'justification', 'expiresAt'] },
+  View: { storage: 'etcd', context: 'web-ui', plural: 'views', purpose: 'Saved triage and dashboard view backed by resource selectors', requiredSpec: ['organizationRef', 'selector'] },
+  Selector: { storage: 'etcd', context: 'web-ui', plural: 'selectors', purpose: 'Reusable label/query selector for workflows and views', requiredSpec: ['organizationRef'] },
+  PullRequest: { storage: 'postgres', context: 'control-plane', plural: 'pullrequests', purpose: 'Review unit with source/target refs, title, checks, and merge lifecycle', requiredSpec: ['organizationRef', 'repository', 'title'] },
+  Issue: { storage: 'postgres', context: 'control-plane', plural: 'issues', purpose: 'Work item with labels, assignment, and lifecycle state', requiredSpec: ['organizationRef', 'title'] },
+  Review: { storage: 'postgres', context: 'control-plane', plural: 'reviews', purpose: 'Approval, comment, or change-request record for a pull request', requiredSpec: ['organizationRef', 'pullRequest'] },
+  Pipeline: { storage: 'postgres', context: 'runners-ci', plural: 'pipelines', purpose: 'CI pipeline run state, trust tier, steps, and resume point', requiredSpec: ['organizationRef', 'repository', 'ref'] },
+  Job: { storage: 'postgres', context: 'runners-ci', plural: 'jobs', purpose: 'Executable CI step with service-account scope and isolation metadata', requiredSpec: ['organizationRef', 'pipeline', 'step'] },
+  RunnerPool: { storage: 'etcd', context: 'runners-ci', plural: 'runnerpools', purpose: 'Runner capacity, warm/max replicas, cache policy, and trust boundary', requiredSpec: ['organizationRef', 'warmReplicas', 'maxReplicas'] },
+  WebhookDelivery: { storage: 'postgres', context: 'hooks-events', plural: 'webhookdeliveries', purpose: 'Durable outbound webhook delivery attempt with signature, phase, response, and replay metadata', requiredSpec: ['organizationRef', 'subscription', 'eventType', 'signature'] }
+});
+
+export function listResourceDefinitions() {
+  return Object.entries(RESOURCE_DEFINITIONS).map(([kind, definition]) => ({ kind, ...clone(definition) }));
+}
+
+export function resourceDefinitionForKind(kind) {
+  const definition = RESOURCE_DEFINITIONS[kind];
+  if (!definition) throw new Error(`Unknown Krate resource kind: ${kind}`);
+  return { kind, ...clone(definition) };
+}
+
+export function resourceSchemaForKind(kind) {
+  const definition = resourceDefinitionForKind(kind);
+  return {
+    apiVersion: 'krate.a5c.ai/v1alpha1',
+    kind: definition.kind,
+    plural: definition.plural,
+    storage: definition.storage,
+    context: definition.context,
+    required: {
+      metadata: ['name'],
+      spec: [...definition.requiredSpec]
+    },
+    status: ['storage', 'phase', 'conditions']
+  };
+}
+
+export function storageClassForKind(kind) {
+  return resourceDefinitionForKind(kind).storage;
+}
+
+export function resourceKey(resource) {
+  const namespace = resource.metadata?.namespace || 'default';
+  const name = resource.metadata?.name;
+  if (!name) throw new Error('resource metadata.name is required');
+  return `${resource.kind}/${namespace}/${name}`;
+}
+
+export function clone(value) {
+  return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+}
+
+export function createResource(kind, metadata, spec = {}, status = {}) {
+  if (!ALL_KINDS.has(kind)) throw new Error(`Unknown Krate resource kind: ${kind}`);
+  if (!metadata?.name) throw new Error(`${kind} requires metadata.name`);
+  return {
+    apiVersion: 'krate.a5c.ai/v1alpha1',
+    kind,
+    metadata: { namespace: metadata.namespace || 'default', labels: {}, annotations: {}, ...metadata },
+    spec: clone(spec),
+    status: clone(status)
+  };
+}
+
+export function validateResource(resource) {
+  if (!resource || typeof resource !== 'object') throw new Error('resource must be an object');
+  const definition = resourceDefinitionForKind(resource.kind);
+  if (!resource.metadata?.name) throw new Error(`${resource.kind} metadata.name is required`);
+  if (!resource.spec || typeof resource.spec !== 'object') resource.spec = {};
+  if (!resource.status || typeof resource.status !== 'object') resource.status = {};
+  resource.metadata.namespace ||= 'default';
+  resource.metadata.labels ||= {};
+  resource.metadata.annotations ||= {};
+  for (const field of definition.requiredSpec) {
+    if (resource.spec[field] === undefined || resource.spec[field] === null || resource.spec[field] === '') {
+      throw new Error(`${resource.kind} spec.${field} is required`);
+    }
+  }
+  return resource;
+}
+
+export function toKubernetesList(kind, items) {
+  return { apiVersion: 'krate.a5c.ai/v1alpha1', kind: `${kind}List`, items: items.map(clone) };
+}
+
+export function matchLabels(resource, selector = {}) {
+  const labels = resource.metadata?.labels || {};
+  return Object.entries(selector).every(([key, value]) => labels[key] === value);
+}
+
+export function createSelector({ name, namespace = 'krate-org-default', organizationRef = 'default', labels = {}, query = '' }) {
+  return createResource('Selector', { name, namespace }, { organizationRef, labels, query });
+}
+
+export function createView({ name, namespace = 'krate-org-default', organizationRef = 'default', selector, columns = [], sort = [] }) {
+  return createResource('View', { name, namespace }, { organizationRef, selector, columns, sort });
+}
+
+export function resourceToYaml(resource) {
+  const lines = [];
+  const scalar = (value) => {
+    if (value === null) return 'null';
+    if (value === undefined) return 'null';
+    if (typeof value === 'string') return value.includes(': ') || value.startsWith('{') || value.startsWith('[') ? JSON.stringify(value) : value;
+    return String(value);
+  };
+  const writeValue = (key, value, indent = 0) => {
+    const pad = ' '.repeat(indent);
+    if (Array.isArray(value)) {
+      lines.push(`${pad}${key}:`);
+      writeArray(value, indent + 2);
+    } else if (value && typeof value === 'object') {
+      lines.push(`${pad}${key}:`);
+      writeObject(value, indent + 2);
+    } else {
+      lines.push(`${pad}${key}: ${scalar(value)}`);
+    }
+  };
+  const writeObject = (value, indent) => {
+    for (const [childKey, childValue] of Object.entries(value)) writeValue(childKey, childValue, indent);
+  };
+  const writeArray = (value, indent) => {
+    const pad = ' '.repeat(indent);
+    for (const item of value) {
+      if (Array.isArray(item)) {
+        lines.push(`${pad}-`);
+        writeArray(item, indent + 2);
+      } else if (item && typeof item === 'object') {
+        const entries = Object.entries(item);
+        if (entries.length === 0) {
+          lines.push(`${pad}- {}`);
+        } else {
+          const [[firstKey, firstValue], ...rest] = entries;
+          if (firstValue && typeof firstValue === 'object') {
+            lines.push(`${pad}- ${firstKey}:`);
+            if (Array.isArray(firstValue)) writeArray(firstValue, indent + 4);
+            else writeObject(firstValue, indent + 4);
+          } else {
+            lines.push(`${pad}- ${firstKey}: ${scalar(firstValue)}`);
+          }
+          for (const [childKey, childValue] of rest) writeValue(childKey, childValue, indent + 2);
+        }
+      } else {
+        lines.push(`${pad}- ${scalar(item)}`);
+      }
+    }
+  };
+  writeObject(resource, 0);
+  return lines.join('\n') + '\n';
+}

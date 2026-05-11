@@ -1,0 +1,41 @@
+import { createKrateApiController } from '../../../../../../core/src/api-controller.js';
+import { createControllerUiModel } from '../../../../../../core/src/controller-ui.js';
+import { orgNamespaceName } from '../../../../../../core/src/kubernetes-controller.js';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(_request, { params }) {
+  const { org } = await params;
+  const controller = createKrateApiController({ namespace: orgNamespaceName(org) });
+  const model = createControllerUiModel(await controller.snapshot(), { organization: org });
+  return Response.json({
+    org,
+    policyEngine: model.policyEngine,
+    profiles: model.policyEngine.profiles,
+    templates: model.policyEngine.templates,
+    bindings: model.policyEngine.bindings,
+    exceptionRequests: model.policyEngine.exceptionRequests
+  }, { headers: { 'Cache-Control': 'no-store' } });
+}
+
+export async function POST(request, { params }) {
+  const { org } = await params;
+  const namespace = orgNamespaceName(org);
+  const controller = createKrateApiController({ namespace });
+  const input = await request.json();
+  const resource = input.kind ? input : {
+    apiVersion: 'krate.a5c.ai/v1alpha1',
+    kind: 'PolicyBinding',
+    metadata: { name: input.name || `${input.templateRef || 'policy'}-${input.mode || 'audit'}`, namespace },
+    spec: {
+      organizationRef: org,
+      templateRef: input.templateRef,
+      profileRef: input.profileRef,
+      mode: input.mode || 'audit',
+      match: input.match || {},
+      parameters: input.parameters || {},
+      suspend: Boolean(input.suspend)
+    }
+  };
+  return Response.json(await controller.applyResource(resource), { status: 201, headers: { 'Cache-Control': 'no-store' } });
+}

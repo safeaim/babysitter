@@ -1,0 +1,33 @@
+import { createKrateApiController } from '../../../../../../core/src/api-controller.js';
+import { createAuthProviderConfig, createSessionCookie, exchangeOAuthCodeForProfile, registerLoginProfile } from '../../../../../../core/src/auth.js';
+
+export const dynamic = 'force-dynamic';
+
+const controller = createKrateApiController();
+const defaultHandler = createOAuthCallbackHandler({ controller });
+
+export function createOAuthCallbackHandler({ controller, fetchImpl = globalThis.fetch } = {}) {
+  if (!controller) throw new Error('OAuth callback handler requires a controller');
+  return async function handleOAuthCallback(request, { params }) {
+    const { provider } = await params;
+    const config = createAuthProviderConfig();
+    const selected = config.providers[provider];
+    if (!selected?.enabled) return Response.json({ error: 'disabled', message: 'Sign-in provider is disabled' }, { status: 400 });
+    const url = new URL(request.url);
+    const code = url.searchParams.get('code');
+    if (!code) return Response.json({ error: 'missing_code', message: 'Authorization code was not supplied' }, { status: 400 });
+    try {
+      const profile = await exchangeOAuthCodeForProfile({ provider: selected, code, requestUrl: request.url, fetchImpl });
+      const registration = await registerLoginProfile({ controller, profile });
+      const response = new Response(null, { status: 302, headers: { Location: '/people', 'Set-Cookie': createSessionCookie(config, profile) } });
+      response.headers.set('X-Krate-User', registration.user.metadata.name);
+      return response;
+    } catch (error) {
+      return Response.json({ error: 'login_failed', message: error.message }, { status: 400 });
+    }
+  };
+}
+
+export async function GET(request, context) {
+  return defaultHandler(request, context);
+}

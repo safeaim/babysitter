@@ -7,6 +7,7 @@ import {
   atlasReadingTime,
 } from "@/components/AtlasDocsScaffold";
 import { MarkdownArticle } from "@/components/MarkdownArticle";
+import { getReusableViewType, renderReusableView } from "@/components/reusable-views/render";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentAtlasView } from "@/lib/server/atlas-view";
@@ -134,6 +135,8 @@ export default async function WikiPage({ params }: { params: Promise<Params> }) 
 
   const article = typeof page.article === "string" ? page.article : "";
   const documented = graph.getOutgoing(page.id).filter((edge) => edge.kind === "documents");
+  const reusableViewType = getReusableViewType(page);
+  const reusableView = renderReusableView(page, graph);
   const pageTitle = String(page.title ?? page.id);
   const pagePath = typeof page.articlePath === "string" ? page.articlePath : page._file;
   const allPages = graph.getPages().filter(isNavigableWikiPage).map(toSummary);
@@ -232,6 +235,7 @@ export default async function WikiPage({ params }: { params: Promise<Params> }) 
           <span>{pagePath}</span>
           <span>{childPages.length ? `Section pages · ${childPages.length}` : `Nearby pages · ${siblingPages.length}`}</span>
           <span>Documents · {documented.length}</span>
+          {reusableViewType ? <span>View · {reusableViewType}</span> : null}
         </>
       }
       marginSections={[
@@ -336,6 +340,11 @@ export default async function WikiPage({ params }: { params: Promise<Params> }) 
         <section className="atlas-docs-full atlas-docs-stack">
           <MarkdownArticle markdown={article} articlePath={pagePath} recordsById={index.records} variant="docs" />
         </section>
+        {reusableView ? (
+          <section className="atlas-docs-full atlas-docs-stack">
+            {reusableView}
+          </section>
+        ) : null}
       </div>
     </AtlasDocsScaffold>
   );

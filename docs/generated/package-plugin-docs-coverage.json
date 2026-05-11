@@ -449,6 +449,16 @@
       "note": "README is the canonical package-level contract."
     },
     {
+      "surface": "packages/krate/core",
+      "packageName": "@a5c-ai/krate",
+      "description": "Kubernetes-native forge runtime with Argo CD GitOps and Gitea-backed Git hosting.",
+      "hasReadme": true,
+      "status": "Public advanced/runtime package",
+      "canonicalHome": "../packages/krate/core/README.md",
+      "supporting": [],
+      "note": "Public npm package for the Krate Kubernetes forge platform."
+    },
+    {
       "surface": "packages/observer-dashboard",
       "packageName": "@a5c-ai/babysitter-observer-dashboard",
       "description": "Real-time observability dashboard for babysitter orchestration runs",

@@ -169,11 +169,20 @@ function loadMarkdownPages(catalogDir: string): { records: Record<string, AtlasR
     const id = typeof data.id === "string" ? data.id : `page:${slug.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "") || "index"}`;
     const title = typeof data.title === "string" ? data.title : fallbackTitle(body, slug);
     const documents = asStringList(data.documents);
+    const {
+      id: _frontmatterId,
+      title: _frontmatterTitle,
+      slug: _frontmatterSlug,
+      articlePath: _frontmatterArticlePath,
+      documents: _frontmatterDocuments,
+      ...pageAttributes
+    } = data;
     records[id] = {
       id,
       _kind: "Page",
       _file: articlePath,
       _cluster: "wiki",
+      ...pageAttributes,
       title,
       displayName: title,
       slug: typeof data.slug === "string" ? data.slug : slug,

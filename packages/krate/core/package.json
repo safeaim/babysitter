@@ -31,13 +31,13 @@
     "rbac",
     "webhooks"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "node": ">=20"
   },
   "dependencies": {},
   "author": "a5c.ai",
-  "homepage": "https://a5c.ai/krate",
+  "homepage": "https://github.com/a5c-ai/babysitter/tree/main/packages/krate/core#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/a5c-ai/babysitter.git",

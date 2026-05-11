@@ -1,0 +1,412 @@
+.tower {
+  --tower-bg: #0b0a0f;
+  --tower-paper: #f0e6d1;
+  --tower-fade: #a89980;
+  --tower-rule: rgba(212, 168, 75, 0.24);
+  --tower-brass: #d4a84b;
+  --tower-ink: #171419;
+  display: grid;
+  min-height: 720px;
+  overflow: hidden;
+  border: 1px solid var(--tower-rule);
+  background:
+    radial-gradient(ellipse 70% 80% at 30% 50%, rgba(43, 42, 107, 0.2), transparent 62%),
+    radial-gradient(ellipse 50% 80% at 88% 50%, rgba(212, 168, 75, 0.1), transparent 70%),
+    var(--tower-bg);
+  color: var(--tower-paper);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 24px 80px rgba(0, 0, 0, 0.24);
+}
+
+.tower::before {
+  content: "";
+  position: absolute;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--tower-rule);
+  background: linear-gradient(180deg, rgba(11, 10, 15, 0.9), rgba(11, 10, 15, 0.62));
+}
+
+.brand {
+  min-width: 0;
+}
+
+.eyebrow,
+.nav,
+.crumbs,
+.footer,
+.drawerEyebrow,
+.drawerId,
+.domainLegend,
+.serviceCode,
+.recordKind,
+.statLabel {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tower-fade);
+  font-size: 10px;
+}
+
+.seal {
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--tower-brass);
+  border-radius: 999px;
+  background: var(--tower-brass);
+  box-shadow: 0 0 8px rgba(212, 168, 75, 0.8);
+}
+
+.title {
+  margin: 4px 0 0;
+  color: var(--tower-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 3vw, 38px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.title em {
+  color: var(--tower-brass);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: rgba(240, 230, 209, 0.72);
+  font-size: 13px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--tower-fade);
+  font-size: 10px;
+}
+
+.nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: var(--tower-brass);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
+  min-height: 0;
+}
+
+.stage {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.stageBar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(212, 168, 75, 0.12);
+}
+
+.crumbs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--tower-fade);
+  font-size: 10px;
+}
+
+.crumbs button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.crumbs button:hover,
+.crumbs button.active {
+  color: var(--tower-brass);
+}
+
+.domainLegend {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  color: var(--tower-fade);
+  font-size: 9px;
+}
+
+.domainLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.swatch {
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+}
+
+.svgWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+  padding: 8px;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  display: block;
+}
+
+.camera {
+  transition: transform 620ms cubic-bezier(0.7, 0.05, 0.25, 1);
+}
+
+.floorGroup,
+.roomGroup {
+  cursor: pointer;
+}
+
+.floorGroup polygon,
+.roomGroup polygon {
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+
+.floorGroup:hover polygon,
+.roomGroup:hover polygon,
+.focused polygon {
+  filter: drop-shadow(0 0 8px rgba(212, 168, 75, 0.35));
+}
+
+.dimmed {
+  opacity: 0.2;
+}
+
+.floorLabel,
+.roomLabel,
+.roomSubLabel {
+  pointer-events: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.floorLabel {
+  fill: rgba(240, 230, 209, 0.82);
+  font-size: 17px;
+}
+
+.roomLabel {
+  fill: #f0e6d1;
+  font-size: 13px;
+}
+
+.roomSubLabel {
+  fill: rgba(240, 230, 209, 0.62);
+  font-size: 9px;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(212, 168, 75, 0.12);
+  color: var(--tower-fade);
+  font-size: 10px;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.statValue {
+  padding-right: 6px;
+  color: var(--tower-brass);
+  font-weight: 700;
+}
+
+.drawer {
+  min-height: 0;
+  overflow: auto;
+  border-left: 1px solid var(--tower-brass);
+  background: var(--tower-paper);
+  color: var(--tower-ink);
+}
+
+.drawerInner {
+  display: grid;
+  gap: 18px;
+  padding: 24px 26px 30px;
+}
+
+.drawerEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(23, 20, 25, 0.56);
+  font-size: 10px;
+}
+
+.drawerName {
+  margin: 0;
+  color: var(--tower-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.drawerId {
+  color: rgba(23, 20, 25, 0.56);
+  font-size: 10px;
+}
+
+.drawerBlurb {
+  margin: 0;
+  color: rgba(23, 20, 25, 0.84);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.roomList,
+.recordList,
+.serviceList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roomCard,
+.recordCard,
+.serviceCard {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(23, 20, 25, 0.14);
+  background: rgba(255, 255, 255, 0.34);
+  padding: 11px 12px;
+}
+
+.roomCard button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.cardTitle,
+.recordCard a {
+  color: var(--tower-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cardTitle:hover,
+.recordCard a:hover {
+  color: #9c3125;
+}
+
+.recordKind,
+.serviceCode {
+  color: rgba(23, 20, 25, 0.56);
+  font-size: 10px;
+}
+
+.cardText,
+.serviceCard p,
+.recordCard p {
+  margin: 0;
+  color: rgba(23, 20, 25, 0.72);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kpis li {
+  border: 1px solid rgba(156, 49, 37, 0.2);
+  background: rgba(156, 49, 37, 0.08);
+  padding: 3px 6px;
+  color: rgba(23, 20, 25, 0.68);
+  font-size: 11px;
+}
+
+.sectionTitle {
+  margin: 0 0 8px;
+  color: var(--tower-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1180px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .drawer {
+    border-left: 0;
+    border-top: 1px solid var(--tower-brass);
+  }
+}
+
+@media (max-width: 820px) {
+  .header,
+  .stageBar,
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .domainLegend {
+    justify-content: flex-start;
+  }
+}

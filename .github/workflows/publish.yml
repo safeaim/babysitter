@@ -42,7 +42,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
@@ -116,7 +116,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
@@ -242,7 +242,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Run live stack contract matrix
@@ -278,7 +278,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
@@ -323,7 +323,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
@@ -393,7 +393,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
@@ -463,7 +463,7 @@ jobs:
       - name: Refresh publish lockfile
         run: |
           set -euo pipefail
-          npm install --package-lock-only --ignore-scripts --workspaces --include-workspace-root
+          npm install --package-lock-only --ignore-scripts --workspaces --include-workspace-root --legacy-peer-deps
 
       - name: Bundle publish workspace
         run: |
@@ -538,7 +538,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
@@ -604,7 +604,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build hooks and agent-mux workspaces
@@ -685,7 +685,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
@@ -738,7 +738,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
@@ -778,7 +778,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux CLI workspace
@@ -831,7 +831,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux root workspace
@@ -885,7 +885,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux TUI workspace
@@ -935,7 +935,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Run docs QA
@@ -1146,7 +1146,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Build cloud workspace
@@ -1230,7 +1230,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --prefer-offline --legacy-peer-deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Publish babysitter metapackage to npm ($NPM_TAG tag)

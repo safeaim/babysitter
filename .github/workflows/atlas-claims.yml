@@ -21,6 +21,8 @@ jobs:
       - name: Stop-hook control claims (vitest)
         run: npx vitest run packages/atlas/tests/claims/stop-hook-control.test.ts --reporter=verbose
         continue-on-error: true
+      - name: Validate library bridge
+        run: node packages/atlas/scripts/validate-library-bridge.mjs --strict
       - name: Run testable claims
         run: node packages/atlas/scripts/run-testable-claims.mjs
       - name: Find untested claims

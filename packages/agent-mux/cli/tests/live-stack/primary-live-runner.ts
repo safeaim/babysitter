@@ -286,7 +286,7 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
 
   const allFailures = [...missingTraceIds.map((id) => `missing trace: ${id}`), ...behaviorFailures];
 
-  await writeVerificationReport(options.artifactsDir, scenario, verifications);
+  await writeVerificationReport(options.artifactsDir, scenario, verifications, options.env);
 
   const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, {
     status: allFailures.length === 0 ? 'passed' : 'failed',
@@ -368,19 +368,20 @@ function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: st
 
 function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
   const traceEvidence = `After completing the task, print on its own line: trace=${traceId} scenario=${scenario.scenarioId}`;
-
-  if (scenario.agent.installMode === 'babysitter-plugin') {
-    // babysitter-plugin: full orchestration through a babysitter process that writes a file.
-    return `/babysitter:call Create a file at .a5c-live-test/${traceId}.txt with content "babysitter-plugin-verified". ${traceEvidence}`;
-  }
+  const odysseyTask = `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek. Save the result to .a5c-live-test/${traceId}-odyssey.md`;
 
   if (scenario.agent.agent === 'babysitter-agent') {
-    // babysitter-agent: single-turn direct API call.
+    // babysitter-agent: single-turn direct API call — can't do multi-turn file ops.
     return `Reply with: trace=${traceId} scenario=${scenario.scenarioId}`;
   }
 
+  if (scenario.agent.installMode === 'babysitter-plugin') {
+    // babysitter-plugin: full orchestration through babysitter.
+    return `/babysitter:call ${odysseyTask}. ${traceEvidence}`;
+  }
+
   // Vanilla: request tool use (file creation) to validate the agent actually executes tools
-  return `Create a file called .a5c-live-test/${traceId}.txt containing "vanilla-verified". Then ${traceEvidence}`;
+  return `${odysseyTask}. ${traceEvidence}`;
 }
 
 function extractTraceIds(output: string): Partial<LiveStackEvidenceBundle> {
@@ -573,220 +574,182 @@ async function validateAgentBehavior(
   traceId: string | undefined,
 ): Promise<VerificationEntry[]> {
   const entries: VerificationEntry[] = [];
+  const isBabysitterAgent = scenario.agent.agent === 'babysitter-agent';
+  const isBabysitterPlugin = scenario.agent.installMode === 'babysitter-plugin';
 
-  // 1. Validate tool execution
-  if (scenario.agent.agent === 'babysitter-agent') {
-    // babysitter-agent: single-turn API call — verify trace echo
-    if (traceId && !output.includes(`trace=${traceId}`)) {
-      entries.push({ name: 'tool-execution', status: 'failed', detail: 'babysitter-agent did not echo trace label' });
+  // --- babysitter-agent: single-turn, only verify trace echo ---
+  if (isBabysitterAgent) {
+    if (traceId && output.includes(`trace=${traceId}`)) {
+      entries.push({ name: 'trace-echo', status: 'passed', detail: 'trace label echoed in output' });
     } else if (traceId) {
-      entries.push({ name: 'tool-execution', status: 'passed', detail: 'trace label echoed in output' });
+      entries.push({ name: 'trace-echo', status: 'failed', detail: 'babysitter-agent did not echo trace label' });
     } else {
-      entries.push({ name: 'tool-execution', status: 'skipped', detail: 'no trace ID available' });
+      entries.push({ name: 'trace-echo', status: 'skipped', detail: 'no trace ID available' });
     }
-  } else if (traceId) {
-    // Check if file was created (proves full tool execution)
-    const expectedFile = path.join(cwd, '.a5c-live-test', `${traceId}.txt`);
-    const expectedContent = scenario.agent.installMode === 'babysitter-plugin'
-      ? 'babysitter-plugin-verified'
-      : 'vanilla-verified';
-    let fileCreated = false;
-    let toolDetail: string | undefined;
-    try {
-      const content = await fs.readFile(expectedFile, 'utf8');
-      if (content.includes(expectedContent)) {
-        fileCreated = true;
-        toolDetail = 'file created with expected content';
-      } else {
-        toolDetail = `file content mismatch: expected "${expectedContent}", got "${content.trim().slice(0, 100)}"`;
-      }
-    } catch {
-      // File not created
-    }
-
-    if (!fileCreated) {
-      // File wasn't created — verify agent at least attempted the operation.
-      const hasToolEvidence = /mkdir|printf|write_file|tool_call|tool_use|\.a5c-live-test|vanilla-verified|babysitter-plugin-verified|creat.*file|unable.*creat|filesystem.*tool|no.*tool/i.test(output);
-      const hasTraceEcho = traceId ? output.includes(`trace=${traceId}`) : false;
-      if (hasToolEvidence) {
-        entries.push({ name: 'tool-execution', status: 'passed', detail: toolDetail ?? 'file not created but tool attempt detected in output' });
-      } else if (hasTraceEcho) {
-        entries.push({ name: 'tool-execution', status: 'passed', detail: 'file not created but trace echoed (cross-model: model responded coherently without native tools)' });
-      } else {
-        entries.push({ name: 'tool-execution', status: 'failed', detail: toolDetail ?? `agent did not create .a5c-live-test/${traceId}.txt and showed no tool awareness in output` });
-      }
-    } else {
-      entries.push({ name: 'tool-execution', status: 'passed', detail: toolDetail });
-    }
-  } else {
-    entries.push({ name: 'tool-execution', status: 'skipped', detail: 'no trace ID available' });
+    return entries;
   }
 
-  // 2. Verify trace labels are in output (proves model responded coherently)
-  if (traceId && output.includes(`trace=${traceId}`)) {
-    entries.push({ name: 'trace-echo', status: 'passed', detail: 'trace label found in output' });
-  } else if (traceId) {
-    if (output.trim().length === 0) {
-      entries.push({ name: 'trace-echo', status: 'failed', detail: 'no output from agent (empty response)' });
+  // --- file-creation: verify the odyssey output file exists with real content (>500 bytes) ---
+  if (traceId) {
+    const expectedFile = path.join(cwd, '.a5c-live-test', `${traceId}-odyssey.md`);
+    let fileSize = 0;
+    let fileExists = false;
+    try {
+      const stat = await fs.stat(expectedFile);
+      fileSize = stat.size;
+      fileExists = true;
+    } catch {
+      // file not created
+    }
+    if (fileExists && fileSize > 500) {
+      entries.push({ name: 'file-creation', status: 'passed', detail: `odyssey file created (${fileSize} bytes)` });
+    } else if (fileExists) {
+      entries.push({ name: 'file-creation', status: 'failed', detail: `odyssey file exists but too small (${fileSize} bytes — expected >500)` });
     } else {
-      // Some agents don't echo trace labels when sandbox blocks execution — pass if there is output
+      entries.push({ name: 'file-creation', status: 'failed', detail: `agent did not create .a5c-live-test/${traceId}-odyssey.md` });
+    }
+
+    // trace-echo: pass if trace label found in output, or accept if the file was created
+    if (output.includes(`trace=${traceId}`)) {
+      entries.push({ name: 'trace-echo', status: 'passed', detail: 'trace label found in output' });
+    } else if (fileExists) {
+      entries.push({ name: 'trace-echo', status: 'passed', detail: 'trace label not echoed but odyssey file was created (agent executed task)' });
+    } else if (output.trim().length > 0) {
       entries.push({ name: 'trace-echo', status: 'passed', detail: 'trace label not echoed but agent produced output' });
+    } else {
+      entries.push({ name: 'trace-echo', status: 'failed', detail: 'no output from agent (empty response)' });
     }
   } else {
+    entries.push({ name: 'file-creation', status: 'skipped', detail: 'no trace ID available' });
     entries.push({ name: 'trace-echo', status: 'skipped', detail: 'no trace ID available' });
   }
 
-  // 3. Verify token usage is reported (proves transport round-trip completed)
-  const hasUsageEvidence = /tokens?\s*(used|usage)|prompt_tokens|completion_tokens|input_tokens|output_tokens/i.test(output);
-  if (hasUsageEvidence) {
-    entries.push({ name: 'token-usage', status: 'passed', detail: 'transport reported token consumption' });
-  } else if (scenario.agent.integrationType === 'runtime-cli') {
-    entries.push({ name: 'token-usage', status: 'skipped', detail: 'runtime-cli does not report token usage inline' });
-  } else {
-    const hasAnyResponse = output.trim().length > 0;
-    if (!hasAnyResponse) {
-      entries.push({ name: 'token-usage', status: 'failed', detail: 'no response from agent (transport may not have completed)' });
-    } else {
-      entries.push({ name: 'token-usage', status: 'passed', detail: 'agent responded but did not report token counts explicitly' });
-    }
-  }
-
-  // 4. For babysitter-plugin in structured-run mode: verify stop hooks fired
-  const isStructuredRun = process.env['LIVE_STACK_USE_AMUX_RUN'] === 'true';
-  if (scenario.agent.installMode === 'babysitter-plugin' && isStructuredRun) {
-    const hasStopHookEvidence = /hook:run.*stop|stop.*hook|AGENT_SESSION_ID|session_end/i.test(output);
-    if (hasStopHookEvidence) {
-      entries.push({ name: 'stop-hooks', status: 'passed', detail: 'stop hook evidence found in output' });
-    } else {
-      entries.push({ name: 'stop-hooks', status: 'failed', detail: 'no stop hook evidence in output (hooks may not be configured or firing)' });
-    }
-
-    // Check .a5c/runs/ for orchestration artifacts
-    const runsDir = path.join(cwd, '.a5c', 'runs');
-    try {
-      const runEntries = await fs.readdir(runsDir);
-      if (runEntries.length === 0) {
-        entries.push({ name: 'run-completion', status: 'failed', detail: 'no runs created in .a5c/runs/ (orchestration did not execute)' });
-      }
-    } catch {
-      // .a5c/runs/ not existing is acceptable for single-turn plugin invocations
-    }
-
-    // Check hooks-mux session logs for evidence the hook infrastructure ran
+  // --- babysitter-plugin: stop hooks, hooks-mux session, run completion, completion proof ---
+  if (isBabysitterPlugin) {
+    // stop-hooks: check for hooks-mux log files
     const hooksLogDir = path.join(cwd, '.a5c', 'logs', 'hooks');
-    let hooksInfraFound = false;
+    let hooksLogsFound = false;
     try {
       const logEntries = await fs.readdir(hooksLogDir);
-      if (logEntries.length > 0) {
-        hooksInfraFound = true;
-      }
+      if (logEntries.length > 0) hooksLogsFound = true;
     } catch {
-      // Hooks log dir not existing — check XDG state dir too
+      // Check XDG state dir as fallback
       const xdgHooksDir = path.join(
         process.env['XDG_STATE_HOME'] ?? path.join(process.env['HOME'] ?? '/tmp', '.local', 'state'),
         'a5c-hooks', 'logs',
       );
       try {
         const xdgEntries = await fs.readdir(xdgHooksDir);
-        if (xdgEntries.length > 0) {
-          hooksInfraFound = true;
-        }
+        if (xdgEntries.length > 0) hooksLogsFound = true;
       } catch {
-        // Neither location has logs — hooks might write elsewhere
+        // Neither location has logs
       }
     }
-    if (hooksInfraFound) {
-      entries.push({ name: 'hooks-infrastructure', status: 'passed', detail: 'hooks-mux logs exist' });
+    if (hooksLogsFound) {
+      entries.push({ name: 'stop-hooks', status: 'passed', detail: 'hooks-mux log files found' });
     } else {
-      entries.push({ name: 'hooks-infrastructure', status: 'failed', detail: 'no hooks-mux logs found (hook infrastructure did not execute)' });
+      entries.push({ name: 'stop-hooks', status: 'failed', detail: 'no hooks-mux log files found in .a5c/logs/hooks/ or XDG state dir' });
     }
-  } else {
-    entries.push({ name: 'stop-hooks', status: 'skipped', detail: 'only checked in babysitter-plugin structured-run mode' });
-    entries.push({ name: 'hooks-infrastructure', status: 'skipped', detail: 'only checked in babysitter-plugin structured-run mode' });
-  }
 
-  // 5. For babysitter-plugin and babysitter-agent: verify run completed
-  if (scenario.agent.installMode === 'babysitter-plugin' || scenario.agent.agent === 'babysitter-agent') {
-    const runCompletion = await verifyBabysitterRunCompletion(cwd, output);
-    if (runCompletion) {
-      entries.push({ name: 'run-completion', status: 'failed', detail: runCompletion });
+    // hooks-mux-session: check output for AGENT_SESSION_ID or hooks-mux evidence
+    const hasHooksMuxEvidence = /AGENT_SESSION_ID|hooks-mux|hookMuxEventId|hook.*session/i.test(output);
+    if (hasHooksMuxEvidence) {
+      entries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'hooks-mux session evidence found in output' });
+    } else if (hooksLogsFound) {
+      entries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'hooks-mux logs exist (session ran even if not in output)' });
     } else {
-      entries.push({ name: 'run-completion', status: 'passed', detail: 'babysitter run reached completed state' });
-    }
-  } else {
-    // Only add if not already added by the structured-run block above
-    if (!entries.some((e) => e.name === 'run-completion')) {
-      entries.push({ name: 'run-completion', status: 'skipped', detail: 'not a babysitter-plugin or babysitter-agent scenario' });
-    }
-  }
-
-  return entries;
-}
-
-async function verifyBabysitterRunCompletion(cwd: string, output: string): Promise<string | undefined> {
-  // Check output for run completion evidence
-  const hasRunComplete = /completed|RUN_COMPLETED|exitReason.*completed|status.*completed/i.test(output);
-  const hasRunFailed = /RUN_FAILED|ProcessDefinitionFailed|aborted/i.test(output);
-
-  if (hasRunFailed) {
-    return 'babysitter run failed (RUN_FAILED or abort detected in output)';
-  }
-
-  // Check .a5c/runs/ for a completed run state
-  const runsDir = path.join(cwd, '.a5c', 'runs');
-  try {
-    const entries = await fs.readdir(runsDir);
-    if (entries.length === 0) {
-      // No runs dir — check if the output itself shows completion
-      if (!hasRunComplete) {
-        return 'no babysitter run created and no completion evidence in output';
-      }
-      return undefined;
+      entries.push({ name: 'hooks-mux-session', status: 'failed', detail: 'no AGENT_SESSION_ID or hooks-mux evidence in output' });
     }
 
-    // Find the most recent run and check its state
-    for (const entry of entries.slice(-3)) {
-      const stateFile = path.join(runsDir, entry, 'state.json');
-      try {
-        const stateRaw = await fs.readFile(stateFile, 'utf8');
-        const state = JSON.parse(stateRaw) as Record<string, unknown>;
-        if (state['status'] === 'completed' || state['phase'] === 'completed') {
-          return undefined; // Run completed successfully
-        }
-        if (state['status'] === 'failed' || state['phase'] === 'failed') {
-          return `babysitter run ${entry} ended with status: ${String(state['status'] ?? state['phase'])}`;
-        }
-      } catch {
-        // No state.json — try journal
-        const journalFile = path.join(runsDir, entry, 'journal.jsonl');
+    // babysitter-run-completion: check .a5c/runs/ for completed state or RUN_COMPLETED journal entry
+    const runsDir = path.join(cwd, '.a5c', 'runs');
+    let runCompleted = false;
+    let runCompletionDetail = 'no .a5c/runs/ directory found';
+    try {
+      const runEntries = await fs.readdir(runsDir);
+      for (const entry of runEntries.slice(-5)) {
+        const stateFile = path.join(runsDir, entry, 'state.json');
         try {
-          const journal = await fs.readFile(journalFile, 'utf8');
-          if (/RUN_COMPLETED/i.test(journal)) {
-            return undefined; // Completed
+          const stateRaw = await fs.readFile(stateFile, 'utf8');
+          const state = JSON.parse(stateRaw) as Record<string, unknown>;
+          if (state['status'] === 'completed' || state['phase'] === 'completed') {
+            runCompleted = true;
+            runCompletionDetail = `run ${entry} state.json shows completed`;
+            break;
           }
-          if (/RUN_FAILED/i.test(journal)) {
-            return `babysitter run ${entry} journal shows RUN_FAILED`;
+        } catch {
+          // try journal
+          const journalFile = path.join(runsDir, entry, 'journal.jsonl');
+          try {
+            const journal = await fs.readFile(journalFile, 'utf8');
+            if (/RUN_COMPLETED/i.test(journal)) {
+              runCompleted = true;
+              runCompletionDetail = `run ${entry} journal.jsonl contains RUN_COMPLETED`;
+              break;
+            }
+          } catch {
+            continue;
+          }
+        }
+      }
+      if (!runCompleted && runEntries.length === 0) {
+        runCompletionDetail = 'no runs created in .a5c/runs/';
+      } else if (!runCompleted) {
+        // Check output as fallback
+        if (/completed|RUN_COMPLETED/i.test(output)) {
+          runCompleted = true;
+          runCompletionDetail = 'run completion evidence found in output';
+        } else {
+          runCompletionDetail = `runs exist (${runEntries.length}) but none show completed state`;
+        }
+      }
+    } catch {
+      // No .a5c/runs/ — check output
+      if (/completed|RUN_COMPLETED/i.test(output)) {
+        runCompleted = true;
+        runCompletionDetail = 'run completion evidence found in output (no .a5c/runs/ directory)';
+      }
+    }
+    entries.push({
+      name: 'babysitter-run-completion',
+      status: runCompleted ? 'passed' : 'failed',
+      detail: runCompletionDetail,
+    });
+
+    // babysitter-completion-proof: check .a5c/runs/*/state.json for completionProof field
+    let completionProofFound = false;
+    let completionProofDetail = 'no completionProof field found in any run state.json';
+    try {
+      const runEntries = await fs.readdir(runsDir);
+      for (const entry of runEntries.slice(-5)) {
+        const stateFile = path.join(runsDir, entry, 'state.json');
+        try {
+          const stateRaw = await fs.readFile(stateFile, 'utf8');
+          const state = JSON.parse(stateRaw) as Record<string, unknown>;
+          if (state['completionProof'] !== undefined && state['completionProof'] !== null) {
+            completionProofFound = true;
+            completionProofDetail = `run ${entry} state.json contains completionProof`;
+            break;
           }
         } catch {
           continue;
         }
       }
+    } catch {
+      completionProofDetail = 'no .a5c/runs/ directory found';
     }
-
-    // Runs exist but none show clear completion — check output
-    if (hasRunComplete) {
-      return undefined;
-    }
-    return undefined; // Runs exist, no explicit failure — allow
-  } catch {
-    // No .a5c/runs/ directory — check output for completion evidence
-    if (hasRunComplete) {
-      return undefined;
-    }
-    // For non-interactive babysitter-plugin, run may not be created
-    return undefined;
+    entries.push({
+      name: 'babysitter-completion-proof',
+      status: completionProofFound ? 'passed' : 'failed',
+      detail: completionProofDetail,
+    });
   }
+
+  // vanilla scenarios: file-creation and trace-echo are already added above — no extra entries
+
+  return entries;
 }
+
 
 function classifySkippableLiveProviderFailure(result: CommandResult): string | undefined {
   const combined = `${result.stdout}\n${result.stderr}`;
@@ -815,6 +778,7 @@ async function writeVerificationReport(
   artifactsDir: string,
   scenario: LiveStackScenario,
   verifications: readonly VerificationEntry[],
+  env: Record<string, string | undefined>,
 ): Promise<void> {
   const statusIcon = (status: VerificationEntry['status']): string => {
     switch (status) {
@@ -838,8 +802,9 @@ async function writeVerificationReport(
   const report = lines.join('\n');
   await fs.writeFile(path.join(artifactsDir, 'verification-report.md'), report);
 
-  // Write to GitHub Actions step summary so it's visible in the Actions UI
-  const summaryPath = process.env['GITHUB_STEP_SUMMARY'];
+  // Write to GitHub Actions step summary so it's visible in the Actions UI.
+  // Prefer the env passed from the pipeline options, fall back to process.env.
+  const summaryPath = env['GITHUB_STEP_SUMMARY'] ?? process.env['GITHUB_STEP_SUMMARY'];
   if (summaryPath) {
     await fs.appendFile(summaryPath, report + '\n\n');
   }

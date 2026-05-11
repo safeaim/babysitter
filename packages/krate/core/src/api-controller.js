@@ -1,4 +1,5 @@
 import { createKubernetesResourceGateway } from './kubernetes-resource-gateway.js';
+import { createPermissionReviewer } from './agent-permission-review.js';
 
 export const KRATE_API_CONTROLLER_BOUNDARY = {
   role: 'krate-api-controller',
@@ -56,6 +57,14 @@ export function createKrateApiController(options = {}) {
     },
     watchResource(resourcePath, handlers = {}) {
       return resourceGateway.watch(resourcePath, handlers);
+    },
+    async reviewAgentPermissions(input) {
+      const reviewer = createPermissionReviewer();
+      const snapshot = await this.snapshot();
+      return reviewer.reviewPermissions({
+        ...input,
+        resources: snapshot.resources
+      });
     }
   };
 }

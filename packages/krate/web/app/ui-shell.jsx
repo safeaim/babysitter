@@ -3,6 +3,7 @@ import { createAuthProviderConfig, listEnabledAuthProviders, parseSessionCookie 
 import { fetchControllerUiModel } from '../../core/src/controller-client.js';
 import { CodeEditor, LiveWatchPanel } from './components/code-editor.jsx';
 import { DeploymentManager, RepositoryManager, ResourceApplyPanel, UserManagementPanel } from './components/resource-actions.jsx';
+import { ApprovalDecisionButtons } from './components/approval-actions.jsx';
 
 export const orgNavigationGroups = [
   {
@@ -436,10 +437,7 @@ export async function AgentApprovalsPage({ org = null } = {}) {
             {requestedAt ? <><dt>Requested</dt><dd><time dateTime={requestedAt}>{relativeTime(requestedAt)}</time></dd></> : null}
             <dt>Description</dt><dd>{description}</dd>
           </dl>
-          <div className="heroActions" style={{ justifyContent: 'flex-start', gap: '0.5rem', marginTop: '0.75rem' }}>
-            <button type="button" title="Approval actions coming in Slice 7" style={{ background: 'var(--color-good, #22863a)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'not-allowed', opacity: 0.85, fontWeight: 600 }} disabled>Approve</button>
-            <button type="button" title="Approval actions coming in Slice 7" style={{ background: 'var(--color-danger, #cb2431)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'not-allowed', opacity: 0.85, fontWeight: 600 }} disabled>Deny</button>
-          </div>
+          <ApprovalDecisionButtons org={activeOrg} approvalName={name} />
         </div>;
       })}</div> : <EmptyState title="No pending approvals" text="All agent approval requests have been resolved. When an agent needs human authorization, pending items appear here." />}
     </div>

@@ -29,7 +29,8 @@ const controllerEndpoints = [
   { method: 'GET', path: '/api/orgs/:org/agents/adapters', purpose: 'list agent adapters and transport bindings' },
   { method: 'GET', path: '/api/orgs/:org/agents/providers', purpose: 'list model provider configurations' },
   { method: 'GET', path: '/api/orgs/:org/agents/projects', purpose: 'list agent projects with board config' },
-  { method: 'POST', path: '/api/orgs/:org/agents/dispatch', purpose: 'create manual agent dispatch run' }
+  { method: 'POST', path: '/api/orgs/:org/agents/dispatch', purpose: 'create manual agent dispatch run' },
+  { method: 'POST', path: '/api/orgs/:org/agents/approvals/:name/decide', purpose: 'approve or deny a pending agent approval request' }
 ];
 
 const runtimeComponents = [

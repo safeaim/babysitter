@@ -87,6 +87,18 @@ export function createKrateHttpHandler({ runtime = createKrateRuntime(), control
         ensureRuntimeOrg(runtime, mergeMatch[1]);
         return send(response, 200, runtime.mergePullRequest({ ...(await readJson(request)), pullRequest: mergeMatch[2] }));
       }
+      const agentApprovalDecideMatch = url.pathname.match(/^\/api\/orgs\/([^/]+)\/agents\/approvals\/([^/]+)\/decide$/);
+      if (request.method === 'POST' && agentApprovalDecideMatch) {
+        const org = agentApprovalDecideMatch[1];
+        const approvalName = agentApprovalDecideMatch[2];
+        const body = await readJson(request);
+        const scopedController = createKrateApiController({ namespace: orgNamespaceName(org) });
+        const input = { approvalName, decidedBy: body.decidedBy || 'unknown', reason: body.reason || '' };
+        const result = body.decision === 'approve'
+          ? await scopedController.approveAgentAction(input)
+          : await scopedController.denyAgentAction(input);
+        return send(response, result.error ? 400 : 200, result);
+      }
       return send(response, 404, { error: 'not_found', method: request.method, path: url.pathname });
     } catch (error) {
       return send(response, 400, { error: 'bad_request', message: error.message });

@@ -26,3 +26,4 @@ export * from './agent-stack-controller.js';
 export * from './agent-context-bundles.js';
 export * from './agent-mux-client.js';
 export * from './agent-dispatch-controller.js';
+export * from './agent-approval-controller.js';

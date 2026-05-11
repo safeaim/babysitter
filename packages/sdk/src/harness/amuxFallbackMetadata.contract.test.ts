@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { listFallbackHarnessMetadata, getHostSignalMap } from "@a5c-ai/agent-catalog";
-import { resolveRunsDir } from "../config";
 import { STATIC_FALLBACK_METADATA } from "./amuxFallbackMetadata";
 
 describe("sdk fallback metadata contract", () => {

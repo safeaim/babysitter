@@ -264,6 +264,73 @@ const laWithRole = new Set(edges.filter(e => e.kind === 'lib_involves_role' && e
 const laRoleCoverage = pct(laWithRole.size, libAgents.length);
 
 // ═══════════════════════════════════════════
+// SECTION 12: Domain Taxonomy & Structure
+// ═══════════════════════════════════════════
+
+const specializations = byKind('Specialization');
+const specsWithSkillArea = new Set(edges.filter(e => e.kind === 'applies_to' && e.to.startsWith('specialization:')).map(e => e.to));
+const specSkillCoverage = pct(specsWithSkillArea.size, specializations.length);
+
+const methodologies = byKind('Methodology');
+const methsReferenced = new Set(edges.filter(e => e.kind === 'follows_methodology').map(e => e.to));
+const methRefCoverage = pct(methsReferenced.size, methodologies.length);
+
+const languages = byKind('Language');
+const langsWithRef = new Set(edges.filter(e => e.kind === 'belongs_to_language').map(e => e.to));
+const langRefCoverage = pct(langsWithRef.size, languages.length);
+
+const platformServices = byKind('PlatformService');
+const platforms = byKind('Platform');
+
+// ═══════════════════════════════════════════
+// SECTION 13: Graph Health & Hygiene
+// ═══════════════════════════════════════════
+
+// Cross-cluster connectivity
+const clusterOf = (id) => index.records[id]?._cluster || 'unknown';
+let crossCluster = 0, sameCluster = 0;
+for (const e of edges) {
+  const fc = clusterOf(e.from), tc = clusterOf(e.to);
+  if (fc !== 'unknown' && tc !== 'unknown') {
+    if (fc === tc) sameCluster++; else crossCluster++;
+  }
+}
+const crossClusterRatio = pct(crossCluster, sameCluster + crossCluster);
+
+// Edge reciprocity
+const activeKindsList = Object.entries(index.edgeKinds).filter(([, v]) => v.count > 0);
+let withInverse = 0;
+for (const [, info] of activeKindsList) {
+  const inv = info.inverse;
+  if (inv && index.edgeKinds[inv] && index.edgeKinds[inv].count > 0) withInverse++;
+}
+const edgeReciprocity = pct(withInverse, activeKindsList.length);
+
+// Source pinning for products
+const withSourceEdge = new Set(edges.filter(e => e.kind === 'sourced_from' || e.kind === 'source_of' || e.kind === 'packageRef').flatMap(e => [e.from, e.to]));
+const productsWithSource = agentProducts.filter(p => withSourceEdge.has(p.id) || p.packageRef || p.homepageUrl);
+const productSourceCoverage = pct(productsWithSource.length, agentProducts.length);
+
+// Description quality (short descriptions < 20 chars among domain entities)
+const shortDescs = domainRecords.filter(r => r.description && String(r.description).trim().length > 0 && String(r.description).trim().length < 20);
+const descQualityScore = pct(domainRecords.length - shortDescs.length, domainRecords.length);
+
+// Duplicate displayName detection (cross-kind)
+const nameMap = {};
+for (const r of records) {
+  const name = r.displayName;
+  if (!name) continue;
+  const key = name.toLowerCase().trim();
+  if (!nameMap[key]) nameMap[key] = [];
+  nameMap[key].push({ id: r.id, kind: r._kind });
+}
+const crossKindDupes = Object.entries(nameMap).filter(([, v]) => v.length > 1 && new Set(v.map(x => x.kind)).size > 1);
+
+// ToolServer categorization
+const tsWithCategory = tsList.filter(t => t.category);
+const tsCategoryCoverage = pct(tsWithCategory.length, tsList.length);
+
+// ═══════════════════════════════════════════
 // Overall Score (reweighted with new metrics)
 // ═══════════════════════════════════════════
 
@@ -313,10 +380,20 @@ const overall = (
   parseFloat(benchResultCoverage) * 0.02 +
   parseFloat(kfRealizeCoverage) * 0.02 +
   parseFloat(memUsedCoverage) * 0.02 +
-  // Library bridge (6%)
+  // Library bridge (4%)
   parseFloat(lpSkillCoverage) * 0.02 +
-  parseFloat(lsSkillCoverage) * 0.02 +
-  parseFloat(laRoleCoverage) * 0.02
+  parseFloat(lsSkillCoverage) * 0.01 +
+  parseFloat(laRoleCoverage) * 0.01 +
+  // Taxonomy & structure (5%)
+  parseFloat(specSkillCoverage) * 0.02 +
+  parseFloat(methRefCoverage) * 0.01 +
+  parseFloat(langRefCoverage) * 0.02 +
+  // Graph health (5%)
+  parseFloat(crossClusterRatio) * 0.01 +
+  parseFloat(edgeReciprocity) * 0.01 +
+  parseFloat(productSourceCoverage) * 0.01 +
+  parseFloat(descQualityScore) * 0.01 +
+  parseFloat(tsCategoryCoverage) * 0.01
 ).toFixed(1);
 
 // ═══════════════════════════════════════════
@@ -426,6 +503,25 @@ console.log(line('Skill→skill-area:', lsSkillCoverage + '%'));
 console.log(line('Lib agents:', libAgents.length));
 console.log(line('Agent→role:', laRoleCoverage + '%'));
 
+console.log(header('DOMAIN TAXONOMY'));
+console.log(line('Specializations:', specializations.length));
+console.log(line('Spec→skill coverage:', specSkillCoverage + '%'));
+console.log(line('Methodologies:', methodologies.length));
+console.log(line('Meth referenced:', methRefCoverage + '%'));
+console.log(line('Languages:', languages.length));
+console.log(line('Lang referenced:', langRefCoverage + '%'));
+console.log(line('Platforms:', platforms.length));
+console.log(line('Platform services:', platformServices.length));
+
+console.log(header('GRAPH HEALTH'));
+console.log(line('Cross-cluster ratio:', crossClusterRatio + '%'));
+console.log(line('Edge reciprocity:', edgeReciprocity + '%'));
+console.log(line('Product source refs:', productSourceCoverage + '%'));
+console.log(line('Desc quality (>20ch):', descQualityScore + '%'));
+console.log(line('ToolServer categories:', tsCategoryCoverage + '%'));
+console.log(line('Cross-kind dupes:', crossKindDupes.length));
+console.log(line('Orphans:', orphans.length));
+
 console.log(`╠${'═'.repeat(W - 2)}╣`);
 console.log(`║ OVERALL SCORE:        ${pad(overall + '/100', 8)}                  ║`);
 console.log(`╚${'═'.repeat(W - 2)}╝`);
@@ -501,6 +597,34 @@ if (verbose) {
     console.log(`\nHook surfaces without mapping or exposure (${hookNoMapping.length}):`);
     for (const h of hookNoMapping.slice(0, 10)) console.log(`  ${h.id}`);
     if (hookNoMapping.length > 10) console.log(`  ... and ${hookNoMapping.length - 10} more`);
+  }
+
+  const langsNoRef = languages.filter(l => !langsWithRef.has(l.id));
+  if (langsNoRef.length > 0) {
+    console.log(`\nLanguages not referenced by any framework/library (${langsNoRef.length}):`);
+    for (const l of langsNoRef) console.log(`  ${l.id}`);
+  }
+
+  const specsNoSkill = specializations.filter(s => !specsWithSkillArea.has(s.id));
+  if (specsNoSkill.length > 0) {
+    console.log(`\nSpecializations without skill-area coverage (${specsNoSkill.length}):`);
+    for (const s of specsNoSkill.slice(0, 15)) console.log(`  ${s.id}`);
+    if (specsNoSkill.length > 15) console.log(`  ... and ${specsNoSkill.length - 15} more`);
+  }
+
+  if (crossKindDupes.length > 0) {
+    console.log(`\nCross-kind duplicate displayNames (${crossKindDupes.length}):`);
+    for (const [name, entries] of crossKindDupes.slice(0, 10)) {
+      console.log(`  "${name}": ${entries.map(e => e.kind + ':' + e.id).join(', ')}`);
+    }
+    if (crossKindDupes.length > 10) console.log(`  ... and ${crossKindDupes.length - 10} more`);
+  }
+
+  const tsNoCategory = tsList.filter(t => !t.category);
+  if (tsNoCategory.length > 0) {
+    console.log(`\nToolServers without category (${tsNoCategory.length}):`);
+    for (const t of tsNoCategory.slice(0, 10)) console.log(`  ${t.id}`);
+    if (tsNoCategory.length > 10) console.log(`  ... and ${tsNoCategory.length - 10} more`);
   }
 
   console.log(`\nOrphans by kind (${orphans.length} total):`);

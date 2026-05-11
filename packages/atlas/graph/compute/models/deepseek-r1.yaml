@@ -32,6 +32,7 @@ edges:
   version_of:
   - model-family:deepseek
   served_by:
+  - provider:deepseek
   - provider:together-ai
   - provider:fireworks-ai
   - provider:hyperbolic

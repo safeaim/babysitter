@@ -13,3 +13,5 @@ edges:
       attributes:
         coverage: full
         weight: 0.4
+  applies_to:
+    - target: domain:web-development

@@ -36,6 +36,8 @@ attributes:
 edges:
   covers:
     - target: skill-area:safety-redteaming
+  applies_to:
+    - target: domain:security
 ---
 nodeKind: Benchmark
 id: benchmark:advbench
@@ -52,3 +54,5 @@ attributes:
 edges:
   covers:
     - target: skill-area:safety-redteaming
+  applies_to:
+    - target: domain:security

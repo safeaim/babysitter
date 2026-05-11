@@ -11,7 +11,9 @@ attributes:
     covering embodied tasks, web, tool use, and games. Reports
     fine-grained progress and sub-goal metrics rather than only success
     rate.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:ml-ai
 ---
 nodeKind: Benchmark
 id: benchmark:lmsys-arena
@@ -27,3 +29,5 @@ attributes:
 edges:
   covers:
     - target: skill-area:general-knowledge-reasoning
+  applies_to:
+    - target: domain:ml-ai

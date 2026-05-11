@@ -17,3 +17,6 @@ edges:
       attributes:
         coverage: partial
         weight: 0.3
+  applies_to:
+    - target: domain:retail
+    - target: domain:customer-experience

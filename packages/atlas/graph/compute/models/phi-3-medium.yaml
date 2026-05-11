@@ -33,6 +33,7 @@ edges:
   version_of:
   - model-family:phi-3
   served_by:
+  - provider:azure-foundry
   - provider:together-ai
   speaks:
   - model-transport:openai-compat

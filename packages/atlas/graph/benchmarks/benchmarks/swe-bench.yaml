@@ -13,3 +13,5 @@ edges:
       attributes:
         coverage: full
         weight: 0.05
+  applies_to:
+    - target: domain:software-engineering

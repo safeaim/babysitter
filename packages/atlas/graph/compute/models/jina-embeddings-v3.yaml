@@ -30,3 +30,5 @@ edges:
     - target: layer:1-model
   version_of:
     - model-family:jina-embeddings-v3
+  served_by:
+    - provider:jina-ai

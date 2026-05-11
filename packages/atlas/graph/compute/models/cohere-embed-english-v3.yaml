@@ -30,3 +30,5 @@ edges:
     - target: layer:1-model
   version_of:
     - model-family:cohere-embed-english-v3
+  served_by:
+    - provider:cohere

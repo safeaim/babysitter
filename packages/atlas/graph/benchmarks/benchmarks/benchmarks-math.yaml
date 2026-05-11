@@ -57,3 +57,5 @@ attributes:
 edges:
   covers:
     - target: skill-area:mathematical-reasoning
+  applies_to:
+    - target: domain:mathematics

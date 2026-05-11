@@ -19,6 +19,9 @@ edges:
       attributes:
         coverage: partial
         weight: 0.2
+  applies_to:
+    - target: domain:computer-science
+    - target: domain:mathematics
 ---
 nodeKind: Benchmark
 id: benchmark:frontier-math
@@ -41,6 +44,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.3
+  applies_to:
+    - target: domain:mathematics
 ---
 nodeKind: Benchmark
 id: benchmark:bbh
@@ -58,6 +63,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.4
+  applies_to:
+    - target: domain:computer-science
 ---
 nodeKind: Benchmark
 id: benchmark:arc-agi-3
@@ -81,6 +88,9 @@ edges:
       attributes:
         coverage: tangential
         weight: 0.2
+  applies_to:
+    - target: domain:computer-science
+    - target: domain:ml-ai
 ---
 nodeKind: Benchmark
 id: benchmark:hellaswag
@@ -109,6 +119,8 @@ attributes:
 edges:
   covers:
     - target: skill-area:general-knowledge-reasoning
+  applies_to:
+    - target: domain:computer-science
 ---
 nodeKind: Benchmark
 id: benchmark:legal-bench
@@ -124,6 +136,9 @@ attributes:
 edges:
   covers:
     - target: skill-area:closed-book-frontier-reasoning
+  applies_to:
+    - target: domain:legal
+    - target: domain:legaltech
 ---
 nodeKind: Benchmark
 id: benchmark:medqa
@@ -139,3 +154,5 @@ attributes:
 edges:
   covers:
     - target: skill-area:medical-agent
+  applies_to:
+    - target: domain:healthcare

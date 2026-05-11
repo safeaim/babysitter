@@ -33,6 +33,7 @@ edges:
     - model:mistral-large-2@current
     - model:mistral-medium-3@current
     - model:codestral-25-01@current
+    - model:codestral-22b@current
   emits_message_type:
     - protocol-message:mistral-system-message
     - protocol-message:mistral-user-message

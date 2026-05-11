@@ -14,3 +14,6 @@ attributes:
 edges:
   covers:
     - target: skill-area:general-knowledge-reasoning
+  applies_to:
+    - target: domain:finance
+    - target: domain:fintech

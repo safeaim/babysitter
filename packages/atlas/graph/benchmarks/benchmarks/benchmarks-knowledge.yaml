@@ -49,6 +49,8 @@ attributes:
 edges:
   covers:
     - target: skill-area:general-knowledge-reasoning
+  applies_to:
+    - target: domain:humanities
 ---
 nodeKind: Benchmark
 id: benchmark:gpqa
@@ -100,6 +102,9 @@ attributes:
 edges:
   covers:
     - target: skill-area:mathematical-reasoning
+  applies_to:
+    - target: domain:mathematics
+    - target: domain:physics
 ---
 nodeKind: Benchmark
 id: benchmark:promptbench
@@ -116,6 +121,9 @@ attributes:
 edges:
   covers:
     - target: skill-area:prompt-engineering
+  applies_to:
+    - target: domain:ml-ai
+    - target: domain:security
 ---
 nodeKind: Benchmark
 id: benchmark:bias-bench
@@ -133,6 +141,8 @@ attributes:
 edges:
   covers:
     - target: skill-area:safety-redteaming
+  applies_to:
+    - target: domain:social-sciences
 ---
 nodeKind: Benchmark
 id: benchmark:truthful-qa

@@ -218,45 +218,7 @@ jobs:
           path: artifacts/mux-logs
           if-no-files-found: warn
 
-  live_stack_contracts:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
-    name: Live Stack Contracts (os=${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-2022]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: |
-          npm ci --prefer-offline --legacy-peer-deps
-          npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
-
-      - name: Run live stack contract matrix
-        run: |
-          npm run test:e2e:live-stack
-          npm run coverage:e2e:live-stack
-
-      - name: Upload live stack artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: publish-live-stack-${{ matrix.os }}
-          path: artifacts/live-stack
-          if-no-files-found: error
 
   live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
@@ -586,7 +548,7 @@ jobs:
     needs:
       - validate_core
       - validate_mux
-      - live_stack_contracts
+      - live_stack_e2e
       - validate_cloud
       - validate_krate
       - validate_observer_and_compiler

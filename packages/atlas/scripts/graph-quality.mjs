@@ -154,45 +154,169 @@ const tsWithRepo = tsList.filter(t => t.repoUrl || t.installCommand || t.npmPack
 const tsRepoCoverage = pct(tsWithRepo.length, tsList.length);
 
 // ═══════════════════════════════════════════
-// SECTION 5: Cross-Layer Associations
+// SECTION 6: Agent Stack Completeness
 // ═══════════════════════════════════════════
 
-// Agent products with stack layer implementations
 const agentProducts = byKind('AgentProduct');
 const productsWithImpl = new Set(edges.filter(e => e.kind === 'has_version' && agentProducts.some(p => p.id === e.from)).map(e => e.from));
-const productImplCoverage = pct(productsWithImpl.size, agentProducts.length);
+const productVersionCoverage = pct(productsWithImpl.size, agentProducts.length);
 
-// Agent versions with capability edges
 const versionsWithCaps = new Set(edges.filter(e => e.kind === 'supports' && agentVersions.some(v => v.id === e.from)).map(e => e.from));
 const versionCapCoverage = pct(versionsWithCaps.size, agentVersions.length);
+
+const versionComposed = new Set(edges.filter(e => e.kind === 'composed_of' && agentVersions.some(v => v.id === e.from)).map(e => e.from));
+const versionComposedCoverage = pct(versionComposed.size, agentVersions.length);
+
+const coreImpls = byKind('AgentCoreImpl');
+const coreRealizes = new Set(edges.filter(e => e.kind === 'realizes' && coreImpls.some(c => c.id === e.from)).map(e => e.from));
+const coreRealizeCoverage = pct(coreRealizes.size, coreImpls.length);
+
+const rtImpls = byKind('AgentRuntimeImpl');
+const rtRealizes = new Set(edges.filter(e => e.kind === 'realizes' && rtImpls.some(r => r.id === e.from)).map(e => e.from));
+const rtRealizeCoverage = pct(rtRealizes.size, rtImpls.length);
+
+const platImpls = byKind('AgentPlatformImpl');
+const platRealizes = new Set(edges.filter(e => e.kind === 'realizes' && platImpls.some(p => p.id === e.from)).map(e => e.from));
+const platRealizeCoverage = pct(platRealizes.size, platImpls.length);
+
+const uiImpls = byKind('AgentUIImpl');
+const uiWithSIP = new Set(edges.filter(e => e.kind === 'supports_interaction_primitive').map(e => e.from));
+const uiSIPCoverage = pct(uiImpls.filter(u => uiWithSIP.has(u.id)).length, uiImpls.length);
+
+const presentations = byKind('Presentation');
+const presBundled = new Set(edges.filter(e => e.kind === 'bundled_with' || e.kind === 'bundled_into').flatMap(e => [e.from, e.to]));
+const presBundledCoverage = pct(presentations.filter(p => presBundled.has(p.id)).length, presentations.length);
+
+const orchPrimitives = byKind('OrchestrationPrimitive');
+const orchWithEdge = new Set([...edges.filter(e => e.from.startsWith('orch-primitive:')).map(e => e.from), ...edges.filter(e => e.to.startsWith('orch-primitive:')).map(e => e.to)]);
+const orchConnectedCoverage = pct(orchPrimitives.filter(o => orchWithEdge.has(o.id)).length, orchPrimitives.length);
+
+// ═══════════════════════════════════════════
+// SECTION 7: Compute & Models
+// ═══════════════════════════════════════════
+
+const modelVersions = byKind('ModelVersion');
+const modelFamilies = byKind('ModelFamily');
+const providers = byKind('Provider');
+
+const mvWithFamily = new Set(edges.filter(e => e.kind === 'belongs_to_family').map(e => e.from));
+const mvFamilyCoverage = pct(mvWithFamily.size, modelVersions.length);
+
+const mvWithProvider = new Set(edges.filter(e => (e.kind === 'provided_by' || e.kind === 'serves') && modelVersions.some(m => m.id === e.from || m.id === e.to)).flatMap(e => [e.from, e.to]).filter(id => modelVersions.some(m => m.id === id)));
+const mvProviderCoverage = pct(mvWithProvider.size, modelVersions.length);
+
+const transportClients = byKind('TransportClient');
+const transportProxies = byKind('TransportProxy');
+
+// ═══════════════════════════════════════════
+// SECTION 8: Benchmarks & Eval
+// ═══════════════════════════════════════════
+
+const benchmarks = byKind('Benchmark');
+const evalResults = byKind('EvalResult');
+const evalRuns = byKind('EvalRun');
+
+const benchWithResults = new Set(edges.filter(e => e.kind === 'evaluated_on' || e.kind === 'has_eval_result' || e.kind === 'benchmarked_on').flatMap(e => [e.from, e.to]).filter(id => benchmarks.some(b => b.id === id)));
+const benchResultCoverage = pct(benchWithResults.size, benchmarks.length);
+
+const evalRunsWithBench = new Set(edges.filter(e => (e.kind === 'evaluated_on' || e.kind === 'benchmarked_on') && evalRuns.some(r => r.id === e.from)).map(e => e.from));
+const evalRunBenchCoverage = pct(evalRunsWithBench.size, evalRuns.length);
+
+// ═══════════════════════════════════════════
+// SECTION 9: Knowledge Fabric & Security
+// ═══════════════════════════════════════════
+
+const kfImpls = byKind('KnowledgeFabricImpl');
+const kfWithRealize = new Set(edges.filter(e => e.kind === 'realizes' && kfImpls.some(k => k.id === e.from)).map(e => e.from));
+const kfRealizeCoverage = pct(kfWithRealize.size, kfImpls.length);
+
+const memorySystems = byKind('MemorySystem');
+const memWithProduct = new Set(edges.filter(e => e.kind === 'uses_memory_system').map(e => e.to));
+const memUsedCoverage = pct(memorySystems.filter(m => memWithProduct.has(m.id)).length, memorySystems.length);
+
+// ═══════════════════════════════════════════
+// SECTION 10: Hooks & Channels
+// ═══════════════════════════════════════════
+
+const hookSurfaces = byKind('HookSurface');
+const hookMappings = byKind('HookMapping');
+const hookSurfacesWithMapping = new Set(edges.filter(e => e.kind === 'maps_hook').map(e => e.to));
+const hookMappingCoverage = pct(hookSurfacesWithMapping.size, hookSurfaces.length);
+
+const hookSurfacesExposed = new Set(edges.filter(e => e.kind === 'exposes' && hookSurfaces.some(h => h.id === e.to)).map(e => e.to));
+const hookExposedCoverage = pct(hookSurfacesExposed.size, hookSurfaces.length);
+
+// ═══════════════════════════════════════════
+// SECTION 11: Library Bridge
+// ═══════════════════════════════════════════
+
+const libProcesses = byKind('LibraryProcess');
+const libSkills = byKind('LibrarySkill');
+const libAgents = byKind('LibraryAgent');
+
+const lpWithSkillArea = new Set(edges.filter(e => e.kind === 'lib_requires_skill_area' && e.from.startsWith('lib-process:')).map(e => e.from));
+const lpSkillCoverage = pct(lpWithSkillArea.size, libProcesses.length);
+
+const lsWithSkillArea = new Set(edges.filter(e => e.kind === 'lib_requires_skill_area' && e.from.startsWith('lib-skill:')).map(e => e.from));
+const lsSkillCoverage = pct(lsWithSkillArea.size, libSkills.length);
+
+const laWithRole = new Set(edges.filter(e => e.kind === 'lib_involves_role' && e.from.startsWith('lib-agent:')).map(e => e.from));
+const laRoleCoverage = pct(laWithRole.size, libAgents.length);
 
 // ═══════════════════════════════════════════
 // Overall Score (reweighted with new metrics)
 // ═══════════════════════════════════════════
 
 const overall = (
-  parseFloat(connectivityScore) * 0.10 +
-  parseFloat(edgeDiversity) * 0.05 +
-  parseFloat(libCoverage) * 0.05 +
-  parseFloat(toolCoverage) * 0.05 +
-  parseFloat(fwCoverage) * 0.05 +
-  parseFloat(tsCoverage) * 0.05 +
-  parseFloat(altCoverage) * 0.05 +
-  parseFloat(learnCoverage) * 0.03 +
-  parseFloat(memCoverage) * 0.03 +
-  (100 - dangling / edgeCount * 10000) * 0.05 +
-  (index.stats.parseErrors === 0 ? 100 : 0) * 0.05 +
-  // New metrics
-  parseFloat(descCoverage) * 0.08 +
-  parseFloat(claimTestCoverage) * 0.05 +
-  parseFloat(productDescCoverage) * 0.04 +
-  parseFloat(toolUrlCoverage) * 0.04 +
-  parseFloat(roleRespCoverage) * 0.03 +
-  parseFloat(domainContainsCoverage) * 0.03 +
-  parseFloat(versionCapCoverage) * 0.04 +
-  parseFloat(tsRepoCoverage) * 0.04 +
-  parseFloat(productClaimCoverage) * 0.04 +
-  parseFloat(workflowAssocCoverage) * 0.04
+  // Structural (15%)
+  parseFloat(connectivityScore) * 0.06 +
+  parseFloat(edgeDiversity) * 0.03 +
+  (100 - dangling / edgeCount * 10000) * 0.03 +
+  (index.stats.parseErrors === 0 ? 100 : 0) * 0.03 +
+  // Domain coverage (15%)
+  parseFloat(libCoverage) * 0.03 +
+  parseFloat(toolCoverage) * 0.03 +
+  parseFloat(fwCoverage) * 0.03 +
+  parseFloat(tsCoverage) * 0.03 +
+  parseFloat(altCoverage) * 0.03 +
+  // Learning & memory (4%)
+  parseFloat(learnCoverage) * 0.02 +
+  parseFloat(memCoverage) * 0.02 +
+  // Description & attributes (12%)
+  parseFloat(descCoverage) * 0.04 +
+  parseFloat(productDescCoverage) * 0.02 +
+  parseFloat(toolUrlCoverage) * 0.03 +
+  parseFloat(tsRepoCoverage) * 0.03 +
+  // Claims & evidence (10%)
+  parseFloat(claimTestCoverage) * 0.04 +
+  parseFloat(productClaimCoverage) * 0.03 +
+  pct(evidenceWithUrl.length, evidenceSources.length) * 0.03 +
+  // Associations (12%)
+  parseFloat(roleRespCoverage) * 0.02 +
+  parseFloat(domainContainsCoverage) * 0.02 +
+  parseFloat(workflowAssocCoverage) * 0.02 +
+  parseFloat(topicParentCoverage) * 0.02 +
+  parseFloat(toolLangCoverage) * 0.02 +
+  parseFloat(versionCapCoverage) * 0.02 +
+  // Agent stack (14%)
+  parseFloat(productVersionCoverage) * 0.02 +
+  parseFloat(versionComposedCoverage) * 0.02 +
+  parseFloat(coreRealizeCoverage) * 0.01 +
+  parseFloat(rtRealizeCoverage) * 0.01 +
+  parseFloat(platRealizeCoverage) * 0.01 +
+  parseFloat(uiSIPCoverage) * 0.02 +
+  parseFloat(presBundledCoverage) * 0.01 +
+  parseFloat(orchConnectedCoverage) * 0.02 +
+  parseFloat(hookMappingCoverage) * 0.02 +
+  // Compute & benchmarks (8%)
+  parseFloat(mvProviderCoverage) * 0.02 +
+  parseFloat(benchResultCoverage) * 0.02 +
+  parseFloat(kfRealizeCoverage) * 0.02 +
+  parseFloat(memUsedCoverage) * 0.02 +
+  // Library bridge (6%)
+  parseFloat(lpSkillCoverage) * 0.02 +
+  parseFloat(lsSkillCoverage) * 0.02 +
+  parseFloat(laRoleCoverage) * 0.02
 ).toFixed(1);
 
 // ═══════════════════════════════════════════
@@ -254,8 +378,53 @@ console.log(line('Role→responsibility:', roleRespCoverage + '%'));
 console.log(line('Workflow associations:', workflowAssocCoverage + '%'));
 console.log(line('Domain→contains:', domainContainsCoverage + '%'));
 console.log(line('Topic→parent:', topicParentCoverage + '%'));
-console.log(line('Product→version:', productImplCoverage + '%'));
+
+console.log(header('AGENT STACK'));
+console.log(line('Product→version:', productVersionCoverage + '%'));
+console.log(line('Version→composed_of:', versionComposedCoverage + '%'));
 console.log(line('Version→capabilities:', versionCapCoverage + '%'));
+console.log(line('Core→realizes:', coreRealizeCoverage + '%'));
+console.log(line('Runtime→realizes:', rtRealizeCoverage + '%'));
+console.log(line('Platform→realizes:', platRealizeCoverage + '%'));
+console.log(line('UI→interaction prims:', uiSIPCoverage + '%'));
+console.log(line('Presentations bundled:', presBundledCoverage + '%'));
+console.log(line('Orch primitives conn:', orchConnectedCoverage + '%'));
+
+console.log(header('COMPUTE & MODELS'));
+console.log(line('Providers:', providers.length));
+console.log(line('Model families:', modelFamilies.length));
+console.log(line('Model versions:', modelVersions.length));
+console.log(line('MV→family:', mvFamilyCoverage + '%'));
+console.log(line('MV→provider:', mvProviderCoverage + '%'));
+
+console.log(header('BENCHMARKS & EVAL'));
+console.log(line('Benchmarks:', benchmarks.length));
+console.log(line('Eval results:', evalResults.length));
+console.log(line('Eval runs:', evalRuns.length));
+console.log(line('Bench→results:', benchResultCoverage + '%'));
+console.log(line('Runs→benchmark:', evalRunBenchCoverage + '%'));
+
+console.log(header('KNOWLEDGE FABRIC'));
+console.log(line('KF implementations:', kfImpls.length));
+console.log(line('KF→realizes:', kfRealizeCoverage + '%'));
+console.log(line('Memory systems:', memorySystems.length));
+console.log(line('Memory systems used:', memUsedCoverage + '%'));
+console.log(line('Knowledge sources:', byKind('KnowledgeSource').length));
+console.log(line('Retrieval pipelines:', byKind('RetrievalPipeline').length));
+
+console.log(header('HOOKS & CHANNELS'));
+console.log(line('Hook surfaces:', hookSurfaces.length));
+console.log(line('Hook mappings:', hookMappings.length));
+console.log(line('Surfaces→mapping:', hookMappingCoverage + '%'));
+console.log(line('Surfaces exposed:', hookExposedCoverage + '%'));
+
+console.log(header('LIBRARY BRIDGE'));
+console.log(line('Lib processes:', libProcesses.length));
+console.log(line('Process→skill-area:', lpSkillCoverage + '%'));
+console.log(line('Lib skills:', libSkills.length));
+console.log(line('Skill→skill-area:', lsSkillCoverage + '%'));
+console.log(line('Lib agents:', libAgents.length));
+console.log(line('Agent→role:', laRoleCoverage + '%'));
 
 console.log(`╠${'═'.repeat(W - 2)}╣`);
 console.log(`║ OVERALL SCORE:        ${pad(overall + '/100', 8)}                  ║`);
@@ -305,6 +474,33 @@ if (verbose) {
     console.log(`\nProducts without testable claims (${productsNoClaims.length}):`);
     for (const p of productsNoClaims.slice(0, 15)) console.log(`  ${p.id} — ${p.displayName || ''}`);
     if (productsNoClaims.length > 15) console.log(`  ... and ${productsNoClaims.length - 15} more`);
+  }
+
+  const versionsNoComposed = agentVersions.filter(v => !versionComposed.has(v.id));
+  if (versionsNoComposed.length > 0) {
+    console.log(`\nAgent versions without composed_of (${versionsNoComposed.length}):`);
+    for (const v of versionsNoComposed) console.log(`  ${v.id}`);
+  }
+
+  const mvNoFamily = modelVersions.filter(m => !mvWithFamily.has(m.id));
+  if (mvNoFamily.length > 0) {
+    console.log(`\nModel versions without family (${mvNoFamily.length}):`);
+    for (const m of mvNoFamily.slice(0, 10)) console.log(`  ${m.id}`);
+    if (mvNoFamily.length > 10) console.log(`  ... and ${mvNoFamily.length - 10} more`);
+  }
+
+  const benchNoResults = benchmarks.filter(b => !benchWithResults.has(b.id));
+  if (benchNoResults.length > 0) {
+    console.log(`\nBenchmarks without eval results (${benchNoResults.length}):`);
+    for (const b of benchNoResults.slice(0, 10)) console.log(`  ${b.id}`);
+    if (benchNoResults.length > 10) console.log(`  ... and ${benchNoResults.length - 10} more`);
+  }
+
+  const hookNoMapping = hookSurfaces.filter(h => !hookSurfacesWithMapping.has(h.id) && !hookSurfacesExposed.has(h.id));
+  if (hookNoMapping.length > 0) {
+    console.log(`\nHook surfaces without mapping or exposure (${hookNoMapping.length}):`);
+    for (const h of hookNoMapping.slice(0, 10)) console.log(`  ${h.id}`);
+    if (hookNoMapping.length > 10) console.log(`  ... and ${hookNoMapping.length - 10} more`);
   }
 
   console.log(`\nOrphans by kind (${orphans.length} total):`);

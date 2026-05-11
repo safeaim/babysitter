@@ -467,13 +467,17 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
   }
 
   // --yolo: add harness-specific auto-approve/sandbox-disable flags
+  // Mappings from atlas graph: agent-stack/launch-configs/*.yaml
   if (flagBool(args.flags, 'yolo')) {
     switch (plan.harness) {
       case 'codex':
-        plan.args.push('--full-auto', '--sandbox', 'danger-full-access');
+        plan.args.push('--dangerously-bypass-approvals-and-sandbox');
         break;
       case 'claude':
         plan.args.push('--dangerously-skip-permissions');
+        break;
+      case 'pi':
+        plan.args.push('--auto-approve');
         break;
     }
   }

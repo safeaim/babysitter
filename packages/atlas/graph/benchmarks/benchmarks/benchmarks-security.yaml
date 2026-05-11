@@ -10,4 +10,7 @@ attributes:
     CyberBench (Princeton et al.) measures language-model and agent
     capability on real-world cybersecurity capture-the-flag tasks
     spanning crypto, web, reverse engineering, pwn, and forensics.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:cybersecurity
+    - target: domain:security

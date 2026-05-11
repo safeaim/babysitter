@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:rails
 attributes:
   displayName: "Ruby on Rails"
+  homepageUrl: "https://rubyonrails.org"
   belongsToLanguageId: language:ruby
   category: web-backend
   description: |

@@ -19,6 +19,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.2
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Benchmark
 id: benchmark:aider-polyglot
@@ -41,6 +43,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.2
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Benchmark
 id: benchmark:repobench
@@ -53,7 +57,9 @@ attributes:
     RepoBench evaluates repository-level code auto-completion across
     Python and Java. Sub-tasks measure retrieval, prediction, and
     end-to-end completion in real-world multi-file repositories.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Benchmark
 id: benchmark:bigcode-evalplus

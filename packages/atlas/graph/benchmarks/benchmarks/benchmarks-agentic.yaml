@@ -19,6 +19,9 @@ edges:
       attributes:
         coverage: tangential
         weight: 0.2
+  applies_to:
+    - target: domain:machine-learning
+    - target: domain:scientific-discovery
 ---
 nodeKind: Benchmark
 id: benchmark:appworld
@@ -41,6 +44,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.3
+  applies_to:
+    - target: domain:software-engineering
 ---
 nodeKind: Benchmark
 id: benchmark:assistant-bench
@@ -63,6 +68,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.2
+  applies_to:
+    - target: domain:web-development
 ---
 nodeKind: Benchmark
 id: benchmark:the-agent-company
@@ -85,6 +92,9 @@ edges:
       attributes:
         coverage: partial
         weight: 0.2
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:operations
 ---
 nodeKind: Benchmark
 id: benchmark:agentclinic
@@ -103,6 +113,8 @@ edges:
       attributes:
         coverage: full
         weight: 0.7
+  applies_to:
+    - target: domain:healthcare
 ---
 nodeKind: Benchmark
 id: benchmark:travelplanner
@@ -121,3 +133,5 @@ edges:
       attributes:
         coverage: full
         weight: 0.8
+  applies_to:
+    - target: domain:travel

@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:solid-start
 attributes:
   displayName: "SolidStart"
+  homepageUrl: "https://start.solidjs.com"
   belongsToLanguageId: language:typescript
   category: web-fullstack
   description: |

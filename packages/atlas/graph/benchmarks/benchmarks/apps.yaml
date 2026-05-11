@@ -7,4 +7,7 @@ attributes:
   targetsKind: ModelVersion
   description: |
     APPS — competitive-programming-style benchmark spanning introductory, interview, and competition difficulty tiers.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:computer-science

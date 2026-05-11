@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:t3-stack
 attributes:
   displayName: "T3 Stack"
+  homepageUrl: "https://create.t3.gg"
   belongsToLanguageId: language:typescript
   category: web-fullstack
   description: |

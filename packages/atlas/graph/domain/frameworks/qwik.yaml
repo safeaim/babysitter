@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:qwik
 attributes:
   displayName: "Qwik"
+  homepageUrl: "https://qwik.dev"
   belongsToLanguageId: language:typescript
   category: web-fullstack
   description: |

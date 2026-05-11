@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:koa
 attributes:
   displayName: "Koa"
+  homepageUrl: "https://koajs.com"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |
@@ -27,6 +28,7 @@ nodeKind: Framework
 id: framework:hapi
 attributes:
   displayName: "Hapi"
+  homepageUrl: "https://hapi.dev"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |
@@ -52,6 +54,7 @@ nodeKind: Framework
 id: framework:gatsby
 attributes:
   displayName: "Gatsby"
+  homepageUrl: "https://www.gatsbyjs.com"
   belongsToLanguageId: language:javascript
   category: static-site
   description: |
@@ -80,6 +83,7 @@ nodeKind: Framework
 id: framework:docusaurus
 attributes:
   displayName: "Docusaurus"
+  homepageUrl: "https://docusaurus.io"
   belongsToLanguageId: language:typescript
   category: static-site
   description: |
@@ -98,6 +102,7 @@ nodeKind: Framework
 id: framework:vitepress
 attributes:
   displayName: "VitePress"
+  homepageUrl: "https://vitepress.dev"
   belongsToLanguageId: language:typescript
   category: static-site
   description: |
@@ -116,6 +121,7 @@ nodeKind: Framework
 id: framework:redwood
 attributes:
   displayName: "RedwoodJS"
+  homepageUrl: "https://redwoodjs.com"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |
@@ -135,6 +141,7 @@ nodeKind: Framework
 id: framework:blitz
 attributes:
   displayName: "Blitz.js"
+  homepageUrl: "https://blitzjs.com"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |
@@ -154,6 +161,7 @@ nodeKind: Framework
 id: framework:preact
 attributes:
   displayName: "Preact"
+  homepageUrl: "https://preactjs.com"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |
@@ -180,6 +188,7 @@ nodeKind: Framework
 id: framework:alpine
 attributes:
   displayName: "Alpine.js"
+  homepageUrl: "https://alpinejs.dev"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |
@@ -201,6 +210,7 @@ nodeKind: Framework
 id: framework:htmx
 attributes:
   displayName: "htmx"
+  homepageUrl: "https://htmx.org"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |
@@ -221,6 +231,7 @@ nodeKind: Framework
 id: framework:slidev
 attributes:
   displayName: "Slidev"
+  homepageUrl: "https://sli.dev"
   belongsToLanguageId: language:javascript
   category: presentation
   description: |
@@ -239,6 +250,7 @@ nodeKind: Framework
 id: framework:inertia
 attributes:
   displayName: "Inertia.js"
+  homepageUrl: "https://inertiajs.com"
   belongsToLanguageId: language:javascript
   category: web-framework
   description: |

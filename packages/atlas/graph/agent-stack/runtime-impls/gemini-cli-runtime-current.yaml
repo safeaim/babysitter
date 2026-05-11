@@ -36,6 +36,8 @@ edges:
   exposes:
   - target: hook-surface:gemini.pre-prompt
   - target: hook-surface:gemini.post-response
+  - target: hook-surface:gemini.tool-call-pre
+  - target: hook-surface:gemini.tool-call-post
   bundles:
   - target: tool-descriptor:read
   - target: tool-descriptor:write

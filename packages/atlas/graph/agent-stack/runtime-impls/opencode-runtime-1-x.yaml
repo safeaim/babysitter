@@ -35,6 +35,7 @@ edges:
   exposes:
   - target: hook-surface:opencode.session-idle
   - target: hook-surface:opencode.shell-env
+  - target: hook-surface:opencode.on-step
   bundles:
   - target: tool-descriptor:read
   - target: tool-descriptor:write

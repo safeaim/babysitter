@@ -3,6 +3,7 @@ nodeKind: Framework
 id: framework:ink
 attributes:
   displayName: "Ink"
+  homepageUrl: "https://github.com/vadimdemedes/ink"
   belongsToLanguageId: language:typescript
   category: agent-ui
   description: |
@@ -30,6 +31,7 @@ nodeKind: Framework
 id: framework:bubbletea
 attributes:
   displayName: "Bubble Tea"
+  homepageUrl: "https://github.com/charmbracelet/bubbletea"
   belongsToLanguageId: language:go
   category: agent-ui
   description: |
@@ -57,6 +59,7 @@ nodeKind: Framework
 id: framework:textual
 attributes:
   displayName: "Textual"
+  homepageUrl: "https://textual.textualize.io"
   belongsToLanguageId: language:python
   category: agent-ui
   description: |
@@ -84,6 +87,7 @@ nodeKind: Framework
 id: framework:rich
 attributes:
   displayName: "Rich"
+  homepageUrl: "https://rich.readthedocs.io"
   belongsToLanguageId: language:python
   category: agent-ui
   description: |
@@ -110,6 +114,7 @@ nodeKind: Framework
 id: framework:open-webui
 attributes:
   displayName: "Open WebUI"
+  homepageUrl: "https://openwebui.com"
   belongsToLanguageId: language:typescript
   category: agent-ui
   description: |
@@ -131,6 +136,7 @@ nodeKind: Framework
 id: framework:chatbot-ui
 attributes:
   displayName: "Chatbot UI"
+  homepageUrl: "https://github.com/mckaywrigley/chatbot-ui"
   belongsToLanguageId: language:typescript
   category: agent-ui
   description: |
@@ -152,6 +158,7 @@ nodeKind: Framework
 id: framework:librechat
 attributes:
   displayName: "LibreChat"
+  homepageUrl: "https://www.librechat.ai"
   belongsToLanguageId: language:typescript
   category: agent-ui
   description: |

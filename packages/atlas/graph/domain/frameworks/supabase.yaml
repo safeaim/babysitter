@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:supabase
 attributes:
   displayName: "Supabase"
+  homepageUrl: "https://supabase.com"
   belongsToLanguageId: language:typescript
   category: web-backend
   description: |

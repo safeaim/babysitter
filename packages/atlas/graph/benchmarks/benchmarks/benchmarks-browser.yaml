@@ -19,6 +19,8 @@ edges:
       attributes:
         coverage: tangential
         weight: 0.1
+  applies_to:
+    - target: domain:web-development
 ---
 nodeKind: Benchmark
 id: benchmark:mind2web-2
@@ -41,6 +43,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.3
+  applies_to:
+    - target: domain:web-development
 ---
 nodeKind: Benchmark
 id: benchmark:workarena
@@ -63,6 +67,8 @@ edges:
       attributes:
         coverage: full
         weight: 0.3
+  applies_to:
+    - target: domain:web-development
 ---
 nodeKind: Benchmark
 id: benchmark:webvoyager
@@ -84,6 +90,8 @@ edges:
       attributes:
         coverage: partial
         weight: 0.3
+  applies_to:
+    - target: domain:web-development
 ---
 nodeKind: Benchmark
 id: benchmark:visualwebarena
@@ -106,3 +114,5 @@ edges:
       attributes:
         coverage: partial
         weight: 0.3
+  applies_to:
+    - target: domain:web-development

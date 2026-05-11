@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:sveltekit
 attributes:
   displayName: "SvelteKit"
+  homepageUrl: "https://svelte.dev/docs/kit"
   belongsToLanguageId: language:typescript
   category: web-fullstack
   description: |

@@ -27,6 +27,8 @@ edges:
   composes:
   - target: agent:omp
     role: runtime
+  exposes:
+  - target: hook-surface:omp.on-event
   bundles:
   - target: tool-descriptor:read
   - target: tool-descriptor:write

@@ -3,6 +3,7 @@ nodeKind: Framework
 id: framework:langchain
 attributes:
   displayName: "LangChain"
+  homepageUrl: "https://www.langchain.com"
   belongsToLanguageId: language:python
   category: agent-orchestration
   description: |
@@ -41,6 +42,7 @@ nodeKind: Framework
 id: framework:langgraph
 attributes:
   displayName: "LangGraph"
+  homepageUrl: "https://www.langchain.com/langgraph"
   belongsToLanguageId: language:python
   category: agent-orchestration
   description: |
@@ -79,6 +81,7 @@ nodeKind: Framework
 id: framework:crewai
 attributes:
   displayName: "CrewAI"
+  homepageUrl: "https://www.crewai.com"
   belongsToLanguageId: language:python
   category: agent-orchestration
   description: |
@@ -116,6 +119,7 @@ nodeKind: Framework
 id: framework:autogen
 attributes:
   displayName: "AutoGen"
+  homepageUrl: "https://github.com/microsoft/autogen"
   belongsToLanguageId: language:python
   category: agent-orchestration
   description: |
@@ -153,6 +157,7 @@ nodeKind: Framework
 id: framework:pydantic-ai
 attributes:
   displayName: "PydanticAI"
+  homepageUrl: "https://ai.pydantic.dev"
   belongsToLanguageId: language:python
   category: agent-orchestration
   description: |
@@ -190,6 +195,7 @@ nodeKind: Framework
 id: framework:semantic-kernel
 attributes:
   displayName: "Semantic Kernel"
+  homepageUrl: "https://learn.microsoft.com/en-us/semantic-kernel"
   belongsToLanguageId: language:csharp
   category: agent-orchestration
   description: |
@@ -227,6 +233,7 @@ nodeKind: Framework
 id: framework:mastra
 attributes:
   displayName: "Mastra"
+  homepageUrl: "https://mastra.ai"
   belongsToLanguageId: language:typescript
   category: agent-orchestration
   description: |
@@ -264,6 +271,7 @@ nodeKind: Framework
 id: framework:google-adk
 attributes:
   displayName: "Google Agent Development Kit (ADK)"
+  homepageUrl: "https://google.github.io/adk-docs"
   belongsToLanguageId: language:python
   category: agent-orchestration
   description: |
@@ -326,6 +334,7 @@ nodeKind: Framework
 id: framework:vercel-ai-sdk
 attributes:
   displayName: "Vercel AI SDK"
+  homepageUrl: "https://sdk.vercel.ai"
   belongsToLanguageId: language:typescript
   category: agent-orchestration
   description: |

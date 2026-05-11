@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:tauri
 attributes:
   displayName: "Tauri"
+  homepageUrl: "https://tauri.app"
   belongsToLanguageId: language:rust
   category: desktop
   description: |

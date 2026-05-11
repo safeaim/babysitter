@@ -27,6 +27,8 @@ edges:
   composes:
   - target: agent:openclaw
     role: runtime
+  exposes:
+  - target: hook-surface:openclaw.on-event
   bundles:
   - target: tool-descriptor:read
   - target: tool-descriptor:write

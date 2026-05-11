@@ -7,4 +7,7 @@ attributes:
   targetsKind: AgentVersion
   description: |
     Multi-domain agent benchmark spanning OS, DB, KG, web shopping, web browsing, and other environments.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering
+    - target: domain:data-science

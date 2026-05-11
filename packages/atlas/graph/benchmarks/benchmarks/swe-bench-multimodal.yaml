@@ -7,4 +7,6 @@ attributes:
   targetsKind: AgentVersion
   description: |
     Multimodal extension of SWE-bench: visual / GUI-driven software engineering tasks.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering

@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:livewire
 attributes:
   displayName: "Laravel Livewire"
+  homepageUrl: "https://livewire.laravel.com"
   belongsToLanguageId: language:php
   category: web-fullstack
   description: |
@@ -21,6 +22,7 @@ nodeKind: Framework
 id: framework:stimulus
 attributes:
   displayName: "Stimulus"
+  homepageUrl: "https://stimulus.hotwired.dev"
   belongsToLanguageId: language:javascript
   category: web-frontend
   description: |
@@ -41,6 +43,7 @@ nodeKind: Framework
 id: framework:turbo-rails
 attributes:
   displayName: "Turbo Rails"
+  homepageUrl: "https://turbo.hotwired.dev"
   belongsToLanguageId: language:ruby
   category: web-fullstack
   description: |
@@ -61,6 +64,7 @@ nodeKind: Framework
 id: framework:blazor
 attributes:
   displayName: "Blazor"
+  homepageUrl: "https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor"
   belongsToLanguageId: language:csharp
   category: web-fullstack
   description: |
@@ -79,6 +83,7 @@ nodeKind: Framework
 id: framework:spring-webflux
 attributes:
   displayName: "Spring WebFlux"
+  homepageUrl: "https://docs.spring.io/spring-framework/reference/web/webflux.html"
   belongsToLanguageId: language:java
   category: web-backend
   description: |
@@ -95,6 +100,7 @@ nodeKind: Framework
 id: framework:dropwizard
 attributes:
   displayName: "Dropwizard"
+  homepageUrl: "https://www.dropwizard.io"
   belongsToLanguageId: language:java
   category: web-backend
   description: |
@@ -111,6 +117,7 @@ nodeKind: Framework
 id: framework:spark-java
 attributes:
   displayName: "Spark Java"
+  homepageUrl: "https://sparkjava.com"
   belongsToLanguageId: language:java
   category: web-backend
   description: |
@@ -127,6 +134,7 @@ nodeKind: Framework
 id: framework:javalin
 attributes:
   displayName: "Javalin"
+  homepageUrl: "https://javalin.io"
   belongsToLanguageId: language:kotlin
   category: web-backend
   description: |
@@ -143,6 +151,7 @@ nodeKind: Framework
 id: framework:vert-x
 attributes:
   displayName: "Vert.x"
+  homepageUrl: "https://vertx.io"
   belongsToLanguageId: language:java
   category: web-backend
   description: |
@@ -170,6 +179,7 @@ nodeKind: Framework
 id: framework:swiftui
 attributes:
   displayName: "SwiftUI"
+  homepageUrl: "https://developer.apple.com/xcode/swiftui"
   belongsToLanguageId: language:swift
   category: mobile-framework
   description: |
@@ -195,6 +205,7 @@ nodeKind: Framework
 id: framework:jetpack-compose
 attributes:
   displayName: "Jetpack Compose"
+  homepageUrl: "https://developer.android.com/compose"
   belongsToLanguageId: language:kotlin
   category: mobile-framework
   description: |
@@ -220,6 +231,7 @@ nodeKind: Framework
 id: framework:compose-multiplatform
 attributes:
   displayName: "Compose Multiplatform"
+  homepageUrl: "https://www.jetbrains.com/compose-multiplatform"
   belongsToLanguageId: language:kotlin
   category: mobile-framework
   description: |
@@ -245,6 +257,7 @@ nodeKind: Framework
 id: framework:maui
 attributes:
   displayName: ".NET MAUI"
+  homepageUrl: "https://dotnet.microsoft.com/en-us/apps/maui"
   belongsToLanguageId: language:csharp
   category: mobile-framework
   description: |
@@ -271,6 +284,7 @@ nodeKind: Framework
 id: framework:vapor
 attributes:
   displayName: "Vapor"
+  homepageUrl: "https://vapor.codes"
   belongsToLanguageId: language:swift
   category: web-backend
   description: |
@@ -289,6 +303,7 @@ nodeKind: Framework
 id: framework:ktor-server
 attributes:
   displayName: "Ktor Server"
+  homepageUrl: "https://ktor.io"
   belongsToLanguageId: language:kotlin
   category: web-backend
   description: |

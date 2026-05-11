@@ -78,6 +78,15 @@ edges:
   - target: hook-surface:session-start
   - target: hook-surface:session-end
   - target: hook-surface:pre-compact
+  - target: hook-surface:claude.pre-tool-use
+  - target: hook-surface:claude.post-tool-use
+  - target: hook-surface:claude.stop
+  - target: hook-surface:claude.subagent-stop
+  - target: hook-surface:claude.notification
+  - target: hook-surface:claude.user-prompt-submit
+  - target: hook-surface:claude.pre-compact
+  - target: hook-surface:claude.session-start
+  - target: hook-surface:claude.session-end
   - target: agent-host-transport:http
   - target: agent-host-transport:mcp-mediated
   - target: agent-host-transport:ws

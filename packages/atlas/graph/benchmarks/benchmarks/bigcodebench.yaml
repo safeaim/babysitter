@@ -7,4 +7,6 @@ attributes:
   targetsKind: ModelVersion
   description: |
     Practical and challenging code-generation benchmark from the BigCode project — function-completion across diverse libraries.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering

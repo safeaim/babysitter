@@ -7,4 +7,6 @@ attributes:
   targetsKind: ModelVersion
   description: |
     MBPP+ from EvalPlus — augmented MBPP with substantially expanded test suites.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:software-engineering

@@ -27,6 +27,8 @@ edges:
   composes:
   - target: agent:hermes
     role: runtime
+  exposes:
+  - target: hook-surface:hermes.on-event
   bundles:
   - target: tool-descriptor:read
   - target: tool-descriptor:write

@@ -13,6 +13,8 @@ attributes:
 edges:
   covers:
     - target: skill-area:general-knowledge-reasoning
+  applies_to:
+    - target: domain:education
 ---
 nodeKind: Benchmark
 id: benchmark:flores-200
@@ -30,6 +32,8 @@ edges:
     - target: skill-area:general-knowledge-reasoning
   uses_test_set:
     - target: test-set:flores-200-devtest
+  applies_to:
+    - target: domain:humanities
 ---
 nodeKind: Benchmark
 id: benchmark:xnli

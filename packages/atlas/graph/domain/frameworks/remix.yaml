@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:remix
 attributes:
   displayName: "Remix"
+  homepageUrl: "https://remix.run"
   belongsToLanguageId: language:typescript
   category: web-fullstack
   description: |

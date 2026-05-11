@@ -2,6 +2,7 @@ nodeKind: Framework
 id: framework:strapi
 attributes:
   displayName: "Strapi"
+  homepageUrl: "https://strapi.io"
   belongsToLanguageId: language:javascript
   category: web-backend
   description: |

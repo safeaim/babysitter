@@ -7,4 +7,7 @@ attributes:
   targetsKind: ModelVersion
   description: |
     DS-1000 — 1,000 data-science code problems across NumPy, Pandas, Scikit-learn, and other Python data libraries.
-edges: {}
+edges:
+  applies_to:
+    - target: domain:data-science
+    - target: domain:software-engineering

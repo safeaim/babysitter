@@ -47,6 +47,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/*/*/node_modules
             packages/agent-mux/*/node_modules
 
       - name: Install dependencies
@@ -122,6 +123,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/*/*/node_modules
             packages/agent-mux/*/node_modules
 
       - name: Install dependencies
@@ -209,6 +211,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/*/*/node_modules
             packages/agent-mux/*/node_modules
 
       - name: Install dependencies
@@ -388,6 +391,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/*/*/node_modules
             packages/agent-mux/*/node_modules
 
       - name: Install dependencies
@@ -492,6 +496,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/*/*/node_modules
             packages/agent-mux/*/node_modules
 
       - name: Install dependencies
@@ -556,6 +561,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/*/*/node_modules
             packages/agent-mux/*/node_modules
 
       - name: Install dependencies
@@ -627,6 +633,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/*/*/node_modules
             packages/agent-mux/*/node_modules
 
       - name: Install dependencies

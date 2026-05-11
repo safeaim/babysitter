@@ -96,6 +96,18 @@ edges:
   applies_to:
     - target: domain:software-engineering
       confidence: primary
+    - target: specialization:mathematics
+      confidence: primary
+    - target: specialization:physics
+      confidence: secondary
+    - target: specialization:computational-mathematics
+      confidence: primary
+    - target: specialization:theoretical-computer-science
+      confidence: secondary
+    - target: specialization:formal-methods
+      confidence: secondary
+    - target: specialization:quantum-computing
+      confidence: secondary
 ---
 nodeKind: SkillArea
 id: skill-area:desktop-automation

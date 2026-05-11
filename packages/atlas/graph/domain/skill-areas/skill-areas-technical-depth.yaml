@@ -557,6 +557,8 @@ edges:
   applies_to:
     - target: specialization:security-compliance
       confidence: primary
+    - target: specialization:legal-compliance
+      confidence: secondary
   prerequisite_for_learning:
     - target: skill-area:ci-security
       strength: helpful
@@ -595,6 +597,10 @@ edges:
   applies_to:
     - target: specialization:data-science-ml
       confidence: primary
+    - target: specialization:bioinformatics
+      confidence: secondary
+    - target: specialization:materials-science
+      confidence: secondary
 ---
 nodeKind: SkillArea
 id: skill-area:feature-engineering

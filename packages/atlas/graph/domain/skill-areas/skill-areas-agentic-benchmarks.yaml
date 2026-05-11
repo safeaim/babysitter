@@ -34,6 +34,10 @@ edges:
   applies_to:
     - target: specialization:ai-agents-conversational
       confidence: primary
+    - target: specialization:research
+      confidence: secondary
+    - target: specialization:scientific-discovery
+      confidence: secondary
   uses_language:
     - language:python
     - target: language:python
@@ -145,6 +149,8 @@ edges:
   applies_to:
     - target: specialization:ai-agents-conversational
       confidence: primary
+    - target: specialization:travel
+      confidence: primary
 ---
 nodeKind: SkillArea
 id: skill-area:medical-agent
@@ -163,6 +169,12 @@ edges:
   applies_to:
     - target: specialization:ai-agents-conversational
       confidence: primary
+    - target: specialization:healthcare
+      confidence: primary
+    - target: specialization:clinical-informatics
+      confidence: secondary
+    - target: specialization:biomedical-informatics
+      confidence: secondary
 ---
 nodeKind: SkillArea
 id: skill-area:mobile-gui-automation

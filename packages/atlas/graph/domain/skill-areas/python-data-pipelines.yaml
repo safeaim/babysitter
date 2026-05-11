@@ -18,6 +18,8 @@ edges:
   applies_to:
     - target: domain:data-engineering
       confidence: primary
+    - target: specialization:biomedical-engineering
+      confidence: secondary
   uses_language:
     - language:python
     - target: language:python

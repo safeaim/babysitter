@@ -20,6 +20,10 @@ edges:
       confidence: primary
     - target: domain:digital-marketing
       confidence: secondary
+    - target: specialization:arts-culture
+      confidence: secondary
+    - target: specialization:digital-humanities
+      confidence: secondary
   prerequisite_for_learning:
     - target: skill-area:brand-positioning
       strength: recommended

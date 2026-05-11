@@ -63,6 +63,10 @@ edges:
   applies_to:
     - target: specialization:robotics-simulation
       confidence: primary
+    - target: specialization:automotive-engineering
+      confidence: secondary
+    - target: specialization:aerospace-engineering
+      confidence: secondary
   prerequisite_for_learning:
     - target: skill-area:motion-planning
       strength: recommended

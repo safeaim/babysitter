@@ -122,6 +122,12 @@ edges:
   applies_to:
     - target: specialization:software-architecture
       confidence: primary
+    - target: specialization:domain-driven-design
+      confidence: primary
+    - target: specialization:event-storming
+      confidence: secondary
+    - target: specialization:ontology-driven-development
+      confidence: secondary
   prerequisite_for_learning:
     - target: skill-area:strangler-fig-pattern
       strength: recommended
@@ -162,6 +168,8 @@ edges:
   applies_to:
     - target: specialization:software-architecture
       confidence: primary
+    - target: specialization:event-storming
+      confidence: secondary
 ---
 nodeKind: SkillArea
 id: skill-area:cqrs

@@ -58,6 +58,8 @@ edges:
   applies_to:
     - target: specialization:algorithms-optimization
       confidence: primary
+    - target: specialization:mechanical-engineering
+      confidence: secondary
 ---
 nodeKind: SkillArea
 id: skill-area:np-hard-heuristics

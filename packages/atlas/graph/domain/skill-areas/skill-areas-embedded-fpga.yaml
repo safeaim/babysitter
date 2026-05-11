@@ -16,6 +16,10 @@ edges:
   applies_to:
     - target: specialization:embedded-systems
       confidence: primary
+    - target: specialization:rpikit
+      confidence: secondary
+    - target: specialization:electrical-engineering
+      confidence: secondary
   uses_language:
     - language:c
     - language:cpp

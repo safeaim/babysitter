@@ -615,7 +615,11 @@ async function validateAgentBehavior(
   }
 
   // --- babysitter-plugin: stop hooks, hooks-mux session, run completion, completion proof ---
-  if (isBabysitterPlugin) {
+  // These checks require the full plugin lifecycle (hooks fire, runs created).
+  // In amux launch mode, the plugin is installed but the harness doesn't invoke
+  // hooks or create babysitter runs — those require structured-run (amux run) mode.
+  const isInteractiveMode = process.env['LIVE_STACK_INTERACTIVE'] === 'true';
+  if (isBabysitterPlugin && isInteractiveMode) {
     // stop-hooks: check for hooks-mux log files
     const hooksLogDir = path.join(cwd, '.a5c', 'logs', 'hooks');
     let hooksLogsFound = false;
@@ -735,7 +739,13 @@ async function validateAgentBehavior(
     });
   }
 
-  // vanilla scenarios: file-creation is already added above — no extra entries
+  // babysitter-plugin in non-interactive mode: plugin lifecycle checks skipped
+  if (isBabysitterPlugin && !isInteractiveMode) {
+    entries.push({ name: 'stop-hooks', status: 'skipped', detail: 'requires interactive mode (amux launch --no-interactive does not fire hooks)' });
+    entries.push({ name: 'hooks-mux-session', status: 'skipped', detail: 'requires interactive mode' });
+    entries.push({ name: 'babysitter-run-completion', status: 'skipped', detail: 'requires interactive mode (no babysitter orchestration in non-interactive launch)' });
+    entries.push({ name: 'babysitter-completion-proof', status: 'skipped', detail: 'requires interactive mode' });
+  }
 
   return entries;
 }

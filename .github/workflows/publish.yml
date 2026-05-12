@@ -1251,7 +1251,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') && github.ref_name != 'develop' }}
     name: Deploy Docs Site
     needs:
-      - prepare_staging_publish
+      - build_all
     runs-on: ubuntu-latest-l
     environment:
       name: github-pages
@@ -1295,7 +1295,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Deploy Atlas WebUI To AKS
     needs:
-      - prepare_staging_publish
+      - build_all
     runs-on: ubuntu-latest-l
     env:
       ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
@@ -1693,8 +1693,8 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Deploy Cloud
     needs:
-      - prepare_staging_publish
-      - publish_staging_foundation
+      - validate_cloud
+      - build_all
     runs-on: ubuntu-latest-l
     steps:
       - name: Download publish workspace

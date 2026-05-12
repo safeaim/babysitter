@@ -155,7 +155,7 @@ function buildDecision({ decision, reasons, grants, capabilities, actor, reposit
 }
 
 function computeDigest(result) {
-  const keys = Object.keys(result).filter((k) => k !== 'digest').sort();
+  const keys = Object.keys(result).filter((k) => k !== 'digest' && k !== 'reviewedAt').sort();
   const canonical = {};
   for (const key of keys) canonical[key] = result[key];
   return createHash('sha256').update(JSON.stringify(canonical)).digest('hex');

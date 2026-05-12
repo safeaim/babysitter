@@ -732,7 +732,6 @@ async function validateAgentBehavior(
     }
 
     // babysitter-run-completion: check .a5c/runs/ for completed state or RUN_COMPLETED
-    const runsDir = path.join(cwd, '.a5c', 'runs');
     let runCompleted = false;
     let runCompletionDetail = 'no .a5c/runs/ directory found';
     try {

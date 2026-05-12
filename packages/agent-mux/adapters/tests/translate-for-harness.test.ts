@@ -46,18 +46,20 @@ describe('translateForHarness', () => {
   });
 
   describe('dispatches to gemini translator', () => {
-    it('sets GEMINI_API_KEY for google provider', () => {
+    it('sets Google API env aliases for google provider', () => {
       const result = translateForHarness('gemini', makeConfig({
         provider: 'google',
         auth: { type: 'api_key', apiKey: 'gai-key' },
       }));
+      expect(result.env['GOOGLE_API_KEY']).toBe('gai-key');
       expect(result.env['GEMINI_API_KEY']).toBe('gai-key');
       expect(result.proxyRequired).toBe(false);
     });
 
     it('sets GOOGLE_GENAI_USE_VERTEXAI for vertex provider', () => {
       const result = translateForHarness('gemini', makeConfig({ provider: 'vertex', auth: { type: 'adc' } }));
-      expect(result.env['GOOGLE_GENAI_USE_VERTEXAI']).toBe('true');
+      expect(result.env['GOOGLE_GENAI_USE_VERTEXAI']).toBe('True');
+      expect(result.env['GOOGLE_CLOUD_LOCATION']).toBe('global');
     });
   });
 

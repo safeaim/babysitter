@@ -14,14 +14,16 @@ function makeConfig(overrides: Partial<ProviderConfig> & { provider: ProviderCon
 
 describe('translateForGemini', () => {
   describe('google provider', () => {
-    it('sets GEMINI_API_KEY from auth.apiKey', () => {
+    it('sets Google API env aliases from auth.apiKey', () => {
       const result = translateForGemini(makeConfig({ provider: 'google', auth: { type: 'api_key', apiKey: 'gai-test-key' } }));
+      expect(result.env['GOOGLE_API_KEY']).toBe('gai-test-key');
       expect(result.env['GEMINI_API_KEY']).toBe('gai-test-key');
       expect(result.proxyRequired).toBe(false);
     });
 
-    it('omits GEMINI_API_KEY when auth.apiKey is absent', () => {
+    it('omits Google API env aliases when auth.apiKey is absent', () => {
       const result = translateForGemini(makeConfig({ provider: 'google', auth: { type: 'api_key' } }));
+      expect(result.env['GOOGLE_API_KEY']).toBeUndefined();
       expect(result.env['GEMINI_API_KEY']).toBeUndefined();
       expect(result.proxyRequired).toBe(false);
     });
@@ -33,9 +35,10 @@ describe('translateForGemini', () => {
   });
 
   describe('vertex provider', () => {
-    it('sets GOOGLE_GENAI_USE_VERTEXAI=true', () => {
+    it('sets GOOGLE_GENAI_USE_VERTEXAI=True', () => {
       const result = translateForGemini(makeConfig({ provider: 'vertex', auth: { type: 'adc' } }));
-      expect(result.env['GOOGLE_GENAI_USE_VERTEXAI']).toBe('true');
+      expect(result.env['GOOGLE_GENAI_USE_VERTEXAI']).toBe('True');
+      expect(result.env['GOOGLE_CLOUD_LOCATION']).toBe('global');
       expect(result.proxyRequired).toBe(false);
     });
 
@@ -55,6 +58,11 @@ describe('translateForGemini', () => {
         params: { region: 'us-east4' },
       }));
       expect(result.env['GOOGLE_CLOUD_LOCATION']).toBe('us-east4');
+    });
+
+    it('passes GOOGLE_API_KEY when auth.apiKey is configured', () => {
+      const result = translateForGemini(makeConfig({ provider: 'vertex', auth: { type: 'adc', apiKey: 'google-key' } }));
+      expect(result.env['GOOGLE_API_KEY']).toBe('google-key');
     });
 
     it('omits GOOGLE_CLOUD_PROJECT when not in params', () => {

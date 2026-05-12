@@ -60,6 +60,28 @@ describe('resolveProvider', () => {
     expect(config.auth.type).toBe('adc');
   });
 
+  it('resolves Vertex Gemini env from Google CI variables', () => {
+    process.env['GOOGLE_CLOUD_PROJECT'] = 'ci-google-project';
+    process.env['GOOGLE_CLOUD_LOCATION'] = 'global';
+    process.env['GOOGLE_API_KEY'] = 'google-ci-key';
+
+    const config = resolveProvider({ provider: 'vertex', model: 'gemini-3.1-pro-preview' });
+
+    expect(config.params['project']).toBe('ci-google-project');
+    expect(config.params['region']).toBe('global');
+    expect(config.auth.type).toBe('adc');
+    expect(config.auth.apiKey).toBe('google-ci-key');
+    expect(config.model).toBe('gemini-3.1-pro-preview');
+  });
+
+  it('keeps GEMINI_API_KEY as a fallback for direct Google provider auth', () => {
+    process.env['GEMINI_API_KEY'] = 'legacy-gemini-key';
+
+    const config = resolveProvider({ provider: 'google' });
+
+    expect(config.auth.apiKey).toBe('legacy-gemini-key');
+  });
+
   it('resolves custom provider requiring all fields', () => {
     const config = resolveProvider({
       provider: 'custom',

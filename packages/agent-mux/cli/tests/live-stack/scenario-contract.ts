@@ -1,5 +1,5 @@
-export type LiveStackProvider = 'foundry-openai' | 'anthropic-direct';
-export type AgentMuxProviderId = 'foundry' | 'anthropic';
+export type LiveStackProvider = 'foundry-openai' | 'anthropic-direct' | 'google-vertex';
+export type AgentMuxProviderId = 'foundry' | 'anthropic' | 'vertex';
 export type LiveStackAgentPath = 'agent-mux' | 'babysitter-agent';
 export type LiveStackIntegrationType = 'third-party-plugin' | 'runtime-cli';
 export type LiveStackInstallMode = 'babysitter-plugin' | 'vanilla';

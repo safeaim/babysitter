@@ -51,6 +51,7 @@ export function applyTransportMuxToHarnessEnv(
     case 'google':
     case 'vertex-native':
       env['CODE_ASSIST_ENDPOINT'] = proxyUrl;
+      env['GOOGLE_API_KEY'] = authToken;
       env['GEMINI_API_KEY'] = authToken;
       break;
   }

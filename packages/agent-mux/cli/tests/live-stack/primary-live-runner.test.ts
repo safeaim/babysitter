@@ -5,10 +5,10 @@ import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { buildPrimaryLiveStackCommands, executeChildProcessCommand, runPrimaryLiveStackScenario } from './primary-live-runner';
-import { primaryLiveStackScenario } from './scenario-contract';
+import { liveStackScenarioFromEnv, primaryLiveStackScenario } from './scenario-contract';
 
 describe('primary live stack runner contract', () => {
-  it('keeps Claude Code live lanes on Foundry GPT-5.5 through transport-mux', () => {
+  it('keeps Claude Code babysitter-plugin live lanes on Foundry GPT-5.5', () => {
     const scenario = primaryLiveStackScenario();
     const commands = buildPrimaryLiveStackCommands(scenario, {
       cwd: '/repo',
@@ -16,12 +16,51 @@ describe('primary live stack runner contract', () => {
       env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1' },
     });
 
+    const run = commands.at(-1);
+    expect(run?.args).toContain('run');
+    expect(run?.args).toContain('claude');
+    expect(run?.args).toContain('gpt-5.5');
+    expect(run?.env['AMUX_PROVIDER']).toBe('foundry');
+    expect(run?.args).not.toContain('anthropic');
+    expect(run?.args).not.toContain('sonnet');
+  });
+
+  it('passes explicit Google Vertex env to Gemini 3.1 Pro live lanes', () => {
+    const scenario = liveStackScenarioFromEnv({
+      LIVE_STACK_SCENARIO_ID: 'live.agent-mux.claude-code.google-vertex.gemini-3.1-pro-preview',
+      LIVE_STACK_AGENT_PATH: 'agent-mux',
+      LIVE_STACK_AGENT: 'claude-code',
+      LIVE_STACK_AMUX_AGENT: 'claude',
+      LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+      LIVE_STACK_INSTALL_MODE: 'vanilla',
+      LIVE_STACK_PROVIDER: 'google-vertex',
+      LIVE_STACK_AMUX_PROVIDER: 'vertex',
+      LIVE_STACK_MODEL: 'gemini-3.1-pro-preview',
+      LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+      LIVE_STACK_REQUIRED_ENV: 'GOOGLE_CLOUD_PROJECT,GOOGLE_API_KEY,GOOGLE_CLOUD_LOCATION,GOOGLE_GENAI_USE_VERTEXAI',
+      LIVE_STACK_LAYERS: 'agent-mux install,agent-mux invocation,transport-mux route,provider/model trace',
+      LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+      LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,transport-mux-trace,provider-trace-redacted',
+    });
+    const commands = buildPrimaryLiveStackCommands(scenario, {
+      cwd: '/repo',
+      timeoutMs: 1000,
+      env: {
+        GOOGLE_CLOUD_PROJECT: 'google-project',
+        GOOGLE_API_KEY: 'google-secret',
+        GOOGLE_CLOUD_LOCATION: 'global',
+        GOOGLE_GENAI_USE_VERTEXAI: 'True',
+        LIVE_STACK_TRACE_ID: 'trace-1',
+      },
+    });
+
     const launch = commands.at(-1);
-    expect(launch?.args).toContain('foundry');
-    expect(launch?.args).toContain('gpt-5.5');
-    expect(launch?.args).toContain('--with-proxy-if-needed');
-    expect(launch?.args).not.toContain('anthropic');
-    expect(launch?.args).not.toContain('sonnet');
+    expect(launch?.args).toContain('vertex');
+    expect(launch?.args).toContain('gemini-3.1-pro-preview');
+    expect(launch?.env['GOOGLE_CLOUD_PROJECT']).toBe('google-project');
+    expect(launch?.env['GOOGLE_API_KEY']).toBe('google-secret');
+    expect(launch?.env['GOOGLE_CLOUD_LOCATION']).toBe('global');
+    expect(launch?.env['GOOGLE_GENAI_USE_VERTEXAI']).toBe('True');
   });
 
   it('skips safely without Foundry credentials and never calls the command executor', async () => {

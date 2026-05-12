@@ -16,6 +16,10 @@ export function translateForClaude(config: ProviderConfig): HarnessProviderTrans
       if (config.auth.awsProfile) env['AWS_PROFILE'] = config.auth.awsProfile;
       return { env, args, proxyRequired: false };
     case 'vertex':
+      if (/^gemini[-.]/i.test(config.model)) {
+        env['ANTHROPIC_API_KEY'] = '';
+        return { env, args, proxyRequired: true, proxyExposedTransport: 'anthropic' };
+      }
       env['CLAUDE_CODE_USE_VERTEX'] = '1';
       if (config.params['project']) env['GOOGLE_CLOUD_PROJECT'] = String(config.params['project']);
       if (config.params['region']) env['GOOGLE_CLOUD_LOCATION'] = String(config.params['region']);

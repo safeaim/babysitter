@@ -35,6 +35,12 @@ function resolveApiKey(providerId: ProviderId, explicit?: string): string | unde
   if (explicit) return explicit;
   const amuxKey = process.env['AMUX_API_KEY'];
   if (amuxKey) return amuxKey;
+  if (providerId === 'google') {
+    return process.env['GOOGLE_API_KEY'] ?? process.env['GEMINI_API_KEY'];
+  }
+  if (providerId === 'vertex') {
+    return process.env['GOOGLE_API_KEY'];
+  }
   const defaults = PROVIDER_DEFAULTS[providerId];
   if (defaults.envKey) {
     return process.env[defaults.envKey];
@@ -64,6 +70,7 @@ function resolveAuth(providerId: ProviderId, input: ResolveProviderInput): Provi
     case 'adc':
       return {
         type: 'adc',
+        apiKey,
         gcpCredentialsFile: process.env['GOOGLE_APPLICATION_CREDENTIALS'],
       };
     case 'none':
@@ -103,7 +110,7 @@ export function resolveProvider(input: ResolveProviderInput): ProviderConfig {
   if (profile?.params) {
     Object.assign(params, profile.params);
   }
-  const region = input.region ?? process.env['AMUX_REGION'] ?? process.env['AWS_REGION'] ?? process.env['AWS_REGION_NAME'] ?? params['region'];
+  const region = input.region ?? process.env['AMUX_REGION'] ?? process.env['GOOGLE_CLOUD_LOCATION'] ?? process.env['VERTEXAI_LOCATION'] ?? process.env['AWS_REGION'] ?? process.env['AWS_REGION_NAME'] ?? params['region'];
   const project = input.project ?? process.env['AMUX_PROJECT'] ?? process.env['GOOGLE_CLOUD_PROJECT'] ?? process.env['VERTEXAI_PROJECT'] ?? params['project'];
   const apiBase = input.apiBase ?? process.env['AMUX_API_BASE'] ?? params['apiBase'];
 

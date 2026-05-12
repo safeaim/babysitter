@@ -8,6 +8,16 @@
 
 import type { CompletionEngine, CompletionRequest, CompletionResult, CompletionStreamEvent } from '@a5c-ai/transport-mux';
 
+interface GoogleCompletionEngineOptions {
+  apiBase?: string;
+  apiKey: string;
+  targetModel: string;
+  provider?: string;
+  project?: string;
+  location?: string;
+  useVertexAi?: boolean;
+}
+
 function buildUrl(apiBase: string, model: string): string {
   return `${apiBase}/openai/deployments/${model}/chat/completions?api-version=2025-04-01-preview`;
 }
@@ -21,6 +31,109 @@ function buildHeaders(apiKey: string): Record<string, string> {
 
 function buildBody(messages: Array<{ role: string; content: string }>, model: string, stream: boolean): string {
   return JSON.stringify({ messages, model, stream });
+}
+
+function buildGoogleContents(messages: Array<{ role: string; content: string }>): Array<{ role: string; parts: Array<{ text: string }> }> {
+  return messages.map((message) => ({
+    role: message.role === 'assistant' || message.role === 'model' ? 'model' : 'user',
+    parts: [{ text: message.content }],
+  }));
+}
+
+function buildGoogleBody(messages: Array<{ role: string; content: string }>): string {
+  return JSON.stringify({ contents: buildGoogleContents(messages) });
+}
+
+function buildGoogleUrl(options: GoogleCompletionEngineOptions, streaming: boolean): string {
+  const useVertexAi = options.useVertexAi === true || options.provider === 'vertex';
+  const method = streaming ? 'streamGenerateContent' : 'generateContent';
+
+  if (useVertexAi) {
+    const project = options.project ?? process.env['GOOGLE_CLOUD_PROJECT'];
+    if (!project) {
+      throw new Error('GOOGLE_CLOUD_PROJECT is required for Vertex AI Gemini proxy calls.');
+    }
+    const location = options.location ?? process.env['GOOGLE_CLOUD_LOCATION'] ?? 'global';
+    const apiBase = options.apiBase ?? 'https://aiplatform.googleapis.com';
+    const url = new URL(`/v1/projects/${encodeURIComponent(project)}/locations/${encodeURIComponent(location)}/publishers/google/models/${encodeURIComponent(options.targetModel)}:${method}`, apiBase);
+    url.searchParams.set('key', options.apiKey);
+    if (streaming) url.searchParams.set('alt', 'sse');
+    return String(url);
+  }
+
+  const apiBase = options.apiBase ?? 'https://generativelanguage.googleapis.com';
+  const url = new URL(`/v1beta/models/${encodeURIComponent(options.targetModel)}:${method}`, apiBase);
+  url.searchParams.set('key', options.apiKey);
+  if (streaming) url.searchParams.set('alt', 'sse');
+  return String(url);
+}
+
+function googleHeaders(): Record<string, string> {
+  return { 'Content-Type': 'application/json' };
+}
+
+function extractGoogleText(data: { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }> }): string {
+  return data.candidates
+    ?.flatMap((candidate) => candidate.content?.parts?.map((part) => part.text ?? '') ?? [])
+    .filter(Boolean)
+    .join('') ?? '';
+}
+
+function googleUsage(data: { usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number } }) {
+  return {
+    promptTokens: data.usageMetadata?.promptTokenCount ?? 0,
+    completionTokens: data.usageMetadata?.candidatesTokenCount ?? 0,
+    totalTokens: data.usageMetadata?.totalTokenCount ?? 0,
+  };
+}
+
+function parseGoogleStreamPayload(payload: string): { text?: string; finishReason?: string; usage?: CompletionResult['usage'] } | null {
+  if (!payload || payload === '[DONE]') return null;
+  try {
+    const data = JSON.parse(payload) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
+      usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number };
+    };
+    return {
+      text: extractGoogleText(data),
+      finishReason: data.candidates?.find((candidate) => candidate.finishReason)?.finishReason?.toLowerCase(),
+      usage: data.usageMetadata ? googleUsage(data) : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function* parseGoogleStream(response: Response): AsyncIterable<CompletionStreamEvent> {
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error('No response body');
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let usage: CompletionResult['usage'] | undefined;
+  let finishReason: string | undefined;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const payload = trimmed.startsWith('data:') ? trimmed.slice(5).trim() : trimmed;
+      const parsed = parseGoogleStreamPayload(payload);
+      if (!parsed) continue;
+      if (parsed.text) yield { type: 'text-delta', text: parsed.text };
+      if (parsed.usage) usage = parsed.usage;
+      if (parsed.finishReason) finishReason = parsed.finishReason;
+    }
+  }
+
+  yield { type: 'done', finishReason, usage };
 }
 
 export function createOpenAICompletionEngine(options: {
@@ -133,6 +246,54 @@ export function createOpenAICompletionEngine(options: {
       }
 
       yield { type: 'done' };
+    },
+  };
+}
+
+export function createGoogleCompletionEngine(options: GoogleCompletionEngineOptions): CompletionEngine {
+  return {
+    async complete(request: CompletionRequest): Promise<CompletionResult> {
+      const messages = request.messages.map((m) => ({ role: m.role, content: m.content }));
+      const response = await fetch(buildGoogleUrl(options, false), {
+        method: 'POST',
+        headers: googleHeaders(),
+        body: buildGoogleBody(messages),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Google API error ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json() as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
+        usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number };
+      };
+
+      return {
+        id: `google_${Date.now()}`,
+        model: options.targetModel,
+        role: 'assistant',
+        text: extractGoogleText(data),
+        finishReason: data.candidates?.find((candidate) => candidate.finishReason)?.finishReason?.toLowerCase() ?? 'stop',
+        usage: googleUsage(data),
+      };
+    },
+
+    async *stream(request: CompletionRequest): AsyncIterable<CompletionStreamEvent> {
+      const messages = request.messages.map((m) => ({ role: m.role, content: m.content }));
+      const response = await fetch(buildGoogleUrl(options, true), {
+        method: 'POST',
+        headers: googleHeaders(),
+        body: buildGoogleBody(messages),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Google API error ${response.status}: ${errorText}`);
+      }
+
+      yield* parseGoogleStream(response);
     },
   };
 }

@@ -69,7 +69,28 @@ describe('resolveLaunchPlan', () => {
       proxyMode: 'if-needed',
     });
     expect(plan.proxyNeeded).toBe(false);
-    expect(plan.env['GOOGLE_GENAI_USE_VERTEXAI']).toBe('true');
+    expect(plan.env['GOOGLE_GENAI_USE_VERTEXAI']).toBe('True');
+  });
+
+  it('claude + vertex Gemini uses transport-mux with Google proxy settings', () => {
+    const plan = resolveLaunchPlan({
+      harness: 'claude',
+      provider: 'vertex',
+      model: 'gemini-3.1-pro-preview',
+      apiKey: 'google-test-key',
+      project: 'google-project',
+      region: 'global',
+      proxyMode: 'if-needed',
+    });
+
+    expect(plan.proxyNeeded).toBe(true);
+    expect(plan.proxy?.targetProvider).toBe('vertex');
+    expect(plan.proxy?.targetModel).toBe('gemini-3.1-pro-preview');
+    expect(plan.proxy?.exposedTransport).toBe('anthropic');
+    expect(plan.proxy?.apiKey).toBe('google-test-key');
+    expect(plan.proxy?.project).toBe('google-project');
+    expect(plan.proxy?.location).toBe('global');
+    expect(plan.proxy?.useVertexAi).toBe(true);
   });
 
   it('claude + foundry: proxies through anthropic transport', () => {

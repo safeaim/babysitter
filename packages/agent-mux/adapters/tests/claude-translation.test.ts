@@ -77,6 +77,13 @@ describe('translateForClaude', () => {
       const result = translateForClaude(makeConfig({ provider: 'vertex', auth: { type: 'adc' }, params: { region: 'us-central1' } }));
       expect(result.env['GOOGLE_CLOUD_LOCATION']).toBe('us-central1');
     });
+
+    it('routes Gemini models on Vertex through transport-mux', () => {
+      const result = translateForClaude(makeConfig({ provider: 'vertex', model: 'gemini-3.1-pro-preview', auth: { type: 'adc', apiKey: 'google-key' } }));
+      expect(result.env).toEqual({ ANTHROPIC_API_KEY: '' });
+      expect(result.proxyRequired).toBe(true);
+      expect(result.proxyExposedTransport).toBe('anthropic');
+    });
   });
 
   describe('foundry provider', () => {

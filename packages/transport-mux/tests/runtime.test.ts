@@ -65,4 +65,12 @@ describe('transport-mux runtime', () => {
     expect(env['ANTHROPIC_API_KEY']).toBe('runtime-token');
     expect(env['ANTHROPIC_AUTH_TOKEN']).toBe('runtime-token');
   });
+
+  it('maps google transport env for Gemini CLI and Google GenAI SDKs', () => {
+    const env = applyTransportMuxToHarnessEnv({}, 'google', 'http://127.0.0.1:4318', 'runtime-token');
+
+    expect(env['CODE_ASSIST_ENDPOINT']).toBe('http://127.0.0.1:4318');
+    expect(env['GOOGLE_API_KEY']).toBe('runtime-token');
+    expect(env['GEMINI_API_KEY']).toBe('runtime-token');
+  });
 });

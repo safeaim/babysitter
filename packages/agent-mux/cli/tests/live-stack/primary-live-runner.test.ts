@@ -17,10 +17,10 @@ describe('primary live stack runner contract', () => {
     });
 
     const run = commands.at(-1);
-    expect(run?.args).toContain('run');
+    expect(run?.args).toContain('launch');
     expect(run?.args).toContain('claude');
     expect(run?.args).toContain('gpt-5.5');
-    expect(run?.env['AMUX_PROVIDER']).toBe('foundry');
+    expect(run?.args).toContain('foundry');
     expect(run?.args).not.toContain('anthropic');
     expect(run?.args).not.toContain('sonnet');
   });

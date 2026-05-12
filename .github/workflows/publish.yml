@@ -1767,8 +1767,8 @@ jobs:
         run: |
           if [[ -n "${KRATE_GITHUB_CLIENT_ID}" && -n "${KRATE_GITHUB_CLIENT_SECRET}" ]]; then
             kubectl -n "$KUBE_NAMESPACE" create secret generic krate-auth \
-              --from-literal=github-client-id="$KRATE_GITHUB_CLIENT_ID" \
-              --from-literal=github-client-secret="$KRATE_GITHUB_CLIENT_SECRET" \
+              --from-literal=KRATE_AUTH_GITHUB_CLIENT_ID="$KRATE_GITHUB_CLIENT_ID" \
+              --from-literal=KRATE_AUTH_GITHUB_CLIENT_SECRET="$KRATE_GITHUB_CLIENT_SECRET" \
               --dry-run=client -o yaml | kubectl apply -f -
           else
             echo "::notice::Skipping krate-auth secret — GitHub OAuth not configured"

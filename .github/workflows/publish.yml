@@ -1710,8 +1710,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Deploy Cloud
     needs:
-      - validate_cloud
-      - build_all
+      - prepare_staging_publish
     runs-on: ubuntu-latest-l
     steps:
       - name: Download publish workspace

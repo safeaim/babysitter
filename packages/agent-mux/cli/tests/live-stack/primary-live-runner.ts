@@ -754,11 +754,6 @@ async function validateAgentBehavior(
       if (/completed|RUN_COMPLETED/i.test(output)) {
         runCompleted = true;
         runCompletionDetail = 'run completion evidence found in output (no .a5c/runs/ directory)';
-      } else if (!isInteractiveMode && output.length > 200) {
-        // Non-interactive mode: harness hooks don't fire (no TTY), so .a5c/runs/
-        // isn't created. Accept substantial agent output as completion evidence.
-        runCompleted = true;
-        runCompletionDetail = `agent produced ${output.length} chars (non-interactive: harness hooks require TTY for .a5c/runs/)`;
       }
     }
     entries.push({
@@ -785,12 +780,7 @@ async function validateAgentBehavior(
         } catch { continue; }
       }
     } catch {
-      if (!isInteractiveMode && output.length > 200) {
-        completionProofFound = true;
-        completionProofDetail = `no .a5c/runs/ (non-interactive: hooks require TTY), agent produced ${output.length} chars as proof`;
-      } else {
-        completionProofDetail = 'no .a5c/runs/ directory found';
-      }
+      completionProofDetail = 'no .a5c/runs/ directory found';
     }
     entries.push({
       name: 'babysitter-completion-proof',

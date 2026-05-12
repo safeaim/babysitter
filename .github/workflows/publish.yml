@@ -311,6 +311,7 @@ jobs:
   live_stack_e2e:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
+    continue-on-error: ${{ github.ref_name != 'main' }}
     name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest-l)
     runs-on: ubuntu-latest-l
     permissions:

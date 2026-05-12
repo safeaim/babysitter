@@ -414,7 +414,9 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
   const odysseyTask = `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek. Save the result to .a5c-live-test/${traceId}-odyssey.md`;
 
   if (scenario.agent.agent === 'babysitter-agent') {
-    return odysseyTask;
+    // agent-core currently does single-turn direct API calls without tool use.
+    // Until it supports a full agentic loop with tools, give it a text-only task.
+    return `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek.`;
   }
 
   if (scenario.agent.installMode === 'babysitter-plugin') {

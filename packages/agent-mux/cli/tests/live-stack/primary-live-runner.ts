@@ -310,6 +310,17 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
 }
 
 export async function executeChildProcessCommand(execution: CommandExecution): Promise<CommandResult> {
+  const isInteractive = execution.env['LIVE_STACK_INTERACTIVE'] === 'true';
+
+  // Interactive mode: use node-pty so the harness gets a real TTY
+  if (isInteractive) {
+    try {
+      return await executePtyCommand(execution);
+    } catch {
+      // node-pty not available — fall through to pipe mode
+    }
+  }
+
   const { spawn } = await import('node:child_process');
   return await new Promise<CommandResult>((resolve) => {
     const child = spawn(execution.command, execution.args, {
@@ -333,6 +344,39 @@ export async function executeChildProcessCommand(execution: CommandExecution): P
     child.on('error', (error) => {
       clearTimeout(timer);
       resolve({ status: 1, stdout, stderr: `${stderr}\n${error.message}` });
+    });
+  });
+}
+
+async function executePtyCommand(execution: CommandExecution): Promise<CommandResult> {
+  const nodePty = require('node-pty') as {
+    spawn(file: string, args: string[], options: Record<string, unknown>): {
+      onData(cb: (data: string) => void): void;
+      onExit(cb: (e: { exitCode: number }) => void): void;
+      kill(signal?: string): void;
+      pid: number;
+    };
+  };
+
+  return await new Promise<CommandResult>((resolve) => {
+    let output = '';
+    const pty = nodePty.spawn(execution.command, execution.args, {
+      name: 'xterm-256color',
+      cols: 120,
+      rows: 40,
+      cwd: execution.cwd,
+      env: { ...process.env, ...execution.env },
+    });
+
+    const timer = setTimeout(() => {
+      pty.kill('SIGTERM');
+      output += '\nTimed out after ' + execution.timeoutMs + 'ms';
+    }, execution.timeoutMs);
+
+    pty.onData((data) => { output += data; });
+    pty.onExit(({ exitCode }) => {
+      clearTimeout(timer);
+      resolve({ status: exitCode, stdout: output, stderr: '' });
     });
   });
 }

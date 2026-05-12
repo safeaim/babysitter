@@ -1801,6 +1801,8 @@ jobs:
             kubectl -n "$KUBE_NAMESPACE" create secret generic krate-auth \
               --from-literal=KRATE_AUTH_GITHUB_CLIENT_ID="$KRATE_GITHUB_CLIENT_ID" \
               --from-literal=KRATE_AUTH_GITHUB_CLIENT_SECRET="$KRATE_GITHUB_CLIENT_SECRET" \
+              --from-literal=KRATE_ADMIN_ORG="a5c-ai" \
+              --from-literal=KRATE_ADMIN_USERNAME="tmuskal" \
               --dry-run=client -o yaml | kubectl apply -f -
           else
             echo "::notice::Skipping krate-auth secret — GitHub OAuth not configured"

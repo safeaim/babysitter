@@ -136,8 +136,12 @@ export function profileFromDelegatedHeaders(headers, config = createAuthProvider
   return { provider: 'delegated', subject: user, email, displayName: user, username: normalizeName(user), groups, teams: [], admin: groups.includes('krate:platform-engineers') || groups.includes('krate:repo-admins'), delegatedIdentitySource: headerUser ? 'proxy-header' : 'local-development' };
 }
 
-export async function registerLoginProfile({ controller, namespace = process.env.KRATE_NAMESPACE || 'default', profile }) {
-  const mapped = mapLoginProfileToKrateIdentity({ ...profile, namespace });
+export async function registerLoginProfile({ controller, namespace, profile }) {
+  const org = process.env.KRATE_ADMIN_ORG || process.env.KRATE_ORG || 'default';
+  const orgNamespace = namespace || `krate-org-${org}`;
+  const adminUsername = process.env.KRATE_ADMIN_USERNAME || '';
+  const isBootstrapAdmin = adminUsername && (profile.username === adminUsername || profile.email === adminUsername || normalizeName(profile.email || '') === adminUsername || normalizeName(profile.username || '') === adminUsername);
+  const mapped = mapLoginProfileToKrateIdentity({ ...profile, namespace: orgNamespace, organizationRef: org, admin: isBootstrapAdmin || profile.admin });
   const userResult = await controller.applyResource(mapped.user);
   const mappingResult = await controller.applyResource(mapped.mapping);
   return { ...mapped, userResult, mappingResult };

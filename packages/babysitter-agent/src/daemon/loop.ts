@@ -37,8 +37,9 @@ export async function runDaemonLoop(
   const activeRuns = new Set<Promise<void>>();
   const queue: TriggerEvent[] = [];
 
+  let statusWriteChain = Promise.resolve();
   function scheduleStatusWrite(): void {
-    void writeLoopStatus().catch(() => {
+    statusWriteChain = statusWriteChain.then(() => writeLoopStatus()).catch(() => {
       // Status persistence is best-effort and must not surface as an
       // unhandled rejection during trigger dispatch or shutdown races.
     });
@@ -170,7 +171,8 @@ export async function runDaemonLoop(
     await Promise.allSettled([...activeRuns]);
   }
 
-  // Write final status after all runs have drained (best-effort)
+  // Wait for any in-flight status writes then write final status
+  await statusWriteChain;
   try { await writeLoopStatus(); } catch { /* directory may be gone in tests */ }
 }
 

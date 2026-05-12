@@ -1394,6 +1394,8 @@ jobs:
             namespace: ${KUBE_NAMESPACE}
           spec:
             replicas: 1
+            strategy:
+              type: Recreate
             selector:
               matchLabels:
                 app: ${APP_NAME}
@@ -1402,6 +1404,7 @@ jobs:
                 labels:
                   app: ${APP_NAME}
               spec:
+                terminationGracePeriodSeconds: 10
                 imagePullSecrets:
                   - name: acr-pull
                 containers:
@@ -1602,6 +1605,8 @@ jobs:
             namespace: ${KUBE_NAMESPACE}
           spec:
             replicas: 1
+            strategy:
+              type: Recreate
             selector:
               matchLabels:
                 app: ${APP_NAME}
@@ -1610,6 +1615,7 @@ jobs:
                 labels:
                   app: ${APP_NAME}
               spec:
+                terminationGracePeriodSeconds: 10
                 imagePullSecrets:
                   - name: acr-pull
                 containers:

@@ -84,7 +84,7 @@ jobs:
           PID_TUI=$!
           npm run build --workspace=@a5c-ai/triggers &
           PID_TRIG=$!
-          npm run build:local --workspace=@a5c-ai/agent-mux-webui &
+          npm run build --workspace=@a5c-ai/agent-mux-webui &
           PID_WEBUI=$!
           npm run build:observer &
           PID_OBS=$!

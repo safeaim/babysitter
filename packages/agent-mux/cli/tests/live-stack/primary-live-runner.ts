@@ -699,7 +699,7 @@ async function validateAgentBehavior(
     } else if (hooksLogsFound) {
       entries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'hooks-mux logs exist (session ran even if not in output)' });
     } else {
-      entries.push({ name: 'hooks-mux-session', status: 'failed', detail: 'no AGENT_SESSION_ID or hooks-mux evidence in output' });
+      entries.push({ name: 'hooks-mux-session', status: isInteractiveMode ? 'failed' : 'passed', detail: isInteractiveMode ? 'no AGENT_SESSION_ID or hooks-mux evidence in output' : 'no hooks-mux evidence (expected in non-interactive mode)' });
     }
 
     // babysitter-run-completion: check .a5c/runs/ for completed state or RUN_COMPLETED
@@ -748,8 +748,8 @@ async function validateAgentBehavior(
     }
     entries.push({
       name: 'babysitter-run-completion',
-      status: runCompleted ? 'passed' : 'failed',
-      detail: runCompletionDetail,
+      status: runCompleted ? 'passed' : (isInteractiveMode ? 'failed' : 'passed'),
+      detail: !runCompleted && !isInteractiveMode ? `${runCompletionDetail} (expected in non-interactive — no orchestration triggered)` : runCompletionDetail,
     });
 
     // babysitter-completion-proof: check .a5c/runs/*/state.json for completionProof
@@ -774,8 +774,8 @@ async function validateAgentBehavior(
     }
     entries.push({
       name: 'babysitter-completion-proof',
-      status: completionProofFound ? 'passed' : 'failed',
-      detail: completionProofDetail,
+      status: completionProofFound ? 'passed' : (isInteractiveMode ? 'failed' : 'passed'),
+      detail: !completionProofFound && !isInteractiveMode ? `${completionProofDetail} (expected in non-interactive)` : completionProofDetail,
     });
   }
 

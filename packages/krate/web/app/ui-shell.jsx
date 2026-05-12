@@ -32,7 +32,9 @@ export const orgNavigationGroups = [
       ['/agents/sessions', 'Sessions', 'Agent chat sessions'],
       ['/agents/runs', 'Dispatch runs', 'Agent dispatch runs'],
       ['/agents/rules', 'Trigger rules', 'Trigger rule definitions'],
-      ['/agents/approvals', 'Approvals', 'Pending agent approvals']
+      ['/agents/approvals', 'Approvals', 'Pending agent approvals'],
+      ['/agents/workspaces', 'Workspaces', 'Agent workspaces and runtimes'],
+      ['/agents/projects', 'Projects', 'Agent project boards']
     ]
   },
   {
@@ -389,18 +391,131 @@ export async function AgentRulesPage({ org = null } = {}) {
   const activeOrg = ui.model.org?.slug || org || 'default';
   const agentView = ui.model.agents || { rules: { count: 0, items: [] } };
   const rules = agentView.rules.items || [];
-  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent trigger rules" title="Trigger rules" text="Trigger rules define which events dispatch agent runs and which stack handles them." actions={[['/agents', 'Overview'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/rules', 'Trigger rules']]}>
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent trigger rules" title="Trigger rules" text="Trigger rules define which events dispatch agent runs and which stack handles them." actions={[['/agents/rules/new', 'New rule'], ['/agents', 'Overview'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/rules', 'Trigger rules']]}>
     <DegradedBanner model={ui.model} />
     <div className="card">
       <div className="cardTitle"><h2>Trigger rules</h2><StatusPill tone={rules.length ? 'good' : 'neutral'}>{rules.length} rules</StatusPill></div>
-      {rules.length ? <div className="resourceTable">{rules.map((rule) => <div key={rule.metadata?.name} className="resourceRow">
+      {rules.length ? <div className="resourceTable">{rules.map((rule) => <a key={rule.metadata?.name} href={orgHref(activeOrg, `/agents/rules/${rule.metadata?.name}`)} className="resourceRow" style={{ textDecoration: 'none' }}>
         <strong>{rule.metadata?.name}</strong>
         <span>{(rule.spec?.sources || []).join(', ') || 'all sources'}</span>
         <span>{rule.spec?.stackRef || rule.spec?.targetStack || 'unassigned'}</span>
         <span>{rule.spec?.taskKind || 'default'}</span>
         <small>{rule.status?.phase || 'Pending'}</small>
-      </div>)}</div> : <EmptyState title="No trigger rules configured" text="Trigger rules are created through Krate resource definitions. When rules are available, they appear here with their sources, target stack, and task kind." />}
+      </a>)}</div> : <EmptyState title="No trigger rules configured" text="Trigger rules are created through Krate resource definitions. When rules are available, they appear here with their sources, target stack, and task kind." />}
     </div>
+  </PageFrame>;
+}
+
+export async function AgentRuleDetailPage({ org = null, ruleName } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { rules: { items: [] }, triggerExecutions: { items: [] }, stacks: { items: [] } };
+  const rule = (agentView.rules.items || []).find((r) => r.metadata?.name === ruleName) || null;
+  const agentStack = rule?.spec?.agentStack || rule?.spec?.stackRef || rule?.spec?.targetStack || null;
+  const sources = rule?.spec?.sources || [];
+  const taskKind = rule?.spec?.taskKind || 'default';
+  const repository = rule?.spec?.repository || null;
+  const allowedActors = rule?.spec?.allowedActors || null;
+  const executions = (agentView.triggerExecutions?.items || []).filter((exec) => exec.spec?.triggerRule === ruleName || exec.spec?.ruleRef === ruleName);
+  const decisionTone = (decision) => {
+    if (!decision) return 'neutral';
+    const d = decision.toLowerCase();
+    if (d === 'dispatched') return 'good';
+    if (d === 'skipped') return 'neutral';
+    if (d === 'deduplicated') return 'warn';
+    if (d === 'failed') return 'danger';
+    return 'neutral';
+  };
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`trigger rule / ${ruleName}`} title={ruleName || 'Rule detail'} text={rule ? `Trigger rule targeting ${agentStack || 'unknown stack'} with ${sources.length ? sources.join(', ') : 'all'} sources.` : 'This trigger rule was not found in the current workspace.'} actions={[['/agents/rules', 'All rules'], ['/agents/rules/new', 'New rule'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/rules', 'Trigger rules'], [`/agents/rules/${ruleName}`, ruleName || 'Detail']]}>
+    <DegradedBanner model={ui.model} />
+    {rule ? <>
+      <section className="routeGrid two">
+        <div className="card">
+          <div className="cardTitle"><h3>Configuration</h3><StatusPill tone={rule.status?.phase === 'Active' || rule.status?.phase === 'Ready' ? 'good' : rule.status?.phase === 'Failed' ? 'danger' : 'neutral'}>{rule.status?.phase || 'Pending'}</StatusPill></div>
+          <dl className="kv">
+            <dt>Sources</dt><dd>{sources.length ? sources.map((source) => <span key={source} className="pill neutral" style={{ marginRight: '0.25rem', fontSize: '0.75rem' }}>{source}</span>) : <span className="pill neutral" style={{ fontSize: '0.75rem' }}>all sources</span>}</dd>
+            <dt>Target stack</dt><dd>{agentStack ? <a href={orgHref(activeOrg, `/agents/stacks/${agentStack}`)}>{agentStack}</a> : 'not assigned'}</dd>
+            <dt>Task kind</dt><dd>{taskKind}</dd>
+            <dt>Repository scope</dt><dd>{repository || 'All repositories'}</dd>
+            <dt>Actor filter</dt><dd>{allowedActors && allowedActors.length ? allowedActors.join(', ') : 'Any actor'}</dd>
+          </dl>
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Metadata</h3><StatusPill tone="neutral">resource</StatusPill></div>
+          <dl className="kv">
+            <dt>Name</dt><dd>{rule.metadata?.name}</dd>
+            <dt>Namespace</dt><dd>{rule.metadata?.namespace || ui.model.namespace}</dd>
+            <dt>Organization</dt><dd>{rule.spec?.organizationRef || activeOrg}</dd>
+            <dt>Created</dt><dd>{rule.metadata?.creationTimestamp || 'unknown'}</dd>
+          </dl>
+        </div>
+      </section>
+      <div className="card">
+        <div className="cardTitle"><h2>Execution history</h2><StatusPill tone={executions.length ? 'good' : 'neutral'}>{executions.length} executions</StatusPill></div>
+        {executions.length ? <div className="resourceTable">{executions.map((exec) => <div key={exec.metadata?.name} className="resourceRow">
+          <strong>{exec.spec?.event || exec.spec?.eventType || 'event'}</strong>
+          <StatusPill tone={decisionTone(exec.status?.decision || exec.spec?.decision)}>{exec.status?.decision || exec.spec?.decision || 'unknown'}</StatusPill>
+          <span>{exec.status?.dispatchRun || exec.spec?.dispatchRun ? <a href={orgHref(activeOrg, `/agents/runs/${exec.status?.dispatchRun || exec.spec?.dispatchRun}`)}>{exec.status?.dispatchRun || exec.spec?.dispatchRun}</a> : 'no run'}</span>
+          <small>{exec.metadata?.creationTimestamp || exec.status?.timestamp || ''}</small>
+        </div>)}</div> : <EmptyState title="No trigger executions yet" text="Execution records appear when events match this trigger rule. Each execution shows the event, decision, and any dispatched run." />}
+      </div>
+    </> : <EmptyState title={`Rule ${ruleName} not found`} text="This trigger rule does not exist in the current workspace. Trigger rules are created through resource definitions." />}
+  </PageFrame>;
+}
+
+export async function AgentRuleBuilderPage({ org = null } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const eventTypes = ['ci-failure', 'webhook', 'comment', 'label-added', 'push', 'schedule', 'manual', 'pr-opened', 'issue-created'];
+  const taskKinds = ['diagnostic', 'repair', 'review', 'custom'];
+  const exampleYaml = `apiVersion: krate.a5c.ai/v1alpha1
+kind: AgentTriggerRule
+metadata:
+  name: my-trigger-rule
+  namespace: krate-system
+spec:
+  organizationRef: ${activeOrg}
+  sources:
+    - ci-failure
+  agentStack: my-diagnostic-stack
+  taskKind: diagnostic`;
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="new trigger rule" title="Create trigger rule" text="Define which events dispatch agent runs and which stack handles them." actions={[['/agents/rules', 'All rules'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/rules', 'Trigger rules'], ['/agents/rules/new', 'New rule']]}>
+    <DegradedBanner model={ui.model} />
+    <div className="card" style={{ borderLeft: '3px solid var(--color-info, #3b82f6)' }}>
+      <div className="cardTitle"><h3>Read-only preview</h3><StatusPill tone="neutral">reference</StatusPill></div>
+      <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Create trigger rules using the Krate CLI or resource definitions. This page shows the resource format for reference.</p>
+    </div>
+    <section className="routeGrid two">
+      <div className="card">
+        <div className="cardTitle"><h3>Rule shape</h3><StatusPill tone="neutral">preview</StatusPill></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Name</label>
+            <input disabled type="text" placeholder="my-trigger-rule" style={{ width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', background: '#f9fafb', color: '#9ca3af', fontSize: '0.875rem' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.5rem' }}>Sources</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>{eventTypes.map((eventType) => <label key={eventType} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', color: '#9ca3af' }}><input disabled type="checkbox" />{eventType}</label>)}</div>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Target stack</label>
+            <select disabled style={{ width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', background: '#f9fafb', color: '#9ca3af', fontSize: '0.875rem' }}><option>Select a stack...</option></select>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Task kind</label>
+            <select disabled style={{ width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', background: '#f9fafb', color: '#9ca3af', fontSize: '0.875rem' }}>{taskKinds.map((kind) => <option key={kind}>{kind}</option>)}</select>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Repository scope</label>
+            <input disabled type="text" placeholder="Optional -- leave empty for all repos" style={{ width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', background: '#f9fafb', color: '#9ca3af', fontSize: '0.875rem' }} />
+          </div>
+        </div>
+      </div>
+      <div className="card">
+        <div className="cardTitle"><h3>Resource definition</h3><StatusPill tone="neutral">example</StatusPill></div>
+        <pre style={{ background: '#1e1e2e', color: '#cdd6f4', padding: '1rem', borderRadius: '0.5rem', fontSize: '0.8125rem', lineHeight: '1.6', overflow: 'auto' }}><code>{exampleYaml}</code></pre>
+      </div>
+    </section>
   </PageFrame>;
 }
 
@@ -490,6 +605,197 @@ function relativeTime(timestamp) {
   } catch { return String(timestamp); }
 }
 
+export async function AgentWorkspacesPage({ org = null } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { workspaces: { count: 0, items: [] } };
+  const workspaces = agentView.workspaces?.items || [];
+  const phaseTone = (phase) => {
+    if (!phase || phase === 'Pending' || phase === 'Provisioning') return 'neutral';
+    if (phase === 'Active') return 'good';
+    if (phase === 'Archived') return 'warn';
+    if (phase === 'Failed') return 'danger';
+    return 'neutral';
+  };
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent workspaces" title="Agent workspaces" text="Each workspace represents a provisioned git worktree with runtime state, session bindings, and work item links." actions={[['/agents', 'Overview'], ['/agents/sessions', 'Sessions']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/workspaces', 'Workspaces']]}>
+    <DegradedBanner model={ui.model} />
+    <div className="card">
+      <div className="cardTitle"><h2>Workspaces</h2><StatusPill tone={workspaces.length ? 'good' : 'neutral'}>{workspaces.length} workspaces</StatusPill></div>
+      {workspaces.length ? <div className="resourceTable">{workspaces.map((ws) => <a key={ws.metadata?.name} href={orgHref(activeOrg, `/agents/workspaces/${ws.metadata?.name}`)} className="resourceRow" style={{ textDecoration: 'none' }}>
+        <strong>{ws.metadata?.name}</strong>
+        <span>{ws.spec?.repository || 'no repository'}</span>
+        <StatusPill tone={phaseTone(ws.status?.phase)}>{ws.status?.phase || 'Pending'}</StatusPill>
+        <span>{(ws.status?.boundSessions || []).length} sessions</span>
+        <small>{ws.spec?.workspacePath || ''}</small>
+      </a>)}</div> : <EmptyState title="No agent workspaces" text="Agent workspaces appear when dispatch runs provision git worktrees. Configure agent stacks and workspace policies to manage worktree lifecycle." />}
+    </div>
+  </PageFrame>;
+}
+
+export async function AgentWorkspaceDetailPage({ org = null, workspaceId } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { workspaces: { items: [] }, sessions: { items: [] } };
+  const workspace = (agentView.workspaces?.items || []).find((w) => w.metadata?.name === workspaceId) || null;
+  const runtimes = (ui.model.resources || []).find((r) => r.kind === 'AgentWorkspaceRuntime');
+  const runtimeItems = runtimes?.items || [];
+  const runtime = runtimeItems.find((r) => r.spec?.workspaceRef === workspaceId) || null;
+  const boundSessions = workspace?.status?.boundSessions || [];
+  const allWorkItemLinks = (ui.model.resources || []).find((r) => r.kind === 'WorkItemWorkspaceLink');
+  const workItemLinks = (allWorkItemLinks?.items || []).filter((link) => link.spec?.workspace === workspaceId);
+  const phaseTone = (phase) => {
+    if (!phase || phase === 'Pending' || phase === 'Provisioning') return 'neutral';
+    if (phase === 'Active') return 'good';
+    if (phase === 'Archived') return 'warn';
+    if (phase === 'Failed') return 'danger';
+    return 'neutral';
+  };
+  const truncatePath = (path, maxLen = 60) => {
+    if (!path) return '—';
+    return path.length > maxLen ? '…' + path.slice(path.length - maxLen + 1) : path;
+  };
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`workspace / ${workspaceId}`} title={workspaceId || 'Workspace detail'} text={workspace ? `Agent workspace for ${workspace.spec?.repository || 'unknown repository'} with phase ${workspace.status?.phase || 'Pending'}.` : 'This agent workspace was not found in the current workspace.'} actions={[['/agents/workspaces', 'All workspaces'], ['/agents/sessions', 'Sessions']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/workspaces', 'Workspaces'], [`/agents/workspaces/${workspaceId}`, workspaceId || 'Detail']]}>
+    <DegradedBanner model={ui.model} />
+    {workspace ? <>
+      <section className="routeGrid two">
+        <div className="card">
+          <div className="cardTitle"><h3>{workspaceId}</h3><StatusPill tone={phaseTone(workspace.status?.phase)}>{workspace.status?.phase || 'Pending'}</StatusPill></div>
+          <p>{workspace.spec?.repository || 'No repository'}</p>
+        </div>
+      </section>
+      <section className="routeGrid four">
+        <div className="card">
+          <div className="cardTitle"><h3>Repository</h3></div>
+          <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.875rem' }}>{workspace.spec?.repository || '—'}</p>
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Path</h3></div>
+          <p title={workspace.spec?.workspacePath || ''} style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{truncatePath(workspace.spec?.workspacePath)}</p>
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Sessions</h3></div>
+          <p><strong>{boundSessions.length}</strong></p>
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Status</h3></div>
+          <p>{runtime ? (runtime.spec?.status || runtime.status?.phase || 'unknown') : 'No runtime'}</p>
+        </div>
+      </section>
+      <section className="routeGrid two">
+        <div className="card">
+          <div className="cardTitle"><h3>Files</h3><StatusPill tone={runtime?.spec?.files ? 'good' : 'neutral'}>{runtime?.spec?.files ? 'available' : 'none'}</StatusPill></div>
+          {runtime?.spec?.files && Array.isArray(runtime.spec.files) && runtime.spec.files.length ? <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.8125rem', lineHeight: '1.75' }}>{runtime.spec.files.map((file) => <div key={file}>{file}</div>)}</div> : <EmptyState title="File explorer available when workspace is active" text="File listing is provided by the workspace runtime when the worktree is provisioned and active." />}
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Runtime</h3><StatusPill tone={runtime ? 'good' : 'neutral'}>{runtime ? (runtime.status?.phase || 'available') : 'none'}</StatusPill></div>
+          {runtime ? <dl className="kv">
+            <dt>Working directory</dt><dd style={{ fontFamily: 'var(--font-mono, monospace)' }}>{runtime.spec?.cwd || '—'}</dd>
+            <dt>Process status</dt><dd>{runtime.spec?.status || 'unknown'}</dd>
+            {runtime.spec?.env ? <><dt>Environment keys</dt><dd>{Object.keys(runtime.spec.env).map((key) => <span key={key} className="pill neutral" style={{ marginRight: '0.25rem', fontSize: '0.75rem' }}>{key}</span>)}</dd></> : null}
+          </dl> : <EmptyState title="No runtime data" text="Runtime details appear when the workspace has been provisioned with a worktree and process." />}
+        </div>
+      </section>
+      <section className="routeGrid two">
+        <div className="card">
+          <div className="cardTitle"><h3>Sessions</h3><StatusPill tone={boundSessions.length ? 'good' : 'neutral'}>{boundSessions.length} bound</StatusPill></div>
+          {boundSessions.length ? <ul className="resourceList">{boundSessions.map((binding, index) => {
+            const sessionRef = binding.sessionRef || binding;
+            const session = (agentView.sessions?.items || []).find((s) => s.metadata?.name === sessionRef);
+            return <li key={sessionRef || index}>
+              <a href={orgHref(activeOrg, `/agents/sessions/${sessionRef}`)}><strong>{sessionRef}</strong></a>
+              {session ? <StatusPill tone={session.status?.phase === 'Active' || session.status?.phase === 'Running' ? 'warn' : session.status?.phase === 'Completed' ? 'good' : 'neutral'}>{session.status?.phase || 'Pending'}</StatusPill> : null}
+              {binding.boundAt ? <small>Bound: {binding.boundAt}</small> : null}
+              {binding.agent ? <small>Agent: {binding.agent}</small> : null}
+            </li>;
+          })}</ul> : <p className="emptyText">No sessions are bound to this workspace.</p>}
+        </div>
+        <div className="card">
+          <div className="cardTitle"><h3>Work items</h3><StatusPill tone={workItemLinks.length ? 'good' : 'neutral'}>{workItemLinks.length} linked</StatusPill></div>
+          {workItemLinks.length ? <ul className="resourceList">{workItemLinks.map((link) => <li key={link.metadata?.name}>
+            <strong>{link.spec?.workItemRef || link.metadata?.name}</strong>
+            <span>{link.spec?.workItemKind || 'Issue'}</span>
+            <small>{link.status?.phase || 'Active'}{link.status?.createdAt ? ` / ${link.status.createdAt}` : ''}</small>
+          </li>)}</ul> : <p className="emptyText">No work items are linked to this workspace.</p>}
+        </div>
+      </section>
+    </> : <EmptyState title={`Workspace ${workspaceId} not found`} text="This agent workspace does not exist in the current workspace. Agent workspaces are provisioned when dispatch runs create git worktrees." />}
+  </PageFrame>;
+}
+
+const WORKFLOW_COLUMNS = [
+  { id: 'todo', label: 'Todo', color: '#6b7280' },
+  { id: 'in-progress', label: 'In Progress', color: '#eab308' },
+  { id: 'review', label: 'Review', color: '#3b82f6' },
+  { id: 'done', label: 'Done', color: '#22c55e' },
+];
+
+function KanbanBoard({ project, items = [], org = 'default' }) {
+  const columns = WORKFLOW_COLUMNS.map((col) => ({
+    ...col,
+    items: items.filter((item) => (item.status?.column || 'todo') === col.id),
+  }));
+  const hasItems = items.length > 0;
+  return <div className="kanbanBoard" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', minHeight: '20rem' }}>
+    {columns.map((col) => <section key={col.id} className="kanbanColumn" style={{ background: 'var(--surface-muted, #f9fafb)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+        <h3 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>{col.label}</h3>
+        <span style={{ background: col.color, color: '#fff', borderRadius: '9999px', padding: '0.125rem 0.5rem', fontSize: '0.75rem', fontWeight: 600 }}>{col.items.length}</span>
+      </div>
+      {col.items.length ? col.items.map((item) => <div key={item.metadata?.name || item.spec?.title} className="kanbanCard" style={{ background: '#fff', borderRadius: '0.375rem', padding: '0.625rem 0.75rem', borderLeft: `4px solid ${col.color}`, boxShadow: '0 1px 2px rgba(0,0,0,0.06)' }}>
+        <strong style={{ fontSize: '0.8125rem', display: 'block', marginBottom: '0.25rem' }}>{item.spec?.title || item.metadata?.name}</strong>
+        {item.spec?.priority ? <span className="pill neutral" style={{ fontSize: '0.6875rem', marginRight: '0.25rem' }}>{item.spec.priority}</span> : null}
+        {item.spec?.assignee ? <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>{item.spec.assignee}</small> : null}
+        <div style={{ display: 'flex', gap: '0.375rem', marginTop: '0.25rem' }}>
+          {item.status?.linkedSessions ? <small style={{ color: '#9ca3af', fontSize: '0.6875rem' }}>{item.status.linkedSessions} sessions</small> : null}
+          {item.status?.linkedWorkspaces ? <small style={{ color: '#9ca3af', fontSize: '0.6875rem' }}>{item.status.linkedWorkspaces} workspaces</small> : null}
+        </div>
+      </div>) : <p style={{ color: '#9ca3af', fontSize: '0.8125rem', textAlign: 'center', margin: 'auto 0', padding: '1rem 0' }}>No items</p>}
+    </section>)}
+    {!hasItems ? <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem 0', color: '#9ca3af' }}>
+      <p style={{ fontSize: '0.875rem' }}>Link issues to this project to populate the board</p>
+    </div> : null}
+  </div>;
+}
+
+export async function AgentProjectsPage({ org = null } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { projects: { count: 0, items: [] }, stacks: { items: [] } };
+  const projects = agentView.projects?.items || [];
+  const stacks = agentView.stacks?.items || [];
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent projects" title="Projects" text="Organize agent work into projects with kanban boards, linked stacks, and tracked issues." actions={[['/agents', 'Overview'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/projects', 'Projects']]}>
+    <DegradedBanner model={ui.model} />
+    {projects.length ? <section className="routeGrid three">{projects.map((project) => {
+      const name = project.metadata?.name;
+      const displayName = project.spec?.displayName || name;
+      const linkedStacks = (project.spec?.stackRefs || []).length || (stacks.filter((s) => s.spec?.projectRef === name).length);
+      const phase = project.status?.phase || 'Active';
+      const phaseTone = phase === 'Active' ? 'good' : phase === 'Archived' ? 'neutral' : 'warn';
+      return <a key={name} href={orgHref(activeOrg, `/agents/projects/${name}`)} className="card quickAction" style={{ textDecoration: 'none' }}>
+        <div className="cardTitle"><h3>{displayName}</h3><StatusPill tone={phaseTone}>{phase}</StatusPill></div>
+        <p style={{ color: '#6b7280', fontSize: '0.8125rem' }}>{project.spec?.description || 'No description'}</p>
+        <small>{linkedStacks} linked stack{linkedStacks === 1 ? '' : 's'}</small>
+      </a>;
+    })}</section> : <EmptyState title="No projects yet" text="Projects organize agent work into boards with columns. Create a project through Krate resource definitions to start tracking work." />}
+  </PageFrame>;
+}
+
+export async function AgentProjectBoardPage({ org = null, projectId } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const agentView = ui.model.agents || { projects: { items: [] }, stacks: { items: [] } };
+  const project = (agentView.projects?.items || []).find((p) => p.metadata?.name === projectId) || null;
+  const displayName = project?.spec?.displayName || projectId || 'Project';
+  const boardItems = project?.spec?.boardItems || project?.status?.boardItems || [];
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`project / ${displayName}`} title={displayName} text={project ? (project.spec?.description || `Kanban board for project ${displayName}.`) : 'This project was not found in the current workspace.'} actions={[['/agents/projects', 'All projects'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/projects', 'Projects'], [`/agents/projects/${projectId}`, displayName]]}>
+    <DegradedBanner model={ui.model} />
+    {project ? <div className="card">
+      <div className="cardTitle"><h2>Board</h2><StatusPill tone={boardItems.length ? 'good' : 'neutral'}>{boardItems.length} items</StatusPill></div>
+      <KanbanBoard project={project} items={boardItems} org={activeOrg} />
+    </div> : <EmptyState title={`Project ${projectId} not found`} text="This project does not exist in the current workspace. Create it through Krate resource definitions." />}
+  </PageFrame>;
+}
+
 export async function AgentSessionsPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);
   const activeOrg = ui.model.org?.slug || org || 'default';
@@ -548,7 +854,7 @@ export async function AgentSessionDetailPage({ org = null, sessionId } = {}) {
             <dt>Agent stack</dt><dd>{stackName ? <a href={orgHref(activeOrg, `/agents/stacks/${stackName}`)}>{stackName}</a> : 'not specified'}</dd>
             <dt>Model</dt><dd>{session.spec?.model || session.status?.model || 'default'}</dd>
             <dt>Dispatch run</dt><dd>{dispatchRunName ? <a href={orgHref(activeOrg, `/agents/runs/${dispatchRunName}`)}>{dispatchRunName}</a> : 'none'}</dd>
-            <dt>Workspace</dt><dd>{session.spec?.workspace ? <a href={orgHref(activeOrg, '/agents')}>{session.spec.workspace}</a> : 'none'}</dd>
+            <dt>Workspace</dt><dd>{session.spec?.workspace ? <a href={orgHref(activeOrg, `/agents/workspaces/${session.spec.workspace}`)}>{session.spec.workspace}</a> : 'none'}</dd>
             <dt>Phase</dt><dd>{session.status?.phase || 'Pending'}</dd>
             <dt>Cost</dt><dd>{session.status?.cost != null ? `$${session.status.cost}` : transcriptRecord?.status?.totalCost != null ? `$${transcriptRecord.status.totalCost}` : 'not tracked'}</dd>
             <dt>Agent Mux session</dt><dd>{session.spec?.agentMuxSessionId || 'not assigned'}</dd>

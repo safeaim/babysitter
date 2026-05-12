@@ -99,14 +99,6 @@ export default async function ForAgentsPage() {
             <Link key={route.path} href={route.path}>{route.path}</Link>
           )),
         },
-        {
-          title: "Graph coverage",
-          items: [
-            <p key="scores" className="atlas-docs-note">Ora scores · {oraScores.length}</p>,
-            <p key="scoreEdges" className="atlas-docs-note">Score edges · {scoreEdges.length}</p>,
-            <p key="support" className="atlas-docs-note">Work-support edges · {supportEdges.length}</p>,
-          ],
-        },
       ]}
     >
       <div className="atlas-docs-body">

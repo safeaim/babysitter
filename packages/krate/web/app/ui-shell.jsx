@@ -8,6 +8,8 @@ import { SessionDetailTabs } from './components/session-tabs.jsx';
 import { DispatchButton } from './components/dispatch-button.jsx';
 import { StackBuilder } from './components/stack-builder.jsx';
 import { InteractiveKanbanBoard } from './components/kanban-interactive.jsx';
+import { MemorySearchForm } from './components/memory-search-form.jsx';
+import { LiveUpdates } from './components/live-updates.jsx';
 
 export const orgNavigationGroups = [
   {
@@ -195,8 +197,9 @@ export async function AgentsDashboardPage({ org = null } = {}) {
   const agentView = ui.model.agents || { stacks: { count: 0 }, runs: { count: 0, active: [] }, rules: { count: 0 }, approvals: { count: 0, pending: [] } };
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent orchestration" title="Agent stacks, runs, and rules" text="View agent stacks, dispatch runs, trigger rules, and pending approvals from one place." actions={[['/agents/stacks', 'View stacks'], ['/agents/runs', 'View runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents']]}>
     <DegradedBanner model={ui.model} />
-    <div style={{ marginBottom: '1rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
       <DispatchButton org={activeOrg} stacks={(agentView.stacks?.items || []).map(s => s.metadata?.name).filter(Boolean)} />
+      <LiveUpdates org={activeOrg} />
     </div>
     <section className="routeGrid two">
       <div className="card">
@@ -294,8 +297,9 @@ export async function AgentRunsPage({ org = null, linkToDetail = false } = {}) {
   };
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent dispatch runs" title="Dispatch runs" text="Track agent dispatch runs across stacks, repositories, and phases. Each run represents a dispatched agent task." actions={[['/agents', 'Overview'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/runs', 'Dispatch runs']]}>
     <DegradedBanner model={ui.model} />
-    <div style={{ marginBottom: '1rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
       <DispatchButton org={activeOrg} stacks={(agentView.stacks?.items || []).map(s => s.metadata?.name).filter(Boolean)} />
+      <LiveUpdates org={activeOrg} />
     </div>
     <div className="card">
       <div className="cardTitle"><h2>Dispatch runs</h2><StatusPill tone={runs.length ? 'good' : 'neutral'}>{runs.length} runs</StatusPill></div>
@@ -558,6 +562,7 @@ export async function AgentApprovalsPage({ org = null } = {}) {
   const deniedCount = resolved.filter(a => a.status?.phase === 'Denied').length;
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent approvals" title="Approval inbox" text="Review and act on pending agent approval requests. Agents pause here when they need human authorization for tools, secrets, write-back, or release actions." actions={[['/agents', 'Overview'], ['/agents/runs', 'Dispatch runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/approvals', 'Approvals']]}>
     <DegradedBanner model={ui.model} />
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}><LiveUpdates org={activeOrg} /></div>
     <section className="routeGrid three">
       <div className="card"><div className="cardTitle"><h3>Pending</h3><StatusPill tone={pending.length ? 'warn' : 'neutral'}>{pending.length}</StatusPill></div><p className="emptyText">Awaiting human decision</p></div>
       <div className="card"><div className="cardTitle"><h3>Approved</h3><StatusPill tone={approvedCount ? 'good' : 'neutral'}>{approvedCount}</StatusPill></div><p className="emptyText">Actions authorized</p></div>
@@ -896,21 +901,8 @@ spec:
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="memory search" title="Search agent memory" text="Query structured graph records or full-text search across markdown documents stored in memory repositories." actions={[['/agents/memory', 'Overview'], ['/agents/memory/imports', 'Imports']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/memory', 'Memory'], ['/agents/memory/search', 'Search']]}>
     <DegradedBanner model={ui.model} />
     <div className="card">
-      <div className="cardTitle"><h2>Search</h2><StatusPill tone={hasRepos ? 'good' : 'neutral'}>{hasRepos ? 'available' : 'preview'}</StatusPill></div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div>
-          <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Query</label>
-          <input disabled type="text" placeholder="Search available when memory repository is configured" style={{ width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', background: '#f9fafb', color: '#9ca3af', fontSize: '0.875rem' }} />
-        </div>
-        <div>
-          <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.5rem' }}>Search mode</label>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', color: '#9ca3af' }}><input disabled type="radio" name="searchMode" />Graph only</label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', color: '#9ca3af' }}><input disabled type="radio" name="searchMode" />Grep only</label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', color: '#9ca3af' }}><input disabled type="radio" name="searchMode" defaultChecked />Graph + Grep</label>
-          </div>
-        </div>
-      </div>
+      <div className="cardTitle"><h2>Search</h2><StatusPill tone="good">live</StatusPill></div>
+      <MemorySearchForm org={activeOrg} />
     </div>
     <section className="routeGrid three">
       <div className="card">
@@ -1179,6 +1171,7 @@ export async function AgentSessionsPage({ org = null } = {}) {
   };
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent sessions" title="Agent chat sessions" text="Each session represents an Agent Mux chat with lifecycle state, transcript, and cost tracking." actions={[['/agents', 'Overview'], ['/agents/stacks', 'Stacks'], ['/agents/runs', 'Dispatch runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/sessions', 'Sessions']]}>
     <DegradedBanner model={ui.model} />
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}><LiveUpdates org={activeOrg} /></div>
     <div className="card">
       <div className="cardTitle"><h2>Sessions</h2><StatusPill tone={sessions.length ? 'good' : 'neutral'}>{sessions.length} sessions</StatusPill></div>
       {sessions.length ? <div className="resourceTable">{sessions.map((session) => <a key={session.metadata?.name} href={orgHref(activeOrg, `/agents/sessions/${session.metadata?.name}`)} className="resourceRow" style={{ textDecoration: 'none' }}>

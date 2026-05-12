@@ -151,6 +151,29 @@ export function createKrateHttpHandler({ runtime = createKrateRuntime(), control
         const result = await scopedController.processWebhookEvent({ ...body, organizationRef: org });
         return send(response, 200, result);
       }
+      const memoryQueryMatch = url.pathname.match(/^\/api\/orgs\/([^/]+)\/agents\/memory\/query$/);
+      if (request.method === 'POST' && memoryQueryMatch) {
+        const org = memoryQueryMatch[1];
+        const body = await readJson(request);
+        const scopedController = createKrateApiController({ namespace: orgNamespaceName(org) });
+        const result = await scopedController.queryAgentMemory({ ...body, organizationRef: org });
+        return send(response, 200, result);
+      }
+      const sseMatch = url.pathname.match(/^\/api\/orgs\/([^/]+)\/agents\/events\/stream$/);
+      if (request.method === 'GET' && sseMatch) {
+        response.writeHead(200, {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'X-Accel-Buffering': 'no',
+        });
+        response.write('data: {"type":"connected"}\n\n');
+        const interval = setInterval(() => {
+          response.write('data: {"type":"heartbeat"}\n\n');
+        }, 30000);
+        request.on('close', () => clearInterval(interval));
+        return;
+      }
       return send(response, 404, { error: 'not_found', method: request.method, path: url.pathname });
     } catch (error) {
       return send(response, 400, { error: 'bad_request', message: error.message });

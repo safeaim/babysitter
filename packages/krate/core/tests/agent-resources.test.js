@@ -29,7 +29,11 @@ const AGENT_CONFIG_KINDS = [
   'AgentTransportBinding',
   'AgentProviderConfig',
   'AgentProject',
-  'AgentGatewayConfig'
+  'AgentGatewayConfig',
+  'AgentMemoryRepository',
+  'AgentMemorySource',
+  'AgentMemoryOntology',
+  'AgentMemoryAssociation'
 ];
 
 const AGENT_AGGREGATED_KINDS = [
@@ -46,7 +50,11 @@ const AGENT_AGGREGATED_KINDS = [
   'WorkItemWorkspaceLink',
   'AgentSessionTranscript',
   'AgentSessionAttachment',
-  'AgentWorkspaceRuntime'
+  'AgentWorkspaceRuntime',
+  'AgentMemorySnapshot',
+  'AgentMemoryQuery',
+  'AgentMemoryUpdate',
+  'AgentRunMemoryImport'
 ];
 
 const ALL_AGENT_KINDS = [...AGENT_CONFIG_KINDS, ...AGENT_AGGREGATED_KINDS];
@@ -84,7 +92,15 @@ function minimalSpecForKind(kind) {
     AgentGatewayConfig: { organizationRef: 'default', gatewayUrl: 'https://mux.example.test' },
     AgentSessionTranscript: { organizationRef: 'default', sessionRef: 'sess-123', messages: [{ role: 'user', content: 'hello' }] },
     AgentSessionAttachment: { organizationRef: 'default', sessionRef: 'sess-123', sourceType: 'upload', digest: 'sha256:abc' },
-    AgentWorkspaceRuntime: { organizationRef: 'default', workspaceRef: 'ws-1', status: 'running' }
+    AgentWorkspaceRuntime: { organizationRef: 'default', workspaceRef: 'ws-1', status: 'running' },
+    AgentMemoryRepository: { organizationRef: 'default', repositoryRef: 'memory-repo', defaultBranch: 'main', layoutProfile: 'standard' },
+    AgentMemorySource: { organizationRef: 'default', repositoryRef: 'memory-repo', appliesTo: 'team:platform', include: ['decisions/**', 'runbooks/**'] },
+    AgentMemoryOntology: { organizationRef: 'default', memoryRepository: 'memory-repo', ontologyPath: '.memory/ontology.yaml' },
+    AgentMemoryAssociation: { organizationRef: 'default', memoryRef: 'decision-001', targetRef: 'issue-42', relationship: 'informs' },
+    AgentMemorySnapshot: { organizationRef: 'default', memoryRepository: 'memory-repo', requestedRef: 'refs/heads/main', resolvedCommit: 'a'.repeat(40) },
+    AgentMemoryQuery: { organizationRef: 'default', snapshotRef: 'snap-1', requester: 'agent-runner', query: 'deployment patterns' },
+    AgentMemoryUpdate: { organizationRef: 'default', memoryRepository: 'memory-repo', sourceRun: 'run-1', changes: [{ path: 'decisions/001.md', op: 'add' }] },
+    AgentRunMemoryImport: { organizationRef: 'default', memoryRepository: 'memory-repo', source: 'babysitter-run-42', include: ['journal', 'effects'] }
   };
   return specs[kind];
 }
@@ -194,19 +210,19 @@ describe('storageClassForKind for agent kinds', () => {
 });
 
 describe('kind set counts', () => {
-  it('CONFIG_KINDS has 37 members', () => {
-    assert.equal(CONFIG_KINDS.size, 37);
+  it('CONFIG_KINDS has 41 members', () => {
+    assert.equal(CONFIG_KINDS.size, 41);
   });
 
-  it('AGGREGATED_KINDS has 20 members', () => {
-    assert.equal(AGGREGATED_KINDS.size, 20);
+  it('AGGREGATED_KINDS has 24 members', () => {
+    assert.equal(AGGREGATED_KINDS.size, 24);
   });
 
-  it('ALL_KINDS has 57 members', () => {
-    assert.equal(ALL_KINDS.size, 57);
+  it('ALL_KINDS has 65 members', () => {
+    assert.equal(ALL_KINDS.size, 65);
   });
 
-  it('listResourceDefinitions returns 57 definitions', () => {
-    assert.equal(listResourceDefinitions().length, 57);
+  it('listResourceDefinitions returns 65 definitions', () => {
+    assert.equal(listResourceDefinitions().length, 65);
   });
 });

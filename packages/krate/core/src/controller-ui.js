@@ -34,7 +34,11 @@ const controllerEndpoints = [
   { method: 'POST', path: '/api/orgs/:org/agents/triggers/process', purpose: 'evaluate an event against trigger rules and dispatch matching agents' },
   { method: 'POST', path: '/api/orgs/:org/agents/workspaces', purpose: 'provision a new agent workspace with worktree and runtime' },
   { method: 'POST', path: '/api/orgs/:org/agents/workspaces/:name/archive', purpose: 'archive an agent workspace and mark it for cleanup' },
-  { method: 'POST', path: '/api/orgs/:org/agents/workspaces/:name/link', purpose: 'link a work item to an agent workspace' }
+  { method: 'POST', path: '/api/orgs/:org/agents/workspaces/:name/link', purpose: 'link a work item to an agent workspace' },
+  { method: 'POST', path: '/api/orgs/:org/agents/memory/query', purpose: 'query Company Brain memory with graph and grep search' },
+  { method: 'POST', path: '/api/orgs/:org/agents/memory/imports', purpose: 'create a memory import from a babysitter run' },
+  { method: 'GET', path: '/api/orgs/:org/agents/memory/snapshots', purpose: 'list memory snapshots for an organization' },
+  { method: 'GET', path: '/api/orgs/:org/agents/memory/repositories', purpose: 'list memory repositories for an organization' }
 ];
 
 const runtimeComponents = [
@@ -107,6 +111,9 @@ export function createControllerUiModel(source, options = {}) {
   const agentProjects = filterByOrg(snapshot.resources.AgentProject || [], activeOrg?.slug);
   const agentGateway = filterByOrg(snapshot.resources.AgentGatewayConfig || [], activeOrg?.slug);
   const agentTranscripts = filterByOrg(snapshot.resources.AgentSessionTranscript || [], activeOrg?.slug);
+  const memoryRepositories = filterByOrg(snapshot.resources.AgentMemoryRepository || [], activeOrg?.slug);
+  const memorySnapshots = filterByOrg(snapshot.resources.AgentMemorySnapshot || [], activeOrg?.slug);
+  const memoryImports = filterByOrg(snapshot.resources.AgentRunMemoryImport || [], activeOrg?.slug);
 
   const agentView = {
     org: activeOrg?.slug,
@@ -121,6 +128,9 @@ export function createControllerUiModel(source, options = {}) {
     projects: { count: agentProjects.length, items: agentProjects },
     gateway: agentGateway[0] || null,
     transcripts: { count: agentTranscripts.length, items: agentTranscripts },
+    memoryRepositories: { count: memoryRepositories.length, items: memoryRepositories },
+    memorySnapshots: { count: memorySnapshots.length, items: memorySnapshots },
+    memoryImports: { count: memoryImports.length, items: memoryImports, pending: memoryImports.filter(i => !i.status?.phase || i.status.phase === 'Pending' || i.status.phase === 'AwaitingReview') },
   };
   const deploymentApplications = filterByOrg(snapshot.resources.KubeVelaApplication || [], activeOrg?.slug);
   const deploymentReleases = filterByOrg(snapshot.resources.KubeVelaApplicationRevision || [], activeOrg?.slug);

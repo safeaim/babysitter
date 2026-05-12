@@ -4,6 +4,7 @@ import { createAgentDispatchController } from './agent-dispatch-controller.js';
 import { createAgentApprovalController } from './agent-approval-controller.js';
 import { createAgentTriggerController } from './agent-trigger-controller.js';
 import { createAgentWorkspaceController } from './agent-workspace-controller.js';
+import { createAgentMemoryController } from './agent-memory-controller.js';
 
 export const KRATE_API_CONTROLLER_BOUNDARY = {
   role: 'krate-api-controller',
@@ -126,6 +127,22 @@ export function createKrateApiController(options = {}) {
     async linkWorkItem(input) {
       const workspaceController = createAgentWorkspaceController();
       return workspaceController.linkWorkItem({
+        ...input,
+        namespace: input.namespace || namespace,
+        organizationRef: input.organizationRef || 'default'
+      });
+    },
+    async queryAgentMemory(input) {
+      const memoryController = createAgentMemoryController();
+      return memoryController.queryMemory({
+        ...input,
+        namespace: input.namespace || namespace,
+        organizationRef: input.organizationRef || 'default'
+      });
+    },
+    async createMemoryImport(input) {
+      const memoryController = createAgentMemoryController();
+      return memoryController.createImport({
         ...input,
         namespace: input.namespace || namespace,
         organizationRef: input.organizationRef || 'default'

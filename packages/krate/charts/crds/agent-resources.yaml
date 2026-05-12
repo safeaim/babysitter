@@ -1140,3 +1140,261 @@ spec:
                   x-kubernetes-preserve-unknown-fields: true
               observedGeneration:
                 type: integer
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentmemoryrepositories.krate.a5c.ai
+spec:
+  group: krate.a5c.ai
+  scope: Namespaced
+  names:
+    kind: AgentMemoryRepository
+    plural: agentmemoryrepositories
+    singular: agentmemoryrepository
+    shortNames:
+    - amr
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - organizationRef
+            - repositoryRef
+            - defaultBranch
+            - layoutProfile
+            properties:
+              organizationRef:
+                type: string
+              repositoryRef:
+                type: string
+              defaultBranch:
+                type: string
+              layoutProfile:
+                type: string
+              indexPolicy:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+                enum: [Pending, Ready, Blocked, Error]
+              conditions:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              observedGeneration:
+                type: integer
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentmemorysources.krate.a5c.ai
+spec:
+  group: krate.a5c.ai
+  scope: Namespaced
+  names:
+    kind: AgentMemorySource
+    plural: agentmemorysources
+    singular: agentmemorysource
+    shortNames:
+    - ams
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - organizationRef
+            - repositoryRef
+            - appliesTo
+            - include
+            properties:
+              organizationRef:
+                type: string
+              repositoryRef:
+                type: string
+              appliesTo:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              include:
+                type: array
+                items:
+                  type: string
+              exclude:
+                type: array
+                items:
+                  type: string
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+                enum: [Pending, Ready, Blocked, Error]
+              conditions:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              observedGeneration:
+                type: integer
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentmemoryontologies.krate.a5c.ai
+spec:
+  group: krate.a5c.ai
+  scope: Namespaced
+  names:
+    kind: AgentMemoryOntology
+    plural: agentmemoryontologies
+    singular: agentmemoryontology
+    shortNames:
+    - amo
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - organizationRef
+            - memoryRepository
+            - ontologyPath
+            properties:
+              organizationRef:
+                type: string
+              memoryRepository:
+                type: string
+              ontologyPath:
+                type: string
+              requiredFields:
+                type: array
+                items:
+                  type: string
+              edgeKinds:
+                type: array
+                items:
+                  type: string
+              vocabulary:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+                enum: [Pending, Ready, Blocked, Error]
+              conditions:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              observedGeneration:
+                type: integer
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentmemoryassociations.krate.a5c.ai
+spec:
+  group: krate.a5c.ai
+  scope: Namespaced
+  names:
+    kind: AgentMemoryAssociation
+    plural: agentmemoryassociations
+    singular: agentmemoryassociation
+    shortNames:
+    - ama
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - organizationRef
+            - memoryRef
+            - targetRef
+            - relationship
+            properties:
+              organizationRef:
+                type: string
+              memoryRef:
+                type: string
+              targetRef:
+                type: string
+              relationship:
+                type: string
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+                enum: [Pending, Ready, Blocked, Error]
+              conditions:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              observedGeneration:
+                type: integer

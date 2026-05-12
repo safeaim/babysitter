@@ -163,20 +163,7 @@ export default async function ForAgentsPage() {
           </div>
         </section>
 
-        <section id="graph-projections" className="atlas-docs-full atlas-docs-stack">
-          <h2>Graph projections</h2>
-          <div className="atlas-docs-grid atlas-docs-grid--3">
-            <ProjectionCard title="Tool readiness" value={oraScores.length} label="AgentReadinessScore records" href="/kind/AgentReadinessScore" />
-            <ProjectionCard title="Work support" value={supportEdges.length} label="Tool and ToolServer support edges" href="/edges/supports_work" />
-            <ProjectionCard title="Tool servers" value={toolServers.length} label="MCP and custom tool servers" href="/kind/ToolServer" />
-          </div>
-          <p>
-            For Ora-derived graph work, start at <code>tool:ora-agent-readiness</code>, traverse
-            <code> scores_agent_readiness_of</code> for product scores, and traverse <code>supports_work</code>
-            for role, responsibility, and workflow projections.
-          </p>
-        </section>
-
+ 
         <section id="openapi" className="atlas-docs-full atlas-docs-stack">
           <h2>REST fallback</h2>
           <p>

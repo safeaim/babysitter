@@ -95,30 +95,43 @@ describe("verifyBreakpointResult", () => {
   });
 
   it("returns verified:false when breakpoints-mux is not installed", async () => {
-    // The default environment does not have breakpoints-mux installed,
-    // so the dynamic import should fail.
-    const result = await verifyBreakpointResult(makeSignedResult());
+    // Simulate missing module by mocking the dynamic import to throw
+    vi.doMock("@a5c-ai/breakpoints-mux/proven", () => {
+      throw new Error("Cannot find module '@a5c-ai/breakpoints-mux/proven'");
+    });
+    // Re-import to pick up the mock
+    const { verifyBreakpointResult: verify } = await import("../proven-verification");
+    const result = await verify(makeSignedResult());
     expect(result.verified).toBe(false);
     expect(result.reason).toBe("breakpoints-mux not installed");
+    vi.doUnmock("@a5c-ai/breakpoints-mux/proven");
   });
 
   it("never throws even with unexpected import errors", async () => {
-    // Directly test with a signed result -- the dynamic import will fail
-    // gracefully. This verifies the catch-all error handling path.
-    const result = await verifyBreakpointResult(makeSignedResult(), {
+    // Simulate unexpected import error
+    vi.doMock("@a5c-ai/breakpoints-mux/proven", () => {
+      throw new Error("Unexpected filesystem error");
+    });
+    const { verifyBreakpointResult: verify } = await import("../proven-verification");
+    const result = await verify(makeSignedResult(), {
       enabled: true,
       trustedKeysDir: "/nonexistent/path",
     });
     expect(result.verified).toBe(false);
     expect(result.reason).toBeDefined();
+    vi.doUnmock("@a5c-ai/breakpoints-mux/proven");
   });
 
   it("defaults to enabled:true when config is omitted", async () => {
-    // With a signed result and no breakpoints-mux installed,
-    // it should attempt verification and fail with "not installed".
-    const result = await verifyBreakpointResult(makeSignedResult());
+    // Simulate missing module
+    vi.doMock("@a5c-ai/breakpoints-mux/proven", () => {
+      throw new Error("Cannot find module '@a5c-ai/breakpoints-mux/proven'");
+    });
+    const { verifyBreakpointResult: verify } = await import("../proven-verification");
+    const result = await verify(makeSignedResult());
     expect(result.verified).toBe(false);
     expect(result.reason).toBe("breakpoints-mux not installed");
+    vi.doUnmock("@a5c-ai/breakpoints-mux/proven");
   });
 
   it("skips verification entirely for unsigned result even when enabled", async () => {

@@ -57,35 +57,40 @@ jobs:
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
-      - name: Build hooks-mux
-        run: npm run build:hooks-mux
-
-      - name: Build runtime
-        run: npm run build:runtime
-
-      - name: Build workspace packages (tui, triggers, webui)
+      - name: "Build phase 1: hooks-mux + SDK (parallel, no interdependency)"
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/agent-mux-tui
-          npm run build --workspace=@a5c-ai/triggers
-          npm run build --workspace=@a5c-ai/agent-mux-webui
+          npm run build:hooks-mux &
+          PID_HOOKS=$!
+          npm run build:sdk
+          wait $PID_HOOKS
 
-      - name: Build observer
-        run: npm run build:observer
+      - name: "Build phase 2: agent-mux non-realtime chain (sequential, depends on SDK)"
+        run: npm run build:agent-mux:non-realtime
 
-      - name: Build cloud
-        run: npm run build:cloud
-
-      - name: Build agent-plugins-mux
+      - name: "Build phase 3: agent-core + parallel independents"
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/agent-plugins-mux
-
-      - name: Build krate
-        run: |
-          set -euo pipefail
-          cd packages/krate/core && npm run build
-          cd ../web && npm run build
+          # agent-core depends on agent-mux chain
+          npm run build --workspace=@a5c-ai/agent-core
+          # These can all run in parallel (each depends on SDK/agent-mux but not each other)
+          npm run build --workspace=@a5c-ai/babysitter-agent &
+          PID_BA=$!
+          npm run build --workspace=@a5c-ai/agent-plugins-mux &
+          PID_APM=$!
+          npm run build --workspace=@a5c-ai/agent-mux-tui &
+          PID_TUI=$!
+          npm run build --workspace=@a5c-ai/triggers &
+          PID_TRIG=$!
+          npm run build --workspace=@a5c-ai/agent-mux-webui &
+          PID_WEBUI=$!
+          npm run build:observer &
+          PID_OBS=$!
+          npm run build:cloud &
+          PID_CLOUD=$!
+          (cd packages/krate/core && npm run build && cd ../web && npm run build) &
+          PID_KRATE=$!
+          wait $PID_BA $PID_APM $PID_TUI $PID_TRIG $PID_WEBUI $PID_OBS $PID_CLOUD $PID_KRATE
 
       - name: Package dist directories
         run: find packages -path '*/dist' -type d | tar czf /tmp/build-all-dist.tar.gz -T -

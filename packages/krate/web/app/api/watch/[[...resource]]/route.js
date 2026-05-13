@@ -1,4 +1,4 @@
-import { createKrateApiController } from '../../../../../core/src/api-controller.js';
+import { createKrateApiController } from '@a5c-ai/krate-sdk';
 
 export const dynamic = 'force-dynamic';
 const advancedWatchMode = '--watch';

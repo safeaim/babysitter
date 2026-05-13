@@ -1,6 +1,4 @@
-import { createKrateApiController } from '../../../../../../core/src/api-controller.js';
-import { createControllerUiModel } from '../../../../../../core/src/controller-ui.js';
-import { orgNamespaceName } from '../../../../../../core/src/kubernetes-controller.js';
+import { createKrateApiController, createControllerUiModel, orgNamespaceName } from '@a5c-ai/krate-sdk';
 
 export const dynamic = 'force-dynamic';
 

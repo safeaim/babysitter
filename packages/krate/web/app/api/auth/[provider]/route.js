@@ -1,4 +1,4 @@
-import { buildAuthorizationRedirect, createAuthProviderConfig } from '../../../../../core/src/auth.js';
+import { buildAuthorizationRedirect, createAuthProviderConfig } from '@a5c-ai/krate-sdk';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,5 +1,4 @@
-import { createControllerUiModel } from '../../../../core/src/controller-ui.js';
-import { createKrateApiController } from '../../../../core/src/api-controller.js';
+import { createControllerUiModel, createKrateApiController } from '@a5c-ai/krate-sdk';
 
 export const dynamic = 'force-dynamic';
 

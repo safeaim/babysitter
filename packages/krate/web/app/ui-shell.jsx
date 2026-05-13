@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
-import { createAuthProviderConfig, listEnabledAuthProviders, parseSessionCookie } from '../../core/src/auth.js';
-import { fetchControllerUiModel } from '../../core/src/controller-client.js';
+import { createAuthProviderConfig, listEnabledAuthProviders, parseSessionCookie, fetchControllerUiModel } from '@a5c-ai/krate-sdk';
 import { CodeEditor, LiveWatchPanel } from './components/code-editor.jsx';
 import { DeploymentManager, RepositoryManager, ResourceApplyPanel, UserManagementPanel } from './components/resource-actions.jsx';
 import { ApprovalDecisionButtons } from './components/approval-actions.jsx';

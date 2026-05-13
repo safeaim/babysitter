@@ -1,4 +1,4 @@
-import { createAuthProviderConfig } from '../../../../../core/src/auth.js';
+import { createAuthProviderConfig } from '@a5c-ai/krate-sdk';
 
 export const dynamic = 'force-dynamic';
 

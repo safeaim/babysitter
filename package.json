@@ -19,6 +19,7 @@
     "packages/hooks-mux/adapter-opencode",
     "packages/hooks-mux/adapter-openclaw",
     "packages/krate/core",
+    "packages/krate/sdk",
     "packages/krate/web"
   ],
   "scripts": {

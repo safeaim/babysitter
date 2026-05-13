@@ -20,6 +20,7 @@
     "packages/hooks-mux/adapter-openclaw",
     "packages/krate/core",
     "packages/krate/sdk",
+    "packages/krate/cli",
     "packages/krate/web"
   ],
   "scripts": {

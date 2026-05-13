@@ -47,3 +47,4 @@ export * from './external/webhook-controller.js';
 export * from './external/sync-controller.js';
 export * from './external/write-controller.js';
 export * from './external/conflict-controller.js';
+export * from './audit-controller.js';

@@ -30,3 +30,4 @@ export * from './agent-approval-controller.js';
 export * from './agent-trigger-controller.js';
 export * from './agent-workspace-controller.js';
 export * from './agent-memory-controller.js';
+export * from './agent-adapter-controller.js';

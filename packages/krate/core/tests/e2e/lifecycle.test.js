@@ -59,7 +59,7 @@ test('chart package contains the MVP Kubernetes install surface', () => {
   assert.ok(chart.includes('readinessProbe'), 'workloads expose readiness probes for live installs');
   assert.ok(chart.includes('serviceAccountName'), 'workloads run with the Krate service account');
   assert.ok(chart.includes('customresourcedefinitions'), 'service account can discover installed Krate CRDs');
-  assert.ok(chart.includes('apps/web/server.js'), 'web deployment serves the built Next.js app');
+  assert.ok(chart.includes('krate.webImage'), 'web deployment uses the web container image');
   assert.ok(chart.includes('sshkeys.krate.a5c.ai'), 'package includes SSH key reconciliation resources');
   assert.ok(chart.includes('repositorypermissions.krate.a5c.ai'), 'package includes Gitea permission reconciliation resources');
   assert.ok(chart.includes('revoked'), 'package access CRDs allow revocation state');

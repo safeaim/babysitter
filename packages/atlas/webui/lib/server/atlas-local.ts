@@ -206,9 +206,16 @@ let publicIndexCache: IndexShape | null = null;
 function loadPublicIndex(): IndexShape {
   if (publicIndexCache) return publicIndexCache;
 
+  const cwd = /* turbopackIgnore: true */ process.cwd();
   const candidates = [
-    path.join(/* turbopackIgnore: true */ process.cwd(), "packages", "atlas", "src", "index.json"),
-    path.join(/* turbopackIgnore: true */ process.cwd(), "..", "src", "index.json"),
+    // monorepo root (dev): {repo}/packages/atlas/src/index.json
+    path.join(cwd, "packages", "atlas", "src", "index.json"),
+    // monorepo root (built): {repo}/packages/atlas/dist/index.json
+    path.join(cwd, "packages", "atlas", "dist", "index.json"),
+    // webui cwd (dev): ../src/index.json
+    path.join(cwd, "..", "src", "index.json"),
+    // webui cwd (built): ../dist/index.json
+    path.join(cwd, "..", "dist", "index.json"),
   ];
 
   for (const indexPath of candidates) {

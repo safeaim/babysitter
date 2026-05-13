@@ -762,6 +762,7 @@ async function validateAgentBehavior(
           const failures: string[] = [];
           if (status !== 'completed') failures.push(`status=${status ?? 'missing'} (expected completed)`);
           if (!processId) failures.push('no processId associated');
+          if (processId && /bare[-_]?run/i.test(processId)) failures.push(`processId="${processId}" is a bare run (no real process)`);
 
           if (failures.length === 0) {
             completionProofFound = true;

@@ -1,12 +1,19 @@
-// GitHub External Provider — Slice 3.3a
+// GitHub External Provider — Slice 3.3a / 3.3b
 // Entry point for the GitHub provider adapter.
-// Re-exports auth helpers, git forge class, boundary object, and provider factory.
+// Re-exports auth helpers, git forge class, issue tracking, CI/CD, boundary objects, and provider factory.
 
 export { createGitHubJwt, exchangeInstallationToken } from './auth.js';
-export { GitHubGitForge } from './git-forge.js';
+
+import { GitHubGitForge } from './git-forge.js';
+import { GitHubIssueTracking } from './issue-tracking.js';
+import { GitHubCicd } from './cicd.js';
+
+export { GitHubGitForge };
+export { GitHubIssueTracking };
+export { GitHubCicd };
 
 // ---------------------------------------------------------------------------
-// Boundary declaration
+// Boundary declarations
 // ---------------------------------------------------------------------------
 
 export const GITHUB_GIT_FORGE_BOUNDARY = Object.freeze({
@@ -30,6 +37,49 @@ export const GITHUB_GIT_FORGE_BOUNDARY = Object.freeze({
   ]
 });
 
+export const GITHUB_ISSUE_TRACKING_BOUNDARY = Object.freeze({
+  role: 'github-issue-tracking',
+  scope: 'GitHub Issues API: listing, creating, updating, closing issues and managing issue comments',
+  owns: [
+    'issue listing',
+    'issue creation',
+    'issue updates',
+    'issue closing',
+    'comment listing',
+    'comment creation'
+  ],
+  delegatesTo: [],
+  mustNotOwn: [
+    'GitHub secret storage',
+    'Kubernetes resources',
+    'CI pipeline execution',
+    'webhook delivery',
+    'pull requests',
+    'branch protection'
+  ]
+});
+
+export const GITHUB_CICD_BOUNDARY = Object.freeze({
+  role: 'github-cicd',
+  scope: 'GitHub Actions API: workflow runs, jobs, rerun/cancel operations, and check runs',
+  owns: [
+    'workflow run listing',
+    'job listing',
+    'workflow rerun',
+    'workflow cancellation',
+    'check run creation',
+    'check run updates'
+  ],
+  delegatesTo: [],
+  mustNotOwn: [
+    'GitHub secret storage',
+    'Kubernetes resources',
+    'webhook delivery',
+    'issue tracking',
+    'pull requests'
+  ]
+});
+
 // ---------------------------------------------------------------------------
 // Provider factory
 // ---------------------------------------------------------------------------
@@ -38,11 +88,11 @@ export const GITHUB_GIT_FORGE_BOUNDARY = Object.freeze({
  * Create a GitHub ExternalProviderAdapter.
  *
  * Returns a lightweight descriptor that carries GitHub App credentials and
- * exposes a `createForge(token)` factory for constructing a GitHubGitForge
- * bound to a specific installation token.
+ * exposes factory methods for constructing GitHubGitForge, GitHubIssueTracking,
+ * and GitHubCicd instances bound to specific installation tokens.
  *
- * @param {{ appId: string, privateKey: string, installationId?: string, baseUrl?: string }} opts
- * @returns {{ type: string, config: object, createForge: Function }}
+ * @param {{ appId: string, privateKey: string, installationId?: string, fetchImpl?: Function }} opts
+ * @returns {{ type: string, config: object, createForge: Function, createIssueTracker: Function, createCicd: Function }}
  */
 export function createGitHubProvider({ appId, privateKey, installationId, fetchImpl } = {}) {
   if (!appId) throw new Error('createGitHubProvider: appId is required');
@@ -58,12 +108,36 @@ export function createGitHubProvider({ appId, privateKey, installationId, fetchI
      * @returns {GitHubGitForge}
      */
     createForge({ owner, installationToken, fetchImpl: forgeFetch } = {}) {
-      const { GitHubGitForge: Forge } = { GitHubGitForge };
-      // Re-import to avoid closure capture issues in bundlers
       return new GitHubGitForge({
         owner,
         installationToken,
         fetchImpl: forgeFetch ?? fetchImpl ?? globalThis.fetch
+      });
+    },
+
+    /**
+     * Construct a GitHubIssueTracking for the given owner and installation token.
+     * @param {{ owner: string, installationToken: string, fetchImpl?: Function }} opts
+     * @returns {GitHubIssueTracking}
+     */
+    createIssueTracker({ owner, installationToken, fetchImpl: trackerFetch } = {}) {
+      return new GitHubIssueTracking({
+        owner,
+        installationToken,
+        fetchImpl: trackerFetch ?? fetchImpl ?? globalThis.fetch
+      });
+    },
+
+    /**
+     * Construct a GitHubCicd for the given owner and installation token.
+     * @param {{ owner: string, installationToken: string, fetchImpl?: Function }} opts
+     * @returns {GitHubCicd}
+     */
+    createCicd({ owner, installationToken, fetchImpl: cicdFetch } = {}) {
+      return new GitHubCicd({
+        owner,
+        installationToken,
+        fetchImpl: cicdFetch ?? fetchImpl ?? globalThis.fetch
       });
     }
   };

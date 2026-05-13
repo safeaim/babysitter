@@ -1825,7 +1825,7 @@ jobs:
             kubectl -n "$KUBE_NAMESPACE" create secret generic atlas-auth \
               --from-literal=GITHUB_CLIENT_ID="$ATLAS_GITHUB_CLIENT_ID" \
               --from-literal=GITHUB_CLIENT_SECRET="$ATLAS_GITHUB_CLIENT_SECRET" \
-              --from-literal=ATLAS_SESSION_SECRET="$(openssl rand -hex 32)" \
+              --from-literal=AUTH_SECRET="$(openssl rand -hex 32)" \
               --dry-run=client -o yaml | kubectl apply -f -
           else
             echo "::notice::Skipping atlas-auth secret — GitHub OAuth not configured"

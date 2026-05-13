@@ -137,6 +137,15 @@ export default async function WikiPage({ params }: { params: Promise<Params> }) 
   const documented = graph.getOutgoing(page.id).filter((edge) => edge.kind === "documents");
   const reusableViewType = getReusableViewType(page);
   const reusableView = renderReusableView(page, graph);
+
+  if (reusableView) {
+    return (
+      <div style={{ position: "fixed", inset: 0, zIndex: 10, overflow: "hidden" }}>
+        {reusableView}
+      </div>
+    );
+  }
+
   const pageTitle = String(page.title ?? page.id);
   const pagePath = typeof page.articlePath === "string" ? page.articlePath : page._file;
   const allPages = graph.getPages().filter(isNavigableWikiPage).map(toSummary);
@@ -340,11 +349,6 @@ export default async function WikiPage({ params }: { params: Promise<Params> }) 
         <section className="atlas-docs-full atlas-docs-stack">
           <MarkdownArticle markdown={article} articlePath={pagePath} recordsById={index.records} variant="docs" />
         </section>
-        {reusableView ? (
-          <section className="atlas-docs-full atlas-docs-stack">
-            {reusableView}
-          </section>
-        ) : null}
       </div>
     </AtlasDocsScaffold>
   );

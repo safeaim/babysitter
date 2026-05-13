@@ -22,12 +22,28 @@ const VB = { w: 1960, h: 1200 };
 
 type ZoomLevel = "building" | "floor" | "room" | "desk";
 
-const ROOM_LAYOUTS = [
-  { x: 0, y: 0, w: 3, h: 2 },
-  { x: 3, y: 0, w: 1, h: 2 },
-  { x: 0, y: 2, w: 2, h: 2 },
-  { x: 2, y: 2, w: 2, h: 2 },
-];
+const ROOM_LAYOUTS_BY_COUNT: Record<number, Array<{ x: number; y: number; w: number; h: number }>> = {
+  1: [{ x: 0, y: 0, w: 4, h: 4 }],
+  2: [
+    { x: 0, y: 0, w: 2, h: 4 },
+    { x: 2, y: 0, w: 2, h: 4 },
+  ],
+  3: [
+    { x: 0, y: 0, w: 2, h: 2 },
+    { x: 2, y: 0, w: 2, h: 2 },
+    { x: 0, y: 2, w: 4, h: 2 },
+  ],
+  4: [
+    { x: 0, y: 0, w: 3, h: 2 },
+    { x: 3, y: 0, w: 1, h: 2 },
+    { x: 0, y: 2, w: 2, h: 2 },
+    { x: 2, y: 2, w: 2, h: 2 },
+  ],
+};
+
+function getRoomLayouts(roomCount: number) {
+  return ROOM_LAYOUTS_BY_COUNT[Math.min(roomCount, 4)] ?? ROOM_LAYOUTS_BY_COUNT[4];
+}
 
 /* ── isometric projection helpers ──────────────────────────── */
 function iso(x: number, y: number, z = 0): readonly [number, number] {
@@ -182,7 +198,9 @@ function computeCamera(
   focusFloorIdx: number | null,
   activeRoomIdx: number | null,
   focusedSvcIdx: number | null,
+  roomCount = 4,
 ): CamTransform {
+  const layouts = getRoomLayouts(roomCount);
   if (zoom === "floor" && focusFloorIdx != null) {
     const z = focusFloorIdx * FLOOR_GAP_Z;
     const c = iso(FLOOR_W / 2, FLOOR_H / 2, z + 30);
@@ -190,7 +208,7 @@ function computeCamera(
     return { tx: VB.w / 2 - c[0] * sx, ty: VB.h / 2 - c[1] * sy, sx, sy };
   }
   if ((zoom === "room" || zoom === "desk") && focusFloorIdx != null && activeRoomIdx != null) {
-    const layout = ROOM_LAYOUTS[activeRoomIdx] ?? ROOM_LAYOUTS[0];
+    const layout = layouts[activeRoomIdx] ?? layouts[0];
     const z = focusFloorIdx * FLOOR_GAP_Z;
     const rx = layout.x * (CELL + ROOM_GAP) + (layout.w * CELL + (layout.w - 1) * ROOM_GAP) / 2;
     const ry = layout.y * (CELL + ROOM_GAP) + (layout.h * CELL + (layout.h - 1) * ROOM_GAP) / 2;
@@ -216,9 +234,10 @@ function computeCamera(
 }
 
 /* ── RoomShape ─────────────────────────────────────────────── */
-function RoomShape({ room, roomIndex, floorIndex, zoom, activeRoomIndex, focusedSvcIdx, onSelect, onPickService }: {
+function RoomShape({ room, roomIndex, roomCount, floorIndex, zoom, activeRoomIndex, focusedSvcIdx, onSelect, onPickService }: {
   room: ServiceTowerRoom;
   roomIndex: number;
+  roomCount: number;
   floorIndex: number;
   zoom: ZoomLevel;
   activeRoomIndex: number | null;
@@ -226,7 +245,8 @@ function RoomShape({ room, roomIndex, floorIndex, zoom, activeRoomIndex, focused
   onSelect: () => void;
   onPickService: (roomIndex: number, svcIdx: number) => void;
 }) {
-  const layout = ROOM_LAYOUTS[roomIndex] ?? ROOM_LAYOUTS[0];
+  const layouts = getRoomLayouts(roomCount);
+  const layout = layouts[roomIndex] ?? layouts[0];
   const cellX = layout.x * (CELL + ROOM_GAP);
   const cellY = layout.y * (CELL + ROOM_GAP);
   const cellW = layout.w * CELL + (layout.w - 1) * ROOM_GAP;
@@ -242,7 +262,7 @@ function RoomShape({ room, roomIndex, floorIndex, zoom, activeRoomIndex, focused
   let cellTranslate = "";
   let cellOpacity = 1;
   if (isRoomOrDeskZoom && activeRoomIndex != null && !selected) {
-    const focusedLayout = ROOM_LAYOUTS[activeRoomIndex] ?? ROOM_LAYOUTS[0];
+    const focusedLayout = layouts[activeRoomIndex] ?? layouts[0];
     const focusedCx = focusedLayout.x * (CELL + ROOM_GAP) + (focusedLayout.w * CELL) / 2;
     const focusedCy = focusedLayout.y * (CELL + ROOM_GAP) + (focusedLayout.h * CELL) / 2;
     const myCx = cellX + cellW / 2, myCy = cellY + cellH / 2;
@@ -427,6 +447,7 @@ function FloorShape({ floor, floorIndex, zoom, activeFloorIndex, activeRoomIndex
           key={room.id}
           room={room}
           roomIndex={roomIndex}
+          roomCount={floor.rooms.length}
           floorIndex={floorIndex}
           zoom={focusedFloor ? zoom : "building"}
           activeRoomIndex={focusedFloor ? activeRoomIndex : null}
@@ -598,9 +619,10 @@ export function ServiceTowerView({ data }: { data: ServiceTowerViewData }) {
   const [focusedSvcIdx, setFocusedSvcIdx] = useState<number | null>(null);
   const wheelLockRef = useRef(0);
 
+  const activeFloorRoomCount = activeFloorIndex != null ? data.floors[activeFloorIndex]?.rooms.length ?? 4 : 4;
   const camera = useMemo(
-    () => computeCamera(zoom, activeFloorIndex, activeRoomIndex, focusedSvcIdx),
-    [zoom, activeFloorIndex, activeRoomIndex, focusedSvcIdx],
+    () => computeCamera(zoom, activeFloorIndex, activeRoomIndex, focusedSvcIdx, activeFloorRoomCount),
+    [zoom, activeFloorIndex, activeRoomIndex, focusedSvcIdx, activeFloorRoomCount],
   );
 
   const room = activeFloorIndex != null && activeRoomIndex != null
@@ -720,17 +742,6 @@ export function ServiceTowerView({ data }: { data: ServiceTowerViewData }) {
 
   return (
     <section className={styles.tower} id={data.id}>
-      <header className={styles.header}>
-        <div className={styles.brand}>
-          <div className={styles.eyebrow}><span className={styles.seal} />{data.eyebrow}</div>
-          <h2 className={styles.title}>{data.title} <em>tower</em></h2>
-          <p className={styles.subtitle}>{data.subtitle}</p>
-        </div>
-        <nav className={styles.nav}>
-          <a href="#tower-stage">Floors</a>
-          <Link href="/graph">{data.ctaLabel}</Link>
-        </nav>
-      </header>
       <div className={styles.layout}>
         <div className={styles.stage} id="tower-stage">
           {/* breadcrumb + domain legend */}

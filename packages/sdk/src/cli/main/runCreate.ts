@@ -39,7 +39,8 @@ export async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
   let entrypoint: { importPath: string; exportName?: string } | undefined;
   if (!isBareRun) {
     try {
-      entrypoint = parseEntrypointSpecifier(parsed.entrySpecifier!);
+      const specifier = parsed.entrySpecifier ?? "";
+      entrypoint = parseEntrypointSpecifier(specifier);
     } catch (error) {
       console.error(error instanceof Error ? error.message : String(error));
       return 1;

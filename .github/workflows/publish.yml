@@ -2067,179 +2067,40 @@ jobs:
             echo "::notice::Skipping krate-auth secret — GitHub OAuth not configured"
           fi
 
-      - name: Install Krate CRDs
-        if: steps.config.outputs.deploy_enabled == 'true'
-        run: kubectl apply -f packages/krate/charts/crds/
-
-      - name: Create Krate RBAC
+      - name: Deploy Krate via Helm
         if: steps.config.outputs.deploy_enabled == 'true'
         run: |
-          cat <<EOF | kubectl apply -f -
-          apiVersion: v1
-          kind: ServiceAccount
-          metadata:
-            name: krate
-            namespace: ${KUBE_NAMESPACE}
-          ---
-          apiVersion: rbac.authorization.k8s.io/v1
-          kind: ClusterRole
-          metadata:
-            name: krate-${KUBE_NAMESPACE}
-          rules:
-            - apiGroups: ["krate.a5c.ai"]
-              resources: ["*"]
-              verbs: ["*"]
-            - apiGroups: [""]
-              resources: ["events", "namespaces"]
-              verbs: ["get", "list", "watch"]
-          ---
-          apiVersion: rbac.authorization.k8s.io/v1
-          kind: ClusterRoleBinding
-          metadata:
-            name: krate-${KUBE_NAMESPACE}
-          roleRef:
-            apiGroup: rbac.authorization.k8s.io
-            kind: ClusterRole
-            name: krate-${KUBE_NAMESPACE}
-          subjects:
-            - kind: ServiceAccount
-              name: krate
-              namespace: ${KUBE_NAMESPACE}
-          EOF
-
-      - name: Deploy Krate
-        if: steps.config.outputs.deploy_enabled == 'true'
-        run: |
-          cat <<EOF | kubectl apply -f -
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            name: ${APP_NAME}
-            namespace: ${KUBE_NAMESPACE}
-          spec:
-            replicas: 1
-            strategy:
-              type: Recreate
-            selector:
-              matchLabels:
-                app: ${APP_NAME}
-            template:
-              metadata:
-                labels:
-                  app: ${APP_NAME}
-              spec:
-                serviceAccountName: krate
-                terminationGracePeriodSeconds: 10
-                imagePullSecrets:
-                  - name: acr-pull
-                containers:
-                  - name: krate-controller
-                    image: ${KRATE_CONTROLLER_IMAGE}
-                    imagePullPolicy: Always
-                    ports:
-                      - containerPort: 8080
-                    env:
-                      - name: NODE_ENV
-                        value: production
-                      - name: PORT
-                        value: "8080"
-                    envFrom:
-                      - secretRef:
-                          name: krate-auth
-                          optional: true
-                    readinessProbe:
-                      httpGet:
-                        path: /healthz
-                        port: 8080
-                      initialDelaySeconds: 5
-                      periodSeconds: 5
-                      failureThreshold: 30
-                    livenessProbe:
-                      httpGet:
-                        path: /healthz
-                        port: 8080
-                      initialDelaySeconds: 15
-                      periodSeconds: 10
-                      failureThreshold: 5
-                  - name: krate-web
-                    image: ${KRATE_WEB_IMAGE}
-                    imagePullPolicy: Always
-                    ports:
-                      - containerPort: 3000
-                    env:
-                      - name: NODE_ENV
-                        value: production
-                      - name: PORT
-                        value: "3000"
-                      - name: HOSTNAME
-                        value: 0.0.0.0
-                    envFrom:
-                      - secretRef:
-                          name: krate-auth
-                          optional: true
-                    readinessProbe:
-                      httpGet:
-                        path: /
-                        port: 3000
-                      initialDelaySeconds: 5
-                      periodSeconds: 5
-                      failureThreshold: 30
-                    livenessProbe:
-                      httpGet:
-                        path: /
-                        port: 3000
-                      initialDelaySeconds: 15
-                      periodSeconds: 10
-                      failureThreshold: 5
-          ---
-          apiVersion: v1
-          kind: Service
-          metadata:
-            name: ${APP_NAME}
-            namespace: ${KUBE_NAMESPACE}
-          spec:
-            selector:
-              app: ${APP_NAME}
-            ports:
-              - name: controller
-                port: 8080
-                targetPort: 8080
-              - name: web
-                port: 80
-                targetPort: 3000
-          ---
-          apiVersion: networking.k8s.io/v1
-          kind: Ingress
-          metadata:
-            name: ${APP_NAME}
-            namespace: ${KUBE_NAMESPACE}
-            annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-production
-              external-dns.alpha.kubernetes.io/hostname: ${APP_HOST}
-              nginx.ingress.kubernetes.io/ssl-redirect: "true"
-          spec:
-            ingressClassName: nginx
-            tls:
-              - hosts:
-                  - ${APP_HOST}
-                secretName: ${APP_NAME}-tls
-            rules:
-              - host: ${APP_HOST}
-                http:
-                  paths:
-                    - path: /
-                      pathType: Prefix
-                      backend:
-                        service:
-                          name: ${APP_NAME}
-                          port:
-                            number: 80
-          EOF
-          # Force-delete pods stuck in Terminating (shown as "Terminating" in STATUS column)
-          kubectl -n "$KUBE_NAMESPACE" get pods -l app="$APP_NAME" --no-headers 2>/dev/null \
+          helm upgrade --install krate packages/krate/charts \
+            --namespace "$KUBE_NAMESPACE" \
+            --create-namespace \
+            --set image.controller.repository="${ACR_NAME}.azurecr.io/krate-controller" \
+            --set image.controller.tag="${GITHUB_SHA}" \
+            --set image.web.repository="${ACR_NAME}.azurecr.io/krate-web" \
+            --set image.web.tag="${GITHUB_SHA}" \
+            --set image.pullPolicy=Always \
+            --set "global.imagePullSecrets[0].name=acr-pull" \
+            --set ingress.enabled=true \
+            --set ingress.className=nginx \
+            --set "ingress.hosts[0].host=${APP_HOST}" \
+            --set "ingress.hosts[0].paths[0].path=/" \
+            --set "ingress.hosts[0].paths[0].pathType=Prefix" \
+            --set "ingress.tls[0].secretName=krate-tls" \
+            --set "ingress.tls[0].hosts[0]=${APP_HOST}" \
+            --set "ingress.annotations.cert-manager\\.io/cluster-issuer=letsencrypt-production" \
+            --set "ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname=${APP_HOST}" \
+            --set "ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/ssl-redirect=true" \
+            --set demo.enabled=false \
+            --set gitea.enabled=false \
+            --set argocd.enabled=false \
+            --set kubevela.enabled=false \
+            --set networkPolicy.enabled=false \
+            --set apiService.enabled=false \
+            --timeout 300s \
+            --wait
+          # Force-delete pods stuck in Terminating
+          kubectl -n "$KUBE_NAMESPACE" get pods --no-headers 2>/dev/null \
             | awk '/Terminating/{print $1}' \
             | xargs -r kubectl -n "$KUBE_NAMESPACE" delete --force --grace-period=0 2>/dev/null || true
-          kubectl -n "$KUBE_NAMESPACE" rollout status deployment/"$APP_NAME" --timeout=300s
 
   deploy_staging_cloud:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}

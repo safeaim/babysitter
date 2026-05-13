@@ -22,6 +22,14 @@ image:
 
   pullPolicy: IfNotPresent
 
+  controller:
+    repository: ""
+    tag: ""
+
+  web:
+    repository: ""
+    tag: ""
+
 
 
 demo:

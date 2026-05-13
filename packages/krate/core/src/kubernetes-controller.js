@@ -484,14 +484,27 @@ export async function applyResource(resource, options = {}) {
   if (!resource.kind) throw new Error('resource.kind is required');
   const namespace = options.namespace || process.env.KRATE_NAMESPACE || 'krate-system';
   const manifest = withOrgScope(resource, { namespace });
+  const kubectlBin = options.kubectl || process.env.KRATE_KUBECTL || 'kubectl';
+  const timeoutMs = Number(options.timeoutMs || process.env.KRATE_KUBECTL_TIMEOUT_MS || 3_000);
+  const env = { ...process.env, ...(options.env || {}) };
+  const targetNs = manifest.metadata?.namespace;
+  if (targetNs) {
+    ensureNamespace(targetNs, { kubectl: kubectlBin, timeoutMs, env });
+  }
   const result = runKubectl(['apply', '-f', '-', '-o', 'json'], {
-    kubectl: options.kubectl || process.env.KRATE_KUBECTL || 'kubectl',
-    timeoutMs: Number(options.timeoutMs || process.env.KRATE_KUBECTL_TIMEOUT_MS || 3_000),
-    env: { ...process.env, ...(options.env || {}) },
+    kubectl: kubectlBin,
+    timeoutMs,
+    env,
     input: JSON.stringify(manifest),
     allowFailure: false
   });
   return { operation: 'apply', command: 'kubectl apply -f -', resource: safeJson(result.stdout) || manifest, stderr: result.stderr.trim() };
+}
+
+function ensureNamespace(name, options) {
+  const check = runKubectl(['get', 'namespace', name], { ...options, allowFailure: true });
+  if (check.ok) return;
+  runKubectl(['create', 'namespace', name], { ...options, allowFailure: true });
 }
 
 export async function deleteResource(kindOrPlural, name, options = {}) {

@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
-import { monotonicFactory } from "ulid";
+import { monotonicFactory } from "ulid/dist/index.esm.js";
 
 import type {
   AutomationExecutionRecord,

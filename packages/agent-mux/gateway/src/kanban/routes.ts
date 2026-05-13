@@ -16,7 +16,7 @@ import type {
 } from '@a5c-ai/agent-mux-core';
 import type { AutomationRuleLifecycleState } from '@a5c-ai/agent-mux-core';
 import type { Hono } from 'hono';
-import { monotonicFactory } from 'ulid';
+import { monotonicFactory } from 'ulid/dist/index.esm.js';
 
 import { getRunCached, getAllCachedDigests, discoverAndCacheAll } from './lib/run-cache.js';
 import { AppError, normalizeError } from './lib/error-handler.js';

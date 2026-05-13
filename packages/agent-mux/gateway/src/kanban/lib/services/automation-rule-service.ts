@@ -1,4 +1,4 @@
-import { monotonicFactory } from 'ulid';
+import { monotonicFactory } from 'ulid/dist/index.esm.js';
 
 import type {
   AutomationExecutionRecord,

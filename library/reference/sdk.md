@@ -1142,6 +1142,27 @@ Outputs:
 * `--json` prints the same data as a single JSON object so automation can parse it reliably.
 * initializes `run.json`, `inputs.json`, and `RUN_CREATED` event (metadata includes `processId`, `entrypoint.importPath/exportName`, `layoutVersion`, optional `processRevision`, and `request`).
 
+#### `babysitter run:process-assign <runDir>`
+
+Assign a process to an existing bare run (one created without `--entry`).
+
+```bash
+babysitter run:process-assign .a5c/runs/run-20260125-001 \
+  --entry ./process/build.js#process \
+  --process-id dev/build
+```
+
+Flags:
+
+* `--entry <path#export>` (required): module path plus optional export name.
+* `--process-id <id>` (optional): override the process identifier (defaults to existing value from bare run).
+* `--process-revision <rev>` (optional): pin a process revision.
+* `--force` (optional): allow re-assigning even if a process is already attached.
+* `--dry-run` (optional): preview the assignment without mutating.
+* `--json`: emit `{"runId","runDir","entry","processId","assigned"}`.
+
+Updates `run.json` under the run lock and appends a `PROCESS_ASSIGNED` journal event. Rejects if the run already has a process unless `--force`.
+
 #### `babysitter run:status <runDir>`
 
 Inspect a run's lifecycle summary: terminal state, the most recent journal entry, and how many effects remain unresolved by kind.

@@ -35,6 +35,11 @@ $CLI task:list <runId> --pending --json
 $CLI task:post <runId> <effectId> --status <ok|error> --json
 ```
 
+**Assign process to bare run:**
+```bash
+$CLI run:process-assign <runDir> --entry <path>#<export> [--process-id <id>] [--json]
+```
+
 **Iterate:**
 ```bash
 $CLI run:iterate <runId> --json --iteration <n>{{iterateFlags}}

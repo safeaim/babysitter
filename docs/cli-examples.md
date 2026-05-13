@@ -37,6 +37,30 @@ Typical JSON response (`--json`):
 
 ---
 
+## 1b. Assign a process to a bare run
+
+When a run is created without `--entry` (a bare run), assign a process before iterating:
+
+```bash
+babysitter run:process-assign .a5c/runs/run-20260112-130455 \
+  --entry processes/build/process.mjs#process \
+  --process-id dev/build \
+  --json
+```
+
+```json
+{
+  "runId": "run-20260112-130455",
+  "runDir": ".a5c/runs/run-20260112-130455",
+  "entry": "processes/build/process.mjs#process",
+  "processId": "dev/build",
+  "previousEntrypoint": { "importPath": "bare-run" },
+  "assigned": true
+}
+```
+
+---
+
 ## 2. Inspect run status
 
 ```bash

@@ -105,7 +105,8 @@ specific CLI commands involved.
    |                   |   |   {sessionId}.md  |   |   journal/       |
    | session:init      |   +-------------------+   |   tasks/         |
    | run:create        |                           |   state/         |
-   | session:associate |                           +------------------+
+   | run:process-assign|                           +------------------+
+   | session:associate |
    | run:iterate       |
    | task:list         |
    | task:post         |
@@ -1340,6 +1341,7 @@ function handleCLIError(commandName, shellResult):
 | `session:init` | 5s | File creation only |
 | `session:associate` | 5s | File update only |
 | `run:create` | 10s | Creates directory structure and journal |
+| `run:process-assign` | 10s | Updates run.json and appends journal event under lock |
 | `run:iterate` | 120s | May execute process function; uses `BABYSITTER_TIMEOUT` env var |
 | `run:status` | 10s | Reads journal and derives state |
 | `task:list` | 10s | Reads task directories |
@@ -1829,6 +1831,7 @@ main().catch(err => { console.error(err); process.exit(1); });
 | `babysitter version --json` | Verify CLI installation | 2a |
 | `babysitter session:init --session-id ID --state-dir DIR --json` | Create baseline session state | 2b |
 | `babysitter run:create --process-id PID --entry FILE --inputs FILE --json` | Create a new run | 2c |
+| `babysitter run:process-assign RUNDIR --entry FILE [--process-id PID] --json` | Assign process to bare run | 2c |
 | `babysitter session:associate --session-id ID --run-id RID --state-dir DIR --json` | Bind session to run | 2c |
 | `babysitter run:iterate RUNDIR --json` | Advance orchestration, discover effects | 2d, 2e |
 | `babysitter run:status RUNDIR --json` | Read run status and completion proof | 2d |

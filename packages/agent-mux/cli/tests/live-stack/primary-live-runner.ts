@@ -56,6 +56,7 @@ export interface PrimaryLiveRunResult {
 }
 
 const DEFAULT_TIMEOUT_MS = 15 * 60 * 1000;
+const INTERACTIVE_TIMEOUT_MS = 3 * 60 * 1000;
 
 export function buildPrimaryLiveStackCommands(
   scenario: LiveStackScenario,
@@ -63,7 +64,8 @@ export function buildPrimaryLiveStackCommands(
 ): readonly CommandExecution[] {
   const commandEnv = buildCommandEnv(options.env, options.cwd);
   if (scenario.agent.babysitterHarness) commandEnv['BABYSITTER_HARNESS'] = scenario.agent.babysitterHarness;
-  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const isInteractive = options.env['LIVE_STACK_INTERACTIVE'] === 'true';
+  const timeoutMs = options.timeoutMs ?? (isInteractive ? INTERACTIVE_TIMEOUT_MS : DEFAULT_TIMEOUT_MS);
   const traceId = commandEnv['LIVE_STACK_TRACE_ID'];
   const prompt = buildPrompt(scenario, traceId);
 
@@ -290,17 +292,8 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
 }
 
 export async function executeChildProcessCommand(execution: CommandExecution): Promise<CommandResult> {
-  const isInteractive = execution.env['LIVE_STACK_INTERACTIVE'] === 'true';
-
-  // Interactive mode: use node-pty so the harness gets a real TTY
-  if (isInteractive) {
-    try {
-      return await executePtyCommand(execution);
-    } catch {
-      // node-pty not available — fall through to pipe mode
-    }
-  }
-
+  // amux launch handles PTY internally via node-pty when interactive.
+  // The test runner always uses pipe mode to collect output.
   const { spawn } = await import('node:child_process');
   return await new Promise<CommandResult>((resolve) => {
     const child = spawn(execution.command, execution.args, {
@@ -754,11 +747,6 @@ async function validateAgentBehavior(
       if (/completed|RUN_COMPLETED/i.test(output)) {
         runCompleted = true;
         runCompletionDetail = 'run completion evidence found in output (no .a5c/runs/ directory)';
-      } else if (!isInteractiveMode) {
-        // In non-interactive mode, hooks don't fire (no TTY) so .a5c/runs/
-        // may never be created by the babysitter-plugin hook chain.
-        runCompleted = true;
-        runCompletionDetail = 'no .a5c/runs/ directory (expected in non-interactive — hooks require TTY)';
       }
     }
     entries.push({
@@ -785,14 +773,7 @@ async function validateAgentBehavior(
         } catch { continue; }
       }
     } catch {
-      if (!isInteractiveMode) {
-        // In non-interactive mode, hooks don't fire (no TTY) so .a5c/runs/
-        // may never be created by the babysitter-plugin hook chain.
-        completionProofFound = true;
-        completionProofDetail = 'no .a5c/runs/ directory (expected in non-interactive — hooks require TTY)';
-      } else {
-        completionProofDetail = 'no .a5c/runs/ directory found';
-      }
+      completionProofDetail = 'no .a5c/runs/ directory found';
     }
     entries.push({
       name: 'babysitter-completion-proof',

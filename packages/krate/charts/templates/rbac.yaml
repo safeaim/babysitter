@@ -12,14 +12,7 @@ rules:
 
   - apiGroups: ["krate.a5c.ai"]
 
-    resources: ["organizations", "orgnamespacebindings", "users", "teams", "invites", "identitymappings", "authproviders", "repositories", "sshkeys", "repositorypermissions", "branchprotections", "refpolicies", "policyprofiles", "policytemplates", "policybindings", "policyexceptionrequests", "pullrequests", "issues", "reviews", "pipelines", "jobs", "runnerpools", "webhooksubscriptions", "webhookdeliveries", "views", "selectors"]
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-
-
-
-  - apiGroups: ["krate.a5c.ai"]
-
-    resources: ["externalbackendproviders", "externalbackendbindings", "externalbackendsyncpolicies", "externalprovidercapabilitymanifests", "externalwebhookdeliveries", "externalsyncevents", "externalsyncstates", "externalwriteintents", "externalsyncconflicts", "externalobjectlinks"]
+    resources: ["*"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
 

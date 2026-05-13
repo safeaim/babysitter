@@ -92,7 +92,7 @@ test('controller deployment assets build and publish the runnable controller', (
   assert.ok(chartValues.includes('auth:'), 'chart values include auth configuration');
   assert.ok(chartValues.includes('github:') && chartValues.includes('sso:'), 'chart values expose GitHub and SSO configuration');
   assert.ok(chartValues.includes('mode: auto') && chartValues.includes('policyReporter:'), 'chart values expose Kyverno auto-discovery modes and policy reporter settings');
-  assert.ok(chartRbac.includes('policyprofiles') && chartRbac.includes('policies.kyverno.io') && chartRbac.includes('policyreports'), 'RBAC covers Krate policy CRDs and Kyverno read/write surfaces');
+  assert.ok(chartRbac.includes('"*"') && chartRbac.includes('policies.kyverno.io') && chartRbac.includes('policyreports'), 'RBAC covers all Krate resources via wildcard and Kyverno read/write surfaces');
   assert.ok(chartDeployment.includes('KRATE_KYVERNO_MODE') && chartDeployment.includes('KRATE_KYVERNO_POLICY_NAMESPACE') && chartDeployment.includes('KRATE_KYVERNO_DISCOVER_EXISTING'), 'deployments receive Kyverno discovery env');
   assert.ok(read('../charts/templates/argocd-kyverno-application.yaml').includes('krate.a5c.ai/policy-engine: kyverno'), 'managed Kyverno Argo CD application template is present');
   assert.ok(authSecret.includes('github-client-id') && authSecret.includes('sso-client-secret'), 'chart renders auth secret keys');

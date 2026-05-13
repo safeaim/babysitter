@@ -593,32 +593,53 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         env: { ...process.env, ...plan.env } as Record<string, string>,
       });
 
-      // End-of-turn detection: read turnCompletePattern from atlas graph
-      let turnCompleteRegex: RegExp | null = null;
+      // End-of-turn detection: parse PTY output through adapter's event system
       let turnDetected = false;
+      let lineBuf = '';
+      let assembler: any = null;
+      let adapter: any = null;
       try {
-        const { getInteractiveSignals } = await import('@a5c-ai/agent-catalog');
-        const signals = getInteractiveSignals(plan.harness);
-        if (signals?.turnCompletePattern) {
-          turnCompleteRegex = new RegExp(signals.turnCompletePattern, 'm');
-        }
-      } catch { /* catalog not available */ }
+        const core = await import('@a5c-ai/agent-mux-core');
+        assembler = new core.StreamAssembler();
+        // Resolve the adapter for this harness to use its parseEvent
+        const adaptersModule = await import('@a5c-ai/agent-mux-adapters');
+        const factory = adaptersModule.getAdapterFactory?.(plan.harness);
+        adapter = factory ? factory() : null;
+      } catch { /* core/adapters not available */ }
 
-      // Pipe PTY to stdout, check for turn completion
-      let ptyOutputBuf = '';
+      // Pipe PTY to stdout + feed through event parser for turn detection
       ptyProcess.onData((data: string) => {
         process.stdout.write(data);
-        if (turnCompleteRegex && !turnDetected && prompt) {
-          ptyOutputBuf += data;
-          // Strip ANSI escapes for pattern matching
-          const clean = ptyOutputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
-          if (turnCompleteRegex.test(clean)) {
-            turnDetected = true;
-            // Harness finished processing — kill it after a brief settle
-            setTimeout(() => {
-              try { ptyProcess.kill('SIGTERM'); } catch { /* */ }
-            }, 500);
-          }
+        if (!assembler || !adapter || turnDetected) return;
+
+        // Strip ANSI escapes, then feed lines to the event parser
+        const clean = data.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '').replace(/\x1b\][^\x07]*\x07/g, '');
+        lineBuf += clean;
+        let idx: number;
+        while ((idx = lineBuf.indexOf('\n')) !== -1) {
+          const line = lineBuf.slice(0, idx).replace(/\r$/, '');
+          lineBuf = lineBuf.slice(idx + 1);
+          if (line.length === 0) continue;
+
+          const assembled = assembler.feed(line);
+          if (assembled === null) continue;
+          try {
+            const ctx = { runId: 'launch', agent: plan.harness, sessionId: undefined, turnIndex: 0, debug: false, outputFormat: 'text', source: 'stdout', assembler, eventCount: 0, lastEventType: null, adapterState: {} };
+            const result = adapter.parseEvent(assembled, ctx);
+            if (result === null) continue;
+            const events = Array.isArray(result) ? result : [result];
+            for (const ev of events) {
+              // Detect turn completion events
+              if (ev.type === 'message_stop' || ev.type === 'turn_end' || ev.type === 'session_end') {
+                turnDetected = true;
+                // Give the harness a moment to flush output, then kill
+                setTimeout(() => {
+                  try { ptyProcess.kill('SIGTERM'); } catch { /* */ }
+                }, 1000);
+                return;
+              }
+            }
+          } catch { /* parse error — ignore */ }
         }
       });
       if (process.stdin.isTTY) {

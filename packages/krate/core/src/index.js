@@ -30,6 +30,7 @@ export * from './agent-approval-controller.js';
 export * from './agent-trigger-controller.js';
 export * from './agent-workspace-controller.js';
 export * from './agent-memory-controller.js';
+export * from './agent-memory-query.js';
 export * from './agent-memory-repository-source-controller.js';
 export * from './agent-adapter-controller.js';
 export * from './agent-transport-binding-controller.js';

@@ -19,6 +19,7 @@ import { ExternalProviderList } from './components/external-provider-list.jsx';
 import { ExternalProviderWizard } from './components/external-provider-wizard.jsx';
 import { ExternalSyncDashboard } from './components/external-sync-dashboard.jsx';
 import { ExternalConflictResolver } from './components/external-conflict-resolver.jsx';
+import { AgentSettingsForm } from './components/agent-settings-form.jsx';
 
 export const orgNavigationGroups = [
   {
@@ -1077,57 +1078,12 @@ export async function AgentSettingsPage({ org = null } = {}) {
   const gateway = agentView.gateway;
   const adapters = agentView.adapters?.items || [];
   const providers = agentView.providers?.items || [];
-  const gatewayUrl = gateway?.spec?.gatewayUrl || gateway?.spec?.url || null;
-  const gatewayConditions = gateway?.status?.conditions || [];
-  const gatewayReady = gatewayConditions.find((c) => c.type === 'Ready');
-  const gatewayStatusTone = gateway ? (gatewayReady?.status === 'True' ? 'good' : gatewayReady?.status === 'False' ? 'danger' : 'neutral') : 'neutral';
-  const gatewayStatusLabel = gateway ? (gatewayReady?.status === 'True' ? 'Ready' : gatewayReady?.status === 'False' ? 'Not Ready' : 'Unknown') : 'Not configured';
-  const lastHealthCheck = gateway?.status?.lastHealthCheck || gateway?.status?.lastProbeTime || null;
-  const adapterPhaseTone = (phase) => {
-    if (!phase || phase === 'Pending') return 'neutral';
-    if (phase === 'Active' || phase === 'Ready') return 'good';
-    if (phase === 'Failed') return 'danger';
-    return 'neutral';
-  };
-  const providerPhaseTone = (phase) => {
-    if (!phase || phase === 'Pending') return 'neutral';
-    if (phase === 'Active' || phase === 'Ready' || phase === 'Configured') return 'good';
-    if (phase === 'Failed') return 'danger';
-    return 'neutral';
-  };
+  const gatewayReady = gateway?.status?.conditions?.find((c) => c.type === 'Ready');
   const agentsEnabled = (agentView.stacks?.count || 0) > 0 || gateway != null;
   const agentMuxConnected = gateway != null && gatewayReady?.status === 'True';
-  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent settings" title="Agent settings" text="Gateway connection, adapter bindings, provider configurations, and system resource counts." actions={[['/agents', 'Overview'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/settings', 'Settings']]}>
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent settings" title="Agent settings" text="Configure the gateway connection, adapter bindings, and provider credentials for this org." actions={[['/agents', 'Overview'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/settings', 'Settings']]}>
     <DegradedBanner model={ui.model} />
-    <div className="card" style={{ borderLeft: `3px solid ${gatewayStatusTone === 'good' ? 'var(--color-good, #22c55e)' : gatewayStatusTone === 'danger' ? 'var(--color-danger, #ef4444)' : 'var(--color-neutral, #9ca3af)'}` }}>
-      <div className="cardTitle"><h2>Gateway connection</h2><StatusPill tone={gatewayStatusTone}>{gatewayStatusLabel}</StatusPill></div>
-      {gateway ? <dl className="kv">
-        <dt>Gateway URL</dt><dd style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.875rem' }}>{gatewayUrl || 'not specified'}</dd>
-        <dt>Status</dt><dd><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', marginRight: '0.375rem', backgroundColor: gatewayStatusTone === 'good' ? '#22c55e' : gatewayStatusTone === 'danger' ? '#ef4444' : '#9ca3af' }} />{gatewayStatusLabel}</dd>
-        {lastHealthCheck ? <><dt>Last health check</dt><dd><time dateTime={lastHealthCheck}>{lastHealthCheck}</time></dd></> : null}
-      </dl> : <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-        <p style={{ marginBottom: '0.25rem' }}><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', marginRight: '0.375rem', backgroundColor: '#9ca3af' }} />No Agent Mux gateway configured</p>
-        <p style={{ color: '#9ca3af', fontSize: '0.8125rem' }}>Create an AgentGatewayConfig resource to connect the workspace to an Agent Mux gateway for agent dispatch and session management.</p>
-      </div>}
-    </div>
-    <div className="card">
-      <div className="cardTitle"><h2>Adapters</h2><StatusPill tone={adapters.length ? 'good' : 'neutral'}>{adapters.length} adapters</StatusPill></div>
-      {adapters.length ? <div className="resourceTable">{adapters.map((adapter) => <div key={adapter.metadata?.name} className="resourceRow">
-        <strong>{adapter.metadata?.name}</strong>
-        <span>{adapter.spec?.type || 'subprocess'}</span>
-        <span>{adapter.spec?.transport || adapter.spec?.transportBinding || 'default'}</span>
-        <StatusPill tone={adapterPhaseTone(adapter.status?.phase)}>{adapter.status?.phase || 'Pending'}</StatusPill>
-      </div>)}</div> : <EmptyState title="No adapters configured" text="Agent adapters define how the workspace connects to agent runtimes. Create AgentAdapter resources to configure subprocess, remote, or programmatic adapters." />}
-    </div>
-    <div className="card">
-      <div className="cardTitle"><h2>Providers</h2><StatusPill tone={providers.length ? 'good' : 'neutral'}>{providers.length} providers</StatusPill></div>
-      {providers.length ? <div className="resourceTable">{providers.map((provider) => <div key={provider.metadata?.name} className="resourceRow">
-        <strong>{provider.metadata?.name}</strong>
-        <span>{provider.spec?.authType || provider.spec?.auth?.type || 'api-key'}</span>
-        <span>{provider.spec?.defaultModel || provider.spec?.model || 'default'}</span>
-        <StatusPill tone={providerPhaseTone(provider.status?.phase)}>{provider.status?.phase || 'Pending'}</StatusPill>
-      </div>)}</div> : <EmptyState title="No providers configured" text="Model providers define LLM access credentials and default models. Create AgentProviderConfig resources to configure provider access." />}
-    </div>
+    <AgentSettingsForm org={activeOrg} gateway={gateway} adapters={adapters} providers={providers} />
     <div className="card">
       <div className="cardTitle"><h2>System info</h2><StatusPill tone="neutral">overview</StatusPill></div>
       <div className="metricGrid">

@@ -24,6 +24,7 @@ describe('live stack scenario contract primitives', () => {
       'amux install claude',
       'npm install --global ./packages/sdk',
       'babysitter harness:install-plugin claude-code',
+      'babysitter run:create --process-id live-stack-e2e',
       'amux launch claude',
     ]);
     expect(scenario.layers).toContain('transport-mux route');

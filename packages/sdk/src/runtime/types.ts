@@ -113,7 +113,8 @@ export interface CreateRunOptions {
   runsDir?: string;
   runId?: string;
   harness?: string;
-  process: {
+  /** Process to execute. Optional — bare runs track session state without a process. */
+  process?: {
     processId: string;
     importPath: string;
     exportName?: string;

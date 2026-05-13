@@ -200,6 +200,26 @@ export function createUnifiedAdapter(): HarnessAdapter {
           verbose: args.verbose,
         });
       }
+
+      // Auto-create a bare run for babysitter-plugin sessions so .a5c/runs/
+      // exists from the start — the agent can attach a process later.
+      try {
+        const { createRun } = await import("../../runtime/createRun");
+        const { resolveRunsDir } = await import("../../config");
+        const runsDir = args.runsDir ?? resolveRunsDir();
+        const result = await createRun({
+          runsDir,
+          harness: "unified",
+        });
+        if (args.verbose) {
+          process.stderr.write(`[session-start] bare run created: ${result.runId}\n`);
+        }
+      } catch (err) {
+        if (args.verbose) {
+          process.stderr.write(`[session-start] bare run creation failed: ${err instanceof Error ? err.message : String(err)}\n`);
+        }
+      }
+
       process.stdout.write("{}\n");
       return 0;
     },

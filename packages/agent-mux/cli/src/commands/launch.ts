@@ -198,16 +198,14 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
     case 'claude':
       if (session.resumeId) plan.args.push('--resume', session.resumeId);
       if (session.sessionId) plan.args.push('--session-id', session.sessionId);
-      // Always pass prompt via --print so the harness exits after processing.
-      // Hooks still fire because the babysitter plugin is in Claude settings.
-      if (session.prompt) plan.args.push('--print', session.prompt);
+      // --print for non-interactive (one-shot), omit for interactive (multi-turn tool use)
+      if (session.prompt && !interactive) plan.args.push('--print', session.prompt);
       if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
       break;
     case 'codex':
       if (session.resumeId) {
         plan.args.unshift('resume', session.resumeId);
-      } else if (session.prompt) {
-        // Always use exec mode so codex processes the prompt and exits.
+      } else if (session.prompt && !interactive) {
         plan.args.unshift('exec', session.prompt);
       }
       break;

@@ -17,8 +17,10 @@ export async function createRun(options: CreateRunOptions): Promise<CreateRunRes
   validateRunId(runId);
   const runsDir = path.resolve(options.runsDir ?? resolveRunsDir());
   const runDir = getRunDir(runsDir, runId);
-  const normalizedEntrypoint = normalizeEntrypoint(runDir, options.process.importPath, options.process.exportName);
-  const requestId = options.request ?? options.process.processId ?? runId;
+  const normalizedEntrypoint = options.process
+    ? normalizeEntrypoint(runDir, options.process.importPath, options.process.exportName)
+    : { importPath: "bare-run", exportName: undefined };
+  const requestId = options.request ?? options.process?.processId ?? runId;
   const providedProof =
     typeof options.metadata?.completionProof === "string" ? options.metadata.completionProof : undefined;
   const completionProof = providedProof ?? crypto.randomBytes(16).toString("hex");
@@ -51,7 +53,7 @@ export async function createRun(options: CreateRunOptions): Promise<CreateRunRes
     runsRoot: runsDir,
     runId,
     request: requestId,
-    processId: options.process.processId,
+    processId: options.process?.processId ?? "bare-run",
     harness: options.harness,
     nested: nestedMetadata,
     processRevision: options.processRevision,

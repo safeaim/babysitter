@@ -32,3 +32,5 @@ export * from './agent-workspace-controller.js';
 export * from './agent-memory-controller.js';
 export * from './agent-adapter-controller.js';
 export * from './agent-transport-binding-controller.js';
+export * from './agent-provider-config-controller.js';
+export * from './agent-project-controller.js';

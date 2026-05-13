@@ -458,14 +458,14 @@ jobs:
             amux_provider: foundry
             model: gpt-5.5
             required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.claude-code.google-vertex.gemini-3.1-pro-preview
+          - id: live.agent-mux.claude-code.google-vertex.gemini-2.5-pro
             agent_path: agent-mux
             agent: claude-code
             amux_agent: claude
             integration_type: third-party-plugin
             provider: google-vertex
             amux_provider: vertex
-            model: gemini-3.1-pro-preview
+            model: gemini-2.5-pro
             required_env: GOOGLE_CLOUD_PROJECT,GOOGLE_API_KEY,GOOGLE_CLOUD_LOCATION,GOOGLE_GENAI_USE_VERTEXAI
           - id: live.agent-mux.codex.foundry-openai.gpt-5.5
             agent_path: agent-mux
@@ -742,14 +742,14 @@ jobs:
             amux_provider: foundry
             model: gpt-5.5
             required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.claude-code.google-vertex.gemini-3.1-pro-preview
+          - id: live.agent-mux.claude-code.google-vertex.gemini-2.5-pro
             agent_path: agent-mux
             agent: claude-code
             amux_agent: claude
             integration_type: third-party-plugin
             provider: google-vertex
             amux_provider: vertex
-            model: gemini-3.1-pro-preview
+            model: gemini-2.5-pro
             required_env: GOOGLE_CLOUD_PROJECT,GOOGLE_API_KEY,GOOGLE_CLOUD_LOCATION,GOOGLE_GENAI_USE_VERTEXAI
           - id: live.agent-mux.codex.foundry-openai.gpt-5.5
             agent_path: agent-mux

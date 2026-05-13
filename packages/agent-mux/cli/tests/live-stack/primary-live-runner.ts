@@ -177,12 +177,12 @@ function harnessApprovalPassthrough(_harness: string): string[] {
 }
 
 function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {
-  // babysitter-agent: use 1 turn to invoke single-shot mode (avoids full orchestration)
   if (scenario.agent.agent === 'babysitter-agent') {
     return 1;
   }
-  // Tool execution requires multiple turns: user → tool_call → tool_result → response
-  return 5;
+  // Cross-model proxied scenarios need more turns: the model may not call
+  // tools on the first attempt and the proxy needs retry/coaching turns.
+  return 12;
 }
 
 

@@ -14,6 +14,11 @@ WORKDIR /app/packages/krate/web
 RUN npx next build
 
 FROM node:20-alpine AS runtime
+RUN apk add --no-cache curl \
+    && curl -fsSL -o /usr/local/bin/kubectl \
+       https://dl.k8s.io/release/v1.32.2/bin/linux/amd64/kubectl \
+    && chmod +x /usr/local/bin/kubectl \
+    && apk del curl
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000

@@ -302,8 +302,6 @@ jobs:
           node scripts/agent-mux-build.cjs test packages/agent-mux/cli 2>&1 | tee artifacts/mux-logs/agent-mux-cli-tests.log
           node scripts/agent-mux-build.cjs test packages/agent-mux/sdk 2>&1 | tee artifacts/mux-logs/agent-mux-sdk-tests.log
           npm run test:unit --workspace=@a5c-ai/triggers 2>&1 | tee artifacts/mux-logs/triggers-tests.log
-          npm run test:e2e --workspace=@a5c-ai/triggers 2>&1 | tee artifacts/mux-logs/triggers-e2e.log
-          npm run test:coverage --workspace=@a5c-ai/triggers 2>&1 | tee artifacts/mux-logs/triggers-coverage.log
 
       - name: Verify non-realtime agent-mux release artifacts
         run: |
@@ -325,11 +323,16 @@ jobs:
           path: artifacts/mux-logs
           if-no-files-found: warn
 
-  e2e_mux_webui:
+  e2e_integration:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
-    needs: build_all
+    needs:
+      - validate_core
+      - validate_mux
+      - validate_krate
+      - validate_cloud
+      - validate_observer_and_compiler
     continue-on-error: ${{ github.ref_name != 'main' }}
-    name: E2E Mux WebUI (Playwright)
+    name: E2E Integration Tests
     runs-on: ubuntu-latest-l
     permissions:
       contents: read
@@ -368,6 +371,22 @@ jobs:
       - name: Extract build artifacts
         run: tar xzf /tmp/build-all-dist.tar.gz
 
+      - name: Prepare artifacts directory
+        run: mkdir -p artifacts/e2e-logs
+
+      - name: Triggers e2e + coverage
+        run: |
+          set -euo pipefail
+          npm run test:e2e --workspace=@a5c-ai/triggers 2>&1 | tee artifacts/e2e-logs/triggers-e2e.log
+          npm run test:coverage --workspace=@a5c-ai/triggers 2>&1 | tee artifacts/e2e-logs/triggers-coverage.log
+
+      - name: Krate e2e + smoke
+        run: |
+          set -euo pipefail
+          cd packages/krate/core
+          npm run e2e 2>&1 | tee ../../../artifacts/e2e-logs/krate-e2e.log
+          npm run smoke 2>&1 | tee ../../../artifacts/e2e-logs/krate-smoke.log
+
       - name: Cache Playwright browsers
         id: pw-cache
         uses: actions/cache@v4
@@ -385,6 +404,14 @@ jobs:
 
       - name: agent-mux webui browser e2e
         run: npm run test:e2e --workspace=@a5c-ai/agent-mux-webui
+
+      - name: Upload e2e logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-e2e-logs
+          path: artifacts/e2e-logs
+          if-no-files-found: warn
 
       - name: Upload Playwright artifacts
         if: always()
@@ -953,16 +980,6 @@ jobs:
           set -euo pipefail
           cd packages/krate/core && npm test 2>&1 | tee ../../../artifacts/krate-logs/core-tests.log
 
-      - name: E2E krate core
-        run: |
-          set -euo pipefail
-          cd packages/krate/core && npm run e2e 2>&1 | tee ../../../artifacts/krate-logs/core-e2e.log
-
-      - name: Smoke krate core
-        run: |
-          set -euo pipefail
-          cd packages/krate/core && npm run smoke 2>&1 | tee ../../../artifacts/krate-logs/core-smoke.log
-
       - name: Upload krate validation logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -1055,7 +1072,7 @@ jobs:
       - build_all
       - validate_core
       - validate_mux
-      - e2e_mux_webui
+      - e2e_integration
       - live_stack_babysitter_plugin
       - live_stack_babysitter_agent
       - live_stack_vanilla

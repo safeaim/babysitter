@@ -62,6 +62,8 @@ const packageFamilies = {
   ],
   "krate-family": [
     "@a5c-ai/krate",
+    "@a5c-ai/krate-sdk",
+    "@a5c-ai/krate-cli",
     "@a5c-ai/krate-web",
   ],
 };

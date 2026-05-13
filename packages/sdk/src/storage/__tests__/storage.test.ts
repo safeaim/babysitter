@@ -6,7 +6,7 @@ import { createRunDir } from "../../storage/createRunDir";
 import { appendEvent, loadJournal } from "../../storage/journal";
 import { getDiskUsage, findOrphanedBlobs } from "../../storage/cleanup";
 import { acquireRunLock, releaseRunLock } from "../../storage/lock";
-import { readRunMetadata } from "../../storage/runFiles";
+import { readRunMetadata, writeRunMetadata } from "../../storage/runFiles";
 import { __resetICloudDriveWarningCacheForTests } from "../../storage/icloudWarning";
 import { BABYSITTER_SDK_VERSION } from "../../sdkVersion";
 
@@ -275,5 +275,25 @@ describe("storage primitives", () => {
     );
     expect(content.name).toBe("my-project");
     expect(content.type).toBe("commonjs");
+  });
+
+  test("writeRunMetadata atomically updates run.json", async () => {
+    const { runDir } = await createRunDir({
+      runsRoot: tmpRoot,
+      runId: "run-write-meta",
+      request: "write-meta-test",
+      processPath: ".a5c/processes/foo.js",
+    });
+    const original = await readRunMetadata(runDir);
+    expect(original.entrypoint.importPath).toContain("foo.js");
+
+    const updated = { ...original, entrypoint: { importPath: "/new/path.js", exportName: "handler" }, processId: "new-process" };
+    await writeRunMetadata(runDir, updated);
+
+    const reread = await readRunMetadata(runDir);
+    expect(reread.entrypoint.importPath).toBe("/new/path.js");
+    expect(reread.entrypoint.exportName).toBe("handler");
+    expect(reread.processId).toBe("new-process");
+    expect(reread.runId).toBe("run-write-meta");
   });
 });

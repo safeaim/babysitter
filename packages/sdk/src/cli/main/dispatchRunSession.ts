@@ -38,6 +38,7 @@ import {
   handleRunCreate,
   handleRunEvents,
   handleRunIterate,
+  handleRunProcessAssign,
   handleRunRebuildState,
   handleRunRepairJournal,
   handleRunStatus,
@@ -61,6 +62,8 @@ async function executeRunTaskCommand(parsed: ParsedArgs): Promise<number | undef
   switch (parsed.command) {
     case "run:create":
       return await handleRunCreate(parsed);
+    case "run:process-assign":
+      return await handleRunProcessAssign(parsed);
     case "run:rebuild-state":
       return await handleRunRebuildState(parsed);
     case "run:repair-journal":

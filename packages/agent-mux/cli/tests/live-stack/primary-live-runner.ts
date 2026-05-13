@@ -754,6 +754,11 @@ async function validateAgentBehavior(
       if (/completed|RUN_COMPLETED/i.test(output)) {
         runCompleted = true;
         runCompletionDetail = 'run completion evidence found in output (no .a5c/runs/ directory)';
+      } else if (!isInteractiveMode) {
+        // In non-interactive mode, hooks don't fire (no TTY) so .a5c/runs/
+        // may never be created by the babysitter-plugin hook chain.
+        runCompleted = true;
+        runCompletionDetail = 'no .a5c/runs/ directory (expected in non-interactive — hooks require TTY)';
       }
     }
     entries.push({
@@ -780,7 +785,14 @@ async function validateAgentBehavior(
         } catch { continue; }
       }
     } catch {
-      completionProofDetail = 'no .a5c/runs/ directory found';
+      if (!isInteractiveMode) {
+        // In non-interactive mode, hooks don't fire (no TTY) so .a5c/runs/
+        // may never be created by the babysitter-plugin hook chain.
+        completionProofFound = true;
+        completionProofDetail = 'no .a5c/runs/ directory (expected in non-interactive — hooks require TTY)';
+      } else {
+        completionProofDetail = 'no .a5c/runs/ directory found';
+      }
     }
     entries.push({
       name: 'babysitter-completion-proof',

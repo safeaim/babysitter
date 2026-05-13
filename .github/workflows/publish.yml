@@ -2067,6 +2067,46 @@ jobs:
             echo "::notice::Skipping krate-auth secret — GitHub OAuth not configured"
           fi
 
+      - name: Install Krate CRDs
+        if: steps.config.outputs.deploy_enabled == 'true'
+        run: kubectl apply -f packages/krate/charts/crds/
+
+      - name: Create Krate RBAC
+        if: steps.config.outputs.deploy_enabled == 'true'
+        run: |
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: krate
+            namespace: ${KUBE_NAMESPACE}
+          ---
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRole
+          metadata:
+            name: krate-${KUBE_NAMESPACE}
+          rules:
+            - apiGroups: ["krate.a5c.ai"]
+              resources: ["*"]
+              verbs: ["*"]
+            - apiGroups: [""]
+              resources: ["events", "namespaces"]
+              verbs: ["get", "list", "watch"]
+          ---
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRoleBinding
+          metadata:
+            name: krate-${KUBE_NAMESPACE}
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: krate-${KUBE_NAMESPACE}
+          subjects:
+            - kind: ServiceAccount
+              name: krate
+              namespace: ${KUBE_NAMESPACE}
+          EOF
+
       - name: Deploy Krate
         if: steps.config.outputs.deploy_enabled == 'true'
         run: |
@@ -2088,6 +2128,7 @@ jobs:
                 labels:
                   app: ${APP_NAME}
               spec:
+                serviceAccountName: krate
                 terminationGracePeriodSeconds: 10
                 imagePullSecrets:
                   - name: acr-pull

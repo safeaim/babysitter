@@ -323,11 +323,11 @@ jobs:
 
 
 
-  live_stack_e2e:
+  live_stack_babysitter_plugin:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     continue-on-error: ${{ github.ref_name != 'main' }}
-    name: Live Stack (${{ matrix.install_mode.id }}, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest-l)
+    name: Live Stack (babysitter-plugin, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest-l)
     runs-on: ubuntu-latest-l
     permissions:
       contents: read
@@ -346,22 +346,6 @@ jobs:
           - id: babysitter-plugin
             required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
             expected_artifacts: agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted
-          - id: vanilla
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
-            expected_artifacts: agent-mux-events,transport-mux-trace,provider-trace-redacted
-        exclude:
-          - install_mode:
-              id: babysitter-plugin
-            scenario:
-              id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
-          - install_mode:
-              id: vanilla
-            interaction_mode:
-              id: interactive
-          - interaction_mode:
-              id: interactive
-            scenario:
-              id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
         scenario:
           - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
             agent_path: agent-mux
@@ -381,16 +365,6 @@ jobs:
             amux_provider: vertex
             model: gemini-3.1-pro-preview
             required_env: GOOGLE_CLOUD_PROJECT,GOOGLE_API_KEY,GOOGLE_CLOUD_LOCATION,GOOGLE_GENAI_USE_VERTEXAI
-          - id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: babysitter-agent
-            amux_agent: babysitter
-            integration_type: third-party-plugin
-            babysitter_harness: agent-core
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
           - id: live.agent-mux.codex.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: codex
@@ -439,6 +413,270 @@ jobs:
       - name: Install node-pty for interactive tests
         if: matrix.interaction_mode.interactive == 'true'
         run: npm install node-pty --no-save
+
+      - name: Link workspace CLIs to PATH
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          for pair in \
+            "amux:packages/agent-mux/cli/dist/index.js" \
+            "babysitter-agent:packages/babysitter-agent/dist/cli/main.js" \
+            "babysitter:packages/sdk/dist/cli/main.js"
+          do
+            name="${pair%%:*}"
+            script="${pair#*:}"
+            printf '#!/bin/sh\nexec node "%s/%s" "$@"\n' "${{ github.workspace }}" "$script" > "$HOME/.local/bin/$name"
+            chmod +x "$HOME/.local/bin/$name"
+          done
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run selected live stack E2E
+        timeout-minutes: 35
+        env:
+          LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
+          LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
+          LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
+          LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
+          LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
+          LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
+          LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
+          LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
+          LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
+          LIVE_STACK_USE_AMUX_RUN: 'false'
+          LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
+          LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
+          LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
+          LIVE_STACK_CREDENTIAL_MODE: github-org-secrets-and-vars
+          LIVE_STACK_REQUIRED_ENV: ${{ matrix.scenario.required_env }}
+          LIVE_STACK_LAYERS: ${{ matrix.install_mode.id }}
+          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.provider }},${{ matrix.scenario.agent }}
+          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
+          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
+          LIVE_STACK_RUN_MODEL_TESTS: '1'
+          LIVE_STACK_REQUIRE_EVIDENCE: '1'
+          LIVE_STACK_TEST_TIMEOUT_MS: '1800000'
+          LIVE_STACK_COMMAND_TIMEOUT_MS: '1500000'
+          LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
+          LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
+          LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
+          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CLOUD_LOCATION: global
+          GOOGLE_GENAI_USE_VERTEXAI: True
+        run: |
+          npm run test:e2e:live-stack:pipeline
+          npm run coverage:e2e:live-stack
+
+      - name: Upload live stack artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-live-stack-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
+          path: artifacts/live-stack
+          if-no-files-found: error
+
+  live_stack_babysitter_agent:
+    if: false
+    needs: build_all
+    continue-on-error: ${{ github.ref_name != 'main' }}
+    name: Live Stack (babysitter-agent, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest-l)
+    runs-on: ubuntu-latest-l
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        interaction_mode:
+          - id: non-interactive
+            interactive: 'false'
+        install_mode:
+          - id: babysitter-plugin
+            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
+            expected_artifacts: agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted
+        scenario:
+          - id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
+            agent_path: agent-mux
+            agent: babysitter-agent
+            amux_agent: babysitter
+            integration_type: third-party-plugin
+            babysitter_harness: agent-core
+            provider: foundry-openai
+            amux_provider: foundry
+            model: gpt-5.5
+            required_env: AZURE_API_KEY,AMUX_API_BASE
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract build artifacts
+        run: tar xzf /tmp/build-all-dist.tar.gz
+
+      - name: Link workspace CLIs to PATH
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          for pair in \
+            "amux:packages/agent-mux/cli/dist/index.js" \
+            "babysitter-agent:packages/babysitter-agent/dist/cli/main.js" \
+            "babysitter:packages/sdk/dist/cli/main.js"
+          do
+            name="${pair%%:*}"
+            script="${pair#*:}"
+            printf '#!/bin/sh\nexec node "%s/%s" "$@"\n' "${{ github.workspace }}" "$script" > "$HOME/.local/bin/$name"
+            chmod +x "$HOME/.local/bin/$name"
+          done
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run selected live stack E2E
+        timeout-minutes: 35
+        env:
+          LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
+          LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
+          LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
+          LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
+          LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
+          LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
+          LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
+          LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
+          LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
+          LIVE_STACK_USE_AMUX_RUN: 'false'
+          LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
+          LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
+          LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
+          LIVE_STACK_CREDENTIAL_MODE: github-org-secrets-and-vars
+          LIVE_STACK_REQUIRED_ENV: ${{ matrix.scenario.required_env }}
+          LIVE_STACK_LAYERS: ${{ matrix.install_mode.id }}
+          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.provider }},${{ matrix.scenario.agent }}
+          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
+          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
+          LIVE_STACK_RUN_MODEL_TESTS: '1'
+          LIVE_STACK_REQUIRE_EVIDENCE: '1'
+          LIVE_STACK_TEST_TIMEOUT_MS: '1800000'
+          LIVE_STACK_COMMAND_TIMEOUT_MS: '1500000'
+          LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
+          LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
+          LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
+          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
+        run: |
+          npm run test:e2e:live-stack:pipeline
+          npm run coverage:e2e:live-stack
+
+      - name: Upload live stack artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-live-stack-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
+          path: artifacts/live-stack
+          if-no-files-found: error
+
+  live_stack_vanilla:
+    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
+    continue-on-error: ${{ github.ref_name != 'main' }}
+    name: Live Stack (vanilla, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest-l)
+    runs-on: ubuntu-latest-l
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        interaction_mode:
+          - id: non-interactive
+            interactive: 'false'
+        install_mode:
+          - id: vanilla
+            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
+            expected_artifacts: agent-mux-events,transport-mux-trace,provider-trace-redacted
+        scenario:
+          - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
+            agent_path: agent-mux
+            agent: claude-code
+            amux_agent: claude
+            integration_type: third-party-plugin
+            provider: foundry-openai
+            amux_provider: foundry
+            model: gpt-5.5
+            required_env: AZURE_API_KEY,AMUX_API_BASE
+          - id: live.agent-mux.claude-code.google-vertex.gemini-3.1-pro-preview
+            agent_path: agent-mux
+            agent: claude-code
+            amux_agent: claude
+            integration_type: third-party-plugin
+            provider: google-vertex
+            amux_provider: vertex
+            model: gemini-3.1-pro-preview
+            required_env: GOOGLE_CLOUD_PROJECT,GOOGLE_API_KEY,GOOGLE_CLOUD_LOCATION,GOOGLE_GENAI_USE_VERTEXAI
+          - id: live.agent-mux.codex.foundry-openai.gpt-5.5
+            agent_path: agent-mux
+            agent: codex
+            amux_agent: codex
+            integration_type: third-party-plugin
+            provider: foundry-openai
+            amux_provider: foundry
+            model: gpt-5.5
+            required_env: AZURE_API_KEY,AMUX_API_BASE
+          - id: live.agent-mux.pi.foundry-openai.gpt-5.5
+            agent_path: agent-mux
+            agent: pi
+            amux_agent: pi
+            integration_type: third-party-plugin
+            provider: foundry-openai
+            amux_provider: foundry
+            model: gpt-5.5
+            required_env: AZURE_API_KEY,AMUX_API_BASE
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract build artifacts
+        run: tar xzf /tmp/build-all-dist.tar.gz
 
       - name: Link workspace CLIs to PATH
         run: |
@@ -689,7 +927,9 @@ jobs:
       - build_all
       - validate_core
       - validate_mux
-      - live_stack_e2e
+      - live_stack_babysitter_plugin
+      - live_stack_babysitter_agent
+      - live_stack_vanilla
       - validate_cloud
       - validate_krate
       - validate_observer_and_compiler
@@ -1491,6 +1731,9 @@ jobs:
     needs:
       - build_all
     runs-on: ubuntu-latest-l
+    environment:
+      name: atlas-${{ github.ref_name == 'main' && 'production' || github.ref_name }}
+      url: ${{ github.ref_name == 'main' && 'https://atlas.a5c.ai' || github.ref_name == 'staging' && 'https://atlas-staging.a5c.ai' || 'https://atlas-develop.a5c.ai' }}
     env:
       ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
       APP_NAME: atlas-webui
@@ -1542,6 +1785,10 @@ jobs:
         with:
           creds: '{"clientId":"${{ vars.AZURE_APPLICATION_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_APPLICATION_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
 
+      - name: Set up Docker Buildx
+        if: steps.config.outputs.deploy_enabled == 'true'
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push image
         if: steps.config.outputs.deploy_enabled == 'true'
         env:
@@ -1549,8 +1796,12 @@ jobs:
         run: |
           az acr login --name "$ACR_NAME"
           IMAGE="${ACR_NAME}.azurecr.io/${APP_NAME}:${IMAGE_TAG}"
-          docker build -f packages/atlas/webui/Dockerfile -t "$IMAGE" .
-          docker push "$IMAGE"
+          docker buildx build \
+            --file packages/atlas/webui/Dockerfile \
+            --tag "$IMAGE" \
+            --cache-from type=gha,scope=atlas-webui \
+            --cache-to type=gha,mode=max,scope=atlas-webui \
+            --push .
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Create ACR pull secret
@@ -1688,6 +1939,9 @@ jobs:
     needs:
       - validate_krate
     runs-on: ubuntu-latest-l
+    environment:
+      name: krate-${{ github.ref_name == 'main' && 'production' || github.ref_name }}
+      url: ${{ github.ref_name == 'main' && 'https://krate.a5c.ai' || github.ref_name == 'staging' && 'https://krate-staging.a5c.ai' || 'https://krate-develop.a5c.ai' }}
     env:
       ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
       APP_NAME: krate
@@ -1752,6 +2006,10 @@ jobs:
         with:
           creds: '{"clientId":"${{ vars.AZURE_APPLICATION_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_APPLICATION_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
 
+      - name: Set up Docker Buildx
+        if: steps.config.outputs.deploy_enabled == 'true'
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push krate-controller image
         if: steps.config.outputs.deploy_enabled == 'true'
         env:
@@ -1759,8 +2017,12 @@ jobs:
         run: |
           az acr login --name "$ACR_NAME"
           IMAGE="${ACR_NAME}.azurecr.io/krate-controller:${IMAGE_TAG}"
-          docker build -f packages/krate/core/Dockerfile -t "$IMAGE" .
-          docker push "$IMAGE"
+          docker buildx build \
+            --file packages/krate/core/Dockerfile \
+            --tag "$IMAGE" \
+            --cache-from type=gha,scope=krate-controller \
+            --cache-to type=gha,mode=max,scope=krate-controller \
+            --push .
           echo "KRATE_CONTROLLER_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Build and push krate-web image
@@ -1769,8 +2031,12 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE="${ACR_NAME}.azurecr.io/krate-web:${IMAGE_TAG}"
-          docker build -f packages/krate/web/Dockerfile -t "$IMAGE" .
-          docker push "$IMAGE"
+          docker buildx build \
+            --file packages/krate/web/Dockerfile \
+            --tag "$IMAGE" \
+            --cache-from type=gha,scope=krate-web \
+            --cache-to type=gha,mode=max,scope=krate-web \
+            --push .
           echo "KRATE_WEB_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Create ACR pull secret

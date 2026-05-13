@@ -33,23 +33,22 @@ export async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
     console.error(USAGE);
     return 1;
   }
-  if (!parsed.entrySpecifier) {
-    console.error("--entry is required for run:create");
-    console.error(USAGE);
-    return 1;
-  }
+  // --entry is optional for bare runs (no process attached)
+  const isBareRun = !parsed.entrySpecifier;
 
-  let entrypoint;
-  try {
-    entrypoint = parseEntrypointSpecifier(parsed.entrySpecifier);
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : String(error));
-    return 1;
+  let entrypoint: { importPath: string; exportName?: string } | undefined;
+  if (!isBareRun) {
+    try {
+      entrypoint = parseEntrypointSpecifier(parsed.entrySpecifier!);
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
+      return 1;
+    }
   }
 
   const runsDir = collapseDoubledA5cRuns(path.resolve(parsed.runsDir));
-  const absoluteImportPath = path.resolve(entrypoint.importPath);
-  const resolvedEntry = formatResolvedEntrypoint(absoluteImportPath, entrypoint.exportName);
+  const absoluteImportPath = entrypoint ? path.resolve(entrypoint.importPath) : undefined;
+  const resolvedEntry = absoluteImportPath ? formatResolvedEntrypoint(absoluteImportPath, entrypoint?.exportName) : "bare-run";
   logVerbose("run:create", parsed, {
     runsDir,
     processId: parsed.processId,
@@ -96,11 +95,13 @@ export async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
     return 0;
   }
 
-  try {
-    await validateProcessEntrypoint(absoluteImportPath, entrypoint.exportName);
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : String(error));
-    return 1;
+  if (!isBareRun && absoluteImportPath) {
+    try {
+      await validateProcessEntrypoint(absoluteImportPath, entrypoint?.exportName);
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
+      return 1;
+    }
   }
 
   const requestedHarness = parsed.harness ?? (parsed.sessionId ? getAdapter().name : undefined);
@@ -111,11 +112,13 @@ export async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
     prompt: parsed.prompt,
     harness: requestedHarness,
     processRevision: parsed.processRevision,
-    process: {
-      processId: parsed.processId,
-      importPath: absoluteImportPath,
-      exportName: entrypoint.exportName,
-    },
+    ...(isBareRun ? {} : {
+      process: {
+        processId: parsed.processId!,
+        importPath: absoluteImportPath!,
+        exportName: entrypoint?.exportName,
+      },
+    }),
     inputs,
     ...(parsed.interactive === false ? { metadata: { nonInteractive: true } } : {}),
   });
@@ -163,7 +166,7 @@ export async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
   const discoverPluginRoot = parsed.pluginRoot ?? adapter?.resolvePluginRoot(parsed);
   if (discoverPluginRoot) {
     try {
-      const processDiscovery = discoverFromProcessFile({ processFilePath: absoluteImportPath, pluginRoot: discoverPluginRoot });
+      const processDiscovery = absoluteImportPath ? discoverFromProcessFile({ processFilePath: absoluteImportPath, pluginRoot: discoverPluginRoot }) : undefined;
       if (processDiscovery) {
         discoveredSkills = processDiscovery.skills;
         discoveredAgents = processDiscovery.agents;

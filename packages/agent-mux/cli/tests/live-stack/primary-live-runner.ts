@@ -163,6 +163,9 @@ export function buildPrimaryLiveStackCommands(
     commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['install', installTarget, '--json'], options.cwd, timeoutMs),
     commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['install', '--global', './packages/sdk'], options.cwd, timeoutMs),
     generatedPluginInstallCommand(commandEnv, scenario, options.cwd, timeoutMs),
+    // Create a bare babysitter run so .a5c/runs/ exists for verification.
+    // No --entry means bare run — just creates the directory + journal.
+    commandExecution(commandEnv, 'LIVE_STACK_BABYSITTER_BIN', 'babysitter', ['run:create', '--process-id', 'live-stack-e2e', '--prompt', prompt, '--json'], options.cwd, timeoutMs),
     executionCommand,
   ];
 }

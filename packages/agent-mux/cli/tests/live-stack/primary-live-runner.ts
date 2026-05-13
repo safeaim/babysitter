@@ -119,7 +119,6 @@ export function buildPrimaryLiveStackCommands(
   }
 
   const installTarget = scenario.agent.agentMuxAgent;
-  const isInteractive = options.env['LIVE_STACK_INTERACTIVE'] === 'true';
   const isBabysitterPlugin = scenario.agent.installMode === 'babysitter-plugin';
 
   // All scenarios use `amux launch` which handles provider resolution, proxy

@@ -317,17 +317,76 @@ jobs:
           npm run test --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-tests.log
           npm run scorecard:migration --workspace=@a5c-ai/transport-mux 2>&1 | tee artifacts/mux-logs/transport-mux-scorecard.log
 
-      - name: Install Playwright Chromium
+      - name: Upload mux validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-mux-logs
+          path: artifacts/mux-logs
+          if-no-files-found: warn
+
+  e2e_mux_webui:
+    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    needs: build_all
+    continue-on-error: ${{ github.ref_name != 'main' }}
+    name: E2E Mux WebUI (Playwright)
+    runs-on: ubuntu-latest-l
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Restore node_modules cache
+        id: nm-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
-          set -euo pipefail
-          npx playwright install --with-deps chromium 2>&1 | tee artifacts/mux-logs/agent-mux-webui-playwright-install.log
+          npm ci
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-all-dist
+          path: /tmp
+
+      - name: Extract build artifacts
+        run: tar xzf /tmp/build-all-dist.tar.gz
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install Playwright Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       - name: agent-mux webui browser e2e
-        run: |
-          set -euo pipefail
-          npm run test:e2e --workspace=@a5c-ai/agent-mux-webui 2>&1 | tee artifacts/mux-logs/agent-mux-webui-browser-e2e.log
+        run: npm run test:e2e --workspace=@a5c-ai/agent-mux-webui
 
-      - name: Upload mux Playwright artifacts
+      - name: Upload Playwright artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -335,14 +394,6 @@ jobs:
           path: |
             packages/agent-mux/webui/.tmp/playwright-report
             packages/agent-mux/webui/.tmp/playwright-test-results
-          if-no-files-found: warn
-
-      - name: Upload mux validation logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: publish-mux-logs
-          path: artifacts/mux-logs
           if-no-files-found: warn
 
 
@@ -1005,6 +1056,7 @@ jobs:
       - build_all
       - validate_core
       - validate_mux
+      - e2e_mux_webui
       - live_stack_babysitter_plugin
       - live_stack_babysitter_agent
       - live_stack_vanilla

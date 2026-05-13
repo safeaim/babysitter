@@ -38,3 +38,6 @@ export * from './agent-provider-config-controller.js';
 export * from './agent-project-controller.js';
 export * from './agent-gateway-config-controller.js';
 export * from './agent-session-transcript-controller.js';
+export * from './agent-writeback-controller.js';
+export * from './agent-memory-import.js';
+export * from './agent-subagent-controller.js';

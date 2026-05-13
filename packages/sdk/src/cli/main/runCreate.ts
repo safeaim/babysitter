@@ -113,13 +113,13 @@ export async function handleRunCreate(parsed: ParsedArgs): Promise<number> {
     prompt: parsed.prompt,
     harness: requestedHarness,
     processRevision: parsed.processRevision,
-    ...(isBareRun ? {} : {
+    ...(!isBareRun && absoluteImportPath && parsed.processId ? {
       process: {
-        processId: parsed.processId!,
-        importPath: absoluteImportPath!,
+        processId: parsed.processId,
+        importPath: absoluteImportPath,
         exportName: entrypoint?.exportName,
       },
-    }),
+    } : {}),
     inputs,
     ...(parsed.interactive === false ? { metadata: { nonInteractive: true } } : {}),
   });

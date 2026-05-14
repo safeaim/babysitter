@@ -51,6 +51,14 @@ function createMockController() {
     async dispatchAgent(input) {
       return { dispatched: true, stackRef: input.agentStack, input };
     },
+
+    async syncExternalBinding(bindingName, options) {
+      return { bindingName, resource: { kind: options.kind, localName: options.localName }, synced: true };
+    },
+
+    async resolveExternalConflict(opts) {
+      return { conflictName: opts.conflictName, strategy: opts.strategy, resolved: true };
+    },
   };
 }
 
@@ -65,8 +73,8 @@ function rpc(method, params = {}, id = 1) {
 // Tests
 // ---------------------------------------------------------------------------
 
-test('MCP_TOOLS array has 8 entries', () => {
-  assert.equal(MCP_TOOLS.length, 8);
+test('MCP_TOOLS array has 14 entries', () => {
+  assert.equal(MCP_TOOLS.length, 14);
   const names = MCP_TOOLS.map((t) => t.name);
   assert.ok(names.includes('krate_list_resources'));
   assert.ok(names.includes('krate_get_resource'));
@@ -76,6 +84,12 @@ test('MCP_TOOLS array has 8 entries', () => {
   assert.ok(names.includes('krate_search'));
   assert.ok(names.includes('krate_list_stacks'));
   assert.ok(names.includes('krate_dispatch_agent'));
+  assert.ok(names.includes('krate_list_secrets'));
+  assert.ok(names.includes('krate_create_secret'));
+  assert.ok(names.includes('krate_create_stack'));
+  assert.ok(names.includes('krate_sync_external'));
+  assert.ok(names.includes('krate_resolve_conflict'));
+  assert.ok(names.includes('krate_audit_query'));
 });
 
 test('createMcpServer returns object with start, stop, handleMessage', () => {
@@ -96,10 +110,10 @@ test('handleMessage initialize returns capabilities with tools', async () => {
   assert.equal(resp.result.protocolVersion, '2024-11-05');
 });
 
-test('handleMessage tools/list returns all 8 tool definitions', async () => {
+test('handleMessage tools/list returns all 14 tool definitions', async () => {
   const server = createMcpServer({ controller: createMockController() });
   const resp = await server.handleMessage(rpc('tools/list'));
-  assert.equal(resp.result.tools.length, 8);
+  assert.equal(resp.result.tools.length, 14);
   for (const tool of resp.result.tools) {
     assert.ok(tool.name, 'each tool has a name');
     assert.ok(tool.description, 'each tool has a description');
@@ -197,4 +211,88 @@ test('handleMessage notifications/initialized returns null (no response)', async
   const server = createMcpServer({ controller: createMockController() });
   const resp = await server.handleMessage(rpc('notifications/initialized'));
   assert.equal(resp, null);
+});
+
+// ---------------------------------------------------------------------------
+// New tool tests
+// ---------------------------------------------------------------------------
+
+test('handleMessage tools/call krate_list_secrets returns items', async () => {
+  const server = createMcpServer({ controller: createMockController() });
+  const resp = await server.handleMessage(rpc('tools/call', { name: 'krate_list_secrets', arguments: {} }));
+  assert.ok(resp.result);
+  const parsed = JSON.parse(resp.result.content[0].text);
+  assert.ok(Array.isArray(parsed.items));
+});
+
+test('handleMessage tools/call krate_list_secrets with org filters by namespace', async () => {
+  const server = createMcpServer({ controller: createMockController() });
+  const resp = await server.handleMessage(rpc('tools/call', { name: 'krate_list_secrets', arguments: { org: 'default' } }));
+  assert.ok(resp.result);
+  const parsed = JSON.parse(resp.result.content[0].text);
+  assert.ok(Array.isArray(parsed.items));
+});
+
+test('handleMessage tools/call krate_create_secret returns apply result', async () => {
+  const server = createMcpServer({ controller: createMockController() });
+  const resp = await server.handleMessage(rpc('tools/call', {
+    name: 'krate_create_secret',
+    arguments: { name: 'my-secret-grant', org: 'default', agentRef: 'review-bot', secretRef: 'db-password', permissions: ['read'] },
+  }));
+  assert.ok(resp.result);
+  const parsed = JSON.parse(resp.result.content[0].text);
+  assert.equal(parsed.operation, 'apply');
+  assert.equal(parsed.resource.kind, 'AgentSecretGrant');
+  assert.equal(parsed.resource.metadata.name, 'my-secret-grant');
+});
+
+test('handleMessage tools/call krate_create_stack returns apply result', async () => {
+  const server = createMcpServer({ controller: createMockController() });
+  const resp = await server.handleMessage(rpc('tools/call', {
+    name: 'krate_create_stack',
+    arguments: { name: 'new-stack', org: 'default', spec: { baseAgent: 'claude-code' } },
+  }));
+  assert.ok(resp.result);
+  const parsed = JSON.parse(resp.result.content[0].text);
+  assert.equal(parsed.operation, 'apply');
+  assert.equal(parsed.resource.kind, 'AgentStack');
+  assert.equal(parsed.resource.metadata.name, 'new-stack');
+  assert.equal(parsed.resource.spec.organizationRef, 'default');
+});
+
+test('handleMessage tools/call krate_sync_external returns sync result', async () => {
+  const server = createMcpServer({ controller: createMockController() });
+  const resp = await server.handleMessage(rpc('tools/call', {
+    name: 'krate_sync_external',
+    arguments: { bindingName: 'github-binding', kind: 'Repository', localName: 'web-app', watermark: 'cursor-123' },
+  }));
+  assert.ok(resp.result);
+  const parsed = JSON.parse(resp.result.content[0].text);
+  assert.equal(parsed.bindingName, 'github-binding');
+  assert.ok(parsed.synced);
+});
+
+test('handleMessage tools/call krate_resolve_conflict returns resolution', async () => {
+  const server = createMcpServer({ controller: createMockController() });
+  const resp = await server.handleMessage(rpc('tools/call', {
+    name: 'krate_resolve_conflict',
+    arguments: { conflictName: 'conflict-abc', strategy: 'local-wins' },
+  }));
+  assert.ok(resp.result);
+  const parsed = JSON.parse(resp.result.content[0].text);
+  assert.equal(parsed.conflictName, 'conflict-abc');
+  assert.equal(parsed.strategy, 'local-wins');
+  assert.ok(parsed.resolved);
+});
+
+test('handleMessage tools/call krate_audit_query returns events and total', async () => {
+  const server = createMcpServer({ controller: createMockController() });
+  const resp = await server.handleMessage(rpc('tools/call', {
+    name: 'krate_audit_query',
+    arguments: { org: 'default', limit: 10 },
+  }));
+  assert.ok(resp.result);
+  const parsed = JSON.parse(resp.result.content[0].text);
+  assert.ok(Array.isArray(parsed.events));
+  assert.equal(typeof parsed.total, 'number');
 });

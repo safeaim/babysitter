@@ -1,5 +1,8 @@
 import { createKrateApiController } from '../../core/src/api-controller.js';
 import { createKubernetesResourceGateway } from '../../core/src/kubernetes-resource-gateway.js';
+import { createAgentSecretGrantController } from '../../core/src/agent-secret-config-grant-controller.js';
+import { createAuditController } from '../../core/src/audit-controller.js';
+import { orgNamespaceName } from '../../core/src/org-scoping.js';
 
 export const MCP_TOOLS = [
   { name: 'krate_list_resources', description: 'List resources of a given kind', inputSchema: { type: 'object', properties: { kind: { type: 'string' } }, required: ['kind'] } },
@@ -10,6 +13,12 @@ export const MCP_TOOLS = [
   { name: 'krate_search', description: 'Search resources by query', inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] } },
   { name: 'krate_list_stacks', description: 'List agent stacks', inputSchema: { type: 'object', properties: {} } },
   { name: 'krate_dispatch_agent', description: 'Dispatch an agent run', inputSchema: { type: 'object', properties: { stackRef: { type: 'string' }, input: { type: 'object' } }, required: ['stackRef'] } },
+  { name: 'krate_list_secrets', description: 'List AgentSecretGrant resources in an org namespace', inputSchema: { type: 'object', properties: { org: { type: 'string' } } } },
+  { name: 'krate_create_secret', description: 'Create an AgentSecretGrant resource', inputSchema: { type: 'object', properties: { name: { type: 'string' }, org: { type: 'string' }, agentRef: { type: 'string' }, secretRef: { type: 'string' }, permissions: { type: 'array', items: { type: 'string' } } }, required: ['name', 'org', 'agentRef', 'secretRef'] } },
+  { name: 'krate_create_stack', description: 'Create an AgentStack resource', inputSchema: { type: 'object', properties: { name: { type: 'string' }, org: { type: 'string' }, spec: { type: 'object' } }, required: ['name', 'org'] } },
+  { name: 'krate_sync_external', description: 'Trigger an external sync for a binding', inputSchema: { type: 'object', properties: { bindingName: { type: 'string' }, kind: { type: 'string' }, localName: { type: 'string' }, spec: { type: 'object' }, externalEnvelope: { type: 'object' }, watermark: { type: 'string' } }, required: ['bindingName', 'kind', 'localName'] } },
+  { name: 'krate_resolve_conflict', description: 'Resolve an external sync conflict', inputSchema: { type: 'object', properties: { conflictName: { type: 'string' }, strategy: { type: 'string' }, resolvedValue: {} }, required: ['conflictName', 'strategy'] } },
+  { name: 'krate_audit_query', description: 'Query audit events with optional org/action/time filters', inputSchema: { type: 'object', properties: { org: { type: 'string' }, action: { type: 'string' }, since: { type: 'string' }, until: { type: 'string' }, limit: { type: 'number' }, offset: { type: 'number' } } } },
 ];
 
 const SERVER_INFO = {
@@ -177,6 +186,78 @@ async function executeTool(controller, toolName, args) {
         agentStack: args.stackRef,
         ...args.input,
       });
+
+    case 'krate_list_secrets': {
+      // List AgentSecretGrant resources, optionally filtering by org namespace.
+      const result = await controller.listResource('AgentSecretGrant');
+      if (!args.org) return result;
+      const ns = orgNamespaceName(args.org);
+      const items = (result.items || []).filter((r) => r.metadata?.namespace === ns);
+      return { ...result, items };
+    }
+
+    case 'krate_create_secret': {
+      // Create an AgentSecretGrant resource and persist it via applyResource.
+      const grantController = createAgentSecretGrantController();
+      const result = grantController.createSecretGrant({
+        name: args.name,
+        orgRef: args.org,
+        secretName: args.secretRef,
+        grantedTo: args.agentRef,
+        permissions: args.permissions || ['read'],
+        namespace: orgNamespaceName(args.org),
+      });
+      if (result.error) throw new Error(result.message);
+      return controller.applyResource(result.grant);
+    }
+
+    case 'krate_create_stack': {
+      // Create an AgentStack resource via applyResource.
+      const resource = {
+        apiVersion: 'krate.a5c.ai/v1',
+        kind: 'AgentStack',
+        metadata: {
+          name: args.name,
+          namespace: orgNamespaceName(args.org),
+        },
+        spec: {
+          organizationRef: args.org,
+          ...(args.spec || {}),
+        },
+      };
+      return controller.applyResource(resource);
+    }
+
+    case 'krate_sync_external':
+      return controller.syncExternalBinding(args.bindingName, {
+        kind: args.kind,
+        localName: args.localName,
+        namespace: args.namespace,
+        spec: args.spec || {},
+        externalEnvelope: args.externalEnvelope || {},
+        watermark: args.watermark,
+      });
+
+    case 'krate_resolve_conflict':
+      return controller.resolveExternalConflict({
+        conflictName: args.conflictName,
+        strategy: args.strategy,
+        resolvedValue: args.resolvedValue,
+      });
+
+    case 'krate_audit_query': {
+      // Use an in-memory audit controller that reads logged events from the
+      // global event bus snapshot (best-effort; returns empty on cold start).
+      const auditController = createAuditController();
+      return auditController.query({
+        org: args.org,
+        action: args.action,
+        since: args.since,
+        until: args.until,
+        limit: args.limit,
+        offset: args.offset,
+      });
+    }
 
     default:
       throw new Error(`Tool not implemented: ${toolName}`);

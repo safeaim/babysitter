@@ -583,7 +583,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // Interactive mode: full TTY passthrough. If a prompt is provided, it's
     // injected as initial stdin after the harness starts (like typing it in).
     try {
-      const nodePty: any = require('node-pty'); // dynamic require — node-pty is optional
+      const nodePty: any = await import('node-pty');
       ptyProcess = nodePty.spawn(plan.command, plan.args, {
         name: 'xterm-256color',
         cols: process.stdout.columns || 80,

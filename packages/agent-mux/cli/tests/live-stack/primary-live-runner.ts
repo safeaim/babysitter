@@ -180,7 +180,7 @@ function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {
   if (scenario.agent.agent === 'babysitter-agent') {
     return 1;
   }
-  return 30;
+  return 10;
 }
 
 
@@ -391,7 +391,7 @@ function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: st
 }
 
 function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
-  const coreTask = `Write a 12-paragraph summary of Homer's Odyssey. Then translate each paragraph to Greek (do translations in parallel if possible). Concatenate the English and Greek versions into one markdown document and save the final result to .a5c-live-test/${traceId}-odyssey.md`;
+  const coreTask = `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek. Combine the English and Greek versions into one markdown document and save the entire result in a single file write to .a5c-live-test/${traceId}-odyssey.md`;
 
   if (scenario.agent.agent === 'babysitter-agent') {
     return `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek.`;

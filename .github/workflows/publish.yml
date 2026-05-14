@@ -559,7 +559,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run selected live stack E2E
-        timeout-minutes: 15
+        timeout-minutes: 7
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
@@ -691,7 +691,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run selected live stack E2E
-        timeout-minutes: 15
+        timeout-minutes: 7
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
@@ -847,7 +847,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run selected live stack E2E
-        timeout-minutes: 15
+        timeout-minutes: 7
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
@@ -2111,6 +2111,130 @@ jobs:
             echo "::notice::Skipping atlas-auth secret — GitHub OAuth not configured"
           fi
 
+      - name: Provision Atlas Postgres
+        if: steps.config.outputs.deploy_enabled == 'true'
+        run: |
+          POSTGRES_APP=atlas-postgres
+          POSTGRES_DB=atlas_webui
+          POSTGRES_USER=atlas
+
+          if kubectl -n "$KUBE_NAMESPACE" get secret "$POSTGRES_APP" >/dev/null 2>&1; then
+            POSTGRES_PASSWORD=$(kubectl -n "$KUBE_NAMESPACE" get secret "$POSTGRES_APP" -o jsonpath='{.data.POSTGRES_PASSWORD}' | base64 -d)
+          else
+            POSTGRES_PASSWORD=$(openssl rand -hex 32)
+          fi
+
+          if [[ -z "$POSTGRES_PASSWORD" ]]; then
+            POSTGRES_PASSWORD=$(openssl rand -hex 32)
+          fi
+
+          DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_APP}:5432/${POSTGRES_DB}"
+          kubectl -n "$KUBE_NAMESPACE" create secret generic "$POSTGRES_APP" \
+            --from-literal=POSTGRES_DB="$POSTGRES_DB" \
+            --from-literal=POSTGRES_USER="$POSTGRES_USER" \
+            --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
+            --from-literal=DATABASE_URL="$DATABASE_URL" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: ${POSTGRES_APP}
+            namespace: ${KUBE_NAMESPACE}
+          spec:
+            selector:
+              app: ${POSTGRES_APP}
+            ports:
+              - name: postgres
+                port: 5432
+                targetPort: 5432
+          ---
+          apiVersion: apps/v1
+          kind: StatefulSet
+          metadata:
+            name: ${POSTGRES_APP}
+            namespace: ${KUBE_NAMESPACE}
+          spec:
+            serviceName: ${POSTGRES_APP}
+            replicas: 1
+            selector:
+              matchLabels:
+                app: ${POSTGRES_APP}
+            template:
+              metadata:
+                labels:
+                  app: ${POSTGRES_APP}
+              spec:
+                containers:
+                  - name: postgres
+                    image: postgres:16-alpine
+                    imagePullPolicy: IfNotPresent
+                    ports:
+                      - containerPort: 5432
+                    envFrom:
+                      - secretRef:
+                          name: ${POSTGRES_APP}
+                    readinessProbe:
+                      exec:
+                        command:
+                          - sh
+                          - -c
+                          - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+                      initialDelaySeconds: 5
+                      periodSeconds: 5
+                      failureThreshold: 30
+                    volumeMounts:
+                      - name: data
+                        mountPath: /var/lib/postgresql/data
+            volumeClaimTemplates:
+              - metadata:
+                  name: data
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  resources:
+                    requests:
+                      storage: 8Gi
+          EOF
+          kubectl -n "$KUBE_NAMESPACE" rollout status statefulset/"$POSTGRES_APP" --timeout=300s
+
+      - name: Initialize Atlas database
+        if: steps.config.outputs.deploy_enabled == 'true'
+        run: |
+          kubectl -n "$KUBE_NAMESPACE" delete job atlas-webui-db-init --ignore-not-found
+          cat <<EOF | kubectl apply -f -
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: atlas-webui-db-init
+            namespace: ${KUBE_NAMESPACE}
+          spec:
+            backoffLimit: 2
+            template:
+              metadata:
+                labels:
+                  app: atlas-webui-db-init
+              spec:
+                restartPolicy: Never
+                imagePullSecrets:
+                  - name: acr-pull
+                containers:
+                  - name: db-init
+                    image: ${IMAGE}
+                    imagePullPolicy: Always
+                    command:
+                      - npm
+                      - run
+                      - db:init
+                      - -w
+                      - @a5c-ai/atlas-webui
+                    envFrom:
+                      - secretRef:
+                          name: atlas-postgres
+          EOF
+          kubectl -n "$KUBE_NAMESPACE" wait --for=condition=complete job/atlas-webui-db-init --timeout=300s
+
       - name: Deploy Atlas WebUI
         if: steps.config.outputs.deploy_enabled == 'true'
         run: |
@@ -2152,6 +2276,8 @@ jobs:
                       - secretRef:
                           name: atlas-auth
                           optional: true
+                      - secretRef:
+                          name: atlas-postgres
                     readinessProbe:
                       httpGet:
                         path: /api/health

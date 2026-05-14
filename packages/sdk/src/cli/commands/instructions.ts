@@ -298,9 +298,9 @@ export async function handleInstructionsCommand(
   const libraryInfo = await tryResolveProcessLibraryRoot();
 
   // Detect whether hooks are actually active in this session.
-  // If the session-start hook never ran (no breadcrumb file), override
-  // hookDriven to false so the agent drives the loop in-turn.
-  const hooksActive = detectHooksActive(resolvedHarness.harness);
+  // hookDriven=false when: non-interactive mode, or session-start hook never ran.
+  // Non-interactive mode never has hooks — the agent must drive the loop in-turn.
+  const hooksActive = args.interactive !== false && detectHooksActive(resolvedHarness.harness);
   const hookOverride: Partial<PromptContext> = {};
   if (!hooksActive) {
     hookOverride.hookDriven = false;

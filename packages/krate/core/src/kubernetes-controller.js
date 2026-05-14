@@ -764,9 +764,12 @@ function organizationNamespaces(organizations = [], bindings = [], fallbackNames
     ...bindings.map((binding) => binding.spec?.namespace || binding.metadata?.labels?.[KRATE_ORG_NAMESPACE_LABEL]).filter(Boolean)
   ])];
   if (namespaces.length) return namespaces;
-  const adminOrg = process.env.KRATE_ADMIN_ORG || process.env.KRATE_ORG;
-  if (adminOrg) return [orgNamespaceName(adminOrg)];
-  return [fallbackNamespace];
+  const fallbackOrgs = new Set();
+  const adminOrg = process.env.KRATE_ADMIN_ORG;
+  const defaultOrg = process.env.KRATE_ORG || 'default';
+  if (adminOrg) fallbackOrgs.add(orgNamespaceName(adminOrg));
+  fallbackOrgs.add(orgNamespaceName(defaultOrg));
+  return fallbackOrgs.size ? [...fallbackOrgs] : [fallbackNamespace];
 }
 
 function parseKubernetesList(stdout) {

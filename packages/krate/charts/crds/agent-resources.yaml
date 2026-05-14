@@ -88,6 +88,19 @@ spec:
               writeBackPolicy:
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              displayName:
+                type: string
+              systemPrompt:
+                type: string
+              developerPrompt:
+                type: string
+              taskPrompt:
+                type: string
+              atlasLayerBindings:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
           status:
             type: object
             properties:

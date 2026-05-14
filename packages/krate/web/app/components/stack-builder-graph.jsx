@@ -294,8 +294,9 @@ export function GraphStackBuilder({ org, atlasBaseUrl, existingStack = null }) {
         },
       },
       spec: {
-        // Derive baseAgent from runtime layer (first AgentProduct selection, or default)
         baseAgent: runtimeSelections.find((r) => r.nodeKind === 'AgentProduct')?.id || 'claude-code',
+        adapter: providerSelections.find((r) => r.nodeKind === 'ModelProviderProduct')?.id || 'default',
+        runtimeIdentity: { serviceAccountRef: 'default' },
         // Derive model from model layer
         ...(modelSelections.length ? { model: modelSelections[0].id } : {}),
         // Derive provider from provider layer

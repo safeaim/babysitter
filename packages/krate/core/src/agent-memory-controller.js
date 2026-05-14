@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { createResource, clone } from './resource-model.js';
+import { queryGraph, queryGrep, queryMemory } from './agent-memory-query.js';
 
 export const AGENT_MEMORY_CONTROLLER_BOUNDARY = {
   role: 'agent-memory-controller',
@@ -90,40 +91,46 @@ export function createAgentMemoryController(options = {}) {
       return { queryResource, results };
     },
 
-    searchGraph({ records, kinds = [], edgeDepth = 2, query = '' }) {
-      let candidates = records;
+    /**
+     * Execute a memory search using the real query engine (agent-memory-query.js).
+     *
+     * @param {object}  params
+     * @param {string}  params.query        - Search text (required, non-empty).
+     * @param {string}  [params.mode]       - 'graph-only' | 'grep-only' | 'graph-and-grep' (default 'graph-and-grep').
+     * @param {Array}   [params.records]    - Graph records.
+     * @param {Array}   [params.edges]      - Flat edge list.
+     * @param {Array}   [params.documents]  - Grep documents.
+     * @param {object}  [params.graphOptions] - Passed to queryGraph: { kinds, depth }.
+     * @param {object}  [params.grepOptions]  - Passed to queryGrep: { paths, context, maxMatches }.
+     * @returns {{ graph: object|null, grep: object|null, stats: object }}
+     */
+    queryAgentMemory({ query, mode = 'graph-and-grep', records = [], edges = [], documents = [], graphOptions = {}, grepOptions = {} }) {
+      return queryMemory({ query, mode, records, edges, documents, graphOptions, grepOptions });
+    },
 
-      // Filter by nodeKind if kinds specified
-      if (kinds.length > 0) {
-        candidates = candidates.filter(r => kinds.includes(r.nodeKind));
-      }
-
-      // Match query against record.id and record.attributes (case-insensitive substring)
-      const lowerQuery = query.toLowerCase();
-      const matches = [];
-
-      for (const record of candidates) {
-        let score = 0;
-        const id = String(record.id || '').toLowerCase();
-        const attrs = JSON.stringify(record.attributes || {}).toLowerCase();
-
-        if (lowerQuery === '') {
-          score = 1;
-        } else if (id.includes(lowerQuery)) {
-          score = 2;
-        } else if (attrs.includes(lowerQuery)) {
-          score = 1;
-        } else {
-          continue;
+    searchGraph({ records, edges = [], kinds = [], edgeDepth = 2, query = '' }) {
+      // Empty query: return all records matching kinds filter with score=1 (no text match)
+      if (!query || query.trim() === '') {
+        let candidates = records;
+        if (kinds.length > 0) {
+          candidates = candidates.filter(r => kinds.includes(r.nodeKind));
         }
-
-        // Collect edges up to edgeDepth levels
-        const edges = this._collectEdges(record, records, edgeDepth);
-
-        matches.push({ record: clone(record), score, edges });
+        const matches = candidates.map(record => ({
+          record: clone(record),
+          score: 1,
+          edges: this._collectEdges(record, records, edgeDepth),
+        }));
+        return { matches, totalMatches: matches.length };
       }
 
-      return { matches, totalMatches: matches.length };
+      // Non-empty query: delegate to the real query engine
+      return queryGraph({
+        records,
+        edges,
+        query,
+        kinds,
+        depth: edgeDepth,
+      });
     },
 
     _collectEdges(startRecord, allRecords, maxDepth) {
@@ -152,42 +159,18 @@ export function createAgentMemoryController(options = {}) {
     },
 
     searchGrep({ documents, paths = [], pattern = '', maxMatches = 25 }) {
-      // Filter documents by path patterns (simple glob: * matches anything)
-      let filtered = documents;
-      if (paths.length > 0) {
-        filtered = documents.filter(doc => {
-          return paths.some(p => globMatch(p, doc.path));
-        });
+      // Empty pattern: return empty (no-op, preserves backward-compatible behavior)
+      if (!pattern || pattern.trim() === '') {
+        return { excerpts: [], totalMatches: 0 };
       }
 
-      const excerpts = [];
-      const lowerPattern = pattern.toLowerCase();
-
-      if (lowerPattern === '') {
-        return { excerpts, totalMatches: 0 };
-      }
-
-      for (const doc of filtered) {
-        if (excerpts.length >= maxMatches) break;
-
-        const lines = String(doc.content || '').split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          if (excerpts.length >= maxMatches) break;
-
-          if (lines[i].toLowerCase().includes(lowerPattern)) {
-            const contextStart = Math.max(0, i - 1);
-            const contextEnd = Math.min(lines.length - 1, i + 1);
-            excerpts.push({
-              path: doc.path,
-              lineNumber: i + 1,
-              line: lines[i],
-              context: lines.slice(contextStart, contextEnd + 1).join('\n'),
-            });
-          }
-        }
-      }
-
-      return { excerpts, totalMatches: excerpts.length };
+      // Delegate to the real query engine, mapping pattern -> query
+      return queryGrep({
+        documents,
+        query: pattern,
+        paths,
+        maxMatches,
+      });
     },
 
     resolveTimeTravel({ mode = 'current', requestedRef, requestedTime, commits = [] }) {

@@ -21,9 +21,12 @@ export const SYNC_CONTROLLER_BOUNDARY = {
  * Create a sync controller that manages bidirectional sync between external
  * providers and the Krate resource store.
  *
+ * @param {{ persistFn?: (resource: object) => Promise<any> }} [opts]
+ *   Optional persistFn is called (fire-and-forget) after watermark/resource changes.
+ *   It receives a K8s-style CRD resource representing the changed state.
  * @returns {object}
  */
-export function createSyncController() {
+export function createSyncController({ persistFn } = {}) {
   /** @type {Map<string, string>} bindingRef → ISO timestamp watermark */
   const watermarks = new Map();
 
@@ -32,6 +35,19 @@ export function createSyncController() {
 
   /** @type {Map<string, object>} nativeId → tombstone record */
   const tombstones = new Map();
+
+  /**
+   * Fire-and-forget persistence: call persistFn without blocking the caller.
+   * @param {object} resource
+   */
+  function persist(resource) {
+    if (typeof persistFn === 'function') {
+      // Intentionally not awaited — persistence is async and non-blocking
+      Promise.resolve(persistFn(resource)).catch(() => {
+        // Swallow errors in fire-and-forget path; caller may wire monitoring separately
+      });
+    }
+  }
 
   return {
     /**
@@ -96,6 +112,7 @@ export function createSyncController() {
       };
 
       resources.set(key, resource);
+      persist(resource);
       return resource;
     },
 
@@ -110,6 +127,24 @@ export function createSyncController() {
       const current = watermarks.get(bindingRef);
       if (!current || timestamp > current) {
         watermarks.set(bindingRef, timestamp);
+        // Persist watermark as a CRD-shaped resource
+        persist({
+          apiVersion: 'krate.a5c.ai/v1alpha1',
+          kind: 'ExternalSyncWatermark',
+          metadata: {
+            name: `watermark-${bindingRef.replace(/[^a-zA-Z0-9]/g, '-')}`,
+            namespace: 'default',
+            labels: {},
+            annotations: {}
+          },
+          spec: {
+            bindingRef,
+            watermark: timestamp
+          },
+          status: {
+            lastUpdatedAt: new Date().toISOString()
+          }
+        });
       }
     },
 

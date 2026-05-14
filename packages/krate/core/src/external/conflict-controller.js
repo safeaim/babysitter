@@ -46,9 +46,21 @@ export function validateConflict(input) {
 /**
  * Create a ConflictController that manages ExternalSyncConflict resources.
  *
+ * @param {{ persistFn?: (resource: object) => Promise<any> }} [opts]
+ *   Optional persistFn is called (fire-and-forget) after conflict state changes.
  * @returns {object}
  */
-export function createConflictController() {
+export function createConflictController({ persistFn } = {}) {
+  /**
+   * Fire-and-forget persistence helper.
+   * @param {object} resource
+   */
+  function persist(resource) {
+    if (typeof persistFn === 'function') {
+      Promise.resolve(persistFn(resource)).catch(() => {});
+    }
+  }
+
   return {
     role: 'conflict-controller',
 
@@ -94,6 +106,7 @@ export function createConflictController() {
         detectedAt: now
       };
 
+      persist(conflict);
       return { conflict };
     },
 
@@ -162,6 +175,7 @@ export function createConflictController() {
 
       const resolution = { strategy, chosenValue };
 
+      persist(updated);
       return { conflict: updated, resolution };
     },
 

@@ -70,9 +70,21 @@ export function validateWriteIntent(input) {
 /**
  * Create a WriteController that manages ExternalWriteIntent resources.
  *
+ * @param {{ persistFn?: (resource: object) => Promise<any> }} [opts]
+ *   Optional persistFn is called (fire-and-forget) after intent state changes.
  * @returns {object}
  */
-export function createWriteController() {
+export function createWriteController({ persistFn } = {}) {
+  /**
+   * Fire-and-forget persistence helper.
+   * @param {object} resource
+   */
+  function persist(resource) {
+    if (typeof persistFn === 'function') {
+      Promise.resolve(persistFn(resource)).catch(() => {});
+    }
+  }
+
   return {
     role: 'write-controller',
 
@@ -120,6 +132,7 @@ export function createWriteController() {
         createdAt: now
       };
 
+      persist(intent);
       return { intent };
     },
 
@@ -154,6 +167,7 @@ export function createWriteController() {
         approvedAt: new Date().toISOString()
       };
 
+      persist(updated);
       return { intent: updated };
     },
 
@@ -189,6 +203,7 @@ export function createWriteController() {
         rejectionReason: reason
       };
 
+      persist(updated);
       return { intent: updated };
     },
 

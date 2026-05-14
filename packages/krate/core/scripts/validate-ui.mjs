@@ -49,11 +49,20 @@ for (const [file, source] of Object.entries(files)) {
 if (!/\.appBody\s*\{[\s\S]*?width:\s*100%;[\s\S]*?max-width:\s*none;/.test(files['apps/web/app/globals.css'])) {
   failures.push('app shell body must use the full viewport width');
 }
-if (/\.appBody\s*\{[\s\S]*?width:\s*min\(100%,\s*\d+px\)/.test(files['apps/web/app/globals.css'])) {
+if (/\.appBody\s*\{[^}]*width:\s*min\(100%,\s*\d+px\)/.test(files['apps/web/app/globals.css'])) {
   failures.push('app shell body is capped to a centered max width');
 }
 if (!/\.appTopbar,\s*\.appBody,\s*\.appContent,\s*\.routeMain\s*\{[\s\S]*?width:\s*100%;[\s\S]*?max-width:\s*none;[\s\S]*?margin-left:\s*0;[\s\S]*?margin-right:\s*0;/.test(files['apps/web/app/globals.css'])) {
   failures.push('authenticated app shell must override centered layout caps at the final cascade layer');
+}
+if (!/\.loginMain\s*\{[\s\S]*?width:\s*100%;[\s\S]*?max-width:\s*none;[\s\S]*?margin:\s*0;/.test(files['apps/web/app/globals.css'])) {
+  failures.push('login shell must use the full viewport width');
+}
+if (/\.loginMain\s*\{[^}]*width:\s*min\([^;]*720px\)/.test(files['apps/web/app/globals.css'])) {
+  failures.push('login shell is capped to a centered card width');
+}
+if (!/\.loginCard\s*\{[\s\S]*?width:\s*min\(100%,\s*720px\)/.test(files['apps/web/app/globals.css'])) {
+  failures.push('login card must own the readable sign-in width cap');
 }
 for (const file of ['apps/web/app/api/controller/route.js', 'apps/web/app/api/watch/[[...resource]]/route.js', 'src/controller-client.js']) {
   if (files[file].includes('createKrateUiDemoRuntime')) failures.push(`${file} imports or calls createKrateUiDemoRuntime`);

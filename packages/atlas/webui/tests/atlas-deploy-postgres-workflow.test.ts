@@ -12,7 +12,10 @@ describe("Atlas WebUI deploy workflow", () => {
     expect(workflow).toContain("name: Provision Atlas Postgres");
     expect(workflow).toContain("kind: StatefulSet");
     expect(workflow).toContain("name: atlas-postgres");
+    expect(workflow).toContain("name: PGDATA");
+    expect(workflow).toContain("value: /var/lib/postgresql/data/pgdata");
     expect(workflow).toContain("--from-literal=DATABASE_URL=\"$DATABASE_URL\"");
+    expect(workflow).toContain("describe pods -l app=\"$POSTGRES_APP\"");
     expect(workflow).toContain("name: Initialize Atlas database");
     expect(workflow).toContain("job/atlas-webui-db-init");
     expect(workflow).toContain("db:init");

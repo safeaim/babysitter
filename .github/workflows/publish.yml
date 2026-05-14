@@ -2175,6 +2175,9 @@ jobs:
                     envFrom:
                       - secretRef:
                           name: ${POSTGRES_APP}
+                    env:
+                      - name: PGDATA
+                        value: /var/lib/postgresql/data/pgdata
                     readinessProbe:
                       exec:
                         command:
@@ -2197,7 +2200,12 @@ jobs:
                     requests:
                       storage: 8Gi
           EOF
-          kubectl -n "$KUBE_NAMESPACE" rollout status statefulset/"$POSTGRES_APP" --timeout=300s
+          if ! kubectl -n "$KUBE_NAMESPACE" rollout status statefulset/"$POSTGRES_APP" --timeout=300s; then
+            kubectl -n "$KUBE_NAMESPACE" get pods -l app="$POSTGRES_APP" -o wide || true
+            kubectl -n "$KUBE_NAMESPACE" describe pods -l app="$POSTGRES_APP" || true
+            kubectl -n "$KUBE_NAMESPACE" logs statefulset/"$POSTGRES_APP" --tail=100 || true
+            exit 1
+          fi
 
       - name: Initialize Atlas database
         if: steps.config.outputs.deploy_enabled == 'true'

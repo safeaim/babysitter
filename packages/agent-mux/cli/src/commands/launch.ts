@@ -198,8 +198,9 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
     case 'claude':
       if (session.resumeId) plan.args.push('--resume', session.resumeId);
       if (session.sessionId) plan.args.push('--session-id', session.sessionId);
-      // --print for non-interactive (one-shot), omit for interactive (multi-turn tool use)
-      if (session.prompt && !interactive) plan.args.push('--print', session.prompt);
+      // -p for non-interactive agentic execution (tool use enabled, exits on completion)
+      // --print is text-only and disables tools — never use it for tasks that need file writes
+      if (session.prompt && !interactive) plan.args.push('-p', session.prompt);
       if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
       break;
     case 'codex':
@@ -508,7 +509,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       if ((plan.proxy.targetProvider === 'google' || plan.proxy.targetProvider === 'vertex') && plan.proxy.apiKey) {
         const { createGoogleCompletionEngine } = await import('./launch-completion-engine.js');
         completionEngine = createGoogleCompletionEngine({
-          apiBase: plan.proxy.apiBase,
+          apiBase: plan.proxy.useVertexAi ? undefined : plan.proxy.apiBase,
           apiKey: plan.proxy.apiKey,
           targetModel: plan.proxy.targetModel,
           provider: plan.proxy.targetProvider,

@@ -112,7 +112,9 @@ export function resolveProvider(input: ResolveProviderInput): ProviderConfig {
   }
   const region = input.region ?? process.env['AMUX_REGION'] ?? process.env['GOOGLE_CLOUD_LOCATION'] ?? process.env['VERTEXAI_LOCATION'] ?? process.env['AWS_REGION'] ?? process.env['AWS_REGION_NAME'] ?? params['region'];
   const project = input.project ?? process.env['AMUX_PROJECT'] ?? process.env['GOOGLE_CLOUD_PROJECT'] ?? process.env['VERTEXAI_PROJECT'] ?? params['project'];
-  const apiBase = input.apiBase ?? process.env['AMUX_API_BASE'] ?? params['apiBase'];
+  const providersUsingGenericApiBase = new Set(['foundry', 'azure', 'custom', 'local']);
+  const amuxApiBase = providersUsingGenericApiBase.has(providerId) ? process.env['AMUX_API_BASE'] : undefined;
+  const apiBase = input.apiBase ?? amuxApiBase ?? params['apiBase'];
 
   if (region) params['region'] = region;
   if (project) params['project'] = project;

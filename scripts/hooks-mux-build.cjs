@@ -17,6 +17,7 @@ const packages = [
   'packages/hooks-mux/adapter-oh-my-pi',
   'packages/hooks-mux/adapter-opencode',
   'packages/hooks-mux/adapter-openclaw',
+  'packages/hooks-mux/adapter-hermes',
 ];
 
 const mode = process.argv[2] || 'build';

@@ -32,10 +32,10 @@ describe('e2e: sample plugin compilation', () => {
     expect(hookErrors).toHaveLength(0);
   });
 
-  it('should compile to all 9 targets without errors', () => {
+  it('should compile to all 10 targets without errors', () => {
     const results = compileAll(SAMPLE_PLUGIN_DIR, tmpDir, {});
 
-    expect(results).toHaveLength(9);
+    expect(results).toHaveLength(10);
     for (const result of results) {
       expect(
         result.status,

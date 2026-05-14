@@ -22,6 +22,7 @@ export const HARNESS_TO_AMUX_ADAPTER: Readonly<Record<string, string>> = {
   "opencode": "opencode",
   "openclaw": "openclaw",
   "oh-my-pi": "omp",
+  "hermes": "hermes",
   // Pi is NOT here -- uses agent-core directly.
 };
 

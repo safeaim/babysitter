@@ -389,6 +389,18 @@
       "note": "README is the canonical package-level contract."
     },
     {
+      "surface": "packages/hooks-mux/adapter-hermes",
+      "packageName": "@a5c-ai/hooks-mux-adapter-hermes",
+      "description": "Hermes harness adapter for the hooks-mux system",
+      "hasReadme": true,
+      "status": "Public family package",
+      "canonicalHome": "../packages/hooks-mux/adapter-hermes/README.md",
+      "supporting": [
+        "../packages/hooks-mux/README.md"
+      ],
+      "note": "README is the canonical package-level contract."
+    },
+    {
       "surface": "packages/hooks-mux/adapter-openclaw",
       "packageName": "@a5c-ai/hooks-mux-adapter-openclaw",
       "description": "OpenClaw harness adapter for the hooks-mux system",

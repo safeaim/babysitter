@@ -29,6 +29,7 @@ function toHookRegistrationFormat(format: string | null | undefined) {
     format === 'cursor' ||
     format === 'gemini' ||
     format === 'github-copilot' ||
+    format === 'hermes' ||
     format === 'opencode' ||
     format === 'openclaw'
   ) {

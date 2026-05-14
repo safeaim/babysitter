@@ -18,6 +18,7 @@
     "packages/hooks-mux/adapter-oh-my-pi",
     "packages/hooks-mux/adapter-opencode",
     "packages/hooks-mux/adapter-openclaw",
+    "packages/hooks-mux/adapter-hermes",
     "packages/krate/core",
     "packages/krate/sdk",
     "packages/krate/cli",

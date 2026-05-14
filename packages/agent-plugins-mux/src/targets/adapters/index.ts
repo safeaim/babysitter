@@ -10,6 +10,7 @@ import { CodexAdapter } from './codex.js';
 import { CursorAdapter } from './cursor.js';
 import { GeminiAdapter } from './gemini.js';
 import { GithubCopilotAdapter } from './github-copilot.js';
+import { HermesAdapter } from './hermes.js';
 import { OpenCodeAdapter } from './opencode.js';
 import { OpenClawAdapter } from './openclaw.js';
 import { PiAdapter } from './pi.js';
@@ -21,6 +22,7 @@ export { CodexAdapter } from './codex.js';
 export { CursorAdapter } from './cursor.js';
 export { GeminiAdapter } from './gemini.js';
 export { GithubCopilotAdapter } from './github-copilot.js';
+export { HermesAdapter } from './hermes.js';
 export { OpenCodeAdapter } from './opencode.js';
 export { OpenClawAdapter } from './openclaw.js';
 export { PiAdapter } from './pi.js';
@@ -30,6 +32,7 @@ export { OhMyPiAdapter } from './oh-my-pi.js';
 export { generateClaudeCodeHooksJson, generateClaudeCodeManifest } from './claude-code.js';
 export { generateCodexHooksJson, generateCodexManifest } from './codex.js';
 export { generateCursorHooksJson, generateCursorManifest } from './cursor.js';
+export { generateHermesHooksJson, generateHermesManifest } from './hermes.js';
 export { generateGeminiHooksJson, generateGeminiManifest } from './gemini.js';
 export { generateGithubCopilotHooksJson, generateGithubCopilotManifest } from './github-copilot.js';
 export { generateOpenCodeHooksJson, generateOpenCodeManifest } from './opencode.js';
@@ -45,6 +48,7 @@ const ADAPTER_CLASS_BY_FORMAT: Record<string, new (targetName: string) => Harnes
   'cursor': CursorAdapter,
   'gemini': GeminiAdapter,
   'github-copilot': GithubCopilotAdapter,
+  'hermes': HermesAdapter,
   'opencode': OpenCodeAdapter,
   'openclaw': OpenClawAdapter,
 };

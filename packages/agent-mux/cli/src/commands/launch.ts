@@ -198,9 +198,10 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
     case 'claude':
       if (session.resumeId) plan.args.push('--resume', session.resumeId);
       if (session.sessionId) plan.args.push('--session-id', session.sessionId);
-      // -p for non-interactive agentic execution (tool use enabled, exits on completion)
-      // --print is text-only and disables tools — never use it for tasks that need file writes
-      if (session.prompt && !interactive) plan.args.push('-p', session.prompt);
+      // Pass prompt as positional arg — starts agentic session with tool use.
+      // --print/-p is text-only and disables tools, so never use it.
+      // --max-turns controls when the session exits.
+      if (session.prompt && !interactive) plan.args.push(session.prompt);
       if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
       break;
     case 'codex':
@@ -670,14 +671,32 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       });
     }
   } else {
-    // Non-interactive: pipe stdin, inherit stdout/stderr
-    const { spawn } = await import('node:child_process');
-    child = spawn(plan.command, plan.args, {
-      stdio: ['pipe', 'inherit', 'inherit'],
-      env: { ...process.env, ...plan.env },
-      cwd: launchCwd,
-      shell: process.platform === 'win32',
-    });
+    // Non-interactive: use PTY when available so harnesses like Claude Code
+    // detect a TTY and enable tool use (without PTY, Claude Code falls back
+    // to --print text-only mode). The prompt is a positional arg and
+    // --max-turns controls exit.
+    let usedPty = false;
+    try {
+      const nodePty: any = require('node-pty');
+      ptyProcess = nodePty.spawn(plan.command, plan.args, {
+        name: 'xterm-256color',
+        cols: 120,
+        rows: 40,
+        cwd: launchCwd,
+        env: { ...process.env, ...plan.env } as Record<string, string>,
+      });
+      usedPty = true;
+      ptyProcess.onData((data: string) => process.stdout.write(data));
+      child = { pid: ptyProcess.pid, kill: (sig: string) => ptyProcess.kill(sig) } as any;
+    } catch {
+      const { spawn } = await import('node:child_process');
+      child = spawn(plan.command, plan.args, {
+        stdio: ['pipe', 'inherit', 'inherit'],
+        env: { ...process.env, ...plan.env },
+        cwd: launchCwd,
+        shell: process.platform === 'win32',
+      });
+    }
   }
 
   if (flagBool(args.flags, 'observe')) {

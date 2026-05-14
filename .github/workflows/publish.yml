@@ -131,16 +131,11 @@ jobs:
           run_bg bash -lc '
             set -euo pipefail
             npm run build --workspace=@a5c-ai/hooks-mux-core
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-claude
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-codex
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-gemini
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-copilot
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-cursor
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-pi
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-oh-my-pi
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-opencode
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-openclaw
-            npm run build --workspace=@a5c-ai/hooks-mux-adapter-hermes
+            # Adapters are independent (only depend on core) — build in parallel
+            for adapter in claude codex gemini copilot cursor pi oh-my-pi opencode openclaw hermes; do
+              npm run build --workspace=@a5c-ai/hooks-mux-adapter-$adapter &
+            done
+            wait
             npm run build --workspace=@a5c-ai/hooks-mux-cli
           '
           run_bg npm run build --workspace=@a5c-ai/agent-plugins-mux
@@ -170,8 +165,11 @@ jobs:
           # webui depends on core + ui — must be after agent-mux chain
           npm run build --workspace=@a5c-ai/agent-mux-webui
 
-          npm run build:sdk
-          npm run build --workspace=@a5c-ai/agent-core
+          # SDK, agent-core, babysitter-agent: prerequisites (atlas, agent-catalog,
+          # agent-mux chain) are already built above — call tsc directly to avoid
+          # redundant rebuilds through chained npm scripts.
+          npm run build --workspace=@a5c-ai/babysitter-sdk
+          (cd packages/agent-core && npx tsc --build --force tsconfig.json)
           (cd packages/babysitter-agent && npx tsc --build tsconfig.json)
 
           wait_all

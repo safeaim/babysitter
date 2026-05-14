@@ -623,8 +623,9 @@ main { width: 100%; max-width: none; padding: 0 0 48px; }
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr);
   gap: 0;
-  width: min(100%, 1680px);
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 .appSidebar {
   position: sticky;
@@ -982,6 +983,13 @@ main { width: 100%; max-width: none; padding: 0 0 48px; }
   .commitBanner small { justify-self: start; }
   .fileRow { gap: 4px; }
   .fileIcon { display: none; }
+}
+
+.appTopbar, .appBody, .appContent, .routeMain {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 /* Closer GitHub repository chrome: owner/name header, counters, and repo-first hierarchy. */

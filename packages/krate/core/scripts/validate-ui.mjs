@@ -1,8 +1,10 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { createControllerUiModel } from '../src/index.js';
 
 const required = [
   'apps/web/app/layout.jsx',
+  'apps/web/app/globals.css',
   'apps/web/app/page.jsx',
   'apps/web/app/ui-shell.jsx',
   'apps/web/proxy.js',
@@ -29,11 +31,29 @@ const required = [
   'src/controller-ui.js',
   'src/http-server.js'
 ];
-const files = Object.fromEntries(required.map((file) => [file, readFileSync(file, 'utf8')]));
+function resolveRequiredFile(file) {
+  if (existsSync(file)) return file;
+  if (file.startsWith('apps/web/')) {
+    const packageRelative = path.join('..', 'web', file.slice('apps/web/'.length));
+    if (existsSync(packageRelative)) return packageRelative;
+  }
+  return file;
+}
+
+const files = Object.fromEntries(required.map((file) => [file, readFileSync(resolveRequiredFile(file), 'utf8')]));
 const failures = [];
 
 for (const [file, source] of Object.entries(files)) {
   if (!source.trim()) failures.push(`${file} is empty`);
+}
+if (!/\.appBody\s*\{[\s\S]*?width:\s*100%;[\s\S]*?max-width:\s*none;/.test(files['apps/web/app/globals.css'])) {
+  failures.push('app shell body must use the full viewport width');
+}
+if (/\.appBody\s*\{[\s\S]*?width:\s*min\(100%,\s*\d+px\)/.test(files['apps/web/app/globals.css'])) {
+  failures.push('app shell body is capped to a centered max width');
+}
+if (!/\.appTopbar,\s*\.appBody,\s*\.appContent,\s*\.routeMain\s*\{[\s\S]*?width:\s*100%;[\s\S]*?max-width:\s*none;[\s\S]*?margin-left:\s*0;[\s\S]*?margin-right:\s*0;/.test(files['apps/web/app/globals.css'])) {
+  failures.push('authenticated app shell must override centered layout caps at the final cascade layer');
 }
 for (const file of ['apps/web/app/api/controller/route.js', 'apps/web/app/api/watch/[[...resource]]/route.js', 'src/controller-client.js']) {
   if (files[file].includes('createKrateUiDemoRuntime')) failures.push(`${file} imports or calls createKrateUiDemoRuntime`);
@@ -105,7 +125,7 @@ const pageContracts = {
   'apps/web/app/orgs/[org]/repositories/[repo]/settings/page.jsx': 'RepositorySettingsPage'
 };
 for (const file of Object.keys(pageContracts)) {
-  files[file] = readFileSync(file, 'utf8');
+  files[file] = readFileSync(resolveRequiredFile(file), 'utf8');
 }
 for (const [file, component] of Object.entries(pageContracts)) {
   if (!files[file].includes(component)) failures.push(`${file} does not use dedicated ${component} route component`);

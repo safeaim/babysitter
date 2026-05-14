@@ -202,7 +202,10 @@ export function createUnifiedAdapter(): HarnessAdapter {
       }
 
       // Auto-create a bare run for babysitter-plugin sessions so .a5c/runs/
-      // exists from the start — the agent can attach a process later.
+      // exists from the start — the agent can attach a process later via
+      // run:assign-process. The run ID is written into session state so the
+      // stop hook doesn't kill the session before the agent has a chance to
+      // assign a process.
       try {
         const { createRun } = await import("../../runtime/createRun");
         const { resolveRunsDir } = await import("../../config");
@@ -211,8 +214,17 @@ export function createUnifiedAdapter(): HarnessAdapter {
           runsDir,
           harness: "unified",
         });
+        if (stateDir && sessionId) {
+          const { updateSessionState } = await import("../../session/write");
+          const { getSessionFilePath } = await import("../../session/parse");
+          const filePath = getSessionFilePath(stateDir, sessionId);
+          await updateSessionState(filePath, {
+            runId: result.runId,
+            runIds: [result.runId],
+          });
+        }
         if (args.verbose) {
-          process.stderr.write(`[session-start] bare run created: ${result.runId}\n`);
+          process.stderr.write(`[session-start] bare run created and bound: ${result.runId}\n`);
         }
       } catch (err) {
         if (args.verbose) {

@@ -688,10 +688,9 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       const ptyOutput: string[] = [];
       ptyProcess.onData((data: string) => {
         ptyOutput.push(data);
-        // Write to stderr to avoid stdout pipe backpressure deadlock
-        if (!process.stdout.isTTY) {
-          process.stderr.write(data);
-        } else {
+        // Only write live output when stdout is a real TTY (interactive).
+        // When piped, buffer everything to avoid backpressure deadlock.
+        if (process.stdout.isTTY) {
           process.stdout.write(data);
         }
       });
@@ -699,7 +698,6 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         // Flush buffered PTY output to stdout on exit
         if (!process.stdout.isTTY && ptyOutput.length > 0) {
           const combined = ptyOutput.join('');
-          // Strip ANSI for piped consumers
           const clean = combined.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '').replace(/\x1b\][^\x07]*\x07/g, '');
           process.stdout.write(clean);
         }

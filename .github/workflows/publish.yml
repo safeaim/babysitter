@@ -542,8 +542,7 @@ jobs:
       - name: Extract build artifacts
         run: tar xzf /tmp/build-all-dist.tar.gz
 
-      - name: Install node-pty for interactive tests
-        if: matrix.interaction_mode.interactive == 'true'
+      - name: Install node-pty for TTY-based tool use
         run: npm install node-pty --no-save
 
       - name: Link workspace CLIs to PATH
@@ -562,7 +561,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run selected live stack E2E
-        timeout-minutes: 20
+        timeout-minutes: 15
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
@@ -675,6 +674,9 @@ jobs:
       - name: Extract build artifacts
         run: tar xzf /tmp/build-all-dist.tar.gz
 
+      - name: Install node-pty for TTY-based tool use
+        run: npm install node-pty --no-save
+
       - name: Link workspace CLIs to PATH
         run: |
           mkdir -p "$HOME/.local/bin"
@@ -691,7 +693,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run selected live stack E2E
-        timeout-minutes: 20
+        timeout-minutes: 15
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
@@ -826,6 +828,9 @@ jobs:
       - name: Extract build artifacts
         run: tar xzf /tmp/build-all-dist.tar.gz
 
+      - name: Install node-pty for TTY-based tool use
+        run: npm install node-pty --no-save
+
       - name: Link workspace CLIs to PATH
         run: |
           mkdir -p "$HOME/.local/bin"
@@ -842,7 +847,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run selected live stack E2E
-        timeout-minutes: 20
+        timeout-minutes: 15
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
           LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}

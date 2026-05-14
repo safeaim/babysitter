@@ -670,19 +670,26 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       });
     }
   } else {
-    // Non-interactive: harnesses like Claude Code need a TTY for tool use.
-    // Use `script` on Linux/macOS to provide a pseudo-TTY, falling back to
-    // plain spawn on Windows or when script isn't available.
-    const { spawn } = await import('node:child_process');
-    const usePseudoTty = process.platform !== 'win32' && plan.harness === 'claude';
-    if (usePseudoTty) {
-      const fullCmd = [plan.command, ...plan.args].map(a => a.includes(' ') || a.includes("'") ? `"${a.replace(/"/g, '\\"')}"` : a).join(' ');
-      child = spawn('script', ['-qec', fullCmd, '/dev/null'], {
-        stdio: ['pipe', 'inherit', 'inherit'],
-        env: { ...process.env, ...plan.env },
+    // Non-interactive: use node-pty when available so harnesses like Claude Code
+    // detect a TTY and enable tool use. node-pty is an optionalDependency —
+    // when it's not available (CI without build tools), fall back to plain spawn
+    // where Claude Code enters text-only print mode.
+    let usedPty = false;
+    try {
+      const nodePty: any = await import('node-pty');
+      ptyProcess = nodePty.spawn(plan.command, plan.args, {
+        name: 'xterm-256color',
+        cols: 120,
+        rows: 40,
         cwd: launchCwd,
+        env: { ...process.env, ...plan.env } as Record<string, string>,
       });
-    } else {
+      usedPty = true;
+      ptyProcess.onData((data: string) => process.stdout.write(data));
+      child = { pid: ptyProcess.pid, kill: (sig: string) => ptyProcess.kill(sig) } as any;
+    } catch {
+      // node-pty unavailable — Claude Code will run in text-only mode
+      const { spawn } = await import('node:child_process');
       child = spawn(plan.command, plan.args, {
         stdio: ['pipe', 'inherit', 'inherit'],
         env: { ...process.env, ...plan.env },

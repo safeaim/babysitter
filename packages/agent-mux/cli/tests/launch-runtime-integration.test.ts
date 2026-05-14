@@ -13,6 +13,10 @@ vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(() => ({ status: 0 })),
 }));
 
+vi.mock('node-pty', () => {
+  throw new Error('node-pty mocked out for tests');
+});
+
 vi.mock('@a5c-ai/transport-mux', () => ({
   startTransportMuxRuntime: startTransportMuxRuntimeMock,
 }));

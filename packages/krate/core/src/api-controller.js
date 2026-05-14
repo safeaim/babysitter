@@ -8,6 +8,10 @@ import { createAgentWorkspaceController } from './agent-workspace-controller.js'
 import { createAgentMemoryController } from './agent-memory-controller.js';
 import { orgNamespaceName, normalizeOrgSlug } from './org-scoping.js';
 import { globalEventBus } from './event-bus.js';
+import { createSyncController } from './external/sync-controller.js';
+import { createWebhookController } from './external/webhook-controller.js';
+import { createWriteController } from './external/write-controller.js';
+import { createConflictController } from './external/conflict-controller.js';
 
 export const KRATE_API_CONTROLLER_BOUNDARY = {
   role: 'krate-api-controller',
@@ -289,6 +293,153 @@ export function createKrateApiController(options = {}) {
         namespace: input.namespace || namespace,
         organizationRef: input.organizationRef || 'default'
       });
+    },
+
+    // ---------------------------------------------------------------------------
+    // External controller integration
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Sync an external resource into the Krate resource store.
+     * Creates a SyncController with a persistFn that calls applyResource, then
+     * upserts the resource and optionally advances the watermark.
+     *
+     * @param {string} bindingName
+     * @param {{ kind, localName, namespace?, spec, externalEnvelope, watermark? }} options
+     */
+    async syncExternalBinding(bindingName, options = {}) {
+      const self = this;
+      const syncController = createSyncController({
+        persistFn: async (resource) => {
+          await resourceGateway.apply(resource);
+        }
+      });
+
+      const {
+        kind,
+        localName,
+        namespace: resourceNamespace = 'default',
+        spec = {},
+        externalEnvelope,
+        watermark
+      } = options;
+
+      const resource = syncController.upsertResource({
+        kind,
+        localName,
+        namespace: resourceNamespace,
+        spec,
+        externalEnvelope
+      });
+
+      if (watermark) {
+        syncController.updateWatermark(bindingName, watermark);
+      }
+
+      // Keep a reference to the sync controller so getExternalSyncStatus can read it
+      if (!self._syncControllers) self._syncControllers = new Map();
+      self._syncControllers.set(bindingName, syncController);
+
+      return { resource, bindingName };
+    },
+
+    /**
+     * Create a write intent for an external operation.
+     *
+     * @param {{ interfaceKey, operation, payload?, resourceRef, requiresApproval?,
+     *           maxRetries?, namespace?, organizationRef? }} input
+     */
+    async createExternalWriteIntent(input) {
+      const writeController = createWriteController({
+        persistFn: async (resource) => {
+          await resourceGateway.apply(resource);
+        }
+      });
+      return writeController.createWriteIntent(input);
+    },
+
+    /**
+     * Approve a PendingApproval ExternalWriteIntent.
+     *
+     * @param {{ intentName, approvedBy, resources? }} opts
+     */
+    async approveExternalWriteIntent(opts) {
+      const writeController = createWriteController({
+        persistFn: async (resource) => {
+          await resourceGateway.apply(resource);
+        }
+      });
+      return writeController.approveWriteIntent(opts);
+    },
+
+    /**
+     * Cancel (reject) an ExternalWriteIntent.
+     *
+     * @param {{ intentName, cancelledBy, resources? }} opts
+     */
+    async cancelExternalWriteIntent({ intentName, cancelledBy, resources } = {}) {
+      const writeController = createWriteController({
+        persistFn: async (resource) => {
+          await resourceGateway.apply(resource);
+        }
+      });
+      return writeController.rejectWriteIntent({
+        intentName,
+        rejectedBy: cancelledBy,
+        reason: 'cancelled',
+        resources
+      });
+    },
+
+    /**
+     * Detect a conflict between local and external field values.
+     *
+     * @param {{ resourceRef, fieldPath, localValue, externalValue, namespace?, organizationRef? }} input
+     */
+    async detectExternalConflict(input) {
+      const conflictController = createConflictController({
+        persistFn: async (resource) => {
+          await resourceGateway.apply(resource);
+        }
+      });
+      return conflictController.detectConflict(input);
+    },
+
+    /**
+     * Resolve an Open ExternalSyncConflict using the specified strategy.
+     *
+     * @param {{ conflictName, strategy, resolvedValue?, resources? }} opts
+     */
+    async resolveExternalConflict(opts) {
+      const conflictController = createConflictController({
+        persistFn: async (resource) => {
+          await resourceGateway.apply(resource);
+        }
+      });
+      return conflictController.resolveConflict(opts);
+    },
+
+    /**
+     * Return the current sync state for a binding (watermark, etc.).
+     *
+     * @param {string} bindingName
+     * @returns {{ bindingName: string, watermark: string|null }}
+     */
+    async getExternalSyncStatus(bindingName) {
+      const syncController = this._syncControllers?.get(bindingName);
+      const watermark = syncController ? syncController.getWatermark(bindingName) : null;
+      return { bindingName, watermark };
+    },
+
+    /**
+     * Process an inbound external webhook payload.
+     * Creates a WebhookController, processes the delivery, and emits events.
+     *
+     * @param {{ deliveryId, eventType, payload, rawBody, providerType?, secret? }} params
+     */
+    async processExternalWebhook({ deliveryId, eventType, payload, rawBody, providerType, secret } = {}) {
+      const webhookController = createWebhookController({ secret: secret || '' });
+      return webhookController.processDelivery({ deliveryId, eventType, payload, rawBody });
     }
   };
 }

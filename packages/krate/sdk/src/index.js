@@ -49,3 +49,18 @@ export {
   COMPOSITION_FACETS,
   ALL_LAYER_DEFS
 } from './atlas-graph-client.js';
+
+// External Controllers
+export { createSyncController } from '../../core/src/external/sync-controller.js';
+export { createWebhookController } from '../../core/src/external/webhook-controller.js';
+export { createWriteController } from '../../core/src/external/write-controller.js';
+export { createConflictController } from '../../core/src/external/conflict-controller.js';
+
+// External Provider Registry & Factory
+export {
+  createDefaultProviderRegistry,
+  createExternalBackendProvider
+} from '../../core/src/external/provider-resource-factory.js';
+
+// Event Bus
+export { createEventBus, globalEventBus } from '../../core/src/event-bus.js';

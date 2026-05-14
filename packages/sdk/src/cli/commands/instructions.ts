@@ -7,8 +7,7 @@
  * @module cli/commands/instructions
  */
 
-import { existsSync, promises as fs } from "node:fs";
-import * as path from "node:path";
+import { existsSync } from "node:fs";
 import {
   composeBabysitSkillPrompt,
   composeProcessCreatePrompt,
@@ -40,7 +39,7 @@ import {
   createDefaultCliSetupSnippet,
   createPromptContext,
 } from "../../prompts/contextShared";
-import { resolveRunsDir } from "../../config";
+import { detectExistingRun, formatExistingRunBlock } from "./detectExistingRun";
 
 export interface InstructionsCommandArgs {
   subcommand: "babysit-skill" | "process-create" | "orchestrate" | "breakpoint-handling";
@@ -238,18 +237,6 @@ async function tryResolveProcessLibraryRoot(): Promise<{
   return {};
 }
 
-/**
- * Detect whether the session-start hook has actually run by checking for the
- * session state file it creates (`<stateDir>/<sessionId>.md`).
- *
- * The definitive signal is now the PID-scoped session marker written by the
- * session-start hook; absence of the marker (even when env vars like
- * GEMINI_SESSION_ID / CODEX_SESSION_ID / AGENT_SESSION_ID are present)
- * usually means hooks did not fire. Env-var-only resolution is a fallback
- * path that may bind to stale IDs inherited from ancestor shells, so it
- * cannot be trusted as proof that hooks are active. The hook writes the
- * state file as a side effect of `babysitter hook:run --hook-type session-start`.
- */
 function detectHooksActive(harness: string): boolean {
   const adapter = getAdapterByName(harness);
   if (!adapter) return false;
@@ -262,43 +249,6 @@ function detectHooksActive(harness: string): boolean {
 
   const stateFile = getSessionFilePath(stateDir, sessionId);
   return existsSync(stateFile);
-}
-
-interface ExistingRunInfo {
-  runId: string;
-  runDir: string;
-  processId: string;
-  isBareRun: boolean;
-  entrypoint: { importPath: string; exportName?: string };
-  completionProof?: string;
-}
-
-async function detectExistingRun(): Promise<ExistingRunInfo | undefined> {
-  try {
-    const runsDir = resolveRunsDir();
-    const entries = await fs.readdir(runsDir, { withFileTypes: true });
-    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name).sort().reverse();
-    for (const runId of dirs.slice(0, 5)) {
-      const runFile = path.join(runsDir, runId, "run.json");
-      try {
-        const raw = await fs.readFile(runFile, "utf8");
-        const meta = JSON.parse(raw) as Record<string, unknown>;
-        const entrypoint = meta["entrypoint"] as { importPath?: string; exportName?: string } | undefined;
-        const processId = (meta["processId"] as string) ?? "";
-        const isBareRun = entrypoint?.importPath === "bare-run";
-        return {
-          runId,
-          runDir: path.join(runsDir, runId),
-          processId,
-          isBareRun,
-          entrypoint: { importPath: entrypoint?.importPath ?? "", exportName: entrypoint?.exportName },
-          completionProof: meta["completionProof"] as string | undefined
-            ?? (meta["metadata"] as Record<string, unknown> | undefined)?.["completionProof"] as string | undefined,
-        };
-      } catch { continue; }
-    }
-  } catch { /* no runs dir */ }
-  return undefined;
 }
 
 /**
@@ -405,55 +355,26 @@ export async function handleInstructionsCommand(
       ),
     );
   } else {
-    for (const warning of resolvedHarness.warnings) {
-      console.error(`[instructions] Warning: ${warning}`);
-    }
-    if (!hooksActive && ctx.hookDriven !== false) {
-      // Context factory defaulted hookDriven to true, but we overrode it.
-      // This is a no-op because the override already happened, but it
-      // clarifies the JSON output. The text output is self-explanatory
-      // from the generated instructions.
-    }
-    const activeCapabilities = Object.entries(capabilityFlags)
-      .filter(([, v]) => v === true)
-      .map(([k]) => k);
-    const contextHeader = [
-      '## Execution Context',
-      '',
-      `- CI: \`${executionContext.ci}\``,
-      `- Trigger: \`${executionContext.trigger}\``,
-      executionContext.branch.ref ? `- Branch: \`${executionContext.branch.ref}\`` : undefined,
-      executionContext.repo ? `- Repo: \`${executionContext.repo.owner}/${executionContext.repo.name}\`` : undefined,
-      executionContext.actor ? `- Actor: \`${executionContext.actor.login}\`${executionContext.actor.isBot ? ' (bot)' : ''}` : undefined,
-      '',
-      `Active context capabilities: ${activeCapabilities.length > 0 ? activeCapabilities.map(c => `\`${c}\``).join(', ') : '_(none)_'}`,
-      '',
-      'When selecting library processes to dispatch, prefer those whose triggers match the active capabilities above.',
-      '',
-      '---',
-      '',
-    ].filter((l): l is string => l !== undefined).join('\n');
-    const processGuide = renderCapabilityProcessGuide(capabilityFlags);
-    const runStateBlock = existingRun
-      ? [
-          '## Existing Run State',
-          '',
-          `- Run ID: \`${existingRun.runId}\``,
-          `- Run Dir: \`${existingRun.runDir}\``,
-          `- Process ID: \`${existingRun.processId}\``,
-          `- Bare Run: \`${existingRun.isBareRun}\``,
-          `- Entrypoint: \`${existingRun.entrypoint.importPath}${existingRun.entrypoint.exportName ? '#' + existingRun.entrypoint.exportName : ''}\``,
-          '',
-          existingRun.isBareRun
-            ? `**This is a bare run.** Use \`run:assign-process ${existingRun.runDir} --entry <path>#<export>\` to assign a process before iterating.`
-            : `This run already has a process assigned. Use \`run:iterate ${existingRun.runDir} --json\` to continue.`,
-          '',
-          '---',
-          '',
-        ].join('\n')
-      : '';
-    console.log(contextHeader + processGuide + runStateBlock + content);
+    for (const warning of resolvedHarness.warnings) console.error(`[instructions] Warning: ${warning}`);
+    console.log(formatTextOutput(executionContext, capabilityFlags, existingRun, content));
   }
 
   return 0;
+}
+
+function formatTextOutput(executionContext: ReturnType<typeof detectExecutionContext>, capabilityFlags: ReturnType<typeof deriveCapabilityFlags>, existingRun: Awaited<ReturnType<typeof detectExistingRun>>, content: string): string {
+  const caps = Object.entries(capabilityFlags).filter(([, v]) => v).map(([k]) => k);
+  const header = [
+    '## Execution Context', '',
+    `- CI: \`${executionContext.ci}\``,
+    `- Trigger: \`${executionContext.trigger}\``,
+    executionContext.branch.ref ? `- Branch: \`${executionContext.branch.ref}\`` : undefined,
+    executionContext.repo ? `- Repo: \`${executionContext.repo.owner}/${executionContext.repo.name}\`` : undefined,
+    executionContext.actor ? `- Actor: \`${executionContext.actor.login}\`${executionContext.actor.isBot ? ' (bot)' : ''}` : undefined,
+    '', `Active context capabilities: ${caps.length > 0 ? caps.map(c => `\`${c}\``).join(', ') : '_(none)_'}`,
+    '', 'When selecting library processes to dispatch, prefer those whose triggers match the active capabilities above.', '', '---', '',
+  ].filter((l): l is string => l !== undefined).join('\n');
+  const guide = renderCapabilityProcessGuide(capabilityFlags);
+  const runBlock = existingRun ? formatExistingRunBlock(existingRun) : '';
+  return header + guide + runBlock + content;
 }

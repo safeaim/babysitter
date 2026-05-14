@@ -25,6 +25,7 @@ attributes:
       terminal: true
       description: Run failed before reaching completed.
   transitions:
+    - { from: run.created,  to: run.created,   event: PROCESS_ASSIGNED }
     - { from: run.created,  to: run.waiting,   event: EFFECT_REQUESTED }
     - { from: run.waiting,  to: run.completed, event: RUN_COMPLETED }
     - { from: run.waiting,  to: run.failed,    event: RUN_FAILED }

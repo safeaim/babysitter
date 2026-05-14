@@ -38,11 +38,26 @@ Default layout under the active runs root:
 
 Use the active runs root from [Command Surfaces](./command-surfaces.md): global `~/.a5c/runs` by default, repo-local only when configured or when probing legacy runs.
 
+## Bare Runs and Process Assignment
+
+A run can be created without `--entry`, producing a **bare run** whose `entrypoint.importPath` is `"bare-run"`. Bare runs reserve a run directory and journal but cannot be iterated until a process is attached.
+
+To attach a process, use:
+
+```bash
+babysitter run:assign-process <runDir> --entry <path>#<export> [--process-id <id>] --json
+```
+
+This updates `run.json` via `writeRunMetadata()` and appends a `PROCESS_ASSIGNED` journal event. After assignment the run can proceed through normal `run:iterate` cycles. The `orchestrateIteration` runtime guards against iterating a bare run that has not yet been assigned a process.
+
+The `instructions:babysit-skill` command dynamically reports existing bare runs so that the orchestrating agent can decide whether to assign a process or create a new run.
+
 ## Journal Event Model
 
 The event stream is append-only and centers on:
 
 - `RUN_CREATED`
+- `PROCESS_ASSIGNED`
 - `EFFECT_REQUESTED`
 - `EFFECT_RESOLVED`
 - `RUN_COMPLETED`

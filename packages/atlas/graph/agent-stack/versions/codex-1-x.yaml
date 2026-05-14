@@ -114,8 +114,10 @@ attributes:
       sessionEnd: unsupported
   bridgeCapabilities:
     interactiveBridge: true
+    hookBridge: true
     sessionResume: false
     positionalPrompt: true
+    nonInteractiveUsesExecMode: true
 edges:
   version_of:
     - agent:codex

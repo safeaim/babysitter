@@ -10,7 +10,7 @@ The `babysitter` binary is shipped by [`@a5c-ai/babysitter`](../../packages/baby
 
 `babysitter --help` is the automation surface. Its usage text is generated from [`packages/sdk/src/cli/main/usage.ts`](../../packages/sdk/src/cli/main/usage.ts) and centers on:
 
-- `run:*` and `task:*` for deterministic replay loops
+- `run:*` and `task:*` for deterministic replay loops (includes `run:assign-process` for attaching a process to a bare run)
 - `session:*` for session binding and iteration guards
 - `skill:discover`
 - `process-library:active`

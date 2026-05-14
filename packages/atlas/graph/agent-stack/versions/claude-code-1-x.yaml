@@ -24,7 +24,7 @@ attributes:
   interactiveSignals:
     turnCompletePattern: "^\\s*❯\\s*$|^\\s*%\\s*$"
     exitOnNonInteractive: true
-    nonInteractiveMode: "--print"
+    nonInteractiveMode: "-p"
     interactiveMode: ""
   hookSupport:
     interactive:
@@ -41,8 +41,10 @@ attributes:
       sessionEnd: unsupported
   bridgeCapabilities:
     interactiveBridge: true
+    hookBridge: true
     sessionResume: true
     positionalPrompt: true
+    nonInteractiveUsesPromptFlag: true
 edges:
   version_of:
     - agent:claude-code

@@ -65,6 +65,17 @@ Use this table when you need the canonical entrypoint for a specific Babysitter 
 | `@a5c-ai/babysitter-pi` | [plugins/babysitter-unified/per-harness/pi/README.md](../plugins/babysitter-unified/per-harness/pi/README.md) | Generated from the unified source; README is the canonical package-level contract. |
 <!-- supported-harness-plugins:end -->
 
+## Bridge Flags for amux Launch
+
+When launching agents through `amux launch`, two bridge flags control how babysitter hooks and interactive orchestration integrate with the harness:
+
+- **`--bridge-interactive`** enables an interactive bridge layer that proxies stdin/stdout through an intermediary capable of injecting babysitter hook responses and orchestration signals while preserving the harness's native TUI.
+- **`--bridge-hooks`** enables hook bridging: the bridge intercepts hook lifecycle events (SessionStart, Stop, PreToolUse, etc.) and forwards them to the babysitter session-start hook. This is how the session-start hook writes a bare run ID into session state, enabling `instructions:babysit-skill` to discover and assign a process to the run.
+
+The `hookSupport` and `bridgeCapabilities` attributes in the atlas graph agent version nodes describe which harnesses support these flags natively. See the [amux CLI reference](agent-mux/reference/10-cli-reference.md) for the full flag table.
+
+---
+
 ## How a Plugin Install Actually Works
 
 Here's what happens when you run `babysitter plugin:install testing-suite`:

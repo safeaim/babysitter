@@ -416,6 +416,13 @@ amux launch <harness> [provider] [flags...]
 | `--max-turns` | | `number` | Turn limit (non-interactive mode). |
 | `--max-budget-usd` | | `number` | Cost limit (where the harness supports it). |
 
+#### Bridge Control
+
+| Flag | Type | Default | Description |
+|---|---|---|---|
+| `--bridge-interactive` | `boolean` | `false` | Enable the interactive bridge layer, which proxies stdin/stdout through an intermediary that can inject babysitter hook responses and orchestration signals while preserving the harness's native TUI. |
+| `--bridge-hooks` | `boolean` | `false` | Enable hook bridging: the bridge intercepts hook lifecycle events (SessionStart, Stop, PreToolUse, etc.) and forwards them to the babysitter session-start hook, which can bind the session to a bare run. Requires `--bridge-interactive` or is implied by it when the harness supports hooks natively. |
+
 #### Harness Passthrough
 
 | Flag | Type | Description |

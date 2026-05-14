@@ -46,8 +46,8 @@ describe("HARNESS_TO_AMUX_ADAPTER", () => {
     expect(HARNESS_TO_AMUX_ADAPTER["agent-core"]).toBeUndefined();
   });
 
-  it("has exactly 8 entries", () => {
-    expect(Object.keys(HARNESS_TO_AMUX_ADAPTER)).toHaveLength(8);
+  it("has exactly 9 entries", () => {
+    expect(Object.keys(HARNESS_TO_AMUX_ADAPTER)).toHaveLength(9);
   });
 });
 

@@ -198,10 +198,8 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
     case 'claude':
       if (session.resumeId) plan.args.push('--resume', session.resumeId);
       if (session.sessionId) plan.args.push('--session-id', session.sessionId);
-      // -p for non-interactive with --tools default to enable all tools.
-      // Without --tools, -p mode restricts filesystem tools.
       if (session.prompt && !interactive) {
-        plan.args.push('-p', session.prompt, '--tools', 'default');
+        plan.args.push(session.prompt);
       }
       if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
       break;
@@ -672,17 +670,26 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       });
     }
   } else {
-    // Non-interactive: prompt is a positional arg (not --print/-p which disables
-    // tool use). stdin is piped so harnesses like Claude Code detect an agentic
-    // session. --max-turns controls exit, --dangerously-skip-permissions (via
-    // --yolo) enables tool permissions.
+    // Non-interactive: harnesses like Claude Code need a TTY for tool use.
+    // Use `script` on Linux/macOS to provide a pseudo-TTY, falling back to
+    // plain spawn on Windows or when script isn't available.
     const { spawn } = await import('node:child_process');
-    child = spawn(plan.command, plan.args, {
-      stdio: ['pipe', 'inherit', 'inherit'],
-      env: { ...process.env, ...plan.env },
-      cwd: launchCwd,
-      shell: process.platform === 'win32',
-    });
+    const usePseudoTty = process.platform !== 'win32' && plan.harness === 'claude';
+    if (usePseudoTty) {
+      const fullCmd = [plan.command, ...plan.args].map(a => a.includes(' ') || a.includes("'") ? `"${a.replace(/"/g, '\\"')}"` : a).join(' ');
+      child = spawn('script', ['-qec', fullCmd, '/dev/null'], {
+        stdio: ['pipe', 'inherit', 'inherit'],
+        env: { ...process.env, ...plan.env },
+        cwd: launchCwd,
+      });
+    } else {
+      child = spawn(plan.command, plan.args, {
+        stdio: ['pipe', 'inherit', 'inherit'],
+        env: { ...process.env, ...plan.env },
+        cwd: launchCwd,
+        shell: process.platform === 'win32',
+      });
+    }
   }
 
   if (flagBool(args.flags, 'observe')) {

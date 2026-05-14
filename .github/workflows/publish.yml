@@ -2136,6 +2136,37 @@ jobs:
             --from-literal=DATABASE_URL="$DATABASE_URL" \
             --dry-run=client -o yaml | kubectl apply -f -
 
+          POSTGRES_PVC="data-${POSTGRES_APP}-0"
+          POSTGRES_STORAGE_CLASS=$(kubectl get storageclass -o jsonpath='{range .items[?(@.metadata.annotations.storageclass\.kubernetes\.io/is-default-class=="true")]}{.metadata.name}{"\n"}{end}' | head -n1)
+          if [[ -z "$POSTGRES_STORAGE_CLASS" ]]; then
+            for candidate in managed-csi managed-premium default azurefile-csi; do
+              if kubectl get storageclass "$candidate" >/dev/null 2>&1; then
+                POSTGRES_STORAGE_CLASS="$candidate"
+                break
+              fi
+            done
+          fi
+
+          POSTGRES_STORAGE_CLASS_LINE=""
+          if [[ -n "$POSTGRES_STORAGE_CLASS" ]]; then
+            POSTGRES_STORAGE_CLASS_LINE="                  storageClassName: ${POSTGRES_STORAGE_CLASS}"
+            echo "Using Atlas Postgres storageClassName=${POSTGRES_STORAGE_CLASS}"
+          else
+            echo "::warning::No Kubernetes storage class found; Atlas Postgres PVC may remain pending"
+            kubectl get storageclass -o wide || true
+          fi
+
+          kubectl -n "$KUBE_NAMESPACE" delete statefulset "$POSTGRES_APP" --ignore-not-found --wait=true
+
+          if kubectl -n "$KUBE_NAMESPACE" get pvc "$POSTGRES_PVC" >/dev/null 2>&1; then
+            POSTGRES_PVC_PHASE=$(kubectl -n "$KUBE_NAMESPACE" get pvc "$POSTGRES_PVC" -o jsonpath='{.status.phase}')
+            if [[ "$POSTGRES_PVC_PHASE" != "Bound" ]]; then
+              echo "Deleting non-bound Atlas Postgres PVC ${POSTGRES_PVC} in phase ${POSTGRES_PVC_PHASE:-unknown}"
+              kubectl -n "$KUBE_NAMESPACE" delete pod "${POSTGRES_APP}-0" --ignore-not-found --wait=false
+              kubectl -n "$KUBE_NAMESPACE" delete pvc "$POSTGRES_PVC" --ignore-not-found
+            fi
+          fi
+
           cat <<EOF | kubectl apply -f -
           apiVersion: v1
           kind: Service
@@ -2194,6 +2225,7 @@ jobs:
               - metadata:
                   name: data
                 spec:
+          ${POSTGRES_STORAGE_CLASS_LINE}
                   accessModes:
                     - ReadWriteOnce
                   resources:
@@ -2202,7 +2234,10 @@ jobs:
           EOF
           if ! kubectl -n "$KUBE_NAMESPACE" rollout status statefulset/"$POSTGRES_APP" --timeout=300s; then
             kubectl -n "$KUBE_NAMESPACE" get pods -l app="$POSTGRES_APP" -o wide || true
+            kubectl -n "$KUBE_NAMESPACE" get pvc "$POSTGRES_PVC" -o wide || true
+            kubectl get storageclass -o wide || true
             kubectl -n "$KUBE_NAMESPACE" describe pods -l app="$POSTGRES_APP" || true
+            kubectl -n "$KUBE_NAMESPACE" describe pvc "$POSTGRES_PVC" || true
             kubectl -n "$KUBE_NAMESPACE" logs statefulset/"$POSTGRES_APP" --tail=100 || true
             exit 1
           fi

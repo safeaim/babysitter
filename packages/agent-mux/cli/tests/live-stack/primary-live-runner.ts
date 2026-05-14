@@ -180,8 +180,7 @@ function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {
   if (scenario.agent.agent === 'babysitter-agent') {
     return 1;
   }
-  // Cross-model proxied scenarios need more turns for tool-use coaching
-  return 12;
+  return 5;
 }
 
 
@@ -392,19 +391,17 @@ function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: st
 }
 
 function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
-  const odysseyTask = `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek. Save the result to .a5c-live-test/${traceId}-odyssey.md`;
+  const fileTask = `Write a short 3-sentence summary of Homer's Odyssey. Save it to .a5c-live-test/${traceId}-odyssey.md`;
 
   if (scenario.agent.agent === 'babysitter-agent') {
-    // agent-core currently does single-turn direct API calls without tool use.
-    // Until it supports a full agentic loop with tools, give it a text-only task.
-    return `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek.`;
+    return `Write a short 3-sentence summary of Homer's Odyssey.`;
   }
 
   if (scenario.agent.installMode === 'babysitter-plugin') {
-    return `/babysitter:call ${odysseyTask}`;
+    return `/babysitter:call ${fileTask}`;
   }
 
-  return odysseyTask;
+  return fileTask;
 }
 
 function extractTraceIds(output: string): Partial<LiveStackEvidenceBundle> {

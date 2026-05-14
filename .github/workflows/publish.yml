@@ -2044,13 +2044,14 @@ jobs:
         if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           case "${GITHUB_REF_NAME}" in
-            main)    NS=atlas;         HOST=atlas.a5c.ai ;;
-            staging) NS=atlas-staging; HOST=atlas-staging.a5c.ai ;;
-            develop) NS=atlas-develop; HOST=atlas-develop.a5c.ai ;;
+            main)    NS=atlas;         HOST=atlas.a5c.ai;         RG="${{ vars.A5C_CLOUD_PROD_RESOURCE_GROUP }}" ;;
+            staging) NS=atlas-staging; HOST=atlas-staging.a5c.ai; RG="${{ vars.A5C_CLOUD_STAGING_RESOURCE_GROUP }}" ;;
+            develop) NS=atlas-develop; HOST=atlas-develop.a5c.ai; RG="${{ vars.A5C_CLOUD_STAGING_RESOURCE_GROUP }}" ;;
             *)       echo "Unsupported branch" >&2; exit 1 ;;
           esac
           echo "KUBE_NAMESPACE=$NS" >> "$GITHUB_ENV"
           echo "APP_HOST=$HOST" >> "$GITHUB_ENV"
+          echo "AZURE_RESOURCE_GROUP=$RG" >> "$GITHUB_ENV"
 
       - name: Configure kubectl
         if: steps.config.outputs.deploy_enabled == 'true'
@@ -2140,8 +2141,11 @@ jobs:
           POSTGRES_PV="${KUBE_NAMESPACE}-${POSTGRES_APP}"
           POSTGRES_STORAGE_CLASS="atlas-postgres-static"
           POSTGRES_SHARE="${KUBE_NAMESPACE}-${POSTGRES_APP}"
-          AZURE_RESOURCE_GROUP=$(az acr show --name "$ACR_NAME" --query resourceGroup -o tsv)
-          AZURE_LOCATION=$(az acr show --name "$ACR_NAME" --query location -o tsv)
+          if [[ -z "${AZURE_RESOURCE_GROUP:-}" ]]; then
+            echo "::error::A5C cloud resource group is not configured for ${GITHUB_REF_NAME}"
+            exit 1
+          fi
+          AZURE_LOCATION=$(az group show --name "$AZURE_RESOURCE_GROUP" --query location -o tsv)
           SUBSCRIPTION_HASH=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)
           STORAGE_ACCOUNT="a5catlaspg${SUBSCRIPTION_HASH}"
 

@@ -15,6 +15,9 @@ describe("Atlas WebUI deploy workflow", () => {
     expect(workflow).toContain("name: PGDATA");
     expect(workflow).toContain("value: /var/lib/postgresql/data/pgdata");
     expect(workflow).toContain("--from-literal=DATABASE_URL=\"$DATABASE_URL\"");
+    expect(workflow).toContain("ATLAS_POSTGRES_STORAGE_ACCOUNT");
+    expect(workflow).toContain("ATLAS_POSTGRES_STORAGE_KEY");
+    expect(workflow).toContain("Using configured Atlas Postgres storage account");
     expect(workflow).toContain("AZURE_RESOURCE_GROUP=$RG");
     expect(workflow).toContain("A5C_CLOUD_STAGING_RESOURCE_GROUP");
     expect(workflow).toContain("NODE_PROVIDER_ID=$(kubectl get nodes");

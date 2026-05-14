@@ -2114,6 +2114,9 @@ jobs:
 
       - name: Provision Atlas Postgres
         if: steps.config.outputs.deploy_enabled == 'true'
+        env:
+          ATLAS_POSTGRES_STORAGE_ACCOUNT: ${{ vars.ATLAS_POSTGRES_STORAGE_ACCOUNT }}
+          ATLAS_POSTGRES_STORAGE_KEY: ${{ secrets.ATLAS_POSTGRES_STORAGE_KEY }}
         run: |
           POSTGRES_APP=atlas-postgres
           POSTGRES_DB=atlas_webui
@@ -2141,35 +2144,41 @@ jobs:
           POSTGRES_PV="${KUBE_NAMESPACE}-${POSTGRES_APP}"
           POSTGRES_STORAGE_CLASS="atlas-postgres-static"
           POSTGRES_SHARE="${KUBE_NAMESPACE}-${POSTGRES_APP}"
-          if [[ -z "${AZURE_RESOURCE_GROUP:-}" ]]; then
-            NODE_PROVIDER_ID=$(kubectl get nodes -o jsonpath='{.items[0].spec.providerID}')
-            NODE_RESOURCE_GROUP=$(echo "$NODE_PROVIDER_ID" | sed -E 's#.*resourceGroups/([^/]+)/.*#\1#')
-            NODE_RESOURCE_GROUP_LOWER=$(echo "$NODE_RESOURCE_GROUP" | tr '[:upper:]' '[:lower:]')
-            if [[ "$NODE_RESOURCE_GROUP_LOWER" == mc_* ]]; then
-              AZURE_RESOURCE_GROUP=$(echo "$NODE_RESOURCE_GROUP" | cut -d_ -f2)
-              AZURE_LOCATION=$(echo "$NODE_RESOURCE_GROUP" | awk -F_ '{print $NF}')
-              echo "Using AKS cluster resource group ${AZURE_RESOURCE_GROUP} for Atlas Postgres storage"
-            else
-              AZURE_RESOURCE_GROUP="$NODE_RESOURCE_GROUP"
-              echo "Using AKS provider resource group ${AZURE_RESOURCE_GROUP} for Atlas Postgres storage"
+          if [[ -n "${ATLAS_POSTGRES_STORAGE_ACCOUNT:-}" && -n "${ATLAS_POSTGRES_STORAGE_KEY:-}" ]]; then
+            STORAGE_ACCOUNT="$ATLAS_POSTGRES_STORAGE_ACCOUNT"
+            STORAGE_KEY="$ATLAS_POSTGRES_STORAGE_KEY"
+            echo "Using configured Atlas Postgres storage account ${STORAGE_ACCOUNT}"
+          else
+            if [[ -z "${AZURE_RESOURCE_GROUP:-}" ]]; then
+              NODE_PROVIDER_ID=$(kubectl get nodes -o jsonpath='{.items[0].spec.providerID}')
+              NODE_RESOURCE_GROUP=$(echo "$NODE_PROVIDER_ID" | sed -E 's#.*resourceGroups/([^/]+)/.*#\1#')
+              NODE_RESOURCE_GROUP_LOWER=$(echo "$NODE_RESOURCE_GROUP" | tr '[:upper:]' '[:lower:]')
+              if [[ "$NODE_RESOURCE_GROUP_LOWER" == mc_* ]]; then
+                AZURE_RESOURCE_GROUP=$(echo "$NODE_RESOURCE_GROUP" | cut -d_ -f2)
+                AZURE_LOCATION=$(echo "$NODE_RESOURCE_GROUP" | awk -F_ '{print $NF}')
+                echo "Using AKS cluster resource group ${AZURE_RESOURCE_GROUP} for Atlas Postgres storage"
+              else
+                AZURE_RESOURCE_GROUP="$NODE_RESOURCE_GROUP"
+                echo "Using AKS provider resource group ${AZURE_RESOURCE_GROUP} for Atlas Postgres storage"
+              fi
             fi
-          fi
-          AZURE_LOCATION="${AZURE_LOCATION:-$(az group show --name "$AZURE_RESOURCE_GROUP" --query location -o tsv)}"
-          SUBSCRIPTION_HASH=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)
-          STORAGE_ACCOUNT="a5catlaspg${SUBSCRIPTION_HASH}"
+            AZURE_LOCATION="${AZURE_LOCATION:-$(az group show --name "$AZURE_RESOURCE_GROUP" --query location -o tsv)}"
+            SUBSCRIPTION_HASH=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)
+            STORAGE_ACCOUNT="a5catlaspg${SUBSCRIPTION_HASH}"
 
-          if ! az storage account show --name "$STORAGE_ACCOUNT" --resource-group "$AZURE_RESOURCE_GROUP" >/dev/null 2>&1; then
-            az storage account create \
-              --name "$STORAGE_ACCOUNT" \
-              --resource-group "$AZURE_RESOURCE_GROUP" \
-              --location "$AZURE_LOCATION" \
-              --sku Standard_LRS \
-              --kind StorageV2 \
-              --https-only true \
-              --allow-blob-public-access false \
-              --min-tls-version TLS1_2 >/dev/null
+            if ! az storage account show --name "$STORAGE_ACCOUNT" --resource-group "$AZURE_RESOURCE_GROUP" >/dev/null 2>&1; then
+              az storage account create \
+                --name "$STORAGE_ACCOUNT" \
+                --resource-group "$AZURE_RESOURCE_GROUP" \
+                --location "$AZURE_LOCATION" \
+                --sku Standard_LRS \
+                --kind StorageV2 \
+                --https-only true \
+                --allow-blob-public-access false \
+                --min-tls-version TLS1_2 >/dev/null
+            fi
+            STORAGE_KEY=$(az storage account keys list --resource-group "$AZURE_RESOURCE_GROUP" --account-name "$STORAGE_ACCOUNT" --query '[0].value' -o tsv)
           fi
-          STORAGE_KEY=$(az storage account keys list --resource-group "$AZURE_RESOURCE_GROUP" --account-name "$STORAGE_ACCOUNT" --query '[0].value' -o tsv)
           az storage share create --account-name "$STORAGE_ACCOUNT" --account-key "$STORAGE_KEY" --name "$POSTGRES_SHARE" --quota 8 >/dev/null
 
           kubectl -n "$KUBE_NAMESPACE" create secret generic atlas-postgres-azure-file \

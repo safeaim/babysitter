@@ -181,6 +181,7 @@ export function createOpenAICompletionEngine(options: {
 
       const decoder = new TextDecoder();
       let buffer = '';
+      const pendingToolCalls: Array<{ id: string; name: string; arguments: string } | undefined> = [];
 
       while (true) {
         const { done, value } = await reader.read();
@@ -201,17 +202,42 @@ export function createOpenAICompletionEngine(options: {
 
           try {
             const chunk = JSON.parse(payload) as {
-              choices: Array<{ delta: { content?: string }; finish_reason?: string | null }>;
+              choices: Array<{
+                delta: {
+                  content?: string | null;
+                  tool_calls?: Array<{ index: number; id?: string; function?: { name?: string; arguments?: string } }>;
+                };
+                finish_reason?: string | null;
+              }>;
               usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
             };
-            const delta = chunk.choices[0]?.delta?.content;
+            const choice = chunk.choices[0];
+            const delta = choice?.delta?.content;
             if (delta) {
               yield { type: 'text-delta', text: delta };
             }
-            if (chunk.choices[0]?.finish_reason) {
+
+            // Accumulate streamed tool_calls — OpenAI streams them as incremental
+            // argument chunks across multiple SSE events.
+            if (choice?.delta?.tool_calls) {
+              for (const tc of choice.delta.tool_calls) {
+                const idx = tc.index;
+                if (!pendingToolCalls[idx]) {
+                  pendingToolCalls[idx] = { id: tc.id ?? `call_${idx}`, name: '', arguments: '' };
+                }
+                if (tc.function?.name) pendingToolCalls[idx].name += tc.function.name;
+                if (tc.function?.arguments) pendingToolCalls[idx].arguments += tc.function.arguments;
+              }
+            }
+
+            if (choice?.finish_reason) {
+              // Emit accumulated tool calls before done
+              for (const tc of pendingToolCalls) {
+                if (tc) yield { type: 'tool-call' as const, id: tc.id, name: tc.name, arguments: tc.arguments };
+              }
               yield {
                 type: 'done',
-                finishReason: chunk.choices[0].finish_reason,
+                finishReason: choice.finish_reason,
                 usage: chunk.usage ? {
                   promptTokens: chunk.usage.prompt_tokens,
                   completionTokens: chunk.usage.completion_tokens,

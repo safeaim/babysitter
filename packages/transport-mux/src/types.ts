@@ -71,7 +71,14 @@ export interface CompletionDoneEvent {
   usage?: CompletionUsage;
 }
 
-export type CompletionStreamEvent = CompletionTextDeltaEvent | CompletionDoneEvent;
+export interface CompletionToolCallEvent {
+  type: 'tool-call';
+  id: string;
+  name: string;
+  arguments: string;
+}
+
+export type CompletionStreamEvent = CompletionTextDeltaEvent | CompletionToolCallEvent | CompletionDoneEvent;
 
 export interface CompletionEngine {
   complete(request: CompletionRequest): Promise<CompletionResult>;

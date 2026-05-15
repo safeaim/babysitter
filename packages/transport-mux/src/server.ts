@@ -447,6 +447,9 @@ function anthropicStreamResponse(
           ),
         );
 
+        let contentIndex = 0;
+        let hasToolUse = false;
+
         for await (const event of stream) {
           if (event.type === 'text-delta' && event.text) {
             controller.enqueue(
@@ -455,21 +458,53 @@ function anthropicStreamResponse(
                   'event: content_block_delta\ndata: ',
                   {
                     type: 'content_block_delta',
-                    index: 0,
+                    index: contentIndex,
                     delta: { type: 'text_delta', text: event.text },
                   },
                 ),
               ),
             );
+          } else if (event.type === 'tool-call') {
+            // Close text block before first tool_use
+            if (!hasToolUse) {
+              controller.enqueue(encoder.encode(
+                encodeSseChunk('event: content_block_stop\ndata: ', { type: 'content_block_stop', index: contentIndex }),
+              ));
+              contentIndex++;
+              hasToolUse = true;
+            }
+            let input: unknown;
+            try { input = JSON.parse(event.arguments); } catch { input = {}; }
+            controller.enqueue(encoder.encode(
+              encodeSseChunk('event: content_block_start\ndata: ', {
+                type: 'content_block_start',
+                index: contentIndex,
+                content_block: { type: 'tool_use', id: event.id, name: event.name, input },
+              }),
+            ));
+            controller.enqueue(encoder.encode(
+              encodeSseChunk('event: content_block_stop\ndata: ', { type: 'content_block_stop', index: contentIndex }),
+            ));
+            contentIndex++;
           }
         }
 
+        if (!hasToolUse) {
+          controller.enqueue(
+            encoder.encode(
+              encodeSseChunk(
+                'event: content_block_stop\ndata: ',
+                { type: 'content_block_stop', index: contentIndex },
+              ),
+            ),
+          );
+        }
         controller.enqueue(
           encoder.encode(
-            encodeSseChunk(
-              'event: content_block_stop\ndata: ',
-              { type: 'content_block_stop', index: 0 },
-            ),
+            encodeSseChunk('event: message_delta\ndata: ', {
+              type: 'message_delta',
+              delta: { stop_reason: hasToolUse ? 'tool_use' : 'end_turn' },
+            }),
           ),
         );
         controller.enqueue(

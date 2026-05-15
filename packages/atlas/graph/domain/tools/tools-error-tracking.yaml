@@ -5,6 +5,7 @@ attributes:
   displayName: "Bugsnag"
   homepageUrl: "https://www.bugsnag.com"
   kind: observability
+  languageApplicability: neutral
   description: |
     Error monitoring and crash reporting platform for web and mobile apps.
     Captures unhandled exceptions with rich diagnostics including breadcrumbs,
@@ -28,6 +29,7 @@ attributes:
   displayName: "Rollbar"
   homepageUrl: "https://rollbar.com"
   kind: observability
+  languageApplicability: neutral
   description: |
     Real-time error tracking and debugging platform with AI-assisted
     grouping and root-cause analysis. Supports 40+ languages/frameworks
@@ -51,6 +53,7 @@ attributes:
   displayName: "Airbrake"
   homepageUrl: "https://airbrake.io"
   kind: observability
+  languageApplicability: neutral
   description: |
     Error and performance monitoring platform integrating exception
     tracking with transaction tracing. Provides error grouping, user
@@ -74,6 +77,7 @@ attributes:
   displayName: "LogRocket"
   homepageUrl: "https://logrocket.com"
   kind: observability
+  languageApplicability: neutral
   description: |
     Frontend monitoring platform combining session replay, logging,
     and performance monitoring. Records user sessions for debugging,

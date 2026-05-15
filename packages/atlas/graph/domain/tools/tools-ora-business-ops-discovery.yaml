@@ -6,6 +6,7 @@ attributes:
   displayName: "Attio"
   homepageUrl: "https://attio.com"
   kind: other
+  languageApplicability: neutral
   description: |
     CRM platform surfaced by Ora for sales, account management, and revenue operations workflows.
   ora:
@@ -32,6 +33,7 @@ attributes:
   displayName: "Close"
   homepageUrl: "https://www.close.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Sales CRM surfaced by Ora for account management, pipeline, and revenue operations workflows.
   ora:
@@ -55,6 +57,7 @@ attributes:
   displayName: "Copper"
   homepageUrl: "https://www.copper.com"
   kind: other
+  languageApplicability: neutral
   description: |
     CRM surfaced by Ora for account management and revenue operations workflows.
   ora:
@@ -78,6 +81,7 @@ attributes:
   displayName: "Pipedrive"
   homepageUrl: "https://www.pipedrive.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Sales CRM surfaced by Ora for revenue operations, account management, and pipeline workflows.
   ora:
@@ -101,6 +105,7 @@ attributes:
   displayName: "Klaviyo"
   homepageUrl: "https://www.klaviyo.com"
   kind: workflow-automation
+  languageApplicability: neutral
   description: |
     Marketing automation and customer messaging platform surfaced by Ora for campaign analytics and content workflows.
   ora:
@@ -130,6 +135,7 @@ attributes:
   displayName: "June"
   homepageUrl: "https://www.june.so"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Product analytics platform surfaced by Ora for campaign analytics, product insights, and growth workflows.
   ora:
@@ -153,6 +159,7 @@ attributes:
   displayName: "Ramp"
   homepageUrl: "https://ramp.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Finance automation, expense, card, and procurement platform surfaced by Ora for accounting and procurement workflows.
   ora:
@@ -182,6 +189,7 @@ attributes:
   displayName: "dbt Labs"
   homepageUrl: "https://www.getdbt.com"
   kind: sql-tool
+  languageApplicability: neutral
   description: |
     Analytics engineering and transformation platform surfaced by Ora for dbt, warehouse, and orchestration workflows.
   ora:
@@ -211,6 +219,7 @@ attributes:
   displayName: "Labelbox"
   homepageUrl: "https://labelbox.com"
   kind: ai-dev-tool
+  languageApplicability: neutral
   description: |
     Data labeling and AI data platform surfaced by Ora for data engineering and AI/ML workflow coverage.
   ora:
@@ -234,6 +243,7 @@ attributes:
   displayName: "Linode"
   homepageUrl: "https://www.linode.com"
   kind: orchestrator
+  languageApplicability: neutral
   description: |
     Cloud infrastructure provider surfaced by Ora for DevSecOps, cloud cost, and platform operations workflows.
   ora:
@@ -260,6 +270,7 @@ attributes:
   displayName: "Tavily"
   homepageUrl: "https://www.tavily.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Agent search API surfaced by Ora for knowledge search, RAG retrieval, and enterprise research workflows.
   ora:
@@ -286,6 +297,7 @@ attributes:
   displayName: "Exa"
   homepageUrl: "https://exa.ai"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Neural/web search API surfaced by Ora for knowledge search, RAG, and retrieval workflows.
   ora:
@@ -309,6 +321,7 @@ attributes:
   displayName: "Cohere"
   homepageUrl: "https://cohere.com"
   kind: ai-dev-tool
+  languageApplicability: neutral
   description: |
     AI platform surfaced by Ora for enterprise retrieval, embedding, reranking, and RAG workflows.
   ora:
@@ -332,6 +345,7 @@ attributes:
   displayName: "Perplexity"
   homepageUrl: "https://www.perplexity.ai"
   kind: ai-dev-tool
+  languageApplicability: neutral
   description: |
     AI answer/search platform surfaced by Ora for knowledge search and retrieval workflows.
   ora:

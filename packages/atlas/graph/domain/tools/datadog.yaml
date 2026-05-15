@@ -4,6 +4,7 @@ attributes:
   displayName: "Datadog"
   homepageUrl: "https://www.datadoghq.com"
   kind: observability
+  languageApplicability: neutral
   description: |
     Monitoring and analytics platform for cloud-scale infrastructure and applications.
 edges:

@@ -5,6 +5,7 @@ attributes:
   displayName: "Glean"
   homepageUrl: "https://www.glean.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Enterprise AI search platform that connects to all company tools —
     Confluence, Slack, Google Drive, GitHub, Jira, Notion, and 100+
@@ -30,6 +31,7 @@ attributes:
   displayName: "Guru"
   homepageUrl: "https://www.getguru.com"
   kind: other
+  languageApplicability: neutral
   description: |
     AI-powered knowledge management platform that organizes company
     knowledge into verified cards with ownership, expiration dates,
@@ -141,6 +143,7 @@ attributes:
   displayName: "Kapa.ai"
   homepageUrl: "https://www.kapa.ai"
   kind: other
+  languageApplicability: neutral
   description: |
     Developer documentation to AI assistant platform that turns docs,
     tutorials, API references, and community forums into an LLM-powered
@@ -166,6 +169,7 @@ attributes:
   displayName: "Dashworks"
   homepageUrl: "https://www.dashworks.ai"
   kind: other
+  languageApplicability: neutral
   description: |
     AI-powered enterprise search that unifies knowledge across SaaS
     applications — Google Workspace, Slack, Notion, Confluence, Jira,

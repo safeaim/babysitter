@@ -5,6 +5,7 @@ attributes:
   displayName: "Fastly"
   homepageUrl: "https://www.fastly.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Edge cloud platform providing CDN, WAF, DDoS protection, and edge
     compute (Compute@Edge). Offers real-time log streaming, instant
@@ -24,6 +25,7 @@ attributes:
   displayName: "Akamai"
   homepageUrl: "https://www.akamai.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Global CDN and edge security platform serving over a third of internet
     traffic. Provides web performance optimization, DDoS mitigation, WAF,

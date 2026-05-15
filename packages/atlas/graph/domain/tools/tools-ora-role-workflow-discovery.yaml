@@ -5,6 +5,7 @@ attributes:
   displayName: "Plain"
   homepageUrl: "https://www.plain.com"
   kind: other
+  languageApplicability: neutral
   description: |
     API-first customer support platform surfaced by Ora for support-ticket triage,
     customer context, and developer-facing support workflows.
@@ -34,6 +35,7 @@ attributes:
   displayName: "LiveChat"
   homepageUrl: "https://www.livechat.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Customer chat and helpdesk platform surfaced by Ora for support-ticket and live-chat workflows.
   ora:
@@ -59,6 +61,7 @@ attributes:
   displayName: "Browserbase"
   homepageUrl: "https://www.browserbase.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Cloud browser automation platform surfaced by Ora for QA, browser testing,
     scraping, and agent web-interaction workflows.
@@ -89,6 +92,7 @@ attributes:
   displayName: "Browserless"
   homepageUrl: "https://www.browserless.io"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Hosted browser automation platform surfaced by Ora for QA and web automation workflows.
   ora:
@@ -118,6 +122,7 @@ attributes:
   displayName: "Bill.com"
   homepageUrl: "https://www.bill.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Payments and billing operations platform surfaced by Ora for billing, payment, and finance workflows.
   ora:
@@ -139,6 +144,7 @@ attributes:
   displayName: "Lago"
   homepageUrl: "https://www.getlago.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Open-source metering and billing platform surfaced by Ora for usage-based billing workflows.
   ora:
@@ -160,6 +166,7 @@ attributes:
   displayName: "Adyen"
   homepageUrl: "https://www.adyen.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Global payments platform surfaced by Ora for payment integration and commerce workflows.
   ora:
@@ -181,6 +188,7 @@ attributes:
   displayName: "Checkout.com"
   homepageUrl: "https://www.checkout.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Payments platform surfaced by Ora for API integration, checkout, and billing workflows.
   ora:
@@ -202,6 +210,7 @@ attributes:
   displayName: "Cloudflare"
   homepageUrl: "https://www.cloudflare.com"
   kind: orchestrator
+  languageApplicability: neutral
   description: |
     Edge, security, developer platform, and operations suite surfaced by Ora for security incident,
     infrastructure, and alerting workflows.
@@ -229,6 +238,7 @@ attributes:
   displayName: "Optimizely"
   homepageUrl: "https://www.optimizely.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Experimentation and feature-optimization platform surfaced by Ora for product analytics,
     feature flag, and A/B testing workflows.

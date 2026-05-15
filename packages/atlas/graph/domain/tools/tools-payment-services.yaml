@@ -5,6 +5,7 @@ attributes:
   displayName: "PayPal"
   homepageUrl: "https://developer.paypal.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Global digital payments platform for online and in-person transactions.
     Provides REST APIs for payments, subscriptions, invoicing, and
@@ -30,6 +31,7 @@ attributes:
   displayName: "Square"
   homepageUrl: "https://squareup.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Payment and commerce platform for in-person, online, and mobile
     payments. Provides point-of-sale hardware, e-commerce APIs, invoicing,
@@ -55,6 +57,7 @@ attributes:
   displayName: "Paddle"
   homepageUrl: "https://www.paddle.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Merchant of record payment infrastructure for SaaS businesses.
     Handles global tax compliance, subscription billing, and payment
@@ -87,6 +90,7 @@ attributes:
   displayName: "Braintree"
   homepageUrl: "https://www.braintreepayments.com"
   kind: other
+  languageApplicability: neutral
   description: |
     PayPal-owned full-stack payment platform for accepting credit cards,
     PayPal, Venmo, and local payment methods. Provides client SDKs,

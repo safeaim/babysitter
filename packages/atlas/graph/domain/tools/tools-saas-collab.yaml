@@ -5,6 +5,7 @@ attributes:
   displayName: "Confluence"
   homepageUrl: "https://www.atlassian.com/software/confluence"
   kind: other
+  languageApplicability: neutral
   description: |
     Atlassian wiki and knowledge management platform for teams.
     Provides spaces, pages, and templates for technical documentation,
@@ -33,6 +34,7 @@ attributes:
   displayName: "Trello"
   homepageUrl: "https://trello.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Kanban-style visual project management tool by Atlassian.
     Organizes work into boards, lists, and cards with checklists,
@@ -60,6 +62,7 @@ attributes:
   displayName: "ClickUp"
   homepageUrl: "https://clickup.com"
   kind: other
+  languageApplicability: neutral
   description: |
     All-in-one project management platform combining tasks, docs,
     goals, and time tracking in a single workspace. Supports multiple
@@ -87,6 +90,7 @@ attributes:
   displayName: "Shortcut"
   homepageUrl: "https://shortcut.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Agile project management tool (formerly Clubhouse) for software teams.
     Provides stories, epics, iterations, and team-based workflows designed
@@ -106,6 +110,7 @@ attributes:
   displayName: "Basecamp"
   homepageUrl: "https://basecamp.com"
   kind: other
+  languageApplicability: neutral
   description: |
     All-in-one project management and team collaboration tool.
     Combines to-dos, message boards, docs, schedules, and group chat
@@ -127,6 +132,7 @@ attributes:
   displayName: "Asana"
   homepageUrl: "https://asana.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Work management platform for teams to track tasks, projects, and goals.
     Offers list, board, timeline, and calendar views with automation,
@@ -156,6 +162,7 @@ attributes:
   displayName: "Monday.com"
   homepageUrl: "https://monday.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Visual work management platform with highly customizable boards
     and workflows. Supports CRM, project tracking, and operational
@@ -183,6 +190,7 @@ attributes:
   displayName: "Notion"
   homepageUrl: "https://www.notion.so"
   kind: other
+  languageApplicability: neutral
   description: |
     All-in-one workspace for notes, docs, wikis, and databases.
     Combines a block-based editor with relational databases, templates,

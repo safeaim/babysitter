@@ -5,6 +5,7 @@ attributes:
   displayName: "Smithery"
   homepageUrl: "https://smithery.ai"
   kind: other
+  languageApplicability: neutral
   description: |
     MCP server registry and marketplace for discovering installable agent tools.
     Added from Ora discovery results for MCP-server and agent-tool lookup intents.
@@ -27,6 +28,7 @@ attributes:
   displayName: "Tinybird"
   homepageUrl: "https://www.tinybird.co"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Real-time analytics and data API platform surfaced by Ora for analytics and data-product intents.
   ora:
@@ -48,6 +50,7 @@ attributes:
   displayName: "Power BI"
   homepageUrl: "https://powerbi.microsoft.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Microsoft business-intelligence and dashboarding platform surfaced by Ora for analytics and observability-style dashboard intents.
   ora:
@@ -69,6 +72,7 @@ attributes:
   displayName: "DigitalOcean"
   homepageUrl: "https://www.digitalocean.com"
   kind: orchestrator
+  languageApplicability: neutral
   description: |
     Developer cloud platform surfaced by Ora for infrastructure, Kubernetes, and operations intents.
   ora:
@@ -94,6 +98,7 @@ attributes:
   displayName: "Nebius"
   homepageUrl: "https://nebius.com"
   kind: other
+  languageApplicability: neutral
   description: |
     AI infrastructure and GPU cloud platform surfaced by Ora for cloud infrastructure intents.
   ora:
@@ -119,6 +124,7 @@ attributes:
   displayName: "CoreWeave"
   homepageUrl: "https://www.coreweave.com"
   kind: other
+  languageApplicability: neutral
   description: |
     GPU cloud and AI infrastructure platform surfaced by Ora for cloud infrastructure and ML operations intents.
   ora:
@@ -144,6 +150,7 @@ attributes:
   displayName: "Wiz"
   homepageUrl: "https://www.wiz.io"
   kind: security
+  languageApplicability: neutral
   description: |
     Cloud security posture and CNAPP platform surfaced by Ora for Kubernetes and cloud-security operations intents.
   ora:
@@ -172,6 +179,7 @@ attributes:
   displayName: "DeepL"
   homepageUrl: "https://www.deepl.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Translation and localization platform surfaced by Ora for documentation and multilingual-product intents.
   ora:
@@ -197,6 +205,7 @@ attributes:
   displayName: "Adobe Creative Cloud"
   homepageUrl: "https://www.adobe.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Creative tooling suite surfaced by Ora for design-system and product-design intents.
   ora:
@@ -222,6 +231,7 @@ attributes:
   displayName: "HashiCorp"
   homepageUrl: "https://www.hashicorp.com"
   kind: iac
+  languageApplicability: neutral
   description: |
     Infrastructure automation vendor suite surfaced by Ora for Terraform, Vault, and cloud-operations intents.
   ora:
@@ -250,6 +260,7 @@ attributes:
   displayName: "GitBook"
   homepageUrl: "https://www.gitbook.com"
   kind: knowledge-platform
+  languageApplicability: neutral
   description: |
     Documentation and developer-docs platform surfaced by Ora for technical-writing and docs workflow intents.
   ora:
@@ -278,6 +289,7 @@ attributes:
   displayName: "Hex"
   homepageUrl: "https://hex.tech"
   kind: sql-tool
+  languageApplicability: neutral
   description: |
     Collaborative data notebook and data app platform surfaced by Ora for analytics and data-science intents.
   ora:
@@ -299,6 +311,7 @@ attributes:
   displayName: "Snowflake"
   homepageUrl: "https://www.snowflake.com"
   kind: sql-tool
+  languageApplicability: neutral
   description: |
     Cloud data warehouse platform surfaced by Ora for analytics, warehouse, and data-pipeline intents.
   ora:
@@ -327,6 +340,7 @@ attributes:
   displayName: "E2B"
   homepageUrl: "https://e2b.dev"
   kind: ai-dev-tool
+  languageApplicability: neutral
   description: |
     Agent sandbox and code-execution platform surfaced by Ora for code interpreter and agent sandbox intents.
   ora:

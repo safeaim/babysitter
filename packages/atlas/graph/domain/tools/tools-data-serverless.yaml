@@ -5,6 +5,7 @@ attributes:
   displayName: "Airbyte"
   homepageUrl: "https://airbyte.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Open-source data integration and ETL platform for syncing data from APIs, databases, and files.
     Provides 300+ pre-built connectors and a low-code connector builder for custom sources and destinations.
@@ -23,6 +24,7 @@ attributes:
   displayName: "Fivetran"
   homepageUrl: "https://www.fivetran.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Fully managed data pipeline service for automated data movement and transformation.
     Provides schema drift detection, automatic schema migration, and normalized data delivery to warehouses.

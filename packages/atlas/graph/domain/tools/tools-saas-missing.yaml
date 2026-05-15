@@ -5,6 +5,7 @@ attributes:
   displayName: "Slack"
   homepageUrl: "https://slack.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Team messaging and collaboration platform for real-time communication.
     Organizes conversations into channels, supports direct messages, file sharing,
@@ -26,6 +27,7 @@ attributes:
   displayName: "Discord"
   homepageUrl: "https://discord.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Communication platform combining text, voice, and video chat for communities.
     Organizes conversations into servers and channels, supports bots, roles,
@@ -47,6 +49,7 @@ attributes:
   displayName: "Figma"
   homepageUrl: "https://www.figma.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Collaborative interface design tool for building UI and UX workflows.
     Supports vector editing, component libraries, prototyping, and real-time
@@ -63,6 +66,7 @@ attributes:
   displayName: "Stripe"
   homepageUrl: "https://stripe.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Payment processing platform and developer-first financial infrastructure.
     Provides APIs for accepting payments, managing subscriptions, invoicing,
@@ -88,6 +92,7 @@ attributes:
   displayName: "Zoom"
   homepageUrl: "https://zoom.us"
   kind: other
+  languageApplicability: neutral
   description: |
     Video conferencing and online meeting platform for remote collaboration.
     Supports video calls, webinars, screen sharing, recordings,
@@ -107,6 +112,7 @@ attributes:
   displayName: "Calendly"
   homepageUrl: "https://calendly.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Scheduling automation platform for managing meeting bookings.
     Eliminates back-and-forth scheduling by sharing availability links,
@@ -133,6 +139,7 @@ attributes:
   displayName: "Snyk"
   homepageUrl: "https://snyk.io"
   kind: other
+  languageApplicability: neutral
   description: |
     Developer security platform for finding and fixing vulnerabilities.
     Scans open-source dependencies, container images, IaC configurations,
@@ -160,6 +167,7 @@ attributes:
   displayName: "SonarQube"
   homepageUrl: "https://www.sonarsource.com/products/sonarqube/"
   kind: other
+  languageApplicability: neutral
   description: |
     Static code analysis platform for continuous code quality inspection.
     Detects bugs, code smells, security vulnerabilities, and technical debt
@@ -183,6 +191,7 @@ attributes:
   displayName: "Intercom"
   homepageUrl: "https://www.intercom.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Customer messaging and engagement platform for support and sales teams.
     Combines live chat, email, and AI-powered bots to manage customer
@@ -202,6 +211,7 @@ attributes:
   displayName: "Shopify"
   homepageUrl: "https://www.shopify.com"
   kind: other
+  languageApplicability: neutral
   description: |
     E-commerce platform for building and managing online stores.
     Provides storefronts, product catalog, inventory, payments, and shipping
@@ -218,6 +228,7 @@ attributes:
   displayName: "Microsoft Outlook"
   homepageUrl: "https://www.microsoft.com/en-us/microsoft-365/outlook"
   kind: other
+  languageApplicability: neutral
   description: |
     Email client and personal information manager from Microsoft.
     Integrates email, calendar, contacts, and tasks via Microsoft 365
@@ -234,6 +245,7 @@ attributes:
   displayName: "Todoist"
   homepageUrl: "https://todoist.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Task management and to-do list application for personal productivity.
     Organizes tasks into projects with labels, priorities, due dates,
@@ -255,6 +267,7 @@ attributes:
   displayName: "Airtable"
   homepageUrl: "https://www.airtable.com"
   kind: other
+  languageApplicability: neutral
   description: |
     No-code database and spreadsheet hybrid for building custom apps.
     Combines the familiarity of spreadsheets with relational database features,
@@ -276,6 +289,7 @@ attributes:
   displayName: "Render"
   homepageUrl: "https://render.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Cloud platform for deploying web services, static sites, and databases.
     Offers automatic deploys from Git, managed PostgreSQL, Redis, and
@@ -292,6 +306,7 @@ attributes:
   displayName: "PagerDuty"
   homepageUrl: "https://www.pagerduty.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Digital operations management platform for incident response.
     Provides on-call scheduling, alert routing, escalation policies,
@@ -338,6 +353,7 @@ attributes:
   displayName: "Hugging Face"
   homepageUrl: "https://huggingface.co"
   kind: other
+  languageApplicability: neutral
   description: |
     AI model hub and platform for building machine learning applications.
     Hosts tens of thousands of pre-trained models and datasets, provides
@@ -372,6 +388,7 @@ attributes:
   displayName: "Context7"
   homepageUrl: "https://context7.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Library documentation service providing up-to-date developer documentation.
     Enables AI coding assistants to retrieve current API references and
@@ -388,6 +405,7 @@ attributes:
   displayName: "Microsoft Teams"
   homepageUrl: "https://www.microsoft.com/en-us/microsoft-teams/"
   kind: other
+  languageApplicability: neutral
   description: |
     Enterprise collaboration platform from Microsoft combining chat, meetings, and apps.
     Integrates with Microsoft 365, enabling teams to chat, video-call, share files,

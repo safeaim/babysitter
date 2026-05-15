@@ -112,6 +112,7 @@ attributes:
   displayName: "LaunchDarkly"
   homepageUrl: "https://launchdarkly.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Feature-flag and A/B testing platform with targeting rules,
     experimentation, and progressive rollouts.
@@ -206,6 +207,7 @@ attributes:
   displayName: "Databricks"
   homepageUrl: "https://www.databricks.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Unified data-and-AI platform built on Apache Spark + Delta Lake.
     Handles data lake, warehousing, ML, and notebook workflows.
@@ -233,6 +235,7 @@ attributes:
   displayName: "SendGrid"
   homepageUrl: "https://sendgrid.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Transactional and marketing email delivery service (Twilio SendGrid).
     REST API with templates, suppression lists, and event webhooks.
@@ -259,6 +262,7 @@ attributes:
   displayName: "Twilio"
   homepageUrl: "https://www.twilio.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Programmable SMS, voice, WhatsApp, and verification APIs. Global
     routing, regulatory templating, and delivery-status webhooks.
@@ -336,6 +340,7 @@ attributes:
   displayName: "DataDome"
   homepageUrl: "https://datadome.co"
   kind: other
+  languageApplicability: neutral
   description: |
     Real-time bot detection and mitigation service. Edge-deployed
     classifier with API/SDK integration for web, mobile, and APIs.

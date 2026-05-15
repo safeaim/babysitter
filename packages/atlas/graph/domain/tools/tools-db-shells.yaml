@@ -18,9 +18,12 @@ attributes:
   displayName: "MongoDB Shell (mongosh)"
   homepageUrl: "https://www.mongodb.com/docs/mongodb-shell/"
   kind: sql-tool
+  language: language:javascript
   description: |
     Modern MongoDB shell — Node.js-based REPL with full driver API,
     autocomplete, and scripting support.
 edges:
+  belongs_to_language:
+    - language:javascript
   tool_used_by:
     - target: skill-area:cli-tooling

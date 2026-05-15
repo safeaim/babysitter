@@ -5,6 +5,7 @@ attributes:
   displayName: "Fireflies.ai"
   homepageUrl: "https://fireflies.ai"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     AI meeting transcription and notes platform surfaced by Ora for team communication, education, and operational-review workflows.
   ora:
@@ -34,6 +35,7 @@ attributes:
   displayName: "Otter.ai"
   homepageUrl: "https://otter.ai"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     AI speech-to-text and meeting-summary platform surfaced by Ora for meeting notes, training, and support handoff workflows.
   ora:
@@ -63,6 +65,7 @@ attributes:
   displayName: "Nylas"
   homepageUrl: "https://www.nylas.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Email, calendar, and contacts API platform surfaced by Ora for scheduling, support, and communication automation workflows.
   ora:
@@ -92,6 +95,7 @@ attributes:
   displayName: "Loops"
   homepageUrl: "https://loops.so"
   kind: workflow-automation
+  languageApplicability: neutral
   description: |
     Email automation platform surfaced by Ora for transactional messaging, lifecycle campaigns, and product-led growth workflows.
   ora:
@@ -121,6 +125,7 @@ attributes:
   displayName: "BigCommerce"
   homepageUrl: "https://www.bigcommerce.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Commerce platform surfaced by Ora for storefront, catalog, inventory, orders, and customer-support workflows.
   ora:
@@ -150,6 +155,7 @@ attributes:
   displayName: "Medusa"
   homepageUrl: "https://medusajs.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Open-source headless commerce platform surfaced by Ora for storefront API, order, product, and inventory workflows.
   ora:
@@ -179,6 +185,7 @@ attributes:
   displayName: "Saleor"
   homepageUrl: "https://saleor.io"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     GraphQL-first headless commerce platform surfaced by Ora for storefront, catalog, checkout, and order workflows.
   ora:
@@ -208,6 +215,7 @@ attributes:
   displayName: "OneLogin"
   homepageUrl: "https://www.onelogin.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Identity and access management platform surfaced by Ora for SSO, directory, access, and compliance workflows.
   ora:
@@ -237,6 +245,7 @@ attributes:
   displayName: "JumpCloud"
   homepageUrl: "https://jumpcloud.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Directory, identity, and device-management platform surfaced by Ora for access governance and compliance workflows.
   ora:
@@ -266,6 +275,7 @@ attributes:
   displayName: "Fireworks AI"
   homepageUrl: "https://fireworks.ai"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     LLM inference and model-serving API surfaced by Ora for LLMOps, prompt evaluation, and model monitoring workflows.
   ora:
@@ -295,6 +305,7 @@ attributes:
   displayName: "Anthropic"
   homepageUrl: "https://www.anthropic.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     LLM provider surfaced by Ora for prompt engineering, agent evaluation, safety, and model governance workflows.
   ora:
@@ -324,6 +335,7 @@ attributes:
   displayName: "Mistral AI"
   homepageUrl: "https://mistral.ai"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     LLM provider surfaced by Ora for inference, prompt evaluation, and open-model workflow selection.
   ora:
@@ -353,6 +365,7 @@ attributes:
   displayName: "OpenAI"
   homepageUrl: "https://openai.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     AI platform surfaced by Ora for LLM, embeddings, image, prompt-evaluation, and agentic workflow development.
   ora:
@@ -382,6 +395,7 @@ attributes:
   displayName: "DeepSeek"
   homepageUrl: "https://www.deepseek.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     LLM provider surfaced by Ora for coding-agent, prompt-evaluation, and model-comparison workflows.
   ora:
@@ -411,6 +425,7 @@ attributes:
   displayName: "Turso"
   homepageUrl: "https://turso.tech"
   kind: sql-tool
+  languageApplicability: neutral
   description: |
     SQLite/libSQL edge database platform surfaced by Ora for database administration, query, and application data workflows.
   ora:
@@ -440,6 +455,7 @@ attributes:
   displayName: "Neon"
   homepageUrl: "https://neon.tech"
   kind: sql-tool
+  languageApplicability: neutral
   description: |
     Serverless Postgres platform surfaced by Ora for database administration, branching, migrations, and query workflows.
   ora:
@@ -469,6 +485,7 @@ attributes:
   displayName: "Redis"
   homepageUrl: "https://redis.io"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     In-memory data store surfaced by Ora for database administration, cache operations, and application reliability workflows.
   ora:
@@ -498,6 +515,7 @@ attributes:
   displayName: "Supabase"
   homepageUrl: "https://supabase.com"
   kind: sql-tool
+  languageApplicability: neutral
   description: |
     Postgres-backed app platform surfaced by Ora for database, auth, realtime, and application backend workflows.
   ora:

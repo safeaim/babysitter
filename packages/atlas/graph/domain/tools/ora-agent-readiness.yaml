@@ -4,6 +4,7 @@ attributes:
   displayName: Ora Agent Readiness
   homepageUrl: https://ora.run/docs
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Agent-readiness ranking and discovery surface used to evaluate products by agent accessibility,
     score domains, retrieve badges, discover products by intent, and gather agent feedback.

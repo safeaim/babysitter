@@ -31,6 +31,7 @@ attributes:
   displayName: "OpenRouter"
   homepageUrl: "https://openrouter.ai"
   kind: other
+  languageApplicability: neutral
   description: |
     API gateway service that routes requests to Claude, GPT-4, Llama,
     Mistral, and dozens of other models through a single OpenAI-compatible
@@ -56,6 +57,7 @@ attributes:
   displayName: "Portkey AI"
   homepageUrl: "https://portkey.ai"
   kind: other
+  languageApplicability: neutral
   description: |
     AI gateway that sits between applications and LLM providers, adding
     caching, automatic retries, fallback routing, load balancing, and
@@ -80,6 +82,7 @@ attributes:
   displayName: "Helicone"
   homepageUrl: "https://www.helicone.ai"
   kind: other
+  languageApplicability: neutral
   description: |
     LLM observability and proxy platform that captures requests, latency,
     cost, and token usage across OpenAI, Anthropic, and other providers.
@@ -104,6 +107,7 @@ attributes:
   displayName: "Braintrust Proxy"
   homepageUrl: "https://www.braintrust.dev"
   kind: other
+  languageApplicability: neutral
   description: |
     AI proxy from the Braintrust evaluation platform that adds logging,
     caching, and access control to LLM API calls. Captured requests feed

@@ -5,6 +5,7 @@ attributes:
   displayName: "Rippling"
   homepageUrl: "https://www.rippling.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     HR, payroll, IT, and employee lifecycle platform surfaced by Ora for recruiting, onboarding, access, and HR operations workflows.
   ora:
@@ -34,6 +35,7 @@ attributes:
   displayName: "Gusto"
   homepageUrl: "https://gusto.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Payroll, benefits, HR, and hiring platform surfaced by Ora for employee lifecycle and finance operations workflows.
   ora:
@@ -63,6 +65,7 @@ attributes:
   displayName: "Ghost"
   homepageUrl: "https://ghost.org"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Publishing, newsletter, and headless CMS platform surfaced by Ora for documentation, knowledge base, and content operations workflows.
   ora:
@@ -92,6 +95,7 @@ attributes:
   displayName: "Contentstack"
   homepageUrl: "https://www.contentstack.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Enterprise headless CMS surfaced by Ora for developer portals, knowledge bases, content APIs, and digital experience workflows.
   ora:
@@ -121,6 +125,7 @@ attributes:
   displayName: "Coda"
   homepageUrl: "https://coda.io"
   kind: workflow-automation
+  languageApplicability: neutral
   description: |
     Collaborative docs, tables, and automation workspace surfaced by Ora for docs, knowledge base, and lightweight operational workflow projections.
   ora:
@@ -150,6 +155,7 @@ attributes:
   displayName: "Chargebee"
   homepageUrl: "https://www.chargebee.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Subscription billing and revenue platform surfaced by Ora for invoicing, subscription, revenue, and billing-support workflows.
   ora:
@@ -179,6 +185,7 @@ attributes:
   displayName: "Lemon Squeezy"
   homepageUrl: "https://www.lemonsqueezy.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Merchant-of-record payments and subscriptions platform surfaced by Ora for digital-product billing and subscription workflows.
   ora:
@@ -208,6 +215,7 @@ attributes:
   displayName: "RevenueCat"
   homepageUrl: "https://www.revenuecat.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Subscription and in-app purchase platform surfaced by Ora for mobile billing, entitlement, and revenue workflows.
   ora:
@@ -237,6 +245,7 @@ attributes:
   displayName: "Mollie"
   homepageUrl: "https://www.mollie.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     European payments and checkout platform surfaced by Ora for payment processing, billing, and support workflows.
   ora:

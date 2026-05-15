@@ -4,6 +4,7 @@ attributes:
   displayName: "Postman"
   homepageUrl: "https://www.postman.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Collaboration platform for API development - request building, collections, and tests.
 edges:

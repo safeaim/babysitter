@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,6 +11,20 @@ const repoRoot = path.resolve(packageRoot, '..', '..');
 const indexPath = path.join(packageRoot, 'src', 'index.json');
 const crdDir = path.join(repoRoot, 'packages', 'krate', 'charts', 'crds');
 const krateWebApiDir = path.join(repoRoot, 'packages', 'krate', 'web', 'app', 'api');
+
+const failures = [];
+const details = {};
+
+const VALID_MODES = new Set(['current-source', 'committed-baseline', 'audit']);
+const options = parseOptions(process.argv.slice(2));
+const sourceMode = options.mode === 'committed-baseline' ? 'committed' : 'current';
+const auditWarnings = [];
+const dirtySourcePathCache = new Map();
+
+const SOURCE_AREAS = {
+  crds: ['packages/krate/charts/crds'],
+  krateWebApi: ['packages/krate/web/app/api'],
+};
 
 const EXPECTED_FAMILY_COUNTS = {
   agent: 22,
@@ -74,11 +89,91 @@ const KRATE_TYPED_EDGE_KINDS = new Set([
   'supports_orchestration_primitive',
 ]);
 
-const failures = [];
-const details = {};
-
 function fail(message, detail) {
   failures.push(detail ? `${message}: ${detail}` : message);
+}
+
+function parseOptions(args) {
+  const parsed = { mode: 'current-source' };
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === '--help' || arg === '-h') {
+      console.log('Usage: node scripts/validate-krate-graph.mjs [--mode=current-source|committed-baseline|audit]');
+      process.exit(0);
+    }
+    if (arg === '--audit') {
+      parsed.mode = 'audit';
+      continue;
+    }
+    if (arg === '--committed-baseline') {
+      parsed.mode = 'committed-baseline';
+      continue;
+    }
+    if (arg === '--current-source') {
+      parsed.mode = 'current-source';
+      continue;
+    }
+    if (arg === '--mode') {
+      parsed.mode = args[index + 1];
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith('--mode=')) {
+      parsed.mode = arg.slice('--mode='.length);
+      continue;
+    }
+    fail('unknown argument', arg);
+  }
+
+  if (!VALID_MODES.has(parsed.mode)) {
+    fail('invalid mode', `expected one of ${[...VALID_MODES].join(', ')} actual=${parsed.mode}`);
+    parsed.mode = 'current-source';
+  }
+
+  return parsed;
+}
+
+function git(args) {
+  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8' });
+}
+
+function toRepoRelative(file) {
+  return path.relative(repoRoot, file).replace(/\\/g, '/');
+}
+
+function getDirtySourcePaths(area) {
+  if (dirtySourcePathCache.has(area)) return dirtySourcePathCache.get(area);
+  const sourcePaths = SOURCE_AREAS[area] ?? [];
+  if (!sourcePaths.length) return [];
+  const output = git(['status', '--porcelain', '--', ...sourcePaths]);
+  const paths = output
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter(Boolean)
+    .map((line) => line.slice(3).replace(/^[^ ]+ -> /, ''));
+  dirtySourcePathCache.set(area, paths);
+  return paths;
+}
+
+function sourceFail(message, detail, area) {
+  const dirtySourcePaths = getDirtySourcePaths(area);
+  if (options.mode === 'audit') {
+    auditWarnings.push({
+      message,
+      detail,
+      sourceArea: area,
+      dirtySourcePaths: dirtySourcePaths.slice(0, 20),
+    });
+    return;
+  }
+  fail(message, detail);
+}
+
+function assertSourceEqual(name, actual, expected, area) {
+  details[name] = actual;
+  if (actual !== expected) {
+    sourceFail(`${name} mismatch`, `expected=${expected} actual=${actual}`, area);
+  }
 }
 
 function readJson(file) {
@@ -118,18 +213,58 @@ function assertFamilyCounts(actual) {
   }
 }
 
+function loadYamlDocumentsFromText(text) {
+  return YAML.parseAllDocuments(text).map((document) => document.toJSON()).filter(Boolean);
+}
+
 function loadYamlDocuments(file) {
-  return YAML.parseAllDocuments(fs.readFileSync(file, 'utf8')).map((document) => document.toJSON()).filter(Boolean);
+  return loadYamlDocumentsFromText(fs.readFileSync(file, 'utf8'));
+}
+
+function getSourceFiles(rootDir, predicate) {
+  if (sourceMode === 'committed') {
+    const relativeRoot = toRepoRelative(rootDir);
+    return git(['ls-tree', '-r', '--name-only', 'HEAD', '--', relativeRoot])
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .filter((relative) => predicate(relative))
+      .sort()
+      .map((relative) => ({
+        name: path.basename(relative),
+        relative,
+        read: () => git(['show', `HEAD:${relative}`]),
+      }));
+  }
+
+  const files = [];
+  function visit(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const absolute = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        visit(absolute);
+        continue;
+      }
+      const relative = toRepoRelative(absolute);
+      if (!predicate(relative)) continue;
+      files.push({
+        name: entry.name,
+        relative,
+        read: () => fs.readFileSync(absolute, 'utf8'),
+      });
+    }
+  }
+  visit(rootDir);
+  return files.sort((a, b) => a.relative.localeCompare(b.relative));
 }
 
 function getSourceCrdKinds() {
   const kinds = [];
-  for (const file of fs.readdirSync(crdDir).filter((name) => name.endsWith('.yaml')).sort()) {
-    const docs = loadYamlDocuments(path.join(crdDir, file));
+  for (const file of getSourceFiles(crdDir, (relative) => relative.endsWith('.yaml'))) {
+    const docs = loadYamlDocumentsFromText(file.read());
     for (const doc of docs) {
       if (doc?.kind !== 'CustomResourceDefinition') continue;
       kinds.push({
-        file,
+        file: file.name,
         kind: doc.spec?.names?.kind,
         group: doc.spec?.group,
         plural: doc.spec?.names?.plural,
@@ -143,27 +278,16 @@ function getSourceCrdKinds() {
 
 function getSourceKrateWebApiEndpoints() {
   const endpoints = [];
-  function visit(dir) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const absolute = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        visit(absolute);
-        continue;
-      }
-      if (entry.name !== 'route.js') continue;
-      const relative = path.relative(repoRoot, absolute).replace(/\\/g, '/');
-      const source = fs.readFileSync(absolute, 'utf8');
-      const routeDir = path.dirname(relative).replace(/\\/g, '/').split('/app/api/')[1];
-      const route = ('/api/' + routeDir)
-        .replace(/\[\[\.\.\.([^\]]+)\]\]/g, ':$1*?')
-        .replace(/\[\.\.\.([^\]]+)\]/g, ':$1*')
-        .replace(/\[([^\]]+)\]/g, ':$1');
-      for (const match of source.matchAll(/export\s+async\s+function\s+(GET|POST|PUT|DELETE|PATCH)\b/g)) {
-        endpoints.push({ file: relative, method: match[1], path: route });
-      }
+  for (const file of getSourceFiles(krateWebApiDir, (relative) => relative.endsWith('/route.js'))) {
+    const routeDir = path.dirname(file.relative).split('/app/api/')[1];
+    const route = ('/api/' + routeDir)
+      .replace(/\[\[\.\.\.([^\]]+)\]\]/g, ':$1*?')
+      .replace(/\[\.\.\.([^\]]+)\]/g, ':$1*')
+      .replace(/\[([^\]]+)\]/g, ':$1');
+    for (const match of file.read().matchAll(/export\s+async\s+function\s+(GET|POST|PUT|DELETE|PATCH)\b/g)) {
+      endpoints.push({ file: file.relative, method: match[1], path: route });
     }
   }
-  visit(krateWebApiDir);
   return endpoints.sort((a, b) => (a.method + ' ' + a.path).localeCompare(b.method + ' ' + b.path));
 }
 function kebab(value) {
@@ -183,7 +307,7 @@ arrayFromObjectMap(index.nodeKinds, 'index.nodeKinds');
 arrayFromObjectMap(index.edgeKinds, 'index.edgeKinds');
 
 const sourceCrds = getSourceCrdKinds();
-assertEqual('sourceCrdDocuments', sourceCrds.length, EXPECTED_COUNTS.crdRecords);
+assertSourceEqual('sourceCrdDocuments', sourceCrds.length, EXPECTED_COUNTS.crdRecords, 'crds');
 
 const crdIds = Object.keys(records).filter((id) => id.startsWith('kubernetes-crd-kind:krate-')).sort();
 assertEqual('crdRecords', crdIds.length, EXPECTED_COUNTS.crdRecords);
@@ -202,7 +326,7 @@ for (const source of sourceCrds) {
   if (record.scope !== source.scope) fail(`scope mismatch for ${id}`, `expected=${source.scope} actual=${record.scope}`);
   if (record.storageVersion !== source.storageVersion) fail(`storageVersion mismatch for ${id}`, `expected=${source.storageVersion} actual=${record.storageVersion}`);
 }
-if (missingSourceKinds.length) fail('missing CRD records for source CRDs', missingSourceKinds.join(', '));
+if (missingSourceKinds.length) sourceFail('missing CRD records for source CRDs', missingSourceKinds.join(', '), 'crds');
 
 details.missingSourceKinds = missingSourceKinds.length;
 
@@ -251,7 +375,7 @@ assertEqual(
 );
 
 const sourceKrateWebApiEndpoints = getSourceKrateWebApiEndpoints();
-assertEqual('sourceKrateWebApiEndpoints', sourceKrateWebApiEndpoints.length, EXPECTED_COUNTS.krateWebApiEndpoints);
+assertSourceEqual('sourceKrateWebApiEndpoints', sourceKrateWebApiEndpoints.length, EXPECTED_COUNTS.krateWebApiEndpoints, 'krateWebApi');
 const krateWebApiEndpointRecords = Object.entries(records)
   .filter(([id, record]) => id.startsWith('api-endpoint:krate-web-') && record._kind === 'APIEndpoint')
   .map(([id, record]) => ({ id, ...record }));
@@ -260,7 +384,7 @@ const endpointKeys = new Set(krateWebApiEndpointRecords.map((record) => record.m
 const missingKrateWebApiEndpoints = sourceKrateWebApiEndpoints
   .filter((endpoint) => !endpointKeys.has(endpoint.method + ' ' + endpoint.path));
 if (missingKrateWebApiEndpoints.length) {
-  fail('missing Krate web APIEndpoint records for source routes', JSON.stringify(missingKrateWebApiEndpoints.slice(0, 10)));
+  sourceFail('missing Krate web APIEndpoint records for source routes', JSON.stringify(missingKrateWebApiEndpoints.slice(0, 10)), 'krateWebApi');
 }
 const krateWebEndpointEdges = edges.filter((edge) => edge.kind === 'exposed_by'
   && String(edge.from).startsWith('api-endpoint:krate-web-')
@@ -305,12 +429,15 @@ if (scopedDuplicates.length) details.scopedDuplicateSamples = scopedDuplicates.s
 
 if (failures.length) {
   console.error('[atlas:validate:krate-graph] failed');
-  console.error(JSON.stringify({ failures, details }, null, 2));
+  console.error(JSON.stringify({ mode: options.mode, sourceMode, failures, auditWarnings, details }, null, 2));
   process.exit(1);
 }
 
 console.log('[atlas:validate:krate-graph] passed');
 console.log(JSON.stringify({
+  mode: options.mode,
+  sourceMode,
+  auditWarnings,
   crdRecords: crdIds.length,
   familyCounts,
   controllers: controllerIds.length,

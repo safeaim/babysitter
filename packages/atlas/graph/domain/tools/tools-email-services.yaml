@@ -5,6 +5,7 @@ attributes:
   displayName: "Mailgun"
   homepageUrl: "https://www.mailgun.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Email API service for sending, receiving, and tracking transactional
     and marketing email. Provides SMTP relay, REST API, webhooks, and
@@ -32,6 +33,7 @@ attributes:
   displayName: "Postmark"
   homepageUrl: "https://postmarkapp.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Transactional email delivery service focused on speed and inbox
     placement. Provides email templates, message streams for marketing
@@ -88,6 +90,7 @@ attributes:
   displayName: "Amazon SES"
   homepageUrl: "https://aws.amazon.com/ses/"
   kind: other
+  languageApplicability: neutral
   description: |
     AWS Simple Email Service for sending transactional, marketing, and
     notification emails at scale. Integrates with other AWS services and
@@ -115,6 +118,7 @@ attributes:
   displayName: "SparkPost"
   homepageUrl: "https://www.sparkpost.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Email delivery service with advanced analytics and predictive inbox
     placement. Provides REST API, SMTP relay, engagement tracking, and

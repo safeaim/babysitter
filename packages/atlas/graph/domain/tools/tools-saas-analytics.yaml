@@ -5,6 +5,7 @@ attributes:
   displayName: "Segment"
   homepageUrl: "https://segment.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Customer data platform (CDP) for collecting, unifying, and routing
     user event data. Provides a single API to capture behavioral data
@@ -31,6 +32,7 @@ attributes:
   displayName: "Mixpanel"
   homepageUrl: "https://mixpanel.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Product analytics platform for tracking user interactions and funnels.
     Enables event-based analysis, cohort segmentation, A/B test measurement,
@@ -64,6 +66,7 @@ attributes:
   displayName: "Amplitude"
   homepageUrl: "https://amplitude.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Digital analytics platform focused on product and behavioral analytics.
     Provides pathfinder analysis, funnel charts, retention curves, and
@@ -97,6 +100,7 @@ attributes:
   displayName: "PostHog"
   homepageUrl: "https://posthog.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Open-source product analytics suite with event capture, funnels,
     session recordings, feature flags, and A/B testing. Self-hostable
@@ -123,6 +127,7 @@ attributes:
   displayName: "Heap"
   homepageUrl: "https://www.heap.io"
   kind: other
+  languageApplicability: neutral
   description: |
     Automatic event-capture analytics platform that retroactively records
     all user interactions. Eliminates manual instrumentation by capturing
@@ -156,6 +161,7 @@ attributes:
   displayName: "Google Analytics"
   homepageUrl: "https://analytics.google.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Google's web and app analytics service for tracking traffic, user
     behavior, and conversions. GA4 uses an event-based model with
@@ -178,6 +184,7 @@ attributes:
   displayName: "Hotjar"
   homepageUrl: "https://www.hotjar.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Behavioral analytics and user feedback platform providing heatmaps,
     session recordings, and on-site surveys. Complements quantitative
@@ -200,6 +207,7 @@ attributes:
   displayName: "FullStory"
   homepageUrl: "https://www.fullstory.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Digital experience intelligence platform with session replay, funnel
     analysis, and frustration signal detection. Automatically indexes all

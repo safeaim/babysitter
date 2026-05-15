@@ -5,6 +5,7 @@ attributes:
   displayName: "Flagsmith"
   homepageUrl: "https://www.flagsmith.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Open-source feature flag and remote configuration service. Self-hostable
     or managed cloud, supporting boolean flags, multivariate flags, and
@@ -28,6 +29,7 @@ attributes:
   displayName: "Unleash"
   homepageUrl: "https://www.getunleash.io"
   kind: other
+  languageApplicability: neutral
   description: |
     Open-source feature toggle framework with enterprise edition.
     Provides client SDKs, activation strategies (gradual rollout, user
@@ -51,6 +53,7 @@ attributes:
   displayName: "Split.io"
   homepageUrl: "https://www.split.io"
   kind: other
+  languageApplicability: neutral
   description: |
     Feature delivery platform combining feature flags with attribution
     analytics. Supports safe deployments, experiments, and monitoring

@@ -4,6 +4,7 @@ attributes:
   displayName: "Honeycomb"
   homepageUrl: "https://www.honeycomb.io"
   kind: observability
+  languageApplicability: neutral
   description: |
     Observability platform for high-cardinality, wide-event analytics on production systems.
 edges:

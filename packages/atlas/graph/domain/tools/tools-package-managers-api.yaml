@@ -83,6 +83,7 @@ attributes:
   displayName: "winget"
   homepageUrl: "https://github.com/microsoft/winget-cli"
   kind: package-manager
+  languageApplicability: neutral
   description: |
     Microsoft's official Windows Package Manager CLI, built into Windows 10/11 and backed
     by the Windows Package Manager Community Repository with thousands of verified packages.
@@ -130,6 +131,7 @@ attributes:
   displayName: "apt"
   homepageUrl: "https://wiki.debian.org/Apt"
   kind: package-manager
+  languageApplicability: neutral
   description: |
     Advanced Package Tool — the primary package manager for Debian-based Linux distributions
     including Ubuntu, handling dependency resolution, installs, upgrades, and removals.
@@ -239,6 +241,7 @@ attributes:
   displayName: "RapidAPI"
   homepageUrl: "https://rapidapi.com"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     World's largest API hub and marketplace where developers discover, test, and connect
     to thousands of public and private APIs through a unified interface.
@@ -262,6 +265,7 @@ attributes:
   displayName: "Swagger Editor"
   homepageUrl: "https://swagger.io/tools/swagger-editor/"
   kind: api-tool
+  languageApplicability: neutral
   description: |
     Browser-based and desktop editor for designing, writing, and validating OpenAPI
     (Swagger) and AsyncAPI specifications with live preview and instant validation feedback.

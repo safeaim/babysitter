@@ -6,6 +6,7 @@ attributes:
   displayName: "Terraform Cloud"
   homepageUrl: "https://app.terraform.io"
   kind: iac
+  languageApplicability: neutral
   description: |
     HashiCorp's managed service for Terraform — provides remote state storage,
     collaborative plan/apply runs, policy enforcement via Sentinel, and an
@@ -28,6 +29,7 @@ attributes:
   displayName: "Pulumi Cloud"
   homepageUrl: "https://www.pulumi.com/product/pulumi-cloud/"
   kind: iac
+  languageApplicability: neutral
   description: |
     Pulumi's SaaS control plane for infrastructure-as-code — hosts stack state,
     provides secrets management, policy enforcement, drift detection, and
@@ -104,6 +106,7 @@ attributes:
   displayName: "Port"
   homepageUrl: "https://www.getport.io"
   kind: orchestrator
+  languageApplicability: neutral
   description: |
     Developer portal and internal developer platform (IDP) — provides a software
     catalog, self-service actions, scorecards, and workflow automation to give

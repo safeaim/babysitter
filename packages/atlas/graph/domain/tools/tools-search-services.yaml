@@ -5,6 +5,7 @@ attributes:
   displayName: "Algolia"
   homepageUrl: "https://www.algolia.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Hosted search and discovery API for building fast, relevant search
     experiences. Provides typo tolerance, faceting, geo-search, and
@@ -28,6 +29,7 @@ attributes:
   displayName: "Typesense"
   homepageUrl: "https://typesense.org"
   kind: other
+  languageApplicability: neutral
   description: |
     Open-source, typo-tolerant search engine built for speed and simplicity.
     Designed as a self-hostable Algolia alternative with vector search,
@@ -51,6 +53,7 @@ attributes:
   displayName: "OpenSearch"
   homepageUrl: "https://opensearch.org"
   kind: other
+  languageApplicability: neutral
   description: |
     Apache-licensed fork of Elasticsearch and Kibana maintained by AWS.
     Provides full-text search, vector search, log analytics, and

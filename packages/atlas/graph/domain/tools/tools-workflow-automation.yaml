@@ -52,6 +52,7 @@ attributes:
   displayName: "Zapier"
   homepageUrl: "https://zapier.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Cloud-based workflow automation platform connecting 7,000+ apps
     via triggers and actions ("Zaps"). No-code interface for building
@@ -84,6 +85,7 @@ attributes:
   displayName: "Make (Integromat)"
   homepageUrl: "https://www.make.com"
   kind: other
+  languageApplicability: neutral
   description: |
     Visual workflow automation platform (formerly Integromat) with a
     drag-and-drop scenario builder. Connects 1,500+ apps with advanced

@@ -4,6 +4,7 @@ attributes:
   displayName: "Prometheus"
   homepageUrl: "https://prometheus.io"
   kind: observability
+  languageApplicability: neutral
   description: |
     Open-source systems monitoring and alerting toolkit with a multi-dimensional time-series model.
 edges:

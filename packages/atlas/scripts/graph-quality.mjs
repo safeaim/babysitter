@@ -49,6 +49,8 @@ const fwWithSkill = new Set(edges.filter(e => e.from.startsWith('framework:') &&
 const fwCoverage = pct(fwWithSkill.size, fws.length);
 
 const tsList = byKind('ToolServer');
+const candidateToolServers = tsList.filter(t => t.candidateStatus === 'needs-source-verification');
+const verifiedToolServers = tsList.filter(t => t.candidateStatus !== 'needs-source-verification');
 const tsWithInt = new Set(edges.filter(e => e.kind === 'integrates_with' && e.from.startsWith('tool-server:')).map(e => e.from));
 const tsCoverage = pct(tsWithInt.size, tsList.length);
 
@@ -122,12 +124,18 @@ const productClaimCoverage = pct(productsWithClaims.length, products.length);
 // SECTION 4: Association Completeness
 // ═══════════════════════════════════════════
 
-// Tools/Frameworks/Libraries with belongs_to_language
+// Tools/Frameworks/Libraries with belongs_to_language.
+// Language-neutral Tool records are SaaS/API/service products where forcing a
+// programming-language edge would be misleading. They are tracked separately so
+// remaining Tool→language gaps stay actionable.
 const langEdge = (prefix) => new Set(edges.filter(e => e.from.startsWith(prefix) && e.kind === 'belongs_to_language').map(e => e.from));
 const toolsWithLang = langEdge('tool:');
+const languageNeutralTools = tools.filter(t => t.languageApplicability === 'neutral');
+const languageApplicableTools = tools.filter(t => t.languageApplicability !== 'neutral');
+const languageApplicableToolsWithLang = languageApplicableTools.filter(t => toolsWithLang.has(t.id));
 const fwsWithLang = langEdge('framework:');
 const libsWithLang = langEdge('library:');
-const toolLangCoverage = pct(toolsWithLang.size, tools.length);
+const toolLangCoverage = pct(languageApplicableToolsWithLang.length, languageApplicableTools.length);
 const fwLangCoverage = pct(fwsWithLang.size, fws.length);
 const libLangCoverage = pct(libsWithLang.size, libs.length);
 
@@ -151,9 +159,11 @@ const topics = byKind('Topic');
 const topicsWithParent = new Set(edges.filter(e => (e.kind === 'belongs_to_domain' || e.kind === 'contains') && topics.some(t => t.id === e.to || t.id === e.from)).flatMap(e => [e.from, e.to]).filter(id => topics.some(t => t.id === id)));
 const topicParentCoverage = pct(topicsWithParent.size, topics.length);
 
-// ToolServers with repoUrl or installCommand
-const tsWithRepo = tsList.filter(t => t.repoUrl || t.installCommand || t.npmPackage);
-const tsRepoCoverage = pct(tsWithRepo.length, tsList.length);
+// Verified ToolServers with repoUrl, installCommand, or npmPackage.
+// Candidate records intentionally track source-verification gaps and should not
+// incentivize fabricated repository/install metadata.
+const tsWithRepo = verifiedToolServers.filter(t => t.repoUrl || t.installCommand || t.npmPackage);
+const tsRepoCoverage = pct(tsWithRepo.length, verifiedToolServers.length);
 
 // ═══════════════════════════════════════════
 // SECTION 6: Agent Stack Completeness
@@ -204,7 +214,9 @@ const providers = byKind('Provider');
 const mvWithFamily = new Set(edges.filter(e => e.kind === 'belongs_to_family').map(e => e.from));
 const mvFamilyCoverage = pct(mvWithFamily.size, modelVersions.length);
 
-const mvWithProvider = new Set(edges.filter(e => (e.kind === 'provided_by' || e.kind === 'serves') && modelVersions.some(m => m.id === e.from || m.id === e.to)).flatMap(e => [e.from, e.to]).filter(id => modelVersions.some(m => m.id === id)));
+const modelProviderEdgeKinds = new Set(['provided_by', 'serves', 'served_by']);
+const modelVersionIds = new Set(modelVersions.map(m => m.id));
+const mvWithProvider = new Set(edges.filter(e => modelProviderEdgeKinds.has(e.kind) && (modelVersionIds.has(e.from) || modelVersionIds.has(e.to))).flatMap(e => [e.from, e.to]).filter(id => modelVersionIds.has(id)));
 const mvProviderCoverage = pct(mvWithProvider.size, modelVersions.length);
 
 const transportClients = byKind('TransportClient');
@@ -439,7 +451,7 @@ console.log(line('DisplayName coverage:', displayNameCoverage + '%'));
 console.log(line('Product descriptions:', productDescCoverage + '%'));
 console.log(line('Tool URLs:', toolUrlCoverage + '%'));
 console.log(line('Framework URLs:', fwUrlCoverage + '%'));
-console.log(line('ToolServer repo/install:', tsRepoCoverage + '%'));
+console.log(line('Verified TS repo/install:', tsRepoCoverage + '%'));
 
 console.log(header('CLAIMS & EVIDENCE'));
 console.log(line('Claims total:', claims.length));
@@ -452,6 +464,7 @@ console.log(line('Products with claims:', productClaimCoverage + '%'));
 
 console.log(header('ASSOCIATION COMPLETENESS'));
 console.log(line('Tool→language:', toolLangCoverage + '%'));
+console.log(line('Language-neutral tools:', languageNeutralTools.length));
 console.log(line('Framework→language:', fwLangCoverage + '%'));
 console.log(line('Library→language:', libLangCoverage + '%'));
 console.log(line('Role→responsibility:', roleRespCoverage + '%'));
@@ -555,11 +568,17 @@ if (verbose) {
     if (noTestClaims.length > 10) console.log(`  ... and ${noTestClaims.length - 10} more`);
   }
 
-  const noLangTools = tools.filter(r => !toolsWithLang.has(r.id));
+  const noLangTools = languageApplicableTools.filter(r => !toolsWithLang.has(r.id));
   if (noLangTools.length > 0) {
-    console.log(`\nTools without language (${noLangTools.length}):`);
+    console.log(`\nLanguage-applicable tools without language (${noLangTools.length}):`);
     for (const t of noLangTools.slice(0, 10)) console.log(`  ${t.id}`);
     if (noLangTools.length > 10) console.log(`  ... and ${noLangTools.length - 10} more`);
+  }
+
+  if (languageNeutralTools.length > 0) {
+    console.log(`\nLanguage-neutral tools excluded from Tool→language denominator (${languageNeutralTools.length}):`);
+    for (const t of languageNeutralTools.slice(0, 10)) console.log(`  ${t.id}`);
+    if (languageNeutralTools.length > 10) console.log(`  ... and ${languageNeutralTools.length - 10} more`);
   }
 
   const noCapsVersions = agentVersions.filter(v => !versionsWithCaps.has(v.id));
@@ -621,6 +640,19 @@ if (verbose) {
       console.log(`  "${name}": ${entries.map(e => e.kind + ':' + e.id).join(', ')}`);
     }
     if (crossKindDupes.length > 10) console.log(`  ... and ${crossKindDupes.length - 10} more`);
+  }
+
+  const verifiedTsNoRepo = verifiedToolServers.filter(t => !t.repoUrl && !t.installCommand && !t.npmPackage);
+  if (verifiedTsNoRepo.length > 0) {
+    console.log(`\nVerified ToolServers without repo/install metadata (${verifiedTsNoRepo.length}):`);
+    for (const t of verifiedTsNoRepo.slice(0, 10)) console.log(`  ${t.id}`);
+    if (verifiedTsNoRepo.length > 10) console.log(`  ... and ${verifiedTsNoRepo.length - 10} more`);
+  }
+
+  if (candidateToolServers.length > 0) {
+    console.log(`\nToolServer candidates pending source verification (${candidateToolServers.length}):`);
+    for (const t of candidateToolServers.slice(0, 10)) console.log(`  ${t.id}`);
+    if (candidateToolServers.length > 10) console.log(`  ... and ${candidateToolServers.length - 10} more`);
   }
 
   const tsNoCategory = tsList.filter(t => !t.category);

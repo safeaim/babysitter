@@ -129,11 +129,22 @@ export function createOpenAICompletionEngine(options: {
 
       const data = await response.json() as {
         id: string;
-        choices: Array<{ message: { content: string }; finish_reason: string }>;
+        choices: Array<{
+          message: {
+            content: string | null;
+            tool_calls?: Array<{ id: string; type: string; function: { name: string; arguments: string } }>;
+          };
+          finish_reason: string;
+        }>;
         usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
       };
 
       const choice = data.choices[0];
+      const toolCalls = choice?.message?.tool_calls?.map(tc => ({
+        id: tc.id,
+        name: tc.function.name,
+        arguments: tc.function.arguments,
+      }));
       return {
         id: data.id,
         model: options.targetModel,
@@ -145,6 +156,7 @@ export function createOpenAICompletionEngine(options: {
           completionTokens: data.usage?.completion_tokens ?? 0,
           totalTokens: data.usage?.total_tokens ?? 0,
         },
+        toolCalls: toolCalls && toolCalls.length > 0 ? toolCalls : undefined,
       };
     },
 

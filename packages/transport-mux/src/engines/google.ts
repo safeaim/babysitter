@@ -65,11 +65,31 @@ function googleHeaders(): Record<string, string> {
   return { 'Content-Type': 'application/json' };
 }
 
-function extractGoogleText(data: { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }> }): string {
+type GooglePart = { text?: string; functionCall?: { name: string; args: Record<string, unknown> } };
+type GoogleCandidate = { content?: { parts?: GooglePart[] }; finishReason?: string };
+type GoogleResponseData = { candidates?: GoogleCandidate[]; usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number } };
+
+function extractGoogleText(data: GoogleResponseData): string {
   return data.candidates
     ?.flatMap((candidate) => candidate.content?.parts?.map((part) => part.text ?? '') ?? [])
     .filter(Boolean)
     .join('') ?? '';
+}
+
+function extractGoogleToolCalls(data: GoogleResponseData): Array<{ id: string; name: string; arguments: string }> | undefined {
+  const calls: Array<{ id: string; name: string; arguments: string }> = [];
+  for (const candidate of data.candidates ?? []) {
+    for (const part of candidate.content?.parts ?? []) {
+      if (part.functionCall) {
+        calls.push({
+          id: `call_${Date.now()}_${calls.length}`,
+          name: part.functionCall.name,
+          arguments: JSON.stringify(part.functionCall.args ?? {}),
+        });
+      }
+    }
+  }
+  return calls.length > 0 ? calls : undefined;
 }
 
 function googleUsage(data: { usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number } }) {
@@ -80,17 +100,15 @@ function googleUsage(data: { usageMetadata?: { promptTokenCount?: number; candid
   };
 }
 
-function parseGoogleStreamPayload(payload: string): { text?: string; finishReason?: string; usage?: CompletionResult['usage'] } | null {
+function parseGoogleStreamPayload(payload: string): { text?: string; finishReason?: string; usage?: CompletionResult['usage']; toolCalls?: CompletionResult['toolCalls'] } | null {
   if (!payload || payload === '[DONE]') return null;
   try {
-    const data = JSON.parse(payload) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
-      usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number };
-    };
+    const data = JSON.parse(payload) as GoogleResponseData;
     return {
       text: extractGoogleText(data),
       finishReason: data.candidates?.find((candidate) => candidate.finishReason)?.finishReason?.toLowerCase(),
       usage: data.usageMetadata ? googleUsage(data) : undefined,
+      toolCalls: extractGoogleToolCalls(data),
     };
   } catch {
     return null;
@@ -144,10 +162,8 @@ export function createGoogleCompletionEngine(options: GoogleCompletionEngineOpti
         throw new Error(`Google API error ${response.status}: ${errorText}`);
       }
 
-      const data = await response.json() as {
-        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
-        usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number };
-      };
+      const data = await response.json() as GoogleResponseData;
+      const toolCalls = extractGoogleToolCalls(data);
 
       return {
         id: `google_${Date.now()}`,
@@ -156,6 +172,7 @@ export function createGoogleCompletionEngine(options: GoogleCompletionEngineOpti
         text: extractGoogleText(data),
         finishReason: data.candidates?.find((candidate) => candidate.finishReason)?.finishReason?.toLowerCase() ?? 'stop',
         usage: googleUsage(data),
+        toolCalls,
       };
     },
 

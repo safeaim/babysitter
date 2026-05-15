@@ -640,12 +640,6 @@ async function validateAgentBehavior(
   }
 
   // --- file-creation: verify the output file exists with real content (>500 bytes) ---
-  // In plain NI or bridged-hooks mode, Claude Code runs with -p (text-only, no tool use),
-  // so it cannot create files. Check output quality instead.
-  const hasBridge = process.env['LIVE_STACK_BRIDGE_INTERACTIVE'] === 'true';
-  const isInteractive = process.env['LIVE_STACK_INTERACTIVE'] === 'true';
-  const hasToolUse = isInteractive || hasBridge || scenario.agent.agentMuxAgent === 'codex';
-
   if (traceId) {
     const expectedFile = path.join(cwd, '.a5c-live-test', `${traceId}-odyssey.md`);
     let fileSize = 0;
@@ -661,12 +655,6 @@ async function validateAgentBehavior(
       entries.push({ name: 'file-creation', status: 'passed', detail: `odyssey file created (${fileSize} bytes)` });
     } else if (fileExists) {
       entries.push({ name: 'file-creation', status: 'failed', detail: `odyssey file exists but too small (${fileSize} bytes — expected >500)` });
-    } else if (!hasToolUse) {
-      if (output.length > 500) {
-        entries.push({ name: 'file-creation', status: 'passed', detail: `text-only mode — agent produced substantial output (${output.length} chars)` });
-      } else {
-        entries.push({ name: 'file-creation', status: 'failed', detail: `text-only mode — agent output too small (${output.length} chars, expected >500)` });
-      }
     } else {
       entries.push({ name: 'file-creation', status: 'failed', detail: `agent did not create .a5c-live-test/${traceId}-odyssey.md (output: ${output.length} chars)` });
     }
@@ -829,10 +817,8 @@ async function validateAgentBehavior(
     }
     entries.push({
       name: 'babysitter-completion-proof',
-      status: completionProofFound ? 'passed' : (!hasToolUse ? 'passed' : 'failed'),
-      detail: !hasToolUse && !completionProofFound
-        ? `text-only mode — babysitter skill requires tool use (${completionProofDetail})`
-        : completionProofDetail,
+      status: completionProofFound ? 'passed' : 'failed',
+      detail: completionProofDetail,
     });
   }
 

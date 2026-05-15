@@ -762,13 +762,27 @@ async function resolveCompletion(
 }
 
 function anthropicResponse(result: CompletionResult, config: ProxyConfig) {
+  const content: Array<Record<string, unknown>> = [];
+  if (result.text) {
+    content.push({ type: 'text', text: result.text });
+  }
+  if (result.toolCalls) {
+    for (const tc of result.toolCalls) {
+      let input: unknown;
+      try { input = JSON.parse(tc.arguments); } catch { input = {}; }
+      content.push({ type: 'tool_use', id: tc.id, name: tc.name, input });
+    }
+  }
+  if (content.length === 0) {
+    content.push({ type: 'text', text: '' });
+  }
   return {
     id: result.id,
     type: 'message',
     role: 'assistant',
     model: config.targetModel,
-    stop_reason: result.finishReason,
-    content: [{ type: 'text', text: result.text }],
+    stop_reason: result.toolCalls?.length ? 'tool_use' : result.finishReason,
+    content,
     usage: {
       input_tokens: result.usage.promptTokens,
       output_tokens: result.usage.completionTokens,
@@ -777,6 +791,14 @@ function anthropicResponse(result: CompletionResult, config: ProxyConfig) {
 }
 
 function openAiChatResponse(result: CompletionResult, config: ProxyConfig) {
+  const message: Record<string, unknown> = { role: 'assistant', content: result.text || null };
+  if (result.toolCalls?.length) {
+    message.tool_calls = result.toolCalls.map(tc => ({
+      id: tc.id,
+      type: 'function',
+      function: { name: tc.name, arguments: tc.arguments },
+    }));
+  }
   return {
     id: result.id,
     object: 'chat.completion',
@@ -785,8 +807,8 @@ function openAiChatResponse(result: CompletionResult, config: ProxyConfig) {
     choices: [
       {
         index: 0,
-        message: { role: 'assistant', content: result.text },
-        finish_reason: result.finishReason,
+        message,
+        finish_reason: result.toolCalls?.length ? 'tool_calls' : result.finishReason,
       },
     ],
     usage: usageShape(result),

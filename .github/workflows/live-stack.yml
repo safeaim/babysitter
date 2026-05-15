@@ -164,13 +164,25 @@ jobs:
         shell: bash
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 5
       matrix:
         interaction_mode:
           - id: non-interactive
             interactive: 'false'
+            bridge_interactive: 'false'
+            bridge_hooks: 'false'
+          - id: bridged-hooks
+            interactive: 'false'
+            bridge_interactive: 'false'
+            bridge_hooks: 'true'
+          - id: bridged-interactive
+            interactive: 'false'
+            bridge_interactive: 'true'
+            bridge_hooks: 'false'
           - id: interactive
             interactive: 'true'
+            bridge_interactive: 'false'
+            bridge_hooks: 'false'
         install_mode:
           - id: babysitter-plugin
             required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
@@ -203,6 +215,9 @@ jobs:
             amux_provider: foundry
             model: gpt-5.5
             required_env: AZURE_API_KEY,AMUX_API_BASE
+        exclude:
+          - interaction_mode: { id: bridged-interactive }
+            scenario: { amux_agent: codex }
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -268,6 +283,8 @@ jobs:
           LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
           LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
           LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
+          LIVE_STACK_BRIDGE_INTERACTIVE: ${{ matrix.interaction_mode.bridge_interactive }}
+          LIVE_STACK_BRIDGE_HOOKS: ${{ matrix.interaction_mode.bridge_hooks }}
           LIVE_STACK_USE_AMUX_RUN: 'false'
           LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
           LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
@@ -446,13 +463,25 @@ jobs:
         shell: bash
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 5
       matrix:
         interaction_mode:
           - id: non-interactive
             interactive: 'false'
+            bridge_interactive: 'false'
+            bridge_hooks: 'false'
+          - id: bridged-hooks
+            interactive: 'false'
+            bridge_interactive: 'false'
+            bridge_hooks: 'true'
+          - id: bridged-interactive
+            interactive: 'false'
+            bridge_interactive: 'true'
+            bridge_hooks: 'false'
           - id: interactive
             interactive: 'true'
+            bridge_interactive: 'false'
+            bridge_hooks: 'false'
         install_mode:
           - id: vanilla
             required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
@@ -485,6 +514,9 @@ jobs:
             amux_provider: foundry
             model: gpt-5.5
             required_env: AZURE_API_KEY,AMUX_API_BASE
+        exclude:
+          - interaction_mode: { id: bridged-interactive }
+            scenario: { amux_agent: codex }
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -550,6 +582,8 @@ jobs:
           LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
           LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
           LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
+          LIVE_STACK_BRIDGE_INTERACTIVE: ${{ matrix.interaction_mode.bridge_interactive }}
+          LIVE_STACK_BRIDGE_HOOKS: ${{ matrix.interaction_mode.bridge_hooks }}
           LIVE_STACK_USE_AMUX_RUN: 'false'
           LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
           LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}

@@ -239,7 +239,7 @@ describe('live stack scenario contract primitives', () => {
     const workflow = fs.readFileSync('.github/workflows/live-stack.yml', 'utf8');
 
     for (const jobName of ['live_stack_babysitter_plugin', 'live_stack_vanilla']) {
-      const pattern = new RegExp(`${jobName}:[\\s\\S]*?strategy:\\n\\s+fail-fast: false\\n\\s+max-parallel: 3`);
+      const pattern = new RegExp(`${jobName}:[\\s\\S]*?strategy:\\n\\s+fail-fast: false\\n\\s+max-parallel: 5`);
       expect(workflow).toMatch(pattern);
     }
   });

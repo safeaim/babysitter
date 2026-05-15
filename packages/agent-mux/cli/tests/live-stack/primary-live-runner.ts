@@ -149,7 +149,7 @@ export function buildPrimaryLiveStackCommands(
       prompt,
       '--max-turns',
       String(resolveLaunchMaxTurns(scenario)),
-      ...(isInteractive ? [] : ['--no-interactive', ...bridgeFlags(scenario)]),
+      ...(isInteractive ? [] : ['--no-interactive', ...bridgeFlags(options.env)]),
       ...harnessApprovalPassthrough(installTarget),
     ],
     options.cwd,
@@ -177,12 +177,11 @@ function harnessApprovalPassthrough(_harness: string): string[] {
   return ['--yolo'];
 }
 
-function bridgeFlags(scenario: LiveStackScenario): string[] {
-  // Only harnesses with interactiveBridge capability can use --bridge-interactive.
-  // Claude Code supports it (PTY spawn for tool use). Codex doesn't need it
-  // (exec mode has native tools). Pi, Gemini don't support it.
-  const bridgeable = new Set(['claude']);
-  return bridgeable.has(scenario.agent.agentMuxAgent) ? ['--bridge-interactive'] : [];
+function bridgeFlags(env: Record<string, string | undefined>): string[] {
+  const flags: string[] = [];
+  if (env['LIVE_STACK_BRIDGE_INTERACTIVE'] === 'true') flags.push('--bridge-interactive');
+  if (env['LIVE_STACK_BRIDGE_HOOKS'] === 'true') flags.push('--bridge-hooks');
+  return flags;
 }
 
 function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {

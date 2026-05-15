@@ -856,26 +856,29 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         ptyProcess.resize(process.stdout.columns || 80, process.stdout.rows || 24);
       });
 
-      // Inject prompt — wait for input field to be ready
+      // Inject prompt — wait for harness to start and input field to be ready
       if (prompt && !plan.args.some(a => a === prompt)) {
-        const startTime = Date.now();
+        let outputSeenAt = 0;
         const doInject = () => {
           ptyProcess.write(prompt);
           setTimeout(() => ptyProcess.write('\r'), 500);
         };
         const checkReady = () => {
+          const bufLen = interactiveOutputBuf.length;
+          if (bufLen === 0) { setTimeout(checkReady, 500); return; }
+          if (!outputSeenAt) outputSeenAt = Date.now();
           const s = interactiveOutputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
           if (interactiveApiKeyHandled || interactiveBypassHandled) {
             setTimeout(doInject, 2000);
           } else if (s.includes('APIkey') || s.includes('Bypass')) {
             setTimeout(checkReady, 500);
-          } else if (s.includes('❯') || s.includes('/effort') || Date.now() - startTime > 5000) {
+          } else if (s.includes('❯') || s.includes('/effort') || Date.now() - outputSeenAt > 5000) {
             setTimeout(doInject, 1000);
           } else {
             setTimeout(checkReady, 500);
           }
         };
-        setTimeout(checkReady, 2000);
+        setTimeout(checkReady, 500);
       }
 
       // Create a fake ChildProcess-like for signal handling
@@ -1045,18 +1048,20 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // Inject prompt after any observed onboarding prompts are dismissed.
     // Do not require startup output: some harnesses wait silently for input.
     if (prompt) {
-      const biStartTime = Date.now();
+      let biOutputSeenAt = 0;
       const injectPrompt = () => {
         ptyProcess.write(prompt);
         setTimeout(() => ptyProcess.write('\r'), 500);
       };
       const checkAndInject = () => {
+        if (outputBuf.length === 0) { setTimeout(checkAndInject, 500); return; }
+        if (!biOutputSeenAt) biOutputSeenAt = Date.now();
         const stripped = outputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
         if (apiKeyPromptHandled || bypassPromptHandled) {
           setTimeout(injectPrompt, 2000);
         } else if (stripped.includes('APIkey') || stripped.includes('Bypass')) {
           setTimeout(checkAndInject, 500);
-        } else if (stripped.includes('❯') || stripped.includes('/effort') || Date.now() - biStartTime > 5000) {
+        } else if (stripped.includes('❯') || stripped.includes('/effort') || Date.now() - biOutputSeenAt > 5000) {
           setTimeout(injectPrompt, 1000);
         } else {
           setTimeout(checkAndInject, 500);

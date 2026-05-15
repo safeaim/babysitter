@@ -474,13 +474,20 @@ function anthropicStreamResponse(
               contentIndex++;
               hasToolUse = true;
             }
-            let input: unknown;
-            try { input = JSON.parse(event.arguments); } catch { input = {}; }
+            // Anthropic streaming format: content_block_start with empty input,
+            // then input_json_delta with the full JSON, then content_block_stop.
             controller.enqueue(encoder.encode(
               encodeSseChunk('event: content_block_start\ndata: ', {
                 type: 'content_block_start',
                 index: contentIndex,
-                content_block: { type: 'tool_use', id: event.id, name: event.name, input },
+                content_block: { type: 'tool_use', id: event.id, name: event.name, input: {} },
+              }),
+            ));
+            controller.enqueue(encoder.encode(
+              encodeSseChunk('event: content_block_delta\ndata: ', {
+                type: 'content_block_delta',
+                index: contentIndex,
+                delta: { type: 'input_json_delta', partial_json: event.arguments },
               }),
             ));
             controller.enqueue(encoder.encode(

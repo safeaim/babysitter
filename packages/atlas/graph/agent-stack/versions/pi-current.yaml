@@ -33,7 +33,7 @@ attributes:
       sessionEnd: unsupported
     nonInteractive: {}
   bridgeCapabilities:
-    interactiveBridge: false
+    interactiveBridge: true
     sessionResume: true
     positionalPrompt: false
 edges:

@@ -1009,10 +1009,12 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // Inject prompt after any observed onboarding prompts are dismissed.
     // Do not require startup output: some harnesses wait silently for input.
     if (prompt) {
-      const injectPrompt = () => ptyProcess.write(prompt + '\r');
+      const injectPrompt = () => {
+        ptyProcess.write(prompt);
+        setTimeout(() => ptyProcess.write('\r'), 500);
+      };
       const checkAndInject = () => {
         if (apiKeyPromptHandled || bypassPromptHandled) {
-          // Give Claude Code time to process the prompt response before injecting task
           setTimeout(injectPrompt, 2000);
         } else {
           const stripped = outputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
@@ -1023,7 +1025,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           injectPrompt();
         }
       };
-      setTimeout(checkAndInject, 500);
+      setTimeout(checkAndInject, 1000);
     }
 
     // Create a fake ChildProcess-like for signal handling

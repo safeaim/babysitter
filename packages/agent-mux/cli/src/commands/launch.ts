@@ -220,9 +220,6 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
       if (session.prompt) plan.args.push('--prompt', session.prompt);
       break;
     case 'pi':
-      if (session.prompt && !interactive) {
-        plan.args.push('--prompt', session.prompt);
-      }
       break;
     case 'opencode':
       if (session.resumeId) plan.args.push('--session', session.resumeId);

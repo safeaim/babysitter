@@ -191,6 +191,7 @@ interface SessionArgs {
   prompt?: string;
   maxTurns?: number;
   interactive?: boolean;
+  bridgeInteractive?: boolean;
 }
 
 function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void {
@@ -198,6 +199,9 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
 
   switch (plan.harness) {
     case 'claude':
+      if (session.bridgeInteractive) {
+        plan.args.push('--bare');
+      }
       if (session.resumeId) plan.args.push('--resume', session.resumeId);
       if (session.sessionId) plan.args.push('--session-id', session.sessionId);
       if (session.prompt && !interactive) {
@@ -502,6 +506,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     prompt,
     maxTurns: flagNum(args.flags, 'max-turns'),
     interactive: isInteractive || bridgeInteractive,
+    bridgeInteractive,
   });
 
   // Add --model for harnesses that accept it as a CLI arg

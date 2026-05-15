@@ -500,6 +500,9 @@ attributes:
     kubectl and client-go can interact with Krate resources natively.
   protocol: rest
   category: platform-api
+  repoUrl: https://github.com/a5c-ai/babysitter/tree/staging/packages/krate/core
+  installCommand: npm install && npm run build --workspace=@a5c-ai/krate
+  npmPackage: '@a5c-ai/krate'
 edges:
   integrates_with:
     - target: tool:kubernetes
@@ -675,6 +678,9 @@ attributes:
     scheduled dispatch via CronJob resources.
   protocol: rest
   category: agent-dispatch
+  repoUrl: https://github.com/a5c-ai/babysitter/tree/staging/packages/krate/cli
+  installCommand: npm install && npm test --workspace=@a5c-ai/krate-cli
+  npmPackage: '@a5c-ai/krate-cli'
 edges:
   integrates_with:
     - target: agent:agent-mux

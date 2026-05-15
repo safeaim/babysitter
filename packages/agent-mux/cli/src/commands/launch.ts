@@ -918,7 +918,9 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     let apiKeyPromptHandled = false;
     let bypassPromptHandled = false;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
-    const IDLE_TIMEOUT_MS = 15_000;
+    const IDLE_TIMEOUT_MS = 30_000;
+    const harnessesWithEndEvents = new Set(['claude', 'codex', 'gemini', 'opencode']);
+    const useIdleTimeout = !harnessesWithEndEvents.has(plan.harness);
 
     const parseCtx = {
       runId: 'bridge',
@@ -992,15 +994,16 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
               return;
             }
 
-            // Reset idle timer — if no structured end event comes, idle timeout
-            // acts as fallback completion detection (e.g., Pi doesn't emit end events).
-            if (idleTimer) clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => {
-              if (!turnComplete && eventCount > 0) {
-                turnComplete = true;
-                try { ptyProcess.kill('SIGTERM'); } catch { /* */ }
-              }
-            }, IDLE_TIMEOUT_MS);
+            // Idle timeout fallback for harnesses without structured end events (Pi).
+            if (useIdleTimeout) {
+              if (idleTimer) clearTimeout(idleTimer);
+              idleTimer = setTimeout(() => {
+                if (!turnComplete && eventCount > 0) {
+                  turnComplete = true;
+                  try { ptyProcess.kill('SIGTERM'); } catch { /* */ }
+                }
+              }, IDLE_TIMEOUT_MS);
+            }
           }
         } catch { /* parse error — ignore */ }
       }
@@ -1062,19 +1065,23 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     });
 
     // Pipe stdout through + idle-timeout kill for harnesses that don't exit
-    // after completing a non-interactive task (e.g., Pi).
+    // after completing a non-interactive task (e.g., Pi doesn't exit on its own).
+    // Harnesses with proper exit behavior (claude -p, codex exec) don't need this.
+    const niUseIdleKill = !new Set(['claude', 'codex', 'gemini', 'opencode']).has(plan.harness);
     let niIdleTimer: ReturnType<typeof setTimeout> | null = null;
     let niHasOutput = false;
-    const NI_IDLE_TIMEOUT_MS = 15_000;
+    const NI_IDLE_TIMEOUT_MS = 30_000;
     child.stdout?.on('data', (chunk: Buffer) => {
       process.stdout.write(chunk);
       niHasOutput = true;
-      if (niIdleTimer) clearTimeout(niIdleTimer);
-      niIdleTimer = setTimeout(() => {
-        if (niHasOutput) {
-          try { child.kill('SIGTERM'); } catch { /* */ }
-        }
-      }, NI_IDLE_TIMEOUT_MS);
+      if (niUseIdleKill) {
+        if (niIdleTimer) clearTimeout(niIdleTimer);
+        niIdleTimer = setTimeout(() => {
+          if (niHasOutput) {
+            try { child.kill('SIGTERM'); } catch { /* */ }
+          }
+        }, NI_IDLE_TIMEOUT_MS);
+      }
     });
   }
 

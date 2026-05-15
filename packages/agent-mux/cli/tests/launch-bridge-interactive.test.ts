@@ -221,7 +221,7 @@ describe('bridge-interactive spawn', () => {
     await new Promise(r => setTimeout(r, 600));
 
     // Verify prompt was injected into PTY
-    expect(ptyWritten).toContain('hello world\n');
+    expect(ptyWritten).toContain('hello world\r');
 
     // Verify PTY was spawned (not child_process.spawn)
     expect(ptySpawnMock).toHaveBeenCalledTimes(1);

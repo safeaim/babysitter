@@ -139,6 +139,11 @@ async function* parseGoogleStream(response: Response): AsyncIterable<CompletionS
       const parsed = parseGoogleStreamPayload(payload);
       if (!parsed) continue;
       if (parsed.text) yield { type: 'text-delta', text: parsed.text };
+      if (parsed.toolCalls) {
+        for (const tc of parsed.toolCalls) {
+          yield { type: 'tool-call' as const, id: tc.id, name: tc.name, arguments: tc.arguments };
+        }
+      }
       if (parsed.usage) usage = parsed.usage;
       if (parsed.finishReason) finishReason = parsed.finishReason;
     }

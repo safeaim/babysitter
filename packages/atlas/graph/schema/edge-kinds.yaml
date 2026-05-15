@@ -1458,6 +1458,24 @@ edgeKinds:
   - TrustLevel
   cardinality: N:1
   aliasOf: at_trust_level
+- id: edge:merge-policy-orders-decision-verb
+  name: merge_policy_orders_decision_verb
+  origin: a5c
+  originContext: Derived from hooks-mux MergePolicy decisionRule ordering semantics.
+  description: a hook merge policy orders a canonical decision verb in its conflict-resolution lattice
+  source: [MergePolicy]
+  target: [DecisionVerb]
+  cardinality: N:N
+  inverse: ordered_by_merge_policy
+- id: edge:diagnoses-hook-surface
+  name: diagnoses_hook_surface
+  origin: a5c
+  originContext: Derived from HookMergeDiagnostic.hookSurfaceId attributes.
+  description: a hook merge diagnostic describes a merge result or conflict for a hook surface
+  source: [HookMergeDiagnostic]
+  target: [HookSurface]
+  cardinality: N:1
+  inverse: has_hook_merge_diagnostic
 - id: edge:belongs-to-benchmark
   name: belongs_to_benchmark
   origin: universal
@@ -1998,6 +2016,15 @@ edgeKinds:
   - FailureClass
   cardinality: N:1
   inverse: handled_by_strategy
+- id: edge:has-partial-state-recovery
+  name: has_partial_state_recovery
+  origin: a5c
+  originContext: Connects runtime/product restart semantics to the PartialStateRecovery policy record.
+  description: an agent runtime or product declares partial state recovery semantics for restart after in-memory state loss
+  source: [AgentProduct, AgentRuntimeImpl]
+  target: [PartialStateRecovery]
+  cardinality: N:N
+  inverse: partial_state_recovery_for
 - id: edge:categorized-as
   name: categorized_as
   origin: universal
@@ -3803,6 +3830,15 @@ edgeKinds:
   source: [TransportClient]
   target: [TokenBudget]
   cardinality: N:N
+- id: edge:has-retry-policy-variant
+  name: has_retry_policy_variant
+  origin: a5c
+  originContext: Derived from Claude Code retry-policy variant decomposition.
+  description: a retry policy has a conditional variant for a narrower source, mode, or unattended execution path
+  source: [RetryPolicy]
+  target: [RetryPolicy]
+  cardinality: N:N
+  inverse: retry_policy_variant_of
 - id: edge:compaction-policy-applied-by
   name: compaction_policy_applied_by
   origin: universal

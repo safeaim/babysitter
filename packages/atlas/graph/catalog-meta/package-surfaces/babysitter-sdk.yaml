@@ -16,6 +16,9 @@ attributes:
   # Source: packages/sdk/package.json bins (babysitter-sdk, babysitter,
   # babysitter-mcp-server) + main/program.ts CORE_VALID_COMMANDS.
 edges:
+  has_payload_schema:
+    - target: shared-context-spec:default
+    - target: shared-context-spec:run-scoped
   references_path:
     - target: path:agent-catalog-graph
 # top-level CLI subcommand groups (run:, task:, session:,

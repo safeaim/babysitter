@@ -35,3 +35,11 @@ attributes:
     sources bail immediately to avoid capacity-cascade amplification. After
     MAX_529_RETRIES consecutive 529s on a foreground source, escalate to
     fallback model via FallbackTriggeredError.
+edges:
+  has_retry_policy_variant:
+    - target: retry-policy:claude-code-background-bail
+      condition: non-foreground 529 overload source
+    - target: retry-policy:claude-code-fast-mode
+      condition: fast-mode 429/529 retry-after handling
+    - target: retry-policy:claude-code-persistent-unattended
+      condition: CLAUDE_CODE_UNATTENDED_RETRY enabled

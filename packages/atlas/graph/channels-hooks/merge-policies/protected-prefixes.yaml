@@ -17,3 +17,15 @@ attributes:
     the first handler that sets it; later handlers attempting to override
     such a key produce a HookMergeDiagnostic with outcome=conflict and
     severity=warning.
+edges:
+  merge_policy_orders_decision_verb:
+    - target: decision-verb:deny
+      rank: 1
+    - target: decision-verb:ask
+      rank: 2
+    - target: decision-verb:allow
+      rank: 3
+    - target: decision-verb:continue
+      rank: 4
+    - target: decision-verb:noop
+      rank: 5

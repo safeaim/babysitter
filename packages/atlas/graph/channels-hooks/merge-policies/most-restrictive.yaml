@@ -13,3 +13,15 @@ attributes:
     handlers overwriting earlier ones at conflicting leaves; arrays are
     replaced wholesale rather than concatenated. systemMessage strings are
     concatenated across handlers in registration order.
+edges:
+  merge_policy_orders_decision_verb:
+    - target: decision-verb:deny
+      rank: 1
+    - target: decision-verb:ask
+      rank: 2
+    - target: decision-verb:allow
+      rank: 3
+    - target: decision-verb:continue
+      rank: 4
+    - target: decision-verb:noop
+      rank: 5

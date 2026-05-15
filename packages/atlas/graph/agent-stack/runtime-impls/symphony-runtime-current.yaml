@@ -29,6 +29,9 @@ edges:
   composes:
     - target: agent:symphony
       role: runtime
+  has_partial_state_recovery:
+    - target: partial-state-recovery:in-memory-only
+      notes: Runtime notes specify filesystem-driven restart recovery while running sessions, retry timers, and claimed sets remain in memory.
   supports:
     - target: capability:supports-subagent-dispatch
       versionRange: '>=0.1.0'

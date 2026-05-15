@@ -306,6 +306,7 @@ jobs:
 
       - name: Upload live stack artifacts
         if: always()
+        timeout-minutes: 5
         uses: actions/upload-artifact@v4
         with:
           name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
@@ -434,6 +435,7 @@ jobs:
 
       - name: Upload live stack artifacts
         if: always()
+        timeout-minutes: 5
         uses: actions/upload-artifact@v4
         with:
           name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
@@ -595,6 +597,7 @@ jobs:
 
       - name: Upload live stack artifacts
         if: always()
+        timeout-minutes: 5
         uses: actions/upload-artifact@v4
         with:
           name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}

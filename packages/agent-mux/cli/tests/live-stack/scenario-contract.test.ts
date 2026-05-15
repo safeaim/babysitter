@@ -227,4 +227,15 @@ describe('live stack scenario contract primitives', () => {
     }
   });
 
+  it('bounds live-stack artifact upload time', () => {
+    const workflow = fs.readFileSync('.github/workflows/live-stack.yml', 'utf8');
+    const uploadStepPattern = /- name: Upload live stack artifacts\n(?<body>[\s\S]*?)(?=\n\s*- name:|\n\s{2}\w|$)/g;
+    const uploadSteps = Array.from(workflow.matchAll(uploadStepPattern));
+
+    expect(uploadSteps.length).toBeGreaterThan(0);
+    for (const step of uploadSteps) {
+      expect(step.groups?.['body']).toMatch(/timeout-minutes:\s*5/);
+    }
+  });
+
 });

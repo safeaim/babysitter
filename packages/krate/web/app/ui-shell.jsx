@@ -299,7 +299,7 @@ export async function AgentStacksPage({ org = null } = {}) {
         <a href={orgHref(activeOrg, `/agents/stacks/${stack.metadata?.name}`)} style={{ textDecoration: 'none', flex: 1, display: 'flex', gap: 12, alignItems: 'center' }}>
           <strong>{stack.metadata?.name}</strong>
           <span>{stack.spec?.adapter || 'default'}</span>
-          <span>{stack.spec?.runtimeIdentity || stack.spec?.identity || 'workspace'}</span>
+          <span>{typeof stack.spec?.runtimeIdentity === 'object' ? (stack.spec.runtimeIdentity.serviceAccountRef || 'sa') : (stack.spec?.runtimeIdentity || stack.spec?.identity || 'workspace')}</span>
           <small>{stack.status?.phase || 'Pending'}</small>
         </a>
         <StackActions org={activeOrg} stackName={stack.metadata?.name} />
@@ -315,7 +315,7 @@ export async function AgentStackDetailPage({ org = null, name } = {}) {
   const stack = (agentView.stacks.items || []).find((s) => s.metadata?.name === name) || null;
   const relatedRules = (agentView.rules.items || []).filter((rule) => rule.spec?.stackRef === name || rule.spec?.targetStack === name);
   const conditions = stack?.status?.conditions || [];
-  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`agent stack / ${name}`} title={name || 'Stack detail'} text={stack ? `Agent stack using ${stack.spec?.adapter || 'default'} adapter with ${stack.spec?.runtimeIdentity || 'workspace'} identity.` : 'This agent stack was not found in the current workspace.'} actions={[[orgHref(activeOrg, '/agents/stacks'), 'All stacks'], ['/agents/runs', 'Dispatch runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/stacks', 'Stacks'], [`/agents/stacks/${name}`, name || 'Detail']]}>
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`agent stack / ${name}`} title={name || 'Stack detail'} text={stack ? `Agent stack using ${stack.spec?.adapter || 'default'} adapter with ${typeof stack.spec?.runtimeIdentity === 'object' ? (stack.spec.runtimeIdentity.serviceAccountRef || 'sa') : (stack.spec?.runtimeIdentity || 'workspace')} identity.` : 'This agent stack was not found in the current workspace.'} actions={[[orgHref(activeOrg, '/agents/stacks'), 'All stacks'], ['/agents/runs', 'Dispatch runs']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/stacks', 'Stacks'], [`/agents/stacks/${name}`, name || 'Detail']]}>
     <DegradedBanner model={ui.model} />
     <section className="routeGrid two">
       <div className="card">
@@ -325,7 +325,7 @@ export async function AgentStackDetailPage({ org = null, name } = {}) {
           <dt>Namespace</dt><dd>{stack.metadata?.namespace || ui.model.namespace}</dd>
           <dt>Base agent</dt><dd>{stack.spec?.baseAgent || stack.spec?.agent || 'not specified'}</dd>
           <dt>Adapter</dt><dd>{stack.spec?.adapter || 'default'}</dd>
-          <dt>Runtime identity</dt><dd>{stack.spec?.runtimeIdentity || stack.spec?.identity || 'workspace'}</dd>
+          <dt>Runtime identity</dt><dd>{typeof stack.spec?.runtimeIdentity === 'object' ? (stack.spec.runtimeIdentity.serviceAccountRef || JSON.stringify(stack.spec.runtimeIdentity)) : (stack.spec?.runtimeIdentity || stack.spec?.identity || 'workspace')}</dd>
           <dt>Phase</dt><dd>{stack.status?.phase || 'Pending'}</dd>
         </dl><div style={{ marginTop: 12 }}><StackActions org={activeOrg} stackName={name} /></div></> : <EmptyState title={`Stack ${name} not found`} text="This agent stack does not exist in the current workspace. Create it through Krate resource definitions." />}
       </div>

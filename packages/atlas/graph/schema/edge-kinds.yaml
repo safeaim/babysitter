@@ -14,6 +14,7 @@ edgeKinds:
   - AgentCoreImpl
   - AgentRuntimeImpl
   - AgentPlatformImpl
+  - AgentGovernanceImpl
   - AgentUIImpl
   - KnowledgeFabricImpl
   - Language
@@ -22,11 +23,7 @@ edgeKinds:
   cardinality: 1:N
   attributes:
   - name: role
-    type: enum<core
-    runtime: null
-    platform: null
-    ui: null
-    knowledge-fabric>: null
+    type: enum<core,runtime,platform,ui,knowledge-fabric,governance>
   inverse: composes
 - id: edge:composes
   name: composes
@@ -36,6 +33,7 @@ edgeKinds:
   - AgentCoreImpl
   - AgentRuntimeImpl
   - AgentPlatformImpl
+  - AgentGovernanceImpl
   - AgentUIImpl
   - KnowledgeFabricImpl
   - Language
@@ -48,11 +46,7 @@ edgeKinds:
   cardinality: N:1
   attributes:
   - name: role
-    type: enum<core
-    runtime: null
-    platform: null
-    ui: null
-    knowledge-fabric>: null
+    type: enum<core,runtime,platform,ui,knowledge-fabric,governance>
   inverse: composed_of
 - id: edge:bundled-with
   name: bundled_with
@@ -117,6 +111,7 @@ edgeKinds:
   - AgentCoreImpl
   - AgentRuntimeImpl
   - AgentPlatformImpl
+  - AgentGovernanceImpl
   - AgentUIImpl
   - KnowledgeFabricImpl
   - MemorySystem
@@ -134,6 +129,9 @@ edgeKinds:
   - Execution
   - Sandbox
   - InteractionPrimitive
+  - OrchestrationPrimitive
+  - Plugin
+  - ToolDescriptor
   target:
   - Layer
   cardinality: N:N
@@ -173,6 +171,7 @@ edgeKinds:
   - ModelVersion
   - AgentRuntimeImpl
   - AgentPlatformImpl
+  - AgentGovernanceImpl
   - AgentCoreImpl
   - AgentProduct
   - ToolServer
@@ -1032,6 +1031,7 @@ edgeKinds:
   - Plugin
   - Subagent
   - ToolServer
+  - AgentGovernanceImpl
   target:
   - ExtensionInterface
   cardinality: N:N
@@ -1405,6 +1405,7 @@ edgeKinds:
   source:
   - AgentRuntimeImpl
   - AgentPlatformImpl
+  - AgentGovernanceImpl
   target:
   - ToolDescriptor
   - Presentation
@@ -1665,6 +1666,7 @@ edgeKinds:
   - AgentCoreImpl
   - AgentRuntimeImpl
   - AgentPlatformImpl
+  - AgentGovernanceImpl
   - Plugin
   - Skill
   - Subagent
@@ -3532,6 +3534,51 @@ edgeKinds:
   - Term
   cardinality: N:N
   inverse: documented_by
+- id: edge:contains-page
+  name: contains_page
+  origin: derived
+  originContext: Derived from wiki page slug hierarchy during Atlas index generation.
+  description: a wiki Page contains or navigates to a child Page in the generated article hierarchy
+  source: [Page]
+  target: [Page]
+  cardinality: 1:N
+  inverse: contained_in_page
+- id: edge:has-evidence-source
+  name: has_evidence_source
+  origin: derived
+  originContext: Derived from curated evidenceRefs attributes when the referenced EvidenceSource exists in the Atlas graph.
+  description: a catalog record cites an EvidenceSource as support for its modeled attributes
+  source: [Modality, ModelProviderProduct, ModelProviderVersion]
+  target: [EvidenceSource]
+  cardinality: N:N
+  inverse: evidence_for_record
+- id: edge:model-provider-version-of
+  name: model_provider_version_of
+  origin: derived
+  originContext: Derived from ModelProviderVersion.providerId attributes.
+  description: a model provider version record belongs to a model provider product record
+  source: [ModelProviderVersion]
+  target: [ModelProviderProduct]
+  cardinality: N:1
+  inverse: has_model_provider_version
+- id: edge:belongs-to-tenant
+  name: belongs_to_tenant
+  origin: derived
+  originContext: Derived from EndUser.tenantId attributes.
+  description: an end user belongs to a tenant boundary
+  source: [EndUser]
+  target: [Tenant]
+  cardinality: N:1
+  inverse: has_end_user
+- id: edge:aliases-journal-event
+  name: aliases_journal_event
+  origin: derived
+  originContext: Derived from matching RunJournalEvent.eventName values and promoted JournalEvent display names.
+  description: a catalog-meta run journal event record aliases the promoted JournalEvent record for the same event name
+  source: [RunJournalEvent]
+  target: [JournalEvent]
+  cardinality: 1:1
+  inverse: aliased_by_run_journal_event
 - id: edge:uses-agent
   name: uses_agent
   origin: universal
@@ -3911,7 +3958,7 @@ edgeKinds:
   name: targets_plugin_surface
   origin: universal
   description: an agent version can target a specific plugin surface
-  source: [AgentVersion]
+  source: [AgentVersion, AgentGovernanceImpl]
   target: [PluginTarget]
   cardinality: N:N
 - id: edge:uses-memory-hierarchy
@@ -3956,6 +4003,117 @@ edgeKinds:
   source: [PackageSurface]
   target: [Graph]
   cardinality: N:N
+- id: edge:defined-by-crd-source
+  name: defined_by_crd_source
+  origin: universal
+  description: a Kubernetes CRD kind is defined by a manifest, source reference, or evidence source
+  source: [KubernetesCrdKind]
+  target: [SourceRef, EvidenceSource]
+  cardinality: N:N
+  attributes:
+  - name: locator
+    type: string
+    required: false
+  inverse: defines_crd_kind
+- id: edge:belongs-to-resource-family
+  name: belongs_to_resource_family
+  origin: universal
+  description: a Kubernetes CRD kind belongs to a product-specific resource family or stack part
+  source: [KubernetesCrdKind]
+  target: [Topic, PlatformService, StackPart]
+  cardinality: N:N
+  attributes:
+  - name: family
+    type: string
+    required: false
+  inverse: contains_resource_kind
+- id: edge:serves-kubernetes-resource
+  name: serves_kubernetes_resource
+  origin: universal
+  description: a platform service or tool server serves a Kubernetes resource API or aggregated API surface
+  source: [PlatformService, ToolServer, AgentPlatformImpl]
+  target: [KubernetesCrdKind]
+  cardinality: N:N
+  attributes:
+  - name: serviceMode
+    type: enum<api-server,aggregated-api,controller-api,proxy,storage,composite>
+    required: false
+  inverse: kubernetes_resource_served_by
+- id: edge:watches-resource
+  name: watches_resource
+  origin: universal
+  description: a Kubernetes controller or service watches a Kubernetes resource kind
+  source: [KubernetesController, PlatformService]
+  target: [KubernetesCrdKind]
+  cardinality: N:N
+  attributes:
+  - name: watchType
+    type: enum<primary,secondary,external,derived>
+    required: false
+  inverse: watched_by_controller
+- id: edge:reconciles-resource
+  name: reconciles_resource
+  origin: universal
+  description: a Kubernetes controller, platform service, or governance implementation reconciles desired and observed state for a Kubernetes resource kind
+  source: [KubernetesController, PlatformService, AgentPlatformImpl, AgentGovernanceImpl, ToolServer]
+  target: [KubernetesCrdKind]
+  cardinality: N:N
+  attributes:
+  - name: mode
+    type: enum<observe,create,update,delete,full,policy-only>
+    required: false
+  - name: evidenceSourceIds
+    type: list<ref<EvidenceSource>>
+    required: false
+  inverse: reconciled_by
+- id: edge:surfaces-resource
+  name: surfaces_resource
+  origin: universal
+  description: a UI, CLI/API tool descriptor, tool server, or platform service surfaces a Kubernetes resource kind to operators or agents
+  source: [Presentation, ToolDescriptor, ToolServer, PlatformService]
+  target: [KubernetesCrdKind]
+  cardinality: N:N
+  attributes:
+  - name: surface
+    type: enum<web,cli,api,kubectl,mcp,controller-api,generated-ui>
+    required: false
+  inverse: resource_surfaced_by
+- id: edge:governs-resource
+  name: governs_resource
+  origin: universal
+  description: a governance implementation, policy, dispatch policy, or platform service governs operations against a Kubernetes resource kind
+  source: [AgentGovernanceImpl, ContentPolicy, ToolDispatchPolicy, PlatformService]
+  target: [KubernetesCrdKind]
+  cardinality: N:N
+  attributes:
+  - name: governanceMode
+    type: enum<admission,rbac,policy-binding,audit,approval,dispatch-control,exception>
+    required: false
+  inverse: governed_by
+- id: edge:maps-to-external-resource
+  name: maps_to_external_resource
+  origin: universal
+  description: a Kubernetes CRD kind maps declarative Kubernetes state to an external provider, VCS host, issue tracker, tool, or platform service
+  source: [KubernetesCrdKind]
+  target: [Provider, VCSHost, IssueTracker, Tool, PlatformService]
+  cardinality: N:N
+  attributes:
+  - name: relationship
+    type: enum<desired-state,mirror,link,event,write-intent,capability-manifest>
+    required: false
+  inverse: external_resource_mapped_by
+- id: edge:emits-resource-status
+  name: emits_resource_status
+  origin: universal
+  description: a Kubernetes controller or service writes status or conditions for a Kubernetes resource kind
+  source: [KubernetesController, PlatformService]
+  target: [KubernetesCrdKind]
+  cardinality: N:N
+  attributes:
+  - name: statusPath
+    type: string
+    required: false
+  inverse: status_emitted_by
 - id: edge:alternative-to
   name: alternative_to
   origin: universal

@@ -4,32 +4,41 @@ attributes:
   displayName: Knowledge Fabric
   position: 12
   path: knowledge
-  scope: Organizational knowledge, memory, and intelligence layer spanning all agents and humans.
+  scope: Durable organizational knowledge, memory systems, retrieval, indexing, provenance, and semantic/graph access paths shared by humans and agents.
   summary: |
-    The knowledge fabric is the organizational brain — a centralized, living
-    knowledge and intelligence layer that captures, organizes, updates, and
-    makes queryable everything the company knows. Unlike per-agent context
-    (Layer 5 runtime), this layer persists across agents, sessions, and users.
-    It encompasses vector stores, knowledge graphs, document indexes, decision
-    logs, process memory, and semantic search — serving both humans and AI agents.
+    The knowledge fabric is the shared organizational brain for humans and
+    agents. It includes durable learned memory, source-of-truth corpora,
+    semantic facts, project conventions, user and team preferences, decision
+    logs, incident histories, code indexes, knowledge graphs, vector indexes,
+    retrieval pipelines, provenance, confidence, temporal invalidation, and
+    privacy-aware recall.
+
+    This layer intentionally uses the knowledge-fabric name rather than a
+    separate company-brain layer. Memory systems belong here when they extract,
+    consolidate, retain, invalidate, and retrieve learned organizational state.
+    Source corpora and retrieval pipelines also belong here when they ground or
+    verify that state. Per-turn context windows and compaction remain runtime
+    concerns, not durable knowledge-fabric concerns.
   responsibilities:
-    - Persist and retrieve organizational knowledge across agent sessions
-    - Index and embed documents, code, decisions, conversations
-    - Provide semantic search and context-aware retrieval
-    - Maintain knowledge graph of entities, relationships, and decisions
-    - Track provenance and confidence of information
-    - Synchronize knowledge across multiple agents and human users
+    - Extract, store, consolidate, deduplicate, and retrieve durable memories and organizational facts.
+    - Index and embed documents, code, decisions, conversations, incidents, and data sources.
+    - Provide semantic search, graph traversal, hybrid retrieval, and context-aware grounding.
+    - Maintain provenance, confidence, staleness, temporal invalidation, retention, and evidence metadata.
+    - Filter secrets and privacy-sensitive data before durable storage or recall.
+    - Scope knowledge and memory at session, project, user, team, organization, and cross-agent levels.
   examples:
-    - Vector databases (Pinecone, Weaviate, Chroma, Qdrant, Milvus)
-    - Knowledge management platforms (Notion, Confluence as knowledge sources)
-    - RAG pipelines (LangChain, LlamaIndex retrieval chains)
-    - Memory services (Mem0, Zep, Motorhead)
-    - Organizational knowledge graphs
-    - Decision logs and ADR repositories
+    - Temporal graph memory services such as Zep-style context graphs.
+    - Agent memory services such as Mem0-style memory stores.
+    - File-based memories such as AGENTS.md, CLAUDE.md, MEMORY.md, and memory-bank folders.
+    - Vector databases (Pinecone, Weaviate, Chroma, Qdrant, Milvus).
+    - Knowledge management platforms and source corpora (Notion, Confluence, docs, ADRs).
+    - RAG and graph retrieval pipelines (LangChain, LlamaIndex, GraphRAG-style flows).
+    - Enterprise knowledge graphs combining conversations, business facts, decisions, and run outcomes.
   fitNotes: |
-    This layer sits above individual agent concerns. Where Layer 5 (runtime)
-    manages per-session context and compaction, Layer 12 manages persistent
-    organizational knowledge that any agent or human can query. The boundary
-    is persistence scope: runtime context dies with the session, knowledge
-    fabric persists indefinitely.
+    Use this layer for durable organizational knowledge and learned memory.
+    Memory extraction, consolidation, retention, temporal fact invalidation,
+    privacy filtering, cross-agent recall, source indexing, and grounded
+    retrieval all fit here. Use runtime layers for ephemeral context windows and
+    use governance for policy, auditability, and accountability controls over
+    memory and knowledge usage.
 edges: {}

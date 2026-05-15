@@ -19,14 +19,13 @@ nodeKinds:
   - name: position
     type: int
     required: true
-    constraint: between 1 and 11
+    constraint: between 1 and 14
     notes: Required for top-level layers; there are no modeled nested layer nodes.
   - name: summary
     type: string
     required: true
   - name: path
-    type: enum<compute
-    surfacing>: null
+    type: enum<compute,surfacing,knowledge,control,governance>
     required: true
   - name: scope
     type: markdown
@@ -48,5 +47,5 @@ nodeKinds:
   - realizes
   outgoingEdges: []
   invariants:
-  - position 1..11 unique across all Layer nodes
+  - position 1..14 unique across all Layer nodes
   examples: []

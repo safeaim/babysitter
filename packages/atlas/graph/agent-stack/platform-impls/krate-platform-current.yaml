@@ -31,7 +31,7 @@ attributes:
     - Provider config: AgentProviderConfig — LLM API key/endpoint mgmt
     - Gateway config: AgentGatewayConfig — multi-agent routing rules
 
-    43 etcd-backed CRDs total. All queryable via kubectl.
+    75 Krate CRDs total. All queryable via kubectl.
 edges:
   realizes:
     - target: layer:6-agent-platform

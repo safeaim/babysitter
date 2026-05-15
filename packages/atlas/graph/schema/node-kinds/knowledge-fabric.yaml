@@ -108,7 +108,7 @@ nodeKinds:
   origin: universal
   prefix: memory-system
   cluster: 21-knowledge-fabric
-  purpose: a concrete memory persistence and retrieval system for an agent — how it stores, retrieves, consolidates, and scopes memories across sessions
+  purpose: a concrete memory persistence and retrieval system for an agent or organization — how it stores, retrieves, consolidates, governs, and scopes durable memory across sessions, users, teams, agents, and company-brain contexts
   attributes:
   - name: id
     type: id
@@ -122,19 +122,19 @@ nodeKinds:
   - name: memoryKind
     type: enum<file-based,vector-backed,api-service,hybrid,proprietary>
     required: false
-    notes: Primary storage/retrieval paradigm for the memory system.
+    notes: Primary storage/retrieval paradigm for the memory system. Memory systems, retrieval pipelines, source indexes, and provenance infrastructure realize layer:12-knowledge-fabric.
   - name: persistence
     type: enum<session-only,project-scoped,user-scoped,org-scoped,cross-agent>
     required: false
-    notes: Widest scope at which memories persist.
+    notes: Widest scope at which memories persist. org-scoped and cross-agent memories are company-brain concerns and require governance for privacy, retention, provenance, and poisoning mitigation.
   - name: autoExtraction
     type: bool
     required: false
-    notes: Whether the system automatically extracts memories from conversations without user action.
+    notes: Whether the system automatically extracts memories from conversations without user action; automatic extraction should be governed for consent, privacy filtering, and evidence.
   - name: consolidation
     type: enum<none,manual,auto-dream,periodic,on-write>
     required: false
-    notes: Strategy for merging, deduplicating, and pruning memories over time.
+    notes: Strategy for merging, deduplicating, invalidating stale facts, and pruning memories over time.
   - name: storageFormat
     type: enum<markdown,yaml,json,sqlite,vector-db,custom>
     required: false
@@ -142,11 +142,11 @@ nodeKinds:
   - name: privacyFilter
     type: bool
     required: false
-    notes: Whether the system strips secrets/credentials before persisting memories.
+    notes: Whether the system strips secrets/credentials before persisting memories; false values should be treated as governance/security review findings for company-brain deployments.
   - name: deduplication
     type: enum<none,sha256,semantic,hybrid>
     required: false
-    notes: Strategy for detecting and removing duplicate memory entries.
+    notes: Strategy for detecting and removing duplicate or contradictory memory entries.
   incomingEdges:
   - uses_memory_system
   outgoingEdges:

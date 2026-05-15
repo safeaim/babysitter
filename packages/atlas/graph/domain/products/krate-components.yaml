@@ -380,6 +380,157 @@ edges:
   bundled_with:
     - target: platform:krate
       notes: "Primary web interface for the Krate forge"
+  surfaces_resource:
+    - target: kubernetes-crd-kind:krate-agent-stack
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-subagent
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-tool-profile
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-mcp-server
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-skill
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-trigger-rule
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-context-label
+      surface: web
+    - target: kubernetes-crd-kind:krate-krate-workspace-policy
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-service-account
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-role-binding
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-secret-grant
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-config-grant
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-adapter
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-transport-binding
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-provider-config
+      surface: web
+    - target: kubernetes-crd-kind:krate-krate-project
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-gateway-config
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-memory-repository
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-memory-source
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-memory-ontology
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-memory-association
+      surface: web
+    - target: kubernetes-crd-kind:krate-krate-workspace
+      surface: web
+    - target: kubernetes-crd-kind:krate-ref-policy
+      surface: web
+    - target: kubernetes-crd-kind:krate-runner-pool
+      surface: web
+    - target: kubernetes-crd-kind:krate-webhook-subscription
+      surface: web
+    - target: kubernetes-crd-kind:krate-view
+      surface: web
+    - target: kubernetes-crd-kind:krate-selector
+      surface: web
+    - target: kubernetes-crd-kind:krate-pull-request
+      surface: web
+    - target: kubernetes-crd-kind:krate-issue
+      surface: web
+    - target: kubernetes-crd-kind:krate-review
+      surface: web
+    - target: kubernetes-crd-kind:krate-pipeline
+      surface: web
+    - target: kubernetes-crd-kind:krate-job
+      surface: web
+    - target: kubernetes-crd-kind:krate-webhook-delivery
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-dispatch-run
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-dispatch-attempt
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-session
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-context-bundle
+      surface: web
+    - target: kubernetes-crd-kind:krate-krate-artifact
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-approval
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-trigger-execution
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-capability-requirement
+      surface: web
+    - target: kubernetes-crd-kind:krate-work-item-session-link
+      surface: web
+    - target: kubernetes-crd-kind:krate-work-item-workspace-link
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-session-transcript
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-session-attachment
+      surface: web
+    - target: kubernetes-crd-kind:krate-krate-workspace-runtime
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-memory-snapshot
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-memory-query
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-memory-update
+      surface: web
+    - target: kubernetes-crd-kind:krate-agent-run-memory-import
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-backend-provider
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-backend-binding
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-backend-sync-policy
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-provider-capability-manifest
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-webhook-delivery
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-sync-event
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-sync-state
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-write-intent
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-sync-conflict
+      surface: web
+    - target: kubernetes-crd-kind:krate-external-object-link
+      surface: web
+    - target: kubernetes-crd-kind:krate-policy-profile
+      surface: web
+    - target: kubernetes-crd-kind:krate-policy-template
+      surface: web
+    - target: kubernetes-crd-kind:krate-policy-binding
+      surface: web
+    - target: kubernetes-crd-kind:krate-policy-exception-request
+      surface: web
+    - target: kubernetes-crd-kind:krate-repository
+      surface: web
+    - target: kubernetes-crd-kind:krate-branch-protection
+      surface: web
+    - target: kubernetes-crd-kind:krate-organization
+      surface: web
+    - target: kubernetes-crd-kind:krate-org-namespace-binding
+      surface: web
+    - target: kubernetes-crd-kind:krate-sshkey
+      surface: web
+    - target: kubernetes-crd-kind:krate-repository-permission
+      surface: web
+    - target: kubernetes-crd-kind:krate-user
+      surface: web
+    - target: kubernetes-crd-kind:krate-team
+      surface: web
+    - target: kubernetes-crd-kind:krate-invite
+      surface: web
+    - target: kubernetes-crd-kind:krate-identity-mapping
+      surface: web
+    - target: kubernetes-crd-kind:krate-auth-provider
+      surface: web
 ---
 nodeKind: Presentation
 id: presentation:krate-cli
@@ -402,6 +553,157 @@ edges:
   bundled_with:
     - target: platform:krate
       notes: "kubectl-native CLI for Krate resources"
+  surfaces_resource:
+    - target: kubernetes-crd-kind:krate-agent-stack
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-subagent
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-tool-profile
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-mcp-server
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-skill
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-trigger-rule
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-context-label
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-krate-workspace-policy
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-service-account
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-role-binding
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-secret-grant
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-config-grant
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-adapter
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-transport-binding
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-provider-config
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-krate-project
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-gateway-config
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-memory-repository
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-memory-source
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-memory-ontology
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-memory-association
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-krate-workspace
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-ref-policy
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-runner-pool
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-webhook-subscription
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-view
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-selector
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-pull-request
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-issue
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-review
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-pipeline
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-job
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-webhook-delivery
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-dispatch-run
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-dispatch-attempt
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-session
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-context-bundle
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-krate-artifact
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-approval
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-trigger-execution
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-capability-requirement
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-work-item-session-link
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-work-item-workspace-link
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-session-transcript
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-session-attachment
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-krate-workspace-runtime
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-memory-snapshot
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-memory-query
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-memory-update
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-agent-run-memory-import
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-backend-provider
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-backend-binding
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-backend-sync-policy
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-provider-capability-manifest
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-webhook-delivery
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-sync-event
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-sync-state
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-write-intent
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-sync-conflict
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-external-object-link
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-policy-profile
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-policy-template
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-policy-binding
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-policy-exception-request
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-repository
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-branch-protection
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-organization
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-org-namespace-binding
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-sshkey
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-repository-permission
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-user
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-team
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-invite
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-identity-mapping
+      surface: kubectl
+    - target: kubernetes-crd-kind:krate-auth-provider
+      surface: kubectl
 ---
 nodeKind: Presentation
 id: presentation:krate-api
@@ -423,6 +725,157 @@ edges:
   bundled_with:
     - target: platform:krate
       notes: "REST API surface for the Krate forge"
+  surfaces_resource:
+    - target: kubernetes-crd-kind:krate-agent-stack
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-subagent
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-tool-profile
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-mcp-server
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-skill
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-trigger-rule
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-context-label
+      surface: api
+    - target: kubernetes-crd-kind:krate-krate-workspace-policy
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-service-account
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-role-binding
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-secret-grant
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-config-grant
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-adapter
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-transport-binding
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-provider-config
+      surface: api
+    - target: kubernetes-crd-kind:krate-krate-project
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-gateway-config
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-memory-repository
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-memory-source
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-memory-ontology
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-memory-association
+      surface: api
+    - target: kubernetes-crd-kind:krate-krate-workspace
+      surface: api
+    - target: kubernetes-crd-kind:krate-ref-policy
+      surface: api
+    - target: kubernetes-crd-kind:krate-runner-pool
+      surface: api
+    - target: kubernetes-crd-kind:krate-webhook-subscription
+      surface: api
+    - target: kubernetes-crd-kind:krate-view
+      surface: api
+    - target: kubernetes-crd-kind:krate-selector
+      surface: api
+    - target: kubernetes-crd-kind:krate-pull-request
+      surface: api
+    - target: kubernetes-crd-kind:krate-issue
+      surface: api
+    - target: kubernetes-crd-kind:krate-review
+      surface: api
+    - target: kubernetes-crd-kind:krate-pipeline
+      surface: api
+    - target: kubernetes-crd-kind:krate-job
+      surface: api
+    - target: kubernetes-crd-kind:krate-webhook-delivery
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-dispatch-run
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-dispatch-attempt
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-session
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-context-bundle
+      surface: api
+    - target: kubernetes-crd-kind:krate-krate-artifact
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-approval
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-trigger-execution
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-capability-requirement
+      surface: api
+    - target: kubernetes-crd-kind:krate-work-item-session-link
+      surface: api
+    - target: kubernetes-crd-kind:krate-work-item-workspace-link
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-session-transcript
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-session-attachment
+      surface: api
+    - target: kubernetes-crd-kind:krate-krate-workspace-runtime
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-memory-snapshot
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-memory-query
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-memory-update
+      surface: api
+    - target: kubernetes-crd-kind:krate-agent-run-memory-import
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-backend-provider
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-backend-binding
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-backend-sync-policy
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-provider-capability-manifest
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-webhook-delivery
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-sync-event
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-sync-state
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-write-intent
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-sync-conflict
+      surface: api
+    - target: kubernetes-crd-kind:krate-external-object-link
+      surface: api
+    - target: kubernetes-crd-kind:krate-policy-profile
+      surface: api
+    - target: kubernetes-crd-kind:krate-policy-template
+      surface: api
+    - target: kubernetes-crd-kind:krate-policy-binding
+      surface: api
+    - target: kubernetes-crd-kind:krate-policy-exception-request
+      surface: api
+    - target: kubernetes-crd-kind:krate-repository
+      surface: api
+    - target: kubernetes-crd-kind:krate-branch-protection
+      surface: api
+    - target: kubernetes-crd-kind:krate-organization
+      surface: api
+    - target: kubernetes-crd-kind:krate-org-namespace-binding
+      surface: api
+    - target: kubernetes-crd-kind:krate-sshkey
+      surface: api
+    - target: kubernetes-crd-kind:krate-repository-permission
+      surface: api
+    - target: kubernetes-crd-kind:krate-user
+      surface: api
+    - target: kubernetes-crd-kind:krate-team
+      surface: api
+    - target: kubernetes-crd-kind:krate-invite
+      surface: api
+    - target: kubernetes-crd-kind:krate-identity-mapping
+      surface: api
+    - target: kubernetes-crd-kind:krate-auth-provider
+      surface: api
 
 # ---------------------------------------------------------------------------
 # 6. Krate-Specific Responsibilities
@@ -497,16 +950,16 @@ edges:
 # ---------------------------------------------------------------------------
 ---
 nodeKind: TestableClaim
-id: claim:krate-has-49-resource-kinds
+id: claim:krate-has-75-crd-kinds
 attributes:
-  displayName: "Krate defines 49 resource kinds"
+  displayName: "Krate defines 75 CRD kinds"
   description: |
     Verifies that the Krate product (platform:krate) description
-    references 49 total resource kinds across etcd CRDs and aggregated
+    references 75 total Krate CRD kinds across etcd CRDs and aggregated
     API resources, confirming the resource model is fully represented.
   testStatus: untested
   testType: unit
-  testCommand: "node -e \"const i=JSON.parse(require('fs').readFileSync('packages/atlas/src/index.json','utf8'));const r=i.records['platform:krate'];process.exit(r&&String(r.description||'').includes('49')?0:1)\""
+  testCommand: "node -e \"const i=JSON.parse(require('fs').readFileSync('packages/atlas/src/index.json','utf8'));const r=i.records['platform:krate'];process.exit(r&&String(r.description||'').includes('75')?0:1)\""
   category: graph-integrity
   priority: high
 edges:

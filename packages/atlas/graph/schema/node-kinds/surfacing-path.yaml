@@ -362,7 +362,7 @@ nodeKinds:
   origin: universal
   prefix: orch-primitive
   cluster: 4-surfacing-path
-  purpose: an orchestration-level action or pattern (dispatch, reconcile, poll, retry, workspace lifecycle)
+  purpose: an orchestration-level control-plane action or pattern (dispatch, handoff, replay, reconcile, poll, retry, approval gates, budget controls, workspace lifecycle) that realizes layer:13-orchestration
   attributes:
   - name: id
     type: id
@@ -388,6 +388,7 @@ nodeKinds:
   - orch_triggers
   - orch_implements_workflow
   - orchestration_primitive_supported_by
+  - realizes
   invariants: []
   examples: []
 - id: node:interaction-primitive-category
@@ -620,4 +621,3 @@ nodeKinds:
   invariants:
   - id starts with dashboard: null
   examples: []
-

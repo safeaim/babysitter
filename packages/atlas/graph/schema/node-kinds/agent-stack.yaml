@@ -1029,3 +1029,58 @@ nodeKinds:
   - id starts with launch-contract: null
   examples: []
 
+
+- id: node:agent-governance-impl
+  name: AgentGovernanceImpl
+  origin: derived
+  originContext: catalog pass 2026-05-14 — governance promoted to a first-class universal agentic stack layer for policy, risk, audit evidence, plugin governance, and tool governance implementation components.
+  prefix: agent-governance-impl
+  cluster: 3-agent-stack
+  purpose: concrete governance implementation for an agent product, SDK, plugin host, or platform tool surface
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: agentVersionId
+    type: ref<AgentVersion>
+    required: true
+  - name: packageRef
+    type: ref<SourceRef|ProcessDescriptor>
+    required: true
+  - name: componentKind
+    type: enum<policy-engine,plugin-governance,tool-governance,audit-evidence,risk-control,composite>
+    required: true
+  - name: governedSurfaces
+    type: list<string>
+    required: false
+    notes: Surfaces governed by this component, such as plugin manifests, hook fanout, task effects, tool dispatch, run journals, approval gates, or generated platform plugins.
+  - name: riskControls
+    type: list<string>
+    required: false
+    notes: Named risks or control families mitigated by this governance implementation.
+  - name: evidenceProduced
+    type: list<string>
+    required: false
+    notes: Evidence artifacts produced for audit or review, such as journal events, completion proof, hook merge diagnostics, task result schemas, or plugin manifests.
+  - name: notes
+    type: markdown
+    required: false
+  incomingEdges:
+  - composed_of
+  outgoingEdges:
+  - realizes
+  - composes
+  - implements
+  - targets_plugin_surface
+  - depends_on
+  - bundles
+  - supports
+  invariants:
+  - id starts with agent-governance-impl: null
+  - composes carries role=governance
+  examples:
+  - graph/agent-stack/governance-impls/babysitter-plugin-governance-current.yaml
+  - graph/agent-stack/governance-impls/babysitter-sdk-tool-governance-current.yaml

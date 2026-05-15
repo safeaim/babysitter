@@ -16,6 +16,8 @@ edges:
       role: core
     - target: agent-runtime-impl:babysitter-sdk.runtime@current
       role: runtime
+    - target: agent-governance-impl:babysitter-sdk-tool.governance@current
+      role: governance
   sourced_from: []
   supports:
     - target: capability:can-multi-turn

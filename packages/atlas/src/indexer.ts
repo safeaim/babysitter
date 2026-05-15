@@ -104,6 +104,62 @@ function extractEdges(record: Record<string, unknown>, fromId: string): Edge[] {
   return edges;
 }
 
+function hasRecordEdge(edges: Edge[], kind: string, to: string): boolean {
+  return edges.some((edge) => edge.kind === kind && edge.to === to);
+}
+
+function evidenceSourceId(ref: string): string {
+  return ref.startsWith("evidence:") ? ref : `evidence:${ref}`;
+}
+
+function journalEventAliasId(eventName: string): string {
+  return `journal-event:babysitter-${eventName.toLowerCase().replace(/_/g, "-")}`;
+}
+
+function providerProductId(providerId: string): string {
+  return providerId.startsWith("provider:") ? providerId : `provider:${providerId}`;
+}
+
+function deriveAttributeEdges(record: AtlasRecord, recordEdges: Edge[], recordIds?: Set<string>): Edge[] {
+  const derived: Edge[] = [];
+  const add = (kind: string, to: string): void => {
+    if (recordIds && !recordIds.has(to)) return;
+    if (!hasRecordEdge(recordEdges, kind, to) && !hasRecordEdge(derived, kind, to)) {
+      derived.push({ from: record.id, to, kind });
+    }
+  };
+
+  if (record._kind === "EvidenceSource" && typeof record.trustLevel === "string") {
+    add("has_trust_level", record.trustLevel);
+  }
+
+  if (["Modality", "ModelProviderProduct", "ModelProviderVersion"].includes(record._kind)) {
+    for (const evidenceRef of asStringList(record.evidenceRefs)) {
+      add("has_evidence_source", evidenceSourceId(evidenceRef));
+    }
+  }
+
+  if (record._kind === "AgentVersion") {
+    for (const installMethod of asStringList(record.installMethods)) {
+      add("installed_via", installMethod);
+    }
+  }
+
+  if (record._kind === "ModelProviderVersion" && typeof record.providerId === "string") {
+    add("model_provider_version_of", providerProductId(record.providerId));
+  }
+
+  if (record._kind === "EndUser" && typeof record.tenantId === "string") {
+    add("belongs_to_tenant", record.tenantId);
+  }
+
+  if (record._kind === "RunJournalEvent" && typeof record.eventName === "string") {
+    add("aliases_journal_event", journalEventAliasId(record.eventName));
+  }
+
+  return derived;
+}
+
 function loadNodeKinds(catalogDir: string, schemaDir: string): Record<string, Record<string, unknown>> {
   const dir = path.join(schemaDir, "node-kinds");
   const nodeKinds: Record<string, Record<string, unknown>> = {};
@@ -157,6 +213,29 @@ function fallbackTitle(body: string, slug: string): string {
   return match ? match[1].trim() : slug.split("/").at(-1) ?? slug;
 }
 
+function derivePageHierarchyEdges(records: Record<string, AtlasRecord>): Edge[] {
+  const pages = Object.values(records);
+  const bySlug = new Map<string, AtlasRecord>();
+  for (const page of pages) {
+    if (typeof page.slug === "string") bySlug.set(page.slug, page);
+  }
+
+  const edges: Edge[] = [];
+  for (const page of pages) {
+    if (typeof page.slug !== "string" || page.slug === "index") continue;
+    const segments = page.slug.split("/").filter(Boolean);
+    for (let length = segments.length - 1; length >= 0; length--) {
+      const parentSlug = length === 0 ? "index" : segments.slice(0, length).join("/");
+      const parent = bySlug.get(parentSlug);
+      if (parent && parent.id !== page.id) {
+        edges.push({ from: parent.id, to: page.id, kind: "contains_page" });
+        break;
+      }
+    }
+  }
+  return edges;
+}
+
 function loadMarkdownPages(catalogDir: string): { records: Record<string, AtlasRecord>; edges: Edge[] } {
   const wikiDir = path.join(catalogDir, "wiki");
   const records: Record<string, AtlasRecord> = {};
@@ -192,6 +271,7 @@ function loadMarkdownPages(catalogDir: string): { records: Record<string, AtlasR
     };
     for (const target of documents) edges.push({ from: id, to: target, kind: "documents" });
   }
+  edges.push(...derivePageHierarchyEdges(records));
   return { records, edges };
 }
 
@@ -206,6 +286,11 @@ export function buildIndex(options: BuildIndexOptions): IndexShape {
   const clusters: Record<string, ClusterAccumulator> = {};
   let parseErrors = 0;
 
+  function addEdge(edge: Edge): void {
+    edges.push(edge);
+    edgeKindCounts[edge.kind] = (edgeKindCounts[edge.kind] ?? 0) + 1;
+  }
+
   function addRecord(record: AtlasRecord, recordEdges: Edge[] = []): void {
     const existing = records[record.id];
     const shouldReplaceDuplicate =
@@ -219,10 +304,7 @@ export function buildIndex(options: BuildIndexOptions): IndexShape {
       clusterInfo.nodeKinds.add(record._kind);
       clusterInfo.recordCount++;
     }
-    for (const edge of recordEdges) {
-      edges.push(edge);
-      edgeKindCounts[edge.kind] = (edgeKindCounts[edge.kind] ?? 0) + 1;
-    }
+    for (const edge of recordEdges) addEdge(edge);
   }
 
   for (const file of yamlFiles) {
@@ -269,6 +351,12 @@ export function buildIndex(options: BuildIndexOptions): IndexShape {
 
   const pages = loadMarkdownPages(catalogDir);
   for (const record of Object.values(pages.records)) addRecord(record, pages.edges.filter((edge) => edge.from === record.id));
+
+  const recordIds = new Set(Object.keys(records));
+  for (const record of Object.values(records)) {
+    const recordEdges = edges.filter((edge) => edge.from === record.id);
+    for (const edge of deriveAttributeEdges(record, recordEdges, recordIds)) addEdge(edge);
+  }
 
   const schemaNodeKinds = loadNodeKinds(catalogDir, schemaDir);
   const schemaEdgeKinds = loadEdgeKinds(schemaDir);

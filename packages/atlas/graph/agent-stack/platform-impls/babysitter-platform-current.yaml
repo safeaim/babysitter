@@ -102,3 +102,11 @@ edges:
     - target: frontmatter-field:task-schema-sleep
     - target: frontmatter-field:task-schema-subprocess
 
+  supports_orchestration_primitive:
+    - target: orch-primitive:babysitter-run-create
+    - target: orch-primitive:babysitter-run-iterate
+    - target: orch-primitive:babysitter-effect-request
+    - target: orch-primitive:babysitter-effect-resolution
+    - target: orch-primitive:babysitter-breakpoint-gate
+    - target: orch-primitive:babysitter-completion-proof
+    - target: orch-primitive:babysitter-harness-dispatch

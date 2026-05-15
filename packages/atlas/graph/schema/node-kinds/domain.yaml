@@ -451,4 +451,138 @@ nodeKinds:
   - exactly one provided_by (V-platform-1)
   - implementsStackPartIds MAY be empty (V-platform-5)
   examples: []
-
+- id: node:kubernetes-crd-kind
+  name: KubernetesCrdKind
+  origin: derived
+  originContext: catalog pass 2026-05-14 — Kubernetes CRDs need first-class graph nodes so products such as Krate can model resource kinds, source manifests, external-resource mappings, policy governance, and controller reconciliation without overloading generic Topic or Definition records.
+  prefix: kubernetes-crd-kind
+  cluster: 9-domain
+  purpose: a Kubernetes CustomResourceDefinition kind that extends the Kubernetes API with a namespaced or cluster-scoped custom resource
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: apiGroup
+    type: string
+    required: true
+  - name: version
+    type: string
+    required: true
+    notes: Primary storage version for the CRD kind.
+  - name: servedVersions
+    type: list<string>
+    required: false
+    notes: All served versions from spec.versions.
+  - name: storageVersion
+    type: string
+    required: false
+    notes: Version marked storage=true in spec.versions.
+  - name: kind
+    type: string
+    required: true
+  - name: plural
+    type: string
+    required: true
+  - name: singular
+    type: string
+    required: false
+  - name: scope
+    type: enum<Namespaced,Cluster>
+    required: true
+  - name: sourceFile
+    type: string
+    required: true
+  - name: schemaPath
+    type: string
+    required: false
+  - name: family
+    type: string
+    required: false
+    notes: Product-specific resource family such as agent, aggregated, external-backend, policy, or identity.
+  - name: owningPlatformId
+    type: ref<Platform>
+    required: false
+  - name: platformServiceIds
+    type: list<id>
+    required: false
+    notes: PlatformService records that own, serve, reconcile, or surface this CRD kind.
+  - name: hasStatus
+    type: bool
+    required: false
+  - name: hasConditions
+    type: bool
+    required: false
+  - name: statusFieldPath
+    type: string
+    required: false
+  - name: categories
+    type: list<string>
+    required: false
+  - name: shortNames
+    type: list<string>
+    required: false
+  incomingEdges:
+  - reconciles_resource
+  - watches_resource
+  - surfaces_resource
+  - governs_resource
+  - serves_kubernetes_resource
+  outgoingEdges:
+  - defined_by_crd_source
+  - belongs_to_resource_family
+  - maps_to_external_resource
+  invariants:
+  - id starts with kubernetes-crd-kind: null
+  - kind, apiGroup, plural, servedVersions, storageVersion, and scope reflect the Kubernetes CustomResourceDefinition spec.
+  examples:
+  - graph/domain/products/krate-crd-kinds.yaml
+- id: node:kubernetes-controller
+  name: KubernetesController
+  origin: derived
+  originContext: catalog pass 2026-05-14 — controller reconciliation is a first-class Kubernetes platform relationship and should not be collapsed into generic service dependency edges.
+  prefix: kubernetes-controller
+  cluster: 9-domain
+  purpose: a Kubernetes controller, operator, admission controller, sync controller, or aggregated API component that watches and reconciles Kubernetes resources
+  attributes:
+  - name: id
+    type: id
+    required: true
+  - name: displayName
+    type: string
+    required: true
+  - name: description
+    type: markdown
+    required: true
+  - name: owningPlatformId
+    type: ref<Platform>
+    required: false
+  - name: controllerKind
+    type: enum<operator,aggregated-api-server,admission-controller,webhook-controller,sync-controller,composite>
+    required: true
+  - name: runtime
+    type: string
+    required: false
+  - name: sourcePath
+    type: string
+    required: false
+  - name: reconciliationScope
+    type: enum<single-namespace,multi-namespace,cluster,mixed>
+    required: false
+  - name: notes
+    type: markdown
+    required: false
+  incomingEdges: []
+  outgoingEdges:
+  - watches_resource
+  - reconciles_resource
+  - emits_resource_status
+  invariants:
+  - id starts with kubernetes-controller: null
+  examples:
+  - graph/domain/products/krate-controllers.yaml

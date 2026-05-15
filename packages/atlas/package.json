@@ -48,7 +48,8 @@
     "deferred:list": "node scripts/list-deferred-nodes.mjs",
     "claims:run": "node scripts/run-testable-claims.mjs",
     "claims:untested": "node scripts/find-untested-claims.mjs",
-    "quality": "node scripts/graph-quality.mjs"
+    "quality": "node scripts/graph-quality.mjs",
+    "validate:krate-graph": "node scripts/validate-krate-graph.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.1"

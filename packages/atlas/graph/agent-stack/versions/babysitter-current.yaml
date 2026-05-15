@@ -20,6 +20,8 @@ edges:
       role: platform
     - target: agent-ui-impl:babysitter.ui@current
       role: ui
+    - target: agent-governance-impl:babysitter-plugin.governance@current
+      role: governance
   sourced_from: []
   supports:
     - target: capability:supports-mcp
@@ -42,3 +44,6 @@ edges:
     - target: memory-system:auto-dream-consolidation-pattern
     - target: memory-system:claude-code-auto-memory
     - target: memory-system:instruction-file-hierarchy
+  targets_plugin_surface:
+    - target: plugin-target:codex
+    - target: plugin-target:claude-code

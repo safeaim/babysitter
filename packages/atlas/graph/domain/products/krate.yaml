@@ -22,7 +22,7 @@ attributes:
     and dispatches coding agents to work on them.
 
     Architecture follows a three-plane design:
-      - Control plane: 43 etcd-backed CRD kinds for configuration,
+      - Control plane: 75 Krate CRD kinds for configuration,
         identity, policy, and org structure.
       - Data plane: 23 Postgres-backed aggregated API kinds for
         high-volume mutable state (repositories, pull requests, issues,
@@ -32,7 +32,7 @@ attributes:
 
     Key properties:
       - Org-scoped tenancy: every resource belongs to an Organization.
-      - 49 total resource kinds across etcd CRDs and aggregated APIs.
+      - 75 total Krate CRD kinds across agent, aggregated, external backend, policy, and repository resource families.
       - GitOps transparency: every UI action has a kubectl equivalent.
       - Agent dispatch as CI: coding agents run as K8s Jobs through
         the same pipeline infrastructure as CI.
@@ -73,10 +73,60 @@ edges:
       notes: "Cursor agents dispatch into Krate-managed repositories"
     - target: agent:gemini-cli
       notes: "Gemini CLI agents dispatch into Krate-managed repositories"
+    - target: agent:aider
+      notes: "Aider agents dispatch into Krate-managed repositories"
+    - target: agent:cline
+      notes: "Cline agents dispatch into Krate-managed repositories"
+    - target: agent:continue
+      notes: "Continue agents dispatch into Krate-managed repositories"
+    - target: agent:windsurf
+      notes: "Windsurf agents dispatch into Krate-managed repositories"
+    - target: agent:devin
+      notes: "Devin agents dispatch into Krate-managed repositories"
+    - target: agent:goose
+      notes: "Goose agents dispatch into Krate-managed repositories"
+    - target: agent:bolt
+      notes: "Bolt agents dispatch into Krate-managed repositories"
+    - target: agent:sweep-ai
+      notes: "Sweep AI agents dispatch into Krate-managed repositories"
+    - target: agent:openhands
+      notes: "OpenHands agents dispatch into Krate-managed repositories"
+    - target: agent:roo-code
+      notes: "Roo Code agents dispatch into Krate-managed repositories"
+    - target: agent:opencode
+      notes: "OpenCode agents dispatch into Krate-managed repositories"
+    - target: agent:hermes
+      notes: "Hermes agents dispatch into Krate-managed repositories"
   applies_to:
     - domain:platform-engineering
     - domain:devops
     - domain:software-engineering
+  supports_orchestration_primitive:
+    - target: orch-primitive:krate-agent-dispatch
+    - target: orch-primitive:krate-auto-trigger
+    - target: orch-primitive:krate-approval-gate
+    - target: orch-primitive:krate-workspace-provision
+    - target: orch-primitive:krate-context-assembly
+    - target: orch-primitive:krate-permission-review
+    - target: orch-primitive:krate-pr-as-artifact
+    - target: orch-primitive:krate-memory-consolidation
+  supports_interaction_primitive:
+    - target: interaction-primitive:krate-agent-dispatch
+      attributes: { mechanism: api-endpoint }
+    - target: interaction-primitive:krate-agent-trigger-process
+      attributes: { mechanism: event-routing }
+    - target: interaction-primitive:krate-agent-approval-decide
+      attributes: { mechanism: ui-control }
+    - target: interaction-primitive:krate-pr-create
+      attributes: { mechanism: api-endpoint }
+    - target: interaction-primitive:krate-pr-merge
+      attributes: { mechanism: api-endpoint }
+    - target: interaction-primitive:krate-pr-review
+      attributes: { mechanism: ui-control }
+    - target: interaction-primitive:krate-memory-query
+      attributes: { mechanism: api-endpoint }
+    - target: interaction-primitive:krate-memory-update
+      attributes: { mechanism: ui-control }
 ---
 nodeKind: PlatformService
 id: platform-service:krate-forge
@@ -458,6 +508,157 @@ edges:
   lib_applies_to_domain:
     - target: domain:platform-engineering
     - target: domain:devops
+  serves_kubernetes_resource:
+    - target: kubernetes-crd-kind:krate-agent-stack
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-subagent
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-tool-profile
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-mcp-server
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-skill
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-trigger-rule
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-context-label
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-krate-workspace-policy
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-service-account
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-role-binding
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-secret-grant
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-config-grant
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-adapter
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-transport-binding
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-provider-config
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-krate-project
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-gateway-config
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-memory-repository
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-memory-source
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-memory-ontology
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-memory-association
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-krate-workspace
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-ref-policy
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-runner-pool
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-webhook-subscription
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-view
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-selector
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-pull-request
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-issue
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-review
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-pipeline
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-job
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-webhook-delivery
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-dispatch-run
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-dispatch-attempt
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-session
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-context-bundle
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-krate-artifact
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-approval
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-trigger-execution
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-capability-requirement
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-work-item-session-link
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-work-item-workspace-link
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-session-transcript
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-session-attachment
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-krate-workspace-runtime
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-memory-snapshot
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-memory-query
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-memory-update
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-agent-run-memory-import
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-backend-provider
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-backend-binding
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-backend-sync-policy
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-provider-capability-manifest
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-webhook-delivery
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-sync-event
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-sync-state
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-write-intent
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-sync-conflict
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-external-object-link
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-policy-profile
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-policy-template
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-policy-binding
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-policy-exception-request
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-repository
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-branch-protection
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-organization
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-org-namespace-binding
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-sshkey
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-repository-permission
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-user
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-team
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-invite
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-identity-mapping
+      serviceMode: aggregated-api
+    - target: kubernetes-crd-kind:krate-auth-provider
+      serviceMode: aggregated-api
 ---
 nodeKind: ToolServer
 id: tool-server:krate-agent-dispatch
@@ -493,7 +694,7 @@ attributes:
   displayName: "Krate Configuration Resource Kinds (etcd CRDs)"
   authoredAt: "2026-05-10T00:00:00Z"
   text: |
-    The 43 etcd-backed Custom Resource Definitions that form Krate's
+    The 75 Krate CustomResourceDefinition documents that form Krate's
     control plane. These are low-volume, high-importance configuration
     resources stored in etcd alongside native Kubernetes objects:
 

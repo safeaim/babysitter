@@ -229,12 +229,52 @@ const transportProxies = byKind('TransportProxy');
 const benchmarks = byKind('Benchmark');
 const evalResults = byKind('EvalResult');
 const evalRuns = byKind('EvalRun');
+const testSets = byKind('TestSet');
 
-const benchEdgeKinds = ['evaluated_on', 'has_eval_result', 'benchmarked_on', 'scored_against', 'for_benchmark', 'belongs_to_benchmark'];
-const benchWithResults = new Set(edges.filter(e => benchEdgeKinds.includes(e.kind)).flatMap(e => [e.from, e.to]).filter(id => benchmarks.some(b => b.id === id)));
+const benchmarkIds = new Set(benchmarks.map(b => b.id));
+const evalResultIds = new Set(evalResults.map(r => r.id));
+const evalRunIds = new Set(evalRuns.map(r => r.id));
+const benchmarkResultEdgeKinds = new Set(['evaluated_on', 'has_eval_result', 'benchmarked_on', 'scored_against', 'for_benchmark']);
+const benchmarkTestSetEdgeKinds = new Set(['belongs_to_benchmark', 'uses_test_set', 'has_test_set']);
+const benchmarkSourceFields = ['homepageUrl', 'repoUrl', 'paperUrl', 'datasetUrl', 'leaderboardUrl', 'sourceUrl'];
+
+const benchmarkWithSources = new Set(benchmarks
+  .filter(b => benchmarkSourceFields.some(field => b[field] || b.attributes?.[field]))
+  .map(b => b.id));
+const benchmarkSourceCoverage = pct(benchmarkWithSources.size, benchmarks.length);
+
+const benchWithTestSets = new Set();
+for (const testSet of testSets) {
+  const benchmarkId = testSet.benchmarkId || testSet.attributes?.benchmarkId;
+  if (benchmarkIds.has(benchmarkId)) benchWithTestSets.add(benchmarkId);
+}
+for (const edge of edges) {
+  if (!benchmarkTestSetEdgeKinds.has(edge.kind)) continue;
+  if (benchmarkIds.has(edge.from)) benchWithTestSets.add(edge.from);
+  if (benchmarkIds.has(edge.to)) benchWithTestSets.add(edge.to);
+}
+const benchmarkTestSetCoverage = pct(benchWithTestSets.size, benchmarks.length);
+
+const benchWithResults = new Set();
+for (const edge of edges) {
+  if (!benchmarkResultEdgeKinds.has(edge.kind)) continue;
+  const fromIsBenchmark = benchmarkIds.has(edge.from);
+  const toIsBenchmark = benchmarkIds.has(edge.to);
+  const fromIsEvalArtifact = evalResultIds.has(edge.from) || evalRunIds.has(edge.from);
+  const toIsEvalArtifact = evalResultIds.has(edge.to) || evalRunIds.has(edge.to);
+  if (fromIsBenchmark && toIsEvalArtifact) benchWithResults.add(edge.from);
+  if (toIsBenchmark && fromIsEvalArtifact) benchWithResults.add(edge.to);
+}
 const benchResultCoverage = pct(benchWithResults.size, benchmarks.length);
+const benchmarkArtifactCoverage = ((
+  parseFloat(benchmarkSourceCoverage) +
+  parseFloat(benchmarkTestSetCoverage) +
+  parseFloat(benchResultCoverage)
+) / 3).toFixed(1);
 
-const evalRunsWithBench = new Set(edges.filter(e => (benchEdgeKinds.includes(e.kind)) && evalRuns.some(r => r.id === e.from)).map(e => e.from));
+const evalRunsWithBench = new Set(edges
+  .filter(e => benchmarkResultEdgeKinds.has(e.kind) && evalRunIds.has(e.from) && benchmarkIds.has(e.to))
+  .map(e => e.from));
 const evalRunBenchCoverage = pct(evalRunsWithBench.size, evalRuns.length);
 
 // ═══════════════════════════════════════════
@@ -392,7 +432,8 @@ const overall = (
   parseFloat(hookMappingCoverage) * 0.02 +
   // Compute & benchmarks (8%)
   parseFloat(mvProviderCoverage) * 0.02 +
-  parseFloat(benchResultCoverage) * 0.02 +
+  parseFloat(benchmarkArtifactCoverage) * 0.015 +
+  parseFloat(benchResultCoverage) * 0.005 +
   parseFloat(kfRealizeCoverage) * 0.02 +
   parseFloat(memUsedCoverage) * 0.02 +
   // Library bridge (4%)
@@ -494,6 +535,9 @@ console.log(header('BENCHMARKS & EVAL'));
 console.log(line('Benchmarks:', benchmarks.length));
 console.log(line('Eval results:', evalResults.length));
 console.log(line('Eval runs:', evalRuns.length));
+console.log(line('Bench→sources:', benchmarkSourceCoverage + '%'));
+console.log(line('Bench→test sets:', benchmarkTestSetCoverage + '%'));
+console.log(line('Bench artifact score:', benchmarkArtifactCoverage + '%'));
 console.log(line('Bench→results:', benchResultCoverage + '%'));
 console.log(line('Runs→benchmark:', evalRunBenchCoverage + '%'));
 
@@ -605,6 +649,20 @@ if (verbose) {
     console.log(`\nModel versions without family (${mvNoFamily.length}):`);
     for (const m of mvNoFamily.slice(0, 10)) console.log(`  ${m.id}`);
     if (mvNoFamily.length > 10) console.log(`  ... and ${mvNoFamily.length - 10} more`);
+  }
+
+  const benchNoSources = benchmarks.filter(b => !benchmarkWithSources.has(b.id));
+  if (benchNoSources.length > 0) {
+    console.log(`\nBenchmarks without source URLs (${benchNoSources.length}):`);
+    for (const b of benchNoSources.slice(0, 10)) console.log(`  ${b.id}`);
+    if (benchNoSources.length > 10) console.log(`  ... and ${benchNoSources.length - 10} more`);
+  }
+
+  const benchNoTestSets = benchmarks.filter(b => !benchWithTestSets.has(b.id));
+  if (benchNoTestSets.length > 0) {
+    console.log(`\nBenchmarks without test-set artifacts (${benchNoTestSets.length}):`);
+    for (const b of benchNoTestSets.slice(0, 10)) console.log(`  ${b.id}`);
+    if (benchNoTestSets.length > 10) console.log(`  ... and ${benchNoTestSets.length - 10} more`);
   }
 
   const benchNoResults = benchmarks.filter(b => !benchWithResults.has(b.id));

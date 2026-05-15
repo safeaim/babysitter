@@ -110,16 +110,28 @@
     "webpackbar": "file:third_party/webpackbar"
   },
   "overrides": {
-    "webpackbar": "file:third_party/webpackbar"
+    "webpackbar": "file:third_party/webpackbar",
+    "@react-native/codegen": "0.85.3",
+    "chromium-edge-launcher": "^2.0.1",
+    "babel-plugin-istanbul": "^8.0.0",
+    "test-exclude": "^8.0.0",
+    "sockjs": {
+      "uuid": "^11.1.0"
+    },
+    "xcode": {
+      "uuid": "^11.1.0"
+    },
+    "node-domexception": "$node-domexception"
   },
   "dependencies": {
     "@a5c-ai/agent-mux": "^5.0.0",
     "@a5c-ai/compendium": "^0.1.0",
-    "@mariozechner/pi-coding-agent": "0.73.1",
+    "@earendil-works/pi-coding-agent": "0.74.0",
     "@modelcontextprotocol/sdk": "1.29.0",
     "expo": "^55.0.24",
     "expo-notifications": "^55.0.23",
     "express-rate-limit": "8.5.1",
-    "react-native": "^0.85.3"
+    "react-native": "^0.85.3",
+    "node-domexception": "file:third_party/node-domexception"
   }
 }

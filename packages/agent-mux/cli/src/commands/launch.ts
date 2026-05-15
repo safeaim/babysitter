@@ -742,7 +742,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       const settingsPath = join(claudeDir, 'settings.json');
       if (home && !existsSync(settingsPath)) {
         mkdirSync(claudeDir, { recursive: true });
-        writeFileSync(settingsPath, JSON.stringify({ permissions: { allow: [], deny: [] } }, null, 2));
+        writeFileSync(settingsPath, JSON.stringify({ permissions: { allow: [], deny: [] }, theme: 'dark' }, null, 2));
       }
     }
 

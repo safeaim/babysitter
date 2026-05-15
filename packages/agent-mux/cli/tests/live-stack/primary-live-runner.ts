@@ -409,7 +409,7 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
   }
 
   if (scenario.agent.installMode === 'babysitter-plugin') {
-    return `Use the babysitter skill to orchestrate the following task: ${coreTask}`;
+    return `You MUST use the babysitter skill to orchestrate this task through the full babysitter lifecycle (run:assign-process, run:iterate, task:post). Do NOT execute the task directly — use the orchestration loop. Task: ${coreTask}`;
   }
 
   return coreTask;

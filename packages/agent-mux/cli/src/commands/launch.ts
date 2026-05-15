@@ -1034,8 +1034,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     process.on('exit', () => { try { ptyProcess.kill('SIGKILL'); } catch { /* */ } });
   }
 
-  const promptPassedAsPiFlag = plan.harness === 'pi' && !isInteractive && plan.args.includes('--prompt');
-  if (prompt && child.stdin && !ptyProcess && !promptPassedAsPiFlag) {
+  const promptPassedAsFlag = (plan.harness === 'pi' && !isInteractive && plan.args.includes('--prompt'));
+  if (prompt && child.stdin && !ptyProcess && !promptPassedAsFlag) {
     child.stdin.write(prompt + '\n');
     if (!isInteractive) {
       child.stdin.end();
@@ -1044,6 +1044,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       process.stdin.resume();
       process.stdin.pipe(child.stdin);
     }
+  }
+  // Close stdin for harnesses where prompt was passed as a CLI flag (not via stdin)
+  // to prevent the process from hanging waiting for interactive input.
+  if (promptPassedAsFlag && child.stdin && !ptyProcess) {
+    child.stdin.end();
   }
 
   const exitCode = await (

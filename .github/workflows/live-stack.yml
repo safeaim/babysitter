@@ -229,6 +229,7 @@ jobs:
             scenario: { amux_agent: codex }
           - interaction_mode: { id: bridged-hooks }
             scenario: { amux_agent: pi }
+          - scenario: { amux_agent: pi }
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

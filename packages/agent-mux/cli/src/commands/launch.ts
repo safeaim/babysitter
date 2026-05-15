@@ -917,6 +917,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     let eventCount = 0;
     let apiKeyPromptHandled = false;
     let bypassPromptHandled = false;
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    const IDLE_TIMEOUT_MS = 15_000;
 
     const parseCtx = {
       runId: 'bridge',
@@ -983,18 +985,29 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
             // Detect turn completion events — schedule PTY termination
             if (ev.type === 'message_stop' || ev.type === 'turn_end' || ev.type === 'session_end') {
               turnComplete = true;
+              if (idleTimer) clearTimeout(idleTimer);
               setTimeout(() => {
                 try { ptyProcess.kill('SIGTERM'); } catch { /* */ }
               }, 1000);
               return;
             }
+
+            // Reset idle timer — if no structured end event comes, idle timeout
+            // acts as fallback completion detection (e.g., Pi doesn't emit end events).
+            if (idleTimer) clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+              if (!turnComplete && eventCount > 0) {
+                turnComplete = true;
+                try { ptyProcess.kill('SIGTERM'); } catch { /* */ }
+              }
+            }, IDLE_TIMEOUT_MS);
           }
         } catch { /* parse error — ignore */ }
       }
     });
 
-    // Inject prompt after all onboarding prompts are dismissed.
-    // If API key or bypass prompts appear, wait for them before sending the task.
+    // Inject prompt after any observed onboarding prompts are dismissed.
+    // Do not require startup output: some harnesses wait silently for input.
     if (prompt) {
       const injectPrompt = () => ptyProcess.write(prompt + '\n');
       const checkAndInject = () => {
@@ -1003,11 +1016,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           setTimeout(injectPrompt, 2000);
         } else {
           const stripped = outputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
-          if (outputBuf.length > 0 && !stripped.includes('APIkey') && !stripped.includes('Bypass')) {
-            injectPrompt();
-          } else {
+          if (stripped.includes('APIkey') || stripped.includes('Bypass')) {
             setTimeout(checkAndInject, 500);
+            return;
           }
+          injectPrompt();
         }
       };
       setTimeout(checkAndInject, 500);
@@ -1040,10 +1053,26 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // internally (claude -p, codex exec, gemini --prompt, pi stdin).
     const { spawn } = await import('node:child_process');
     child = spawn(plan.command, plan.args, {
-      stdio: ['pipe', 'inherit', 'inherit'],
+      stdio: ['pipe', 'pipe', 'inherit'],
       env: { ...process.env, ...plan.env },
       cwd: launchCwd,
       shell: process.platform === 'win32',
+    });
+
+    // Pipe stdout through + idle-timeout kill for harnesses that don't exit
+    // after completing a non-interactive task (e.g., Pi).
+    let niIdleTimer: ReturnType<typeof setTimeout> | null = null;
+    let niHasOutput = false;
+    const NI_IDLE_TIMEOUT_MS = 15_000;
+    child.stdout?.on('data', (chunk: Buffer) => {
+      process.stdout.write(chunk);
+      niHasOutput = true;
+      if (niIdleTimer) clearTimeout(niIdleTimer);
+      niIdleTimer = setTimeout(() => {
+        if (niHasOutput) {
+          try { child.kill('SIGTERM'); } catch { /* */ }
+        }
+      }, NI_IDLE_TIMEOUT_MS);
     });
   }
 

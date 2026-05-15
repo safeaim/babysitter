@@ -229,10 +229,10 @@ describe('live stack scenario contract primitives', () => {
     expect(workflow).toContain('cancel-in-progress: true');
   });
 
-  it('does not schedule Pi in live-stack until the harness supports terminating one-shot runs', () => {
+  it('schedules Pi in live-stack with idle-timeout completion detection', () => {
     const workflow = fs.readFileSync('.github/workflows/live-stack.yml', 'utf8');
 
-    expect(workflow).not.toContain('live.agent-mux.pi.foundry-openai.gpt-5.5');
+    expect(workflow).toContain('live.agent-mux.pi.foundry-openai.gpt-5.5');
   });
 
   it('keeps live-stack matrix concurrency below publish runner saturation', () => {

@@ -978,6 +978,8 @@ jobs:
       - name: Build hooks adapter workspace
         run: |
           set -euo pipefail
+          npm run build --workspace=@a5c-ai/atlas
+          npm run build --workspace=@a5c-ai/agent-catalog
           npm run build --workspace=@a5c-ai/hooks-mux-core
           npm run build --workspace=${{ matrix.workspace }}
 

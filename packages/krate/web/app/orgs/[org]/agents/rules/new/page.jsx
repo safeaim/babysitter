@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { AgentRuleBuilderPage } from '../../../../../ui-shell.jsx';
+export const metadata = { title: 'New Agent Rule | Krate' };
+
 
 export default async function Page({ params }) {
   const routeParams = await params;

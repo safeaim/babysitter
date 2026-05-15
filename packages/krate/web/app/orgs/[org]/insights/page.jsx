@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { InsightsPage } from '../../../ui-shell.jsx';
+export const metadata = { title: 'Insights | Krate' };
+
 
 export default async function Page({ params }) {
   const routeParams = await params;

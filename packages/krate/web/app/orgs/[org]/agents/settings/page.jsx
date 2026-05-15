@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { AgentSettingsPage } from '../../../../ui-shell.jsx';
+export const metadata = { title: 'Agent Settings | Krate' };
+
 
 export default async function Page({ params }) {
   const routeParams = await params;

@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { RunnersCiPage } from '../../../ui-shell.jsx';
+export const metadata = { title: 'Runners & CI | Krate' };
+
 
 export default async function Page({ params }) {
   const routeParams = await params;

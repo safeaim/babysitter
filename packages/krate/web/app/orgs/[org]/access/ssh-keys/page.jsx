@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { SSHKeysPage } from '../../../../ui-shell.jsx';
+export const metadata = { title: 'SSH Keys | Krate' };
+
 
 export default async function Page({ params }) {
   const routeParams = await params;

@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { InboxPage } from '../../../ui-shell.jsx';
+export const metadata = { title: 'Inbox | Krate' };
+
 
 export default async function Page({ params }) {
   const routeParams = await params;

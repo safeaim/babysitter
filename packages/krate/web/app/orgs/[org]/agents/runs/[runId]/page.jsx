@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { AgentRunDetailPage } from '../../../../../ui-shell.jsx';
+export const metadata = { title: 'Agent Run | Krate' };
+
 
 export default async function Page({ params }) {
   const routeParams = await params;

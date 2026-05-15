@@ -314,6 +314,56 @@ function defaultArchitecture(namespace) {
   };
 }
 
+export function issueRepositoryRefs(issue = {}) {
+  return uniqueStrings([
+    issue.spec?.repository,
+    issue.spec?.repoRef,
+    issue.spec?.repositoryRef,
+    issue.metadata?.labels?.repository,
+    issue.metadata?.labels?.['krate.a5c.ai/repository'],
+    issue.metadata?.annotations?.['krate.a5c.ai/repository'],
+    issue.metadata?.annotations?.['krate.a5c.ai/repositories'],
+    issue.status?.repository,
+    issue.status?.repositoryRef,
+    ...(issue.spec?.repositories || []),
+    ...(issue.spec?.repositoryRefs || []),
+    ...(issue.status?.repositories || []),
+    ...(issue.status?.repositoryRefs || [])
+  ]);
+}
+
+export function issueProjectRefs(issue = {}) {
+  return uniqueStrings([
+    issue.spec?.project,
+    issue.spec?.projectRef,
+    issue.spec?.krateProject,
+    issue.spec?.krateProjectRef,
+    issue.metadata?.labels?.project,
+    issue.metadata?.labels?.['krate.a5c.ai/project'],
+    issue.metadata?.labels?.['krate.a5c.ai/krate-project'],
+    issue.metadata?.annotations?.['krate.a5c.ai/project'],
+    issue.metadata?.annotations?.['krate.a5c.ai/projects'],
+    issue.status?.project,
+    issue.status?.projectRef,
+    ...(issue.spec?.projects || []),
+    ...(issue.spec?.projectRefs || []),
+    ...(issue.status?.projects || []),
+    ...(issue.status?.projectRefs || [])
+  ]);
+}
+
+function uniqueStrings(values = []) {
+  return [...new Set(values.flatMap(refNames).filter(Boolean).map(String))];
+}
+
+function refNames(value) {
+  if (value === undefined || value === null || value === '') return [];
+  if (Array.isArray(value)) return value.flatMap(refNames);
+  if (typeof value === 'string') return value.split(',').map((part) => part.trim()).filter(Boolean);
+  if (typeof value === 'object') return refNames(value.name || value.repository || value.repo || value.project || value.krateProject || value.metadata?.name || value.ref || value.slug);
+  return [String(value)];
+}
+
 function pullRequestReview(pullRequest, pipelines, jobs) {
   const pipelineRuns = pipelines.filter((pipeline) => pipeline.spec?.pullRequest === pullRequest.metadata?.name || pipeline.metadata?.labels?.pullrequest === pullRequest.metadata?.name);
   return {

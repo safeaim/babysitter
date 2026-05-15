@@ -93,6 +93,9 @@ jobs:
             npx --no-install tsc --build packages/babysitter-agent/tsconfig.json
           }
 
+          echo "Building @a5c-ai/atlas before agent-catalog"
+          npm run build --workspace=@a5c-ai/atlas
+
           run_many "Build foundation packages" \
             @a5c-ai/agent-catalog \
             @a5c-ai/breakpoints-mux \

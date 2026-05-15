@@ -863,15 +863,15 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           setTimeout(() => ptyProcess.write('\r'), 500);
         };
         const checkReady = () => {
+          const s = interactiveOutputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
           if (interactiveApiKeyHandled || interactiveBypassHandled) {
             setTimeout(doInject, 2000);
+          } else if (s.includes('APIkey') || s.includes('Bypass')) {
+            setTimeout(checkReady, 500);
+          } else if (s.includes('❯') || s.includes('/effort')) {
+            doInject();
           } else {
-            const s = interactiveOutputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
-            if (s.includes('APIkey') || s.includes('Bypass')) {
-              setTimeout(checkReady, 500);
-            } else {
-              doInject();
-            }
+            setTimeout(checkReady, 500);
           }
         };
         setTimeout(checkReady, 1000);
@@ -1049,15 +1049,15 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         setTimeout(() => ptyProcess.write('\r'), 500);
       };
       const checkAndInject = () => {
+        const stripped = outputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
         if (apiKeyPromptHandled || bypassPromptHandled) {
           setTimeout(injectPrompt, 2000);
-        } else {
-          const stripped = outputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
-          if (stripped.includes('APIkey') || stripped.includes('Bypass')) {
-            setTimeout(checkAndInject, 500);
-            return;
-          }
+        } else if (stripped.includes('APIkey') || stripped.includes('Bypass')) {
+          setTimeout(checkAndInject, 500);
+        } else if (stripped.includes('❯') || stripped.includes('/effort')) {
           injectPrompt();
+        } else {
+          setTimeout(checkAndInject, 500);
         }
       };
       setTimeout(checkAndInject, 1000);

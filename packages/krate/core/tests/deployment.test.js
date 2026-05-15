@@ -185,6 +185,8 @@ test('web UI and controller API expose live Kubernetes deployment and publishing
   assert.equal(model.controller.architecture.repositoryService.role, 'repository-service');
   assert.deepEqual(model.controller.architecture.apiController.delegatesTo, ['krate-resource-gateway', 'repository-service']);
   assert.ok(model.resources.some((resource) => resource.kind === 'Repository' && resource.count > 0));
+  assert.ok(model.resources.some((resource) => resource.kind === 'KrateProject'));
+  assert.ok(model.views.dashboard.issueSync?.gitea?.repo, 'dashboard exposes issue sync backend plan');
   assert.equal(model.policyEngine.health, 'ready');
   assert.equal(model.policyEngine.violations.length, 1);
   assert.ok(model.resources.some((resource) => resource.kind === 'PolicyBinding' && resource.count > 0));
@@ -219,7 +221,7 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   const server = read('src/http-server.js');
   assert.ok(page.includes("redirect('/orgs/'"));
   assert.ok(orgPage.includes('DashboardPage'));
-  assert.ok(read('../web/app/orgs/page.jsx').includes('Choose an organization')); 
+  assert.ok(read('../web/app/orgs/page.jsx').includes('Choose an organization'));
   assert.ok(client.includes('KRATE_CONTROLLER_URL'));
   assert.ok(client.includes('createKrateApiController'));
   assert.ok(client.includes('createKubernetesResourceGateway'));
@@ -234,6 +236,11 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   assert.ok(shell.includes('/api/controller'));
   assert.ok(shell.includes('ArchitectureMap'));
   assert.ok(shell.includes('Repository home'));
+  assert.ok(shell.includes('IssueWorkspace'));
+  assert.ok(shell.includes('IssueViewSwitcher'));
+  assert.ok(shell.includes('issuesForScope'));
+  assert.ok(shell.includes('issueRepositoryRefs'));
+  assert.ok(shell.includes('issueProjectRefs'));
   assert.ok(shell.includes('DeploymentCenter'));
   assert.ok(shell.includes('DeploymentManager'));
   assert.ok(shell.includes('Krate deployment center'));
@@ -272,6 +279,9 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   assert.equal(existsSync('../web/app/runs/page.jsx'), false);
   assert.equal(existsSync('../web/app/pipelines/page.jsx'), false);
   assert.equal(existsSync('../web/app/orgs/[org]/repositories/[repo]/runs/page.jsx'), true);
+  assert.equal(existsSync('../web/app/orgs/[org]/repositories/[repo]/issues/[issue]/page.jsx'), true);
+  assert.equal(existsSync('../web/app/orgs/[org]/agents/projects/[projectId]/issues/page.jsx'), true);
+  assert.equal(existsSync('../web/app/orgs/[org]/agents/projects/[projectId]/issues/[issue]/page.jsx'), true);
   assert.equal(existsSync('../web/app/repositories/[repo]/runs/page.jsx'), false);
   assert.equal(existsSync('../web/app/repositories/[repo]/pipelines/page.jsx'), false);
   assert.equal(existsSync('../web/proxy.js'), true);
@@ -298,9 +308,9 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   assert.ok(!page.includes('createKrateMvpDemo'));
   assert.ok(!page.includes('createKrateLifecycleSnapshot'));
   assert.ok(apiController.includes('const repoPath = `/orgs/${encodeURIComponent(org)}/repositories/${encodeURIComponent(name)}`'));
-  assert.ok(apiController.includes('runs: `${repoPath}/runs`')); 
+  assert.ok(apiController.includes('runs: `${repoPath}/runs`'));
   assert.ok(server.includes('/api/controller'));
-  assert.ok(server.includes('orgResourceCollectionMatch')); 
+  assert.ok(server.includes('orgResourceCollectionMatch'));
   assert.ok(!server.includes("url.pathname === '/api/repositories'"));
 });
 

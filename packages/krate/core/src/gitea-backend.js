@@ -77,6 +77,42 @@ export function createGiteaBackend({ baseUrl = 'http://krate-gitea-http:3000', t
   };
 }
 
+export function orgMemoryRepositoryName(org = 'default') {
+  return `_${String(org || 'default').replace(/[^a-zA-Z0-9.-]+/g, '-')}_`;
+}
+
+export function giteaIssueSyncPlan({ org = 'default', project = null, issue = null, repositories = [] } = {}) {
+  const owner = org;
+  const repo = orgMemoryRepositoryName(org);
+  const issueName = issue?.metadata?.name || issue?.name || '<issue>';
+  return {
+    backend: 'gitea',
+    owner,
+    repo,
+    issue: issueName,
+    project,
+    repositoryRefs: repositories,
+    metadataKeys: ['krate.a5c.ai/project', 'krate.a5c.ai/repositories'],
+    actions: [
+      { action: 'ensureOrgMemoryRepository', owner, repo },
+      { action: 'syncIssue', owner, repo, issue: issueName },
+      { action: 'writeIssueRepositoryMetadata', issue: issueName, repositories }
+    ]
+  };
+}
+
+export function githubProjectIssueSyncPlan({ org = 'default', project = null, issue = null, repositories = [] } = {}) {
+  return {
+    backend: 'github',
+    owner: org,
+    project,
+    issue: issue?.metadata?.name || issue?.name || '<issue>',
+    repositoryRefs: repositories,
+    metadataKeys: ['project item fields', 'krate repositories field'],
+    actions: ['syncProjectItem', 'syncIssueMetadata', 'syncRepositoryLinks']
+  };
+}
+
 export function giteaRepositoryIntegrationPlan({ owner, repo, deployKeyTitle = 'krate-gitops', permission = 'write', branch = 'main', webhookUrl }) {
   return {
     backend: 'gitea',

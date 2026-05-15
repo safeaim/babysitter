@@ -248,10 +248,46 @@ spec:
                 type: string
               repository:
                 type: string
+              repoRef:
+                type: string
+              repositoryRef:
+                type: string
+              repositories:
+                type: array
+                items:
+                  type: string
+              repositoryRefs:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              project:
+                type: string
+              projectRef:
+                type: string
+              krateProjectRef:
+                type: string
+              projects:
+                type: array
+                items:
+                  type: string
+              projectRefs:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
               title:
                 type: string
               body:
                 type: string
+              comments:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              sync:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               labels:
                 type: array
                 items:

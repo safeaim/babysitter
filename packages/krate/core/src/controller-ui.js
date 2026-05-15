@@ -1,3 +1,4 @@
+import { giteaIssueSyncPlan, githubProjectIssueSyncPlan } from './gitea-backend.js';
 import { resourceToYaml } from './resource-model.js';
 import { KRATE_ORG_LABEL, KRATE_ORG_NAMESPACE_LABEL, KRATE_RESOURCES, apiResourceName, createKrateKubernetesReconciler, orgNamespaceName } from './kubernetes-controller.js';
 
@@ -43,7 +44,7 @@ const controllerEndpoints = [
 
 const runtimeComponents = [
   { id: 'identity-access', title: 'Identity and access', area: 'identity', resources: ['User', 'Team', 'Invite', 'IdentityMapping', 'AuthProvider'], docs: 'src/auth.js' },
-  { id: 'api-controller', title: 'Krate API controller', area: 'api', resources: ['Repository', 'PullRequest', 'Pipeline'], docs: 'src/api-controller.js' },
+  { id: 'api-controller', title: 'Krate API controller', area: 'api', resources: ['Repository', 'KrateProject', 'PullRequest', 'Issue', 'Pipeline'], docs: 'src/api-controller.js' },
   { id: 'krate-resource-client', title: 'Krate resource client', area: 'control-plane', resources: ['Repository', 'BranchProtection', 'RefPolicy'], docs: 'src/kubernetes-controller.js' },
   { id: 'repository-service', title: 'Repository service', area: 'data-plane', resources: ['Repository', 'BranchProtection', 'RefPolicy'], docs: 'src/data-plane.js' },
   { id: 'runners-ci', title: 'Runner scheduler', area: 'ci', resources: ['RunnerPool', 'Pipeline', 'Job'], docs: 'src/kubernetes-controller.js' },
@@ -90,6 +91,7 @@ export function createControllerUiModel(source, options = {}) {
   identityView.org = activeOrg?.slug;
   const repositories = filterByOrg(snapshot.resources.Repository || [], activeOrg?.slug);
   const pullRequests = filterByOrg(snapshot.resources.PullRequest || [], activeOrg?.slug);
+  const issues = filterByOrg(snapshot.resources.Issue || [], activeOrg?.slug);
   const pipelines = filterByOrg(snapshot.resources.Pipeline || [], activeOrg?.slug);
   const jobs = filterByOrg(snapshot.resources.Job || [], activeOrg?.slug);
   const runnerPools = filterByOrg(snapshot.resources.RunnerPool || [], activeOrg?.slug);
@@ -183,6 +185,8 @@ export function createControllerUiModel(source, options = {}) {
       invites: invites.length,
       repositories: repositories.length,
       pullRequests: pullRequests.length,
+      issues: issues.length,
+      projects: agentProjects.length,
       pipelines: pipelines.length,
       jobs: jobs.length,
       runnerPools: runnerPools.length,
@@ -217,8 +221,11 @@ export function createControllerUiModel(source, options = {}) {
     views: {
       dashboard: {
         repositories,
+        projects: agentProjects,
+        issues,
+        issueSync: issueSyncView({ org: activeOrg?.slug, projects: agentProjects, repositories, issues }),
       excellentFlows: ['Create or import a repository', 'Browse code and copy clone commands', 'Review and merge a pull request', 'Debug a failing pipeline run', 'Edit runner pool capacity', 'Inspect and replay webhook deliveries', 'Save a triage View'],
-        cards: dashboardCards({ repositories, pullRequests, pipelines, runnerPools, webhookDeliveries })
+        cards: dashboardCards({ repositories, projects: agentProjects, pullRequests, issues, pipelines, runnerPools, webhookDeliveries })
       },
       pullRequestReview: pullRequests[0] ? pullRequestReview(pullRequests[0], pipelines, jobs) : null,
       failingRun: pipelines.find((pipeline) => pipeline.status?.phase === 'Failed') ? failingRun(pipelines.find((pipeline) => pipeline.status?.phase === 'Failed'), jobs) : null,
@@ -294,9 +301,11 @@ function summarizePhases(items) {
   }, {});
 }
 
-function dashboardCards({ repositories, pullRequests, pipelines, runnerPools, webhookDeliveries }) {
+function dashboardCards({ repositories, projects = [], pullRequests, issues = [], pipelines, runnerPools, webhookDeliveries }) {
   return [
     { label: 'Repositories', value: repositories.length, href: '/repositories' },
+    { label: 'Projects', value: projects.length, href: '/agents/projects' },
+    { label: 'Issues', value: issues.length, href: '/inbox' },
     { label: 'Pull requests', value: pullRequests.length, href: '/inbox' },
     { label: 'Runs', value: pipelines.length, href: '/runs' },
     { label: 'Runner pools', value: runnerPools.length, href: '/runners-ci' },
@@ -362,6 +371,13 @@ function refNames(value) {
   if (typeof value === 'string') return value.split(',').map((part) => part.trim()).filter(Boolean);
   if (typeof value === 'object') return refNames(value.name || value.repository || value.repo || value.project || value.krateProject || value.metadata?.name || value.ref || value.slug);
   return [String(value)];
+}
+
+function issueSyncView({ org = 'default', projects = [], repositories = [], issues = [] }) {
+  return {
+    gitea: giteaIssueSyncPlan({ org, project: projects[0]?.metadata?.name || null, issue: issues[0] || null, repositories: repositories.map((repo) => repo.metadata?.name).filter(Boolean) }),
+    github: githubProjectIssueSyncPlan({ org, project: projects[0]?.metadata?.name || null, issue: issues[0] || null, repositories: repositories.map((repo) => repo.metadata?.name).filter(Boolean) })
+  };
 }
 
 function pullRequestReview(pullRequest, pipelines, jobs) {

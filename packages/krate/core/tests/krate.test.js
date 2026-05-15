@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ControlPlane, GiteaGitService, GiteaRepositoryStore, RunnerScheduler, WebhookBus, createAdmissionPolicy, createAuthProviderConfig, buildAuthorizationRedirect, exchangeOAuthCodeForProfile, profileFromDelegatedHeaders, registerLoginProfile, createSessionCookie, parseSessionCookie, createInviteResource, createTeamResource, identityBackendSyncPlan, mapLoginProfileToKrateIdentity, createKrateApiController, createControllerUiModel, createKrateComponentCatalog, createKrateHandoffSummary, createKrateLifecycleSnapshot, createKrateMvpDemo, createPolicyRolloutModel, createResource, createKrateKubernetesReconciler, identityAccessReconciliationPlan, createKubernetesResourceClient, createKubernetesResourceGateway, createGiteaBackend, createGiteaRepositoryHosting, createKrateGitOpsPlan, listResourceDefinitions, mapOidcIdentity, resourceSchemaForKind, resourceToYaml, runSmokeAssertions } from '../src/index.js';
+import { ControlPlane, GiteaGitService, GiteaRepositoryStore, RunnerScheduler, WebhookBus, createAdmissionPolicy, createAuthProviderConfig, buildAuthorizationRedirect, exchangeOAuthCodeForProfile, profileFromDelegatedHeaders, registerLoginProfile, createSessionCookie, parseSessionCookie, createInviteResource, createTeamResource, identityBackendSyncPlan, mapLoginProfileToKrateIdentity, createKrateApiController, createControllerUiModel, createKrateComponentCatalog, createKrateHandoffSummary, createKrateLifecycleSnapshot, createKrateMvpDemo, createPolicyRolloutModel, createResource, createKrateKubernetesReconciler, identityAccessReconciliationPlan, createKubernetesResourceClient, createKubernetesResourceGateway, createGiteaBackend, createGiteaRepositoryHosting, giteaIssueSyncPlan, githubProjectIssueSyncPlan, issueProjectRefs, issueRepositoryRefs, orgMemoryRepositoryName, createKrateGitOpsPlan, listResourceDefinitions, mapOidcIdentity, resourceSchemaForKind, resourceToYaml, runSmokeAssertions } from '../src/index.js';
 
 const platform = mapOidcIdentity({ subject: 'platform', email: 'platform@example.com', groups: ['krate:platform-engineers'] });
 const developer = mapOidcIdentity({ subject: 'dev', email: 'dev@example.com', groups: ['krate:developers'] });
@@ -61,6 +61,9 @@ test('Gitea repository hosting plan includes Argo CD deploy key and webhook inte
   assert.match(hosting.httpUrl, /platform-config\.git$/);
   assert.ok(hosting.integrationPlan.operations.some((step) => step.action === 'addDeployKey' && step.title === 'krate-argocd'));
   assert.ok(hosting.integrationPlan.operations.some((step) => step.action === 'createWebhook'));
+  assert.equal(hosting.forgeRecords.issues, 'Gitea /repos/krate/_krate-system_/issues');
+  assert.equal(hosting.issueSync.repo, '_krate-system_');
+  assert.ok(hosting.issueSync.actions.some((step) => step.action === 'ensureOrgMemoryRepository'));
 });
 test('resource catalog exposes all ontology kinds and storage boundaries', () => {
   const definitions = listResourceDefinitions();
@@ -75,13 +78,39 @@ test('resource catalog exposes all ontology kinds and storage boundaries', () =>
   assert.equal(resourceSchemaForKind('AuthProvider').plural, 'authproviders');
   assert.equal(resourceSchemaForKind('SSHKey').plural, 'sshkeys');
   assert.equal(resourceSchemaForKind('RepositoryPermission').plural, 'repositorypermissions');
+  assert.equal(resourceSchemaForKind('KrateProject').plural, 'krateprojects');
   const schema = resourceSchemaForKind('PullRequest');
   assert.deepEqual(schema.required.spec, ['organizationRef', 'repository', 'title']);
   assert.match(resourceToYaml(createResource('Repository', { name: 'yaml-demo' }, { organizationRef: 'default', visibility: 'private' })), /kind: Repository/);
   assert.match(resourceToYaml(createResource('SSHKey', { name: 'alice-key' }, { organizationRef: 'default', scope: 'user', key: 'ssh-ed25519 AAAA' })), /kind: SSHKey/);
+  assert.match(resourceToYaml(createResource('KrateProject', { name: 'triage' }, { organizationRef: 'default', displayName: 'Triage', repositories: ['app'] })), /kind: KrateProject/);
   assert.match(resourceToYaml({ apiVersion: 'core.oam.dev/v1beta1', kind: 'Application', spec: { components: [{ name: 'web', properties: { image: 'krate/mvp-model:0.1.0' }, traits: [{ type: 'scaler', properties: { replicas: 1 } }] }] } }), /components:\n    - name: web\n      properties:\n        image: krate\/mvp-model:0.1.0\n      traits:\n        - type: scaler/);
 });
 
+
+
+test('issue project and repository associations are normalized for scoped views', () => {
+  const issue = createResource('Issue', { name: 'bug-1', annotations: { 'krate.a5c.ai/repositories': 'app, docs', 'krate.a5c.ai/projects': 'planning' } }, {
+    organizationRef: 'default',
+    title: 'Bug',
+    repositoryRefs: [{ name: 'api' }, { repository: 'ui' }],
+    repositories: ['worker'],
+    projectRef: { name: 'release' },
+    projects: ['roadmap']
+  });
+  assert.deepEqual(issueRepositoryRefs(issue).sort(), ['api', 'app', 'docs', 'ui', 'worker']);
+  assert.deepEqual(issueProjectRefs(issue).sort(), ['planning', 'release', 'roadmap']);
+
+  const gitea = giteaIssueSyncPlan({ org: 'default', project: 'release', issue, repositories: issueRepositoryRefs(issue) });
+  assert.equal(orgMemoryRepositoryName('default'), '_default_');
+  assert.equal(gitea.repo, '_default_');
+  assert.deepEqual(gitea.metadataKeys, ['krate.a5c.ai/project', 'krate.a5c.ai/repositories']);
+  assert.ok(gitea.actions.some((step) => step.action === 'writeIssueRepositoryMetadata'));
+
+  const github = githubProjectIssueSyncPlan({ org: 'default', project: 'release', issue, repositories: issueRepositoryRefs(issue) });
+  assert.equal(github.project, 'release');
+  assert.ok(github.actions.includes('syncProjectItem'));
+});
 
 
 test('Krate auth resources map sign-in, teams, invites, and repository identities', () => {

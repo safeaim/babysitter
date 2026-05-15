@@ -1,4 +1,4 @@
-import { giteaRepositoryIntegrationPlan } from './gitea-backend.js';
+import { giteaIssueSyncPlan, giteaRepositoryIntegrationPlan, orgMemoryRepositoryName } from './gitea-backend.js';
 import { clone, createResource } from './resource-model.js';
 
 
@@ -22,7 +22,8 @@ export function createGiteaRepositoryHosting({ backend = createDefaultGiteaGitBa
     organization: { kind: 'Organization', name: owner, delegatedTo: 'Gitea /api/v1/orgs' },
     sshKeys: { kind: 'SSHKey', scopes: ['user', 'deploy', 'argocd'], delegatedTo: 'Gitea /api/v1/user/keys and /repos/{owner}/{repo}/keys' },
     permissions: { kind: 'RepositoryPermission', defaultCollaborator: 'write', adminTeam: 'maintainers', delegatedTo: 'Gitea collaborators and team repository APIs' },
-    forgeRecords: { issues: 'Gitea /repos/{owner}/{repo}/issues', pullRequests: 'Gitea /repos/{owner}/{repo}/pulls' },
+    forgeRecords: { issues: `Gitea /repos/${owner}/${orgMemoryRepositoryName(namespace)}/issues`, pullRequests: 'Gitea /repos/{owner}/{repo}/pulls' },
+    issueSync: giteaIssueSyncPlan({ org: namespace, repositories: [repository] }),
     webhookUrl,
     integrationPlan: giteaRepositoryIntegrationPlan({ owner, repo: repository, deployKeyTitle: 'krate-argocd', permission: 'write', branch, webhookUrl })
   };

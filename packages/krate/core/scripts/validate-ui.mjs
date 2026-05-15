@@ -10,6 +10,7 @@ const required = [
   'apps/web/proxy.js',
   'apps/web/app/components/code-editor.jsx',
   'apps/web/app/components/resource-actions.jsx',
+  'apps/web/app/components/issue-editor.jsx',
   'apps/web/app/api/controller/route.js',
   'apps/web/app/api/orgs/[org]/resources/route.js',
   'apps/web/app/api/orgs/[org]/resources/[kind]/[name]/route.js',
@@ -29,7 +30,11 @@ const required = [
   'src/kubernetes-controller.js',
   'src/controller-client.js',
   'src/controller-ui.js',
-  'src/http-server.js'
+  'src/http-server.js',
+  'src/gitea-backend.js',
+  '../sdk/src/index.js',
+  '../charts/crds/agent-resources.yaml',
+  '../charts/crds/aggregated-resources.yaml'
 ];
 function resolveRequiredFile(file) {
   if (existsSync(file)) return file;
@@ -129,6 +134,9 @@ const pageContracts = {
   'apps/web/app/orgs/[org]/repositories/[repo]/code/page.jsx': 'RepositoryCodePage',
   'apps/web/app/orgs/[org]/repositories/[repo]/pull-requests/page.jsx': 'RepositoryPullRequestsPage',
   'apps/web/app/orgs/[org]/repositories/[repo]/issues/page.jsx': 'RepositoryIssuesPage',
+  'apps/web/app/orgs/[org]/repositories/[repo]/issues/[issue]/page.jsx': 'RepositoryIssueDetailPage',
+  'apps/web/app/orgs/[org]/agents/projects/[projectId]/issues/page.jsx': 'ProjectIssuesPage',
+  'apps/web/app/orgs/[org]/agents/projects/[projectId]/issues/[issue]/page.jsx': 'ProjectIssueDetailPage',
   'apps/web/app/orgs/[org]/repositories/[repo]/runs/page.jsx': 'RepositoryRunsPage',
   'apps/web/app/orgs/[org]/repositories/[repo]/hooks/page.jsx': 'RepositoryHooksPage',
   'apps/web/app/orgs/[org]/repositories/[repo]/settings/page.jsx': 'RepositorySettingsPage'
@@ -140,10 +148,20 @@ for (const [file, component] of Object.entries(pageContracts)) {
   if (!files[file].includes(component)) failures.push(`${file} does not use dedicated ${component} route component`);
 }
 if (required.some((file) => file.includes('/pipelines'))) failures.push('legacy pipelines route is still required');
-for (const token of ['ControllerApiPage', 'RepositoriesPage', 'InboxPage', 'RunsPage', 'RunnersCiPage', 'HooksEventsPage', 'InsightsPage', 'OperationsInstallPage', 'AdvancedPlansPage', 'PeoplePage', 'LoginPage', 'LogoutPage', 'RepositoryCodePage', 'RepositoryPullRequestsPage', 'RepositoryIssuesPage', 'RepositoryRunsPage', 'RepositoryHooksPage', 'RepositorySettingsPage']) {
+for (const token of ['KrateProject', 'issues', 'issueSync', 'issueRepositoryRefs', 'issueProjectRefs']) {
+  if (!files['src/controller-ui.js'].includes(token)) failures.push(`controller UI issue scoping missing ${token}`);
+}
+for (const token of ['giteaIssueSyncPlan', 'githubProjectIssueSyncPlan', 'orgMemoryRepositoryName', 'ensureOrgMemoryRepository', 'writeIssueRepositoryMetadata']) {
+  if (!files['src/gitea-backend.js'].includes(token)) failures.push(`backend issue sync plan missing ${token}`);
+}
+for (const [file, token] of [['../charts/crds/agent-resources.yaml', 'repositoryRefs'], ['../charts/crds/aggregated-resources.yaml', 'repositoryRefs'], ['../sdk/src/index.js', 'issueRepositoryRefs'], ['apps/web/app/api/orgs/[org]/resources/[kind]/[name]/route.js', 'PATCH'], ['apps/web/app/api/orgs/[org]/resources/[kind]/[name]/route.js', 'applyResourceForOrg'], ['apps/web/app/components/issue-editor.jsx', 'IssueCreateForm'], ['apps/web/app/components/issue-editor.jsx', 'IssueEditor'], ['apps/web/app/components/issue-editor.jsx', 'Create scoped issue'], ['apps/web/app/components/issue-editor.jsx', 'Add comment']]) {
+  if (!files[file].includes(token)) failures.push(`${file} missing project issue scoping token ${token}`);
+}
+
+for (const token of ['ControllerApiPage', 'RepositoriesPage', 'InboxPage', 'RunsPage', 'RunnersCiPage', 'HooksEventsPage', 'InsightsPage', 'OperationsInstallPage', 'AdvancedPlansPage', 'PeoplePage', 'LoginPage', 'LogoutPage', 'RepositoryCodePage', 'RepositoryPullRequestsPage', 'RepositoryIssuesPage', 'RepositoryIssueDetailPage', 'ProjectIssuesPage', 'ProjectIssueDetailPage', 'IssueScopePage', 'RepositoryRunsPage', 'RepositoryHooksPage', 'RepositorySettingsPage']) {
   if (!files['apps/web/app/ui-shell.jsx'].includes(token)) failures.push(`ui shell missing dedicated flow component ${token}`);
 }
-for (const token of ['Invite people', 'identity links', 'repository permissions', 'Access overview', 'Access readiness', 'Use workspace identity', 'Sign in to Krate', 'Repository home', 'Review inbox', 'Run debugger', 'Capacity designer', 'Automation inspector', 'Clone and refs', 'Repository settings map', 'Advanced architecture details', 'ResourceList', 'PlanCard', 'ForgeFlowRail', 'RepositoryCommandBar', 'breadcrumbs', 'Create → review → merge → deploy', 'Advanced resource details']) {
+for (const token of ['IssueWorkspace', 'IssueCreateForm', 'IssueViewSwitcher', 'IssueDetailPage', 'IssueDetailView', 'IssueEditor', 'IssueComments', 'issuesForScope', 'issueRepositoryRefs', 'issueProjectRefs', 'Invite people', 'identity links', 'repository permissions', 'Access overview', 'Access readiness', 'Use workspace identity', 'Sign in to Krate', 'Repository home', 'Review inbox', 'Run debugger', 'Capacity designer', 'Automation inspector', 'Clone and refs', 'Repository settings map', 'Advanced architecture details', 'ResourceList', 'PlanCard', 'ForgeFlowRail', 'RepositoryCommandBar', 'breadcrumbs', 'Create → review → merge → deploy', 'Advanced resource details']) {
   if (!files['apps/web/app/ui-shell.jsx'].includes(token)) failures.push(`ui shell missing forge UX affordance ${token}`);
 }
 
@@ -162,6 +180,8 @@ const model = createControllerUiModel({
   resources: {
     Organization: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'Organization', metadata: { name: 'default', namespace: 'krate-system' }, spec: { slug: 'default', namespaceName: 'krate-org-default', displayName: 'Default org' } }],
     Repository: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'Repository', metadata: { name: 'live-repo', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', visibility: 'internal', defaultBranch: 'main' }, status: { phase: 'Ready' } }],
+    KrateProject: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'KrateProject', metadata: { name: 'default-project', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', displayName: 'Default project', repositories: ['live-repo'] }, status: { phase: 'Ready' } }],
+    Issue: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'Issue', metadata: { name: 'issue-live', namespace: 'krate-org-default', annotations: { 'krate.a5c.ai/repositories': 'live-repo' } }, spec: { organizationRef: 'default', project: 'default-project', title: 'Scoped issue', repositoryRefs: [{ name: 'live-repo' }] }, status: { phase: 'Open', comments: [{ author: 'alice', body: 'linked to live repo' }] } }],
     User: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'User', metadata: { name: 'alice', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', email: 'alice@example.com', username: 'alice' }, status: { phase: 'Active' } }],
     RepositoryPermission: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'RepositoryPermission', metadata: { name: 'live-repo-alice', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', repository: 'live-repo', subject: 'alice', subjectKind: 'user', permission: 'write' }, status: { phase: 'Synced' } }],
     SSHKey: [{ apiVersion: 'krate.a5c.ai/v1alpha1', kind: 'SSHKey', metadata: { name: 'alice-laptop', namespace: 'krate-org-default' }, spec: { organizationRef: 'default', owner: 'alice', title: 'laptop', scope: 'user', key: 'ssh-ed25519 AAAA' }, status: { phase: 'Synced' } }],
@@ -208,6 +228,9 @@ if (model.controller.architecture?.resourceClient?.role !== 'krate-resource-clie
 if (model.controller.architecture?.deliveryReconciler?.role !== 'krate-delivery-reconciler') failures.push('model missing delivery reconciler architecture boundary');
 if (!model.controller.architecture?.apiController?.delegatesTo?.includes('krate-resource-gateway')) failures.push('API controller does not delegate to resource gateway');
 if (model.resources.find((resource) => resource.kind === 'Repository')?.items?.[0]?.metadata?.name !== 'live-repo') failures.push('repository model missing live items');
+if (model.resources.find((resource) => resource.kind === 'KrateProject')?.count !== 1) failures.push('project model missing live KrateProject items');
+if (model.resources.find((resource) => resource.kind === 'Issue')?.count !== 1) failures.push('issue model missing live issue items');
+if (model.views.dashboard.issueSync?.gitea?.repo !== '_default_') failures.push('issue sync view missing org memory repository');
 if (!model.validation.some((item) => item.evidence.includes('/api/orgs/:org/repositories'))) failures.push('validation missing repository management evidence');
 if (model.policyEngine.health !== 'ready') failures.push('policy engine did not project ready Kyverno health');
 if (model.policyEngine.violations.length !== 1) failures.push('policy engine did not normalize Kyverno violations');

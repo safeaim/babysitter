@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { createAuthProviderConfig, listEnabledAuthProviders, parseSessionCookie, fetchControllerUiModel } from '@a5c-ai/krate-sdk';
+import { createAuthProviderConfig, issueProjectRefs, issueRepositoryRefs, listEnabledAuthProviders, parseSessionCookie, fetchControllerUiModel } from '@a5c-ai/krate-sdk';
 import { CodeEditor, LiveWatchPanel } from './components/code-editor.jsx';
 import { DeploymentManager, RepositoryManager, ResourceApplyPanel, UserManagementPanel } from './components/resource-actions.jsx';
 import { ApprovalDecisionButtons } from './components/approval-actions.jsx';
@@ -30,7 +30,7 @@ import { EnableDisableToggle, DeleteRuleButton } from './components/rule-actions
 import { ResourceActions, InlineCreateForm } from './components/resource-crud-actions.jsx';
 import { RepoCodeBrowser } from './components/repo-code-browser.jsx';
 import { PullRequestList } from './components/pull-request-list.jsx';
-import { IssueList } from './components/issue-list.jsx';
+import { IssueCreateForm, IssueEditor } from './components/issue-editor.jsx';
 import { RepoRuns } from './components/repo-runs.jsx';
 import { WebhookManager } from './components/webhook-manager.jsx';
 import { DeploymentPipeline } from './components/deployment-pipeline.jsx';
@@ -119,6 +119,7 @@ export async function loadKrateUi(org = null) {
     repositories,
     repository: repositories[0] || null,
     repositoryResource: model.resources.find((resource) => resource.kind === 'Repository'),
+    projectResource: model.resources.find((resource) => resource.kind === 'KrateProject'),
     deploymentResource: model.resources.find((resource) => resource.kind === deploymentKind('Application')),
     releaseResource: model.resources.find((resource) => resource.kind === deploymentKind('ApplicationRevision')),
     deploymentPolicyResource: model.resources.find((resource) => resource.kind === deploymentKind('Policy')),
@@ -199,7 +200,7 @@ export async function DashboardPage({ org = null } = {}) {
   const { model, repository, repositoryResource, repositories } = ui;
   const repoName = repository?.metadata?.name;
   const activeOrg = model.org?.slug || org || 'default';
-  return <PageFrame org={activeOrg} orgs={model.orgs} currentPath="/" eyebrow="a5c.ai Krate workspace" title="What do you want to ship today?" text="Start with code, reviews, issues, or deployments. Advanced resource details stay collapsed until you need them." actions={repoName ? [[`/repositories/${repoName}/code`, 'Open repository'], ['/deployments', 'Deploy']] : [['/repositories', 'Create repository'], ['/deployments', 'Start deployment']]}> 
+  return <PageFrame org={activeOrg} orgs={model.orgs} currentPath="/" eyebrow="a5c.ai Krate workspace" title="What do you want to ship today?" text="Start with code, reviews, issues, or deployments. Advanced resource details stay collapsed until you need them." actions={repoName ? [[`/repositories/${repoName}/code`, 'Open repository'], ['/deployments', 'Deploy']] : [['/repositories', 'Create repository'], ['/deployments', 'Start deployment']]}>
     <DegradedBanner model={model} />
     <QuickStart repository={repository} org={activeOrg} />
     <section className="routeGrid two"><DashboardMetrics model={model} /><RepositoryManager namespace={model.namespace} org={activeOrg} repositories={repositories.map(publicResource)} /></section>
@@ -859,12 +860,37 @@ export async function AgentProjectBoardPage({ org = null, projectId } = {}) {
     };
   });
 
-  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`project / ${displayName}`} title={displayName} text={project ? (project.spec?.description || `Kanban board for project ${displayName}.`) : 'This project was not found in the current workspace.'} actions={[['/agents/projects', 'All projects'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/projects', 'Projects'], [`/agents/projects/${projectId}`, displayName]]}>
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`project / ${displayName}`} title={displayName} text={project ? (project.spec?.description || `Kanban board for project ${displayName}.`) : 'This project was not found in the current workspace.'} actions={[[`/agents/projects/${projectId}/issues`, 'Issue view'], ['/agents/projects', 'All projects'], ['/agents/stacks', 'Stacks']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/projects', 'Projects'], [`/agents/projects/${projectId}`, displayName]]}>
     <DegradedBanner model={ui.model} />
     {project ? <div className="card">
       <div className="cardTitle"><h2>Board</h2><StatusPill tone={enrichedItems.length ? 'good' : 'neutral'}>{enrichedItems.length} items</StatusPill></div>
       <EnhancedKanbanBoard project={project} initialIssues={enrichedItems} org={activeOrg} workspaces={workspaces} sessions={sessions} />
     </div> : <EmptyState title={`Project ${projectId} not found`} text="This project does not exist in the current workspace. Create it through Krate resource definitions." />}
+  </PageFrame>;
+}
+
+
+export async function IssueScopePage({ org = null, projectId, view = 'kanban' } = {}) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const project = (ui.model.agents?.projects?.items || []).find((item) => item.metadata?.name === projectId) || null;
+  const displayName = project?.spec?.displayName || projectId || 'Project';
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow={`project issues / ${displayName}`} title={`${displayName} issues`} text="Use the same issue workspace for project and repository triage. Issues may link to zero, one, or many repositories." actions={[[`/agents/projects/${projectId}`, 'Project board'], [`/agents/projects/${projectId}/issues?view=kanban`, 'Kanban'], [`/agents/projects/${projectId}/issues?view=list`, 'List view']]} breadcrumbs={[[ '/', 'Krate' ], [ '/agents', 'Agents' ], [ '/agents/projects', 'Projects' ], [ `/agents/projects/${projectId}/issues`, `${displayName} issues` ]]}>
+    <DegradedBanner model={ui.model} />
+    <IssueWorkspace model={ui.model} resource={ui.issues} project={projectId} view={view} />
+  </PageFrame>;
+}
+
+export async function IssueDetailPage({ org = null, repo = null, projectId = null, issueName }) {
+  const ui = await loadKrateUi(org);
+  const activeOrg = ui.model.org?.slug || org || 'default';
+  const scopedIssues = issuesForScope(ui.issues?.items || [], { repo, project: projectId });
+  const issue = scopedIssues.find((item) => item.metadata?.name === issueName) || null;
+  const parentHref = repo ? `/repositories/${repo}/issues` : projectId ? `/agents/projects/${projectId}/issues` : '/inbox';
+  const parentLabel = repo || projectId || 'Issues';
+  return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath={repo ? '/repositories' : '/agents'} eyebrow={repo ? `repository issue / ${repo}` : `project issue / ${projectId}`} title={issue?.spec?.title || issueName} text="Edit the issue resource, review comments, and verify backend sync metadata from one full-page view." actions={[[parentHref, 'Back to issues'], [`${parentHref}?view=list`, 'List view']]} breadcrumbs={[[ '/', 'Krate' ], [ repo ? '/repositories' : '/agents/projects', repo ? 'Repositories' : 'Projects' ], [ parentHref, parentLabel ], [ `${parentHref}/${issueName}`, issueName ]]}>
+    <DegradedBanner model={ui.model} />
+    {issue ? <IssueDetailView model={ui.model} issue={issue} repo={repo} project={projectId} /> : <EmptyState title="Issue is not linked to this scope" text="This issue is not associated with the selected repository or project, so it is hidden from this issue view." />}
   </PageFrame>;
 }
 
@@ -1478,7 +1504,10 @@ export async function BranchProtectionPage({ org = null } = {}) {
 
 export async function RepositoryCodePage({ org = null, repo }) { return <RepositorySectionPage org={org} repo={repo} section="code" />; }
 export async function RepositoryPullRequestsPage({ org = null, repo }) { return <RepositorySectionPage org={org} repo={repo} section="pull-requests" />; }
-export async function RepositoryIssuesPage({ org = null, repo }) { return <RepositorySectionPage org={org} repo={repo} section="issues" />; }
+export async function RepositoryIssuesPage({ org = null, repo, view = 'kanban' }) { return <RepositorySectionPage org={org} repo={repo} section="issues" view={view} />; }
+export async function RepositoryIssueDetailPage({ org = null, repo, issue }) { return <IssueDetailPage org={org} repo={repo} issueName={issue} />; }
+export async function ProjectIssuesPage({ org = null, projectId, view = 'kanban' }) { return <IssueScopePage org={org} projectId={projectId} view={view} />; }
+export async function ProjectIssueDetailPage({ org = null, projectId, issue }) { return <IssueDetailPage org={org} projectId={projectId} issueName={issue} />; }
 export async function RepositoryRunsPage({ org = null, repo }) { return <RepositorySectionPage org={org} repo={repo} section="runs" />; }
 export async function RepositoryHooksPage({ org = null, repo }) { return <RepositorySectionPage org={org} repo={repo} section="hooks" />; }
 export async function RepositorySettingsPage({ org = null, repo }) { return <RepositorySectionPage org={org} repo={repo} section="settings" />; }
@@ -1490,11 +1519,11 @@ export async function SectionPage({ org = null, section }) {
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath={`/${section}`} eyebrow={page.eyebrow} title={page.title} text={page.text} actions={page.actions} breadcrumbs={page.breadcrumbs || [['/', 'Krate'], ['/' + section, page.title]]}><DegradedBanner model={ui.model} />{page.body}</PageFrame>;
 }
 
-export async function RepositorySectionPage({ org = null, repo, section = 'code' }) {
+export async function RepositorySectionPage({ org = null, repo, section = 'code', view = 'kanban' }) {
   const ui = await loadKrateUi(org);
   const activeOrg = ui.model.org?.slug || org || 'default';
   const repository = ui.repositories.find((item) => item.metadata?.name === repo) || null;
-  const page = repositorySectionContent(section, repo, repository, ui, activeOrg);
+  const page = repositorySectionContent(section, repo, repository, ui, activeOrg, view);
   const actions = repository ? [[`/repositories/${repo}/pull-requests`, 'Open reviews'], [`/repositories/${repo}/runs`, 'View runs'], [`/repositories/${repo}/settings`, 'Settings']] : [['/repositories', 'Create repository'], ['/advanced-plans', 'Advanced details']];
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/repositories" eyebrow={`repository / ${repo}`} title={page.title} text={page.text} actions={actions} breadcrumbs={[[ '/', 'Krate' ], [ '/repositories', 'Repositories' ], [ `/repositories/${repo}/code`, repo ], [ `/repositories/${repo}/${section}`, page.title ]] }><RepositoryHeader repo={repo} repository={repository} model={ui.model} /><DegradedBanner model={ui.model} /><RepositoryNav org={activeOrg} repo={repository ? repo : null} /><RepositoryCommandBar org={activeOrg} repo={repo} repository={repository} model={ui.model} />{page.body}</PageFrame>;
 }
@@ -1528,13 +1557,13 @@ function RepositoryHeader({ repo, repository, model }) {
   </section>;
 }
 
-function repositorySectionContent(section, repo, repository, ui, activeOrg) {
+function repositorySectionContent(section, repo, repository, ui, activeOrg, view = 'kanban') {
   const plan = repository ? resourceJson(repository) : null;
   const empty = !repository;
   const pages = {
     code: { title: repo, text: empty ? 'Create this repository to start browsing files and cloning code.' : 'Browse files, copy clone commands, and branch from the default ref.', body: <div className="repoCodePage">{!empty ? <RepoCodeBrowser org={activeOrg} repo={repo} defaultBranch={repository?.spec?.defaultBranch || 'main'} /> : <div className="card"><h3>Repository not connected</h3><p>Create this repository to start browsing files and cloning code.</p></div>}<CloneAndRefs repo={repo} repository={repository} /></div> },
     'pull-requests': { title: 'Reviews', text: 'Review, merge, or close pull requests for this repository.', body: <div className="routeGrid wideLeft"><PullRequestList org={activeOrg} repo={repo} pullRequests={ui.pullRequests} /><PullRequestReviewPanel model={ui.model} repo={repo} /></div> },
-    issues: { title: 'Issues', text: 'Create, triage, and close issues for this repository.', body: <div className="routeGrid wideLeft"><IssueList org={activeOrg} repo={repo} issues={ui.issues} /><IssueBoard model={ui.model} repo={repo} /></div> },
+    issues: { title: 'Issues', text: 'Triage only issues linked to this repository, with project context, comments, and backend sync metadata.', body: <IssueWorkspace model={ui.model} resource={ui.issues} repo={repo} view={view} /> },
     runs: { title: 'Runs', text: 'Trigger and monitor pipeline runs for this repository.', body: <div className="routeGrid wideLeft"><RepoRuns org={activeOrg} repo={repo} runs={ui.pipelines} /><RunEventStream org={activeOrg} resource={ui.pipelines} events={ui.model.events} /></div> },
     hooks: { title: 'Hooks & Policies', text: 'Inspect subscriptions, replay deliveries, and adjust repository admission policies.', body: <div className="routeGrid wideLeft"><WebhookInspector model={ui.model} repo={repo} /><PolicyPanel org={activeOrg} model={ui.model} repo={repo} resource={ui.model.resources.find((resource) => resource.kind === 'RefPolicy')} /></div> },
     settings: { title: 'Settings', text: 'Update visibility, default branch, access, and policy checks from one settings map.', body: <div className="routeGrid wideLeft"><RepoSettingsPanel repository={repository} model={ui.model} org={activeOrg} repo={repo} /><div className="stack"><ResourceApplyPanel org={activeOrg} resource={publicResource(repository)} /><PlanCard title="Repository details" plan={plan} command="Save repository changes" /></div></div> }
@@ -1604,10 +1633,79 @@ function PullRequestReviewSummary({ review }) {
   return <div><h3>{review.pullRequest.spec?.title || review.pullRequest.metadata?.name}</h3><div className="phaseBadges"><span>{review.pullRequest.status?.phase || 'Open'}</span><span>{review.pipelineRuns.length} runs</span><span>{review.jobs.length} jobs</span></div><ul className="compactList"><li>Changed files: {review.changedFiles.length || 'reported by status when available'}</li><li>Merge gate: checks, review decision, branch policy, policy preview</li><li>Decision: ready when checks and policy agree</li></ul></div>;
 }
 
-function IssueBoard({ model, repo }) {
-  const issues = model.resources.find((resource) => resource.kind === 'Issue')?.items || [];
-  const columns = ['triage', 'ready', 'blocked'];
-  return <div className="card issueBoard"><div className="cardTitle"><h3>Issue board</h3><StatusPill tone={issues.length ? 'good' : 'neutral'}>{issues.length} issues</StatusPill></div><div className="boardColumns">{columns.map((column) => <section key={column}><h4>{column}</h4>{issues.filter((issue, index) => (issue.status?.phase || columns[index % columns.length]).toLowerCase() === column).map((issue) => <article key={issue.metadata?.name}><strong>{issue.spec?.title || issue.metadata?.name}</strong><small>{repo} · {issue.metadata?.name}</small></article>)}{!issues.length ? <p className="emptyText">No {column} issues.</p> : null}</section>)}</div></div>;
+function IssueWorkspace({ model, resource, repo = null, project = null, view = 'kanban' }) {
+  const issues = issuesForScope(resource?.items || [], { repo, project });
+  const title = repo ? `${repo} issues` : project ? `${project} issues` : 'Issues';
+  const scopeText = repo ? 'Only issues whose repository metadata includes this repository are visible here.' : 'Issues are filtered by project metadata and can link to zero, one, or many repositories.';
+  return <div className="issueWorkspace"><div className="card"><div className="cardTitle"><h3>{title}</h3><StatusPill tone={issues.length ? 'good' : 'neutral'}>{issues.length} issues</StatusPill></div><p>{scopeText}</p><IssueCreateForm org={model.org?.slug || 'default'} repo={repo} project={project} /><IssueViewSwitcher model={model} repo={repo} project={project} view={view} />{view === 'list' ? <IssueListView model={model} issues={issues} repo={repo} project={project} /> : <IssueKanbanView model={model} issues={issues} repo={repo} project={project} />}</div><IssueSyncSummary model={model} repo={repo} project={project} /></div>;
+}
+
+function IssueViewSwitcher({ model, repo = null, project = null, view = 'kanban' }) {
+  const base = repo ? `/repositories/${repo}/issues` : project ? `/agents/projects/${project}/issues` : '/inbox';
+  return <nav className="issueViewSwitcher" aria-label="Issue view"><a aria-current={view !== 'list' ? 'page' : undefined} href={modelHref(model, `${base}?view=kanban`)}>Kanban</a><a aria-current={view === 'list' ? 'page' : undefined} href={modelHref(model, `${base}?view=list`)}>List</a></nav>;
+}
+
+function IssueKanbanView({ model, issues, repo = null, project = null }) {
+  const columns = ['triage', 'ready', 'blocked', 'done'];
+  return <div className="boardColumns issueColumns">{columns.map((column) => { const columnIssues = issues.filter((issue) => issueColumn(issue) === column); return <section key={column}><h4>{column}</h4>{columnIssues.map((issue) => <IssueCard key={issue.metadata?.name} model={model} issue={issue} repo={repo} project={project} />)}{columnIssues.length ? null : <p className="emptyText">No {column} issues.</p>}</section>; })}</div>;
+}
+
+function IssueListView({ model, issues, repo = null, project = null }) {
+  if (!issues.length) return <EmptyState title="No scoped issues" text="Create or sync an issue with matching project and repository metadata to show it here." />;
+  return <ul className="resourceList issueList">{issues.map((issue) => <li key={issue.metadata?.name}><a href={issueDetailHref(model, issue, { repo, project })}><strong>{issue.spec?.title || issue.metadata?.name}</strong></a><span>{issue.status?.phase || issue.spec?.status || 'Open'}</span><small>{issueLabels(issue).join(', ') || 'no labels'} · repos: {issueRepositoryRefs(issue).join(', ') || 'none'}</small></li>)}</ul>;
+}
+
+function IssueCard({ model, issue, repo = null, project = null }) {
+  const repositories = issueRepositoryRefs(issue);
+  const projects = issueProjectRefs(issue);
+  return <article><a href={issueDetailHref(model, issue, { repo, project })}><strong>{issue.spec?.title || issue.metadata?.name}</strong></a><small>{issue.status?.phase || issue.spec?.status || 'Open'} · {issue.metadata?.name}</small><small>Repos: {repositories.join(', ') || 'none'}</small>{projects.length ? <small>Projects: {projects.join(', ')}</small> : null}</article>;
+}
+
+function IssueDetailView({ model, issue, repo = null, project = null }) {
+  const comments = issueComments(issue);
+  const org = model.org?.slug || 'default';
+  return <div className="routeGrid wideLeft"><div className="stack"><div className="card issueDetailCard"><div className="cardTitle"><h2>{issue.spec?.title || issue.metadata?.name}</h2><StatusPill tone={issueColumn(issue) === 'blocked' ? 'warn' : issueColumn(issue) === 'done' ? 'good' : 'neutral'}>{issue.status?.phase || issue.spec?.status || 'Open'}</StatusPill></div><p>{sanitizeCopy(issue.spec?.body || issue.spec?.description || issue.status?.summary || 'No description has been synced yet.')}</p><dl className="kv"><dt>Issue</dt><dd>{issue.metadata?.name}</dd><dt>Project refs</dt><dd>{issueProjectRefs(issue).join(', ') || project || 'none'}</dd><dt>Repository refs</dt><dd>{issueRepositoryRefs(issue).join(', ') || 'none'}</dd><dt>Labels</dt><dd>{issueLabels(issue).join(', ') || 'none'}</dd></dl></div><IssueComments comments={comments} /><IssueEditor org={org} issue={publicResource(issue)} repo={repo} project={project} /></div><div className="stack"><IssueSyncSummary model={model} issue={issue} repo={repo} project={project} /><ResourceApplyPanel org={org} resource={publicResource(issue)} /><PlanCard title="Issue details" plan={resourceJson(issue)} initiallyOpen /></div></div>;
+}
+
+function IssueComments({ comments }) {
+  return <div className="card issueComments"><div className="cardTitle"><h3>Comments</h3><StatusPill tone={comments.length ? 'good' : 'neutral'}>{comments.length}</StatusPill></div>{comments.length ? <ul className="conversation">{comments.map((comment) => <li key={comment.id}><strong>{comment.author}</strong><p>{sanitizeCopy(comment.body)}</p><small>{comment.createdAt || 'synced comment'}</small></li>)}</ul> : <p className="emptyText">No comments have been synced for this issue yet.</p>}</div>;
+}
+
+function IssueSyncSummary({ model, repo = null, project = null, issue = null }) {
+  const sync = model.views?.dashboard?.issueSync || {};
+  return <div className="card issueSync"><div className="cardTitle"><h3>Backend sync</h3><StatusPill tone="neutral">metadata</StatusPill></div><p>Internal Gitea uses the org memory repository for issues. GitHub keeps project-scoped issue state and stores repository links as metadata.</p><dl className="kv"><dt>Scope</dt><dd>{project || repo || model.org?.slug || 'default'}</dd><dt>Gitea memory repo</dt><dd>{sync.gitea?.repo || '_org_'}</dd><dt>GitHub project</dt><dd>{sync.github?.project || project || 'project field'}</dd><dt>Issue</dt><dd>{issue?.metadata?.name || sync.gitea?.issue || 'selected on sync'}</dd></dl></div>;
+}
+
+function issuesForScope(issues = [], { repo = null, project = null } = {}) {
+  return issues.filter((issue) => {
+    if (repo && !issueRepositoryRefs(issue).includes(repo)) return false;
+    if (project && !issueProjectRefs(issue).includes(project)) return false;
+    return true;
+  });
+}
+
+function issueDetailHref(model, issue, { repo = null, project = null } = {}) {
+  const name = issue.metadata?.name;
+  if (repo) return modelHref(model, `/repositories/${repo}/issues/${name}`);
+  if (project) return modelHref(model, `/agents/projects/${project}/issues/${name}`);
+  return modelHref(model, '/inbox');
+}
+
+function issueColumn(issue) {
+  const phase = String(issue.status?.phase || issue.spec?.status || issue.spec?.state || 'triage').toLowerCase();
+  if (['done', 'closed', 'resolved', 'merged'].includes(phase)) return 'done';
+  if (['blocked', 'failed', 'stalled'].includes(phase)) return 'blocked';
+  if (['ready', 'active', 'open', 'in-progress', 'in progress'].includes(phase)) return 'ready';
+  return 'triage';
+}
+
+function issueLabels(issue) {
+  return [...(issue.spec?.labels || []), ...(issue.metadata?.labels ? Object.values(issue.metadata.labels) : [])].filter(Boolean).map(String);
+}
+
+function issueComments(issue) {
+  const raw = [issue.spec?.comments, issue.status?.comments, issue.spec?.discussion, issue.status?.discussion].flat().filter(Boolean);
+  return raw.map((comment, index) => typeof comment === 'string' ? { id: `comment-${index}`, author: 'synced comment', body: comment, createdAt: '' } : { id: comment.id || comment.url || `comment-${index}`, author: comment.author || comment.user || 'synced comment', body: comment.body || comment.text || comment.message || '', createdAt: comment.createdAt || comment.created_at || comment.updatedAt || '' });
 }
 
 function RunCenter({ model, pipelines, repositories = [], repo = null }) {
@@ -1681,7 +1779,7 @@ function RepoSettingsPanel({ repository, model, org = 'default', repo }) {
       {/* General settings */}
       <div className="card securitySettings">
         <div className="cardTitle">
-          <h3>Repository settings</h3>
+          <h3>Repository settings map</h3>
           <StatusPill tone={repository ? 'good' : 'warn'}>{repository ? 'connected' : 'missing'}</StatusPill>
         </div>
         <dl className="kv">

@@ -269,7 +269,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 .formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .formGrid label { display: grid; gap: 6px; color: var(--ink-fade); font-size: .82rem; font-weight: 750; }
-.formGrid .wideField { grid-column: 1 / -1; }
+.formGrid .wideField, .formGrid .spanFull { grid-column: 1 / -1; }
 input, select, textarea { width: 100%; padding: 9px 12px; color: var(--ink-pigment); background: linear-gradient(180deg, #fff8e8 0%, #f0e6d1 100%); border: 1.5px solid rgba(91, 56, 23, .34); border-radius: 6px; box-shadow: inset 0 1px 2px rgba(91, 56, 23, .12); }
 button, .actionButton { cursor: pointer; }
 button:disabled { opacity: .58; cursor: not-allowed; }
@@ -1330,3 +1330,17 @@ main { width: 100%; max-width: none; padding: 0 0 48px; }
   .sidebar { position: fixed; z-index: 100; transform: translateX(-100%); transition: transform 0.2s; }
   .sidebar.open { transform: translateX(0); }
 }
+
+.issueWorkspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .34fr); gap: 18px; align-items: start; }
+.issueViewSwitcher { display: inline-flex; gap: 6px; margin: 6px 0 16px; padding: 4px; border: 1px solid rgba(91, 56, 23, .18); border-radius: 999px; background: rgba(255, 251, 244, .7); }
+.issueCreateForm { margin: 14px 0; padding: 12px; border: 1px solid rgba(91, 56, 23, .12); border-radius: 16px; background: rgba(255, 251, 244, .5); }
+.issueCreateForm summary { cursor: pointer; font-weight: 850; color: var(--ink-pigment); }
+.issueViewSwitcher a { padding: 7px 13px; border-radius: 999px; color: var(--ink-ghost); text-decoration: none; font-weight: 800; }
+.issueViewSwitcher a[aria-current="page"] { color: var(--glyph-bone); background: var(--mahogany); }
+.issueColumns article { border: 1px solid rgba(91, 56, 23, .14); }
+.issueColumns article a, .issueList a { color: var(--ink-pigment); text-decoration: none; }
+.issueDetailCard .kv, .issueSync .kv { margin-top: 18px; }
+.issueComments .conversation li { padding: 14px; border: 1px solid rgba(91, 56, 23, .13); border-radius: 14px; background: rgba(255, 251, 244, .58); }
+.issueComments .conversation p { margin: 6px 0; }
+.issueEditor .commentComposer { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(91, 56, 23, .12); }
+@media (max-width: 980px) { .issueWorkspace { grid-template-columns: 1fr; } }

@@ -89,8 +89,6 @@ spec:
               writeBackPolicy:
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
-              displayName:
-                type: string
               systemPrompt:
                 type: string
               developerPrompt:
@@ -1102,6 +1100,20 @@ spec:
                 type: string
               displayName:
                 type: string
+              description:
+                type: string
+              repositories:
+                type: array
+                items:
+                  type: string
+              repositoryRefs:
+                type: array
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              backend:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
           status:
             type: object
             properties:

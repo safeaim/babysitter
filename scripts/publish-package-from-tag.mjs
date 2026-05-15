@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const workspace = getArg('--workspace');
+const skipBuild = hasFlag('--skip-build') || process.env.PUBLISH_PACKAGE_FROM_TAG_SKIP_BUILD === '1';
 
 if (!workspace) {
   fail('Usage: node scripts/publish-package-from-tag.mjs --workspace=<package-name>');
@@ -44,9 +45,15 @@ for (const dependency of collectInternalDependencies(target.manifest)) {
   }
 }
 
-buildWorkspaceDependencies(target.manifest.name, new Set());
-buildWorkspace(target.manifest.name);
+if (!skipBuild) {
+  buildWorkspaceDependencies(target.manifest.name, new Set());
+  buildWorkspace(target.manifest.name);
+}
 run('npm', ['publish', '--workspace', target.manifest.name, '--access', 'public', '--tag', tag, '--ignore-scripts']);
+
+function hasFlag(name) {
+  return process.argv.slice(2).includes(name);
+}
 
 function getArg(name) {
   const prefix = `${name}=`;

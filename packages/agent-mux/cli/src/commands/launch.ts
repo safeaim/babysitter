@@ -733,6 +733,19 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // - Auto-kill on turn completion
     // - Buffer PTY output to avoid pipe deadlock (stdout is piped)
 
+    // Pre-create Claude Code settings to skip onboarding wizard in PTY mode
+    if (plan.harness === 'claude') {
+      const { join } = await import('node:path');
+      const { mkdirSync, existsSync, writeFileSync } = await import('node:fs');
+      const home = process.env['HOME'] ?? process.env['USERPROFILE'] ?? '';
+      const claudeDir = join(home, '.claude');
+      const settingsPath = join(claudeDir, 'settings.json');
+      if (home && !existsSync(settingsPath)) {
+        mkdirSync(claudeDir, { recursive: true });
+        writeFileSync(settingsPath, JSON.stringify({ permissions: { allow: [], deny: [] } }, null, 2));
+      }
+    }
+
     let nodePty: any;
     try {
       nodePty = await import('node-pty');

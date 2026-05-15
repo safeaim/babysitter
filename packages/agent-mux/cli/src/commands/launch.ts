@@ -856,8 +856,9 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         ptyProcess.resize(process.stdout.columns || 80, process.stdout.rows || 24);
       });
 
-      // Inject prompt — wait for onboarding prompts to clear first
+      // Inject prompt — wait for input field to be ready
       if (prompt && !plan.args.some(a => a === prompt)) {
+        const startTime = Date.now();
         const doInject = () => {
           ptyProcess.write(prompt);
           setTimeout(() => ptyProcess.write('\r'), 500);
@@ -868,13 +869,13 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
             setTimeout(doInject, 2000);
           } else if (s.includes('APIkey') || s.includes('Bypass')) {
             setTimeout(checkReady, 500);
-          } else if (s.includes('❯') || s.includes('/effort')) {
-            doInject();
+          } else if (s.includes('❯') || s.includes('/effort') || Date.now() - startTime > 5000) {
+            setTimeout(doInject, 1000);
           } else {
             setTimeout(checkReady, 500);
           }
         };
-        setTimeout(checkReady, 1000);
+        setTimeout(checkReady, 2000);
       }
 
       // Create a fake ChildProcess-like for signal handling
@@ -1044,6 +1045,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // Inject prompt after any observed onboarding prompts are dismissed.
     // Do not require startup output: some harnesses wait silently for input.
     if (prompt) {
+      const biStartTime = Date.now();
       const injectPrompt = () => {
         ptyProcess.write(prompt);
         setTimeout(() => ptyProcess.write('\r'), 500);
@@ -1054,13 +1056,13 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           setTimeout(injectPrompt, 2000);
         } else if (stripped.includes('APIkey') || stripped.includes('Bypass')) {
           setTimeout(checkAndInject, 500);
-        } else if (stripped.includes('❯') || stripped.includes('/effort')) {
-          injectPrompt();
+        } else if (stripped.includes('❯') || stripped.includes('/effort') || Date.now() - biStartTime > 5000) {
+          setTimeout(injectPrompt, 1000);
         } else {
           setTimeout(checkAndInject, 500);
         }
       };
-      setTimeout(checkAndInject, 1000);
+      setTimeout(checkAndInject, 2000);
     }
 
     // Create a fake ChildProcess-like for signal handling

@@ -234,7 +234,7 @@ describe('live stack scenario contract primitives', () => {
 
     expect(uploadSteps.length).toBeGreaterThan(0);
     for (const step of uploadSteps) {
-      expect(step.groups?.['body']).toMatch(/timeout-minutes:\s*5/);
+      expect(step.groups?.['body']).toMatch(/timeout-minutes:\s*1/);
     }
   });
 

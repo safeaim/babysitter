@@ -164,6 +164,7 @@ jobs:
         shell: bash
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
         interaction_mode:
           - id: non-interactive
@@ -452,6 +453,7 @@ jobs:
         shell: bash
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
         interaction_mode:
           - id: non-interactive

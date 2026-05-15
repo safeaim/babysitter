@@ -280,7 +280,7 @@ export async function AgentsDashboardPage({ org = null } = {}) {
       </div>
       <div className="card">
         <div className="cardTitle"><h2>Recent activity</h2><StatusPill tone={agentView.runs.active?.length ? 'warn' : 'neutral'}>{agentView.runs.active?.length || 0} active</StatusPill></div>
-        {agentView.runs.items?.length ? <ul className="resourceList">{agentView.runs.items.slice(0, 5).map((run) => <li key={run.metadata?.name}><a href={orgHref(activeOrg, `/agents/runs/${run.metadata?.name}`)}><strong>{run.metadata?.name}</strong></a><span>{run.spec?.stackRef || 'unassigned'} {run.spec?.repository ? `/ ${run.spec.repository}` : ''}</span><small>Phase: {run.status?.phase || 'Pending'}{run.status?.startedAt ? ` / Started: ${run.status.startedAt}` : ''}</small></li>)}</ul> : <EmptyState title="No dispatch runs yet" text="Dispatch runs appear when agent stacks are triggered by rules or manual dispatch." />}
+        {agentView.runs.items?.length ? <ul className="resourceList">{agentView.runs.items.slice(0, 5).map((run) => <li key={run.metadata?.name}><a href={orgHref(activeOrg, `/agents/runs/${run.metadata?.name}`)}><strong>{run.metadata?.name}</strong></a><span>{run.spec?.stackRef || 'unassigned'} {run.spec?.repository ? `/ ${run.spec.repository}` : ''}</span><small>Phase: {run.status?.phase || 'Pending'}{run.status?.startedAt ? ` / Started: ${run.status.startedAt}` : ''}</small></li>)}</ul> : <EmptyState title="No dispatch runs yet" text="Dispatch runs appear when agent stacks are triggered by rules or manual dispatch." cta={orgHref(activeOrg, '/agents/runs')} ctaLabel="Dispatch an agent" />}
       </div>
     </section>
   </PageFrame>;
@@ -381,7 +381,7 @@ export async function AgentRunsPage({ org = null, linkToDetail = false } = {}) {
         <span>{run.spec?.stackRef || 'unassigned'} / {run.spec?.repository || 'no repository'}</span>
         <small>Phase: {run.status?.phase || 'Pending'}{run.status?.startedAt ? ` / Started: ${run.status.startedAt}` : ''}</small>
         <RunActions org={activeOrg} runName={run.metadata?.name} stackRef={run.spec?.stackRef || run.spec?.agentStack} phase={run.status?.phase} />
-      </li>)}</ul> : <EmptyState title="No dispatch runs" text="Dispatch runs appear when agent stacks are triggered by rules or manual dispatch. Configure trigger rules or dispatch manually to create runs." />}
+      </li>)}</ul> : <EmptyState title="No dispatch runs" text="Dispatch runs appear when agent stacks are triggered by rules or manual dispatch. Configure trigger rules or dispatch manually to create runs."><DispatchButton org={activeOrg} stacks={availableStacks} /></EmptyState>}
     </div>
   </PageFrame>;
 }
@@ -641,7 +641,7 @@ export async function AgentApprovalsPage({ org = null } = {}) {
           </dl>
           <ApprovalDecisionButtons org={activeOrg} approvalName={name} />
         </div>;
-      })}</div> : <EmptyState title="No pending approvals" text="All agent approval requests have been resolved. When an agent needs human authorization, pending items appear here." />}
+      })}</div> : <EmptyState title="All clear!" text="No pending approval requests. When an agent needs human authorization, pending items appear here." info />}
     </div>
     <ResolvedApprovalsSection resolved={resolved} />
   </PageFrame>;
@@ -719,7 +719,7 @@ export async function AgentWorkspacesPage({ org = null } = {}) {
           {ws.status?.runRef ? <small style={{ color: '#2563eb' }}>mounted: {ws.status.runRef}</small> : null}
         </a>
         <ResourceActions org={activeOrg} apiPath={`agents/workspaces/${ws.metadata?.name}`} actions={ws.status?.phase === 'Archived' ? ['delete'] : ws.status?.phase === 'InUse' ? ['release', 'delete'] : ['sync', 'delete']} />
-      </div>)}</div> : <EmptyState title="No agent workspaces" text="Agent workspaces appear when dispatch runs provision volumes. Configure agent stacks and workspace policies to manage workspace lifecycle." />}
+      </div>)}</div> : <EmptyState title="No agent workspaces" text="Workspaces are provisioned when runs start. Configure agent stacks and dispatch runs to begin provisioning." info />}
     </div>
   </PageFrame>;
 }
@@ -1178,7 +1178,7 @@ export async function AgentSessionsPage({ org = null } = {}) {
         {(session.status?.phase !== 'Terminated' && session.status?.phase !== 'Completed' && session.status?.phase !== 'Succeeded') ? (
           <ResourceActions org={activeOrg} apiPath={`agents/sessions/${session.metadata?.name}`} actions={['terminate']} />
         ) : null}
-      </div>)}</div> : <EmptyState title="No agent sessions" text="Agent sessions appear when dispatch runs create Agent Mux chat sessions. Configure agent stacks and trigger rules to start sessions." />}
+      </div>)}</div> : <EmptyState title="No agent sessions" text="Sessions are created automatically when agents run. Configure agent stacks and trigger rules to start sessions." info />}
     </div>
   </PageFrame>;
 }
@@ -1581,7 +1581,7 @@ function ArchitectureMap({ model, compact = false }) {
 }
 
 function RepositoryLanding({ model, repositories }) {
-  return <div className="card repoBrowser"><div className="cardTitle"><h3>Repository home</h3><StatusPill tone={repositories.length ? 'good' : 'warn'}>{repositories.length} repos</StatusPill></div><p>Create or import a repository, then move through code, reviews, runs, automations, and settings.</p>{repositories.length ? <ul className="resourceList">{repositories.map((repository) => <li key={repository.metadata?.name}><a href={modelHref(model, `/repositories/${repository.metadata?.name}/code`)}><strong>{repository.metadata?.name}</strong></a><span>{repository.spec?.visibility || 'internal'} · {repository.spec?.defaultBranch || 'main'}</span><small>Phase: {repository.status?.phase || 'Unknown'}</small></li>)}</ul> : <EmptyState title="Create or import your first repository" text="Use the form on this page. The advanced editor is available only when you need it." /> }<InfoList title="Next best actions" items={model.views.dashboard.excellentFlows.slice(0, 4)} /></div>;
+  return <div className="card repoBrowser"><div className="cardTitle"><h3>Repository home</h3><StatusPill tone={repositories.length ? 'good' : 'warn'}>{repositories.length} repos</StatusPill></div><p>Create or import a repository, then move through code, reviews, runs, automations, and settings.</p>{repositories.length ? <ul className="resourceList">{repositories.map((repository) => <li key={repository.metadata?.name}><a href={modelHref(model, `/repositories/${repository.metadata?.name}/code`)}><strong>{repository.metadata?.name}</strong></a><span>{repository.spec?.visibility || 'internal'} · {repository.spec?.defaultBranch || 'main'}</span><small>Phase: {repository.status?.phase || 'Unknown'}</small></li>)}</ul> : <EmptyState title="Create or import your first repository" text="Use the form on this page. The advanced editor is available only when you need it." cta={modelHref(model, '/repositories')} ctaLabel="Create repository" /> }<InfoList title="Next best actions" items={model.views.dashboard.excellentFlows.slice(0, 4)} /></div>;
 }
 
 function DeploymentCenter({ model, deployments, releases }) {
@@ -2001,8 +2001,10 @@ export function FlowVisualization({ runs = [], transcripts = [] }) {
   })}</div>;
 }
 
-function EmptyState({ title, text, cta, ctaLabel }) {
-  return <div className="card emptyState"><h3>{title}</h3><p>{text}</p>{cta ? <div style={{ marginTop: '0.75rem' }}><a href={cta} style={{ padding: '0.4rem 1rem', background: 'var(--color-accent, #3b82f6)', color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>{ctaLabel || 'Get started'}</a></div> : null}</div>;
+function EmptyState({ title, text, cta, ctaLabel, children, info = false }) {
+  const ctaBtn = cta ? <a href={cta} style={{ padding: '0.4rem 1rem', background: 'var(--color-accent, #3b82f6)', color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>{ctaLabel || 'Get started'}</a> : null;
+  const hasAction = children || ctaBtn;
+  return <div className="card emptyState">{info && <span style={{ display: 'inline-block', marginBottom: '0.25rem', fontSize: '1.25rem' }} aria-hidden="true">&#10003;</span>}<h3>{title}</h3><p>{text}</p>{hasAction ? <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>{ctaBtn}{children}</div> : null}</div>;
 }
 
 export async function ExternalProvidersPage({ org = null } = {}) {

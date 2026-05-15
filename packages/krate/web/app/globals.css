@@ -658,7 +658,7 @@ main { width: 100%; max-width: none; padding: 0 0 48px; }
   font-weight: 650;
 }
 .appSidebar a:hover, .appSidebar a:focus-visible { background: rgba(91, 56, 23, .08); }
-.appSidebar a[aria-current="page"] { color: var(--accent-cinnabar); background: rgba(192, 58, 43, .08); }
+.appSidebar a[aria-current="page"] { color: var(--accent-cinnabar); background: rgba(192, 58, 43, .08); border-left: 3px solid var(--accent-cinnabar); padding-left: 7px; }
 
 .orgSwitcher {
   margin: 0 0 18px;
@@ -1235,6 +1235,8 @@ main { width: 100%; max-width: none; padding: 0 0 48px; }
 [data-theme="dark"] .appSidebar a[aria-current="page"] {
   color: #f85149;
   background: rgba(248, 81, 73, .1);
+  border-left: 3px solid #f85149;
+  padding-left: 7px;
 }
 [data-theme="dark"] .orgSwitcher {
   border-color: #30363d;

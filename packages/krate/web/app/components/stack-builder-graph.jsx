@@ -332,6 +332,8 @@ export function GraphStackBuilder({ org, atlasBaseUrl, existingStack = null }) {
       } else {
         setStatus('success');
         setMessage(isEditing ? 'Stack updated successfully.' : `Stack "${name}" created successfully.`);
+        // Auto-dismiss success after 3s
+        setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
       }
     } catch (err) {
       setStatus('error');

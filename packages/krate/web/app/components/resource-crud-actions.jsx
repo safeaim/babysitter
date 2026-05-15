@@ -116,24 +116,48 @@ export function ResourceActions({ org, apiPath, actions = [], onMutated }) {
  *   buildSpec   {fn}      — (formData) => spec object
  *   successText {fn|str}  — (body) => string, or fixed string
  */
-export function InlineCreateForm({ org, namespace = 'krate-system', kind, apiVersion = 'krate.a5c.ai/v1alpha1', title, fields = [], successText }) {
+export function InlineCreateForm({ org, namespace = 'krate-system', kind, apiVersion = 'krate.a5c.ai/v1alpha1', title, fields = [], successText, buildSpec }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [invalidFields, setInvalidFields] = useState({});
+  const [submitted, setSubmitted] = useState(false);
 
-  async function handleSubmit(formData) {
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const formEl = e.currentTarget || e.target;
+    const formData = new FormData(formEl);
+
+    // Client-side validation
+    const errors = {};
+    for (const field of fields) {
+      if (field.required !== false) {
+        const val = formData.get(field.name);
+        if (!val || !String(val).trim()) {
+          errors[field.name] = `${field.label || field.name} is required`;
+        }
+      }
+    }
+    setSubmitted(true);
+    setInvalidFields(errors);
+    if (Object.keys(errors).length > 0) return;
+
     setBusy(true);
     setMessage('');
     setIsSuccess(false);
     try {
       const name = slugify(formData.get('name') || formData.get(fields[0]?.name) || kind.toLowerCase());
-      const spec = {};
-      for (const field of fields) {
-        if (field.name === 'name') continue;
-        const value = formData.get(field.name);
-        if (value) spec[field.name] = field.name === 'workflow' || field.name === 'workflowColumns'
-          ? String(value).split(',').map(c => c.trim()).filter(Boolean)
-          : value;
+      let spec = {};
+      if (typeof buildSpec === 'function') {
+        spec = buildSpec(formData);
+      } else {
+        for (const field of fields) {
+          if (field.name === 'name') continue;
+          const value = formData.get(field.name);
+          if (value) spec[field.name] = field.name === 'workflow' || field.name === 'workflowColumns'
+            ? String(value).split(',').map(c => c.trim()).filter(Boolean)
+            : value;
+        }
       }
       const resource = {
         apiVersion,
@@ -150,11 +174,15 @@ export function InlineCreateForm({ org, namespace = 'krate-system', kind, apiVer
       const body = await response.json().catch(() => ({}));
       if (response.ok) {
         setIsSuccess(true);
-        setMessage(
-          typeof successText === 'function'
-            ? successText(body)
-            : successText || `Created ${kind}/${body.resource?.metadata?.name || name}`
-        );
+        const msg = typeof successText === 'function'
+          ? successText(body)
+          : successText || `Created ${kind}/${body.resource?.metadata?.name || name}`;
+        setMessage(msg);
+        setSubmitted(false);
+        setInvalidFields({});
+        formEl.reset();
+        // Auto-dismiss success after 3s
+        setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage(body.message || body.error || 'Create failed');
       }
@@ -165,19 +193,38 @@ export function InlineCreateForm({ org, namespace = 'krate-system', kind, apiVer
     }
   }
 
+  const inputBorderStyle = (fieldName) => {
+    if (submitted && invalidFields[fieldName]) {
+      return { border: '1.5px solid var(--color-danger, #cb2431)' };
+    }
+    return {};
+  };
+
   return (
     <div className="card managementCard">
       <div className="cardTitle"><h3>{title || `Create ${kind}`}</h3><span className="pill neutral">inline</span></div>
-      <form action={handleSubmit} className="formGrid">
+      <form onSubmit={handleSubmit} className="formGrid" noValidate>
         {fields.map((field) => (
           <label key={field.name}>
-            <span>{field.label || field.name}</span>
+            <span>
+              {field.label || field.name}
+              {field.required !== false && <span aria-hidden="true" style={{ color: 'var(--color-danger, #cb2431)', marginLeft: '0.2rem' }}>*</span>}
+            </span>
             {field.type === 'select' ? (
-              <select name={field.name} defaultValue={field.defaultValue || ''}>
+              <select name={field.name} defaultValue={field.defaultValue || ''} style={inputBorderStyle(field.name)}>
                 {(field.options || []).map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label || opt.value}</option>
                 ))}
               </select>
+            ) : field.type === 'textarea' ? (
+              <textarea
+                name={field.name}
+                placeholder={field.placeholder || ''}
+                defaultValue={field.defaultValue || ''}
+                required={field.required !== false}
+                rows={3}
+                style={{ ...inputBorderStyle(field.name), resize: 'vertical' }}
+              />
             ) : (
               <input
                 name={field.name}
@@ -185,11 +232,21 @@ export function InlineCreateForm({ org, namespace = 'krate-system', kind, apiVer
                 placeholder={field.placeholder || ''}
                 defaultValue={field.defaultValue || ''}
                 required={field.required !== false}
+                aria-required={field.required !== false}
+                aria-invalid={submitted && !!invalidFields[field.name]}
+                style={inputBorderStyle(field.name)}
               />
+            )}
+            {submitted && invalidFields[field.name] && (
+              <span role="alert" style={{ color: 'var(--color-danger, #cb2431)', fontSize: '0.75rem', marginTop: '0.125rem', display: 'block' }}>
+                {invalidFields[field.name]}
+              </span>
             )}
           </label>
         ))}
-        <button type="submit" disabled={busy}>{busy ? 'Creating...' : `Create ${kind}`}</button>
+        <button type="submit" disabled={busy} style={{ marginTop: '0.25rem' }}>
+          {busy ? 'Saving...' : `Create ${kind}`}
+        </button>
       </form>
       {message ? (
         <p role="status" className="mutationStatus" style={{ color: isSuccess ? 'var(--color-good, #22c55e)' : 'var(--color-danger, #cb2431)' }}>

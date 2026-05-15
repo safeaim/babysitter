@@ -29,8 +29,12 @@ export function TriggerRuleForm({ org, stacks = [] }) {
     );
   }
 
+  const [touched, setTouched] = useState({});
+
   async function handleSubmit(e) {
     e.preventDefault();
+    // Mark all required fields as touched to show errors
+    setTouched({ name: true, stackRef: true });
     if (!name || !stackRef) return;
     setStatus('saving');
     setMessage('');
@@ -61,6 +65,8 @@ export function TriggerRuleForm({ org, stacks = [] }) {
       } else {
         setStatus('success');
         setMessage(`Trigger rule "${name}" created successfully.`);
+        // Auto-dismiss success after 3s
+        setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
       }
     } catch (err) {
       setStatus('error');
@@ -72,6 +78,7 @@ export function TriggerRuleForm({ org, stacks = [] }) {
   const primaryStyle = { ...buttonStyle, backgroundColor: '#2563eb', color: '#fff' };
   const disabledPrimaryStyle = { ...primaryStyle, opacity: 0.5, cursor: 'not-allowed' };
   const canSubmit = name && stackRef && status !== 'saving';
+  const errorStyle = { border: '1.5px solid #dc2626' };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -87,12 +94,15 @@ export function TriggerRuleForm({ org, stacks = [] }) {
               id="trigger-name"
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={e => { setName(e.target.value); setTouched(t => ({ ...t, name: true })); }}
+              onBlur={() => setTouched(t => ({ ...t, name: true }))}
               placeholder="my-trigger-rule"
               required
               aria-required="true"
-              style={inputStyle}
+              aria-invalid={touched.name && !name}
+              style={{ ...inputStyle, ...(touched.name && !name ? errorStyle : {}) }}
             />
+            {touched.name && !name && <span role="alert" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.125rem', display: 'block' }}>Name is required</span>}
           </div>
 
           <div>
@@ -119,16 +129,19 @@ export function TriggerRuleForm({ org, stacks = [] }) {
             <select
               id="trigger-stack"
               value={stackRef}
-              onChange={e => setStackRef(e.target.value)}
+              onChange={e => { setStackRef(e.target.value); setTouched(t => ({ ...t, stackRef: true })); }}
+              onBlur={() => setTouched(t => ({ ...t, stackRef: true }))}
               required
               aria-required="true"
-              style={selectStyle}
+              aria-invalid={touched.stackRef && !stackRef}
+              style={{ ...selectStyle, ...(touched.stackRef && !stackRef ? errorStyle : {}) }}
             >
               <option value="">Select a stack...</option>
               {stacks.map(stack => (
                 <option key={stack} value={stack}>{stack}</option>
               ))}
             </select>
+            {touched.stackRef && !stackRef && <span role="alert" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.125rem', display: 'block' }}>Target stack is required</span>}
           </div>
 
           <div>

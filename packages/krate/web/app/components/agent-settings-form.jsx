@@ -97,6 +97,7 @@ function GatewaySection({ org, gateway }) {
       } else {
         setStatus('success');
         setMessage('Gateway configuration saved.');
+        setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
       }
     } catch (err) {
       setStatus('error');
@@ -141,12 +142,14 @@ function GatewaySection({ org, gateway }) {
         </div>
         <div style={fieldGroupStyle}>
           <div>
-            <label style={labelStyle}>Gateway URL</label>
+            <label style={labelStyle}>Gateway URL <span aria-hidden="true" style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="url"
               value={url}
               onChange={e => setUrl(e.target.value)}
               placeholder="https://agent-mux.example.com"
+              required
+              aria-required="true"
               style={inputStyle}
             />
             <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
@@ -270,6 +273,7 @@ function AddAdapterForm({ org, onCreated }) {
       } else {
         setStatus('success');
         setMessage(`Adapter "${name.trim()}" created.`);
+        setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
         onCreated(data);
         setName('');
         setAdapterType('subprocess');
@@ -320,7 +324,7 @@ function AddAdapterForm({ org, onCreated }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button type="submit" disabled={!canSubmit} style={!canSubmit ? disabledStyle : primaryStyle}>
-              {status === 'saving' ? 'Creating...' : 'Create adapter'}
+              {status === 'saving' ? 'Saving...' : 'Create adapter'}
             </button>
             <StatusMsg status={status} message={message} />
           </div>
@@ -561,6 +565,7 @@ function AddProviderForm({ org, onCreated, secrets }) {
       } else {
         setStatus('success');
         setMessage(`Provider "${name.trim()}" created.`);
+        setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
         onCreated(data);
         setName('');
         setProviderType('anthropic');
@@ -645,7 +650,7 @@ function AddProviderForm({ org, onCreated, secrets }) {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button type="submit" disabled={!canSubmit} style={!canSubmit ? disabledStyle : primaryStyle}>
-              {status === 'saving' ? 'Creating...' : 'Create provider'}
+              {status === 'saving' ? 'Saving...' : 'Create provider'}
             </button>
             <StatusMsg status={status} message={message} />
           </div>

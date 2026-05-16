@@ -5,7 +5,37 @@ import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { buildPrimaryLiveStackCommands, executeChildProcessCommand, runPrimaryLiveStackScenario } from './primary-live-runner';
+import type { LiveStackScenario } from './scenario-contract';
 import { liveStackScenarioFromEnv, primaryLiveStackScenario } from './scenario-contract';
+
+function foundryClaudeVanillaScenario(): LiveStackScenario {
+  return liveStackScenarioFromEnv({
+    LIVE_STACK_SCENARIO_ID: 'live.agent-mux.claude-code.foundry-openai.gpt-5.5',
+    LIVE_STACK_AGENT_PATH: 'agent-mux',
+    LIVE_STACK_AGENT: 'claude-code',
+    LIVE_STACK_AMUX_AGENT: 'claude',
+    LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+    LIVE_STACK_INSTALL_MODE: 'vanilla',
+    LIVE_STACK_PROVIDER: 'foundry-openai',
+    LIVE_STACK_AMUX_PROVIDER: 'foundry',
+    LIVE_STACK_MODEL: 'gpt-5.5',
+    LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+    LIVE_STACK_REQUIRED_ENV: 'AZURE_API_KEY,AMUX_API_BASE',
+    LIVE_STACK_LAYERS: 'agent-mux install,agent-mux invocation,transport-mux route,provider/model trace',
+    LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+    LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,transport-mux-trace,provider-trace-redacted',
+  });
+}
+
+function promptFor(scenario: LiveStackScenario, env: Record<string, string | undefined> = {}): string | undefined {
+  const commands = buildPrimaryLiveStackCommands(scenario, {
+    cwd: '/repo',
+    timeoutMs: 1000,
+    env: { AZURE_API_KEY: 'sk-live-secret', AMUX_API_BASE: 'https://foundry.example.test', LIVE_STACK_TRACE_ID: 'trace-1', ...env },
+  });
+  const launch = commands.at(-1);
+  return launch?.args[(launch?.args.indexOf('--prompt') ?? -2) + 1];
+}
 
 describe('primary live stack runner contract', () => {
   it('keeps Claude Code babysitter-plugin live lanes on Foundry GPT-5.5', () => {
@@ -65,6 +95,45 @@ describe('primary live stack runner contract', () => {
 
     expect(codexPrompt).toMatch(/^\$babysitter:yolo /);
     expect(codexPrompt).toContain('.a5c/processes/summarize-translate-test.mjs');
+  });
+
+  it('keeps Claude TTY live prompts bounded for interactive and bridged-interactive lanes', () => {
+    const scenario = foundryClaudeVanillaScenario();
+
+    for (const env of [
+      { LIVE_STACK_INTERACTIVE: 'true' },
+      { LIVE_STACK_INTERACTIVE: 'false', LIVE_STACK_BRIDGE_INTERACTIVE: 'true' },
+    ]) {
+      const prompt = promptFor(scenario, env);
+
+      expect(prompt).toContain('concise 6-section summary');
+      expect(prompt).not.toContain('12-paragraph summary');
+    }
+  });
+
+  it('keeps the full Odyssey task for non-TTY live prompts', () => {
+    const claudePrompt = promptFor(foundryClaudeVanillaScenario());
+    const codexPrompt = promptFor(liveStackScenarioFromEnv({
+      LIVE_STACK_SCENARIO_ID: 'live.agent-mux.codex.foundry-openai.gpt-5.5',
+      LIVE_STACK_AGENT_PATH: 'agent-mux',
+      LIVE_STACK_AGENT: 'codex',
+      LIVE_STACK_AMUX_AGENT: 'codex',
+      LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+      LIVE_STACK_INSTALL_MODE: 'babysitter-plugin',
+      LIVE_STACK_PROVIDER: 'foundry-openai',
+      LIVE_STACK_AMUX_PROVIDER: 'foundry',
+      LIVE_STACK_MODEL: 'gpt-5.5',
+      LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+      LIVE_STACK_REQUIRED_ENV: 'AZURE_API_KEY,AMUX_API_BASE',
+      LIVE_STACK_LAYERS: 'babysitter-plugin',
+      LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+      LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted',
+    }));
+
+    for (const prompt of [claudePrompt, codexPrompt]) {
+      expect(prompt).toContain('12-paragraph summary');
+      expect(prompt).not.toContain('concise 6-section summary');
+    }
   });
 
   it('runs plugin bridged-hooks through the interactive bridge so slash commands resolve', () => {

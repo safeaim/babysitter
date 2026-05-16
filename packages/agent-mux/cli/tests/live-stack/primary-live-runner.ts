@@ -71,7 +71,7 @@ export function buildPrimaryLiveStackCommands(
   const isInteractive = options.env['LIVE_STACK_INTERACTIVE'] === 'true';
   const timeoutMs = options.timeoutMs ?? (isInteractive ? INTERACTIVE_TIMEOUT_MS : DEFAULT_TIMEOUT_MS);
   const traceId = commandEnv['LIVE_STACK_TRACE_ID'];
-  const prompt = buildPrompt(scenario, traceId);
+  const prompt = buildPrompt(scenario, traceId, options.env);
 
   if (scenario.agent.integrationType === 'runtime-cli') {
     return [
@@ -423,8 +423,11 @@ function withWorkspaceBinOnPath(env: Record<string, string | undefined>, cwd: st
   return [workspaceBin, env['PATH'] ?? process.env['PATH'] ?? ''].filter(Boolean).join(delimiter);
 }
 
-function buildPrompt(scenario: LiveStackScenario, traceId: string): string {
-  const coreTask = `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek. Combine the English and Greek versions into one markdown document and save the entire result in a single file write to .a5c-live-test/${traceId}-odyssey.md`;
+function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<string, string | undefined>): string {
+  const usesClaudeTty = scenario.agent.agent === 'claude-code' && (env['LIVE_STACK_INTERACTIVE'] === 'true' || env['LIVE_STACK_BRIDGE_INTERACTIVE'] === 'true');
+  const coreTask = usesClaudeTty
+    ? `Write a concise 6-section summary of Homer's Odyssey, then add one Greek translation sentence after each section. Combine the English and Greek versions into one markdown document and save the entire result in a single file write to .a5c-live-test/${traceId}-odyssey.md`
+    : `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek. Combine the English and Greek versions into one markdown document and save the entire result in a single file write to .a5c-live-test/${traceId}-odyssey.md`;
 
   if (scenario.agent.agent === 'babysitter-agent') {
     return `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek.`;

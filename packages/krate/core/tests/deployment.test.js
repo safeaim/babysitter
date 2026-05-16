@@ -99,6 +99,7 @@ test('controller deployment assets build and publish the runnable controller', (
   assert.ok(chartIngress.includes('kind: Ingress') && chartIngress.includes('ingressClassName') && chartIngress.includes('app.kubernetes.io/component: web'), 'chart renders web ingress');
   assert.ok(chartDeployment.includes('imagePullSecrets') && chartDeployment.includes('global.imagePullSecrets'), 'workloads can use registry pull secrets');
   assert.ok(chartDeployment.includes('KRATE_AUTH_GITHUB_ENABLED') && chartDeployment.includes('KRATE_AUTH_SSO_ENABLED') && chartDeployment.includes('KRATE_AUTH_DELEGATED_EMAIL_HEADER'), 'workloads receive auth provider configuration');
+  assert.ok(chartDeployment.includes('readinessProbe:') && chartDeployment.includes('path: /login'), 'web deployment has an HTTP readiness probe');
   assert.ok(chartDeployment.includes('KRATE_AUTH_DELEGATED_LOCAL_DEVELOPMENT') && chartDeployment.includes('KRATE_AUTH_DELEGATED_LOCAL_GROUPS'), 'workloads can opt into local delegated development login');
   assert.ok(chartRbac.includes('core.oam.dev') && chartRbac.includes('applications') && chartRbac.includes('create'), 'delivery resources can be composed through Krate');
   assert.ok(chartValues.includes('localDevelopment:') && chartValues.includes('enabled: false'), 'local delegated development login is off by default');
@@ -212,6 +213,7 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   const gateway = read('src/kubernetes-resource-gateway.js');
   const kubernetes = read('src/kubernetes-controller.js');
   const server = read('src/http-server.js');
+  const webControllerRoute = read('../web/app/api/controller/route.js');
   assert.ok(page.includes("redirect('/orgs/'"));
   assert.ok(orgPage.includes('DashboardPage'));
   assert.ok(read('../web/app/orgs/page.jsx').includes('Choose an organization'));
@@ -227,6 +229,8 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   assert.ok(kubernetes.includes('/var/run/secrets/kubernetes.io/serviceaccount'), 'Kubernetes client can use in-cluster service-account credentials');
   assert.ok(gateway.includes('repositoryManifest'));
   assert.ok(shell.includes('/api/controller'));
+  assert.ok(webControllerRoute.includes('KRATE_CONTROLLER_URL'));
+  assert.ok(!webControllerRoute.includes('createKrateApiController'), 'web API route proxies the controller service instead of shelling out through local kubectl');
   assert.ok(shell.includes('ArchitectureMap'));
   assert.ok(shell.includes('Repository home'));
   assert.ok(shell.includes('IssueWorkspace'));

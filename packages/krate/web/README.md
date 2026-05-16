@@ -139,7 +139,7 @@ All interactive components are under `app/components/` and use the `'use client'
 
 All server-side API routes live under `app/api/`:
 
-- `GET /api/controller` — Kubernetes controller snapshot
+- `GET /api/controller` — proxied Krate controller snapshot
 - `GET /api/orgs` — Organization list
 - `GET /api/orgs/[org]/repositories` — Repository list
 - `POST /api/orgs/[org]/repositories` — Create repository
@@ -173,6 +173,7 @@ All server-side API routes live under `app/api/`:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `KRATE_CONTROLLER_URL` | — | URL of a remote Krate controller API |
+| `KRATE_CONTROLLER_REQUEST_TIMEOUT_MS` | `5000` | Timeout for web-to-controller API proxy requests |
 | `KRATE_NAMESPACE` | `krate-system` | Kubernetes namespace for the control plane |
 | `KRATE_ORG` | `default` | Default organization slug |
 | `KRATE_ADMIN_ORG` | — | Admin organization slug |

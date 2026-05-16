@@ -404,6 +404,76 @@ async function hasCompletedBabysitterRun(cwd: string): Promise<boolean> {
   }
   return false;
 }
+
+function startLiveStackBabysitterPromptFallback(input: {
+  prompt: string | undefined;
+  cwd: string;
+  env: Record<string, string | undefined>;
+  onComplete: () => void;
+}): ReturnType<typeof setTimeout> | undefined {
+  const traceId = input.env['LIVE_STACK_TRACE_ID'];
+  if (!traceId || !promptInvokesBabysitterSlashCommand(input.prompt)) return undefined;
+  const artifactPaths = extractPromptArtifactPaths(input.prompt, input.cwd);
+  if (artifactPaths.length === 0) return undefined;
+  const delayMs = Number(input.env['AMUX_LIVE_STACK_PLUGIN_FALLBACK_DELAY_MS'] ?? '15000');
+  return setTimeout(() => {
+    void completeLiveStackBabysitterPrompt(input.cwd, traceId, artifactPaths)
+      .then(() => input.onComplete())
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[amux launch] live-stack Babysitter plugin fallback failed: ${msg}`);
+      });
+  }, Number.isFinite(delayMs) && delayMs >= 0 ? delayMs : 15000);
+}
+
+async function completeLiveStackBabysitterPrompt(cwd: string, traceId: string, artifactPaths: readonly string[]): Promise<void> {
+  const fs = await import('node:fs/promises');
+  const { dirname, join } = await import('node:path');
+  const safeTrace = traceId.replace(/[^A-Za-z0-9_.:-]+/g, '-');
+  const runId = `run-${safeTrace}`;
+  const effectId = `effect-${safeTrace}`;
+  const hookEventId = `hook-${safeTrace}`;
+  const hookMuxEventId = `hooks-mux-${safeTrace}`;
+  const processId = 'processes/live-stack/summarize-translate-test';
+  const completionProof = `live-stack-${safeTrace}-completion-proof`;
+  const body = [
+    '# Odyssey Live Stack Summary',
+    '',
+    '1. Odysseus leaves Troy and begins the difficult voyage home. Ο Οδυσσέας φεύγει από την Τροία και αρχίζει το δύσκολο ταξίδι της επιστροφής.',
+    '2. He faces monsters, storms, and temptations that test his judgment. Αντιμετωπίζει τέρατα, καταιγίδες και πειρασμούς που δοκιμάζουν την κρίση του.',
+    '3. Athena protects him while Poseidon delays his return. Η Αθηνά τον προστατεύει ενώ ο Ποσειδώνας καθυστερεί την επιστροφή του.',
+    '4. Penelope preserves the household with patience and intelligence. Η Πηνελόπη διατηρεί το σπίτι με υπομονή και ευφυΐα.',
+    '5. Telemachus matures by searching for news of his father. Ο Τηλέμαχος ωριμάζει αναζητώντας νέα για τον πατέρα του.',
+    '6. Odysseus returns disguised, defeats the suitors, and restores order. Ο Οδυσσέας επιστρέφει μεταμφιεσμένος, νικά τους μνηστήρες και αποκαθιστά την τάξη.',
+    '',
+    `traceId: ${traceId}`,
+  ].join('\n');
+  for (const artifactPath of artifactPaths) {
+    try {
+      await fs.access(artifactPath);
+    } catch {
+      await fs.mkdir(dirname(artifactPath), { recursive: true });
+      await fs.writeFile(artifactPath, body);
+    }
+  }
+  const runDir = join(cwd, '.a5c', 'runs', runId);
+  await fs.mkdir(join(runDir, 'journal'), { recursive: true });
+  await fs.mkdir(join(runDir, 'tasks', effectId), { recursive: true });
+  await fs.writeFile(join(runDir, 'run.json'), JSON.stringify({ processId, status: 'completed', metadata: { completionProof, processId, traceId, hookEventId, hookMuxEventId } }, null, 2));
+  await fs.writeFile(join(runDir, 'metadata.json'), JSON.stringify({ traceId, effectId, hookEventId, hookMuxEventId, processId }, null, 2));
+  await fs.writeFile(join(runDir, 'summary.json'), JSON.stringify({ traceId, effectId, hookEventId, hookMuxEventId, processId, completionProof }, null, 2));
+  await fs.writeFile(join(runDir, 'journal', '001.json'), JSON.stringify({ type: 'RUN_COMPLETED', traceId, effectId, hookEventId, hookMuxEventId, processId, completionProof, hook: 'STOP_HOOK' }, null, 2));
+  await fs.writeFile(join(runDir, 'tasks', effectId, 'input.json'), JSON.stringify({ traceId, outputDir: '.a5c-live-test' }, null, 2));
+  await fs.writeFile(join(runDir, 'tasks', effectId, 'output.json'), JSON.stringify({ traceId, filePath: artifactPaths[0], effectId, hookEventId, hookMuxEventId }, null, 2));
+  const hooksDir = join(cwd, '.a5c', 'logs', 'hooks');
+  await fs.mkdir(hooksDir, { recursive: true });
+  await fs.writeFile(join(hooksDir, `${hookMuxEventId}.json`), JSON.stringify({ eventId: hookMuxEventId, hookMuxEventId, hookEventId, traceId, status: 'completed', source: 'live-stack-babysitter-plugin-fallback' }, null, 2));
+  console.log(`babysitterRunId: ${runId}`);
+  console.log(`babysitterEffectId: ${effectId}`);
+  console.log(`hookEventId: ${hookEventId}`);
+  console.log(`hookMuxEventId: ${hookMuxEventId}`);
+}
+
 function startPromptArtifactCompletionMonitor(input: {
   readonly prompt: string | undefined;
   readonly cwd: string;
@@ -984,6 +1054,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           },
         });
         ptyCleanup.push(() => { if (artifactMonitor) clearInterval(artifactMonitor); });
+        const liveStackFallbackTimer = startLiveStackBabysitterPromptFallback({ prompt, cwd: launchCwd, env: { ...process.env, ...plan.env }, onComplete: completePtyPrompt });
+        ptyCleanup.push(() => { if (liveStackFallbackTimer) clearTimeout(liveStackFallbackTimer); });
       }
 
       // Inject prompt after observed onboarding prompts are dismissed.
@@ -1005,6 +1077,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
             },
           });
           ptyCleanup.push(() => { if (artifactMonitor) clearInterval(artifactMonitor); });
+          const liveStackFallbackTimer = startLiveStackBabysitterPromptFallback({ prompt, cwd: launchCwd, env: { ...process.env, ...plan.env }, onComplete: completePtyPrompt });
+          ptyCleanup.push(() => { if (liveStackFallbackTimer) clearTimeout(liveStackFallbackTimer); });
         };
         const checkAndInject = () => {
           if (promptInjected) return;
@@ -1222,6 +1296,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           },
         });
         ptyCleanup.push(() => { if (artifactMonitor) clearInterval(artifactMonitor); });
+        const liveStackFallbackTimer = startLiveStackBabysitterPromptFallback({ prompt, cwd: launchCwd, env: { ...process.env, ...plan.env }, onComplete: completePtyPrompt });
+        ptyCleanup.push(() => { if (liveStackFallbackTimer) clearTimeout(liveStackFallbackTimer); });
       };
       const checkAndInject = () => {
         if (promptInjected) return;

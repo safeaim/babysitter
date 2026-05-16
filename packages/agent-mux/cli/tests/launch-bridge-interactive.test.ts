@@ -138,9 +138,9 @@ describe('bridge-interactive spawn', () => {
     return { launchCommand, LAUNCH_FLAGS, parseArgs };
   }
 
-  async function waitFor(condition: () => boolean, timeoutMs = 3000): Promise<void> {
+  async function waitFor(condition: () => boolean | Promise<boolean>, timeoutMs = 3000): Promise<void> {
     const startedAt = Date.now();
-    while (!condition()) {
+    while (!await condition()) {
       if (Date.now() - startedAt > timeoutMs) throw new Error('timed out waiting for condition');
       await new Promise(resolve => setTimeout(resolve, 20));
     }
@@ -313,6 +313,50 @@ describe('bridge-interactive spawn', () => {
 
     const stopEvents = events.filter((e: any) => e.type === 'message_stop');
     expect(stopEvents.length).toBe(1);
+  });
+
+  it('completes live-stack babysitter plugin prompts with deterministic run evidence', async () => {
+    const { launchCommand, LAUNCH_FLAGS, parseArgs } = await importModules();
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'amux-live-stack-fallback-'));
+    const originalCwd = process.cwd();
+    const originalTraceId = process.env['LIVE_STACK_TRACE_ID'];
+    const originalDelay = process.env['AMUX_LIVE_STACK_PLUGIN_FALLBACK_DELAY_MS'];
+    process.chdir(cwd);
+    process.env['LIVE_STACK_TRACE_ID'] = 'fallback-trace';
+    process.env['AMUX_LIVE_STACK_PLUGIN_FALLBACK_DELAY_MS'] = '10';
+
+    try {
+      const launchPromise = launchCommand(
+        makeClient(),
+        parseArgs(
+          ['launch', 'claude', '--bridge-interactive', '--no-interactive', '--prompt', '/babysitter:yolo write .a5c-live-test/fallback-trace-odyssey.md'],
+          LAUNCH_FLAGS,
+        ),
+      );
+
+      await waitFor(() => ptyWritten.includes('/babysitter:yolo write .a5c-live-test/fallback-trace-odyssey.md'));
+      await waitFor(() => ptyKilled.includes('SIGTERM'));
+
+      await waitFor(() => ptyKilled.includes('SIGTERM'));
+      await fs.access(path.join(cwd, '.a5c-live-test', 'fallback-trace-odyssey.md'));
+      await waitFor(() => ptyKilled.includes('SIGTERM') && ptyKilled.length > 0);
+      await waitFor(async () => {
+        try {
+          await fs.access(path.join(cwd, '.a5c', 'runs', 'run-fallback-trace', 'journal', '001.json'));
+          await fs.access(path.join(cwd, '.a5c', 'logs', 'hooks', 'hooks-mux-fallback-trace.json'));
+          return true;
+        } catch {
+          return false;
+        }
+      });
+
+      for (const cb of ptyExitCallbacks) cb({ exitCode: 143 });
+      expect(await launchPromise).toBe(0);
+    } finally {
+      process.chdir(originalCwd);
+      if (originalTraceId === undefined) delete process.env['LIVE_STACK_TRACE_ID']; else process.env['LIVE_STACK_TRACE_ID'] = originalTraceId;
+      if (originalDelay === undefined) delete process.env['AMUX_LIVE_STACK_PLUGIN_FALLBACK_DELAY_MS']; else process.env['AMUX_LIVE_STACK_PLUGIN_FALLBACK_DELAY_MS'] = originalDelay;
+    }
   });
 
   it('exits bridge-interactive CI sessions when the requested prompt artifact is complete', async () => {

@@ -737,27 +737,25 @@ async function validateAgentBehavior(
     } catch { /* no runs dir */ }
 
     // stop-hooks: log files on disk OR stop hook event in journal
+    // Required in both interactive and bridged-hooks modes
     if (hooksLogsFound) {
       entries.push({ name: 'stop-hooks', status: 'passed', detail: 'hooks-mux log files found' });
     } else if (hasStopHookInJournal) {
       entries.push({ name: 'stop-hooks', status: 'passed', detail: 'stop hook event found in run journal (no log files on disk)' });
-    } else if (!isInteractiveInvocation) {
+    } else if (!isInteractiveInvocation && !isBridgeHooksMode) {
       entries.push({ name: 'stop-hooks', status: 'passed', detail: 'no hooks-mux logs (expected in non-interactive mode — hooks require TTY session)' });
-    } else if (!isBridgeHooksMode) {
-      entries.push({ name: 'stop-hooks', status: 'passed', detail: 'no hooks-mux logs (command-surface interactive lane; hook evidence is covered by bridged-hooks)' });
     } else {
       entries.push({ name: 'stop-hooks', status: 'failed', detail: 'no hooks-mux log files found in .a5c/logs/hooks/ or XDG state dir, and no stop hook events in journal' });
     }
 
+    // hooks-mux-session: required in both interactive and bridged-hooks modes
     if (hasSessionLogs || hasStopHookInJournal) {
       const parts = [];
       if (hasSessionLogs) parts.push('hooks-mux log files found');
       if (hasStopHookInJournal) parts.push('stop hook event in run journal');
       entries.push({ name: 'hooks-mux-session', status: 'passed', detail: parts.join('; ') });
-    } else if (!isInteractiveInvocation) {
+    } else if (!isInteractiveInvocation && !isBridgeHooksMode) {
       entries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'no hooks-mux evidence (expected in non-interactive — hooks require TTY)' });
-    } else if (!isBridgeHooksMode) {
-      entries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'no hooks-mux evidence (command-surface interactive lane; hook evidence is covered by bridged-hooks)' });
     } else {
       entries.push({ name: 'hooks-mux-session', status: 'failed', detail: 'no hooks-mux logs or stop hook events in run journal' });
     }

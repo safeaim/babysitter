@@ -329,7 +329,7 @@ describe('primary live stack runner contract', () => {
     expect(result.failure).toBeUndefined();
   });
 
-  it('does not require hook logs from command-surface interactive plugin lanes', async () => {
+  it('requires hooks evidence from interactive plugin lanes', async () => {
     const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-plugin-interactive-run-'));
     const artifactsDir = path.join(cwd, 'artifacts');
     const traceId = 'trace-plugin-interactive-run';
@@ -355,6 +355,9 @@ describe('primary live stack runner contract', () => {
         await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
         await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId: 'processes/live-stack/summarize-translate-test', metadata: { completionProof: `${runId}-proof` } }));
         await writeMinimalJournal(path.join(runDir, 'journal'), true);
+        const hooksDir = path.join(cwd, '.a5c', 'logs', 'hooks');
+        await fs.mkdir(hooksDir, { recursive: true });
+        await fs.writeFile(path.join(hooksDir, 'session-start.json'), JSON.stringify({ eventId: 'hook-1', status: 'completed' }));
 
         return {
           status: 0,
@@ -375,7 +378,7 @@ describe('primary live stack runner contract', () => {
     expect(result.status).toBe('passed');
     expect(result.failure).toBeUndefined();
   });
-  it('does not require hook logs from command-surface bridged-interactive plugin lanes', async () => {
+  it('requires hooks evidence from bridged-interactive plugin lanes', async () => {
     const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-plugin-bridged-interactive-run-'));
     const artifactsDir = path.join(cwd, 'artifacts');
     const traceId = 'trace-plugin-bridged-interactive-run';
@@ -402,6 +405,9 @@ describe('primary live stack runner contract', () => {
         await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
         await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId: 'processes/live-stack/summarize-translate-test', metadata: { completionProof: `${runId}-proof` } }));
         await writeMinimalJournal(path.join(runDir, 'journal'), true);
+        const hooksDir = path.join(cwd, '.a5c', 'logs', 'hooks');
+        await fs.mkdir(hooksDir, { recursive: true });
+        await fs.writeFile(path.join(hooksDir, 'session-start.json'), JSON.stringify({ eventId: 'hook-1', status: 'completed' }));
 
         return {
           status: 0,

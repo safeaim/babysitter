@@ -1,6 +1,5 @@
 import type {
   Breakpoint,
-  BreakpointAnswer,
   BreakpointPublicAnswer,
   BreakpointContext,
   BreakpointRouting,

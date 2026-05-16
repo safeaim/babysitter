@@ -159,7 +159,6 @@ export class ServerClient {
         let currentData = "";
 
         while (!aborted) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const { done, value } = await reader.read();
           if (done) break;
 

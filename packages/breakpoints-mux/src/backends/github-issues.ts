@@ -842,7 +842,6 @@ export class GitHubIssuesBackend implements BreakpointBackend {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async listResponders(_params?: ListRespondersParams): Promise<ResponderProfile[]> {
     return this.assignees.map((login) => ({
       id: login,

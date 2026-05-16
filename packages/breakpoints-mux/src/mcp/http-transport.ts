@@ -125,6 +125,7 @@ export function createHttpMcpServer(
   const connectPromise = mcpServer.connect(transport);
 
   const close = async (): Promise<void> => {
+    await connectPromise;
     await transport.close();
     await new Promise<void>((resolve, reject) => {
       httpServer.close((err) => (err ? reject(err) : resolve()));

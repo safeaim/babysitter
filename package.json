@@ -100,13 +100,13 @@
     "@docusaurus/preset-classic": "3.10.1",
     "@mdx-js/react": "^3.0.0",
     "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/coverage-v8": "4.1.5",
+    "@vitest/coverage-v8": "4.1.6",
     "markdownlint-cli2": "0.22.1",
     "prism-react-renderer": "^2.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom-v6": "npm:react-router-dom@^6.30.2",
-    "vitest": "4.1.5",
+    "vitest": "4.1.6",
     "webpackbar": "file:third_party/webpackbar"
   },
   "overrides": {
@@ -121,7 +121,15 @@
     "xcode": {
       "uuid": "^11.1.0"
     },
-    "node-domexception": "$node-domexception"
+    "node-domexception": "$node-domexception",
+    "serialize-javascript": "^7.0.5",
+    "postcss": "^8.5.10",
+    "postcss-custom-media": "^12.0.1",
+    "postcss-custom-properties": "^15.0.1",
+    "postcss-custom-selectors": "^9.0.1",
+    "@csstools/postcss-media-minmax": "^3.0.3",
+    "@csstools/cascade-layer-name-parser": "^3.0.0",
+    "@csstools/media-query-list-parser": "^5.0.0"
   },
   "dependencies": {
     "@a5c-ai/agent-mux": "^5.0.0",

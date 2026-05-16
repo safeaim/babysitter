@@ -1602,9 +1602,15 @@ export function getHostEnvSignals(harness: string): string[] {
   return metadata?.hostEnvSignals ?? [];
 }
 
+function expandHome(p: string | undefined): string | undefined {
+  if (!p) return p;
+  const home = (typeof process !== 'undefined' && process.env) ? (process.env['HOME'] || process.env['USERPROFILE'] || '') : '';
+  return path.normalize(p.replace(/^~(?=[/\\]|$)/, home));
+}
+
 export function getSessionConfig(harness: string): { sessionDir?: string; sessionPersistence?: string } {
   const metadata = getAdapterMetadata(harness);
-  return { sessionDir: metadata?.sessionDir, sessionPersistence: metadata?.sessionPersistence };
+  return { sessionDir: expandHome(metadata?.sessionDir), sessionPersistence: metadata?.sessionPersistence };
 }
 
 export function getCapabilityFlags(harness: string): Record<string, unknown> {
@@ -1619,7 +1625,12 @@ export function getRuntimeHooks(harness: string): import('./models.js').AdapterR
 
 export function getConfigSchema(harness: string): import('./models.js').AdapterConfigSchema {
   const metadata = getAdapterMetadata(harness);
-  return metadata?.configSchema ?? {};
+  const schema = metadata?.configSchema ?? {};
+  return {
+    ...schema,
+    configFilePaths: schema.configFilePaths?.map(expandHome).filter((p): p is string => !!p),
+    projectConfigFilePaths: schema.projectConfigFilePaths?.map(expandHome).filter((p): p is string => !!p),
+  };
 }
 
 export function getDisplayName(harness: string): string {

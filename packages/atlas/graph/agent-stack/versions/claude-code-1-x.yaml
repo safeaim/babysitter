@@ -76,6 +76,13 @@ attributes:
       supportsImageOutput: false
       supportsFileAttachments: true
       supportsPlugins: true
+      pluginFormats: [mcp-server]
+      pluginRegistries:
+        - name: mcp
+          url: https://modelcontextprotocol.io
+          searchable: false
+      supportedPlatforms: [darwin, linux, win32]
+      thinkingEffortLevels: [low, medium, high, max]
       requiresGitRepo: false
       requiresPty: false
     runtimeHooks:

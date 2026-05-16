@@ -68,6 +68,9 @@ attributes:
       supportsImageOutput: false
       supportsFileAttachments: true
       supportsPlugins: true
+      pluginFormats: [mcp-server]
+      supportedPlatforms: [darwin, linux, win32]
+      thinkingEffortLevels: [low, medium, high]
       requiresGitRepo: false
       requiresPty: false
     runtimeHooks:

@@ -67,6 +67,7 @@ attributes:
       supportsImageOutput: false
       supportsFileAttachments: false
       supportsPlugins: false
+      supportedPlatforms: [darwin, linux, win32]
       requiresGitRepo: false
       requiresPty: false
     runtimeHooks:

@@ -26,11 +26,13 @@ attributes:
       - type: api_key
         name: "Provider API Key"
         envVars: [ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY]
+      - type: oauth
+        name: "OAuth Login"
     authFiles:
       - "~/.config/opencode/opencode.json"
     hostEnvSignals:
-      - OPENCODE_SESSION
-      - OPENCODE_RUN_ID
+      - OPENCODE_SESSION_ID
+      - OPENCODE_CONFIG
     sessionDir: "~/.config/opencode/sessions"
     sessionPersistence: file
     approvalModes:
@@ -65,6 +67,12 @@ attributes:
       supportsImageOutput: false
       supportsFileAttachments: true
       supportsPlugins: true
+      pluginFormats: [mcp-server]
+      pluginRegistries:
+        - name: mcp
+          url: https://modelcontextprotocol.io
+          searchable: false
+      supportedPlatforms: [darwin, linux, win32]
       requiresGitRepo: false
       requiresPty: false
     runtimeHooks:

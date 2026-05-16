@@ -262,10 +262,10 @@ describe('GeminiAdapter', () => {
       const fs = await import('node:fs/promises');
       const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-cfg-'));
       const tmpFile = path.join(tmpDir, 'settings.json');
-      (adapter as unknown as { configSchema: { configFilePaths: string[] } }).configSchema = {
-        ...adapter.configSchema,
-        configFilePaths: [tmpFile],
-      } as never;
+      Object.defineProperty(adapter, 'configSchema', {
+        value: { ...adapter.configSchema, configFilePaths: [tmpFile] },
+        configurable: true,
+      });
       await adapter.writeConfig({ model: 'test' });
       const written = JSON.parse(await fs.readFile(tmpFile, 'utf8'));
       expect(written.model).toBe('test');

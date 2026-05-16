@@ -24,10 +24,13 @@ function redirectAdapter(
     value: () => sessionDirPath,
     configurable: true,
   });
-  (adapter as unknown as { configSchema: { configFilePaths: string[] } }).configSchema = {
-    ...adapter.configSchema,
-    configFilePaths: [configFilePath],
-  } as never;
+  Object.defineProperty(adapter, 'configSchema', {
+    value: {
+      ...adapter.configSchema,
+      configFilePaths: [configFilePath],
+    },
+    configurable: true,
+  });
 }
 
 describe('adapter real-FS integration', () => {

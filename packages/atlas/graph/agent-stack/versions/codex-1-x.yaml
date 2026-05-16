@@ -70,6 +70,8 @@ attributes:
       supportsImageOutput: false
       supportsFileAttachments: false
       supportsPlugins: false
+      supportedPlatforms: [darwin, linux, win32]
+      thinkingEffortLevels: []
       requiresGitRepo: false
       requiresPty: false
     runtimeHooks:
@@ -206,6 +208,8 @@ attributes:
       supportsImageOutput: false
       supportsFileAttachments: false
       supportsPlugins: false
+      supportedPlatforms: [darwin, linux, win32]
+      thinkingEffortLevels: []
       requiresGitRepo: false
       requiresPty: false
     runtimeHooks:

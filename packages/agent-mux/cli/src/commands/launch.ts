@@ -1415,10 +1415,14 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // internally (claude -p, codex exec, gemini --prompt, pi stdin).
     const { spawn } = await import('node:child_process');
     child = spawn(plan.command, plan.args, {
-      stdio: ['pipe', 'pipe', 'inherit'],
+      stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env, ...plan.env },
       cwd: launchCwd,
       shell: process.platform === 'win32',
+    });
+    child.stderr?.on('data', (chunk: Buffer) => {
+      process.stderr.write(chunk);
+      capturedOutputChunks.push(chunk.toString('utf8'));
     });
 
     // Pipe stdout through + idle-timeout kill for harnesses that don't exit

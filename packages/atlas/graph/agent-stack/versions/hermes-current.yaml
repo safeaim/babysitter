@@ -38,6 +38,50 @@ attributes:
     approvalModes:
       - yolo
       - prompt
+    capabilityFlags:
+      canResume: true
+      canFork: false
+      supportsMultiTurn: true
+      sessionPersistence: sqlite
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: false
+      supportsNativeTools: true
+      supportsMCP: true
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: false
+      supportsJsonMode: false
+      supportsStructuredOutput: false
+      structuredSessionTransport: none
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: false
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: true
+      supportsStdinInjection: true
+      supportsImageInput: false
+      supportsImageOutput: false
+      supportsFileAttachments: false
+      supportsPlugins: false
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: yaml
+      configFilePaths:
+        - "~/.hermes/cli-config.yaml"
+    displayName: "Hermes"
+    defaultModelId: "hermes-3-llama-3.1-405b"
   hookSupport:
     interactive:
       sessionStart: unsupported

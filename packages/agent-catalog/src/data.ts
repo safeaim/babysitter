@@ -469,6 +469,15 @@ function parseAdapterMetadata(value: unknown): import('./models.js').AdapterMeta
     sessionPersistence: (['file', 'sqlite', 'none'].includes(valueAsString(obj.sessionPersistence)) ? valueAsString(obj.sessionPersistence) : undefined) as 'file' | 'sqlite' | 'none' | undefined,
     automationEnv: obj.automationEnv && typeof obj.automationEnv === 'object' ? Object.fromEntries(Object.entries(obj.automationEnv as Record<string, unknown>).map(([k, v]) => [k, String(v)])) : undefined,
     approvalModes: Array.isArray(obj.approvalModes) ? obj.approvalModes.map(String) : undefined,
+    capabilityFlags: obj.capabilityFlags && typeof obj.capabilityFlags === 'object' ? obj.capabilityFlags as Record<string, unknown> : undefined,
+    runtimeHooks: obj.runtimeHooks && typeof obj.runtimeHooks === 'object' ? obj.runtimeHooks as import('./models.js').AdapterRuntimeHooks : undefined,
+    configSchema: obj.configSchema && typeof obj.configSchema === 'object' ? {
+      configFormat: valueAsString((obj.configSchema as Record<string, unknown>).configFormat) || undefined,
+      configFilePaths: Array.isArray((obj.configSchema as Record<string, unknown>).configFilePaths) ? ((obj.configSchema as Record<string, unknown>).configFilePaths as unknown[]).map(String) : undefined,
+      projectConfigFilePaths: Array.isArray((obj.configSchema as Record<string, unknown>).projectConfigFilePaths) ? ((obj.configSchema as Record<string, unknown>).projectConfigFilePaths as unknown[]).map(String) : undefined,
+    } : undefined,
+    displayName: valueAsString(obj.displayName) || undefined,
+    defaultModelId: valueAsString(obj.defaultModelId) || undefined,
   };
 }
 

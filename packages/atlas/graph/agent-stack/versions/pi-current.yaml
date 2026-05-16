@@ -34,6 +34,50 @@ attributes:
     approvalModes:
       - yolo
       - prompt
+    capabilityFlags:
+      canResume: true
+      canFork: false
+      supportsMultiTurn: true
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: false
+      supportsNativeTools: true
+      supportsMCP: false
+      supportsParallelToolCalls: false
+      requiresToolApproval: true
+      supportsThinking: false
+      supportsJsonMode: false
+      supportsStructuredOutput: false
+      structuredSessionTransport: none
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: false
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: true
+      supportsStdinInjection: true
+      supportsImageInput: false
+      supportsImageOutput: false
+      supportsFileAttachments: false
+      supportsPlugins: false
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.pi/agent/settings.json"
+    displayName: "Pi"
+    defaultModelId: "default"
   interactiveSignals:
     turnCompletePattern: "^>"
     exitOnNonInteractive: false

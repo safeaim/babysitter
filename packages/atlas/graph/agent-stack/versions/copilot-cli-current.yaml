@@ -38,6 +38,50 @@ attributes:
     sessionPersistence: file
     approvalModes:
       - prompt
+    capabilityFlags:
+      canResume: false
+      canFork: false
+      supportsMultiTurn: false
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: false
+      supportsThinkingStreaming: false
+      supportsNativeTools: false
+      supportsMCP: false
+      supportsParallelToolCalls: false
+      requiresToolApproval: false
+      supportsThinking: false
+      supportsJsonMode: false
+      supportsStructuredOutput: false
+      structuredSessionTransport: none
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: false
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: true
+      supportsStdinInjection: false
+      supportsImageInput: false
+      supportsImageOutput: false
+      supportsFileAttachments: false
+      supportsPlugins: false
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.config/github-copilot/settings.json"
+    displayName: "GitHub Copilot"
+    defaultModelId: "gpt-4o"
   hookSupport:
     interactive:
       sessionStart: unsupported

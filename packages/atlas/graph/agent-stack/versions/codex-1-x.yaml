@@ -41,6 +41,50 @@ attributes:
       - yolo
       - prompt
       - deny
+    capabilityFlags:
+      canResume: true
+      canFork: false
+      supportsMultiTurn: true
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: false
+      supportsNativeTools: true
+      supportsMCP: false
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: false
+      supportsJsonMode: true
+      supportsStructuredOutput: true
+      structuredSessionTransport: restart-per-turn
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: false
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: false
+      supportsStdinInjection: false
+      supportsImageInput: false
+      supportsImageOutput: false
+      supportsFileAttachments: false
+      supportsPlugins: false
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.codex/config.json"
+    displayName: "OpenAI Codex"
+    defaultModelId: "o4-mini"
   hookSupport:
     interactive:
       sessionStart: native
@@ -133,6 +177,50 @@ attributes:
       - yolo
       - prompt
       - deny
+    capabilityFlags:
+      canResume: true
+      canFork: false
+      supportsMultiTurn: true
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: false
+      supportsNativeTools: true
+      supportsMCP: false
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: false
+      supportsJsonMode: true
+      supportsStructuredOutput: true
+      structuredSessionTransport: restart-per-turn
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: false
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: false
+      supportsStdinInjection: false
+      supportsImageInput: false
+      supportsImageOutput: false
+      supportsFileAttachments: false
+      supportsPlugins: false
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.codex/config.json"
+    displayName: "OpenAI Codex"
+    defaultModelId: "o4-mini"
   hookSupport:
     interactive:
       sessionStart: native

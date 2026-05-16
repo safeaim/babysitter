@@ -36,6 +36,52 @@ attributes:
     approvalModes:
       - yolo
       - prompt
+    capabilityFlags:
+      canResume: true
+      canFork: false
+      supportsMultiTurn: true
+      sessionPersistence: sqlite
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: false
+      supportsNativeTools: true
+      supportsMCP: true
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: false
+      supportsJsonMode: false
+      supportsStructuredOutput: false
+      structuredSessionTransport: none
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: true
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: true
+      supportsStdinInjection: false
+      supportsImageInput: true
+      supportsImageOutput: false
+      supportsFileAttachments: true
+      supportsPlugins: true
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.cursor/settings.json"
+      projectConfigFilePaths:
+        - ".cursor/settings.json"
+    displayName: "Cursor"
+    defaultModelId: "cursor-fast"
   hookSupport:
     interactive:
       sessionStart: native

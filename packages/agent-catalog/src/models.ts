@@ -424,6 +424,21 @@ export interface AdapterAuthMethod {
   envVars?: string[];
 }
 
+export interface AdapterRuntimeHooks {
+  preToolUse?: string;
+  postToolUse?: string;
+  sessionStart?: string;
+  sessionEnd?: string;
+  stop?: string;
+  userPromptSubmit?: string;
+}
+
+export interface AdapterConfigSchema {
+  configFormat?: string;
+  configFilePaths?: string[];
+  projectConfigFilePaths?: string[];
+}
+
 export interface AdapterMetadata {
   authMethods?: AdapterAuthMethod[];
   authFiles?: string[];
@@ -432,6 +447,11 @@ export interface AdapterMetadata {
   sessionPersistence?: 'file' | 'sqlite' | 'none';
   automationEnv?: Record<string, string>;
   approvalModes?: string[];
+  capabilityFlags?: Record<string, unknown>;
+  runtimeHooks?: AdapterRuntimeHooks;
+  configSchema?: AdapterConfigSchema;
+  displayName?: string;
+  defaultModelId?: string;
 }
 
 export interface AgentVersion {

@@ -21,6 +21,67 @@ attributes:
     - install:brew
     - install:curl
   minSchemaVersion: "6.0.0"
+  adapterMetadata:
+    authMethods:
+      - type: api_key
+        name: "Provider API Key"
+        envVars: [ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY]
+    authFiles:
+      - "~/.config/opencode/opencode.json"
+    hostEnvSignals:
+      - OPENCODE_SESSION
+      - OPENCODE_RUN_ID
+    sessionDir: "~/.config/opencode/sessions"
+    sessionPersistence: file
+    approvalModes:
+      - yolo
+      - prompt
+    capabilityFlags:
+      canResume: true
+      canFork: true
+      supportsMultiTurn: true
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: false
+      supportsNativeTools: true
+      supportsMCP: true
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: false
+      supportsJsonMode: true
+      supportsStructuredOutput: true
+      structuredSessionTransport: restart-per-turn
+      sessionControlPlane: self-managed
+      supportsSkills: true
+      supportsAgentsMd: true
+      skillsFormat: file
+      supportsSubagentDispatch: true
+      supportsParallelExecution: true
+      maxParallelTasks: 5
+      supportsInteractiveMode: false
+      supportsStdinInjection: false
+      supportsImageInput: true
+      supportsImageOutput: false
+      supportsFileAttachments: true
+      supportsPlugins: true
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.config/opencode/opencode.json"
+      projectConfigFilePaths:
+        - ".opencode/config.json"
+    displayName: "OpenCode"
+    defaultModelId: "claude-3-5-sonnet-20241022"
   hookSupport:
     interactive:
       sessionStart: native

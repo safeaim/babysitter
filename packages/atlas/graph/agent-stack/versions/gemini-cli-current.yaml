@@ -39,6 +39,50 @@ attributes:
     approvalModes:
       - yolo
       - prompt
+    capabilityFlags:
+      canResume: true
+      canFork: false
+      supportsMultiTurn: true
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: true
+      supportsNativeTools: true
+      supportsMCP: true
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: true
+      supportsJsonMode: true
+      supportsStructuredOutput: true
+      structuredSessionTransport: restart-per-turn
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: false
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: true
+      supportsStdinInjection: true
+      supportsImageInput: true
+      supportsImageOutput: false
+      supportsFileAttachments: true
+      supportsPlugins: true
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.config/gemini/settings.json"
+    displayName: "Gemini CLI"
+    defaultModelId: "gemini-2.5-pro"
   hookSupport:
     interactive:
       sessionStart: native

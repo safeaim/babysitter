@@ -34,6 +34,50 @@ attributes:
     approvalModes:
       - yolo
       - prompt
+    capabilityFlags:
+      canResume: false
+      canFork: false
+      supportsMultiTurn: true
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: false
+      supportsNativeTools: true
+      supportsMCP: true
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: false
+      supportsJsonMode: false
+      supportsStructuredOutput: false
+      structuredSessionTransport: none
+      sessionControlPlane: self-managed
+      supportsSkills: false
+      supportsAgentsMd: false
+      skillsFormat: none
+      supportsSubagentDispatch: false
+      supportsParallelExecution: false
+      maxParallelTasks: 1
+      supportsInteractiveMode: true
+      supportsStdinInjection: true
+      supportsImageInput: false
+      supportsImageOutput: false
+      supportsFileAttachments: false
+      supportsPlugins: true
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: nonblocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: nonblocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.openclaw/config.json"
+    displayName: "OpenClaw"
+    defaultModelId: "default"
   hookSupport:
     interactive:
       sessionStart: unsupported

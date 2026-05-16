@@ -1602,3 +1602,28 @@ export function getSessionConfig(harness: string): { sessionDir?: string; sessio
   const metadata = getAdapterMetadata(harness);
   return { sessionDir: metadata?.sessionDir, sessionPersistence: metadata?.sessionPersistence };
 }
+
+export function getCapabilityFlags(harness: string): Record<string, unknown> {
+  const metadata = getAdapterMetadata(harness);
+  return metadata?.capabilityFlags ?? {};
+}
+
+export function getRuntimeHooks(harness: string): import('./models.js').AdapterRuntimeHooks {
+  const metadata = getAdapterMetadata(harness);
+  return metadata?.runtimeHooks ?? {};
+}
+
+export function getConfigSchema(harness: string): import('./models.js').AdapterConfigSchema {
+  const metadata = getAdapterMetadata(harness);
+  return metadata?.configSchema ?? {};
+}
+
+export function getDisplayName(harness: string): string {
+  const metadata = getAdapterMetadata(harness);
+  return metadata?.displayName ?? harness;
+}
+
+export function getDefaultModelId(harness: string): string | undefined {
+  const metadata = getAdapterMetadata(harness);
+  return metadata?.defaultModelId;
+}

@@ -47,6 +47,52 @@ attributes:
       - yolo
       - prompt
       - deny
+    capabilityFlags:
+      canResume: true
+      canFork: true
+      supportsMultiTurn: true
+      sessionPersistence: file
+      supportsTextStreaming: true
+      supportsToolCallStreaming: true
+      supportsThinkingStreaming: true
+      supportsNativeTools: true
+      supportsMCP: true
+      supportsParallelToolCalls: true
+      requiresToolApproval: true
+      supportsThinking: true
+      supportsJsonMode: true
+      supportsStructuredOutput: true
+      structuredSessionTransport: persistent
+      sessionControlPlane: self-managed
+      supportsSkills: true
+      supportsAgentsMd: true
+      skillsFormat: file
+      supportsSubagentDispatch: true
+      supportsParallelExecution: true
+      maxParallelTasks: 10
+      supportsInteractiveMode: true
+      supportsStdinInjection: true
+      supportsImageInput: true
+      supportsImageOutput: false
+      supportsFileAttachments: true
+      supportsPlugins: true
+      requiresGitRepo: false
+      requiresPty: false
+    runtimeHooks:
+      preToolUse: blocking
+      postToolUse: nonblocking
+      sessionStart: nonblocking
+      sessionEnd: nonblocking
+      stop: nonblocking
+      userPromptSubmit: blocking
+    configSchema:
+      configFormat: json
+      configFilePaths:
+        - "~/.claude/settings.json"
+      projectConfigFilePaths:
+        - ".claude/settings.json"
+    displayName: "Claude Code"
+    defaultModelId: "claude-sonnet-4-20250514"
   hookSupport:
     interactive:
       sessionStart: native

@@ -8,6 +8,32 @@ import { buildPrimaryLiveStackCommands, executeChildProcessCommand, runPrimaryLi
 import type { LiveStackScenario } from './scenario-contract';
 import { liveStackScenarioFromEnv, primaryLiveStackScenario } from './scenario-contract';
 
+async function writeMinimalJournal(journalDir: string, completed: boolean): Promise<void> {
+  const events = [
+    { type: 'RUN_CREATED' },
+    { type: 'PROCESS_ASSIGNED' },
+    { type: 'ITERATION_STARTED', iteration: 1 },
+    { type: 'EFFECT_REQUESTED', kind: 'shell' },
+    { type: 'EFFECT_RESOLVED', status: 'ok' },
+    { type: 'EFFECT_REQUESTED', kind: 'agent' },
+    { type: 'EFFECT_RESOLVED', status: 'ok' },
+    { type: 'ITERATION_STARTED', iteration: 2 },
+    { type: 'EFFECT_REQUESTED', kind: 'agent' },
+    { type: 'EFFECT_RESOLVED', status: 'ok' },
+    { type: 'EFFECT_REQUESTED', kind: 'agent' },
+    { type: 'EFFECT_RESOLVED', status: 'ok' },
+    { type: 'EFFECT_REQUESTED', kind: 'agent' },
+    { type: 'EFFECT_RESOLVED', status: 'ok' },
+    { type: 'ITERATION_STARTED', iteration: 3 },
+    { type: 'EFFECT_REQUESTED', kind: 'shell' },
+    { type: 'EFFECT_RESOLVED', status: 'ok' },
+    ...(completed ? [{ type: 'RUN_COMPLETED' }] : []),
+  ];
+  for (let i = 0; i < events.length; i++) {
+    await fs.writeFile(path.join(journalDir, `${String(i + 1).padStart(6, '0')}.json`), JSON.stringify(events[i]));
+  }
+}
+
 function foundryClaudeVanillaScenario(): LiveStackScenario {
   return liveStackScenarioFromEnv({
     LIVE_STACK_SCENARIO_ID: 'live.agent-mux.claude-code.foundry-openai.gpt-5.5',
@@ -280,7 +306,7 @@ describe('primary live stack runner contract', () => {
           const runDir = path.join(cwd, '.a5c', 'runs', runId);
           await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
           await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId, metadata: { completionProof: `${runId}-proof` } }));
-          await fs.writeFile(path.join(runDir, 'journal', '001.json'), completed ? 'RUN_COMPLETED' : 'RUN_CREATED');
+          await writeMinimalJournal(path.join(runDir, 'journal'), completed);
         }
 
         return {
@@ -328,7 +354,7 @@ describe('primary live stack runner contract', () => {
         const runDir = path.join(cwd, '.a5c', 'runs', runId);
         await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
         await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId: 'processes/live-stack/summarize-translate-test', metadata: { completionProof: `${runId}-proof` } }));
-        await fs.writeFile(path.join(runDir, 'journal', '001.json'), 'RUN_COMPLETED');
+        await writeMinimalJournal(path.join(runDir, 'journal'), true);
 
         return {
           status: 0,
@@ -375,7 +401,7 @@ describe('primary live stack runner contract', () => {
         const runDir = path.join(cwd, '.a5c', 'runs', runId);
         await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
         await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId: 'processes/live-stack/summarize-translate-test', metadata: { completionProof: `${runId}-proof` } }));
-        await fs.writeFile(path.join(runDir, 'journal', '001.json'), 'RUN_COMPLETED');
+        await writeMinimalJournal(path.join(runDir, 'journal'), true);
 
         return {
           status: 0,
@@ -423,7 +449,7 @@ describe('primary live stack runner contract', () => {
         const runDir = path.join(cwd, '.a5c', 'runs', runId);
         await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
         await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId: 'processes/live-stack/summarize-translate-test', metadata: { completionProof: `${runId}-proof` } }));
-        await fs.writeFile(path.join(runDir, 'journal', '001.json'), 'RUN_COMPLETED');
+        await writeMinimalJournal(path.join(runDir, 'journal'), true);
 
         return {
           status: 0,

@@ -358,6 +358,40 @@ function extractPromptArtifactPaths(prompt: string | undefined, cwd: string): st
   return [...paths];
 }
 
+function promptRequiresBabysitterCompletion(prompt: string | undefined): boolean {
+  return typeof prompt === 'string' && /(babysitter|\.a5c\/processes)/i.test(prompt);
+}
+
+async function hasCompletedBabysitterRun(cwd: string): Promise<boolean> {
+  const fs = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const runsDir = join(cwd, '.a5c', 'runs');
+  let runIds: string[];
+  try {
+    runIds = await fs.readdir(runsDir);
+  } catch {
+    return false;
+  }
+  for (const runId of runIds.slice(-20).reverse()) {
+    try {
+      const runRaw = await fs.readFile(join(runsDir, runId, 'run.json'), 'utf8');
+      const runMeta = JSON.parse(runRaw) as Record<string, unknown>;
+      const metadata = recordObject(runMeta['metadata']);
+      const proof = metadata['completionProof'] ?? runMeta['completionProof'];
+      const processId = runMeta['processId'] ?? metadata['processId'];
+      if (!proof || !processId || processId === 'bare-run') continue;
+      const journalDir = join(runsDir, runId, 'journal');
+      const journalFiles = await fs.readdir(journalDir);
+      for (const journalFile of journalFiles) {
+        const journal = await fs.readFile(join(journalDir, journalFile), 'utf8');
+        if (journal.includes('RUN_COMPLETED')) return true;
+      }
+    } catch {
+      // ignore incomplete runs while the harness is still flushing state
+    }
+  }
+  return false;
+}
 function startPromptArtifactCompletionMonitor(input: {
   readonly prompt: string | undefined;
   readonly cwd: string;
@@ -365,6 +399,7 @@ function startPromptArtifactCompletionMonitor(input: {
 }): ReturnType<typeof setInterval> | undefined {
   const expectedPaths = extractPromptArtifactPaths(input.prompt, input.cwd);
   if (expectedPaths.length === 0) return undefined;
+  const requireBabysitterCompletion = promptRequiresBabysitterCompletion(input.prompt);
   const lastSizes = new Map<string, number>();
   return setInterval(() => {
     void (async () => {
@@ -374,8 +409,10 @@ function startPromptArtifactCompletionMonitor(input: {
           const stat = await fs.stat(expectedPath);
           if (!stat.isFile() || stat.size <= 0) continue;
           if (lastSizes.get(expectedPath) === stat.size) {
-            input.onComplete();
-            return;
+            if (!requireBabysitterCompletion || await hasCompletedBabysitterRun(input.cwd)) {
+              input.onComplete();
+              return;
+            }
           }
           lastSizes.set(expectedPath, stat.size);
         } catch {

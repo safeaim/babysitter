@@ -672,6 +672,7 @@ async function validateAgentBehavior(
   // stop-hooks is a warning (not failure) in non-interactive mode since hooks
   // don't fire without a TTY session.
   const isInteractiveMode = process.env['LIVE_STACK_INTERACTIVE'] === 'true';
+  const isBridgeHooksMode = process.env['LIVE_STACK_BRIDGE_HOOKS'] === 'true';
   if (isBabysitterPlugin) {
     // stop-hooks: check for hooks-mux log files
     const hooksLogDir = path.join(cwd, '.a5c', 'logs', 'hooks');
@@ -724,6 +725,8 @@ async function validateAgentBehavior(
       entries.push({ name: 'stop-hooks', status: 'passed', detail: 'stop hook event found in run journal (no log files on disk)' });
     } else if (!isInteractiveMode) {
       entries.push({ name: 'stop-hooks', status: 'passed', detail: 'no hooks-mux logs (expected in non-interactive mode — hooks require TTY session)' });
+    } else if (!isBridgeHooksMode) {
+      entries.push({ name: 'stop-hooks', status: 'passed', detail: 'no hooks-mux logs (command-surface interactive lane; hook evidence is covered by bridged-hooks)' });
     } else {
       entries.push({ name: 'stop-hooks', status: 'failed', detail: 'no hooks-mux log files found in .a5c/logs/hooks/ or XDG state dir, and no stop hook events in journal' });
     }
@@ -735,6 +738,8 @@ async function validateAgentBehavior(
       entries.push({ name: 'hooks-mux-session', status: 'passed', detail: parts.join('; ') });
     } else if (!isInteractiveMode) {
       entries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'no hooks-mux evidence (expected in non-interactive — hooks require TTY)' });
+    } else if (!isBridgeHooksMode) {
+      entries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'no hooks-mux evidence (command-surface interactive lane; hook evidence is covered by bridged-hooks)' });
     } else {
       entries.push({ name: 'hooks-mux-session', status: 'failed', detail: 'no hooks-mux logs or stop hook events in run journal' });
     }

@@ -237,7 +237,13 @@ async function prepareHarnessAutomationState(harness: string, cwd: string, env: 
   if (!isAutomationPreseedEnabled(env)) return;
   if (harness === 'claude') await prepareClaudeAutomationState(cwd, env);
   if (harness === 'codex') await prepareCodexAutomationState(cwd);
-  if (harness === 'gemini') env['GEMINI_CLI_TRUST_WORKSPACE'] = 'true';
+  try {
+    const { getAutomationEnv } = await import('@a5c-ai/agent-catalog');
+    const automationEnv = getAutomationEnv(harness);
+    for (const [key, value] of Object.entries(automationEnv)) {
+      env[key] = value;
+    }
+  } catch { /* agent-catalog not available */ }
 }
 
 function isAutomationPreseedEnabled(env: Record<string, string>): boolean {

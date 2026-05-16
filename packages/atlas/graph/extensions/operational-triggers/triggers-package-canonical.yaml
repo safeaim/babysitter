@@ -207,21 +207,27 @@ edges:
 nodeKind: OperationalTrigger
 id: operational-trigger:amux-triggers-action
 attributes:
-  displayName: amux-triggers — reusable GitHub Action composite
+  displayName: Agent Mux — reusable GitHub Action composite
   triggerKind: vcs-event
-  effect: 'Composite action at packages/triggers/action.yml. Steps: setup-node →
+  effect: 'Composite action at packages/triggers/action.yml. Supports all harnesses
+
+    (claude, codex, pi, gemini, copilot, cursor, opencode, hermes) with providers
+
+    (foundry, google, anthropic, bedrock, openai). Steps: setup-node →
 
     optional a5c GitHub App token exchange → npm ci + build agent-mux +
 
     build @a5c-ai/triggers → optional `amux install <harness>` →
 
-    optional newline-delimited `amux plugin install` → enrich →
+    optional babysitter plugin install → optional legacy plugin install → enrich →
 
-    evaluate (exit-code 78 means skip) → if matched: pre-run, amux
+    evaluate (exit-code 78 means skip) → if matched: pre-run, amux launch
 
-    <command> [--agent <adapter>] [--prompt <prompt>] [args-json|args],
+    <harness> [<provider>] [--model M] [--prompt P] [--max-turns N]
 
-    post-run. Outputs: matched, event, exit-code.
+    [--with-proxy-if-needed] [--yolo] [args-json|args], post-run.
+
+    Outputs: matched, event, exit-code.
 
     '
   idempotent: false
@@ -265,6 +271,7 @@ edges:
   - target: github-action-step:triggers-action-a5c-token
   - target: github-action-step:triggers-action-build-runtime
   - target: github-action-step:triggers-action-install-harness
+  - target: github-action-step:triggers-action-install-babysitter-plugin
   - target: github-action-step:triggers-action-install-plugins
   - target: github-action-step:triggers-action-evaluate-trigger
   - target: github-action-step:triggers-action-pre-run
@@ -272,11 +279,20 @@ edges:
   - target: github-action-step:triggers-action-post-run
   defines_frontmatter_field:
   - target: frontmatter-field:triggers-action-input-command
+  - target: frontmatter-field:triggers-action-input-harness
+  - target: frontmatter-field:triggers-action-input-provider
+  - target: frontmatter-field:triggers-action-input-model
+  - target: frontmatter-field:triggers-action-input-prompt
+  - target: frontmatter-field:triggers-action-input-interaction-mode
+  - target: frontmatter-field:triggers-action-input-max-turns
+  - target: frontmatter-field:triggers-action-input-with-proxy
+  - target: frontmatter-field:triggers-action-input-proxy-log-level
+  - target: frontmatter-field:triggers-action-input-babysitter-plugin
+  - target: frontmatter-field:triggers-action-input-process-file
+  - target: frontmatter-field:triggers-action-input-babysitter-prompt-prefix
   - target: frontmatter-field:triggers-action-input-args
   - target: frontmatter-field:triggers-action-input-args-json
   - target: frontmatter-field:triggers-action-input-adapter
-  - target: frontmatter-field:triggers-action-input-prompt
-  - target: frontmatter-field:triggers-action-input-harness
   - target: frontmatter-field:triggers-action-input-plugins
   - target: frontmatter-field:triggers-action-input-trigger-backend
   - target: frontmatter-field:triggers-action-input-trigger-query

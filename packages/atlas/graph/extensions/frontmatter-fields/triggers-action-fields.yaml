@@ -1,6 +1,6 @@
-# packages/triggers/action.yml inputs (16) + outputs (3) decomposed into
+# packages/triggers/action.yml inputs (25) + outputs (3) decomposed into
 # per-field FrontmatterField records.
-# Source: packages/triggers/action.yml (lines 9-75 inputs, 66-75 outputs).
+# Source: packages/triggers/action.yml (lines 9-120 inputs, 121-131 outputs).
 nodeKind: FrontmatterField
 id: frontmatter-field:triggers-action-input-command
 attributes:
@@ -8,7 +8,7 @@ attributes:
   name: command
   valueType: string
   required: "no"
-  defaultValue: "run"
+  defaultValue: "launch"
   appliesTo: github-action-input
   description: "agent-mux command to execute after trigger evaluation."
 ---
@@ -40,7 +40,7 @@ attributes:
   valueType: string
   required: "no"
   appliesTo: github-action-input
-  description: "Agent adapter/agent name passed to amux via --agent when set."
+  description: "Alias for harness (backward compatibility)."
 ---
 nodeKind: FrontmatterField
 id: frontmatter-field:triggers-action-input-prompt
@@ -50,17 +50,136 @@ attributes:
   valueType: string
   required: "no"
   appliesTo: github-action-input
-  description: "Prompt passed to amux run via --prompt when set."
+  description: "Prompt or task to send to the agent."
 ---
 nodeKind: FrontmatterField
 id: frontmatter-field:triggers-action-input-harness
 attributes:
   displayName: "amux-triggers action input: harness"
   name: harness
+  valueType: enum
+  required: "yes"
+  allowedValues:
+    - claude
+    - codex
+    - pi
+    - gemini
+    - copilot
+    - cursor
+    - opencode
+    - hermes
+  appliesTo: github-action-input
+  description: "Coding agent harness to use (claude, codex, pi, gemini, copilot, cursor, opencode, hermes)."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-provider
+attributes:
+  displayName: "amux-triggers action input: provider"
+  name: provider
+  valueType: enum
+  required: "no"
+  allowedValues:
+    - foundry
+    - google
+    - anthropic
+    - bedrock
+    - openai
+  appliesTo: github-action-input
+  description: "Model provider (foundry, google, anthropic, bedrock, openai)."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-model
+attributes:
+  displayName: "amux-triggers action input: model"
+  name: model
   valueType: string
   required: "no"
   appliesTo: github-action-input
-  description: "Harness to install before plugin installation."
+  description: "Model name to use (e.g. gpt-5.5, gemini-3.1-pro-preview, claude-sonnet-4)."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-interaction-mode
+attributes:
+  displayName: "amux-triggers action input: interaction-mode"
+  name: interaction-mode
+  valueType: enum
+  required: "no"
+  defaultValue: "non-interactive"
+  allowedValues:
+    - non-interactive
+    - bridged-hooks
+    - bridged-interactive
+  appliesTo: github-action-input
+  description: "How to launch the harness in CI: non-interactive (plain NI mode), bridged-hooks (NI + emulated babysitter lifecycle hooks), bridged-interactive (NI externally, interactive internally via PTY)."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-max-turns
+attributes:
+  displayName: "amux-triggers action input: max-turns"
+  name: max-turns
+  valueType: string
+  required: "no"
+  defaultValue: "15"
+  appliesTo: github-action-input
+  description: "Maximum model turns before the agent exits."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-with-proxy
+attributes:
+  displayName: "amux-triggers action input: with-proxy"
+  name: with-proxy
+  valueType: bool
+  required: "no"
+  defaultValue: "true"
+  appliesTo: github-action-input
+  description: "Start transport-mux proxy if the harness doesn't support the provider natively."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-proxy-log-level
+attributes:
+  displayName: "amux-triggers action input: proxy-log-level"
+  name: proxy-log-level
+  valueType: enum
+  required: "no"
+  defaultValue: "error"
+  allowedValues:
+    - error
+    - warn
+    - info
+    - debug
+  appliesTo: github-action-input
+  description: "Proxy log level (error, warn, info, debug)."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-babysitter-plugin
+attributes:
+  displayName: "amux-triggers action input: babysitter-plugin"
+  name: babysitter-plugin
+  valueType: bool
+  required: "no"
+  defaultValue: "false"
+  appliesTo: github-action-input
+  description: "Install the babysitter plugin into the harness before running."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-process-file
+attributes:
+  displayName: "amux-triggers action input: process-file"
+  name: process-file
+  valueType: string
+  required: "no"
+  appliesTo: github-action-input
+  description: "Path to a babysitter process definition (.mjs) to copy into .a5c/processes/."
+---
+nodeKind: FrontmatterField
+id: frontmatter-field:triggers-action-input-babysitter-prompt-prefix
+attributes:
+  displayName: "amux-triggers action input: babysitter-prompt-prefix"
+  name: babysitter-prompt-prefix
+  valueType: string
+  required: "no"
+  appliesTo: github-action-input
+  description: "Slash command prefix for babysitter invocation. Harness-specific: claude → /babysitter:yolo, codex → $babysitter:yolo, other → Invoke the babysitter:yolo command to:"
 ---
 nodeKind: FrontmatterField
 id: frontmatter-field:triggers-action-input-plugins

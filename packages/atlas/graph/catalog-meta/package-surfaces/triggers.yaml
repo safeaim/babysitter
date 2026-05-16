@@ -13,6 +13,26 @@ attributes:
   sourceOfTruthRole: external
   publishedTo: npm
   versionPolicy: semver
+  supportedHarnesses:
+    - claude
+    - codex
+    - gemini
+    - copilot
+    - cursor
+    - opencode
+    - pi
+    - hermes
+  supportedProviders:
+    - foundry
+    - google
+    - anthropic
+    - bedrock
+    - openai
+  supportedTriggerBackends:
+    - github
+    - gitlab
+    - bitbucket
+    - generic-webhook
 edges:
   has_payload_schema:
     - target: shared-context-spec:normalized-trigger-event

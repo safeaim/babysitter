@@ -62,8 +62,9 @@ export function KrateLoadingView({
 function controllerModelIsReachable(body) {
   if (!body || body.error) return false;
   const errors = body.controller?.connection?.errors || [];
-  const hasFetchFailure = errors.some((error) => /fetch failed|controller API|ECONN|ENOTFOUND|ETIMEDOUT|Krate workspace unavailable/i.test(String(error || '')));
-  return Boolean(body.product === 'Krate' || body.controller) && !hasFetchFailure;
+  const hasUnavailableError = errors.some((error) => /fetch failed|controller API|ECONN|ENOTFOUND|ETIMEDOUT|Krate workspace unavailable|KRATE_CONTROLLER_URL is not configured/i.test(String(error || '')));
+  const hasUsableControllerData = Boolean(body.status === 'ready' || body.controller?.connection?.available || body.controller?.apiService || body.metrics?.resources);
+  return hasUsableControllerData && !hasUnavailableError;
 }
 
 export function KrateControllerRecovery({ org = 'default', pollMs = 2500 }) {
@@ -132,4 +133,5 @@ export function KrateControllerRecovery({ org = 'default', pollMs = 2500 }) {
     </div>
   );
 }
+
 

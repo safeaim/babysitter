@@ -6,7 +6,7 @@ import { getControllerSnapshotAsync } from './kubernetes-controller-async.js';
 
 export { clearSnapshotCache };
 
-export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE_CONTROLLER_URL, fetchImpl = globalThis.fetch, controller = createKrateApiController({ resourceGateway: createKubernetesResourceGateway() }), organization = process.env.KRATE_ORG || null } = {}) {
+export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE_CONTROLLER_URL, fetchImpl = globalThis.fetch, controller = createKrateApiController({ resourceGateway: createKubernetesResourceGateway() }), organization = process.env.KRATE_ORG || null, localFallback = true } = {}) {
   const revalidateFn = async () => {
     if (controllerUrl) {
       try {
@@ -24,6 +24,7 @@ export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE
         }, { organization });
       }
     }
+    if (!localFallback) return unavailableControllerModel('KRATE_CONTROLLER_URL is not configured', organization);
     return fallbackControllerModel(controller, null, organization);
   };
 
@@ -49,4 +50,19 @@ async function fallbackControllerModel(controller, connectionError = null, organ
       commands: []
     }, { organization });
   }
+}
+
+function unavailableControllerModel(messages, organization = null) {
+  const errors = Array.isArray(messages) ? messages : [messages];
+  return createControllerUiModel({
+    source: 'kubernetes',
+    namespace: process.env.KRATE_NAMESPACE || 'krate-system',
+    kubectl: { available: false, context: null, errors: errors.filter(Boolean) },
+    resources: {},
+    crds: [],
+    events: [],
+    permissions: [],
+    storage: {},
+    commands: []
+  }, { organization });
 }

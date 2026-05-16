@@ -137,7 +137,7 @@ export function sanitizeAction(value) {
 }
 
 export async function loadKrateUi(org = null) {
-  const model = await fetchControllerUiModel({ organization: org });
+  const model = await fetchControllerUiModel({ organization: org, localFallback: false });
   const repositories = model.views.dashboard.repositories || [];
   return {
     model,
@@ -194,7 +194,7 @@ export function shouldShowControllerRecovery(model) {
   if (!model || model.status === 'ready') return false;
   const errors = model.controller?.connection?.errors || [];
   const hasControllerData = Boolean(model.controller?.connection?.available || model.controller?.apiService || model.metrics?.resources);
-  const hasFetchFailure = errors.some((error) => /fetch failed|controller API|ECONN|ENOTFOUND|ETIMEDOUT|Krate workspace unavailable/i.test(String(error || '')));
+  const hasFetchFailure = errors.some((error) => /fetch failed|controller API|ECONN|ENOTFOUND|ETIMEDOUT|Krate workspace unavailable|KRATE_CONTROLLER_URL is not configured/i.test(String(error || '')));
   return !hasControllerData && hasFetchFailure;
 }
 
@@ -216,5 +216,6 @@ export function ResourceTable({ resource }) {
   const label = displayKind(resource.kind);
   return <details className="card"><summary><span><h3>{label}</h3><p>{resource.count} records available. Expand for advanced details.</p></span><StatusPill tone={resource.count ? 'good' : 'neutral'}>{resource.count} returned</StatusPill></summary><code>{displayCommand(resource, 'list')}</code>{resource.names?.length ? <ul className="compactList">{resource.names.map((name) => <li key={name}>{name}</li>)}</ul> : <p className="emptyText">No {label} records returned by Krate.</p>}<PlanCard title={`${label} details`} plan={resource.yaml} command={displayCommand(resource, 'apply')} /></details>;
 }
+
 
 

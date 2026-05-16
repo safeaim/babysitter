@@ -1,3 +1,7 @@
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
+
 import { afterEach, describe, expect, it } from "vitest";
 import {
   _resetAmuxInstallClientCache,
@@ -119,6 +123,20 @@ describe("install amux bridge", () => {
     });
   });
 
+  it("plans a Claude Code plugin install from generated local marketplace when available", async () => {
+    const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "babysitter-claude-plugin-"));
+    await fs.mkdir(path.join(workspace, "artifacts", "generated-plugins", ".claude-plugin"), { recursive: true });
+    await fs.writeFile(path.join(workspace, "artifacts", "generated-plugins", ".claude-plugin", "marketplace.json"), "{}\n");
+
+    const result = await installHarnessPlugin("claude-code", {
+      workspace,
+      json: true,
+      dryRun: true,
+      verbose: false,
+    });
+
+    expect(result.command).toBe(`claude plugin marketplace add ${path.join(workspace, "artifacts", "generated-plugins")} && claude plugin install --scope project babysitter@a5c.ai`);
+  });
   it("plans a plugin install through the published package installer", async () => {
     const result = await installHarnessPlugin("codex", {
       workspace: "/tmp/demo",

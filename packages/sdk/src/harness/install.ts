@@ -12,6 +12,8 @@ import type {
   HarnessInstallResult,
 } from "./types";
 import { KNOWN_HARNESSES } from "./registry";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { execFilePromise, installCliViaNpm, renderCommand, runPackageBinaryViaNpx } from "./installSupport";
 
 // ---------------------------------------------------------------------------
@@ -279,9 +281,18 @@ export async function installHarnessPlugin(
  * Reset the cached client. For testing.
  * @internal
  */
+function resolveClaudeMarketplaceSource(options: HarnessInstallOptions): string {
+  if (options.workspace) {
+    const generatedMarketplace = join(options.workspace, "artifacts", "generated-plugins", ".claude-plugin", "marketplace.json");
+    if (existsSync(generatedMarketplace)) return join(options.workspace, "artifacts", "generated-plugins");
+  }
+  return "a5c-ai/babysitter-claude";
+}
+
 async function installClaudeCodePlugin(options: HarnessInstallOptions): Promise<HarnessInstallResult> {
+  const marketplaceSource = resolveClaudeMarketplaceSource(options);
   const commands = [
-    { command: "claude", args: ["plugin", "marketplace", "add", "a5c-ai/babysitter-claude"] },
+    { command: "claude", args: ["plugin", "marketplace", "add", marketplaceSource] },
     { command: "claude", args: ["plugin", "install", "--scope", options.workspace ? "project" : "user", "babysitter@a5c.ai"] },
   ];
   const rendered = commands.map((item) => renderCommand(item.command, item.args)).join(" && ");

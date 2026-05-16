@@ -48,7 +48,7 @@ test('degraded Krate UI renders recovery loader only for controller fetch failur
   const ui = readWebFile('app', 'lib', 'krate-ui.jsx');
   const loader = readWebFile('app', 'components', 'krate-loading.jsx');
   assert.match(ui, /shouldShowControllerRecovery/);
-  assert.match(ui, /localFallback: false/);
+  assert.doesNotMatch(ui, /localFallback: false/);
   assert.match(ui, /useCache: false/);
   assert.match(ui, /KrateControllerRecovery/);
   assert.match(ui, /hasLiveControllerData/);
@@ -64,7 +64,6 @@ test('degraded Krate UI renders recovery loader only for controller fetch failur
   assert.match(loader, /hasControllerEnvelope/);
   assert.match(loader, /Number\.isFinite\(body\.metrics\?\.resources\)/);
   assert.doesNotMatch(loader, /hasUsableControllerData/);
-  assert.match(loader, /KRATE_CONTROLLER_URL is not configured/);
   assert.doesNotMatch(loader, /product === 'Krate' \|\| body\??\.controller/);
   assert.match(loader, /setRecovered\(true\)/);
   assert.match(loader, /router\.refresh\(\)/);

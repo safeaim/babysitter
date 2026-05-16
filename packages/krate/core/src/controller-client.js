@@ -17,14 +17,14 @@ export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE
         const signal = requestTimeoutMs > 0 && globalThis.AbortSignal?.timeout ? AbortSignal.timeout(requestTimeoutMs) : undefined;
         const response = await fetchImpl(target, { cache: 'no-store', ...(signal ? { signal } : {}) });
         if (!response.ok) throw new Error(`controller API ${response.status}`);
-        return await response.json();
+        const remoteModel = await response.json();
+        if (localFallback && shouldFallbackFromRemoteModel(remoteModel)) {
+          return fallbackControllerModel(controller, new Error(remoteControllerError(remoteModel) || 'controller returned degraded empty data'), organization);
+        }
+        return remoteModel;
       } catch (error) {
-        return createControllerUiModel({
-          source: 'kubernetes',
-          namespace: process.env.KRATE_NAMESPACE || 'krate-system',
-          kubectl: { available: false, context: null, errors: [error.message] },
-          resources: {}, crds: [], events: [], permissions: [], storage: {}, commands: []
-        }, { organization });
+        if (localFallback) return fallbackControllerModel(controller, error, organization);
+        return unavailableControllerModel(error.message, organization);
       }
     }
     if (!localFallback) return unavailableControllerModel('KRATE_CONTROLLER_URL is not configured', organization);
@@ -37,7 +37,7 @@ export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE
 
 async function fallbackControllerModel(controller, connectionError = null, organization = null) {
   try {
-    const snapshot = await getControllerSnapshotAsync().catch(() => controller.snapshot());
+    const snapshot = await controller.snapshot().catch(() => getControllerSnapshotAsync());
     const model = createControllerUiModel(snapshot, { organization });
     if (connectionError) model.controller.connection.errors = [connectionError.message, ...(model.controller.connection.errors || [])];
     return model;
@@ -54,6 +54,21 @@ async function fallbackControllerModel(controller, connectionError = null, organ
       commands: []
     }, { organization });
   }
+}
+
+function shouldFallbackFromRemoteModel(model) {
+  if (!model || model.status !== 'degraded') return false;
+  const hasLiveConnection = Boolean(model.controller?.connection?.available || model.controller?.apiService);
+  if (hasLiveConnection) return false;
+  const resourceCount = Number(model.metrics?.resources || 0);
+  const hasResourceItems = Array.isArray(model.resources) && model.resources.some((resource) => Number(resource?.count || 0) > 0 || resource?.items?.length);
+  const hasDashboardItems = Number(model.views?.dashboard?.repositories?.length || 0) > 0;
+  const errors = model.controller?.connection?.errors || [];
+  return resourceCount === 0 && !hasResourceItems && !hasDashboardItems && errors.length > 0;
+}
+
+function remoteControllerError(model) {
+  return (model?.controller?.connection?.errors || []).filter(Boolean).join('; ');
 }
 
 function unavailableControllerModel(messages, organization = null) {

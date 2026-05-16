@@ -5,6 +5,8 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import { getAdapterMetadata, getAgentVersion, getInstallMethods, getHostEnvSignals, getSessionConfig } from '@a5c-ai/agent-catalog';
+
 import type {
   AgentCapabilities,
   ModelCapabilities,
@@ -17,6 +19,7 @@ import type {
   RunOptions,
   AgentEvent,
   InstalledPlugin,
+  InstallMethod,
   PluginInstallOptions,
   AgentConfig,
 } from '@a5c-ai/agent-mux-core';
@@ -42,7 +45,7 @@ export class CursorAdapter extends BaseAgentAdapter {
   constructor(agent?: string, cliCommand?: string) {
     super();
   }
-  readonly hostEnvSignals = ['CURSOR_SESSION', 'CURSOR_AGENT_SESSION'] as const;
+  get hostEnvSignals() { return getHostEnvSignals(this.agent); }
 
   readonly capabilities: AgentCapabilities = {
     agent: this.agent,
@@ -82,14 +85,9 @@ export class CursorAdapter extends BaseAgentAdapter {
     supportedPlatforms: ['darwin', 'linux', 'win32'],
     requiresGitRepo: false,
     requiresPty: false,
-    authMethods: [
-      { type: 'api_key', name: 'API Key', description: 'CURSOR_API_KEY environment variable' },
-      { type: 'browser_login', name: 'Browser Login', description: 'Cursor account browser login' },
-    ],
-    authFiles: ['.cursor/settings.json'],
-    installMethods: [
-      { platform: 'all', type: 'manual', command: 'Download from https://cursor.com' },
-    ],
+    authMethods: (getAdapterMetadata(this.agent)?.authMethods ?? []).map(m => ({ type: m.type, name: m.name })),
+    authFiles: getAdapterMetadata(this.agent)?.authFiles ?? [],
+    installMethods: getInstallMethods(this.agent).map(m => ({ platform: 'all' as const, type: m as InstallMethod['type'], command: m })),
   };
 
   readonly models: ModelCapabilities[] = [
@@ -236,7 +234,7 @@ export class CursorAdapter extends BaseAgentAdapter {
   }
 
   sessionDir(_cwd?: string): string {
-    return path.join(os.homedir(), '.cursor', 'sessions');
+    return getSessionConfig(this.agent).sessionDir!;
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {

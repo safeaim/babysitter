@@ -5,6 +5,8 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import { getAdapterMetadata, getAgentVersion, getInstallMethods, getHostEnvSignals, getSessionConfig } from '@a5c-ai/agent-catalog';
+
 import type {
   AgentCapabilities,
   ModelCapabilities,
@@ -17,6 +19,7 @@ import type {
   RunOptions,
   AgentEvent,
   AgentConfig,
+  InstallMethod,
 } from '@a5c-ai/agent-mux-core';
 
 import { BaseAgentAdapter } from './base-adapter.js';
@@ -37,7 +40,7 @@ export class CopilotAdapter extends BaseAgentAdapter {
   constructor(agent?: string, cliCommand?: string) {
     super();
   }
-  readonly hostEnvSignals = ['COPILOT_CLI_SESSION', 'GH_COPILOT_SESSION'] as const;
+  get hostEnvSignals() { return getHostEnvSignals(this.agent); }
 
   readonly capabilities: AgentCapabilities = {
     agent: this.agent,
@@ -77,15 +80,9 @@ export class CopilotAdapter extends BaseAgentAdapter {
     supportedPlatforms: ['darwin', 'linux', 'win32'],
     requiresGitRepo: false,
     requiresPty: false,
-    authMethods: [
-      { type: 'github_token', name: 'GitHub Token', description: 'GITHUB_TOKEN environment variable' },
-      { type: 'oauth_device', name: 'OAuth Device Flow', description: 'GitHub CLI OAuth device flow' },
-    ],
-    authFiles: ['.config/github-copilot/settings.json'],
-    installMethods: [
-      { platform: 'all', type: 'gh-extension', command: 'gh extension install github/gh-copilot' },
-      { platform: 'all', type: 'npm', command: 'npm install -g @github/copilot-cli' },
-    ],
+    authMethods: (getAdapterMetadata(this.agent)?.authMethods ?? []).map(m => ({ type: m.type, name: m.name })),
+    authFiles: getAdapterMetadata(this.agent)?.authFiles ?? [],
+    installMethods: getInstallMethods(this.agent).map(m => ({ platform: 'all' as const, type: m as InstallMethod['type'], command: m })),
   };
 
   readonly models: ModelCapabilities[] = [
@@ -215,7 +212,7 @@ export class CopilotAdapter extends BaseAgentAdapter {
   }
 
   sessionDir(_cwd?: string): string {
-    return path.join(os.homedir(), '.config', 'github-copilot', 'sessions');
+    return getSessionConfig(this.agent).sessionDir!;
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {

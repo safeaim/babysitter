@@ -5,6 +5,8 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import { getAdapterMetadata, getAgentVersion, getInstallMethods, getHostEnvSignals, getSessionConfig } from '@a5c-ai/agent-catalog';
+
 import type {
   AgentCapabilities,
   ModelCapabilities,
@@ -17,6 +19,7 @@ import type {
   RunOptions,
   AgentEvent,
   AgentConfig,
+  InstallMethod,
 } from '@a5c-ai/agent-mux-core';
 
 import { BaseAgentAdapter } from './base-adapter.js';
@@ -37,7 +40,7 @@ export class OmpAdapter extends BaseAgentAdapter {
   constructor(agent?: string, cliCommand?: string) {
     super();
   }
-  readonly hostEnvSignals = ['OMP_RUN_ID', 'OMP_SESSION_ID'] as const;
+  get hostEnvSignals() { return getHostEnvSignals(this.agent); }
 
   readonly capabilities: AgentCapabilities = {
     agent: this.agent,
@@ -77,13 +80,9 @@ export class OmpAdapter extends BaseAgentAdapter {
     supportedPlatforms: ['darwin', 'linux', 'win32'],
     requiresGitRepo: false,
     requiresPty: false,
-    authMethods: [
-      { type: 'api_key', name: 'Provider API Key', description: 'Provider-specific API key env vars' },
-    ],
-    authFiles: ['.omp/agent/settings.json'],
-    installMethods: [
-      { platform: 'all', type: 'npm', command: 'npm install -g omp-cli' },
-    ],
+    authMethods: (getAdapterMetadata(this.agent)?.authMethods ?? []).map(m => ({ type: m.type, name: m.name })),
+    authFiles: getAdapterMetadata(this.agent)?.authFiles ?? [],
+    installMethods: getInstallMethods(this.agent).map(m => ({ platform: 'all' as const, type: m as InstallMethod['type'], command: m })),
   };
 
   readonly models: ModelCapabilities[] = [
@@ -214,7 +213,7 @@ export class OmpAdapter extends BaseAgentAdapter {
   }
 
   sessionDir(_cwd?: string): string {
-    return path.join(os.homedir(), '.omp', 'agent', 'sessions');
+    return getSessionConfig(this.agent).sessionDir!;
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {

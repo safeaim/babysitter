@@ -5,6 +5,8 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import { getAdapterMetadata, getAgentVersion, getInstallMethods, getHostEnvSignals, getSessionConfig } from '@a5c-ai/agent-catalog';
+
 import type {
   AgentCapabilities,
   ModelCapabilities,
@@ -17,6 +19,7 @@ import type {
   RunOptions,
   AgentEvent,
   AgentConfig,
+  InstallMethod,
 } from '@a5c-ai/agent-mux-core';
 
 import * as fs from 'node:fs/promises';
@@ -42,7 +45,7 @@ export class HermesAdapter extends BaseAgentAdapter {
     this.agent = agent ?? this.constructor.name.replace(/Adapter$/, '').toLowerCase();
     this.cliCommand = cliCommand ?? this.agent;
   }
-  readonly hostEnvSignals = ['HERMES_SESSION', 'HERMES_RUN_ID'] as const;
+  get hostEnvSignals() { return getHostEnvSignals(this.agent); }
 
   readonly capabilities: AgentCapabilities = {
     agent: 'hermes',
@@ -82,18 +85,9 @@ export class HermesAdapter extends BaseAgentAdapter {
     supportedPlatforms: ['darwin', 'linux', 'win32'],
     requiresGitRepo: false,
     requiresPty: false,
-    authMethods: [
-      { type: 'api_key', name: 'OpenRouter API Key', description: 'OPENROUTER_API_KEY environment variable' },
-      { type: 'api_key', name: 'Anthropic API Key', description: 'ANTHROPIC_API_KEY environment variable' },
-      { type: 'api_key', name: 'OpenAI API Key', description: 'OPENAI_API_KEY environment variable' },
-      { type: 'api_key', name: 'Nous API Key', description: 'NOUS_API_KEY environment variable' },
-      { type: 'github_token', name: 'GitHub Token', description: 'GITHUB_TOKEN environment variable' },
-      { type: 'api_key', name: 'Google API Key', description: 'GOOGLE_API_KEY environment variable' },
-    ],
-    authFiles: ['.hermes/cli-config.yaml'],
-    installMethods: [
-      { platform: 'all', type: 'npm', command: 'npm install -g hermes-agent' },
-    ],
+    authMethods: (getAdapterMetadata('hermes')?.authMethods ?? []).map(m => ({ type: m.type, name: m.name })),
+    authFiles: getAdapterMetadata('hermes')?.authFiles ?? [],
+    installMethods: getInstallMethods('hermes').map(m => ({ platform: 'all' as const, type: m as InstallMethod['type'], command: m })),
   };
 
   readonly models: ModelCapabilities[] = [
@@ -251,7 +245,7 @@ export class HermesAdapter extends BaseAgentAdapter {
   }
 
   sessionDir(_cwd?: string): string {
-    return path.join(os.homedir(), '.hermes', 'sessions');
+    return getSessionConfig(this.agent).sessionDir!;
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {

@@ -5,6 +5,8 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import { getAdapterMetadata, getAgentVersion, getInstallMethods, getHostEnvSignals, getSessionConfig } from '@a5c-ai/agent-catalog';
+
 import type {
   AgentCapabilities,
   ModelCapabilities,
@@ -17,6 +19,7 @@ import type {
   RunOptions,
   AgentEvent,
   InstalledPlugin,
+  InstallMethod,
   PluginInstallOptions,
   AgentConfig,
 } from '@a5c-ai/agent-mux-core';
@@ -42,7 +45,7 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
   constructor(agent?: string, cliCommand?: string) {
     super();
   }
-  readonly hostEnvSignals = ['OPENCODE_SESSION_ID', 'OPENCODE_CONFIG'] as const;
+  get hostEnvSignals() { return getHostEnvSignals(this.agent); }
 
   readonly capabilities: AgentCapabilities = {
     agent: this.agent,
@@ -83,16 +86,9 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
     supportedPlatforms: ['darwin', 'linux', 'win32'],
     requiresGitRepo: false,
     requiresPty: false,
-    authMethods: [
-      { type: 'api_key', name: 'API Key', description: 'Provider API keys via opencode auth' },
-      { type: 'oauth', name: 'OAuth', description: 'Provider OAuth via opencode auth' },
-    ],
-    authFiles: ['.config/opencode/config.json', '.opencode/config.json'],
-    installMethods: [
-      { platform: 'all', type: 'npm', command: 'npm install -g @anomalyco/opencode' },
-      { platform: 'darwin', type: 'brew', command: 'brew install --cask opencode' },
-      { platform: 'all', type: 'curl', command: 'curl -fsSL https://opencode.ai/install | bash' },
-    ],
+    authMethods: (getAdapterMetadata(this.agent)?.authMethods ?? []).map(m => ({ type: m.type, name: m.name })),
+    authFiles: getAdapterMetadata(this.agent)?.authFiles ?? [],
+    installMethods: getInstallMethods(this.agent).map(m => ({ platform: 'all' as const, type: m as InstallMethod['type'], command: m })),
   };
 
   readonly models: ModelCapabilities[] = [
@@ -364,7 +360,7 @@ export class OpenCodeAdapter extends BaseAgentAdapter {
   }
 
   sessionDir(_cwd?: string): string {
-    return path.join(os.homedir(), '.config', 'opencode', 'sessions');
+    return getSessionConfig(this.agent).sessionDir!;
   }
 
   async parseSessionFile(filePath: string): Promise<Session> {

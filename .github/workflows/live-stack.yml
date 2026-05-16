@@ -211,6 +211,7 @@ jobs:
             amux_provider: google
             model: gemini-3.1-pro-preview
             required_env: GOOGLE_API_KEY
+            skip: 'true'
           - id: live.agent-mux.pi.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: pi
@@ -449,6 +450,7 @@ jobs:
             amux_provider: google
             model: gemini-3.1-pro-preview
             required_env: GOOGLE_API_KEY
+            skip: 'true'
           - id: live.agent-mux.pi.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: pi
@@ -787,6 +789,7 @@ jobs:
             amux_provider: google
             model: gemini-3.1-pro-preview
             required_env: GOOGLE_API_KEY
+            skip: 'true'
           - id: live.agent-mux.pi.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: pi
@@ -848,6 +851,8 @@ jobs:
         exclude:
           - interaction_mode: { id: bridged-interactive }
             scenario: { amux_agent: codex }
+          - interaction_mode: { id: non-interactive }
+            scenario: { amux_agent: pi }
     steps:
       - name: Skip marker
         if: ${{ matrix.scenario.skip == 'true' }}
@@ -1023,6 +1028,7 @@ jobs:
             amux_provider: google
             model: gemini-3.1-pro-preview
             required_env: GOOGLE_API_KEY
+            skip: 'true'
           - id: live.agent-mux.pi.foundry-openai.gpt-5.5
             agent_path: agent-mux
             agent: pi

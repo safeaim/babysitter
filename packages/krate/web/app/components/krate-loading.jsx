@@ -58,7 +58,7 @@ export function KrateLoadingView({
   );
 }
 
-export function KrateControllerRecovery({ org = 'default', pollMs = 2500 }) {
+export function KrateControllerRecovery({ org = 'default', pollMs = 10000 }) {
   const redirectingRef = useRef(false);
   const [detail, setDetail] = useState('Polling the controller until the workspace is ready.');
 
@@ -97,7 +97,7 @@ export function KrateControllerRecovery({ org = 'default', pollMs = 2500 }) {
     <div className="krateRecoveryOverlay">
       <KrateLoadingView
         title="Reconnecting Krate workspace"
-        subtitle="Krate is waiting for the workspace service instead of showing a degraded empty state."
+        subtitle=""
         detail={detail}
         fullPage={false}
       />

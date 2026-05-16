@@ -215,9 +215,8 @@ describe('launchCommand transport-mux integration', () => {
       expect(spawnMock).toHaveBeenCalledTimes(1);
       const spawnedArgs = spawnMock.mock.calls[0]?.[1] as string[];
       expect(spawnedArgs).not.toContain('--prompt');
-      expect(spawnedArgs).toContain('--print');
-      expect(spawnedArgs).toContain('write the file');
-      expect(child.stdin.write).not.toHaveBeenCalled();
+      expect(spawnedArgs).not.toContain('--print');
+      expect(child.stdin.write).toHaveBeenCalledWith('write the file\n');
       expect(child.stdin.end).toHaveBeenCalledTimes(1);
       expect(runtimeStop).toHaveBeenCalledTimes(1);
     } finally {

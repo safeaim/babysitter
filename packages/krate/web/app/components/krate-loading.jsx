@@ -63,8 +63,10 @@ function controllerModelIsReachable(body) {
   if (!body || body.error) return false;
   const errors = body.controller?.connection?.errors || [];
   const hasUnavailableError = errors.some((error) => /fetch failed|controller API|ECONN|ENOTFOUND|ETIMEDOUT|Krate workspace unavailable|KRATE_CONTROLLER_URL is not configured/i.test(String(error || '')));
-  const hasUsableControllerData = Boolean(body.status === 'ready' || body.controller?.connection?.available || body.controller?.apiService || body.metrics?.resources);
-  return hasUsableControllerData && !hasUnavailableError;
+  const hasResourceMetric = Number.isFinite(body.metrics?.resources);
+  const hasControllerEnvelope = Boolean(body.controller?.connection || body.metrics || body.views);
+  const hasUsableControllerData = Boolean(body.status === 'ready' || body.controller?.connection?.available || body.controller?.apiService || hasResourceMetric);
+  return hasUsableControllerData || (hasControllerEnvelope && !hasUnavailableError);
 }
 
 function orgFromPathname(pathname) {

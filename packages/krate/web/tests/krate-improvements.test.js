@@ -52,13 +52,16 @@ test('degraded Krate UI renders recovery loader only for controller fetch failur
   assert.match(ui, /useCache: false/);
   assert.match(ui, /KrateControllerRecovery/);
   assert.match(ui, /hasControllerData/);
-  assert.match(ui, /metrics\?\.resources/);
+  assert.match(ui, /Number\.isFinite\(model\.metrics\?\.resources\)/);
   assert.doesNotMatch(ui, /orgs\?\.length/);
   assert.match(ui, /hasFetchFailure/);
   assert.doesNotMatch(ui, /Krate workspace degraded or empty/);
   assert.match(loader, /fetch\(target, \{ cache: 'no-store' \}\)/);
   assert.match(loader, /controllerModelIsReachable/);
   assert.match(loader, /content-type/);
+  assert.match(loader, /hasResourceMetric/);
+  assert.match(loader, /hasControllerEnvelope/);
+  assert.match(loader, /Number\.isFinite\(body\.metrics\?\.resources\)/);
   assert.match(loader, /hasUsableControllerData/);
   assert.match(loader, /KRATE_CONTROLLER_URL is not configured/);
   assert.doesNotMatch(loader, /product === 'Krate' \|\| body\??\.controller/);

@@ -33,10 +33,10 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -64,12 +64,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -77,7 +77,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -90,7 +90,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Restore build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             packages/**/tsconfig.tsbuildinfo
@@ -177,7 +177,7 @@ jobs:
         run: find packages -path '*/dist' -type d | tar czf /tmp/build-all-dist.tar.gz -T -
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-all-dist
           path: /tmp/build-all-dist.tar.gz
@@ -192,12 +192,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -205,7 +205,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -217,7 +217,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -252,7 +252,7 @@ jobs:
 
       - name: Upload core validation logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-core-logs
           path: artifacts/core-logs
@@ -267,12 +267,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -280,7 +280,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -292,7 +292,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -336,7 +336,7 @@ jobs:
 
       - name: Upload mux validation logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-mux-logs
           path: artifacts/mux-logs
@@ -357,12 +357,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -370,7 +370,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -382,7 +382,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -408,7 +408,7 @@ jobs:
 
       - name: Cache Playwright browsers
         id: pw-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -426,7 +426,7 @@ jobs:
 
       - name: Upload e2e logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-e2e-logs
           path: artifacts/e2e-logs
@@ -434,7 +434,7 @@ jobs:
 
       - name: Upload Playwright artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-mux-playwright-artifacts
           path: |
@@ -451,12 +451,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -464,7 +464,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -476,7 +476,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -498,7 +498,7 @@ jobs:
 
       - name: Upload cloud validation logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-cloud-logs
           path: artifacts/cloud-logs
@@ -513,12 +513,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -526,7 +526,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -538,7 +538,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -558,7 +558,7 @@ jobs:
 
       - name: Upload krate validation logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-krate-logs
           path: artifacts/krate-logs
@@ -573,12 +573,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -586,7 +586,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -597,7 +597,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -627,7 +627,7 @@ jobs:
 
       - name: Upload observer and compiler logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-observer-compiler-logs
           path: artifacts/observer-compiler-logs
@@ -661,12 +661,12 @@ jobs:
       staging_version_sdk: ${{ steps.version.outputs.staging_version_sdk }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -676,7 +676,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -762,7 +762,7 @@ jobs:
           tar --exclude=.git --exclude=node_modules --exclude=artifacts -czf artifacts/publish-source/publish-source.tgz .
 
       - name: Upload publish workspace
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-source
           path: artifacts/publish-source/publish-source.tgz
@@ -807,7 +807,7 @@ jobs:
             publish: npm publish --workspace=@a5c-ai/krate --access public --tag "$NPM_TAG"
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -818,7 +818,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -828,7 +828,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -869,7 +869,7 @@ jobs:
             publish: npm publish --workspace=@a5c-ai/agent-plugins-mux --access public --tag "$NPM_TAG"
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -880,7 +880,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -890,7 +890,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -942,7 +942,7 @@ jobs:
             workspace: '@a5c-ai/hooks-mux-adapter-hermes'
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -953,7 +953,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -963,7 +963,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -996,7 +996,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1007,7 +1007,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1017,7 +1017,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1076,7 +1076,7 @@ jobs:
               npm run build --workspace=@a5c-ai/transport-mux
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1087,7 +1087,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1097,7 +1097,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1125,7 +1125,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1136,7 +1136,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1146,7 +1146,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1181,7 +1181,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1192,7 +1192,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1228,7 +1228,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1239,7 +1239,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1249,7 +1249,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1287,7 +1287,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1298,7 +1298,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1308,7 +1308,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1347,7 +1347,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1358,7 +1358,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1368,7 +1368,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1402,7 +1402,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1413,7 +1413,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1423,7 +1423,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1454,7 +1454,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -1465,7 +1465,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -1475,7 +1475,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1509,21 +1509,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: package-lock.json
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -1543,13 +1543,13 @@ jobs:
         run: npm run docs:build
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs-site/build
 
       - name: Deploy docs
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   deploy_atlas_webui:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
@@ -1565,7 +1565,7 @@ jobs:
       APP_NAME: atlas-webui
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check deployment configuration
         id: config
@@ -2019,10 +2019,10 @@ jobs:
       APP_NAME: krate
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -2183,7 +2183,7 @@ jobs:
     runs-on: ubuntu-latest-l
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -2194,7 +2194,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -2202,7 +2202,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -2270,7 +2270,7 @@ jobs:
       contents: read
     steps:
       - name: Download publish workspace
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: publish-source
           path: artifacts/publish-source
@@ -2281,7 +2281,7 @@ jobs:
           tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -2291,7 +2291,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}

@@ -32,12 +32,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -45,7 +45,7 @@ jobs:
 
       - name: Restore node_modules cache
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -58,7 +58,7 @@ jobs:
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Restore build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             packages/**/tsconfig.tsbuildinfo
@@ -145,7 +145,7 @@ jobs:
         run: find packages -path '*/dist' -type d | tar czf /tmp/build-all-dist.tar.gz -T -
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-all-dist
           path: /tmp/build-all-dist.tar.gz
@@ -266,13 +266,13 @@ jobs:
 
       - name: Checkout repository
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -281,7 +281,7 @@ jobs:
       - name: Restore node_modules cache
         if: ${{ matrix.scenario.skip != 'true' }}
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -294,7 +294,7 @@ jobs:
 
       - name: Download build artifacts
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -368,7 +368,7 @@ jobs:
       - name: Upload live stack artifacts
         if: ${{ always() && matrix.scenario.skip != 'true' }}
         timeout-minutes: 1
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
           path: artifacts/live-stack
@@ -408,13 +408,13 @@ jobs:
             required_env: AZURE_API_KEY,AMUX_API_BASE
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -423,7 +423,7 @@ jobs:
       - name: Restore node_modules cache
         if: ${{ matrix.scenario.skip != 'true' }}
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -436,7 +436,7 @@ jobs:
 
       - name: Download build artifacts
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -504,7 +504,7 @@ jobs:
       - name: Upload live stack artifacts
         if: ${{ always() && matrix.scenario.skip != 'true' }}
         timeout-minutes: 1
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
           path: artifacts/live-stack
@@ -629,13 +629,13 @@ jobs:
 
       - name: Checkout repository
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -644,7 +644,7 @@ jobs:
       - name: Restore node_modules cache
         if: ${{ matrix.scenario.skip != 'true' }}
         id: nm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -657,7 +657,7 @@ jobs:
 
       - name: Download build artifacts
         if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: /tmp
@@ -731,7 +731,7 @@ jobs:
       - name: Upload live stack artifacts
         if: ${{ always() && matrix.scenario.skip != 'true' }}
         timeout-minutes: 1
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
           path: artifacts/live-stack

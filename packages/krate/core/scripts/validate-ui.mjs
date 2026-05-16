@@ -130,7 +130,7 @@ for (const token of ['RepositoryManager', 'DeploymentManager', 'ResourceApplyPan
 for (const token of ['DegradedBanner', 'No repositories are available yet.', 'No resource selected yet.', 'Access checks', 'Krate repositories']) {
   if (!(webUiSource() + files['apps/web/app/components/resource-actions.jsx']).includes(token)) failures.push(`truthful degraded/empty UI missing ${token}`);
 }
-for (const token of ['KrateControllerRecovery', 'KrateLoadingView', 'KRATE_LOADING_MESSAGES', '/api/controller', 'setRecovered(true)', 'router.refresh()', 'sessionStorage']) {
+for (const token of ['KrateControllerRecovery', 'KrateRouteLoadingOverlay', 'KrateLoadingView', 'KRATE_LOADING_MESSAGES', '/api/controller', 'setRecovered(true)', 'router.refresh()', 'sessionStorage', 'krate-route-loading-refresh']) {
   if (!(webUiSource() + files['apps/web/app/components/krate-loading.jsx']).includes(token)) failures.push(`recovery loading UI missing ${token}`);
 }
 if ((webUiSource() + files['apps/web/app/components/krate-loading.jsx']).includes('Krate workspace degraded or empty')) failures.push('degraded workspace copy should be replaced by recovery loading UI');

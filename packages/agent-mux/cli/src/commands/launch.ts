@@ -224,7 +224,7 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
       break;
     case 'pi':
       if (session.prompt && !interactive && !session.bridgeInteractive) {
-        plan.args.push('--print', session.prompt);
+        plan.args.push('--prompt', session.prompt);
       }
       break;
     case 'opencode':
@@ -1489,7 +1489,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     process.on('exit', () => { try { ptyProcess.kill('SIGKILL'); } catch { /* */ } });
   }
 
-  const promptPassedAsFlag = (plan.harness === 'pi' && !isInteractive && plan.args.includes('--print'));
+  const promptPassedAsFlag = (plan.harness === 'pi' && !isInteractive && plan.args.includes('--prompt'));
   if (prompt && child.stdin && !ptyProcess && !promptPassedAsFlag) {
     child.stdin.write(prompt + '\n');
     if (!isInteractive) {

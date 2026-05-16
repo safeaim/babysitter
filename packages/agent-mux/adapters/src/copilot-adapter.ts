@@ -5,7 +5,7 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { getAdapterMetadata, getAgentVersion, getInstallMethods, getHostEnvSignals, getSessionConfig } from '@a5c-ai/agent-catalog';
+import { getAdapterMetadata, getAgentVersion, getInstallMethods, getHostEnvSignals, getSessionConfig, getCapabilityFlags, getRuntimeHooks, getConfigSchema, getDisplayName, getDefaultModelId } from '@a5c-ai/agent-catalog';
 
 import type {
   AgentCapabilities,
@@ -23,7 +23,7 @@ import type {
 } from '@a5c-ai/agent-mux-core';
 
 import { BaseAgentAdapter } from './base-adapter.js';
-import { createVirtualRuntimeHookCapabilities } from './shared/runtime-hooks-virtual.js';
+
 import {
   listJsonlFiles,
   parseJsonlSessionFile,
@@ -33,7 +33,7 @@ import {
 
 export class CopilotAdapter extends BaseAgentAdapter {
   readonly agent: string = this.constructor.name.replace(/Adapter$/, "").toLowerCase();
-  readonly displayName = 'GitHub Copilot';
+  get displayName() { return getDisplayName(this.agent); }
   readonly cliCommand: string = this.agent;
   readonly minVersion = '1.0.0';
 
@@ -42,48 +42,61 @@ export class CopilotAdapter extends BaseAgentAdapter {
   }
   get hostEnvSignals() { return getHostEnvSignals(this.agent); }
 
-  readonly capabilities: AgentCapabilities = {
-    agent: this.agent,
-    canResume: false,
-    canFork: false,
-    supportsMultiTurn: false,
-    sessionPersistence: 'file',
-    supportsTextStreaming: true,
-    supportsToolCallStreaming: false,
-    supportsThinkingStreaming: false,
-    supportsNativeTools: false,
-    supportsMCP: false,
-    supportsParallelToolCalls: false,
-    requiresToolApproval: false,
-    approvalModes: ['prompt'],
-    runtimeHooks: createVirtualRuntimeHookCapabilities(),
-    supportsThinking: false,
-    thinkingEffortLevels: [],
-    supportsThinkingBudgetTokens: false,
-    supportsJsonMode: false,
-    supportsStructuredOutput: false,
-    structuredSessionTransport: 'none',
-    sessionControlPlane: 'self-managed',
-    supportsSkills: false,
-    supportsAgentsMd: false,
-    skillsFormat: null,
-    supportsSubagentDispatch: false,
-    supportsParallelExecution: false,
-    supportsInteractiveMode: true,
-    supportsStdinInjection: false,
-    supportsImageInput: false,
-    supportsImageOutput: false,
-    supportsFileAttachments: false,
-    supportsPlugins: false,
-    pluginFormats: [],
-    pluginRegistries: [],
-    supportedPlatforms: ['darwin', 'linux', 'win32'],
-    requiresGitRepo: false,
-    requiresPty: false,
-    authMethods: (getAdapterMetadata(this.agent)?.authMethods ?? []).map(m => ({ type: m.type, name: m.name })),
-    authFiles: getAdapterMetadata(this.agent)?.authFiles ?? [],
-    installMethods: getInstallMethods(this.agent).map(m => ({ platform: 'all' as const, type: m.type as InstallMethod['type'], command: m.command })),
-  };
+  get capabilities(): AgentCapabilities {
+    const flags = getCapabilityFlags(this.agent);
+    const hooks = getRuntimeHooks(this.agent);
+    const metadata = getAdapterMetadata(this.agent);
+    return {
+      agent: this.agent,
+      canResume: Boolean(flags.canResume),
+      canFork: Boolean(flags.canFork),
+      supportsMultiTurn: Boolean(flags.supportsMultiTurn),
+      sessionPersistence: String(flags.sessionPersistence ?? 'file') as any,
+      supportsTextStreaming: Boolean(flags.supportsTextStreaming),
+      supportsToolCallStreaming: Boolean(flags.supportsToolCallStreaming),
+      supportsThinkingStreaming: Boolean(flags.supportsThinkingStreaming),
+      supportsNativeTools: Boolean(flags.supportsNativeTools),
+      supportsMCP: Boolean(flags.supportsMCP),
+      supportsParallelToolCalls: Boolean(flags.supportsParallelToolCalls),
+      requiresToolApproval: Boolean(flags.requiresToolApproval),
+      approvalModes: (metadata?.approvalModes ?? ['yolo', 'prompt']) as any,
+      runtimeHooks: {
+        preToolUse: (hooks.preToolUse ?? 'nonblocking') as any,
+        postToolUse: (hooks.postToolUse ?? 'nonblocking') as any,
+        sessionStart: (hooks.sessionStart ?? 'nonblocking') as any,
+        sessionEnd: (hooks.sessionEnd ?? 'nonblocking') as any,
+        stop: (hooks.stop ?? 'nonblocking') as any,
+        userPromptSubmit: (hooks.userPromptSubmit ?? 'nonblocking') as any,
+      },
+      supportsThinking: Boolean(flags.supportsThinking),
+      thinkingEffortLevels: flags.thinkingEffortLevels as any ?? [],
+      supportsThinkingBudgetTokens: Boolean(flags.supportsThinkingBudgetTokens),
+      supportsJsonMode: Boolean(flags.supportsJsonMode),
+      supportsStructuredOutput: Boolean(flags.supportsStructuredOutput),
+      structuredSessionTransport: String(flags.structuredSessionTransport ?? 'none') as any,
+      sessionControlPlane: String(flags.sessionControlPlane ?? 'self-managed') as any,
+      supportsSkills: Boolean(flags.supportsSkills),
+      supportsAgentsMd: Boolean(flags.supportsAgentsMd),
+      skillsFormat: (flags.skillsFormat ?? null) as any,
+      supportsSubagentDispatch: Boolean(flags.supportsSubagentDispatch),
+      supportsParallelExecution: Boolean(flags.supportsParallelExecution),
+      maxParallelTasks: flags.maxParallelTasks as number | undefined,
+      supportsInteractiveMode: Boolean(flags.supportsInteractiveMode),
+      supportsStdinInjection: Boolean(flags.supportsStdinInjection),
+      supportsImageInput: Boolean(flags.supportsImageInput),
+      supportsImageOutput: Boolean(flags.supportsImageOutput),
+      supportsFileAttachments: Boolean(flags.supportsFileAttachments),
+      supportsPlugins: Boolean(flags.supportsPlugins),
+      pluginFormats: flags.pluginFormats as any ?? [],
+      pluginRegistries: flags.pluginRegistries as any ?? [],
+      supportedPlatforms: flags.supportedPlatforms as any ?? ['darwin', 'linux', 'win32'],
+      requiresGitRepo: Boolean(flags.requiresGitRepo),
+      requiresPty: Boolean(flags.requiresPty),
+      authMethods: (metadata?.authMethods ?? []).map(m => ({ type: m.type, name: m.name })),
+      authFiles: metadata?.authFiles ?? [],
+      installMethods: getInstallMethods(this.agent).map(m => ({ platform: 'all' as const, type: m.type as InstallMethod['type'], command: m.command })),
+    };
+  }
 
   readonly models: ModelCapabilities[] = [
     {
@@ -111,16 +124,20 @@ export class CopilotAdapter extends BaseAgentAdapter {
     },
   ];
 
-  readonly defaultModelId = 'gpt-4o';
+  get defaultModelId() { return getDefaultModelId(this.agent) ?? 'gpt-4o'; }
 
-  readonly configSchema: AgentConfigSchema = {
-    agent: this.agent,
-    version: 1,
-    fields: [],
-    configFilePaths: [path.join(os.homedir(), '.config', 'github-copilot', 'settings.json')],
-    configFormat: 'json',
-    supportsProjectConfig: false,
-  };
+  get configSchema(): AgentConfigSchema {
+    const schema = getConfigSchema(this.agent);
+    return {
+      agent: this.agent,
+      version: 1,
+      fields: [],
+      configFilePaths: schema.configFilePaths ?? [],
+      projectConfigFilePaths: schema.projectConfigFilePaths ?? [],
+      configFormat: (schema.configFormat ?? 'json') as any,
+      supportsProjectConfig: (schema.projectConfigFilePaths ?? []).length > 0,
+    };
+  }
 
   buildSpawnArgs(options: RunOptions): SpawnArgs {
     const { prompt, stdin } = this.buildPromptTransport(options);

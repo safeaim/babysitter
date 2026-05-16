@@ -223,9 +223,6 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
       if (session.prompt) plan.args.push('--prompt', session.prompt);
       break;
     case 'pi':
-      if (session.prompt && !interactive && !session.bridgeInteractive) {
-        plan.args.push('--prompt', session.prompt);
-      }
       break;
     case 'opencode':
       if (session.resumeId) plan.args.push('--session', session.resumeId);
@@ -1489,7 +1486,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     process.on('exit', () => { try { ptyProcess.kill('SIGKILL'); } catch { /* */ } });
   }
 
-  const promptPassedAsFlag = (plan.harness === 'pi' && !isInteractive && plan.args.includes('--prompt'));
+  const promptPassedAsFlag = false;
   if (prompt && child.stdin && !ptyProcess && !promptPassedAsFlag) {
     child.stdin.write(prompt + '\n');
     if (!isInteractive) {

@@ -5,14 +5,20 @@ attributes:
   agentProductId: agent:hermes
   displayName: "Hermes"
   summary: "NousResearch agentic CLI"
-  sourcePackage: "hermes"
-  versionRange: ">=1.0.0"
+  sourcePackage: "hermes-agent"
+  versionRange: ">=0.14.0"
   releasedAt: "2025-01-01"
   cliCommand: "hermes"
   installMethods:
+    - install:pip
     - install:curl
   minSchemaVersion: "6.0.0"
   adapterMetadata:
+    installCommands:
+      - type: pip
+        command: "pip install hermes-agent"
+      - type: curl
+        command: "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash"
     authMethods:
       - type: api_key
         name: "OpenRouter API Key"

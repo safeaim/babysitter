@@ -238,7 +238,7 @@ export class HermesAdapter extends BaseAgentAdapter {
         { name: 'GITHUB_TOKEN', description: 'GitHub token', required: false },
         { name: 'GOOGLE_API_KEY', description: 'Google API key', required: false },
       ],
-      documentationUrls: ['https://github.com/NousResearch/hermes'],
+      documentationUrls: ['https://github.com/NousResearch/hermes-agent'],
       verifyCommand: 'hermes --version',
     };
   }

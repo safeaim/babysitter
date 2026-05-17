@@ -3,7 +3,7 @@ id: agent:hermes
 attributes:
   displayName: "Hermes"
   vendor: "Nous Research"
-  homepageUrl: "https://github.com/NousResearch/hermes"
+  homepageUrl: "https://github.com/NousResearch/hermes-agent"
   primarySurface: cli
   supportTier: adapter-only
   productKind: full-cli-agent

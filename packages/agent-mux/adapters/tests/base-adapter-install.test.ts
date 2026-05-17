@@ -141,14 +141,28 @@ describe('BaseAgentAdapter.install (default)', () => {
     expect(res.command).toMatch(/@3\.1\.0$/);
   });
 
-  it('returns manual message when the only method is manual (no spawn)', async () => {
+  it('cursor install resolves curl install (not manual)', async () => {
     const adapter = new CursorAdapter();
-    const { spawner, calls } = spawnerFrom(() => ({ code: 0, stdout: '', stderr: '' }));
+    let installed = false;
+    const { spawner, calls } = spawnerFrom((cmd, args) => {
+      if (cmd === 'which' || cmd === 'where') {
+        return installed
+          ? { code: 0, stdout: '/usr/bin/cursor\n', stderr: '' }
+          : { code: 1, stdout: '', stderr: '' };
+      }
+      if (cmd === 'curl') {
+        installed = true;
+        return { code: 0, stdout: 'installed cursor', stderr: '' };
+      }
+      if (args.includes('--version')) return { code: 0, stdout: '1.0.0', stderr: '' };
+      return { code: 0, stdout: '', stderr: '' };
+    });
     adapter.setSpawner(spawner);
     const res = await adapter.install({ force: true });
-    expect(res.ok).toBe(false);
-    expect(res.method).toBe('manual');
-    expect(calls.length).toBe(0);
+    expect(res.ok).toBe(true);
+    expect(res.method).toBe('curl');
+    const curlCall = calls.find(c => c.cmd === 'curl');
+    expect(curlCall).toBeDefined();
   });
 });
 
@@ -213,28 +227,36 @@ describe('GeminiAdapter.parseVersionOutput override', () => {
 });
 
 // ---------------------------------------------------------------------------
-// CursorAdapter overrides: install + update always manual
+// CursorAdapter: install/update use standard base logic (curl installer)
 // ---------------------------------------------------------------------------
 
-describe('CursorAdapter install/update overrides', () => {
-  it('install returns manual message without spawning', async () => {
+describe('CursorAdapter install/update (standard base adapter logic)', () => {
+  it('install resolves a curl command for cursor', async () => {
     const adapter = new CursorAdapter();
-    const { spawner, calls } = spawnerFrom(() => ({ code: 0, stdout: '', stderr: '' }));
+    const { spawner, calls } = spawnerFrom((cmd, args) => {
+      if (cmd === 'curl') return { code: 0, stdout: '', stderr: '' };
+      if (args?.includes('--version')) return { code: 0, stdout: '1.0.0', stderr: '' };
+      return { code: 0, stdout: '', stderr: '' };
+    });
     adapter.setSpawner(spawner);
     const res = await adapter.install();
-    expect(res.ok).toBe(false);
-    expect(res.method).toBe('manual');
-    expect(calls.length).toBe(0);
+    expect(res.ok).toBe(true);
+    const curlCall = calls.find(c => c.cmd === 'curl');
+    expect(curlCall).toBeDefined();
   });
 
-  it('update returns manual message without spawning', async () => {
+  it('update re-runs the curl installer for cursor', async () => {
     const adapter = new CursorAdapter();
-    const { spawner, calls } = spawnerFrom(() => ({ code: 0, stdout: '', stderr: '' }));
+    const { spawner, calls } = spawnerFrom((cmd, args) => {
+      if (cmd === 'curl') return { code: 0, stdout: '', stderr: '' };
+      if (args?.includes('--version')) return { code: 0, stdout: '1.0.0', stderr: '' };
+      return { code: 0, stdout: '', stderr: '' };
+    });
     adapter.setSpawner(spawner);
     const res = await adapter.update();
-    expect(res.ok).toBe(false);
-    expect(res.method).toBe('manual');
-    expect(calls.length).toBe(0);
+    expect(res.ok).toBe(true);
+    const curlCall = calls.find(c => c.cmd === 'curl');
+    expect(curlCall).toBeDefined();
   });
 });
 

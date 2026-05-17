@@ -220,9 +220,9 @@ export class CursorAdapter extends BaseAgentAdapter {
       agent: this.agent,
       providerName: 'Cursor',
       steps: [
-        { step: 1, description: 'Download Cursor from https://cursor.com', url: 'https://cursor.com' },
-        { step: 2, description: 'Sign in with your Cursor account in the IDE' },
-        { step: 3, description: 'Optionally set CURSOR_API_KEY for CLI usage', command: 'export CURSOR_API_KEY=...' },
+        { step: 1, description: 'Install Cursor CLI: curl -fsS https://cursor.com/install | bash', command: 'curl -fsS https://cursor.com/install | bash' },
+        { step: 2, description: 'Authenticate with: cursor auth (opens browser)', command: 'cursor auth' },
+        { step: 3, description: 'Optionally set CURSOR_API_KEY for headless/CI usage', command: 'export CURSOR_API_KEY=...' },
       ],
       envVars: [
         { name: 'CURSOR_API_KEY', description: 'Cursor API key', required: false },
@@ -261,36 +261,9 @@ export class CursorAdapter extends BaseAgentAdapter {
     await writeJsonFileAtomic(filePath, { ...existing, ...rest });
   }
 
-  /**
-   * Override: Cursor is install-only via manual download. Return a clear
-   * message rather than attempting to spawn anything.
-   */
-  override async install(
-    _opts?: import('@a5c-ai/agent-mux-core').AdapterInstallOptions,
-  ): Promise<import('@a5c-ai/agent-mux-core').InstallResult> {
-    const method = this.capabilities.installMethods[0];
-    const cmd = method?.command ?? 'https://cursor.com';
-    return {
-      ok: false,
-      method: 'manual',
-      command: cmd,
-      message: `Cursor must be installed manually. ${cmd}`,
-    };
-  }
-
-  /**
-   * Override: no programmatic update path; surface a manual-update message.
-   */
-  override async update(
-    _opts?: import('@a5c-ai/agent-mux-core').AdapterUpdateOptions,
-  ): Promise<import('@a5c-ai/agent-mux-core').InstallResult> {
-    return {
-      ok: false,
-      method: 'manual',
-      command: '',
-      message: 'Cursor updates are delivered via the Cursor desktop app; no CLI update is available.',
-    };
-  }
+  // install() and update() are inherited from BaseAgentAdapter, which
+  // resolves the correct command from installMethods / installCommands
+  // in the atlas YAML (curl -fsS https://cursor.com/install | bash).
 
   private pluginsPath(): string {
     return this.configSchema.configFilePaths?.[0] ?? '';

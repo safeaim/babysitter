@@ -17,9 +17,12 @@ attributes:
   releasedAt: "2024-08-01"
   cliCommand: "cursor"
   installMethods:
-    - install:manual
+    - install:curl
   minSchemaVersion: "6.0.0"
   adapterMetadata:
+    installCommands:
+      - type: curl
+        command: "curl -fsS https://cursor.com/install | bash"
     authMethods:
       - type: api_key
         name: "API Key"

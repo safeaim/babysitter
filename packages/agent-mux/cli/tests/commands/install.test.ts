@@ -199,16 +199,19 @@ describe('installCommand dispatch (real adapters)', () => {
     } finally { io.restore(); }
   });
 
-  it('cursor install short-circuits to manual (override)', async () => {
+  it('cursor install runs curl install', async () => {
     const io = captureOutput();
-    const { runner, calls } = makeSpawnRunner(async () => ({ code: 0, stdout: '', stderr: '' }));
+    const { runner, calls } = makeSpawnRunner(async (cmd) => {
+      if (cmd === 'which' || cmd === 'where') return { code: 1, stdout: '', stderr: '' };
+      return { code: 0, stdout: '', stderr: '' };
+    });
     try {
       const args = parseArgs(['install', 'cursor'], INSTALL_FLAGS);
       const client = makeClient([cursor]);
       const code = await installCommand(client, args, { spawnRunner: runner });
       expect(code).toBe(ExitCode.SUCCESS);
-      expect(calls.find((c) => c.cmd === 'npm')).toBeUndefined();
-      expect(io.stdout.join('').toLowerCase()).toContain('manual');
+      const curlCall = calls.find((c) => c.cmd === 'curl');
+      expect(curlCall).toBeDefined();
     } finally { io.restore(); }
   });
 
@@ -278,16 +281,19 @@ describe('updateCommand dispatch', () => {
     } finally { io.restore(); }
   });
 
-  it('cursor update returns manual (override)', async () => {
+  it('cursor update resolves curl update', async () => {
     const io = captureOutput();
-    const { runner, calls } = makeSpawnRunner(async () => ({ code: 0, stdout: '', stderr: '' }));
+    const { runner, calls } = makeSpawnRunner(async (cmd) => {
+      if (cmd === 'which' || cmd === 'where') return { code: 0, stdout: '/usr/bin/cursor\n', stderr: '' };
+      return { code: 0, stdout: '', stderr: '' };
+    });
     try {
       const args = parseArgs(['update', 'cursor'], INSTALL_FLAGS);
       const client = makeClient([new CursorAdapter()]);
       const code = await installCommand(client, args, { spawnRunner: runner });
       expect(code).toBe(ExitCode.SUCCESS);
-      expect(calls.length).toBe(0);
-      expect(io.stdout.join('').toLowerCase()).toContain('cursor');
+      const curlCall = calls.find((c) => c.cmd === 'curl');
+      expect(curlCall).toBeDefined();
     } finally { io.restore(); }
   });
 });

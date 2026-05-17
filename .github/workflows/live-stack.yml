@@ -202,6 +202,7 @@ jobs:
                   integration_type: 'third-party-plugin',
                   provider: m.provider, amux_provider: m.amux_provider, model: m.model,
                   required_env: m.required_env, live: entry.live !== false,
+                  process_mode: entry.process_mode || 'predefined',
                 };
               }
 
@@ -373,6 +374,7 @@ jobs:
           LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
           LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
           LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
+          LIVE_STACK_PROCESS_MODE: ${{ matrix.scenario.process_mode || 'predefined' }}
           LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
           LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
           LIVE_STACK_BRIDGE_INTERACTIVE: ${{ matrix.interaction_mode.bridge_interactive }}
@@ -435,7 +437,7 @@ jobs:
 
   live_stack_bp_interactive:
     if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
-    needs: [live_stack_vanilla_ni, live_stack_vanilla_interactive, setup]
+    needs: [build_all, setup]
     name: "Live Stack (bp, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ubuntu-latest-m
     permissions:
@@ -451,7 +453,7 @@ jobs:
 
   live_stack_bp_bridged:
     if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
-    needs: [live_stack_vanilla_ni, live_stack_vanilla_interactive, setup]
+    needs: [build_all, setup]
     name: "Live Stack (bp, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ubuntu-latest-m
     permissions:

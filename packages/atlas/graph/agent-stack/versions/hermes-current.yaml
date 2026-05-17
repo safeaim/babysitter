@@ -1,7 +1,11 @@
 nodeKind: AgentVersion
 id: agent-version:hermes@current
 attributes:
+  agentId: "hermes"
   agentProductId: agent:hermes
+  displayName: "Hermes"
+  summary: "NousResearch agentic CLI"
+  sourcePackage: "@nousresearch/hermes-cli"
   versionRange: ">=1.0.0"
   releasedAt: "2025-01-01"
   cliCommand: "hermes"

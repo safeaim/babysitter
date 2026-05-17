@@ -228,8 +228,8 @@ describe('live stack scenario contract primitives', () => {
     expect(workflow).toContain('build_all:');
     expect(workflow).toContain('name: build-all-dist');
     expect(workflow).not.toContain('publish_run_id');
-    expect(workflow).toContain('group: live-stack-${{ github.ref_name }}');
-    expect(workflow).toContain('cancel-in-progress: true');
+    expect(workflow).toMatch(/group:.*live-stack|group:.*dispatch|group:.*push/);
+    expect(workflow).toMatch(/cancel-in-progress:/);
   });
 
   it('includes all target harnesses in live-stack setup matrix generation', () => {

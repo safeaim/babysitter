@@ -935,6 +935,26 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         plan.env['ANTHROPIC_AUTH_TOKEN'] = '';
       }
 
+      // Gemini CLI: set GOOGLE_API_KEY to proxy token and GOOGLE_AI_STUDIO_API_ENDPOINT
+      // to the proxy URL so gemini-cli connects through the transport-mux.
+      if (plan.harness === 'gemini') {
+        plan.env['GOOGLE_API_KEY'] = proxyRuntime.authToken ?? 'proxy-token';
+        plan.env['GEMINI_API_KEY'] = proxyRuntime.authToken ?? 'proxy-token';
+        const proxyOrigin = new URL(proxyRuntime.url).origin;
+        plan.env['GOOGLE_AI_STUDIO_API_ENDPOINT'] = proxyOrigin;
+        plan.env['GEMINI_CLI_TRUST_WORKSPACE'] = '1';
+        console.error(`[amux launch] Gemini proxy: GOOGLE_API_KEY=proxy-token, endpoint=${proxyOrigin}`);
+      }
+
+      // Generic OpenAI-compatible harnesses: set OPENAI_API_KEY + OPENAI_BASE_URL
+      // to route through the proxy for harnesses that use the openai-chat transport.
+      if (['cursor', 'hermes', 'omp', 'openclaw', 'opencode'].includes(plan.harness)) {
+        plan.env['OPENAI_API_KEY'] = proxyRuntime.authToken ?? 'proxy-token';
+        plan.env['OPENAI_BASE_URL'] = `${proxyRuntime.url}/v1`;
+        plan.env['OPENAI_API_BASE'] = `${proxyRuntime.url}/v1`;
+        console.error(`[amux launch] ${plan.harness} proxy: OPENAI_BASE_URL=${proxyRuntime.url}/v1`);
+      }
+
       // Pi ignores OPENAI_BASE_URL — write a models.json config that registers
       // a custom provider pointing to the local proxy.
       if (plan.harness === 'pi') {

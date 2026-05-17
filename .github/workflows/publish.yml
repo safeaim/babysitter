@@ -779,6 +779,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: atlas
+            build: npm run build --workspace=@a5c-ai/atlas
+            publish: npm publish --workspace=@a5c-ai/atlas --access public --tag "$NPM_TAG"
           - name: agent-catalog
             build: npm run build --workspace=@a5c-ai/atlas && npm run build --workspace=@a5c-ai/agent-catalog
             publish: npm publish --workspace=@a5c-ai/agent-catalog --access public --tag "$NPM_TAG"

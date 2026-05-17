@@ -9,6 +9,12 @@ on:
       - staging
       - develop
   workflow_dispatch:
+    inputs:
+      matrix:
+        description: 'JSON array of test combinations. Each entry: {agent, model, mode, install, live}. Empty = use push defaults.'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -54,7 +60,6 @@ jobs:
         if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
-          # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Restore build cache
@@ -77,28 +82,16 @@ jobs:
           npm run build --workspace=@a5c-ai/atlas
           npm run build --workspace=@a5c-ai/agent-catalog
 
-
       - name: "Build phase 2: parallel independents and agent-mux critical path"
         run: |
           set -euo pipefail
           PIDS=()
-          run_bg() {
-            "$@" &
-            PIDS+=("$!")
-          }
-          wait_all() {
-            local fail=0
-            for pid in "${PIDS[@]}"; do
-              wait "$pid" || fail=1
-            done
-            PIDS=()
-            [ "$fail" -eq 0 ] || exit 1
-          }
+          run_bg() { "$@" & PIDS+=("$!"); }
+          wait_all() { local fail=0; for pid in "${PIDS[@]}"; do wait "$pid" || fail=1; done; PIDS=(); [ "$fail" -eq 0 ] || exit 1; }
 
           run_bg bash -lc '
             set -euo pipefail
             npm run build --workspace=@a5c-ai/hooks-mux-core
-            # Adapters are independent (only depend on core) — build in parallel
             for adapter in claude codex gemini copilot cursor pi oh-my-pi opencode openclaw hermes; do
               npm run build --workspace=@a5c-ai/hooks-mux-adapter-$adapter &
             done
@@ -111,7 +104,6 @@ jobs:
           run_bg npm run build:cloud
           run_bg bash -lc 'cd packages/krate/core && npm run build && cd ../web && npm run build'
 
-          # agent-mux critical path (sequential — each depends on previous)
           npm run build --workspace=@a5c-ai/agent-mux-observability
           npm run build --workspace=@a5c-ai/agent-mux-core
 
@@ -120,21 +112,14 @@ jobs:
           npm run build --workspace=@a5c-ai/agent-mux-harness-mock & leaf_pids+=("$!")
           npm run build --workspace=@a5c-ai/transport-mux & leaf_pids+=("$!")
           leaf_fail=0
-          for pid in "${leaf_pids[@]}"; do
-            wait "$pid" || leaf_fail=1
-          done
+          for pid in "${leaf_pids[@]}"; do wait "$pid" || leaf_fail=1; done
           [ "$leaf_fail" -eq 0 ] || exit 1
 
           npm run build --workspace=@a5c-ai/agent-mux-gateway
           npm run build --workspace=@a5c-ai/agent-mux-cli
           npm run build --workspace=@a5c-ai/agent-mux
           npm run build:local --workspace=@a5c-ai/agent-mux-tui
-          # webui depends on core + ui — must be after agent-mux chain
           npm run build --workspace=@a5c-ai/agent-mux-webui
-
-          # SDK, agent-core, babysitter-agent: prerequisites (atlas, agent-catalog,
-          # agent-mux chain) are already built above — call tsc directly to avoid
-          # redundant rebuilds through chained npm scripts.
           npm run build --workspace=@a5c-ai/babysitter-sdk
           (cd packages/agent-core && npx tsc --build --force tsconfig.json)
           (cd packages/babysitter-agent && npx tsc --build tsconfig.json)
@@ -151,600 +136,171 @@ jobs:
           path: /tmp/build-all-dist.tar.gz
           if-no-files-found: error
 
-  live_stack_bp_interactive:
+  setup:
     if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
-    needs: [live_stack_vanilla_ni, live_stack_vanilla_interactive]
-    name: Live Stack (babysitter-plugin, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest)
-    runs-on: ubuntu-latest-m
-    permissions:
-      contents: read
-      actions: read
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        interaction_mode:
-          - id: interactive
-            interactive: 'true'
-            bridge_interactive: 'false'
-            bridge_hooks: 'false'
-        install_mode:
-          - id: babysitter-plugin
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
-            expected_artifacts: agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted
-        scenario:
-          - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.claude-code.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-          - id: live.agent-mux.codex.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.codex.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-            skip: 'true'
-          - id: live.agent-mux.pi.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-            skip: 'true'
-          - id: live.agent-mux.pi.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-            skip: 'true'
-          - id: live.agent-mux.hermes.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: hermes
-            amux_agent: hermes
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-            skip: 'true'
-          - id: live.agent-mux.gemini-cli.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: gemini-cli
-            amux_agent: gemini
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-          - id: live.agent-mux.gemini-cli.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: gemini-cli
-            amux_agent: gemini
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.copilot-cli.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: copilot-cli
-            amux_agent: copilot
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.cursor-cli.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: cursor-cli
-            amux_agent: cursor
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-            skip: 'true'
-        exclude:
-          - interaction_mode: { id: bridged-hooks }
-            scenario: { amux_agent: pi }
+    name: Compute Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      vanilla_ni: ${{ steps.matrix.outputs.vanilla_ni }}
+      vanilla_interactive: ${{ steps.matrix.outputs.vanilla_interactive }}
+      bp_interactive: ${{ steps.matrix.outputs.bp_interactive }}
+      bp_bridged: ${{ steps.matrix.outputs.bp_bridged }}
     steps:
-      - name: Skip marker
-        if: ${{ matrix.scenario.skip == 'true' }}
-        run: echo "LIVE_STACK_SKIP=1" >> "$GITHUB_ENV"
-
-      - name: Checkout repository
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Restore node_modules cache
-        if: ${{ matrix.scenario.skip != 'true' }}
-        id: nm-cache
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        if: ${{ matrix.scenario.skip != 'true' && steps.nm-cache.outputs.cache-hit != 'true' }}
+      - name: Generate matrix combinations
+        id: matrix
         run: |
-          npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+          set -euo pipefail
 
-      - name: Download build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/download-artifact@v8
-        with:
-          name: build-all-dist
-          path: /tmp
+          # --- Axis definitions ---
+          # Agents: id → amux_agent mapping
+          # Models: id → {provider, amux_provider, model, required_env}
+          # Modes: id → {interactive, bridge_interactive, bridge_hooks}
 
-      - name: Extract build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: tar xzf /tmp/build-all-dist.tar.gz
+          DISPATCH_MATRIX='${{ inputs.matrix }}'
 
-      - name: Install node-pty for TTY-based tool use
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: npm install node-pty --no-save
+          if [ -n "$DISPATCH_MATRIX" ] && [ "$DISPATCH_MATRIX" != "null" ]; then
+            # --- Manual dispatch: parse custom JSON ---
+            echo "Using workflow_dispatch matrix input"
+            # Input format: [{"agent":"claude","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true}, ...]
+            # Transform into per-job matrices
+            node -e "
+              const input = JSON.parse(process.env.DISPATCH_MATRIX || '[]');
+              const agents = {
+                'claude': {agent:'claude-code', amux_agent:'claude'},
+                'codex': {agent:'codex', amux_agent:'codex'},
+                'pi': {agent:'pi', amux_agent:'pi'},
+                'gemini': {agent:'gemini-cli', amux_agent:'gemini'},
+                'copilot': {agent:'copilot-cli', amux_agent:'copilot'},
+                'cursor': {agent:'cursor-cli', amux_agent:'cursor'},
+                'hermes': {agent:'hermes', amux_agent:'hermes'},
+                'opencode': {agent:'opencode', amux_agent:'opencode'},
+              };
+              const models = {
+                'foundry-gpt55': {provider:'foundry-openai', amux_provider:'foundry', model:'gpt-5.5', required_env:'AZURE_API_KEY,AMUX_API_BASE'},
+                'google-gemini31': {provider:'google', amux_provider:'google', model:'gemini-3.1-pro-preview', required_env:'GOOGLE_API_KEY'},
+              };
+              const modes = {
+                'ni': {id:'non-interactive', interactive:'false', bridge_interactive:'false', bridge_hooks:'false'},
+                'bridged-interactive': {id:'bridged-interactive', interactive:'false', bridge_interactive:'true', bridge_hooks:'false'},
+                'interactive': {id:'interactive', interactive:'true', bridge_interactive:'false', bridge_hooks:'false'},
+                'bridged-hooks': {id:'bridged-hooks', interactive:'false', bridge_interactive:'true', bridge_hooks:'true'},
+              };
+              const installModes = {
+                'vanilla': {id:'vanilla', required_trace_ids:'agentMuxRunId,agentMuxSessionId,transportTraceId', expected_artifacts:'agent-mux-events,transport-mux-trace,provider-trace-redacted'},
+                'bp': {id:'babysitter-plugin', required_trace_ids:'agentMuxRunId,agentMuxSessionId,transportTraceId', expected_artifacts:'agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted'},
+              };
 
-      - name: Link workspace CLIs to PATH
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          for pair in \
-            "amux:packages/agent-mux/cli/dist/index.js" \
-            "babysitter-agent:packages/babysitter-agent/dist/cli/main.js" \
-            "babysitter:packages/sdk/dist/cli/main.js"
-          do
-            name="${pair%%:*}"
-            script="${pair#*:}"
-            printf '#!/bin/sh\nexec node "%s/%s" "$@"\n' "${{ github.workspace }}" "$script" > "$HOME/.local/bin/$name"
-            chmod +x "$HOME/.local/bin/$name"
-          done
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+              function toScenario(entry) {
+                const a = agents[entry.agent] || {agent: entry.agent, amux_agent: entry.agent};
+                const m = models[entry.model] || models['foundry-gpt55'];
+                return {
+                  id: 'live.agent-mux.' + a.agent + '.' + m.provider + '.' + m.model,
+                  agent_path: 'agent-mux', agent: a.agent, amux_agent: a.amux_agent,
+                  integration_type: 'third-party-plugin',
+                  provider: m.provider, amux_provider: m.amux_provider, model: m.model,
+                  required_env: m.required_env, live: entry.live !== false,
+                };
+              }
 
-      - name: Run selected live stack E2E
-        if: ${{ matrix.scenario.skip != 'true' }}
-        timeout-minutes: 18
-        env:
-          LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
-          LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
-          LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
-          LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
-          LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
-          LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
-          LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
-          LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
-          LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
-          LIVE_STACK_BRIDGE_INTERACTIVE: ${{ matrix.interaction_mode.bridge_interactive }}
-          LIVE_STACK_BRIDGE_HOOKS: ${{ matrix.interaction_mode.bridge_hooks }}
-          LIVE_STACK_USE_AMUX_RUN: 'false'
-          LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
-          LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
-          LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
-          LIVE_STACK_CREDENTIAL_MODE: github-org-secrets-and-vars
-          LIVE_STACK_REQUIRED_ENV: ${{ matrix.scenario.required_env }}
-          LIVE_STACK_LAYERS: ${{ matrix.install_mode.id }}
-          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.provider }},${{ matrix.scenario.agent }}
-          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
-          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
-          LIVE_STACK_RUN_MODEL_TESTS: '1'
-          LIVE_STACK_REQUIRE_EVIDENCE: '1'
-          LIVE_STACK_TEST_TIMEOUT_MS: '780000'
-          LIVE_STACK_COMMAND_TIMEOUT_MS: '720000'
-          LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
-          LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
-          LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
-          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
-          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GOOGLE_CLOUD_LOCATION: global
-          GOOGLE_GENAI_USE_VERTEXAI: True
-        run: |
-          START_TS=$(date +%s)
-          npm run test:e2e:live-stack:pipeline
-          npm run coverage:e2e:live-stack
-          ELAPSED=$(( $(date +%s) - START_TS ))
-          echo "${ELAPSED}" > artifacts/live-stack/duration-seconds.txt
+              const vanillaNi = [], vanillaInt = [], bpInt = [], bpBridged = [];
+              for (const e of input) {
+                const scenario = toScenario(e);
+                const mode = modes[e.mode] || modes['ni'];
+                const install = installModes[e.install] || installModes['vanilla'];
+                const combo = {scenario, interaction_mode: mode, install_mode: install};
+                if (e.install === 'bp' && mode.id === 'interactive') bpInt.push(combo);
+                else if (e.install === 'bp' && mode.id === 'bridged-hooks') bpBridged.push(combo);
+                else if (mode.id === 'interactive') vanillaInt.push(combo);
+                else vanillaNi.push(combo);
+              }
 
-      - name: Upload live stack artifacts
-        if: ${{ always() && matrix.scenario.skip != 'true' }}
-        timeout-minutes: 1
-        uses: actions/upload-artifact@v7
-        with:
-          name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
-          path: artifacts/live-stack
-          if-no-files-found: error
+              const wrap = (arr) => JSON.stringify({include: arr.length > 0 ? arr : [{scenario:{skip:'true'}}]});
+              const fs = require('fs');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'vanilla_ni=' + wrap(vanillaNi) + '\n');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'vanilla_interactive=' + wrap(vanillaInt) + '\n');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'bp_interactive=' + wrap(bpInt) + '\n');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'bp_bridged=' + wrap(bpBridged) + '\n');
+            "
+          else
+            # --- Push trigger: default compact set ---
+            # Vanilla + BP, claude + codex, live, foundry (non-native model), one mode each
+            node -e "
+              const foundry = {provider:'foundry-openai', amux_provider:'foundry', model:'gpt-5.5', required_env:'AZURE_API_KEY,AMUX_API_BASE'};
+              const google = {provider:'google', amux_provider:'google', model:'gemini-3.1-pro-preview', required_env:'GOOGLE_API_KEY'};
+              const vanillaInstall = {id:'vanilla', required_trace_ids:'agentMuxRunId,agentMuxSessionId,transportTraceId', expected_artifacts:'agent-mux-events,transport-mux-trace,provider-trace-redacted'};
+              const bpInstall = {id:'babysitter-plugin', required_trace_ids:'agentMuxRunId,agentMuxSessionId,transportTraceId', expected_artifacts:'agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted'};
 
-  live_stack_bp_bridged:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
-    needs: [live_stack_vanilla_ni, live_stack_vanilla_interactive]
-    name: Live Stack (babysitter-plugin, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest)
-    runs-on: ubuntu-latest-m
-    permissions:
-      contents: read
-      actions: read
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        interaction_mode:
-          - id: bridged-hooks
-            interactive: 'false'
-            bridge_interactive: 'true'
-            bridge_hooks: 'true'
-        install_mode:
-          - id: babysitter-plugin
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
-            expected_artifacts: agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted
-        scenario:
-          - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.claude-code.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-          - id: live.agent-mux.codex.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.codex.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-            skip: 'true'
-          - id: live.agent-mux.pi.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-            skip: 'true'
-          - id: live.agent-mux.pi.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-            skip: 'true'
-        exclude:
-          - interaction_mode: { id: bridged-hooks }
-            scenario: { amux_agent: pi }
-    steps:
-      - name: Skip marker
-        if: ${{ matrix.scenario.skip == 'true' }}
-        run: echo "LIVE_STACK_SKIP=1" >> "$GITHUB_ENV"
+              const ni = {id:'non-interactive', interactive:'false', bridge_interactive:'false', bridge_hooks:'false'};
+              const bridgedInt = {id:'bridged-interactive', interactive:'false', bridge_interactive:'true', bridge_hooks:'false'};
+              const interactive = {id:'interactive', interactive:'true', bridge_interactive:'false', bridge_hooks:'false'};
+              const bridgedHooks = {id:'bridged-hooks', interactive:'false', bridge_interactive:'true', bridge_hooks:'true'};
 
-      - name: Checkout repository
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+              function scenario(agent, amux_agent, m) {
+                return {id:'live.agent-mux.'+agent+'.'+m.provider+'.'+m.model, agent_path:'agent-mux', agent, amux_agent, integration_type:'third-party-plugin', provider:m.provider, amux_provider:m.amux_provider, model:m.model, required_env:m.required_env, live:true};
+              }
 
-      - name: Setup Node.js
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
+              const claude = (m) => scenario('claude-code','claude',m);
+              const codex = (m) => scenario('codex','codex',m);
+              const pi = (m) => scenario('pi','pi',m);
+              const gemini = (m) => scenario('gemini-cli','gemini',m);
+              const copilot = (m) => scenario('copilot-cli','copilot',m);
 
-      - name: Restore node_modules cache
-        if: ${{ matrix.scenario.skip != 'true' }}
-        id: nm-cache
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+              // Vanilla NI: claude+codex (foundry+google), pi (bridged-int only), gemini (google+foundry)
+              const vanillaNi = [
+                {scenario: claude(foundry), interaction_mode: ni, install_mode: vanillaInstall},
+                {scenario: claude(google), interaction_mode: ni, install_mode: vanillaInstall},
+                {scenario: codex(foundry), interaction_mode: ni, install_mode: vanillaInstall},
+                {scenario: claude(foundry), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+                {scenario: claude(google), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+                {scenario: codex(foundry), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+                {scenario: pi(foundry), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+                {scenario: pi(google), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+                {scenario: gemini(google), interaction_mode: ni, install_mode: vanillaInstall},
+                {scenario: gemini(foundry), interaction_mode: ni, install_mode: vanillaInstall},
+                {scenario: gemini(google), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+                {scenario: gemini(foundry), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+                {scenario: copilot(foundry), interaction_mode: bridgedInt, install_mode: vanillaInstall},
+              ];
 
-      - name: Install dependencies
-        if: ${{ matrix.scenario.skip != 'true' && steps.nm-cache.outputs.cache-hit != 'true' }}
-        run: |
-          npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+              // Vanilla Interactive: claude+codex+pi+gemini
+              const vanillaInt = [
+                {scenario: claude(foundry), interaction_mode: interactive, install_mode: vanillaInstall},
+                {scenario: claude(google), interaction_mode: interactive, install_mode: vanillaInstall},
+                {scenario: codex(foundry), interaction_mode: interactive, install_mode: vanillaInstall},
+                {scenario: codex(google), interaction_mode: interactive, install_mode: vanillaInstall},
+                {scenario: pi(foundry), interaction_mode: interactive, install_mode: vanillaInstall},
+                {scenario: pi(google), interaction_mode: interactive, install_mode: vanillaInstall},
+                {scenario: gemini(google), interaction_mode: interactive, install_mode: vanillaInstall},
+                {scenario: gemini(foundry), interaction_mode: interactive, install_mode: vanillaInstall},
+              ];
 
-      - name: Download build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/download-artifact@v8
-        with:
-          name: build-all-dist
-          path: /tmp
+              // BP Interactive: claude+codex (foundry+google)
+              const bpInt = [
+                {scenario: claude(foundry), interaction_mode: interactive, install_mode: bpInstall},
+                {scenario: claude(google), interaction_mode: interactive, install_mode: bpInstall},
+                {scenario: codex(foundry), interaction_mode: interactive, install_mode: bpInstall},
+              ];
 
-      - name: Extract build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: tar xzf /tmp/build-all-dist.tar.gz
+              // BP Bridged-hooks: claude+codex (foundry+google)
+              const bpBridged = [
+                {scenario: claude(foundry), interaction_mode: bridgedHooks, install_mode: bpInstall},
+                {scenario: claude(google), interaction_mode: bridgedHooks, install_mode: bpInstall},
+                {scenario: codex(foundry), interaction_mode: bridgedHooks, install_mode: bpInstall},
+              ];
 
-      - name: Install node-pty for TTY-based tool use
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: npm install node-pty --no-save
-
-      - name: Link workspace CLIs to PATH
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          for pair in \
-            "amux:packages/agent-mux/cli/dist/index.js" \
-            "babysitter-agent:packages/babysitter-agent/dist/cli/main.js" \
-            "babysitter:packages/sdk/dist/cli/main.js"
-          do
-            name="${pair%%:*}"
-            script="${pair#*:}"
-            printf '#!/bin/sh\nexec node "%s/%s" "$@"\n' "${{ github.workspace }}" "$script" > "$HOME/.local/bin/$name"
-            chmod +x "$HOME/.local/bin/$name"
-          done
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Run selected live stack E2E
-        if: ${{ matrix.scenario.skip != 'true' }}
-        timeout-minutes: 18
-        env:
-          LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
-          LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
-          LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
-          LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
-          LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
-          LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
-          LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
-          LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
-          LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
-          LIVE_STACK_BRIDGE_INTERACTIVE: ${{ matrix.interaction_mode.bridge_interactive }}
-          LIVE_STACK_BRIDGE_HOOKS: ${{ matrix.interaction_mode.bridge_hooks }}
-          LIVE_STACK_USE_AMUX_RUN: 'false'
-          LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
-          LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
-          LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
-          LIVE_STACK_CREDENTIAL_MODE: github-org-secrets-and-vars
-          LIVE_STACK_REQUIRED_ENV: ${{ matrix.scenario.required_env }}
-          LIVE_STACK_LAYERS: ${{ matrix.install_mode.id }}
-          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.provider }},${{ matrix.scenario.agent }}
-          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
-          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
-          LIVE_STACK_RUN_MODEL_TESTS: '1'
-          LIVE_STACK_REQUIRE_EVIDENCE: '1'
-          LIVE_STACK_TEST_TIMEOUT_MS: '780000'
-          LIVE_STACK_COMMAND_TIMEOUT_MS: '720000'
-          LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
-          LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
-          LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
-          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
-          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GOOGLE_CLOUD_LOCATION: global
-          GOOGLE_GENAI_USE_VERTEXAI: True
-        run: |
-          START_TS=$(date +%s)
-          npm run test:e2e:live-stack:pipeline
-          npm run coverage:e2e:live-stack
-          ELAPSED=$(( $(date +%s) - START_TS ))
-          echo "${ELAPSED}" > artifacts/live-stack/duration-seconds.txt
-
-      - name: Upload live stack artifacts
-        if: ${{ always() && matrix.scenario.skip != 'true' }}
-        timeout-minutes: 1
-        uses: actions/upload-artifact@v7
-        with:
-          name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
-          path: artifacts/live-stack
-          if-no-files-found: error
-
-  live_stack_babysitter_agent:
-    if: false
-    needs: build_all
-    name: Live Stack (babysitter-agent, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest)
-    runs-on: ubuntu-latest-m
-    permissions:
-      contents: read
-      actions: read
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        interaction_mode:
-          - id: non-interactive
-            interactive: 'false'
-        install_mode:
-          - id: babysitter-plugin
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
-            expected_artifacts: agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted
-        scenario:
-          - id: live.agent-mux.babysitter-agent.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: babysitter-agent
-            amux_agent: babysitter
-            integration_type: third-party-plugin
-            babysitter_harness: agent-core
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Restore node_modules cache
-        if: ${{ matrix.scenario.skip != 'true' }}
-        id: nm-cache
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        if: ${{ matrix.scenario.skip != 'true' && steps.nm-cache.outputs.cache-hit != 'true' }}
-        run: |
-          npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
-
-      - name: Download build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/download-artifact@v8
-        with:
-          name: build-all-dist
-          path: /tmp
-
-      - name: Extract build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: tar xzf /tmp/build-all-dist.tar.gz
-
-      - name: Install node-pty for TTY-based tool use
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: npm install node-pty --no-save
-
-      - name: Link workspace CLIs to PATH
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          for pair in \
-            "amux:packages/agent-mux/cli/dist/index.js" \
-            "babysitter-agent:packages/babysitter-agent/dist/cli/main.js" \
-            "babysitter:packages/sdk/dist/cli/main.js"
-          do
-            name="${pair%%:*}"
-            script="${pair#*:}"
-            printf '#!/bin/sh\nexec node "%s/%s" "$@"\n' "${{ github.workspace }}" "$script" > "$HOME/.local/bin/$name"
-            chmod +x "$HOME/.local/bin/$name"
-          done
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Run selected live stack E2E
-        if: ${{ matrix.scenario.skip != 'true' }}
-        timeout-minutes: 18
-        env:
-          LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
-          LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
-          LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
-          LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
-          LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
-          LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
-          LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
-          LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
-          LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
-          LIVE_STACK_USE_AMUX_RUN: 'false'
-          LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
-          LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
-          LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
-          LIVE_STACK_CREDENTIAL_MODE: github-org-secrets-and-vars
-          LIVE_STACK_REQUIRED_ENV: ${{ matrix.scenario.required_env }}
-          LIVE_STACK_LAYERS: ${{ matrix.install_mode.id }}
-          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.provider }},${{ matrix.scenario.agent }}
-          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
-          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
-          LIVE_STACK_RUN_MODEL_TESTS: '1'
-          LIVE_STACK_REQUIRE_EVIDENCE: '1'
-          LIVE_STACK_TEST_TIMEOUT_MS: '780000'
-          LIVE_STACK_COMMAND_TIMEOUT_MS: '720000'
-          LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
-          LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
-          LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
-          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
-        run: |
-          START_TS=$(date +%s)
-          npm run test:e2e:live-stack:pipeline
-          npm run coverage:e2e:live-stack
-          ELAPSED=$(( $(date +%s) - START_TS ))
-          echo "${ELAPSED}" > artifacts/live-stack/duration-seconds.txt
-
-      - name: Upload live stack artifacts
-        if: ${{ always() && matrix.scenario.skip != 'true' }}
-        timeout-minutes: 1
-        uses: actions/upload-artifact@v7
-        with:
-          name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
-          path: artifacts/live-stack
-          if-no-files-found: error
+              const wrap = (arr) => JSON.stringify({include: arr});
+              const fs = require('fs');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'vanilla_ni=' + wrap(vanillaNi) + '\n');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'vanilla_interactive=' + wrap(vanillaInt) + '\n');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'bp_interactive=' + wrap(bpInt) + '\n');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'bp_bridged=' + wrap(bpBridged) + '\n');
+            "
+          fi
 
   live_stack_vanilla_ni:
     if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
-    needs: build_all
-    name: Live Stack (vanilla, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest)
+    needs: [build_all, setup]
+    name: "Live Stack (vanilla, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ubuntu-latest-m
     permissions:
       contents: read
@@ -754,131 +310,8 @@ jobs:
         shell: bash
     strategy:
       fail-fast: false
-      matrix:
-        interaction_mode:
-          - id: non-interactive
-            interactive: 'false'
-            bridge_interactive: 'false'
-            bridge_hooks: 'false'
-          - id: bridged-interactive
-            interactive: 'false'
-            bridge_interactive: 'true'
-            bridge_hooks: 'false'
-        install_mode:
-          - id: vanilla
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
-            expected_artifacts: agent-mux-events,transport-mux-trace,provider-trace-redacted
-        scenario:
-          - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.claude-code.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-          - id: live.agent-mux.codex.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.codex.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-            skip: 'true'
-          - id: live.agent-mux.pi.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.pi.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-          - id: live.agent-mux.hermes.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: hermes
-            amux_agent: hermes
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-            skip: 'true'
-          - id: live.agent-mux.gemini-cli.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: gemini-cli
-            amux_agent: gemini
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-          - id: live.agent-mux.gemini-cli.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: gemini-cli
-            amux_agent: gemini
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.copilot-cli.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: copilot-cli
-            amux_agent: copilot
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.cursor-cli.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: cursor-cli
-            amux_agent: cursor
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-            skip: 'true'
-        exclude:
-          - interaction_mode: { id: bridged-interactive }
-            scenario: { amux_agent: codex }
-          - interaction_mode: { id: non-interactive }
-            scenario: { amux_agent: pi }
-          - interaction_mode: { id: non-interactive }
-            scenario: { amux_agent: copilot }
-    steps:
+      matrix: ${{ fromJSON(needs.setup.outputs.vanilla_ni) }}
+    steps: &live_stack_steps
       - name: Skip marker
         if: ${{ matrix.scenario.skip == 'true' }}
         run: echo "LIVE_STACK_SKIP=1" >> "$GITHUB_ENV"
@@ -967,7 +400,7 @@ jobs:
           LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.provider }},${{ matrix.scenario.agent }}
           LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
           LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
-          LIVE_STACK_RUN_MODEL_TESTS: '1'
+          LIVE_STACK_RUN_MODEL_TESTS: ${{ matrix.scenario.live && '1' || '0' }}
           LIVE_STACK_REQUIRE_EVIDENCE: '1'
           LIVE_STACK_TEST_TIMEOUT_MS: '780000'
           LIVE_STACK_COMMAND_TIMEOUT_MS: '720000'
@@ -998,8 +431,8 @@ jobs:
 
   live_stack_vanilla_interactive:
     if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
-    needs: build_all
-    name: Live Stack (vanilla, ${{ matrix.scenario.id }}, ${{ matrix.interaction_mode.id }}, os=ubuntu-latest)
+    needs: [build_all, setup]
+    name: "Live Stack (vanilla, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ubuntu-latest-m
     permissions:
       contents: read
@@ -1009,189 +442,40 @@ jobs:
         shell: bash
     strategy:
       fail-fast: false
-      matrix:
-        interaction_mode:
-          - id: interactive
-            interactive: 'true'
-            bridge_interactive: 'false'
-            bridge_hooks: 'false'
-        install_mode:
-          - id: vanilla
-            required_trace_ids: agentMuxRunId,agentMuxSessionId,transportTraceId
-            expected_artifacts: agent-mux-events,transport-mux-trace,provider-trace-redacted
-        scenario:
-          - id: live.agent-mux.claude-code.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.claude-code.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: claude-code
-            amux_agent: claude
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-          - id: live.agent-mux.codex.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.codex.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: codex
-            amux_agent: codex
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-            skip: 'true'
-          - id: live.agent-mux.pi.foundry-openai.gpt-5.5
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: foundry-openai
-            amux_provider: foundry
-            model: gpt-5.5
-            required_env: AZURE_API_KEY,AMUX_API_BASE
-          - id: live.agent-mux.pi.google.gemini-3.1-pro
-            agent_path: agent-mux
-            agent: pi
-            amux_agent: pi
-            integration_type: third-party-plugin
-            provider: google
-            amux_provider: google
-            model: gemini-3.1-pro-preview
-            required_env: GOOGLE_API_KEY
-    steps:
-      - name: Skip marker
-        if: ${{ matrix.scenario.skip == 'true' }}
-        run: echo "LIVE_STACK_SKIP=1" >> "$GITHUB_ENV"
+      matrix: ${{ fromJSON(needs.setup.outputs.vanilla_interactive) }}
+    steps: *live_stack_steps
 
-      - name: Checkout repository
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+  live_stack_bp_interactive:
+    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
+    needs: [live_stack_vanilla_ni, live_stack_vanilla_interactive, setup]
+    name: "Live Stack (bp, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
+    runs-on: ubuntu-latest-m
+    permissions:
+      contents: read
+      actions: read
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup.outputs.bp_interactive) }}
+    steps: *live_stack_steps
 
-      - name: Setup Node.js
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Restore node_modules cache
-        if: ${{ matrix.scenario.skip != 'true' }}
-        id: nm-cache
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        if: ${{ matrix.scenario.skip != 'true' && steps.nm-cache.outputs.cache-hit != 'true' }}
-        run: |
-          npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
-
-      - name: Download build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        uses: actions/download-artifact@v8
-        with:
-          name: build-all-dist
-          path: /tmp
-
-      - name: Extract build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: tar xzf /tmp/build-all-dist.tar.gz
-
-      - name: Install node-pty for TTY-based tool use
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: npm install node-pty --no-save
-
-      - name: Link workspace CLIs to PATH
-        if: ${{ matrix.scenario.skip != 'true' }}
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          for pair in \
-            "amux:packages/agent-mux/cli/dist/index.js" \
-            "babysitter-agent:packages/babysitter-agent/dist/cli/main.js" \
-            "babysitter:packages/sdk/dist/cli/main.js"
-          do
-            name="${pair%%:*}"
-            script="${pair#*:}"
-            printf '#!/bin/sh\nexec node "%s/%s" "$@"\n' "${{ github.workspace }}" "$script" > "$HOME/.local/bin/$name"
-            chmod +x "$HOME/.local/bin/$name"
-          done
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Run selected live stack E2E
-        if: ${{ matrix.scenario.skip != 'true' }}
-        timeout-minutes: 18
-        env:
-          LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
-          LIVE_STACK_AGENT_PATH: ${{ matrix.scenario.agent_path }}
-          LIVE_STACK_AGENT: ${{ matrix.scenario.agent }}
-          LIVE_STACK_AMUX_AGENT: ${{ matrix.scenario.amux_agent }}
-          LIVE_STACK_INTEGRATION_TYPE: ${{ matrix.scenario.integration_type }}
-          LIVE_STACK_BABYSITTER_HARNESS: ${{ matrix.scenario.babysitter_harness }}
-          LIVE_STACK_INSTALL_MODE: ${{ matrix.install_mode.id }}
-          LIVE_STACK_INTERACTION_MODE: ${{ matrix.interaction_mode.id }}
-          LIVE_STACK_INTERACTIVE: ${{ matrix.interaction_mode.interactive }}
-          LIVE_STACK_BRIDGE_INTERACTIVE: ${{ matrix.interaction_mode.bridge_interactive }}
-          LIVE_STACK_BRIDGE_HOOKS: ${{ matrix.interaction_mode.bridge_hooks }}
-          LIVE_STACK_USE_AMUX_RUN: 'false'
-          LIVE_STACK_PROVIDER: ${{ matrix.scenario.provider }}
-          LIVE_STACK_AMUX_PROVIDER: ${{ matrix.scenario.amux_provider }}
-          LIVE_STACK_MODEL: ${{ matrix.scenario.model }}
-          LIVE_STACK_CREDENTIAL_MODE: github-org-secrets-and-vars
-          LIVE_STACK_REQUIRED_ENV: ${{ matrix.scenario.required_env }}
-          LIVE_STACK_LAYERS: ${{ matrix.install_mode.id }}
-          LIVE_STACK_COVERAGE_LAYERS: ${{ matrix.scenario.provider }},${{ matrix.scenario.agent }}
-          LIVE_STACK_REQUIRED_TRACE_IDS: ${{ matrix.install_mode.required_trace_ids }}
-          LIVE_STACK_EXPECTED_ARTIFACTS: ${{ matrix.install_mode.expected_artifacts }}
-          LIVE_STACK_RUN_MODEL_TESTS: '1'
-          LIVE_STACK_REQUIRE_EVIDENCE: '1'
-          LIVE_STACK_TEST_TIMEOUT_MS: '780000'
-          LIVE_STACK_COMMAND_TIMEOUT_MS: '720000'
-          LIVE_STACK_BABYSITTER_BIN: ${{ github.workspace }}/packages/sdk/dist/cli/main.js
-          LIVE_STACK_AMUX_BIN: ${{ github.workspace }}/packages/agent-mux/cli/dist/index.js
-          LIVE_STACK_BABYSITTER_AGENT_BIN: ${{ github.workspace }}/packages/babysitter-agent/dist/cli/main.js
-          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
-          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GOOGLE_CLOUD_LOCATION: global
-          GOOGLE_GENAI_USE_VERTEXAI: True
-        run: |
-          START_TS=$(date +%s)
-          npm run test:e2e:live-stack:pipeline
-          npm run coverage:e2e:live-stack
-          ELAPSED=$(( $(date +%s) - START_TS ))
-          echo "${ELAPSED}" > artifacts/live-stack/duration-seconds.txt
-
-      - name: Upload live stack artifacts
-        if: ${{ always() && matrix.scenario.skip != 'true' }}
-        timeout-minutes: 1
-        uses: actions/upload-artifact@v7
-        with:
-          name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
-          path: artifacts/live-stack
-          if-no-files-found: error
+  live_stack_bp_bridged:
+    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
+    needs: [live_stack_vanilla_ni, live_stack_vanilla_interactive, setup]
+    name: "Live Stack (bp, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
+    runs-on: ubuntu-latest-m
+    permissions:
+      contents: read
+      actions: read
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup.outputs.bp_bridged) }}
+    steps: *live_stack_steps
 
   live_stack_report:
     if: ${{ always() && !contains(github.event.head_commit.message || '', '[skip publish]') }}
@@ -1239,19 +523,18 @@ jobs:
               mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
               failures=$(grep -c '✗' "$report" 2>/dev/null || true)
               passes=$(grep -c '✓' "$report" 2>/dev/null || true)
+              dur_file=$(find "$dir" -name "duration-seconds.txt" | head -1)
+              if [ -n "$dur_file" ] && [ -f "$dur_file" ]; then
+                dur_s=$(cat "$dur_file"); runtime="$((dur_s / 60))m$((dur_s % 60))s"
+              else
+                runtime="—"
+              fi
               if [ "${failures:-0}" -gt 0 ]; then
                 status="❌"; bp_fail=$((bp_fail + 1))
                 detail=$(grep '✗' "$report" | head -1 | sed 's/.*| //;s/ |.*//' || echo "")
               else
                 status="✅"; bp_pass=$((bp_pass + 1))
                 detail="${passes:-0} checks"
-              fi
-              dur_file=$(find "$dir" -name "duration-seconds.txt" | head -1)
-              if [ -n "$dur_file" ] && [ -f "$dur_file" ]; then
-                dur_s=$(cat "$dur_file")
-                runtime="$((dur_s / 60))m$((dur_s % 60))s"
-              else
-                runtime="—"
               fi
               echo "| ${agent} | ${provider} | ${model} | ${mode} | ${runtime} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
             else
@@ -1273,9 +556,16 @@ jobs:
             if [ -n "$report" ] && [ -f "$report" ]; then
               agent=$(grep -oP '(?<=\*\*Agent:\*\* ).*' "$report" | head -1 || echo "?")
               provider=$(grep -oP '(?<=\*\*Provider:\*\* ).*' "$report" | head -1 || echo "?")
+              model=$(grep -oP '(?<=\*\*Model:\*\* ).*' "$report" | head -1 || echo "?")
               mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
               failures=$(grep -c '✗' "$report" 2>/dev/null || true)
               passes=$(grep -c '✓' "$report" 2>/dev/null || true)
+              dur_file=$(find "$dir" -name "duration-seconds.txt" | head -1)
+              if [ -n "$dur_file" ] && [ -f "$dur_file" ]; then
+                dur_s=$(cat "$dur_file"); runtime="$((dur_s / 60))m$((dur_s % 60))s"
+              else
+                runtime="—"
+              fi
               if [ "${failures:-0}" -gt 0 ]; then
                 status="❌"; van_fail=$((van_fail + 1))
                 detail=$(grep '✗' "$report" | head -1 | sed 's/.*| //;s/ |.*//' || echo "")
@@ -1283,7 +573,7 @@ jobs:
                 status="✅"; van_pass=$((van_pass + 1))
                 detail="${passes:-0} checks"
               fi
-              echo "| ${agent} | ${provider} | ${mode} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
+              echo "| ${agent} | ${provider} | ${model} | ${mode} | ${runtime} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
             else
               mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
               echo "| ? | — | — | ${mode} | — | ⊘ | skipped |" >> "$GITHUB_STEP_SUMMARY"

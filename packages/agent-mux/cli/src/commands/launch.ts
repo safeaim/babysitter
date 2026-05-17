@@ -572,8 +572,15 @@ function startPromptArtifactCompletionMonitor(input: {
   if (expectedPaths.length === 0) return undefined;
   const requireBabysitterCompletion = promptRequiresBabysitterCompletion(input.prompt);
   const lastSizes = new Map<string, number>();
+  const startedAt = Date.now();
+  const MONITOR_TIMEOUT_MS = 600_000;
   return setInterval(() => {
     void (async () => {
+      if (Date.now() - startedAt > MONITOR_TIMEOUT_MS) {
+        console.error(`[amux launch] artifact monitor timed out after ${MONITOR_TIMEOUT_MS / 1000}s — forcing completion`);
+        input.onComplete();
+        return;
+      }
       const fs = await import('node:fs/promises');
       for (const expectedPath of expectedPaths) {
         try {

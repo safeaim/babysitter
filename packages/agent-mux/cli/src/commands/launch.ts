@@ -991,6 +991,12 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         console.error(`[amux launch] ${plan.harness} proxy: OPENAI_BASE_URL=${proxyRuntime.url}/v1`);
       }
 
+      // Cursor: set CURSOR_API_KEY to skip browser login — the proxy handles
+      // upstream auth, so cursor-agent just needs a non-empty key to proceed.
+      if (plan.harness === 'cursor') {
+        plan.env['CURSOR_API_KEY'] = plan.env['CURSOR_API_KEY'] || proxyRuntime.authToken || 'proxy-token';
+      }
+
       // Pi ignores OPENAI_BASE_URL — write a models.json config that registers
       // a custom provider pointing to the local proxy.
       if (plan.harness === 'pi') {

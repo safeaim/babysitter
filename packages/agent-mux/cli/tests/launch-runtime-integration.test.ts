@@ -138,7 +138,7 @@ describe('launchCommand transport-mux integration', () => {
       port: 0,
     });
     expect(spawnMock).toHaveBeenCalledTimes(1);
-    expect(spawnMock.mock.calls[0]?.[2]?.env['OPENAI_BASE_URL']).toBe('http://127.0.0.1:4010');
+    expect(spawnMock.mock.calls[0]?.[2]?.env['OPENAI_BASE_URL']).toBe('http://127.0.0.1:4010/v1');
     expect(spawnMock.mock.calls[0]?.[2]?.env['OPENAI_API_KEY']).toBe('runtime-token');
     expect(runtimeStop).toHaveBeenCalledTimes(1);
     expect(child.stdin.write).toHaveBeenCalledWith('hello\n');
@@ -214,9 +214,9 @@ describe('launchCommand transport-mux integration', () => {
       expect(code).toBe(0);
       expect(spawnMock).toHaveBeenCalledTimes(1);
       const spawnedArgs = spawnMock.mock.calls[0]?.[1] as string[];
-      expect(spawnedArgs).not.toContain('--prompt');
-      expect(spawnedArgs).not.toContain('--print');
-      expect(child.stdin.write).toHaveBeenCalledWith('write the file\n');
+      expect(spawnedArgs).toContain('-p');
+      expect(spawnedArgs).toContain('write the file');
+      expect(child.stdin.write).not.toHaveBeenCalled();
       expect(child.stdin.end).toHaveBeenCalledTimes(1);
       expect(runtimeStop).toHaveBeenCalledTimes(1);
     } finally {

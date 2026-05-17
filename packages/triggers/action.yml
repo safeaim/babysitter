@@ -143,51 +143,101 @@ runs:
       continue-on-error: true
       uses: a5c-ai/generate-token-action@main
 
-    - name: Build agent-mux action runtime
+    - name: Resolve action runtime
+      id: resolve-runtime
       shell: bash
       env:
         ACTION_ROOT: ${{ github.action_path }}
       run: |
         set -euo pipefail
         REPO_ROOT=$(cd "$ACTION_ROOT/../.." && pwd)
+        if [ -f "$REPO_ROOT/package.json" ] && grep -q '"@a5c-ai/agent-mux-cli"' "$REPO_ROOT/package.json" 2>/dev/null; then
+          echo "mode=monorepo" >> "$GITHUB_OUTPUT"
+          echo "repo_root=$REPO_ROOT" >> "$GITHUB_OUTPUT"
+        else
+          echo "mode=npx" >> "$GITHUB_OUTPUT"
+          echo "repo_root=" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Restore monorepo build cache
+      if: steps.resolve-runtime.outputs.mode == 'monorepo'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ steps.resolve-runtime.outputs.repo_root }}/node_modules
+          ${{ steps.resolve-runtime.outputs.repo_root }}/packages/**/dist
+          ${{ steps.resolve-runtime.outputs.repo_root }}/packages/**/tsconfig.tsbuildinfo
+        key: triggers-build-${{ runner.os }}-${{ hashFiles(format('{0}/package-lock.json', steps.resolve-runtime.outputs.repo_root)) }}
+        restore-keys: |
+          triggers-build-${{ runner.os }}-
+
+    - name: Build agent-mux (monorepo)
+      if: steps.resolve-runtime.outputs.mode == 'monorepo'
+      shell: bash
+      env:
+        REPO_ROOT: ${{ steps.resolve-runtime.outputs.repo_root }}
+      run: |
+        set -euo pipefail
         cd "$REPO_ROOT"
-        npm ci
-        npm run build:agent-mux
-        npm run build --workspace=@a5c-ai/triggers
+        if [ ! -d "node_modules" ]; then
+          npm ci
+        fi
+        if [ ! -f "packages/agent-mux/cli/dist/index.js" ]; then
+          npm run build:agent-mux
+        fi
+        if [ ! -f "packages/triggers/dist/cli.js" ]; then
+          npm run build --workspace=@a5c-ai/triggers
+        fi
+        if [ ! -f "packages/sdk/dist/cli/main.js" ]; then
+          npm run build --workspace=@a5c-ai/babysitter-sdk
+        fi
 
     - name: Install harness
       if: ${{ inputs.harness != '' || inputs.adapter != '' }}
       shell: bash
       env:
         ACTION_ROOT: ${{ github.action_path }}
+        RUNTIME_MODE: ${{ steps.resolve-runtime.outputs.mode }}
+        REPO_ROOT: ${{ steps.resolve-runtime.outputs.repo_root }}
         INPUT_HARNESS: ${{ inputs.harness || inputs.adapter }}
         INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
         set -euo pipefail
-        REPO_ROOT=$(cd "$ACTION_ROOT/../.." && pwd)
         cd "$INPUT_WORKING_DIRECTORY"
-        node "$REPO_ROOT/packages/agent-mux/cli/dist/index.js" install "$INPUT_HARNESS" || true
+        if [ "$RUNTIME_MODE" = "monorepo" ]; then
+          node "$REPO_ROOT/packages/agent-mux/cli/dist/index.js" install "$INPUT_HARNESS" || true
+        else
+          npx -y @a5c-ai/agent-mux-cli install "$INPUT_HARNESS" || true
+        fi
 
     - name: Install babysitter plugin
       if: ${{ inputs.babysitter-plugin == 'true' }}
       shell: bash
       env:
-        ACTION_ROOT: ${{ github.action_path }}
+        RUNTIME_MODE: ${{ steps.resolve-runtime.outputs.mode }}
+        REPO_ROOT: ${{ steps.resolve-runtime.outputs.repo_root }}
         INPUT_HARNESS: ${{ inputs.harness || inputs.adapter }}
         INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
         INPUT_PROCESS_FILE: ${{ inputs.process-file }}
       run: |
         set -euo pipefail
-        REPO_ROOT=$(cd "$ACTION_ROOT/../.." && pwd)
         cd "$INPUT_WORKING_DIRECTORY"
 
-        # Generate plugins if in monorepo with generator script
-        if [ -f "$REPO_ROOT/package.json" ] && node -e "process.exit(JSON.parse(require('fs').readFileSync('$REPO_ROOT/package.json','utf8')).scripts?.['generate:plugins'] ? 0 : 1)" 2>/dev/null; then
-          cd "$REPO_ROOT" && npm run generate:plugins && cd "$INPUT_WORKING_DIRECTORY"
+        if [ "$RUNTIME_MODE" = "monorepo" ]; then
+          # Generate plugins if generator script exists
+          if [ -f "$REPO_ROOT/package.json" ] && node -e "process.exit(JSON.parse(require('fs').readFileSync('$REPO_ROOT/package.json','utf8')).scripts?.['generate:plugins'] ? 0 : 1)" 2>/dev/null; then
+            cd "$REPO_ROOT" && npm run generate:plugins && cd "$INPUT_WORKING_DIRECTORY"
+          fi
+          # Use local SDK
+          export PATH="$REPO_ROOT/packages/sdk/dist/cli:$PATH"
+          if ! command -v babysitter >/dev/null 2>&1; then
+            npm install -g "$REPO_ROOT/packages/sdk" 2>/dev/null || \
+              node "$REPO_ROOT/packages/sdk/dist/cli/main.js" harness:install-plugin "$INPUT_HARNESS" --workspace "$INPUT_WORKING_DIRECTORY" && exit 0
+          fi
+        else
+          # External use — install from npm
+          npm install -g @a5c-ai/babysitter-sdk
         fi
-
-        # Install SDK globally
-        npm install -g @a5c-ai/babysitter-sdk || npm install -g "$REPO_ROOT/packages/sdk"
 
         # Install babysitter plugin into harness
         babysitter harness:install-plugin "$INPUT_HARNESS" --workspace "$INPUT_WORKING_DIRECTORY"

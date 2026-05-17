@@ -13,6 +13,7 @@ import type {
   AgentConfigSchema,
   AuthState,
   AuthSetupGuidance,
+  DetectInstallationResult,
   Session,
   SpawnArgs,
   ParseContext,
@@ -40,6 +41,24 @@ export class CopilotAdapter extends BaseAgentAdapter {
   constructor(agent?: string, cliCommand?: string) {
     super();
   }
+
+  async detectInstallation(): Promise<DetectInstallationResult> {
+    try {
+      const res = await this._spawner('gh', ['copilot', '--version']);
+      if (res.code === 0) {
+        const version = res.stdout.trim().split(/\s+/).pop();
+        return { installed: true, version };
+      }
+    } catch { /* not installed */ }
+    try {
+      const res = await this._spawner('gh', ['extension', 'list']);
+      if (res.code === 0 && res.stdout.includes('copilot')) {
+        return { installed: true };
+      }
+    } catch { /* gh not available */ }
+    return { installed: false };
+  }
+
   get hostEnvSignals() { return getHostEnvSignals(this.agent); }
 
   get capabilities(): AgentCapabilities {

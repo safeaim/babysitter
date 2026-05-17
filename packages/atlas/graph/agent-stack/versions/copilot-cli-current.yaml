@@ -20,14 +20,11 @@ attributes:
   cliCommand: "gh copilot"
   installMethods:
     - install:gh-extension
-    - install:npm
   minSchemaVersion: "6.0.0"
   adapterMetadata:
     installCommands:
       - type: gh-extension
         command: "gh extension install github/gh-copilot"
-      - type: npm
-        command: "npm install -g @github/copilot-cli"
     authMethods:
       - type: github_token
         name: "GitHub Token"

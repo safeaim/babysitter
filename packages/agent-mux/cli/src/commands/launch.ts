@@ -991,21 +991,6 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         console.error(`[amux launch] ${plan.harness} proxy: OPENAI_BASE_URL=${proxyRuntime.url}/v1`);
       }
 
-      // Cursor: pre-create ~/.cursor/auth.json with a proxy token so
-      // cursor-agent skips browser OAuth. Also set CURSOR_API_KEY env var.
-      if (plan.harness === 'cursor') {
-        const token = proxyRuntime.authToken || 'proxy-token';
-        plan.env['CURSOR_API_KEY'] = plan.env['CURSOR_API_KEY'] || token;
-        const { writeFileSync, mkdirSync } = await import('node:fs');
-        const { join } = await import('node:path');
-        const cursorDir = join(process.env['HOME'] ?? process.env['USERPROFILE'] ?? '/tmp', '.cursor');
-        mkdirSync(cursorDir, { recursive: true });
-        const authPayload = JSON.stringify({ accessToken: token, refreshToken: token, userId: 'ci-proxy', email: 'ci@proxy.local' });
-        writeFileSync(join(cursorDir, 'auth.json'), authPayload);
-        writeFileSync(join(cursorDir, 'credentials.json'), authPayload);
-        console.error(`[amux launch] Cursor auth pre-seeded at ${cursorDir}/auth.json`);
-      }
-
       // Pi ignores OPENAI_BASE_URL — write a models.json config that registers
       // a custom provider pointing to the local proxy.
       if (plan.harness === 'pi') {
@@ -1042,6 +1027,22 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       else printError(`Failed to launch transport runtime: ${msg}`);
       return ExitCode.GENERAL_ERROR;
     }
+  }
+
+  // Cursor: pre-create ~/.cursor/auth.json so cursor-agent skips browser OAuth.
+  // Runs outside the proxy block because cursor always needs auth, regardless
+  // of whether the proxy was started.
+  if (plan.harness === 'cursor') {
+    const token = plan.env['CURSOR_API_KEY'] || 'proxy-token';
+    plan.env['CURSOR_API_KEY'] = token;
+    const { writeFileSync: wf, mkdirSync: md } = await import('node:fs');
+    const { join: pj } = await import('node:path');
+    const cursorDir = pj(process.env['HOME'] ?? process.env['USERPROFILE'] ?? '/tmp', '.cursor');
+    md(cursorDir, { recursive: true });
+    const auth = JSON.stringify({ accessToken: token, refreshToken: token, userId: 'ci-proxy', email: 'ci@proxy.local' });
+    wf(pj(cursorDir, 'auth.json'), auth);
+    wf(pj(cursorDir, 'credentials.json'), auth);
+    console.error(`[amux launch] Cursor auth pre-seeded at ${cursorDir}/auth.json`);
   }
 
   // Bridge hooks: emulate lifecycle hooks when --bridge-hooks is set

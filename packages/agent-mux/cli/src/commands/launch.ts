@@ -1332,8 +1332,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     };
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
     const IDLE_TIMEOUT_MS = 30_000;
-    const harnessesWithEndEvents = new Set(['claude', 'codex', 'gemini', 'opencode']);
-    const useIdleTimeout = !harnessesWithEndEvents.has(plan.harness);
+    const useIdleTimeout = true;
 
     const parseCtx = {
       runId: 'bridge',
@@ -1408,11 +1407,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
               return;
             }
 
-            // Idle timeout fallback for harnesses without structured end events (Pi).
+            // Idle timeout fallback for harnesses without structured end events.
             if (useIdleTimeout) {
               if (idleTimer) clearTimeout(idleTimer);
               idleTimer = setTimeout(() => {
-                if (!turnComplete && eventCount > 0) {
+                if (!turnComplete) {
                   turnComplete = true;
                   completePtyPrompt();
                 }

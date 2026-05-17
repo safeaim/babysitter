@@ -1332,7 +1332,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     };
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
     const IDLE_TIMEOUT_MS = 30_000;
-    const useIdleTimeout = true;
+    const harnessesWithEndEvents = new Set(['claude', 'codex', 'gemini', 'opencode']);
+    const useIdleTimeout = !harnessesWithEndEvents.has(plan.harness);
 
     const parseCtx = {
       runId: 'bridge',

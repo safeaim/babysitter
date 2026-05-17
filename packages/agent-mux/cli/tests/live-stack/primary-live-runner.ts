@@ -163,15 +163,24 @@ export function buildPrimaryLiveStackCommands(
     ];
   }
 
-  return [
+  const processMode = options.env['LIVE_STACK_PROCESS_MODE'] ?? 'predefined';
+  const setupCommands = [
     commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['run', 'generate:plugins'], options.cwd, SETUP_TIMEOUT_MS),
     commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['install', installTarget, '--json'], options.cwd, SETUP_TIMEOUT_MS),
     commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['install', '--global', './packages/sdk'], options.cwd, SETUP_TIMEOUT_MS),
     generatedPluginInstallCommand(commandEnv, scenario, options.cwd, SETUP_TIMEOUT_MS),
     ensureLiveArtifactDirCommand(commandEnv, options.cwd),
-    { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(options.cwd, 'packages', 'agent-mux', 'cli', 'tests', 'live-stack', 'fixtures', 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
-    executionCommand,
   ];
+  if (processMode === 'predefined') {
+    setupCommands.push(
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(options.cwd, 'packages', 'agent-mux', 'cli', 'tests', 'live-stack', 'fixtures', 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+    );
+  } else {
+    setupCommands.push(
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+    );
+  }
+  return [...setupCommands, executionCommand];
 }
 
 function harnessApprovalPassthrough(_harness: string): string[] {
@@ -470,6 +479,22 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
   }
 
   if (scenario.agent.installMode === 'babysitter-plugin') {
+    const processMode = env['LIVE_STACK_PROCESS_MODE'] ?? 'predefined';
+    if (processMode === 'create') {
+      const createInstructions = [
+        coreTask + '.',
+        'Create a new babysitter process file at .a5c/processes/odyssey-live-test.mjs that orchestrates this task.',
+        'The process must use defineTask from @a5c-ai/babysitter-sdk and export an async process(inputs, ctx) function.',
+        'Structure it with: parallel steps (ctx.parallel.all), agent kind tasks for content generation, shell kind tasks for file I/O with expectedExitCode, and at least 3 iterations.',
+        'Reference packages/agent-mux/cli/tests/live-stack/fixtures/summarize-translate-test.mjs for the pattern — it uses sharded parallel writes, translations, assembly, and verification.',
+        'Look in the process library (.a5c/process-library/) for additional examples of process definitions.',
+        'Add a comment at the top of the file: // @reference summarize-translate-test.mjs, library/processes/shared/deterministic-quality-gate.js',
+        'Then use the process to complete the task.',
+      ].join(' ');
+      if (scenario.agent.agent === 'claude-code') return `/babysitter:yolo ${createInstructions}`;
+      if (scenario.agent.agent === 'codex') return `$babysitter:yolo ${createInstructions}`;
+      return `Invoke the babysitter:yolo command to: ${createInstructions}`;
+    }
     const processHint = 'A process definition is available at .a5c/processes/summarize-translate-test.mjs';
     if (scenario.agent.agent === 'claude-code') return `/babysitter:yolo ${coreTask}. ${processHint}`;
     if (scenario.agent.agent === 'codex') return `$babysitter:yolo ${coreTask}. ${processHint}`;
@@ -710,6 +735,21 @@ async function validateAgentBehavior(
     }
   } else {
     entries.push({ name: 'file-creation', status: 'skipped', detail: 'no trace ID available' });
+  }
+
+  // --- process-creation: verify @reference marker in created process file (create mode only) ---
+  const processMode = env['LIVE_STACK_PROCESS_MODE'] ?? 'predefined';
+  if (isBabysitterPlugin && processMode === 'create') {
+    const processFile = path.join(cwd, '.a5c', 'processes', 'odyssey-live-test.mjs');
+    let processContent = '';
+    try { processContent = await fs.readFile(processFile, 'utf8'); } catch { /* */ }
+    if (processContent && /@reference/.test(processContent)) {
+      entries.push({ name: 'process-creation', status: 'passed', detail: `process file created with @reference marker (${processContent.length} bytes)` });
+    } else if (processContent) {
+      entries.push({ name: 'process-creation', status: 'failed', detail: `process file exists (${processContent.length} bytes) but missing @reference marker` });
+    } else {
+      entries.push({ name: 'process-creation', status: 'failed', detail: 'agent did not create .a5c/processes/odyssey-live-test.mjs' });
+    }
   }
 
   // --- babysitter-plugin: stop hooks, hooks-mux session, run completion, completion proof ---

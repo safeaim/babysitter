@@ -114,16 +114,15 @@ export interface LaunchPlan {
 // Plan resolution
 // ---------------------------------------------------------------------------
 
+const CLI_COMMAND_MAP: Record<string, string> = {
+  'copilot': 'gh copilot',
+  'cursor': 'cursor-agent',
+};
+
 function resolveCliCommand(harness: string): { command: string; prefixArgs: string[] } {
-  try {
-    const { getPluginTargetDescriptor } = require('@a5c-ai/agent-catalog') as typeof import('@a5c-ai/agent-catalog');
-    const target = getPluginTargetDescriptor(harness);
-    if (target?.cliCommand) {
-      const parts = target.cliCommand.split(/\s+/);
-      return { command: parts[0]!, prefixArgs: parts.slice(1) };
-    }
-  } catch { /* catalog unavailable */ }
-  return { command: harness, prefixArgs: [] };
+  const cli = CLI_COMMAND_MAP[harness] ?? harness;
+  const parts = cli.split(/\s+/);
+  return { command: parts[0]!, prefixArgs: parts.slice(1) };
 }
 
 export function resolveLaunchPlan(input: LaunchPlanInput): LaunchPlan {

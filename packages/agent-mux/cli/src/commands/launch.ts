@@ -114,6 +114,18 @@ export interface LaunchPlan {
 // Plan resolution
 // ---------------------------------------------------------------------------
 
+function resolveCliCommand(harness: string): { command: string; prefixArgs: string[] } {
+  try {
+    const { getPluginTargetDescriptor } = require('@a5c-ai/agent-catalog') as typeof import('@a5c-ai/agent-catalog');
+    const target = getPluginTargetDescriptor(harness);
+    if (target?.cliCommand) {
+      const parts = target.cliCommand.split(/\s+/);
+      return { command: parts[0]!, prefixArgs: parts.slice(1) };
+    }
+  } catch { /* catalog unavailable */ }
+  return { command: harness, prefixArgs: [] };
+}
+
 export function resolveLaunchPlan(input: LaunchPlanInput): LaunchPlan {
   const providerConfig = resolveProvider({
     provider: input.provider as ProviderId | undefined,
@@ -173,6 +185,8 @@ export function resolveLaunchPlan(input: LaunchPlanInput): LaunchPlan {
       }
     : undefined;
 
+  const resolved = resolveCliCommand(input.harness);
+
   return {
     harness: input.harness,
     provider: providerConfig.provider,
@@ -181,8 +195,8 @@ export function resolveLaunchPlan(input: LaunchPlanInput): LaunchPlan {
     proxyNeeded,
     proxyReason,
     proxy,
-    command: input.harness,
-    args: [...translation.args],
+    command: resolved.command,
+    args: [...resolved.prefixArgs, ...translation.args],
     env: { ...translation.env },
   };
 }

@@ -19,6 +19,10 @@ export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE
         if (localFallback && shouldFallbackFromRemoteModel(remoteModel)) {
           return fallbackControllerModel({ controller, connectionError: new Error(remoteControllerError(remoteModel) || 'controller returned degraded empty data'), organization, fallbackSnapshot });
         }
+        if (localFallback && shouldProbeLocalModel(remoteModel)) {
+          const localModel = await fallbackControllerModel({ controller, organization, fallbackSnapshot });
+          if (modelResourceScore(localModel) > modelResourceScore(remoteModel)) return localModel;
+        }
         return remoteModel;
       } catch (error) {
         if (localFallback) return fallbackControllerModel({ controller, connectionError: error, organization, fallbackSnapshot });
@@ -52,6 +56,29 @@ async function fallbackControllerModel({ controller = null, connectionError = nu
       commands: []
     }, { organization });
   }
+}
+
+
+function shouldProbeLocalModel(model) {
+  if (!model || model.status !== 'ready') return false;
+  const hasLiveConnection = Boolean(model.controller?.connection?.available || model.controller?.apiService);
+  if (!hasLiveConnection) return false;
+  const summaries = Array.isArray(model.resources) ? model.resources : [];
+  const crdKinds = new Set(['Repository', 'RunnerPool', 'Pipeline', 'Job']);
+  const crdItems = summaries
+    .filter((resource) => crdKinds.has(resource?.kind))
+    .reduce((count, resource) => count + Number(resource?.count || resource?.items?.length || 0), 0);
+  return crdItems === 0;
+}
+
+function modelResourceScore(model) {
+  if (!model) return 0;
+  const metricCount = Number(model.metrics?.resources || 0);
+  const summaryCount = Array.isArray(model.resources)
+    ? model.resources.reduce((count, resource) => count + Number(resource?.count || resource?.items?.length || 0), 0)
+    : 0;
+  const dashboardCount = Number(model.views?.dashboard?.repositories?.length || 0);
+  return metricCount + summaryCount + dashboardCount;
 }
 
 function shouldFallbackFromRemoteModel(model) {

@@ -102,3 +102,32 @@ test('fetchControllerUiModel uses async fallback for degraded empty remote data 
   assert.equal(model.views.dashboard.repositories[0].metadata.name, 'test2');
   assert.ok(model.controller.connection.errors.length > 0);
 });
+
+
+test('fetchControllerUiModel probes local snapshot when remote controller is ready but missing CRD-backed resources', async () => {
+  const calls = [];
+  const emptyRemote = createControllerUiModel({
+    source: 'kubernetes',
+    namespace: 'krate-staging',
+    kubectl: { available: true, context: 'aks-krate-staging', errors: [] },
+    apiService: { metadata: { name: 'v1alpha1.krate.a5c.ai' } },
+    resources: {},
+    crds: [],
+    events: [],
+    permissions: [],
+    storage: {},
+    commands: []
+  }, { organization: 'default' });
+
+  const model = await fetchControllerUiModel({
+    controllerUrl: 'http://krate-api.krate-staging.svc.cluster.local',
+    organization: 'default',
+    useCache: false,
+    fetchImpl: async () => ({ ok: true, json: async () => emptyRemote }),
+    fallbackSnapshot: async () => { calls.push('fallbackSnapshot'); return liveSnapshot(); }
+  });
+
+  assert.deepEqual(calls, ['fallbackSnapshot']);
+  assert.equal(model.metrics.repositories, 1);
+  assert.equal(model.views.dashboard.repositories[0].metadata.name, 'test2');
+});

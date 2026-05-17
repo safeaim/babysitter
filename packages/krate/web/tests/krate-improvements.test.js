@@ -49,7 +49,8 @@ test('degraded Krate UI renders recovery loader only for controller fetch failur
   const loader = readWebFile('app', 'components', 'krate-loading.jsx');
   assert.match(ui, /shouldShowControllerRecovery/);
   assert.doesNotMatch(ui, /localFallback: false/);
-  assert.match(ui, /useCache: false/);
+  assert.match(ui, /useCache: true/);
+  assert.doesNotMatch(ui, /useCache: false/);
   assert.match(ui, /KrateControllerRecovery/);
   assert.match(ui, /hasLiveControllerData/);
   assert.doesNotMatch(ui, /Number\.isFinite\(model\.metrics\?\.resources\)/);
@@ -76,11 +77,16 @@ test('recovery overlay progresses without covering normal route navigation', () 
   const loading = readWebFile('app', 'loading.jsx');
   const css = readWebFile('app', 'globals.css');
   const loader = readWebFile('app', 'components', 'krate-loading.jsx');
-  assert.match(loading, /KrateDelayedRouteLoading/);
+  assert.match(loading, /routeLoading/);
+  assert.match(loading, /krateLoadingBar animated/);
+  assert.doesNotMatch(loading, /KrateDelayedRouteLoading/);
   assert.doesNotMatch(loading, /KrateRouteLoadingOverlay/);
+  assert.doesNotMatch(loading, /return null/);
   assert.match(css, /\.krateRecoveryOverlay\s*\{[\s\S]*position:\s*fixed[\s\S]*inset:\s*0/);
+  assert.match(css, /krateRouteLoadingProgress/);
+  assert.match(css, /krateRouteLoadingPhase/);
   assert.match(loader, /export function KrateControllerRecovery/);
-  assert.match(loader, /export function KrateDelayedRouteLoading/);
+  assert.doesNotMatch(loader, /export function KrateDelayedRouteLoading/);
   assert.doesNotMatch(loader, /export function KrateRouteLoadingOverlay/);
   assert.doesNotMatch(loader, /krate-route-loading-refresh/);
   assert.doesNotMatch(loader, /orgFromPathname/);

@@ -1162,6 +1162,15 @@ main { width: 100%; max-width: none; padding: 0 0 48px; }
 .krateLoadingText p { margin: 0; color: var(--ink-fade); }
 .krateLoadingBar { width: min(100%, 420px); height: 10px; margin: 24px auto 12px; overflow: hidden; border-radius: 999px; background: rgba(126, 82, 35, .18); }
 .krateLoadingBar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent-cinnabar), var(--accent-sulphur)); transition: width .36s ease; }
+.krateLoadingBar.animated span { width: 72%; min-width: 18%; animation: krateRouteLoadingProgress 2.4s ease-in-out infinite; }
+.routeLoadingPhases { position: relative; width: min(100%, 420px); }
+.routeLoadingPhases span { display: block; animation: krateRouteLoadingPhase 7.2s steps(1, end) infinite; }
+.routeLoadingPhases span:not(:first-child) { position: absolute; inset: 0; opacity: 0; }
+.routeLoadingPhases span:nth-child(2) { animation-delay: 1.8s; }
+.routeLoadingPhases span:nth-child(3) { animation-delay: 3.6s; }
+.routeLoadingPhases span:nth-child(4) { animation-delay: 5.4s; }
+@keyframes krateRouteLoadingProgress { 0% { width: 18%; } 55% { width: 86%; } 100% { width: 18%; } }
+@keyframes krateRouteLoadingPhase { 0%, 24.9% { opacity: 1; } 25%, 100% { opacity: 0; } }
 .krateLoadingPhase { min-height: 1.4em; margin: 0 0 8px; color: var(--ink-pigment); font-weight: 700; }
 .krateRecoveryHint { width: min(100%, 560px); margin: 14px auto 0; color: rgba(255, 251, 244, .9); text-align: center; font-size: .92rem; text-shadow: 0 1px 2px rgba(0,0,0,.34); }
 [data-theme="dark"] .krateRecoveryOverlay { background: rgba(1, 4, 9, .68); }

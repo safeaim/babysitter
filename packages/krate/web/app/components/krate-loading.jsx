@@ -60,26 +60,6 @@ export function KrateLoadingView({
 }
 
 
-export function KrateDelayedRouteLoading({ delayMs = 650 }) {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), delayMs);
-    return () => clearTimeout(timer);
-  }, [delayMs]);
-
-  if (!visible) return null;
-
-  return (
-    <KrateLoadingView
-      title="Loading Krate page"
-      subtitle="Fetching the latest workspace state."
-      detail="Showing only for slow route loads so normal navigation does not flash."
-      fullPage
-    />
-  );
-}
-
 function controllerModelIsReachable(body) {
   if (!body || body.error) return false;
   const errors = body.controller?.connection?.errors || [];
@@ -159,4 +139,3 @@ export function KrateControllerRecovery({ org = 'default', pollMs = 2500 }) {
     </div>
   );
 }
-

@@ -137,7 +137,10 @@ for (const token of ['KrateControllerRecovery', 'KrateLoadingView', 'KRATE_LOADI
 for (const token of ['KrateRouteLoadingOverlay', 'krate-route-loading-refresh']) {
   if ((webUiSource() + files['apps/web/app/components/krate-loading.jsx']).includes(token)) failures.push(`route transitions must not render recovery loading UI token ${token}`);
 }
-if (!files['apps/web/app/loading.jsx'].includes('KrateDelayedRouteLoading')) failures.push('route loading UI must use delayed non-overlay loading feedback');
+if (!files['apps/web/app/loading.jsx'].includes('routeLoading') || !files['apps/web/app/loading.jsx'].includes('krateLoadingBar animated')) failures.push('route loading UI must render immediate non-overlay loading feedback');
+if (files['apps/web/app/loading.jsx'].includes('KrateDelayedRouteLoading') || files['apps/web/app/loading.jsx'].includes('return null')) failures.push('route loading UI must not delay or render a blank fallback');
+if (!files['apps/web/app/globals.css'].includes('krateRouteLoadingProgress') || !files['apps/web/app/globals.css'].includes('krateRouteLoadingPhase')) failures.push('route loading UI must animate progress and phase text without client hydration');
+if (!files['apps/web/app/lib/krate-ui.jsx'].includes('useCache: true') || files['apps/web/app/lib/krate-ui.jsx'].includes('useCache: false')) failures.push('Krate page loader must use cached controller snapshots');
 if ((webUiSource() + files['apps/web/app/components/krate-loading.jsx']).includes('Krate workspace degraded or empty')) failures.push('degraded workspace copy should be replaced by recovery loading UI');
 if ((webUiSource() + files['apps/web/app/components/krate-loading.jsx']).includes('window.location.reload')) failures.push('recovery loading UI must not reload the page');
 for (const token of ['text/event-stream', 'globalEventBus', 'KRATE_CONTROLLER_URL', "type: 'connected'"]) {

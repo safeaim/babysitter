@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const labelStyle = { display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem', color: '#374151' };
 const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem', boxSizing: 'border-box', background: '#fff' };
@@ -12,7 +12,15 @@ const STATUS_COLORS = {
   Terminating: { color: '#9a3412', bg: '#ffedd5', border: '#f97316' }
 };
 
-function RunnerStatusBadge({ status }) {
+function normalizePools(pools) {
+  return Array.isArray(pools) ? pools.filter(Boolean) : [];
+}
+
+function normalizeRunners(runners) {
+  return Array.isArray(runners) ? runners.filter((runner) => runner && typeof runner === 'object') : [];
+}
+
+function RunnerStatusBadge({ status = 'Idle' }) {
   const s = STATUS_COLORS[status] || { color: '#6b7280', bg: '#f3f4f6', border: '#e5e7eb' };
   return (
     <span style={{
@@ -41,22 +49,26 @@ function CapacityBar({ used, total, label }) {
 }
 
 function RunnerRow({ runner }) {
+  const safeRunner = runner && typeof runner === 'object' ? runner : {};
+  const runnerId = safeRunner.id || safeRunner.name || 'runner';
+  const runnerStatus = safeRunner.status || 'Idle';
+
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0',
       borderBottom: '1px solid #f3f4f6', flexWrap: 'wrap'
     }}>
       <code style={{ fontFamily: 'monospace', fontSize: '0.8125rem', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {runner.id}
+        {runnerId}
       </code>
-      <RunnerStatusBadge status={runner.status} />
-      {runner.runRef && (
+      <RunnerStatusBadge status={runnerStatus} />
+      {safeRunner.runRef && (
         <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-          job: <code style={{ fontFamily: 'monospace' }}>{runner.runRef}</code>
+          job: <code style={{ fontFamily: 'monospace' }}>{safeRunner.runRef}</code>
         </span>
       )}
-      {runner.image && (
-        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{runner.image}</span>
+      {safeRunner.image && (
+        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{safeRunner.image}</span>
       )}
     </div>
   );
@@ -81,8 +93,8 @@ function PoolCard({ pool, org, onScale, onToggleAutoScale }) {
     onScale?.(name, next);
   }
 
-  const runners = pool._runners || [];
-  const usedSlots = runners.filter((r) => r.status === 'Running').length;
+  const runners = normalizeRunners(pool?._runners);
+  const usedSlots = runners.filter((runner) => runner.status === 'Running').length;
 
   return (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -158,7 +170,7 @@ function PoolCard({ pool, org, onScale, onToggleAutoScale }) {
           {runners.length === 0 ? (
             <p style={{ margin: 0, fontSize: '0.8125rem', color: '#9ca3af' }}>No runners allocated.</p>
           ) : (
-            runners.map((r) => <RunnerRow key={r.id} runner={r} />)
+            runners.map((runner, index) => <RunnerRow key={runner.id || runner.name || index} runner={runner} />)
           )}
         </div>
       )}
@@ -180,11 +192,15 @@ const DEFAULT_FORM = {
 };
 
 export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = null }) {
-  const [localPools, setLocalPools] = useState(pools);
+  const [localPools, setLocalPools] = useState(() => normalizePools(pools));
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(DEFAULT_FORM);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    setLocalPools(normalizePools(pools));
+  }, [pools]);
 
   function setField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -390,7 +406,7 @@ export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {localPools.map((pool) => (
             <PoolCard
-              key={pool.metadata?.name}
+              key={pool?.metadata?.name || pool?.metadata?.uid || pool?.id}
               pool={pool}
               org={org}
               onScale={handleScale}

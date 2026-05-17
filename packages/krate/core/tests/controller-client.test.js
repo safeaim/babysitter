@@ -64,3 +64,41 @@ test('fetchControllerUiModel falls back to local snapshot when remote controller
   assert.equal(model.metrics.repositories, 1);
   assert.match(model.controller.connection.errors[0], /ECONNREFUSED/);
 });
+test('fetchControllerUiModel uses bounded async fallback when remote controller hangs', async () => {
+  const calls = [];
+  const model = await fetchControllerUiModel({
+    controllerUrl: 'http://krate-api.krate-staging.svc.cluster.local',
+    organization: 'default',
+    requestTimeoutMs: 10,
+    useCache: false,
+    fetchImpl: async (_target, options = {}) => new Promise((_resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('remote controller hung')), 25);
+      options.signal?.addEventListener('abort', () => {
+        clearTimeout(timer);
+        reject(new Error('remote controller hung'));
+      }, { once: true });
+    }),
+    fallbackSnapshot: async () => { calls.push('fallbackSnapshot'); return liveSnapshot(); }
+  });
+
+  assert.deepEqual(calls, ['fallbackSnapshot']);
+  assert.equal(model.status, 'ready');
+  assert.equal(model.metrics.repositories, 1);
+  assert.match(model.controller.connection.errors.join('; '), /remote controller hung/);
+});
+
+test('fetchControllerUiModel uses async fallback for degraded empty remote data without constructing sync controller', async () => {
+  const calls = [];
+  const model = await fetchControllerUiModel({
+    controllerUrl: 'http://krate-api.krate-staging.svc.cluster.local',
+    organization: 'default',
+    useCache: false,
+    fetchImpl: async () => ({ ok: true, json: async () => degradedRemoteModel() }),
+    fallbackSnapshot: async () => { calls.push('fallbackSnapshot'); return liveSnapshot(); }
+  });
+
+  assert.deepEqual(calls, ['fallbackSnapshot']);
+  assert.equal(model.status, 'ready');
+  assert.equal(model.views.dashboard.repositories[0].metadata.name, 'test2');
+  assert.ok(model.controller.connection.errors.length > 0);
+});

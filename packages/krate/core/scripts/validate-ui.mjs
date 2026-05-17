@@ -104,7 +104,7 @@ for (const token of ['export function proxy', 'NextResponse.redirect', 'KRATE_AU
 for (const token of ['spawnSync', 'spawn(', 'kubectl', 'getControllerSnapshot', 'listResource', 'getResource', 'applyResource', 'deleteResource', 'createRepository', 'watchResource', 'auth', 'can-i']) {
   if (!files['src/kubernetes-controller.js'].includes(token)) failures.push(`kubernetes controller missing ${token}`);
 }
-for (const token of ['createKubernetesResourceGateway', 'controller.snapshot()', 'createControllerUiModel']) {
+for (const token of ['getControllerSnapshotAsync', 'fallbackSnapshot', 'controller.snapshot()', 'createControllerUiModel']) {
   if (!files['src/controller-client.js'].includes(token)) failures.push(`controller client missing ${token}`);
 }
 for (const token of ['createKrateApiController', 'resourceGateway', 'withArchitecture', 'krate-api-controller', 'kubernetes-resource-gateway', 'kubernetes-resource-client', 'git-data-plane', 'never owns Kubernetes reconciliation loops', 'KRATE_API_CONTROLLER_BOUNDARY', 'listRepositoriesForForge', 'getRepositoryForgeView', 'krate-kubernetes-reconciler']) {

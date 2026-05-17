@@ -1,6 +1,4 @@
 import { createControllerUiModel } from './controller-ui.js';
-import { createKrateApiController } from './api-controller.js';
-import { createKubernetesResourceGateway } from './kubernetes-resource-gateway.js';
 import { clearSnapshotCache, staleWhileRevalidate } from './snapshot-cache.js';
 import { getControllerSnapshotAsync } from './kubernetes-controller-async.js';
 
@@ -8,7 +6,7 @@ export { clearSnapshotCache };
 
 const CONTROLLER_REQUEST_TIMEOUT_MS = Number(process.env.KRATE_CONTROLLER_REQUEST_TIMEOUT_MS || 5_000);
 
-export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE_CONTROLLER_URL, fetchImpl = globalThis.fetch, controller = createKrateApiController({ resourceGateway: createKubernetesResourceGateway() }), organization = process.env.KRATE_ORG || null, localFallback = true, requestTimeoutMs = CONTROLLER_REQUEST_TIMEOUT_MS, useCache = true, swrOptions = {} } = {}) {
+export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE_CONTROLLER_URL, fetchImpl = globalThis.fetch, controller = null, organization = process.env.KRATE_ORG || null, localFallback = true, requestTimeoutMs = CONTROLLER_REQUEST_TIMEOUT_MS, useCache = true, swrOptions = {}, fallbackSnapshot = getControllerSnapshotAsync } = {}) {
   const revalidateFn = async () => {
     if (controllerUrl) {
       try {
@@ -19,25 +17,25 @@ export async function fetchControllerUiModel({ controllerUrl = process.env.KRATE
         if (!response.ok) throw new Error(`controller API ${response.status}`);
         const remoteModel = await response.json();
         if (localFallback && shouldFallbackFromRemoteModel(remoteModel)) {
-          return fallbackControllerModel(controller, new Error(remoteControllerError(remoteModel) || 'controller returned degraded empty data'), organization);
+          return fallbackControllerModel({ controller, connectionError: new Error(remoteControllerError(remoteModel) || 'controller returned degraded empty data'), organization, fallbackSnapshot });
         }
         return remoteModel;
       } catch (error) {
-        if (localFallback) return fallbackControllerModel(controller, error, organization);
+        if (localFallback) return fallbackControllerModel({ controller, connectionError: error, organization, fallbackSnapshot });
         return unavailableControllerModel(error.message, organization);
       }
     }
     if (!localFallback) return unavailableControllerModel('KRATE_CONTROLLER_URL is not configured', organization);
-    return fallbackControllerModel(controller, null, organization);
+    return fallbackControllerModel({ controller, organization, fallbackSnapshot });
   };
 
   if (!useCache) return revalidateFn();
   return staleWhileRevalidate(organization, revalidateFn, swrOptions);
 }
 
-async function fallbackControllerModel(controller, connectionError = null, organization = null) {
+async function fallbackControllerModel({ controller = null, connectionError = null, organization = null, fallbackSnapshot = getControllerSnapshotAsync } = {}) {
   try {
-    const snapshot = await controller.snapshot().catch(() => getControllerSnapshotAsync());
+    const snapshot = controller ? await controller.snapshot() : await fallbackSnapshot();
     const model = createControllerUiModel(snapshot, { organization });
     if (connectionError) model.controller.connection.errors = [connectionError.message, ...(model.controller.connection.errors || [])];
     return model;

@@ -222,8 +222,10 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   assert.ok(client.includes('AbortSignal.timeout'));
   assert.ok(client.includes('if (!useCache) return revalidateFn();'));
   assert.ok(client.includes('staleWhileRevalidate(organization, revalidateFn, swrOptions)'));
-  assert.ok(client.includes('createKrateApiController'));
-  assert.ok(client.includes('createKubernetesResourceGateway'));
+  assert.ok(client.includes('getControllerSnapshotAsync'));
+  assert.ok(client.includes('fallbackSnapshot'));
+  assert.ok(!client.includes('createKubernetesResourceGateway'));
+  assert.ok(!client.includes('createKrateApiController')); 
   assert.ok(apiController.includes('resourceGateway'));
   assert.ok(apiController.includes('withArchitecture'));
   assert.ok(apiController.includes('kubernetes-resource-gateway'));

@@ -1,4 +1,4 @@
-import { fetchControllerUiModel } from '@a5c-ai/krate-sdk';
+import { createKrateApiController, fetchControllerUiModel, orgNamespaceName, resourceToYaml } from '@a5c-ai/krate-sdk';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +12,44 @@ export async function GET(request) {
     requestTimeoutMs: CONTROLLER_TIMEOUT_MS,
     useCache: false
   });
+  await hydrateOrgResourceSummaries(model, organization || model.org?.slug || 'default');
   return Response.json(model, {
     headers: { 'Cache-Control': 'no-store' }
   });
+}
+
+
+async function hydrateOrgResourceSummaries(model, org) {
+  if (!org || !Array.isArray(model?.resources)) return;
+  const kinds = ['Repository', 'RunnerPool', 'Pipeline', 'Job'];
+  const summaries = new Map(model.resources.map((resource) => [resource.kind, resource]));
+  const missingKinds = kinds.filter((kind) => !Number(summaries.get(kind)?.count || summaries.get(kind)?.items?.length || 0));
+  if (!missingKinds.length) return;
+  try {
+    const controller = createKrateApiController({ namespace: orgNamespaceName(org) });
+    await Promise.all(missingKinds.map(async (kind) => {
+      const result = await controller.listResourceForOrg(org, kind);
+      const items = Array.isArray(result?.items) ? result.items : [];
+      if (!items.length) return;
+      const summary = summaries.get(kind);
+      if (!summary) return;
+      summary.count = items.length;
+      summary.names = items.map((item) => item.metadata?.name).filter(Boolean);
+      summary.items = items;
+      summary.yaml = resourceToYaml(items[0]);
+    }));
+    const metrics = model.metrics || {};
+    model.metrics = {
+      ...metrics,
+      resources: model.resources.reduce((count, resource) => count + Number(resource?.count || 0), 0),
+      repositories: Number(summaries.get('Repository')?.count || metrics.repositories || 0),
+      pipelines: Number(summaries.get('Pipeline')?.count || metrics.pipelines || 0),
+      jobs: Number(summaries.get('Job')?.count || metrics.jobs || 0),
+      runnerPools: Number(summaries.get('RunnerPool')?.count || metrics.runnerPools || 0)
+    };
+    const repositories = summaries.get('Repository')?.items;
+    if (repositories?.length) model.views.dashboard.repositories = repositories;
+  } catch {
+    // Keep the remote controller model unchanged when local hydration is unavailable.
+  }
 }

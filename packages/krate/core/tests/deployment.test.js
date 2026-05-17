@@ -236,7 +236,7 @@ test('web UI is wired to the Kubernetes controller API instead of a static local
   assert.ok(gateway.includes('repositoryManifest'));
   assert.ok(shell.includes('/api/controller'));
   assert.ok(webControllerRoute.includes('KRATE_CONTROLLER_URL'));
-  assert.ok(!webControllerRoute.includes('createKrateApiController'), 'web API route proxies the controller service instead of shelling out through local kubectl');
+  assert.ok(webControllerRoute.includes('hydrateOrgResourceSummaries'), 'web API route hydrates empty controller summaries from org-scoped resources');
   assert.ok(shell.includes('ArchitectureMap'));
   assert.ok(shell.includes('Repository home'));
   assert.ok(shell.includes('IssueWorkspace'));

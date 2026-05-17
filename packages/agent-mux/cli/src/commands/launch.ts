@@ -943,6 +943,9 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         const proxyOrigin = new URL(proxyRuntime.url).origin;
         plan.env['GOOGLE_AI_STUDIO_API_ENDPOINT'] = proxyOrigin;
         plan.env['GEMINI_CLI_TRUST_WORKSPACE'] = '1';
+        plan.env['GOOGLE_GENAI_USE_VERTEXAI'] = '';
+        delete plan.env['GOOGLE_CLOUD_PROJECT'];
+        delete plan.env['GOOGLE_CLOUD_LOCATION'];
         console.error(`[amux launch] Gemini proxy: GOOGLE_API_KEY=proxy-token, endpoint=${proxyOrigin}`);
       }
 

@@ -49,8 +49,7 @@ jobs:
           harness: claude-code
           provider: foundry
           model: gpt-5.5
-          interaction-mode: bridged-hooks
-          babysitter-plugin: 'false'
+          interaction-mode: non-interactive
           max-turns: '9999'
           prompt: |
             You are an autonomous coding agent.

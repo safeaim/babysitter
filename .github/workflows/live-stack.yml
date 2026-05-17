@@ -1,7 +1,4 @@
 name: Live Stack
-
-run-name: Live Stack for ${{ github.ref_name }} @ ${{ github.sha }}
-
 on:
   push:
     branches:
@@ -26,8 +23,8 @@ env:
   NPM_CONFIG_PREFER_OFFLINE: "true"
 
 concurrency:
-  group: live-stack-${{ github.ref_name }}
-  cancel-in-progress: true
+  group: live-stack-${{ github.event_name == 'workflow_dispatch' && format('dispatch-{0}', github.run_id) || format('push-{0}', github.ref_name) }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
   build_all:
@@ -148,6 +145,8 @@ jobs:
     steps:
       - name: Generate matrix combinations
         id: matrix
+        env:
+          DISPATCH_MATRIX: ${{ inputs.matrix }}
         run: |
           set -euo pipefail
 
@@ -156,9 +155,7 @@ jobs:
           # Models: id → {provider, amux_provider, model, required_env}
           # Modes: id → {interactive, bridge_interactive, bridge_hooks}
 
-          DISPATCH_MATRIX='${{ inputs.matrix }}'
-
-          if [ -n "$DISPATCH_MATRIX" ] && [ "$DISPATCH_MATRIX" != "null" ]; then
+          if [ -n "${DISPATCH_MATRIX:-}" ] && [ "${DISPATCH_MATRIX:-}" != "null" ] && [ "${DISPATCH_MATRIX:-}" != "" ]; then
             # --- Manual dispatch: parse custom JSON ---
             echo "Using workflow_dispatch matrix input"
             # Input format: [{"agent":"claude","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true}, ...]
@@ -174,10 +171,15 @@ jobs:
                 'cursor': {agent:'cursor-cli', amux_agent:'cursor'},
                 'hermes': {agent:'hermes', amux_agent:'hermes'},
                 'opencode': {agent:'opencode', amux_agent:'opencode'},
+                'openclaw': {agent:'openclaw', amux_agent:'openclaw'},
+                'omp': {agent:'omp', amux_agent:'omp'},
+                'droid': {agent:'droid', amux_agent:'droid'},
+                'amp': {agent:'amp', amux_agent:'amp'},
               };
               const models = {
                 'foundry-gpt55': {provider:'foundry-openai', amux_provider:'foundry', model:'gpt-5.5', required_env:'AZURE_API_KEY,AMUX_API_BASE'},
                 'google-gemini31': {provider:'google', amux_provider:'google', model:'gemini-3.1-pro-preview', required_env:'GOOGLE_API_KEY'},
+                'anthropic-sonnet47': {provider:'anthropic', amux_provider:'anthropic', model:'claude-sonnet-4-7-20250515', required_env:'ANTHROPIC_API_KEY'},
               };
               const modes = {
                 'ni': {id:'non-interactive', interactive:'false', bridge_interactive:'false', bridge_hooks:'false'},

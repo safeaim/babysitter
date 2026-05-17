@@ -146,60 +146,30 @@ runs:
     - name: Resolve action runtime
       id: resolve-runtime
       shell: bash
-      env:
-        ACTION_ROOT: ${{ github.action_path }}
       run: |
         set -euo pipefail
-        # Check if the WORKSPACE (not the action checkout) is the monorepo
         WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
         if [ -d "$WORKSPACE/packages/agent-mux/cli" ] && [ -f "$WORKSPACE/packages/triggers/action.yml" ]; then
           echo "mode=monorepo" >> "$GITHUB_OUTPUT"
-          echo "repo_root=$WORKSPACE" >> "$GITHUB_OUTPUT"
+          echo "tag=staging" >> "$GITHUB_OUTPUT"
         else
-          echo "mode=npx" >> "$GITHUB_OUTPUT"
-          echo "repo_root=" >> "$GITHUB_OUTPUT"
+          echo "mode=external" >> "$GITHUB_OUTPUT"
+          echo "tag=latest" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Restore monorepo build cache
-      if: steps.resolve-runtime.outputs.mode == 'monorepo'
-      uses: actions/cache@v4
-      with:
-        path: |
-          ${{ steps.resolve-runtime.outputs.repo_root }}/node_modules
-          ${{ steps.resolve-runtime.outputs.repo_root }}/packages/**/dist
-          ${{ steps.resolve-runtime.outputs.repo_root }}/packages/**/tsconfig.tsbuildinfo
-        key: triggers-build-${{ runner.os }}-${{ hashFiles(format('{0}/package-lock.json', steps.resolve-runtime.outputs.repo_root)) }}
-        restore-keys: |
-          triggers-build-${{ runner.os }}-
-
-    - name: Build agent-mux (monorepo)
-      if: steps.resolve-runtime.outputs.mode == 'monorepo'
+    - name: Install runtime packages
       shell: bash
       env:
-        REPO_ROOT: ${{ steps.resolve-runtime.outputs.repo_root }}
+        NPM_TAG: ${{ steps.resolve-runtime.outputs.tag }}
       run: |
         set -euo pipefail
-        cd "$REPO_ROOT"
-        if [ ! -d "node_modules" ]; then
-          npm ci
-        fi
-        if [ ! -f "packages/agent-mux/cli/dist/index.js" ]; then
-          npm run build:agent-mux
-        fi
-        if [ ! -f "packages/triggers/dist/cli.js" ]; then
-          npm run build --workspace=@a5c-ai/triggers
-        fi
-        if [ ! -f "packages/sdk/dist/cli/main.js" ]; then
-          npm run build --workspace=@a5c-ai/babysitter-sdk
-        fi
+        echo "Installing @a5c-ai packages with tag: $NPM_TAG"
+        npm install -g @a5c-ai/agent-mux-cli@$NPM_TAG @a5c-ai/babysitter-sdk@$NPM_TAG @a5c-ai/triggers@$NPM_TAG 2>/dev/null || true
 
     - name: Install harness
       if: ${{ inputs.harness != '' || inputs.adapter != '' }}
       shell: bash
       env:
-        ACTION_ROOT: ${{ github.action_path }}
-        RUNTIME_MODE: ${{ steps.resolve-runtime.outputs.mode }}
-        REPO_ROOT: ${{ steps.resolve-runtime.outputs.repo_root }}
         INPUT_HARNESS: ${{ inputs.harness || inputs.adapter }}
         INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
@@ -213,18 +183,12 @@ runs:
           copilot-cli) AMUX_AGENT="copilot" ;;
           cursor-cli) AMUX_AGENT="cursor" ;;
         esac
-        if [ "$RUNTIME_MODE" = "monorepo" ]; then
-          node "$REPO_ROOT/packages/agent-mux/cli/dist/index.js" install "$AMUX_AGENT" || true
-        else
-          npx -y @a5c-ai/agent-mux-cli install "$AMUX_AGENT" || true
-        fi
+        amux install "$AMUX_AGENT" || true
 
     - name: Install babysitter plugin
       if: ${{ inputs.babysitter-plugin == 'true' }}
       shell: bash
       env:
-        RUNTIME_MODE: ${{ steps.resolve-runtime.outputs.mode }}
-        REPO_ROOT: ${{ steps.resolve-runtime.outputs.repo_root }}
         INPUT_HARNESS: ${{ inputs.harness || inputs.adapter }}
         INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
         INPUT_PROCESS_FILE: ${{ inputs.process-file }}
@@ -232,26 +196,8 @@ runs:
         set -euo pipefail
         cd "$INPUT_WORKING_DIRECTORY"
 
-        if [ "$RUNTIME_MODE" = "monorepo" ]; then
-          # Generate plugins if generator script exists
-          if [ -f "$REPO_ROOT/package.json" ] && node -e "process.exit(JSON.parse(require('fs').readFileSync('$REPO_ROOT/package.json','utf8')).scripts?.['generate:plugins'] ? 0 : 1)" 2>/dev/null; then
-            cd "$REPO_ROOT" && npm run generate:plugins && cd "$INPUT_WORKING_DIRECTORY"
-          fi
-          # Use generated plugin's own installer (same as live-stack tests)
-          GENERATED_DIR="$REPO_ROOT/artifacts/generated-plugins/$INPUT_HARNESS"
-          if [ -f "$GENERATED_DIR/bin/cli.js" ]; then
-            node "$GENERATED_DIR/bin/cli.js" install --workspace "$INPUT_WORKING_DIRECTORY"
-          elif [ -f "$GENERATED_DIR/bin/cli.cjs" ]; then
-            node "$GENERATED_DIR/bin/cli.cjs" install --workspace "$INPUT_WORKING_DIRECTORY"
-          else
-            # Fallback to SDK installer
-            node "$REPO_ROOT/packages/sdk/dist/cli/main.js" harness:install-plugin "$INPUT_HARNESS" --workspace "$INPUT_WORKING_DIRECTORY"
-          fi
-        else
-          # External use — install from npm
-          npm install -g @a5c-ai/babysitter-sdk
-          babysitter harness:install-plugin "$INPUT_HARNESS" --workspace "$INPUT_WORKING_DIRECTORY"
-        fi
+        # Install babysitter plugin into harness
+        babysitter harness:install-plugin "$INPUT_HARNESS" --workspace "$INPUT_WORKING_DIRECTORY"
 
         # Copy process file if provided
         if [ -n "$INPUT_PROCESS_FILE" ]; then
@@ -268,10 +214,9 @@ runs:
         INPUT_PLUGINS: ${{ inputs.plugins }}
       run: |
         set -euo pipefail
-        REPO_ROOT="${GITHUB_WORKSPACE:-$(pwd)}"
         while IFS= read -r plugin; do
           [ -z "$plugin" ] && continue
-          node "$REPO_ROOT/packages/agent-mux/cli/dist/index.js" plugin install "$INPUT_ADAPTER" "$plugin"
+          amux plugin install "$INPUT_ADAPTER" "$plugin"
         done <<< "$INPUT_PLUGINS"
 
     - name: Evaluate trigger
@@ -285,21 +230,20 @@ runs:
         EFFECTIVE_GITHUB_TOKEN: ${{ steps.a5c-token.outputs.a5c_token || inputs.github-token }}
       run: |
         set -euo pipefail
-        REPO_ROOT="${GITHUB_WORKSPACE:-$(pwd)}"
         EVENT_FILE="$RUNNER_TEMP/agent-mux-event.json"
         RESULT_FILE="$RUNNER_TEMP/agent-mux-trigger.json"
         INCLUDE_DIFF_ARGS=()
         if [ "$INPUT_INCLUDE_DIFF" = "true" ]; then
           INCLUDE_DIFF_ARGS+=(--include-diff)
         fi
-        node "$REPO_ROOT/packages/triggers/dist/cli.js" enrich \
+        triggers enrich \
           --backend "$INPUT_TRIGGER_BACKEND" \
           --token "$EFFECTIVE_GITHUB_TOKEN" \
           "${INCLUDE_DIFF_ARGS[@]}" \
           --output "$EVENT_FILE"
         if [ -z "$INPUT_TRIGGER_QUERY" ]; then
           echo '{"matched":true,"reasons":["no trigger query configured"]}' > "$RESULT_FILE"
-        elif node "$REPO_ROOT/packages/triggers/dist/cli.js" evaluate \
+        elif triggers evaluate \
           --backend "$INPUT_TRIGGER_BACKEND" \
           --query "$INPUT_TRIGGER_QUERY" \
           --token "$EFFECTIVE_GITHUB_TOKEN" \
@@ -351,8 +295,7 @@ runs:
         AMUX_TRIGGER_EVENT_PATH: ${{ steps.trigger.outputs.event }}
       run: |
         set -euo pipefail
-        REPO_ROOT="${GITHUB_WORKSPACE:-$(pwd)}"
-        AMUX="node $REPO_ROOT/packages/agent-mux/cli/dist/index.js"
+        AMUX="amux"
 
         # Build command args
         ARGS=()

@@ -1195,8 +1195,8 @@ jobs:
 
           echo "## Babysitter-Plugin Matrix" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Agent | Provider | Mode | Status | Detail |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-------|----------|------|--------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Agent | Provider | Model | Mode | Status | Detail |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|----------|-------|------|--------|--------|" >> "$GITHUB_STEP_SUMMARY"
 
           for dir in all-artifacts/live-stack-*-babysitter-plugin-*/ ; do
             [ -d "$dir" ] || continue
@@ -1204,6 +1204,7 @@ jobs:
             if [ -n "$report" ] && [ -f "$report" ]; then
               agent=$(grep -oP '(?<=\*\*Agent:\*\* ).*' "$report" | head -1 || echo "?")
               provider=$(grep -oP '(?<=\*\*Provider:\*\* ).*' "$report" | head -1 || echo "?")
+              model=$(grep -oP '(?<=\*\*Model:\*\* ).*' "$report" | head -1 || echo "?")
               mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
               failures=$(grep -c '✗' "$report" 2>/dev/null || true)
               passes=$(grep -c '✓' "$report" 2>/dev/null || true)
@@ -1214,19 +1215,19 @@ jobs:
                 status="✅"; bp_pass=$((bp_pass + 1))
                 detail="${passes:-0} checks"
               fi
-              echo "| ${agent} | ${provider} | ${mode} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
+              echo "| ${agent} | ${provider} | ${model} | ${mode} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
             else
               mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
-              echo "| ? | — | ${mode} | ⊘ | skipped |" >> "$GITHUB_STEP_SUMMARY"
+              echo "| ? | — | — | ${mode} | ⊘ | skipped |" >> "$GITHUB_STEP_SUMMARY"
               bp_skip=$((bp_skip + 1))
             fi
           done
 
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Vanilla Matrix" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Agent-Mux Matrix" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Agent | Provider | Mode | Status | Detail |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-------|----------|------|--------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Agent | Provider | Model | Mode | Status | Detail |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|----------|-------|------|--------|--------|" >> "$GITHUB_STEP_SUMMARY"
 
           for dir in all-artifacts/live-stack-*-vanilla-*/ ; do
             [ -d "$dir" ] || continue
@@ -1247,7 +1248,7 @@ jobs:
               echo "| ${agent} | ${provider} | ${mode} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
             else
               mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
-              echo "| ? | — | ${mode} | ⊘ | skipped |" >> "$GITHUB_STEP_SUMMARY"
+              echo "| ? | — | — | ${mode} | ⊘ | skipped |" >> "$GITHUB_STEP_SUMMARY"
               van_skip=$((van_skip + 1))
             fi
           done
@@ -1262,7 +1263,7 @@ jobs:
           echo "| Matrix | Passed | Failed | Skipped | Total |" >> "$GITHUB_STEP_SUMMARY"
           echo "|--------|--------|--------|---------|-------|" >> "$GITHUB_STEP_SUMMARY"
           echo "| Babysitter-Plugin | ${bp_pass} | ${bp_fail} | ${bp_skip} | $((bp_pass + bp_fail + bp_skip)) |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Vanilla | ${van_pass} | ${van_fail} | ${van_skip} | $((van_pass + van_fail + van_skip)) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Agent-Mux | ${van_pass} | ${van_fail} | ${van_skip} | $((van_pass + van_fail + van_skip)) |" >> "$GITHUB_STEP_SUMMARY"
           echo "| **Total** | **${total_pass}** | **${total_fail}** | **${total_skip}** | **${total}** |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
 

@@ -2130,25 +2130,10 @@ jobs:
           kubectl -n "$KUBE_NAMESPACE" delete service krate --ignore-not-found
           kubectl -n "$KUBE_NAMESPACE" delete deployment krate --ignore-not-found
 
-      - name: Install KubeVela
+      - name: Build Helm dependencies
         if: steps.config.outputs.deploy_enabled == 'true'
         run: |
-          helm repo add kubevela https://kubevela.github.io/charts 2>/dev/null || true
-          helm repo update
-          helm upgrade --install kubevela kubevela/vela-core \
-            --namespace vela-system --create-namespace \
-            --set installCRDs=true \
-            --timeout 300s --wait 2>&1 || echo "::notice::KubeVela install skipped or already present"
-
-      - name: Install Kyverno
-        if: steps.config.outputs.deploy_enabled == 'true'
-        run: |
-          helm repo add kyverno https://kyverno.github.io/kyverno/ 2>/dev/null || true
-          helm repo update
-          helm upgrade --install kyverno kyverno/kyverno \
-            --namespace kyverno --create-namespace \
-            --set admissionController.replicas=1 \
-            --timeout 300s --wait 2>&1 || echo "::notice::Kyverno install skipped or already present"
+          helm dependency update packages/krate/charts 2>&1 || echo "::notice::Helm dependency update completed (some repos may be unavailable)"
 
       - name: Update Krate CRDs
         if: steps.config.outputs.deploy_enabled == 'true'

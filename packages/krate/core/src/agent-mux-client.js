@@ -1,19 +1,18 @@
 import http from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
-import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { createResource } from './resource-model.js';
 
 export const AGENT_MUX_CLIENT_BOUNDARY = {
   role: 'agent-mux-client',
-  scope: 'HTTP/SSE adapter for Agent Mux gateway — capabilities, sessions, events, transcripts, local subprocess sessions',
-  owns: ['gateway HTTP calls', 'SSE event streaming', 'transcript reconciliation', 'local session spawning', 'subprocess lifecycle'],
-  delegatesTo: ['resource-model'],
+  scope: 'HTTP/SSE adapter for Agent Mux gateway — capabilities, sessions, events, transcripts, K8s Job dispatch',
+  owns: ['gateway HTTP calls', 'SSE event streaming', 'transcript reconciliation', 'K8s Job manifest generation', 'Job lifecycle management'],
+  delegatesTo: ['resource-model', 'kubernetes-resource-gateway'],
   mustNotOwn: ['secret values', 'permission review', 'resource persistence']
 };
 
-/** Known agent adapter names for local session spawning. */
+/** Known agent adapter names for job dispatch. */
 const KNOWN_ADAPTERS = new Set([
   'claude-code', 'codex', 'gemini-cli', 'aider', 'goose',
   'amp', 'roo-code', 'kilo-code', 'cline', 'cursor',
@@ -80,16 +79,49 @@ export function parseSseLines(text) {
 }
 
 /**
- * @param {{ gateway?: string, enabled?: boolean }} options
+ * Map provider name to codec identifier.
+ * @param {string} provider
+ * @returns {'anthropic'|'openai'|'google'}
+ */
+function deriveCodec(provider) {
+  const map = { anthropic: 'anthropic', openai: 'openai', google: 'google', gemini: 'google' };
+  return map[provider] || 'anthropic';
+}
+
+/**
+ * @param {{ gateway?: string, enabled?: boolean, resourceGateway?: object }} options
  */
 export function createAgentMuxClient(options = {}) {
-  const { gateway = '', enabled = false } = options;
+  const { gateway = '', enabled = false, resourceGateway = null } = options;
 
   return {
     role: 'agent-mux-client',
 
     isAvailable() {
       return enabled && !!gateway;
+    },
+
+    /**
+     * Resolve the transport config for a stack from its AgentTransportBinding.
+     * Defaults to 'stdio' for local subprocess adapters when no binding is found.
+     *
+     * @param {object} stack - AgentStack resource or plain spec object
+     * @param {object[]} transportBindings - Array of AgentTransportBinding resources
+     * @returns {{ protocol: string, endpoint: string, codec: string }}
+     */
+    resolveTransport(stack, transportBindings = []) {
+      const adapterName = stack?.spec?.adapter || stack?.spec?.baseAgent || 'claude-code';
+      const provider = stack?.spec?.provider || 'anthropic';
+      const binding = (transportBindings || []).find(b => b.spec?.adapterRef === adapterName);
+
+      if (binding) {
+        const protocol = binding.spec.protocol || 'http';
+        const endpoint = binding.spec.endpoint || '';
+        const codec = deriveCodec(provider);
+        return { protocol, endpoint, codec };
+      }
+
+      return { protocol: 'stdio', endpoint: '', codec: deriveCodec(provider) };
     },
 
     /**
@@ -236,200 +268,184 @@ export function createAgentMuxClient(options = {}) {
     },
 
     /**
-     * Create a local agent session by spawning an agent-mux subprocess directly.
-     * Used when no gateway is available or for local development.
+     * Generate a Kubernetes Job manifest to run an agent as an isolated Job
+     * instead of a subprocess of the API server.
      *
-     * @param {{ adapter: string, provider?: string, model?: string, workspace?: string, prompt?: string, env?: Record<string,string>, spawnFn?: Function, cliPath?: string, timeout?: number }} config
-     * @returns {Promise<{ pid: number, sessionId: string, runId: string, stdin: import('node:stream').Writable, stdout: import('node:stream').Readable, stderr: import('node:stream').Readable, process: import('node:child_process').ChildProcess }>}
+     * @param {{ adapter: string, provider?: string, model?: string, workspace?: { pvcName?: string }, prompt?: { system?: string, task?: string }, env?: Record<string,string>, org: string, runId?: string, stackName?: string, budget?: { maxDurationSeconds?: number }, resources?: object, image?: string, serviceAccount?: string, callbackUrl?: string }} config
+     * @returns {{ jobManifest: object, jobName: string }}
      */
-    async createLocalSession(config = {}) {
+    createAgentJob(config = {}) {
       const {
         adapter,
         provider = 'anthropic',
         model,
-        workspace,
+        org,
+        runId = randomUUID(),
+        stackName,
+        budget,
+        image,
+        serviceAccount,
+        callbackUrl,
         prompt,
         env = {},
-        spawnFn = spawn,
-        cliPath = 'node',
-        timeout = 30000,
+        workspace,
+        resources: resourceLimits,
+        transportBindings = [],
       } = config;
 
       // Validate adapter
       if (!adapter || typeof adapter !== 'string') {
-        throw new Error('createLocalSession requires a valid adapter name');
+        throw new Error('createAgentJob requires a valid adapter name');
       }
       if (!KNOWN_ADAPTERS.has(adapter)) {
         throw new Error(`Unknown adapter: ${adapter}. Known adapters: ${[...KNOWN_ADAPTERS].join(', ')}`);
       }
+      if (!org) {
+        throw new Error('createAgentJob requires an org');
+      }
 
-      // Build command args: node packages/agent-mux/cli/dist/index.js launch <adapter> <provider>
-      const scriptPath = config.scriptPath || 'packages/agent-mux/cli/dist/index.js';
-      const args = [scriptPath, 'launch', adapter, provider];
-      if (model) { args.push('--model', model); }
-      if (prompt) { args.push('--prompt', prompt); }
-      if (workspace) { args.push('--workspace', workspace); }
-      args.push('--json');
+      const jobName = `krate-agent-${runId}`;
+      const pvcName = workspace?.pvcName;
 
-      // Merge env vars
-      const childEnv = {
-        ...process.env,
-        ...env,
+      const transportConfig = this.resolveTransport(
+        { spec: { adapter, provider } },
+        transportBindings
+      );
+
+      const containerEnv = [
+        { name: 'KRATE_ORG', value: org },
+        { name: 'KRATE_RUN_ID', value: runId },
+        { name: 'KRATE_WORKSPACE_PATH', value: '/workspace' },
+        { name: 'AGENT_MUX_TRANSPORT', value: transportConfig.protocol },
+        { name: 'TRANSPORT_MUX_CODEC', value: transportConfig.codec },
+        ...(transportConfig.endpoint ? [{ name: 'AGENT_MUX_TRANSPORT_ENDPOINT', value: transportConfig.endpoint }] : []),
+        ...(callbackUrl ? [{ name: 'KRATE_CALLBACK_URL', value: callbackUrl }] : []),
+        ...(prompt?.system ? [{ name: 'AGENT_SYSTEM_PROMPT', value: prompt.system }] : []),
+        ...(prompt?.task ? [{ name: 'AGENT_TASK', value: prompt.task }] : []),
+        ...Object.entries(env).map(([name, value]) => ({ name, value: String(value) })),
+      ];
+
+      const jobManifest = {
+        apiVersion: 'batch/v1',
+        kind: 'Job',
+        metadata: {
+          name: jobName,
+          namespace: `krate-org-${org}`,
+          labels: {
+            'krate.a5c.ai/component': 'agent-run',
+            'krate.a5c.ai/run': runId,
+            ...(stackName ? { 'krate.a5c.ai/stack': stackName } : {}),
+            'krate.a5c.ai/org': org,
+          },
+        },
+        spec: {
+          backoffLimit: 0,
+          activeDeadlineSeconds: budget?.maxDurationSeconds || 3600,
+          template: {
+            metadata: {
+              labels: {
+                'krate.a5c.ai/component': 'agent-run',
+                'krate.a5c.ai/run': runId,
+              },
+            },
+            spec: {
+              restartPolicy: 'Never',
+              serviceAccountName: serviceAccount || 'krate',
+              containers: [{
+                name: 'agent',
+                image: image || 'ghcr.io/a5c-ai/agent-mux:latest',
+                command: ['node', 'dist/cli/index.js', 'launch', adapter, provider],
+                args: model ? ['--model', model] : [],
+                env: containerEnv,
+                resources: resourceLimits || {
+                  requests: { cpu: '500m', memory: '1Gi' },
+                  limits: { cpu: '2', memory: '4Gi' },
+                },
+                volumeMounts: pvcName ? [{ name: 'workspace', mountPath: '/workspace' }] : [],
+              }],
+              volumes: pvcName ? [{ name: 'workspace', persistentVolumeClaim: { claimName: pvcName } }] : [],
+            },
+          },
+        },
       };
-      if (workspace) childEnv.KRATE_WORKSPACE_PATH = workspace;
 
-      // Spawn subprocess
-      const child = spawnFn(cliPath, args, {
-        stdio: ['pipe', 'pipe', 'pipe'],
-        env: childEnv,
-      });
-
-      // Wait for sessionId/runId from stdout (first JSON line) or timeout
-      const sessionId = `local-${randomUUID()}`;
-      const runId = `local-run-${randomUUID()}`;
-      let resolvedIds = { sessionId, runId };
-
-      const idPromise = new Promise((resolve, reject) => {
-        let buffer = '';
-        const timer = setTimeout(() => {
-          resolve(resolvedIds); // Use generated IDs on timeout
-        }, timeout);
-
-        const onData = (chunk) => {
-          buffer += chunk.toString();
-          const lines = buffer.split('\n');
-          for (const line of lines) {
-            if (!line.trim()) continue;
-            try {
-              const parsed = JSON.parse(line);
-              if (parsed.sessionId || parsed.runId) {
-                resolvedIds = {
-                  sessionId: parsed.sessionId || sessionId,
-                  runId: parsed.runId || runId,
-                };
-                clearTimeout(timer);
-                child.stdout.removeListener('data', onData);
-                resolve(resolvedIds);
-                return;
-              }
-            } catch { /* not JSON yet, keep buffering */ }
-          }
-          // Keep last partial line
-          buffer = lines[lines.length - 1] || '';
-        };
-        child.stdout.on('data', onData);
-
-        child.on('error', (err) => {
-          clearTimeout(timer);
-          reject(err);
-        });
-
-        child.on('exit', (code) => {
-          clearTimeout(timer);
-          if (code !== 0 && code !== null) {
-            reject(new Error(`Agent subprocess exited with code ${code}`));
-          } else {
-            resolve(resolvedIds);
-          }
-        });
-      });
-
-      const ids = await idPromise;
-
-      return {
-        pid: child.pid,
-        sessionId: ids.sessionId,
-        runId: ids.runId,
-        stdin: child.stdin,
-        stdout: child.stdout,
-        stderr: child.stderr,
-        process: child,
-      };
+      return { jobManifest, jobName };
     },
 
     /**
-     * Send a task to a running local agent session via its stdin and stream the response.
+     * Submit a Job manifest to Kubernetes via the resource gateway.
      *
-     * @param {{ stdin: import('node:stream').Writable, stdout: import('node:stream').Readable, process: import('node:child_process').ChildProcess }} session
-     * @param {{ type?: string, prompt?: string, payload?: any }} task
-     * @param {{ timeout?: number }} options
-     * @returns {Promise<{ success: boolean, response: object|null, events: object[] }>}
+     * @param {object} jobManifest - Full K8s Job manifest
+     * @returns {Promise<{ jobName: string, namespace: string, submitted: boolean }>}
      */
-    async executeAgentTask(session, task, { timeout = 60000 } = {}) {
-      if (!session || !session.stdin || !session.stdout) {
-        throw new Error('executeAgentTask requires a valid session with stdin/stdout');
+    async submitAgentJob(jobManifest) {
+      if (!resourceGateway) {
+        throw new Error('submitAgentJob requires a resourceGateway');
       }
-
-      const taskPayload = JSON.stringify({
-        type: task.type || 'task',
-        prompt: task.prompt,
-        payload: task.payload,
-        timestamp: new Date().toISOString(),
-      }) + '\n';
-
-      const events = [];
-      let response = null;
-
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          session.stdout.removeListener('data', onData);
-          resolve({ success: false, response: null, events, timedOut: true });
-        }, timeout);
-
-        const onData = (chunk) => {
-          const lines = chunk.toString().split('\n');
-          for (const line of lines) {
-            if (!line.trim()) continue;
-            try {
-              const parsed = JSON.parse(line);
-              events.push(parsed);
-              if (parsed.type === 'completion' || parsed.type === 'result') {
-                response = parsed;
-                clearTimeout(timer);
-                session.stdout.removeListener('data', onData);
-                resolve({ success: true, response, events });
-                return;
-              }
-              if (parsed.type === 'error') {
-                response = parsed;
-                clearTimeout(timer);
-                session.stdout.removeListener('data', onData);
-                resolve({ success: false, response, events });
-                return;
-              }
-            } catch { /* partial line */ }
-          }
-        };
-
-        session.stdout.on('data', onData);
-
-        // Write task
-        try {
-          session.stdin.write(taskPayload);
-        } catch (err) {
-          clearTimeout(timer);
-          session.stdout.removeListener('data', onData);
-          reject(new Error(`Failed to write to agent stdin: ${err.message}`));
-        }
-      });
+      const jobName = jobManifest?.metadata?.name;
+      const namespace = jobManifest?.metadata?.namespace;
+      await resourceGateway.apply(jobManifest);
+      return { jobName, namespace, submitted: true };
     },
 
     /**
-     * Terminate a local agent session by killing the subprocess.
-     * @param {{ process: import('node:child_process').ChildProcess, pid?: number }} session
-     * @returns {{ killed: boolean, pid: number|undefined }}
+     * Get the status of a submitted K8s Job.
+     *
+     * @param {string} jobName
+     * @param {string} namespace
+     * @returns {Promise<{ active: number, succeeded: number, failed: number, startTime: string|null, completionTime: string|null, conditions: object[] }>}
      */
-    terminateSession(session) {
-      if (!session || !session.process) {
-        return { killed: false, pid: undefined };
+    async getJobStatus(jobName, namespace) {
+      if (!resourceGateway) {
+        throw new Error('getJobStatus requires a resourceGateway');
       }
-      const pid = session.process.pid || session.pid;
-      try {
-        session.process.kill('SIGTERM');
-        return { killed: true, pid };
-      } catch {
-        return { killed: false, pid };
+      const job = await resourceGateway.get('Job', jobName);
+      if (!job) {
+        return { active: 0, succeeded: 0, failed: 0, startTime: null, completionTime: null, conditions: [] };
       }
+      const status = job.status || {};
+      return {
+        active: status.active || 0,
+        succeeded: status.succeeded || 0,
+        failed: status.failed || 0,
+        startTime: status.startTime || null,
+        completionTime: status.completionTime || null,
+        conditions: status.conditions || [],
+      };
+    },
+
+    /**
+     * Retrieve logs from a K8s Job's pod.
+     *
+     * @param {string} jobName
+     * @param {string} namespace
+     * @returns {Promise<string>}
+     */
+    async getJobLogs(jobName, namespace) {
+      if (!resourceGateway) {
+        throw new Error('getJobLogs requires a resourceGateway');
+      }
+      // Use the resource gateway's log retrieval (reads pod logs for the job)
+      if (typeof resourceGateway.getLogs === 'function') {
+        return resourceGateway.getLogs('Job', jobName, namespace);
+      }
+      // Fallback: return empty string if gateway doesn't support logs
+      return '';
+    },
+
+    /**
+     * Delete a completed K8s Job and its pods.
+     *
+     * @param {string} jobName
+     * @param {string} namespace
+     * @returns {Promise<{ deleted: boolean }>}
+     */
+    async deleteJob(jobName, namespace) {
+      if (!resourceGateway) {
+        throw new Error('deleteJob requires a resourceGateway');
+      }
+      await resourceGateway.delete('Job', jobName);
+      return { deleted: true };
     },
 
     /**

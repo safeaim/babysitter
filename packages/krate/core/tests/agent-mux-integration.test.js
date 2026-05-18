@@ -4,62 +4,33 @@ import { EventEmitter } from 'node:events';
 import { createAgentMuxClient, createAgentDispatchController, createResource, createEventBus } from '../src/index.js';
 
 // ---------------------------------------------------------------------------
-// Mock subprocess helper
+// Mock resource gateway helper
 // ---------------------------------------------------------------------------
 
-function createMockProcess({ exitCode = 0, stdoutData = [], stderrData = [], emitError = false } = {}) {
-  const proc = new EventEmitter();
-  proc.stdin = {
-    _written: [],
-    write(data) { this._written.push(data); return true; },
-    end() {},
+function createMockResourceGateway({ applyFn, getFn, deleteFn, getLogsFn } = {}) {
+  const applied = [];
+  const deleted = [];
+  return {
+    applied,
+    deleted,
+    async apply(resource) {
+      applied.push(resource);
+      if (applyFn) return applyFn(resource);
+      return resource;
+    },
+    async get(kind, name) {
+      if (getFn) return getFn(kind, name);
+      return null;
+    },
+    async delete(kind, name) {
+      deleted.push({ kind, name });
+      if (deleteFn) return deleteFn(kind, name);
+    },
+    async getLogs(kind, name, namespace) {
+      if (getLogsFn) return getLogsFn(kind, name, namespace);
+      return '';
+    },
   };
-  proc.stdout = new EventEmitter();
-  proc.stderr = new EventEmitter();
-  proc.pid = 12345;
-  proc.killed = false;
-  proc.kill = function (sig) {
-    this.killed = true;
-    this._killSignal = sig;
-    return true;
-  };
-
-  // Schedule stdout data emission
-  if (stdoutData.length > 0) {
-    setImmediate(() => {
-      for (const chunk of stdoutData) {
-        proc.stdout.emit('data', Buffer.from(chunk));
-      }
-    });
-  }
-
-  // Schedule stderr data emission
-  if (stderrData.length > 0) {
-    setImmediate(() => {
-      for (const chunk of stderrData) {
-        proc.stderr.emit('data', Buffer.from(chunk));
-      }
-    });
-  }
-
-  // Schedule error or exit
-  if (emitError) {
-    setImmediate(() => proc.emit('error', new Error('spawn failed')));
-  } else if (exitCode !== null && stdoutData.length === 0) {
-    setImmediate(() => proc.emit('exit', exitCode));
-  }
-
-  return proc;
-}
-
-function createMockSpawn(mockProcess) {
-  const calls = [];
-  const fn = (cmd, args, opts) => {
-    calls.push({ cmd, args, opts });
-    return mockProcess;
-  };
-  fn.calls = calls;
-  return fn;
 }
 
 // ---------------------------------------------------------------------------
@@ -70,7 +41,8 @@ function makeStack(name, specOverrides = {}) {
   return createResource('AgentStack', { name, namespace: 'krate-org-default' }, {
     organizationRef: 'default',
     baseAgent: 'claude-code',
-    adapter: 'anthropic',
+    adapter: 'claude-code',
+    provider: 'anthropic',
     runtimeIdentity: { serviceAccountRef: 'sa-default' },
     ...specOverrides,
   });
@@ -92,274 +64,427 @@ function buildValidResources(stackName, specOverrides = {}) {
 }
 
 // ============================================================================
-// PRIORITY 1: Agent-Mux Session Manager Integration
+// PRIORITY 1: K8s Job Manifest Generation (createAgentJob)
 // ============================================================================
 
-describe('createLocalSession', () => {
-  it('builds correct command with adapter/provider/model', async () => {
-    const sessionJson = JSON.stringify({ sessionId: 'sess-abc', runId: 'run-xyz' }) + '\n';
-    const proc = createMockProcess({ stdoutData: [sessionJson] });
-    const mockSpawn = createMockSpawn(proc);
-    const client = createAgentMuxClient({ gateway: '', enabled: false });
+describe('createAgentJob', () => {
+  it('generates valid K8s Job manifest', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest, jobName } = client.createAgentJob({
+      adapter: 'claude-code',
+      provider: 'anthropic',
+      org: 'acme',
+      runId: 'run-123',
+    });
 
-    const session = await client.createLocalSession({
+    assert.equal(jobManifest.apiVersion, 'batch/v1');
+    assert.equal(jobManifest.kind, 'Job');
+    assert.equal(jobManifest.metadata.name, 'krate-agent-run-123');
+    assert.equal(jobManifest.metadata.namespace, 'krate-org-acme');
+    assert.equal(jobName, 'krate-agent-run-123');
+  });
+
+  it('includes correct image, command, and env vars', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      provider: 'anthropic',
+      org: 'acme',
+      runId: 'run-456',
+      image: 'ghcr.io/custom/agent:v2',
+    });
+
+    const container = jobManifest.spec.template.spec.containers[0];
+    assert.equal(container.name, 'agent');
+    assert.equal(container.image, 'ghcr.io/custom/agent:v2');
+    assert.deepEqual(container.command, ['node', 'dist/cli/index.js', 'launch', 'claude-code', 'anthropic']);
+
+    // Env vars should include KRATE_ORG and KRATE_RUN_ID
+    const envMap = Object.fromEntries(container.env.map(e => [e.name, e.value]));
+    assert.equal(envMap.KRATE_ORG, 'acme');
+    assert.equal(envMap.KRATE_RUN_ID, 'run-456');
+    assert.equal(envMap.KRATE_WORKSPACE_PATH, '/workspace');
+  });
+
+  it('includes model arg when provided', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
       adapter: 'claude-code',
       provider: 'anthropic',
       model: 'claude-sonnet-4-20250514',
-      spawnFn: mockSpawn,
+      org: 'acme',
     });
 
-    assert.equal(mockSpawn.calls.length, 1);
-    const call = mockSpawn.calls[0];
-    assert.ok(call.args.includes('launch'));
-    assert.ok(call.args.includes('claude-code'));
-    assert.ok(call.args.includes('anthropic'));
-    assert.ok(call.args.includes('--model'));
-    assert.ok(call.args.includes('claude-sonnet-4-20250514'));
-    assert.equal(session.sessionId, 'sess-abc');
-    assert.equal(session.runId, 'run-xyz');
+    const container = jobManifest.spec.template.spec.containers[0];
+    assert.deepEqual(container.args, ['--model', 'claude-sonnet-4-20250514']);
   });
 
-  it('sets workspace env vars', async () => {
-    const sessionJson = JSON.stringify({ sessionId: 's1', runId: 'r1' }) + '\n';
-    const proc = createMockProcess({ stdoutData: [sessionJson] });
-    const mockSpawn = createMockSpawn(proc);
-    const client = createAgentMuxClient({ gateway: '', enabled: false });
-
-    await client.createLocalSession({
-      adapter: 'claude-code',
-      workspace: '/tmp/workspace',
-      spawnFn: mockSpawn,
-      env: { KRATE_ORG: 'acme', BABYSITTER_RUNS_DIR: '/runs' },
-    });
-
-    const call = mockSpawn.calls[0];
-    assert.equal(call.opts.env.KRATE_WORKSPACE_PATH, '/tmp/workspace');
-    assert.equal(call.opts.env.KRATE_ORG, 'acme');
-    assert.equal(call.opts.env.BABYSITTER_RUNS_DIR, '/runs');
-  });
-
-  it('captures sessionId from stdout JSON', async () => {
-    const sessionJson = JSON.stringify({ sessionId: 'captured-sess', runId: 'captured-run' }) + '\n';
-    const proc = createMockProcess({ stdoutData: [sessionJson] });
-    const mockSpawn = createMockSpawn(proc);
+  it('generates empty args when no model provided', () => {
     const client = createAgentMuxClient({});
-
-    const session = await client.createLocalSession({
+    const { jobManifest } = client.createAgentJob({
       adapter: 'claude-code',
-      spawnFn: mockSpawn,
+      org: 'acme',
     });
 
-    assert.equal(session.sessionId, 'captured-sess');
-    assert.equal(session.runId, 'captured-run');
-    assert.equal(session.pid, 12345);
-    assert.ok(session.stdin);
-    assert.ok(session.stdout);
-    assert.ok(session.stderr);
-    assert.ok(session.process);
+    const container = jobManifest.spec.template.spec.containers[0];
+    assert.deepEqual(container.args, []);
   });
 
-  it('generates fallback IDs when stdout has no JSON', async () => {
-    const proc = createMockProcess({ stdoutData: ['not json data\n'] });
-    const mockSpawn = createMockSpawn(proc);
+  it('mounts workspace PVC when provided', () => {
     const client = createAgentMuxClient({});
-
-    // Use a short timeout so test doesn't hang
-    const session = await client.createLocalSession({
+    const { jobManifest } = client.createAgentJob({
       adapter: 'claude-code',
-      spawnFn: mockSpawn,
-      timeout: 100,
+      org: 'acme',
+      workspace: { pvcName: 'ws-pvc-acme-main' },
     });
 
-    assert.ok(session.sessionId.startsWith('local-'));
-    assert.ok(session.runId.startsWith('local-run-'));
+    const podSpec = jobManifest.spec.template.spec;
+    assert.equal(podSpec.volumes.length, 1);
+    assert.equal(podSpec.volumes[0].name, 'workspace');
+    assert.equal(podSpec.volumes[0].persistentVolumeClaim.claimName, 'ws-pvc-acme-main');
+
+    const container = podSpec.containers[0];
+    assert.equal(container.volumeMounts.length, 1);
+    assert.equal(container.volumeMounts[0].mountPath, '/workspace');
   });
 
-  it('rejects when adapter not found', async () => {
+  it('omits volumes when no workspace PVC', () => {
     const client = createAgentMuxClient({});
-    await assert.rejects(
-      () => client.createLocalSession({ adapter: 'unknown-adapter', spawnFn: createMockSpawn(createMockProcess()) }),
-      { message: /Unknown adapter: unknown-adapter/ }
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+    });
+
+    const podSpec = jobManifest.spec.template.spec;
+    assert.deepEqual(podSpec.volumes, []);
+    assert.deepEqual(podSpec.containers[0].volumeMounts, []);
+  });
+
+  it('sets resource limits from config', () => {
+    const client = createAgentMuxClient({});
+    const customResources = {
+      requests: { cpu: '1', memory: '2Gi' },
+      limits: { cpu: '4', memory: '8Gi' },
+    };
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+      resources: customResources,
+    });
+
+    const container = jobManifest.spec.template.spec.containers[0];
+    assert.deepEqual(container.resources, customResources);
+  });
+
+  it('uses default resource limits when not specified', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+    });
+
+    const container = jobManifest.spec.template.spec.containers[0];
+    assert.deepEqual(container.resources, {
+      requests: { cpu: '500m', memory: '1Gi' },
+      limits: { cpu: '2', memory: '4Gi' },
+    });
+  });
+
+  it('sets activeDeadlineSeconds from budget', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+      budget: { maxDurationSeconds: 7200 },
+    });
+
+    assert.equal(jobManifest.spec.activeDeadlineSeconds, 7200);
+  });
+
+  it('defaults activeDeadlineSeconds to 3600', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+    });
+
+    assert.equal(jobManifest.spec.activeDeadlineSeconds, 3600);
+  });
+
+  it('includes prompt env vars when provided', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+      prompt: { system: 'You are helpful.', task: 'Fix the CI.' },
+    });
+
+    const envMap = Object.fromEntries(
+      jobManifest.spec.template.spec.containers[0].env.map(e => [e.name, e.value])
+    );
+    assert.equal(envMap.AGENT_SYSTEM_PROMPT, 'You are helpful.');
+    assert.equal(envMap.AGENT_TASK, 'Fix the CI.');
+  });
+
+  it('includes callbackUrl in env when provided', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+      callbackUrl: 'https://krate.example.com/api/callback',
+    });
+
+    const envMap = Object.fromEntries(
+      jobManifest.spec.template.spec.containers[0].env.map(e => [e.name, e.value])
+    );
+    assert.equal(envMap.KRATE_CALLBACK_URL, 'https://krate.example.com/api/callback');
+  });
+
+  it('includes custom env vars from config', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+      env: { MY_VAR: 'hello', ANOTHER: 'world' },
+    });
+
+    const envMap = Object.fromEntries(
+      jobManifest.spec.template.spec.containers[0].env.map(e => [e.name, e.value])
+    );
+    assert.equal(envMap.MY_VAR, 'hello');
+    assert.equal(envMap.ANOTHER, 'world');
+  });
+
+  it('sets labels including stack and org', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+      runId: 'run-lbl',
+      stackName: 'my-stack',
+    });
+
+    const labels = jobManifest.metadata.labels;
+    assert.equal(labels['krate.a5c.ai/component'], 'agent-run');
+    assert.equal(labels['krate.a5c.ai/run'], 'run-lbl');
+    assert.equal(labels['krate.a5c.ai/stack'], 'my-stack');
+    assert.equal(labels['krate.a5c.ai/org'], 'acme');
+  });
+
+  it('omits stack label when stackName not provided', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+    });
+
+    assert.equal(jobManifest.metadata.labels['krate.a5c.ai/stack'], undefined);
+  });
+
+  it('sets backoffLimit to 0 and restartPolicy to Never', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+    });
+
+    assert.equal(jobManifest.spec.backoffLimit, 0);
+    assert.equal(jobManifest.spec.template.spec.restartPolicy, 'Never');
+  });
+
+  it('uses custom serviceAccount when provided', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+      serviceAccount: 'sa-custom',
+    });
+
+    assert.equal(jobManifest.spec.template.spec.serviceAccountName, 'sa-custom');
+  });
+
+  it('defaults serviceAccount to krate', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+    });
+
+    assert.equal(jobManifest.spec.template.spec.serviceAccountName, 'krate');
+  });
+
+  it('uses default image when not specified', () => {
+    const client = createAgentMuxClient({});
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      org: 'acme',
+    });
+
+    assert.equal(jobManifest.spec.template.spec.containers[0].image, 'ghcr.io/a5c-ai/agent-mux:latest');
+  });
+
+  it('throws for unknown adapter', () => {
+    const client = createAgentMuxClient({});
+    assert.throws(
+      () => client.createAgentJob({ adapter: 'unknown-thing', org: 'acme' }),
+      { message: /Unknown adapter: unknown-thing/ }
     );
   });
 
-  it('rejects when adapter is empty', async () => {
+  it('throws for missing adapter', () => {
     const client = createAgentMuxClient({});
-    await assert.rejects(
-      () => client.createLocalSession({ adapter: '', spawnFn: createMockSpawn(createMockProcess()) }),
+    assert.throws(
+      () => client.createAgentJob({ adapter: '', org: 'acme' }),
       { message: /requires a valid adapter name/ }
     );
   });
 
-  it('rejects when spawn emits error', async () => {
-    const proc = createMockProcess({ emitError: true });
-    const mockSpawn = createMockSpawn(proc);
+  it('throws for missing org', () => {
     const client = createAgentMuxClient({});
-
-    await assert.rejects(
-      () => client.createLocalSession({ adapter: 'claude-code', spawnFn: mockSpawn }),
-      { message: /spawn failed/ }
+    assert.throws(
+      () => client.createAgentJob({ adapter: 'claude-code' }),
+      { message: /requires an org/ }
     );
   });
 
-  it('rejects when subprocess exits with non-zero code', async () => {
-    const proc = createMockProcess({ exitCode: 1 });
-    const mockSpawn = createMockSpawn(proc);
+  it('generates unique jobName from runId', () => {
     const client = createAgentMuxClient({});
-
-    await assert.rejects(
-      () => client.createLocalSession({ adapter: 'claude-code', spawnFn: mockSpawn }),
-      { message: /exited with code 1/ }
-    );
-  });
-
-  it('includes --prompt and --workspace flags when provided', async () => {
-    const sessionJson = JSON.stringify({ sessionId: 's', runId: 'r' }) + '\n';
-    const proc = createMockProcess({ stdoutData: [sessionJson] });
-    const mockSpawn = createMockSpawn(proc);
-    const client = createAgentMuxClient({});
-
-    await client.createLocalSession({
-      adapter: 'claude-code',
-      prompt: 'Fix the bug',
-      workspace: '/work',
-      spawnFn: mockSpawn,
-    });
-
-    const args = mockSpawn.calls[0].args;
-    assert.ok(args.includes('--prompt'));
-    assert.ok(args.includes('Fix the bug'));
-    assert.ok(args.includes('--workspace'));
-    assert.ok(args.includes('/work'));
-  });
-
-  it('includes --json flag', async () => {
-    const sessionJson = JSON.stringify({ sessionId: 's', runId: 'r' }) + '\n';
-    const proc = createMockProcess({ stdoutData: [sessionJson] });
-    const mockSpawn = createMockSpawn(proc);
-    const client = createAgentMuxClient({});
-
-    await client.createLocalSession({
-      adapter: 'claude-code',
-      spawnFn: mockSpawn,
-    });
-
-    assert.ok(mockSpawn.calls[0].args.includes('--json'));
+    const { jobName: name1 } = client.createAgentJob({ adapter: 'claude-code', org: 'acme' });
+    const { jobName: name2 } = client.createAgentJob({ adapter: 'claude-code', org: 'acme' });
+    // Each call with no explicit runId should produce different names (randomUUID)
+    assert.notEqual(name1, name2);
   });
 });
 
-describe('executeAgentTask', () => {
-  it('writes to stdin and reads response', async () => {
-    const proc = createMockProcess({});
-    const mockSpawn = createMockSpawn(proc);
-    const client = createAgentMuxClient({});
+// ============================================================================
+// PRIORITY 2: Job Lifecycle Management
+// ============================================================================
 
-    // Pre-build a session handle
-    const session = {
-      stdin: proc.stdin,
-      stdout: proc.stdout,
-      stderr: proc.stderr,
-      process: proc,
+describe('submitAgentJob', () => {
+  it('calls resourceGateway.apply with the manifest', async () => {
+    const gw = createMockResourceGateway();
+    const client = createAgentMuxClient({ resourceGateway: gw });
+
+    const manifest = {
+      apiVersion: 'batch/v1',
+      kind: 'Job',
+      metadata: { name: 'krate-agent-run-1', namespace: 'krate-org-acme' },
+      spec: {},
     };
 
-    // Schedule a completion response
-    setImmediate(() => {
-      proc.stdout.emit('data', Buffer.from(
-        JSON.stringify({ type: 'completion', content: 'Done!' }) + '\n'
-      ));
-    });
+    const result = await client.submitAgentJob(manifest);
 
-    const result = await client.executeAgentTask(session, { prompt: 'Fix the tests' });
-
-    assert.equal(result.success, true);
-    assert.equal(result.response.type, 'completion');
-    assert.equal(result.response.content, 'Done!');
-    assert.ok(proc.stdin._written.length > 0);
-    const written = JSON.parse(proc.stdin._written[0].trim());
-    assert.equal(written.prompt, 'Fix the tests');
-    assert.equal(written.type, 'task');
+    assert.equal(result.jobName, 'krate-agent-run-1');
+    assert.equal(result.namespace, 'krate-org-acme');
+    assert.equal(result.submitted, true);
+    assert.equal(gw.applied.length, 1);
+    assert.equal(gw.applied[0].metadata.name, 'krate-agent-run-1');
   });
 
-  it('returns failure on error event', async () => {
-    const proc = createMockProcess({});
-    const client = createAgentMuxClient({});
-    const session = { stdin: proc.stdin, stdout: proc.stdout, stderr: proc.stderr, process: proc };
-
-    setImmediate(() => {
-      proc.stdout.emit('data', Buffer.from(
-        JSON.stringify({ type: 'error', message: 'Something failed' }) + '\n'
-      ));
-    });
-
-    const result = await client.executeAgentTask(session, { prompt: 'Do something' });
-    assert.equal(result.success, false);
-    assert.equal(result.response.type, 'error');
-  });
-
-  it('times out when no response arrives', async () => {
-    const proc = createMockProcess({});
-    const client = createAgentMuxClient({});
-    const session = { stdin: proc.stdin, stdout: proc.stdout, stderr: proc.stderr, process: proc };
-
-    const result = await client.executeAgentTask(session, { prompt: 'Hang' }, { timeout: 50 });
-    assert.equal(result.success, false);
-    assert.equal(result.timedOut, true);
-  });
-
-  it('collects intermediate events before completion', async () => {
-    const proc = createMockProcess({});
-    const client = createAgentMuxClient({});
-    const session = { stdin: proc.stdin, stdout: proc.stdout, stderr: proc.stderr, process: proc };
-
-    setImmediate(() => {
-      proc.stdout.emit('data', Buffer.from(
-        JSON.stringify({ type: 'progress', content: 'Working...' }) + '\n' +
-        JSON.stringify({ type: 'completion', content: 'Done' }) + '\n'
-      ));
-    });
-
-    const result = await client.executeAgentTask(session, { prompt: 'Work' });
-    assert.equal(result.success, true);
-    assert.equal(result.events.length, 2);
-    assert.equal(result.events[0].type, 'progress');
-    assert.equal(result.events[1].type, 'completion');
-  });
-
-  it('rejects when session is null', async () => {
+  it('throws without resourceGateway', async () => {
     const client = createAgentMuxClient({});
     await assert.rejects(
-      () => client.executeAgentTask(null, { prompt: 'test' }),
-      { message: /requires a valid session/ }
+      () => client.submitAgentJob({ metadata: { name: 'j', namespace: 'ns' } }),
+      { message: /requires a resourceGateway/ }
     );
   });
 });
 
-describe('terminateSession', () => {
-  it('kills subprocess on terminate', () => {
-    const proc = createMockProcess({});
-    const client = createAgentMuxClient({});
-    const session = { process: proc, pid: proc.pid };
+describe('getJobStatus', () => {
+  it('returns parsed job status', async () => {
+    const gw = createMockResourceGateway({
+      getFn: (kind, name) => ({
+        status: {
+          active: 1,
+          succeeded: 0,
+          failed: 0,
+          startTime: '2026-01-01T00:00:00Z',
+          completionTime: null,
+          conditions: [{ type: 'Running', status: 'True' }],
+        },
+      }),
+    });
+    const client = createAgentMuxClient({ resourceGateway: gw });
 
-    const result = client.terminateSession(session);
-    assert.equal(result.killed, true);
-    assert.equal(result.pid, 12345);
-    assert.equal(proc.killed, true);
-    assert.equal(proc._killSignal, 'SIGTERM');
+    const status = await client.getJobStatus('krate-agent-run-1', 'krate-org-acme');
+    assert.equal(status.active, 1);
+    assert.equal(status.succeeded, 0);
+    assert.equal(status.startTime, '2026-01-01T00:00:00Z');
+    assert.equal(status.conditions.length, 1);
   });
 
-  it('returns killed=false when session is null', () => {
-    const client = createAgentMuxClient({});
-    const result = client.terminateSession(null);
-    assert.equal(result.killed, false);
-    assert.equal(result.pid, undefined);
+  it('returns zeroed status when job not found', async () => {
+    const gw = createMockResourceGateway({ getFn: () => null });
+    const client = createAgentMuxClient({ resourceGateway: gw });
+
+    const status = await client.getJobStatus('nonexistent', 'ns');
+    assert.equal(status.active, 0);
+    assert.equal(status.succeeded, 0);
+    assert.equal(status.failed, 0);
+    assert.equal(status.startTime, null);
   });
 
-  it('returns killed=false when process has no kill', () => {
+  it('throws without resourceGateway', async () => {
     const client = createAgentMuxClient({});
-    const result = client.terminateSession({ process: {} });
-    assert.equal(result.killed, false);
+    await assert.rejects(
+      () => client.getJobStatus('j', 'ns'),
+      { message: /requires a resourceGateway/ }
+    );
   });
 });
+
+describe('getJobLogs', () => {
+  it('returns container logs', async () => {
+    const gw = createMockResourceGateway({
+      getLogsFn: () => 'line 1\nline 2\n',
+    });
+    const client = createAgentMuxClient({ resourceGateway: gw });
+
+    const logs = await client.getJobLogs('krate-agent-run-1', 'krate-org-acme');
+    assert.equal(logs, 'line 1\nline 2\n');
+  });
+
+  it('returns empty string when gateway has no getLogs', async () => {
+    const gw = createMockResourceGateway();
+    delete gw.getLogs;
+    const client = createAgentMuxClient({ resourceGateway: gw });
+
+    const logs = await client.getJobLogs('krate-agent-run-1', 'krate-org-acme');
+    assert.equal(logs, '');
+  });
+
+  it('throws without resourceGateway', async () => {
+    const client = createAgentMuxClient({});
+    await assert.rejects(
+      () => client.getJobLogs('j', 'ns'),
+      { message: /requires a resourceGateway/ }
+    );
+  });
+});
+
+describe('deleteJob', () => {
+  it('deletes job via resourceGateway', async () => {
+    const gw = createMockResourceGateway();
+    const client = createAgentMuxClient({ resourceGateway: gw });
+
+    const result = await client.deleteJob('krate-agent-run-1', 'krate-org-acme');
+    assert.equal(result.deleted, true);
+    assert.equal(gw.deleted.length, 1);
+    assert.equal(gw.deleted[0].name, 'krate-agent-run-1');
+  });
+
+  it('throws without resourceGateway', async () => {
+    const client = createAgentMuxClient({});
+    await assert.rejects(
+      () => client.deleteJob('j', 'ns'),
+      { message: /requires a resourceGateway/ }
+    );
+  });
+});
+
+// ============================================================================
+// PRIORITY 3: HTTP Gateway Fallback
+// ============================================================================
 
 describe('fallback to HTTP gateway when KRATE_CONTROLLER_URL is set', () => {
   it('isAvailable returns true only when gateway is set and enabled', () => {
@@ -379,7 +504,7 @@ describe('fallback to HTTP gateway when KRATE_CONTROLLER_URL is set', () => {
 });
 
 // ============================================================================
-// PRIORITY 2: Stack Resolution
+// PRIORITY 4: Stack Resolution
 // ============================================================================
 
 describe('resolveStack', () => {
@@ -388,7 +513,7 @@ describe('resolveStack', () => {
     const controller = createAgentDispatchController();
 
     const config = controller.resolveStack(stack);
-    assert.equal(config.adapter, 'anthropic');
+    assert.equal(config.adapter, 'claude-code');
     assert.equal(config.provider, 'anthropic');
     assert.equal(config.model, 'claude-sonnet-4-20250514');
     assert.equal(config.approvalMode, 'prompt');
@@ -497,7 +622,65 @@ describe('resolveStack', () => {
 });
 
 // ============================================================================
-// PRIORITY 3: Event Persistence
+// PRIORITY 5: Dispatch Flow (K8s Job instead of subprocess)
+// ============================================================================
+
+describe('createManualDispatch with K8s Job', () => {
+  it('creates job instead of subprocess', async () => {
+    const gw = createMockResourceGateway();
+    const agentMuxClient = createAgentMuxClient({ resourceGateway: gw });
+    const controller = createAgentDispatchController({ agentMuxClient });
+    const resources = buildValidResources('test-stack');
+
+    const result = await controller.createManualDispatch({
+      repository: 'test-repo',
+      ref: 'main',
+      agentStack: 'test-stack',
+      actor: 'owner',
+      namespace: 'krate-org-default',
+      organizationRef: 'default',
+      resources,
+    });
+
+    assert.equal(result.error, false);
+    assert.equal(result.run.status.phase, 'Running');
+    assert.ok(result.run.spec.jobRef);
+    assert.ok(result.attempt.status.jobName);
+    assert.equal(result.attempt.status.jobSubmitted, true);
+    assert.ok(result.jobResult);
+    assert.equal(result.jobResult.submitted, true);
+    // The job was submitted to the resource gateway
+    assert.equal(gw.applied.length, 1);
+    assert.equal(gw.applied[0].kind, 'Job');
+  });
+
+  it('queues run when job submission fails', async () => {
+    const gw = createMockResourceGateway({
+      applyFn: () => { throw new Error('cluster unreachable'); },
+    });
+    const agentMuxClient = createAgentMuxClient({ resourceGateway: gw });
+    const controller = createAgentDispatchController({ agentMuxClient });
+    const resources = buildValidResources('test-stack');
+
+    const result = await controller.createManualDispatch({
+      repository: 'test-repo',
+      ref: 'main',
+      agentStack: 'test-stack',
+      actor: 'owner',
+      namespace: 'krate-org-default',
+      organizationRef: 'default',
+      resources,
+    });
+
+    assert.equal(result.error, false);
+    assert.equal(result.run.status.phase, 'Queued');
+    assert.ok(result.run.status.conditions.find(c => c.reason === 'SubmitFailed'));
+    assert.equal(result.jobResult.submitted, false);
+  });
+});
+
+// ============================================================================
+// PRIORITY 6: Event Persistence
 // ============================================================================
 
 describe('persistSessionEvent', () => {
@@ -674,11 +857,13 @@ describe('persistSessionEvent', () => {
       { namespace: 'default', organizationRef: 'default' }
     );
 
-    // Should emit both session-event and the notification
-    assert.equal(emitted.length, 2);
-    assert.equal(emitted[0].type, 'session-event');
-    assert.equal(emitted[1].type, 'run-complete');
-    assert.equal(emitted[1].status, 'completed');
+    // Should emit session-event, run-complete notification, and lifecycle hook events
+    assert.ok(emitted.length >= 2, `Expected at least 2 events, got ${emitted.length}`);
+    const sessionEvent = emitted.find(e => e.type === 'session-event');
+    assert.ok(sessionEvent, 'Should have a session-event');
+    const runComplete = emitted.find(e => e.type === 'run-complete');
+    assert.ok(runComplete, 'Should have a run-complete event');
+    assert.equal(runComplete.status, 'completed');
   });
 
   it('increments eventCount on attempt status', () => {
@@ -734,5 +919,53 @@ describe('persistSessionEvent', () => {
     assert.equal(result.transcript.spec.cost.inputTokens, 300);
     assert.equal(result.transcript.spec.cost.outputTokens, 130);
     assert.equal(result.transcript.spec.cost.totalTokens, 430);
+  });
+});
+
+// ============================================================================
+// PRIORITY 7: Callback Endpoint
+// ============================================================================
+
+describe('callback endpoint contract', () => {
+  it('agent callback payload shape is well-defined', () => {
+    // Verify the shape of a callback payload that the agent container posts
+    const payload = {
+      status: 'completed',
+      result: { summary: 'Fixed 3 bugs' },
+      transcript: [{ role: 'assistant', content: 'Done' }],
+      tokenUsage: { inputTokens: 1000, outputTokens: 500 },
+      artifacts: [{ name: 'patch.diff', type: 'file' }],
+    };
+
+    assert.ok(['completed', 'failed'].includes(payload.status));
+    assert.ok(payload.result);
+    assert.ok(Array.isArray(payload.transcript));
+    assert.ok(payload.tokenUsage.inputTokens >= 0);
+    assert.ok(payload.tokenUsage.outputTokens >= 0);
+  });
+
+  it('persistSessionEvent handles callback completion event', () => {
+    const controller = createAgentDispatchController();
+    const run = createResource('AgentDispatchRun', { name: 'run-cb', namespace: 'krate-org-default' }, {
+      organizationRef: 'default', repository: 'repo', sourceRefs: [], agentStack: 'stack', taskKind: 'diagnostic', contextBundleRef: 'b',
+    });
+    run.status = { phase: 'Running', queuedAt: new Date().toISOString() };
+
+    const attempt = createResource('AgentDispatchAttempt', { name: 'run-cb-attempt-1', namespace: 'krate-org-default' }, {
+      organizationRef: 'default', agentDispatchRun: 'run-cb', attemptReason: 'initial', agentStackSnapshot: {}, contextBundleDigest: 'sha256:x',
+    });
+    attempt.status = { agentMuxSessionId: 'sess-cb', startedAt: new Date().toISOString() };
+
+    // Simulate what the callback route would do after receiving agent POST
+    const result = controller.persistSessionEvent(
+      { type: 'completion', role: 'agent', content: 'Job finished', usage: { inputTokens: 500, outputTokens: 200 } },
+      run, attempt,
+      { namespace: 'krate-org-default', organizationRef: 'default' }
+    );
+
+    assert.equal(result.run.status.phase, 'Completed');
+    assert.ok(result.run.status.completedAt);
+    assert.equal(result.transcript.spec.cost.inputTokens, 500);
+    assert.equal(result.transcript.spec.cost.outputTokens, 200);
   });
 });

@@ -6,10 +6,21 @@ function makeStack(name, spec = {}) {
   return createResource('AgentStack', { name, namespace: 'krate-org-default' }, {
     organizationRef: 'default',
     baseAgent: 'claude-code',
-    adapter: 'anthropic',
+    adapter: 'claude-code',
+    provider: 'anthropic',
     runtimeIdentity: { serviceAccountRef: 'sa-default' },
     ...spec
   });
+}
+
+function createMockResourceGateway() {
+  const applied = [];
+  return {
+    applied,
+    async apply(resource) { applied.push(resource); return resource; },
+    async get() { return null; },
+    async delete() {},
+  };
 }
 
 function makeServiceAccount(name) {
@@ -48,21 +59,9 @@ function buildValidResources(stackName) {
 }
 
 test('Successful dispatch with Agent Mux available', async () => {
-  // Use a mock mux client that returns a session without making real HTTP calls
-  const muxClient = {
-    role: 'agent-mux-client',
-    isAvailable() { return true; },
-    async launchSession() { return { runId: `amux-${Date.now()}`, sessionId: `session-${Date.now()}` }; },
-    subscribeToEvents(runId, cb) { return { abort() {} }; },
-    reconcileTranscript(sessionId, events, opts) {
-      return createResource('AgentSessionTranscript', { name: `transcript-${sessionId}`, namespace: opts?.namespace || 'default' }, {
-        organizationRef: opts?.organizationRef || 'default',
-        sessionRef: sessionId,
-        messages: [],
-        cost: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
-      }, { phase: 'Reconciled', reconciledAt: new Date().toISOString() });
-    },
-  };
+  // Use a mux client with a mock resource gateway so job submission succeeds
+  const gw = createMockResourceGateway();
+  const muxClient = createAgentMuxClient({ resourceGateway: gw });
   const resources = buildValidResources('dispatch-stack');
   const controller = createAgentDispatchController({ agentMuxClient: muxClient });
 
@@ -83,14 +82,21 @@ test('Successful dispatch with Agent Mux available', async () => {
   assert.ok(result.permissionSnapshot, 'Result should include permissionSnapshot');
   assert.equal(result.run.kind, 'AgentDispatchRun');
   assert.equal(result.attempt.kind, 'AgentDispatchAttempt');
-  assert.equal(result.run.status.phase, 'Running', 'Run phase should be Running when mux is available');
-  assert.ok(result.attempt.status.agentMuxRunId, 'Attempt should have agentMuxRunId');
-  assert.ok(result.attempt.status.agentMuxSessionId, 'Attempt should have agentMuxSessionId');
+  assert.equal(result.run.status.phase, 'Running', 'Run phase should be Running when job submits');
+  assert.ok(result.attempt.status.jobName, 'Attempt should have jobName');
+  assert.ok(result.attempt.status.jobSubmitted, 'Attempt should have jobSubmitted=true');
   assert.ok(result.attempt.status.startedAt, 'Attempt should have startedAt timestamp');
+  assert.ok(result.run.spec.jobRef, 'Run should have jobRef');
+  assert.ok(result.jobResult, 'Result should include jobResult');
+  assert.equal(result.jobResult.submitted, true, 'Job should be submitted');
+  // Verify the K8s Job was applied to the gateway
+  assert.equal(gw.applied.length, 1, 'One Job should be applied');
+  assert.equal(gw.applied[0].kind, 'Job', 'Applied resource should be a Job');
 });
 
-test('Dispatch with Agent Mux unavailable', async () => {
-  const muxClient = createAgentMuxClient({ gateway: '', enabled: false });
+test('Dispatch with Agent Mux unavailable (no resource gateway)', async () => {
+  // When no resourceGateway is provided, job submission throws
+  const muxClient = createAgentMuxClient({});
   const resources = buildValidResources('dispatch-stack');
   const controller = createAgentDispatchController({ agentMuxClient: muxClient });
 
@@ -105,12 +111,11 @@ test('Dispatch with Agent Mux unavailable', async () => {
   });
 
   assert.equal(result.error, false, 'Dispatch should still succeed (queued)');
-  assert.equal(result.run.status.phase, 'Queued', 'Run phase should be Queued when mux is unavailable');
+  assert.equal(result.run.status.phase, 'Queued', 'Run phase should be Queued when job submission fails');
   assert.ok(result.run.status.conditions, 'Run should have conditions');
-  const muxCondition = result.run.status.conditions.find(c => c.type === 'AgentMuxBound');
-  assert.ok(muxCondition, 'Should have AgentMuxBound condition');
-  assert.equal(muxCondition.status, 'False', 'AgentMuxBound should be False');
-  assert.equal(muxCondition.reason, 'Unavailable');
+  const jobCondition = result.run.status.conditions.find(c => c.type === 'JobSubmitted');
+  assert.ok(jobCondition, 'Should have JobSubmitted condition');
+  assert.equal(jobCondition.status, 'False', 'JobSubmitted should be False');
 });
 
 test('Dispatch denied by permission review', async () => {
@@ -276,23 +281,9 @@ test('Dispatch with requires-approval returns early with awaitingApproval', asyn
   assert.equal(result.attempt, undefined, 'No attempt when awaiting approval');
 });
 
-test('Successful launch creates transcript ref on run', async () => {
-  const sessionId = `session-${Date.now()}`;
-  const runId = `amux-${Date.now()}`;
-  const muxClient = {
-    role: 'agent-mux-client',
-    isAvailable() { return true; },
-    async launchSession() { return { runId, sessionId }; },
-    subscribeToEvents(rid, cb) { return { abort() {} }; },
-    reconcileTranscript(sid, events, opts) {
-      return createResource('AgentSessionTranscript', { name: `transcript-${sid}`, namespace: opts?.namespace || 'default' }, {
-        organizationRef: opts?.organizationRef || 'default',
-        sessionRef: sid,
-        messages: [],
-        cost: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
-      }, { phase: 'Reconciled', reconciledAt: new Date().toISOString() });
-    },
-  };
+test('Successful launch creates jobRef on run', async () => {
+  const gw = createMockResourceGateway();
+  const muxClient = createAgentMuxClient({ resourceGateway: gw });
   const resources = buildValidResources('transcript-stack');
   const controller = createAgentDispatchController({ agentMuxClient: muxClient });
 
@@ -308,8 +299,8 @@ test('Successful launch creates transcript ref on run', async () => {
 
   assert.equal(result.error, false, 'Dispatch should succeed');
   assert.equal(result.run.status.phase, 'Running', 'Run phase should be Running');
-  assert.ok(result.transcript, 'Result should include transcript');
-  assert.equal(result.transcript.kind, 'AgentSessionTranscript', 'Transcript should be AgentSessionTranscript');
-  assert.ok(result.run.status.transcriptRef, 'Run should have transcriptRef in status');
-  assert.equal(result.run.status.transcriptRef, result.transcript.metadata.name, 'Run transcriptRef should match transcript name');
+  assert.ok(result.run.spec.jobRef, 'Run should have jobRef in spec');
+  assert.ok(result.attempt.status.jobName, 'Attempt should have jobName');
+  assert.equal(result.attempt.status.jobSubmitted, true, 'Job should be submitted');
+  assert.equal(result.jobResult.submitted, true, 'jobResult.submitted should be true');
 });

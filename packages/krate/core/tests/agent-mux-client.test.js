@@ -202,3 +202,129 @@ describe('createAgentMuxClient — reconcileTranscript', () => {
     assert.equal(transcript.spec.organizationRef, 'default');
   });
 });
+
+describe('createAgentMuxClient — resolveTransport', () => {
+  it('returns stdio + anthropic codec when no transport bindings provided', () => {
+    const client = createAgentMuxClient();
+    const result = client.resolveTransport({ spec: { adapter: 'claude-code', provider: 'anthropic' } }, []);
+    assert.equal(result.protocol, 'stdio');
+    assert.equal(result.endpoint, '');
+    assert.equal(result.codec, 'anthropic');
+  });
+
+  it('returns stdio + openai codec when provider is openai', () => {
+    const client = createAgentMuxClient();
+    const result = client.resolveTransport({ spec: { adapter: 'codex', provider: 'openai' } }, []);
+    assert.equal(result.protocol, 'stdio');
+    assert.equal(result.codec, 'openai');
+  });
+
+  it('returns stdio + google codec when provider is google', () => {
+    const client = createAgentMuxClient();
+    const result = client.resolveTransport({ spec: { adapter: 'gemini-cli', provider: 'google' } }, []);
+    assert.equal(result.protocol, 'stdio');
+    assert.equal(result.codec, 'google');
+  });
+
+  it('returns google codec when provider is gemini', () => {
+    const client = createAgentMuxClient();
+    const result = client.resolveTransport({ spec: { adapter: 'gemini-cli', provider: 'gemini' } }, []);
+    assert.equal(result.codec, 'google');
+  });
+
+  it('returns http + endpoint + anthropic codec from a matching AgentTransportBinding', () => {
+    const client = createAgentMuxClient();
+    const bindings = [
+      { spec: { adapterRef: 'claude-code', protocol: 'http', endpoint: 'http://localhost:9090' } },
+    ];
+    const result = client.resolveTransport({ spec: { adapter: 'claude-code', provider: 'anthropic' } }, bindings);
+    assert.equal(result.protocol, 'http');
+    assert.equal(result.endpoint, 'http://localhost:9090');
+    assert.equal(result.codec, 'anthropic');
+  });
+
+  it('returns websocket + endpoint from a binding with websocket protocol', () => {
+    const client = createAgentMuxClient();
+    const bindings = [
+      { spec: { adapterRef: 'claude-code', protocol: 'websocket', endpoint: 'ws://agent.example.com:8080' } },
+    ];
+    const result = client.resolveTransport({ spec: { adapter: 'claude-code', provider: 'anthropic' } }, bindings);
+    assert.equal(result.protocol, 'websocket');
+    assert.equal(result.endpoint, 'ws://agent.example.com:8080');
+  });
+
+  it('ignores a binding whose adapterRef does not match the stack adapter', () => {
+    const client = createAgentMuxClient();
+    const bindings = [
+      { spec: { adapterRef: 'other-adapter', protocol: 'http', endpoint: 'http://other:9090' } },
+    ];
+    const result = client.resolveTransport({ spec: { adapter: 'claude-code', provider: 'anthropic' } }, bindings);
+    assert.equal(result.protocol, 'stdio');
+  });
+
+  it('defaults to stdio when transportBindings is undefined', () => {
+    const client = createAgentMuxClient();
+    const result = client.resolveTransport({ spec: { adapter: 'aider', provider: 'openai' } });
+    assert.equal(result.protocol, 'stdio');
+    assert.equal(result.codec, 'openai');
+  });
+
+  it('falls back to claude-code adapter when stack spec has no adapter or baseAgent', () => {
+    const client = createAgentMuxClient();
+    const result = client.resolveTransport({ spec: {} }, []);
+    assert.equal(result.protocol, 'stdio');
+    assert.equal(result.codec, 'anthropic');
+  });
+});
+
+describe('createAgentMuxClient — createAgentJob transport env vars', () => {
+  it('injects AGENT_MUX_TRANSPORT=stdio when no transport binding found', () => {
+    const client = createAgentMuxClient();
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      provider: 'anthropic',
+      org: 'test-org',
+      transportBindings: [],
+    });
+    const env = jobManifest.spec.template.spec.containers[0].env;
+    const transport = env.find(e => e.name === 'AGENT_MUX_TRANSPORT');
+    const codec = env.find(e => e.name === 'TRANSPORT_MUX_CODEC');
+    assert.ok(transport, 'AGENT_MUX_TRANSPORT must be set');
+    assert.equal(transport.value, 'stdio');
+    assert.ok(codec, 'TRANSPORT_MUX_CODEC must be set');
+    assert.equal(codec.value, 'anthropic');
+  });
+
+  it('injects AGENT_MUX_TRANSPORT=http and AGENT_MUX_TRANSPORT_ENDPOINT when binding found', () => {
+    const client = createAgentMuxClient();
+    const bindings = [
+      { spec: { adapterRef: 'claude-code', protocol: 'http', endpoint: 'http://mux.internal:9090' } },
+    ];
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      provider: 'anthropic',
+      org: 'test-org',
+      transportBindings: bindings,
+    });
+    const env = jobManifest.spec.template.spec.containers[0].env;
+    const transport = env.find(e => e.name === 'AGENT_MUX_TRANSPORT');
+    const endpoint = env.find(e => e.name === 'AGENT_MUX_TRANSPORT_ENDPOINT');
+    const codec = env.find(e => e.name === 'TRANSPORT_MUX_CODEC');
+    assert.equal(transport.value, 'http');
+    assert.ok(endpoint, 'AGENT_MUX_TRANSPORT_ENDPOINT must be set for non-stdio');
+    assert.equal(endpoint.value, 'http://mux.internal:9090');
+    assert.equal(codec.value, 'anthropic');
+  });
+
+  it('does not set AGENT_MUX_TRANSPORT_ENDPOINT for stdio transport', () => {
+    const client = createAgentMuxClient();
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      provider: 'anthropic',
+      org: 'test-org',
+    });
+    const env = jobManifest.spec.template.spec.containers[0].env;
+    const endpoint = env.find(e => e.name === 'AGENT_MUX_TRANSPORT_ENDPOINT');
+    assert.equal(endpoint, undefined);
+  });
+});

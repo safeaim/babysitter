@@ -669,8 +669,33 @@ trust boundary, and scaling configuration.
 **Relationships:**
 - Belongs to: Organization
 - Contains: Runners (in-memory registry)
-- Schedules: Jobs from Pipelines and AgentDispatchRuns
+- Schedules: CI Jobs from Pipelines; agent execution via `batch/v1` K8s Jobs for AgentDispatchRuns
 - Referenced by: AgentStack (runner policy)
+
+---
+
+### 1.2.1 How K8s Jobs Relate to RunnerPools
+
+Agent dispatch (via `AgentDispatchRun`) uses **Kubernetes `batch/v1` Jobs** for
+execution, not the RunnerPool's in-memory runner registry directly.
+
+| Concept | RunnerPool (CI) | Agent K8s Job |
+|---------|----------------|---------------|
+| Scheduling unit | Runner pod (long-lived, warm) | Job pod (short-lived, per-run) |
+| Lifecycle | Idle → Running → Terminating (reused) | Pending → Active → Succeeded/Failed (one-shot) |
+| Scaling | warmReplicas/maxReplicas | One Job per dispatch run |
+| Workspace mount | `/workspace` via PVC | `/workspace` via same PVC pattern |
+| Budget enforcement | `resourceLimits` in pod spec | `activeDeadlineSeconds` in Job spec |
+| Result delivery | Runner calls back or exits | Agent pod POSTs to callback endpoint |
+
+RunnerPool capacity is used for **CI Jobs** (Pipeline, Job resources). For **agent
+dispatch**, the dispatch controller creates `batch/v1` Jobs directly using the pod
+spec from the stack's `AgentServiceAccount` and `RunnerPool.spec.image` as a
+starting point. The RunnerPool's `warmReplicas` does not pre-warm agent Job pods.
+
+When an AgentStack references a `runnerPolicy.runnerPoolRef`, the referenced pool's
+`spec.image`, `spec.resourceLimits`, `spec.resourceRequests`, and `spec.serviceAccount`
+fields are used as defaults when building the agent Job manifest via `createAgentJob()`.
 
 ---
 
@@ -1487,16 +1512,26 @@ cost tracking, and memory snapshot reference.
 - `conditions[]` — K8s-style condition array
 
 **Creation Flow (via `createManualDispatch()`):**
-1. Find AgentStack by name
+1. Resolve AgentStack via `resolveStack()` (translates CRD → execution config)
 2. Permission review (allowed / denied / requires-approval)
-3. Memory snapshot creation (if AgentMemoryRepository exists)
-4. Approval gate (if required)
-5. Workspace provisioning (reuse existing or create new)
-6. Context bundle assembly
-7. Create AgentDispatchRun + AgentDispatchAttempt resources
-8. Launch Agent Mux session
-9. Start SSE subscription
-10. Reconcile transcript
+3. Budget check via `checkBudget()` + `estimateCost()`
+4. Memory snapshot creation (if AgentMemoryRepository exists)
+5. Approval gate (if required) — emits `APPROVAL_REQUESTED` hooks event
+6. Workspace provisioning (reuse existing or create new)
+7. Context bundle assembly
+8. Create AgentDispatchRun + AgentDispatchAttempt resources
+9. `createAgentJob()` generates `batch/v1` Job manifest (image, command, env, volumes, deadline)
+10. `submitAgentJob()` submits Job to Kubernetes
+11. Workspace PVC mounted at `/workspace` in agent pod
+12. Transport env vars injected: `AGENT_MUX_TRANSPORT`, `TRANSPORT_MUX_CODEC`
+13. Agent pod executes and POSTs result to `/api/orgs/{org}/agents/runs/{name}/callback`
+14. `persistSessionEvent()` applies result, emits `RUN_COMPLETED` or `RUN_FAILED`
+
+**K8s Job Relationship:**
+Each `Running` dispatch run owns exactly one active `batch/v1` Job in Kubernetes.
+Job name: `agent-{run.metadata.name}`. The `activeDeadlineSeconds` field enforces
+the budget ceiling: if the agent exceeds the allowed time, Kubernetes terminates
+the pod and the run transitions to `Failed` (deadline-exceeded).
 
 **Relationships:**
 - Belongs to: Organization
@@ -1875,8 +1910,8 @@ and redaction status.
 | Plural | krateworkspaces |
 | Namespace | org-scoped |
 
-**Purpose:** Volume-backed git workspace with PVC lifecycle, repository binding, runner
-mount spec, session associations, and run history.
+**Purpose:** Volume-backed git workspace with PVC lifecycle, repository binding, agent
+Job mount spec, session associations, and run history.
 
 **Required Spec Fields:**
 - `organizationRef` — owning organization
@@ -1892,10 +1927,30 @@ mount spec, session associations, and run history.
 - `Pending` — workspace created, PVC not yet bound
 - `Provisioning` — PVC being created
 - `Ready` — workspace available for use
-- `InUse` — claimed by a dispatch run
+- `InUse` — claimed by a dispatch run; PVC mounted at `/workspace` in agent Job pod
 - `Released` — run completed, workspace available again
 - `Archived` — long-term storage, not active
 - `Terminating` — being deleted
+
+**Agent Job Mounting:**
+When an `AgentDispatchRun` enters the `Running` phase, the workspace PVC is mounted
+into the agent's `batch/v1` Job pod at `/workspace`. `getMountSpec()` returns the
+`{ volume, volumeMount }` pair that `createAgentJob()` injects into the Job template:
+
+```yaml
+volumes:
+  - name: workspace
+    persistentVolumeClaim:
+      claimName: krate-ws-{workspaceName}
+containers:
+  - name: agent
+    volumeMounts:
+      - name: workspace
+        mountPath: /workspace
+```
+
+The agent process reads source code, writes changes, and produces artifacts relative
+to `/workspace`. This path is fixed regardless of which workspace PVC is mounted.
 
 **Operations:**
 - `createWorkspace()` — creates workspace + PVC manifest

@@ -547,9 +547,14 @@ if (!resourceNs || resourceNs !== orgNs) {
 
 ## 8. Agent Dispatch Lifecycle
 
-### 8.1 Complete Flow
+### 8.1 Complete Flow (K8s Job-Based)
 
 Source: `packages/krate/core/src/agent-dispatch-controller.js`
+
+Agents are dispatched as Kubernetes `batch/v1` Jobs (not subprocesses or direct
+Agent Mux HTTP calls). Each dispatch creates a Job manifest via `createAgentJob()`,
+submits it to Kubernetes via `submitAgentJob()`, and waits for the agent pod to
+POST its result to the callback endpoint.
 
 ```mermaid
 sequenceDiagram
@@ -563,14 +568,18 @@ sequenceDiagram
     participant Approval as ApprovalController
     participant Workspace as WorkspaceController
     participant Context as ContextBundler
-    participant Mux as AgentMuxClient
+    participant Hooks as HooksLifecycleEmitter
+    participant K8s as Kubernetes Jobs API
+    participant Pod as Agent Pod (Job)
+    participant Callback as Callback Endpoint
 
     UI->>HTTP: POST /api/orgs/:org/agents/dispatch
     HTTP->>API: controller.dispatchAgent(input)
     API->>API: snapshot = await this.snapshot()
     API->>Dispatch: createManualDispatch({ ...input, resources: snapshot.resources })
 
-    Dispatch->>Dispatch: 1. Find AgentStack by name in resources
+    Dispatch->>Dispatch: 1. resolveStack(agentStack, resources)
+    Note over Dispatch: Translates AgentStack CRD → execution config (model, prompt, tools, transport)
     alt Stack not found
         Dispatch-->>API: { error: true, reason: 'stack-not-found' }
     end
@@ -581,12 +590,15 @@ sequenceDiagram
         Dispatch-->>API: { error: true, reason: 'permission-denied' }
     end
 
+    Dispatch->>Hooks: emit('RUN_CREATED', { runId, org, stackRef })
+
     Dispatch->>Memory: 3. Memory snapshot (if AgentMemoryRepository exists)
     Memory-->>Dispatch: memorySnapshot resource
 
     alt Requires approval
         Dispatch->>Dispatch: Create AgentDispatchRun (phase: AwaitingApproval)
         Dispatch->>Approval: createApprovalRequest({ dispatchRun, action: 'secret-access' })
+        Dispatch->>Hooks: emit('APPROVAL_REQUESTED', { dispatchRun, action })
         Dispatch-->>API: { run, approval, awaitingApproval: true }
     end
 
@@ -602,24 +614,150 @@ sequenceDiagram
     Context-->>Dispatch: contextBundle resource
 
     Dispatch->>Dispatch: 6. Create AgentDispatchRun + AgentDispatchAttempt
+    Dispatch->>Dispatch: checkBudget({ org, model, estimatedTokens })
+    Note over Dispatch: Enforced via activeDeadlineSeconds + model-based cost tracking
 
-    Dispatch->>Mux: 7. agentMuxClient.launchSession({ stack, contextBundle })
-    alt Mux available and launch succeeds
-        Mux-->>Dispatch: { runId, sessionId }
-        Dispatch->>Dispatch: run.status.phase = 'Running'
-        Dispatch->>Mux: subscribeToEvents(runId, handler)
-        Dispatch->>Mux: reconcileTranscript(sessionId, events)
-    else Mux unavailable
-        Dispatch->>Dispatch: run.status.phase = 'Queued'
-        Dispatch->>Dispatch: condition: AgentMuxBound=False
-    end
+    Dispatch->>Dispatch: 7. createAgentJob(run, executionConfig)
+    Note over Dispatch: Generates batch/v1 Job manifest with image, command, env, volumes, resources, deadline
+    Dispatch->>K8s: submitAgentJob(jobManifest)
+    K8s-->>Dispatch: Job created (phase: Pending)
+    Dispatch->>Dispatch: run.status.phase = 'Running'
+    Dispatch->>Hooks: emit('STEP_STARTED', { runId, jobName })
 
-    Dispatch-->>API: { run, attempt, contextBundle, workspace, transcript }
+    K8s->>Pod: Schedule agent pod (workspace PVC mounted at /workspace)
+    Note over Pod: Env: AGENT_MUX_TRANSPORT, TRANSPORT_MUX_CODEC injected by resolveTransport()
+    Pod->>Pod: Execute agent session
+    Pod->>Callback: POST /api/orgs/:org/agents/runs/:name/callback (result)
+    Callback->>Dispatch: persistSessionEvent(runId, result)
+    Dispatch->>Dispatch: run.status.phase = 'Completed' | 'Failed'
+    Dispatch->>Hooks: emit('RUN_COMPLETED' | 'RUN_FAILED', { runId, result })
+
+    Dispatch-->>API: { run, attempt, contextBundle, workspace, jobName }
 ```
 
-### 8.2 Permission Review Steps
+### 8.2 K8s Job Manifest Structure
 
-1. Resolve AgentStack from resources
+`createAgentJob(run, executionConfig)` produces a `batch/v1` Job manifest with
+the following structure:
+
+```javascript
+{
+  apiVersion: 'batch/v1',
+  kind: 'Job',
+  metadata: {
+    name: `agent-${run.metadata.name}`,
+    namespace: run.metadata.namespace,
+    labels: {
+      'krate.a5c.ai/org': org,
+      'krate.a5c.ai/dispatch-run': run.metadata.name,
+      'krate.a5c.ai/agent-job': 'true'
+    }
+  },
+  spec: {
+    activeDeadlineSeconds: budgetDeadline,  // budget enforcement
+    backoffLimit: 0,                         // no automatic retry (krate handles retries)
+    template: {
+      spec: {
+        serviceAccountName: executionConfig.serviceAccountName,
+        restartPolicy: 'Never',
+        containers: [{
+          name: 'agent',
+          image: executionConfig.agentImage,
+          command: executionConfig.command,
+          env: [
+            { name: 'AGENT_MUX_TRANSPORT', value: resolvedTransport.transport },
+            { name: 'TRANSPORT_MUX_CODEC',  value: resolvedTransport.codec },
+            { name: 'KRATE_CALLBACK_URL',   value: callbackUrl },
+            { name: 'KRATE_RUN_ID',         value: run.metadata.name },
+            // ...stack-specific env vars
+          ],
+          resources: executionConfig.resourceRequests,
+          volumeMounts: [{ name: 'workspace', mountPath: '/workspace' }]
+        }],
+        volumes: [{
+          name: 'workspace',
+          persistentVolumeClaim: { claimName: workspace.spec.pvcName }
+        }]
+      }
+    }
+  }
+}
+```
+
+### 8.3 Transport Resolution and Codec Injection
+
+`resolveTransport(stack, resources)` reads the `AgentTransportBinding` referenced
+by the stack's adapter and produces the environment variables injected into the Job:
+
+| Variable | Source | Example |
+|----------|--------|---------|
+| `AGENT_MUX_TRANSPORT` | `binding.spec.protocol` | `'websocket'` |
+| `TRANSPORT_MUX_CODEC` | `binding.spec.codec ?? 'json'` | `'json'` |
+
+The agent pod reads these variables at startup to configure its message framing
+and connection lifecycle. No agent code changes are needed when switching transports.
+
+### 8.4 Budget Enforcement
+
+`checkBudget({ org, model, estimatedTokens })` runs before Job creation:
+
+1. Load `AgentProviderConfig` for the stack's model/provider
+2. Compute `estimateCost(model, estimatedTokens)` using model-based rate tables
+3. Compare against `org.spec.budgetLimitUsd` or a default ceiling
+4. If over budget: return `{ allowed: false, reason: 'budget-exceeded' }` — dispatch aborted
+5. If within budget: set `activeDeadlineSeconds` on the Job spec proportional to the
+   remaining budget at the model's token rate
+
+This ensures agent pods are automatically terminated by Kubernetes if they run
+longer than the budget allows, even without an explicit callback.
+
+### 8.5 Callback-Based Result Collection
+
+The agent pod calls `POST /api/orgs/:org/agents/runs/:name/callback` when the
+session completes:
+
+```
+POST /api/orgs/{org}/agents/runs/{name}/callback
+Authorization: Bearer <krate-run-token>
+Content-Type: application/json
+
+{
+  "phase": "Succeeded" | "Failed",
+  "exitCode": 0 | 1,
+  "artifacts": [...],
+  "costUsd": 0.042,
+  "errorMessage": "..." // present on failure
+}
+```
+
+`persistSessionEvent(runId, result)` applies the callback payload to the
+`AgentDispatchRun` and `AgentSession` resources, then emits the appropriate
+hooks lifecycle event.
+
+### 8.6 Hooks Lifecycle Events
+
+`createHooksLifecycleEmitter(bus)` wraps the internal event bus and emits
+9 lifecycle events:
+
+| Event | Trigger |
+|-------|---------|
+| `RUN_CREATED` | `createManualDispatch()` called |
+| `RUN_QUEUED` | Run enters `Queued` phase (budget check pending) |
+| `RUN_STARTED` | Job submitted to K8s, pod scheduled |
+| `STEP_STARTED` | Agent pod reports a tool-use or reasoning step |
+| `STEP_COMPLETED` | Agent pod reports step completion |
+| `APPROVAL_REQUESTED` | `createApprovalRequest()` called |
+| `APPROVAL_GRANTED` | `recordDecision()` with `Approved` |
+| `APPROVAL_DENIED` | `recordDecision()` with `Denied` |
+| `RUN_COMPLETED` | Callback received with `phase: Succeeded` |
+| `RUN_FAILED` | Callback received with `phase: Failed`, or Job deadline exceeded |
+
+These events flow to registered `WebhookSubscription` endpoints and the
+notification system.
+
+### 8.7 Permission Review Steps
+
+1. Resolve AgentStack from resources via `resolveStack()`
 2. Validate approvalMode (yolo/prompt/deny)
 3. Cross-org denial: agent org vs repository org
 4. Expand capabilities from stack spec (tools, MCP, skills, subagents)
@@ -630,7 +768,7 @@ sequenceDiagram
 9. Check AgentConfigGrant for agent
 10. Compute decision: `allowed`, `requires-approval`, or `denied`
 
-### 8.3 Decision Matrix
+### 8.8 Decision Matrix
 
 | approvalMode | Errors | Fork | Decision |
 |-------------|--------|------|----------|

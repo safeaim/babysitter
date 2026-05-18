@@ -19,7 +19,7 @@ Krate is split into 4 packages under `packages/krate/`:
 
 ```bash
 npm run build     # Generate dist/ JSON snapshots
-npm test          # Unit + integration tests (node:test) — 1259 tests
+npm test          # Unit + integration tests (node:test) — 1300 tests
 npm run e2e       # End-to-end package validation — 3 tests
 npm run smoke     # MVP smoke assertions — 21 checks
 npm run serve     # Start HTTP API on port 3080
@@ -88,6 +88,28 @@ The CLI provides an MCP server (`krate mcp`) that exposes 14 tools, 3 prompts, a
 - Auth middleware on all mutating API routes
 - Async kubectl snapshot with stale-while-revalidate cache (30s TTL)
 
+## Agent Dispatch: K8s Job Architecture
+
+Agents are dispatched as Kubernetes `batch/v1` Jobs (not subprocesses or Agent Mux HTTP calls).
+The dispatch flow:
+
+1. `resolveStack(agentStack, resources)` — translates AgentStack CRD to execution config
+2. `checkBudget()` + `estimateCost()` — enforce org budget before Job creation
+3. `resolveTransport(stack, resources)` — reads AgentTransportBinding, produces env vars
+4. `createAgentJob(run, executionConfig)` — generates Job manifest with:
+   - Workspace PVC mounted at `/workspace`
+   - `AGENT_MUX_TRANSPORT` and `TRANSPORT_MUX_CODEC` env vars injected
+   - `activeDeadlineSeconds` set for budget enforcement
+   - `KRATE_CALLBACK_URL` pointing to result callback endpoint
+5. `submitAgentJob(manifest)` — applies Job to Kubernetes
+6. Agent pod executes, then POSTs result to `POST /api/orgs/{org}/agents/runs/{name}/callback`
+7. `persistSessionEvent(runId, result)` — updates AgentDispatchRun + AgentSession resources
+8. `createHooksLifecycleEmitter(bus)` — emits 9 lifecycle events at each dispatch stage
+
+**Key new SDK exports:** `createAgentJob`, `submitAgentJob`, `getJobStatus`, `getJobLogs`,
+`deleteJob`, `resolveStack`, `persistSessionEvent`, `createHooksLifecycleEmitter`,
+`checkBudget`, `estimateCost`, `resolveTransport`
+
 ## Agent Mux Integration
 
 - AgentStack, AgentDispatchRun, AgentTriggerRule, AgentSession, AgentMemory and 7+ more resource kinds fully implemented
@@ -96,3 +118,4 @@ The CLI provides an MCP server (`krate mcp`) that exposes 14 tools, 3 prompts, a
 - Subagent orchestration with dispatch, supervision, tool scoping
 - Permission review with cross-org denial, workspace policy enforcement
 - External backend providers with GitHub adapter, webhook/sync/write/conflict controllers
+- K8s Job-based dispatch with callback result collection and hooks lifecycle events

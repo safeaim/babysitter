@@ -324,6 +324,217 @@ normalizeOrgSlug('  HELLO  ');  // 'hello'
 
 ## 6. Agent Controllers
 
+### resolveStack(agentStack, resources)
+
+Translates an `AgentStack` CRD into a flat execution config consumed by `createAgentJob()`.
+
+```javascript
+import { resolveStack } from '@a5c-ai/krate-sdk';
+
+const executionConfig = resolveStack(agentStack, resources);
+// Returns: {
+//   agentImage: string,
+//   command: string[],
+//   model: string,
+//   prompt: string,
+//   systemPrompt: string,
+//   serviceAccountName: string,
+//   resourceRequests: { cpu, memory },
+//   resourceLimits: { cpu, memory },
+//   adapterRef: string,
+//   runnerPoolRef: string | null
+// }
+```
+
+**Throws:** `Error('AgentStack not found: X')` if stack is not in resources.
+
+---
+
+### createAgentJob(run, executionConfig)
+
+Generates a `batch/v1` Job manifest for an agent dispatch run. Does not submit
+to Kubernetes — call `submitAgentJob()` to apply.
+
+```javascript
+import { createAgentJob } from '@a5c-ai/krate-sdk';
+
+const jobManifest = createAgentJob(run, executionConfig, {
+  workspacePvcName: 'krate-ws-my-workspace',
+  callbackUrl: 'https://krate.example.com/api/orgs/acme/agents/runs/run-abc/callback',
+  resolvedTransport: { transport: 'websocket', codec: 'json' },
+  budgetDeadlineSeconds: 3600
+});
+// Returns: batch/v1 Job object ready for kubectl apply
+```
+
+**Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `run` | `object` | AgentDispatchRun resource |
+| `executionConfig` | `object` | Output of `resolveStack()` |
+| `options.workspacePvcName` | `string` | PVC name to mount at `/workspace` |
+| `options.callbackUrl` | `string` | Callback endpoint for result reporting |
+| `options.resolvedTransport` | `object` | Output of `resolveTransport()` |
+| `options.budgetDeadlineSeconds` | `number` | `activeDeadlineSeconds` for budget enforcement |
+
+---
+
+### submitAgentJob(jobManifest)
+
+Submits a Job manifest to Kubernetes via `kubectl apply -f -`. Returns the applied
+Job resource.
+
+```javascript
+import { submitAgentJob } from '@a5c-ai/krate-sdk';
+
+const appliedJob = await submitAgentJob(jobManifest);
+// Returns: { job: K8s Job resource, jobName: string }
+```
+
+---
+
+### getJobStatus(jobName, namespace)
+
+Retrieves the current status of a Kubernetes Job.
+
+```javascript
+import { getJobStatus } from '@a5c-ai/krate-sdk';
+
+const status = await getJobStatus('agent-run-abc', 'krate-org-acme');
+// Returns: { phase: 'Pending'|'Active'|'Succeeded'|'Failed', startTime, completionTime, conditions }
+```
+
+---
+
+### getJobLogs(jobName, namespace, options?)
+
+Retrieves logs from the agent pod associated with a Job.
+
+```javascript
+import { getJobLogs } from '@a5c-ai/krate-sdk';
+
+const logs = await getJobLogs('agent-run-abc', 'krate-org-acme', { tail: 100 });
+// Returns: string (raw log output)
+```
+
+---
+
+### deleteJob(jobName, namespace)
+
+Deletes a completed or failed Job and its associated pods.
+
+```javascript
+import { deleteJob } from '@a5c-ai/krate-sdk';
+
+await deleteJob('agent-run-abc', 'krate-org-acme');
+// Returns: { deleted: true, jobName }
+```
+
+---
+
+### persistSessionEvent(runId, result)
+
+Applies a callback result payload to the `AgentDispatchRun` and `AgentSession`
+resources, updating their phases and status fields.
+
+```javascript
+import { persistSessionEvent } from '@a5c-ai/krate-sdk';
+
+await persistSessionEvent('run-abc', {
+  phase: 'Succeeded',
+  exitCode: 0,
+  artifacts: [{ kind: 'pr', digest: 'sha256:abc' }],
+  costUsd: 0.042
+});
+// Updates: AgentDispatchRun.status.phase, AgentSession.status.phase, costUsd, artifacts
+```
+
+---
+
+### createHooksLifecycleEmitter(bus?)
+
+Creates a lifecycle event emitter that wraps an event bus and emits 9 structured
+agent lifecycle events to registered `WebhookSubscription` endpoints.
+
+```javascript
+import { createHooksLifecycleEmitter, globalEventBus } from '@a5c-ai/krate-sdk';
+
+const emitter = createHooksLifecycleEmitter(globalEventBus);
+
+emitter.emit('RUN_CREATED', { runId: 'run-abc', org: 'acme', stackRef: 'my-stack' });
+emitter.emit('RUN_STARTED', { runId: 'run-abc', k8sJobName: 'agent-run-abc' });
+emitter.emit('RUN_COMPLETED', { runId: 'run-abc', costUsd: 0.042, artifacts: [] });
+```
+
+**Event types:** `RUN_CREATED`, `RUN_QUEUED`, `RUN_STARTED`, `STEP_STARTED`,
+`STEP_COMPLETED`, `APPROVAL_REQUESTED`, `APPROVAL_GRANTED`, `APPROVAL_DENIED`,
+`RUN_COMPLETED`, `RUN_FAILED`
+
+---
+
+### checkBudget({ org, model, estimatedTokens, resources })
+
+Checks whether a dispatch run is within the organization's budget ceiling and
+computes the `activeDeadlineSeconds` value for the Job spec.
+
+```javascript
+import { checkBudget } from '@a5c-ai/krate-sdk';
+
+const result = checkBudget({
+  org: 'acme',
+  model: 'claude-sonnet-4',
+  estimatedTokens: 100000,
+  resources: snapshot.resources
+});
+// Returns: {
+//   allowed: boolean,
+//   reason: string | null,       // 'budget-exceeded' if not allowed
+//   estimatedCostUsd: number,
+//   activeDeadlineSeconds: number
+// }
+```
+
+---
+
+### estimateCost(model, inputTokens, outputTokens?)
+
+Pure function that computes estimated cost from model rate tables.
+
+```javascript
+import { estimateCost } from '@a5c-ai/krate-sdk';
+
+const cost = estimateCost('claude-sonnet-4', 80000, 20000);
+// Returns: number (USD)
+```
+
+Rate tables are sourced from `AgentProviderConfig.spec.modelRates`. Falls back
+to built-in defaults when no provider config is available.
+
+---
+
+### resolveTransport(stack, resources)
+
+Resolves the transport protocol and codec for an agent Job by reading the
+`AgentTransportBinding` referenced by the stack's adapter.
+
+```javascript
+import { resolveTransport } from '@a5c-ai/krate-sdk';
+
+const transport = resolveTransport(agentStack, resources);
+// Returns: {
+//   transport: 'websocket' | 'http' | 'stdio' | 'unix',
+//   codec: 'json' | 'msgpack',
+//   envVars: {
+//     AGENT_MUX_TRANSPORT: string,
+//     TRANSPORT_MUX_CODEC: string
+//   }
+// }
+```
+
+Falls back to `{ transport: 'http', codec: 'json' }` when no binding is found.
+
+---
+
 ### createAgentStackController(options?)
 
 ```javascript

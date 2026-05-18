@@ -1177,25 +1177,22 @@ experimental: {
 
 ## 5. Integration Gaps (Known, Documented)
 
-The following 13 agent-mux integration gap categories represent areas where
-krate has resource definitions and controller logic but lacks runtime integration
-with the agent-mux ecosystem.
+The following integration gap categories track areas where krate has resource
+definitions and controller logic but previously lacked (or still lacks) runtime
+integration. Items marked **RESOLVED** have been implemented in the K8s Job
+dispatch architecture.
 
-### Gap 1: Session Lifecycle Sync
+### Gap 1: Session Lifecycle Sync — RESOLVED
 
-**What krate does now:**
-Creates `AgentSession` resources with `spec.agentMuxSessionId`. Status is set
-based on mux client responses. If mux is unavailable, status stays `Pending`.
+**Previous state:**
+Created `AgentSession` resources with `spec.agentMuxSessionId`. Status depended
+on mux client responses; if mux was unavailable, status stayed `Pending`.
 
-**What it should do:**
-Bidirectional sync -- mux session state changes should update krate's AgentSession
-status in real-time. Currently only krate → mux (launch), no mux → krate (status updates).
-
-**What blocks it:**
-No webhook receiver or watch mechanism for mux-initiated status changes.
-Would need either a callback URL registered during launch or a polling loop.
-
-**Estimated effort:** 2-3 days (webhook receiver + reconciliation loop)
+**Resolution:**
+Agent pods now POST directly to the Krate callback endpoint
+(`POST /api/orgs/{org}/agents/runs/{name}/callback`) on completion.
+`persistSessionEvent()` applies the result to `AgentSession` and `AgentDispatchRun`
+in a single atomic update. No polling or mux webhook receiver needed.
 
 ---
 
@@ -1217,57 +1214,47 @@ mux is usually fast and capabilities rarely change.
 
 ---
 
-### Gap 3: Transport Binding Activation
+### Gap 3: Transport Resolution and Codec Injection — RESOLVED
 
-**What krate does now:**
-Validates `AgentTransportBinding` spec, reports connection status from
-resource status field (externally set).
+**Previous state:**
+Validated `AgentTransportBinding` spec, but never activated the transport runtime
+or injected settings into agent processes.
 
-**What it should do:**
-Signal transport-mux to activate/deactivate bindings when they are created/deleted.
-Currently transport-mux must independently discover binding changes.
-
-**What blocks it:**
-No communication channel to transport-mux. Could be solved with K8s watch
-on the transport-mux side, or webhook from krate on binding mutation.
-
-**Estimated effort:** 1-2 days (webhook or watch-based notification)
+**Resolution:**
+`resolveTransport(stack, resources)` reads the `AgentTransportBinding` referenced
+by the stack's adapter and injects `AGENT_MUX_TRANSPORT` and `TRANSPORT_MUX_CODEC`
+as environment variables directly into the `batch/v1` Job spec via `createAgentJob()`.
+Agent pods receive transport configuration at startup without any manual wiring.
 
 ---
 
-### Gap 4: Lifecycle Event Emission
+### Gap 4: Lifecycle Event Emission — RESOLVED
 
-**What krate does now:**
-`globalEventBus.emitResourceChange()` fires on resource CRUD operations.
-Purely internal, resource-level granularity.
+**Previous state:**
+`globalEventBus.emitResourceChange()` fired on resource CRUD operations only.
+Purely internal, resource-level granularity. No agent lifecycle events.
 
-**What it should do:**
-Emit hooks-mux-compatible lifecycle events (RUN_CREATED, STEP_STARTED, etc.)
-when agent-related resources change status.
-
-**What blocks it:**
-No hooks-mux event format adapter. Need to define mapping from resource status
-transitions to lifecycle event types.
-
-**Estimated effort:** 3-5 days (event mapper + hooks-mux client + delivery tracking)
+**Resolution:**
+`createHooksLifecycleEmitter(bus)` emits 9 structured lifecycle events
+(RUN_CREATED, RUN_QUEUED, RUN_STARTED, STEP_STARTED, STEP_COMPLETED,
+APPROVAL_REQUESTED, APPROVAL_GRANTED, APPROVAL_DENIED, RUN_COMPLETED/RUN_FAILED)
+at the correct dispatch lifecycle points. Events are forwarded to registered
+`WebhookSubscription` endpoints via the existing webhook delivery system.
 
 ---
 
-### Gap 5: Cost Aggregation
+### Gap 5: Cost Aggregation — RESOLVED
 
-**What krate does now:**
-`reconcileTranscript()` sums token usage from SSE events into a single
-AgentSessionTranscript. Cost fields are zero when no events available.
+**Previous state:**
+`reconcileTranscript()` summed token usage from SSE events. Cost fields were zero
+when no events were available.
 
-**What it should do:**
-Aggregate cost across multiple sessions in a dispatch run. Roll up to
-organization level for billing/budgeting.
-
-**What blocks it:**
-No cost aggregation controller. Need periodic job that sums transcript costs
-per run, per org, per time window.
-
-**Estimated effort:** 2-3 days (aggregation controller + UI dashboard)
+**Resolution:**
+`checkBudget()` + `estimateCost()` enforce budget before dispatch. The agent pod's
+callback payload includes `costUsd` (actual incurred cost). `persistSessionEvent()`
+records this against `AgentDispatchRun.status.costUsd`. Budget ceiling is enforced
+at the infrastructure level via `activeDeadlineSeconds` on the Job spec, ensuring
+agents cannot exceed their budget even if the callback is never delivered.
 
 ---
 
@@ -1278,13 +1265,13 @@ Web console shows session status from cached snapshot (30s staleness).
 SSE endpoint only emits resource-change events (kind/name/operation).
 
 **What it should do:**
-Proxy or relay agent-mux SSE events to the web console for live session
+Proxy or relay agent step events to the web console for live session
 viewing (token-by-token streaming).
 
 **What blocks it:**
-Web container cannot reach mux directly. API container would need to relay
-mux SSE to its own SSE endpoint. Significant complexity for multi-subscriber
-fanout with back-pressure.
+Web container cannot reach agent pods directly. API container would need to relay
+agent SSE or WebSocket events to its own SSE endpoint. Significant complexity for
+multi-subscriber fanout with back-pressure.
 
 **Estimated effort:** 5-8 days (SSE relay, subscriber management, back-pressure)
 
@@ -1294,17 +1281,19 @@ fanout with back-pressure.
 
 **What krate does now:**
 `AgentApproval` resources created with spec describing the gate (action, requestedBy).
-Status updated manually (via UI form or API call).
+Status updated manually (via UI form or API call). `APPROVAL_REQUESTED` hooks event
+is now emitted when the gate is created.
 
 **What it should do:**
-When approval is granted/denied, signal back to agent-mux to resume/cancel
-the blocked session. Currently approval resolution doesn't trigger mux action.
+When approval is granted/denied, automatically resume or cancel the blocked agent Job.
+Currently approval resolution updates the AgentDispatchRun phase but does not signal
+the suspended Job pod to continue.
 
 **What blocks it:**
-No callback mechanism from krate to mux on approval state change. Mux would
-need to poll AgentApproval status or register a webhook.
+Agent Job pods are not designed to pause mid-execution awaiting approval. The approval
+gate must be enforced at dispatch time (before Job creation), not within a running pod.
 
-**Estimated effort:** 2-3 days (approval webhook + mux integration)
+**Estimated effort:** 1-2 days (pre-dispatch approval gate enforcement tightening)
 
 ---
 
@@ -1312,54 +1301,47 @@ need to poll AgentApproval status or register a webhook.
 
 **What krate does now:**
 `AgentContextBundle` resources store prompt/context snapshots with digest.
-Created during dispatch, immutable after creation.
+Created during dispatch, immutable after creation. Bundle digest is stored in
+the Job's env vars.
 
 **What it should do:**
-Deliver the context bundle payload to agent-mux during session launch.
-Currently `launchSession()` passes `contextBundle.prompt` and `contextBundle.systemPrompt`
-but not the full bundle (attachments, provenance, redaction manifest).
+Deliver the full bundle payload (attachments, provenance, redaction manifest) to
+the agent pod at startup, not just the digest.
 
 **What blocks it:**
-Mux API may not support full bundle format. Need API contract alignment
-between krate's AgentContextBundle spec and mux's session creation payload.
+Bundle payloads may be too large for env var injection. Need a signed URL or
+in-cluster object store reference that the pod can fetch at startup.
 
-**Estimated effort:** 1-2 days (payload mapping + mux API extension)
+**Estimated effort:** 1-2 days (signed URL generation or object store integration)
 
 ---
 
-### Gap 9: Workspace Mount Coordination
+### Gap 9: Workspace Mount Coordination — RESOLVED
 
-**What krate does now:**
-`KrateWorkspace` spec defines volume mounts and repository bindings.
-`launchSession()` passes `workspace.mountPath` to mux.
+**Previous state:**
+`KrateWorkspace` spec defined volume mounts. `launchSession()` passed
+`workspace.mountPath` to mux. Assumed workspace was pre-provisioned.
 
-**What it should do:**
-Coordinate actual workspace provisioning (PVC creation, git clone, branch checkout)
-before signaling mux to start. Currently assumes workspace is pre-provisioned.
-
-**What blocks it:**
-Workspace provisioning is a separate controller's responsibility. Need
-orchestration to ensure workspace is ready before session starts.
-
-**Estimated effort:** 3-5 days (provisioning coordination, readiness gates)
+**Resolution:**
+The dispatch flow now verifies workspace phase before Job creation.
+`findReusableWorkspace()` returns only `Ready` workspaces. If none found,
+`createWorkspace()` provisions a new PVC. The Job is only submitted after the
+workspace PVC is `Bound`. The PVC is mounted at `/workspace` in the Job pod spec
+via `getMountSpec()`.
 
 ---
 
-### Gap 10: Trigger-to-Dispatch Pipeline
+### Gap 10: Trigger-to-Dispatch Pipeline — RESOLVED
 
-**What krate does now:**
-`AgentTriggerRule` defines event-to-stack routing. `AgentTriggerExecution`
-records evaluation decisions. Creates `AgentDispatchRun` on match.
+**Previous state:**
+`AgentTriggerRule` created `AgentDispatchRun` on match, but dispatch run creation
+was the terminal action — no agent was actually launched.
 
-**What it should do:**
-After creating AgentDispatchRun, automatically progress to session launch
-via agent-mux. Currently dispatch run creation is the terminal action.
-
-**What blocks it:**
-No "dispatch controller" that watches AgentDispatchRun resources in Queued
-state and calls `launchSession()`. This is the critical missing piece.
-
-**Estimated effort:** 3-5 days (dispatch reconciliation controller)
+**Resolution:**
+`createManualDispatch()` now continues through the full dispatch flow after creating
+the run resource: it runs `checkBudget()`, calls `createAgentJob()`, and submits the
+Job to Kubernetes via `submitAgentJob()`. The trigger-to-execution pipeline is now
+complete end-to-end.
 
 ---
 
@@ -1370,11 +1352,11 @@ state and calls `launchSession()`. This is the critical missing piece.
 Stack reconciliation resolves subagent references.
 
 **What it should do:**
-Orchestrate multiple concurrent mux sessions (one per subagent) for a single
+Orchestrate multiple concurrent K8s Jobs (one per subagent) for a single
 dispatch run. Track progress, handle dependencies between subagent tasks.
 
 **What blocks it:**
-No multi-session coordinator. Would need significant orchestration logic
+No multi-Job coordinator. Would need significant orchestration logic
 (task graph, dependency resolution, failure handling, rollback).
 
 **Estimated effort:** 10-15 days (orchestrator, state machine, failure handling)
@@ -1385,60 +1367,108 @@ No multi-session coordinator. Would need significant orchestration logic
 
 **What krate does now:**
 `AgentMemorySnapshot` pins memory state at dispatch time. `AgentMemoryQuery`
-records retrieval requests. Both are CRD resources.
+records retrieval requests. Both are CRD resources. A snapshot is created during
+dispatch if an `AgentMemoryRepository` exists.
 
 **What it should do:**
-At dispatch time, automatically query memory repositories, create snapshot,
-include relevant memory in the context bundle delivered to mux.
+Automatically inject the resolved memory snapshot content into the context bundle
+delivered to the agent Job as a mounted file or env var.
 
 **What blocks it:**
-No automated memory query pipeline. Currently snapshots/queries are created
-manually or by external automation. Need dispatch-time hook.
+Memory content may be large (full git-backed repository). Need efficient delivery
+mechanism (in-cluster object store or read-only PVC mount).
 
-**Estimated effort:** 3-5 days (dispatch hook, query execution, bundle injection)
+**Estimated effort:** 2-3 days (snapshot injection into Job spec)
 
 ---
 
 ### Gap 13: Provider Config Resolution
 
 **What krate does now:**
-`AgentProviderConfig` stores API base URLs, auth types, rate limits per provider.
-`AgentGatewayConfig` stores gateway connection settings.
+`AgentProviderConfig` stores API base URLs, auth types, and model rate tables.
+`checkBudget()` and `estimateCost()` use these rate tables for budget enforcement.
 
 **What it should do:**
-Resolve provider config at session launch time and pass credentials/settings
-to mux. Currently mux must independently manage provider credentials.
+Resolve provider config at Job creation time and pass credential references to
+the agent pod via env var secret refs (`valueFrom.secretKeyRef`).
 
 **What blocks it:**
-Security boundary -- krate should not pass raw API keys to mux (secret
-handling is mux's responsibility). Need credential reference protocol
-(e.g. "use secret X from namespace Y").
+Security boundary -- krate should not pass raw API keys in Job env vars.
+Need `secretKeyRef` protocol (reference existing K8s Secret by name/key).
 
-**Estimated effort:** 2-3 days (credential reference protocol, secret ref forwarding)
+**Estimated effort:** 1-2 days (secretKeyRef injection in createAgentJob)
 
 ---
 
 ### Summary of Integration Gaps
 
-| # | Gap | Effort | Priority |
-|---|-----|--------|----------|
-| 1 | Session Lifecycle Sync | 2-3d | High |
-| 2 | Adapter Capability Caching | 0.5d | Low |
-| 3 | Transport Binding Activation | 1-2d | Medium |
-| 4 | Lifecycle Event Emission | 3-5d | Medium |
-| 5 | Cost Aggregation | 2-3d | Medium |
-| 6 | Real-Time Session Streaming | 5-8d | High |
-| 7 | Approval Gate Integration | 2-3d | High |
-| 8 | Context Bundle Delivery | 1-2d | High |
-| 9 | Workspace Mount Coordination | 3-5d | Medium |
-| 10 | Trigger-to-Dispatch Pipeline | 3-5d | Critical |
-| 11 | Multi-Session Orchestration | 10-15d | Low |
-| 12 | Memory Query at Dispatch Time | 3-5d | Medium |
-| 13 | Provider Config Resolution | 2-3d | Medium |
+| # | Gap | Status | Effort | Priority |
+|---|-----|--------|--------|----------|
+| 1 | Session Lifecycle Sync | **RESOLVED** (callback endpoint) | — | — |
+| 2 | Adapter Capability Caching | Open | 0.5d | Low |
+| 3 | Transport Binding Activation | **RESOLVED** (env var injection) | — | — |
+| 4 | Lifecycle Event Emission | **RESOLVED** (9 hooks events) | — | — |
+| 5 | Cost Aggregation | **RESOLVED** (checkBudget + deadline) | — | — |
+| 6 | Real-Time Session Streaming | Open | 5-8d | High |
+| 7 | Approval Gate Integration | Partial (pre-dispatch) | 1-2d | Medium |
+| 8 | Context Bundle Delivery | Open | 1-2d | Medium |
+| 9 | Workspace Mount Coordination | **RESOLVED** (PVC mount in Job) | — | — |
+| 10 | Trigger-to-Dispatch Pipeline | **RESOLVED** (K8s Job submission) | — | — |
+| 11 | Multi-Session Orchestration | Open | 10-15d | Low |
+| 12 | Memory Query at Dispatch Time | Partial (snapshot created) | 2-3d | Medium |
+| 13 | Provider Config Resolution | Partial (rates used, creds pending) | 1-2d | Medium |
 
-**Total estimated integration effort:** 35-60 developer-days
+**Remaining open effort:** ~20-31 developer-days (down from 35-60)
 
-**Critical path:** Gap 10 (Trigger-to-Dispatch) is the minimal viable
-integration -- without it, no trigger rule can automatically launch an agent.
-Gaps 1, 7, and 8 are next priority as they complete the basic dispatch-to-completion
-lifecycle.
+**Resolved critical path:** Gap 10 (Trigger-to-Dispatch) is complete. The basic
+dispatch-to-completion lifecycle (Gaps 1, 9, 10) is now end-to-end operational
+via K8s Jobs. Remaining gaps (6, 11) are non-critical enhancements.
+
+---
+
+## 6. Architectural Choice: Why K8s Jobs (vs DaemonSet, Deployment, Raw Pod)
+
+### Decision
+
+Agent execution uses `batch/v1` Jobs (not DaemonSets, Deployments, or raw Pods).
+
+### Rationale
+
+| Option | Why Rejected |
+|--------|-------------|
+| **Raw Pod** | No automatic restart semantics; pod evictions or node failures lose the run. Pod lifecycle not tracked by K8s controller. Manual cleanup required. |
+| **Deployment** | Designed for long-lived services, not one-shot tasks. Scales by replica count, not by task. Restart policy conflicts with agent "run once to completion" semantics. |
+| **DaemonSet** | Runs one pod per node — not suitable for per-run isolation. Cannot express per-run resource limits or deadlines. |
+| **StatefulSet** | Designed for ordered, persistent services. Overkill for ephemeral agent runs. |
+| **batch/v1 Job (chosen)** | Native support for `completionMode`, `backoffLimit`, `activeDeadlineSeconds`. K8s garbage-collects succeeded Jobs automatically. Pod failure is surfaced as Job failure. Integrates with K8s scheduler for resource-aware placement. Works with cluster autoscaler for node provisioning. |
+
+### Why `activeDeadlineSeconds` for Budget Enforcement
+
+Budget enforcement requires a hard ceiling that survives process crashes, pod
+restarts, and network partitions. `activeDeadlineSeconds` is enforced by the
+K8s Job controller at the infrastructure level — even if the agent pod loses
+connectivity to Krate, Kubernetes will terminate the pod when the deadline is
+exceeded and mark the Job as Failed. This gives Krate a guaranteed out-of-band
+termination path independent of the callback mechanism.
+
+### Why One Job per Dispatch Run (vs Shared Runner Pool)
+
+- **Isolation:** Each run gets its own process namespace, filesystem, and network
+  policy. A bug in one agent cannot corrupt another run's workspace.
+- **Resource accounting:** Job resource requests/limits are per-run, enabling
+  accurate cost tracking and scheduler placement decisions.
+- **Auditability:** K8s Job name matches dispatch run name (`agent-{runName}`),
+  making cross-referencing between Krate resources and cluster logs trivial.
+- **Simplicity:** No need for a long-lived runner daemon to multiplex tasks; K8s
+  handles pod lifecycle, log collection, and cleanup.
+
+### Tradeoffs
+
+- **Cold start latency:** Each run incurs image pull + pod scheduling time (~5-30s
+  depending on cluster). RunnerPool warm replicas can mitigate this for CI Jobs,
+  but agent Jobs currently pay the full cold start cost.
+- **Cluster resource pressure:** Many concurrent dispatch runs create many pods.
+  Cluster autoscaler must be configured to scale node groups for agent workloads.
+- **Log retention:** K8s deletes completed Job pods after TTL. Krate must ship
+  logs to an external store (or use `persistSessionEvent` artifact logging) before
+  the TTL expires.

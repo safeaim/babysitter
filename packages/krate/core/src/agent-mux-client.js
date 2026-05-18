@@ -1,15 +1,23 @@
 import http from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
+import { spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { createResource } from './resource-model.js';
 
 export const AGENT_MUX_CLIENT_BOUNDARY = {
   role: 'agent-mux-client',
-  scope: 'HTTP/SSE adapter for Agent Mux gateway — capabilities, sessions, events, transcripts',
-  owns: ['gateway HTTP calls', 'SSE event streaming', 'transcript reconciliation'],
+  scope: 'HTTP/SSE adapter for Agent Mux gateway — capabilities, sessions, events, transcripts, local subprocess sessions',
+  owns: ['gateway HTTP calls', 'SSE event streaming', 'transcript reconciliation', 'local session spawning', 'subprocess lifecycle'],
   delegatesTo: ['resource-model'],
   mustNotOwn: ['secret values', 'permission review', 'resource persistence']
 };
+
+/** Known agent adapter names for local session spawning. */
+const KNOWN_ADAPTERS = new Set([
+  'claude-code', 'codex', 'gemini-cli', 'aider', 'goose',
+  'amp', 'roo-code', 'kilo-code', 'cline', 'cursor',
+]);
 
 /**
  * Internal HTTP request helper. Zero external deps — uses node:http / node:https.
@@ -225,6 +233,203 @@ export function createAgentMuxClient(options = {}) {
           }
         }
       };
+    },
+
+    /**
+     * Create a local agent session by spawning an agent-mux subprocess directly.
+     * Used when no gateway is available or for local development.
+     *
+     * @param {{ adapter: string, provider?: string, model?: string, workspace?: string, prompt?: string, env?: Record<string,string>, spawnFn?: Function, cliPath?: string, timeout?: number }} config
+     * @returns {Promise<{ pid: number, sessionId: string, runId: string, stdin: import('node:stream').Writable, stdout: import('node:stream').Readable, stderr: import('node:stream').Readable, process: import('node:child_process').ChildProcess }>}
+     */
+    async createLocalSession(config = {}) {
+      const {
+        adapter,
+        provider = 'anthropic',
+        model,
+        workspace,
+        prompt,
+        env = {},
+        spawnFn = spawn,
+        cliPath = 'node',
+        timeout = 30000,
+      } = config;
+
+      // Validate adapter
+      if (!adapter || typeof adapter !== 'string') {
+        throw new Error('createLocalSession requires a valid adapter name');
+      }
+      if (!KNOWN_ADAPTERS.has(adapter)) {
+        throw new Error(`Unknown adapter: ${adapter}. Known adapters: ${[...KNOWN_ADAPTERS].join(', ')}`);
+      }
+
+      // Build command args: node packages/agent-mux/cli/dist/index.js launch <adapter> <provider>
+      const scriptPath = config.scriptPath || 'packages/agent-mux/cli/dist/index.js';
+      const args = [scriptPath, 'launch', adapter, provider];
+      if (model) { args.push('--model', model); }
+      if (prompt) { args.push('--prompt', prompt); }
+      if (workspace) { args.push('--workspace', workspace); }
+      args.push('--json');
+
+      // Merge env vars
+      const childEnv = {
+        ...process.env,
+        ...env,
+      };
+      if (workspace) childEnv.KRATE_WORKSPACE_PATH = workspace;
+
+      // Spawn subprocess
+      const child = spawnFn(cliPath, args, {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: childEnv,
+      });
+
+      // Wait for sessionId/runId from stdout (first JSON line) or timeout
+      const sessionId = `local-${randomUUID()}`;
+      const runId = `local-run-${randomUUID()}`;
+      let resolvedIds = { sessionId, runId };
+
+      const idPromise = new Promise((resolve, reject) => {
+        let buffer = '';
+        const timer = setTimeout(() => {
+          resolve(resolvedIds); // Use generated IDs on timeout
+        }, timeout);
+
+        const onData = (chunk) => {
+          buffer += chunk.toString();
+          const lines = buffer.split('\n');
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const parsed = JSON.parse(line);
+              if (parsed.sessionId || parsed.runId) {
+                resolvedIds = {
+                  sessionId: parsed.sessionId || sessionId,
+                  runId: parsed.runId || runId,
+                };
+                clearTimeout(timer);
+                child.stdout.removeListener('data', onData);
+                resolve(resolvedIds);
+                return;
+              }
+            } catch { /* not JSON yet, keep buffering */ }
+          }
+          // Keep last partial line
+          buffer = lines[lines.length - 1] || '';
+        };
+        child.stdout.on('data', onData);
+
+        child.on('error', (err) => {
+          clearTimeout(timer);
+          reject(err);
+        });
+
+        child.on('exit', (code) => {
+          clearTimeout(timer);
+          if (code !== 0 && code !== null) {
+            reject(new Error(`Agent subprocess exited with code ${code}`));
+          } else {
+            resolve(resolvedIds);
+          }
+        });
+      });
+
+      const ids = await idPromise;
+
+      return {
+        pid: child.pid,
+        sessionId: ids.sessionId,
+        runId: ids.runId,
+        stdin: child.stdin,
+        stdout: child.stdout,
+        stderr: child.stderr,
+        process: child,
+      };
+    },
+
+    /**
+     * Send a task to a running local agent session via its stdin and stream the response.
+     *
+     * @param {{ stdin: import('node:stream').Writable, stdout: import('node:stream').Readable, process: import('node:child_process').ChildProcess }} session
+     * @param {{ type?: string, prompt?: string, payload?: any }} task
+     * @param {{ timeout?: number }} options
+     * @returns {Promise<{ success: boolean, response: object|null, events: object[] }>}
+     */
+    async executeAgentTask(session, task, { timeout = 60000 } = {}) {
+      if (!session || !session.stdin || !session.stdout) {
+        throw new Error('executeAgentTask requires a valid session with stdin/stdout');
+      }
+
+      const taskPayload = JSON.stringify({
+        type: task.type || 'task',
+        prompt: task.prompt,
+        payload: task.payload,
+        timestamp: new Date().toISOString(),
+      }) + '\n';
+
+      const events = [];
+      let response = null;
+
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          session.stdout.removeListener('data', onData);
+          resolve({ success: false, response: null, events, timedOut: true });
+        }, timeout);
+
+        const onData = (chunk) => {
+          const lines = chunk.toString().split('\n');
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const parsed = JSON.parse(line);
+              events.push(parsed);
+              if (parsed.type === 'completion' || parsed.type === 'result') {
+                response = parsed;
+                clearTimeout(timer);
+                session.stdout.removeListener('data', onData);
+                resolve({ success: true, response, events });
+                return;
+              }
+              if (parsed.type === 'error') {
+                response = parsed;
+                clearTimeout(timer);
+                session.stdout.removeListener('data', onData);
+                resolve({ success: false, response, events });
+                return;
+              }
+            } catch { /* partial line */ }
+          }
+        };
+
+        session.stdout.on('data', onData);
+
+        // Write task
+        try {
+          session.stdin.write(taskPayload);
+        } catch (err) {
+          clearTimeout(timer);
+          session.stdout.removeListener('data', onData);
+          reject(new Error(`Failed to write to agent stdin: ${err.message}`));
+        }
+      });
+    },
+
+    /**
+     * Terminate a local agent session by killing the subprocess.
+     * @param {{ process: import('node:child_process').ChildProcess, pid?: number }} session
+     * @returns {{ killed: boolean, pid: number|undefined }}
+     */
+    terminateSession(session) {
+      if (!session || !session.process) {
+        return { killed: false, pid: undefined };
+      }
+      const pid = session.process.pid || session.pid;
+      try {
+        session.process.kill('SIGTERM');
+        return { killed: true, pid };
+      } catch {
+        return { killed: false, pid };
+      }
     },
 
     /**

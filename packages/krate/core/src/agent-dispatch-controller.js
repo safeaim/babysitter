@@ -9,8 +9,8 @@ import { createAgentWorkspaceController } from './agent-workspace-controller.js'
 
 export const AGENT_DISPATCH_CONTROLLER_BOUNDARY = {
   role: 'agent-dispatch-controller',
-  scope: 'Manual dispatch orchestration with permission gating, context assembly, and workspace provisioning',
-  owns: ['dispatch creation', 'attempt lifecycle', 'Agent Mux session binding', 'workspace provisioning'],
+  scope: 'Manual dispatch orchestration with permission gating, context assembly, workspace provisioning, stack resolution, and event persistence',
+  owns: ['dispatch creation', 'attempt lifecycle', 'Agent Mux session binding', 'workspace provisioning', 'stack resolution', 'session event persistence'],
   delegatesTo: ['agent-permission-review', 'agent-stack-controller', 'agent-context-bundles', 'agent-mux-client', 'agent-memory-controller', 'agent-approval-controller', 'agent-workspace-controller'],
   mustNotOwn: ['secret values', 'UI rendering']
 };
@@ -22,9 +22,141 @@ export function createAgentDispatchController(options = {}) {
   const memoryController = options.memoryController || createAgentMemoryController();
   const approvalController = options.approvalController || createAgentApprovalController();
   const workspaceController = options.workspaceController || createAgentWorkspaceController();
+  const eventBus = options.eventBus || null;
 
   return {
     role: 'agent-dispatch-controller',
+
+    /**
+     * Resolve an AgentStack CRD into a concrete execution config for agent-mux.
+     *
+     * @param {object} stack - AgentStack resource
+     * @param {{ organizationRef?: string }} opts
+     * @returns {{ adapter: string, provider: string, model: string, prompt: object, mcpServers: string[], skills: string[], approvalMode: string, env: Record<string,string> }}
+     */
+    resolveStack(stack, { organizationRef = 'default' } = {}) {
+      if (!stack || !stack.spec) {
+        throw new Error('resolveStack requires a valid AgentStack resource with spec');
+      }
+      const spec = stack.spec;
+      return {
+        adapter: spec.adapter || spec.baseAgent || 'claude-code',
+        provider: spec.provider || 'anthropic',
+        model: spec.model || 'claude-sonnet-4-20250514',
+        prompt: {
+          system: spec.systemPrompt || null,
+          developer: spec.developerPrompt || null,
+          task: spec.taskPrompt || null,
+        },
+        mcpServers: clone(spec.mcpServerRefs || []),
+        skills: clone(spec.skillRefs || []),
+        approvalMode: spec.approvalMode || 'prompt',
+        env: {
+          KRATE_ORG: organizationRef,
+          KRATE_STACK_NAME: stack.metadata?.name || 'unknown',
+        },
+      };
+    },
+
+    /**
+     * Persist a session event from an agent-mux session.
+     * Appends to the transcript, updates the dispatch attempt status,
+     * marks the run as Completed/Failed on terminal events, and emits to event bus.
+     *
+     * @param {object} event - The SSE event object
+     * @param {object} run - AgentDispatchRun resource (mutated in place)
+     * @param {object} attempt - AgentDispatchAttempt resource (mutated in place)
+     * @param {{ namespace?: string, organizationRef?: string, transcript?: object }} opts
+     * @returns {{ run: object, attempt: object, transcript: object, notification: object|null }}
+     */
+    persistSessionEvent(event, run, attempt, { namespace = 'default', organizationRef = 'default', transcript = null } = {}) {
+      if (!event || typeof event !== 'object') {
+        return { run, attempt, transcript, notification: null };
+      }
+
+      const now = new Date().toISOString();
+
+      // 1. Append to AgentSessionTranscript
+      if (!transcript) {
+        const sessionRef = attempt?.status?.agentMuxSessionId || 'unknown';
+        transcript = createResource('AgentSessionTranscript', { name: `transcript-${sessionRef}`, namespace }, {
+          organizationRef,
+          sessionRef,
+          messages: [],
+          cost: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+        }, { phase: 'Streaming', startedAt: now });
+      }
+
+      const role = event.role || 'system';
+      const content = event.content || event.text || event.message || '';
+      const message = {
+        role,
+        content: typeof content === 'string' ? content : JSON.stringify(content),
+        timestamp: event.timestamp || now,
+      };
+      if (event.toolUse) message.toolUse = event.toolUse;
+      if (event.toolResult) message.toolResult = event.toolResult;
+      transcript.spec.messages.push(message);
+
+      // Accumulate token usage
+      if (event.usage) {
+        transcript.spec.cost.inputTokens += event.usage.inputTokens || 0;
+        transcript.spec.cost.outputTokens += event.usage.outputTokens || 0;
+        transcript.spec.cost.totalTokens = transcript.spec.cost.inputTokens + transcript.spec.cost.outputTokens;
+      }
+
+      // 2. Update AgentDispatchAttempt status
+      attempt.status.lastEventAt = now;
+      attempt.status.eventCount = (attempt.status.eventCount || 0) + 1;
+
+      // 3. Terminal event handling
+      let notification = null;
+      if (event.type === 'completion') {
+        run.status.phase = 'Completed';
+        run.status.completedAt = now;
+        attempt.status.completedAt = now;
+        transcript.status.phase = 'Reconciled';
+        transcript.status.reconciledAt = now;
+
+        notification = {
+          type: 'run-complete',
+          status: 'completed',
+          name: run.metadata?.name,
+          org: organizationRef,
+          timestamp: now,
+        };
+      } else if (event.type === 'error') {
+        run.status.phase = 'Failed';
+        run.status.failedAt = now;
+        run.status.failureReason = event.error || event.message || 'Unknown error';
+        attempt.status.failedAt = now;
+        attempt.status.failureReason = event.error || event.message || 'Unknown error';
+        transcript.status.phase = 'Failed';
+
+        notification = {
+          type: 'run-complete',
+          status: 'failed',
+          name: run.metadata?.name,
+          org: organizationRef,
+          timestamp: now,
+        };
+      }
+
+      // 5. Emit to event bus for SSE broadcast
+      if (eventBus) {
+        eventBus.emit({
+          type: 'session-event',
+          runName: run.metadata?.name,
+          eventType: event.type || 'message',
+          timestamp: now,
+        });
+        if (notification) {
+          eventBus.emit(notification);
+        }
+      }
+
+      return { run, attempt, transcript, notification };
+    },
 
     async createManualDispatch({ repository, ref, sourceRefs = [], agentStack, taskKind, actor, namespace = 'default', organizationRef = 'default', resources = {} }) {
       // 1. Find stack

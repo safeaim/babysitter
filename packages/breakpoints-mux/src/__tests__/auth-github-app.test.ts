@@ -16,7 +16,7 @@ const mockGitCreateRef = vi.fn();
 const mockPullsCreate = vi.fn();
 
 vi.mock("@octokit/rest", () => ({
-  Octokit: vi.fn().mockImplementation(() => ({
+  Octokit: vi.fn().mockImplementation(function () { return {
     apps: {
       createInstallationAccessToken: mockAppsCreateInstallationAccessToken,
       listInstallations: mockAppsListInstallations,
@@ -33,7 +33,7 @@ vi.mock("@octokit/rest", () => ({
     pulls: {
       create: mockPullsCreate,
     },
-  })),
+  }; }),
 }));
 
 vi.mock("@octokit/auth-app", () => ({

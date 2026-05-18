@@ -25,14 +25,14 @@ These workspaces ship public packages or release-facing operational behavior. Th
 
 | Workspace or family | Role | Validation path |
 | --- | --- | --- |
-| `packages/sdk` (`@a5c-ai/babysitter-sdk`) | Core SDK and CLI runtime | `.github/workflows/ci.yml` jobs `test` and `packages-sdk`, plus `release.yml` and `staging-publish.yml` |
-| `packages/breakpoints-mux` | Published breakpoint runtime | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` |
-| `packages/agent-plugins-mux` | Published plugin compiler/runtime package | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` |
-| `packages/observer-dashboard` | Published observer dashboard package | `.github/workflows/ci.yml` job `observer-dashboard`, plus `release.yml` and `staging-publish.yml` |
-| `packages/hooks-mux/*` | Published hooks-mux packages | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` |
-| `packages/agent-mux/*` | Published agent-mux packages | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` |
-| `packages/transport-mux` | Published transport/proxy runtime package used by the agent-mux CLI/runtime chain | `.github/workflows/ci.yml` job `workspace-coverage` (`build` + `lint` + `typecheck` + `test` + `scorecard:migration`), plus `release.yml` and `staging-publish.yml` |
-| `packages/babysitter`, `plugins/babysitter-unified`, and generated/published harness plugin packages | Published metapackage, canonical plugin source, and harness plugin packages | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` |
+| `packages/sdk` (`@a5c-ai/babysitter-sdk`) | Core SDK and CLI runtime | `.github/workflows/ci.yml` jobs `test` and `packages-sdk`, plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/breakpoints-mux` | Published breakpoint runtime | `.github/workflows/ci.yml` job `test`, plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/agent-plugins-mux` | Published plugin compiler/runtime package | `.github/workflows/ci.yml` job `test`, plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/observer-dashboard` | Published observer dashboard package | `.github/workflows/ci.yml` job `observer-dashboard`, plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/hooks-mux/*` | Published hooks-mux packages | `.github/workflows/ci.yml` job `test`, plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/agent-mux/*` | Published agent-mux packages | `.github/workflows/ci.yml` job `test`, plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/transport-mux` | Published transport/proxy runtime package used by the agent-mux CLI/runtime chain | `.github/workflows/ci.yml` job `workspace-coverage` (`build` + `lint` + `typecheck` + `test` + `scorecard:migration`), plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/babysitter`, `plugins/babysitter-unified`, and generated/published harness plugin packages | Published metapackage, canonical plugin source, and harness plugin packages | `.github/workflows/ci.yml` job `test`, plus `publish.yml` and `publish-packages-from-tag.yml` |
 
 ## Public advanced/runtime packages
 
@@ -40,9 +40,9 @@ These packages are publicly installable, but their canonical docs live primarily
 
 | Workspace | Role | Validation path |
 | --- | --- | --- |
-| `packages/babysitter-agent` | Public runtime CLI for headless/orchestrated/operator workflows; not the default first-stop end-user entrypoint | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` runtime build/test validation |
-| `packages/agent-core` | Public advanced/runtime dependency package consumed by `@a5c-ai/babysitter-agent` and runtime orchestration flows | `.github/workflows/ci.yml` job `test`, plus `release.yml` and `staging-publish.yml` |
-| `packages/agent-catalog` | Public graph/evidence catalog package consumed by SDK, agent-mux, hooks-mux, plugin compiler, and catalog-adjacent tooling | `.github/workflows/ci.yml` job `workspace-coverage` (`npm run ci:test --workspace=@a5c-ai/agent-catalog`), plus `release.yml` and `staging-publish.yml` |
+| `packages/babysitter-agent` | Public runtime CLI for headless/orchestrated/operator workflows; not the default first-stop end-user entrypoint | `.github/workflows/ci.yml` job `test`, plus `publish.yml` and `publish-packages-from-tag.yml` runtime build/test validation |
+| `packages/agent-core` | Public advanced/runtime dependency package consumed by `@a5c-ai/babysitter-agent` and runtime orchestration flows | `.github/workflows/ci.yml` job `test`, plus `publish.yml` and `publish-packages-from-tag.yml` |
+| `packages/agent-catalog` | Public graph/evidence catalog package consumed by SDK, agent-mux, hooks-mux, plugin compiler, and catalog-adjacent tooling | `.github/workflows/ci.yml` job `workspace-coverage` (`npm run ci:test --workspace=@a5c-ai/agent-catalog`), plus `publish.yml` and `publish-packages-from-tag.yml` |
 
 ## Internal-only active workspaces
 

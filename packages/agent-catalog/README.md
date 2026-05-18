@@ -2,7 +2,7 @@
 
 `@a5c-ai/agent-catalog` is a public package for the shared agent ontology, discovery catalog, packaged evidence shards, and graph-backed helper APIs used across the Babysitter toolchain.
 
-The package is published through the central `release.yml` and `staging-publish.yml` workflows. `main` publishes production releases, and `staging` publishes prerelease builds with the `staging` dist-tag.
+The package is published through the central `publish.yml` and `publish-packages-from-tag.yml` workflows. `main` publishes production releases, and `staging` publishes prerelease builds with the `staging` dist-tag.
 
 ## What ships
 
@@ -79,7 +79,7 @@ When graph structure or evidence claims change, update the YAML inputs first, th
 
 - The package must stay publishable: it ships with `publishConfig.access = public`, includes this README in `files`, and is owned by the central publish workflows.
 - `npm run ci:test --workspace=@a5c-ai/agent-catalog` is the release-equivalent contract for this workspace. It covers build output, graph validation, evidence freshness, package contract tests, and the publish lifecycle policy check.
-- `release.yml` and `staging-publish.yml` version, pack, and publish this package alongside the SDK, hooks-mux, agent-mux, and plugin compiler surfaces that consume it.
+- `publish.yml` and `publish-packages-from-tag.yml` version, pack, and publish this package alongside the SDK, hooks-mux, agent-mux, and plugin compiler surfaces that consume it.
 
 ## Downstream compatibility
 

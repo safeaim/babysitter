@@ -16,8 +16,8 @@ const repoRoot = path.resolve(packageRoot, "..", "..");
 const packageJson = JSON.parse(readText(path.join(packageRoot, "package.json")));
 const readme = readText(path.join(packageRoot, "README.md"));
 const ciWorkflow = readText(path.join(repoRoot, ".github", "workflows", "ci.yml"));
-const releaseWorkflow = readText(path.join(repoRoot, ".github", "workflows", "release.yml"));
-const stagingWorkflow = readText(path.join(repoRoot, ".github", "workflows", "staging-publish.yml"));
+const releaseWorkflow = readText(path.join(repoRoot, ".github", "workflows", "publish.yml"));
+const stagingWorkflow = readText(path.join(repoRoot, ".github", "workflows", "publish-packages-from-tag.yml"));
 const workspaceValidationDoc = readText(path.join(repoRoot, "docs", "workspace-validation.md"));
 const packageMapDoc = readText(path.join(repoRoot, "docs", "package-and-plugin-map.md"));
 const releasePipelineDoc = readText(path.join(repoRoot, "docs", "release-pipeline.md"));
@@ -50,7 +50,7 @@ if (!Array.isArray(packageJson.files) || !packageJson.files.includes("README.md"
 
 const requiredReadmeSnippets = [
   "public package",
-  "published through the central `release.yml` and `staging-publish.yml` workflows",
+  "published through the central `publish.yml` and `publish-packages-from-tag.yml` workflows",
   "`npm run ci:test --workspace=@a5c-ai/agent-catalog` is the release-equivalent contract",
   "Breaking changes to exported APIs, graph documents, evidence layout, or generated discovery data require a semver-major release",
 ];
@@ -65,7 +65,7 @@ if (!ciWorkflow.includes("npm run ci:test --workspace=@a5c-ai/agent-catalog")) {
   fail("CI workflow must validate @a5c-ai/agent-catalog through npm run ci:test --workspace=@a5c-ai/agent-catalog.");
 }
 
-if (!workspaceValidationDoc.includes("packages/agent-catalog") || !workspaceValidationDoc.includes("release.yml") || !workspaceValidationDoc.includes("staging-publish.yml")) {
+if (!workspaceValidationDoc.includes("packages/agent-catalog") || !workspaceValidationDoc.includes("publish.yml") || !workspaceValidationDoc.includes("publish-packages-from-tag.yml")) {
   fail("docs/workspace-validation.md must describe @a5c-ai/agent-catalog as a public package validated by CI plus release/staging workflows.");
 }
 
@@ -78,11 +78,11 @@ if (!releasePipelineAgentCatalogLine || releasePipelineAgentCatalogLine.includes
 }
 
 if (!releaseWorkflow.includes("npm publish --workspace=@a5c-ai/agent-catalog --access public")) {
-  fail("release.yml must publish @a5c-ai/agent-catalog as a public package.");
+  fail("publish.yml must publish @a5c-ai/agent-catalog as a public package.");
 }
 
-if (!stagingWorkflow.includes("npm publish --workspace=@a5c-ai/agent-catalog --access public --tag staging")) {
-  fail("staging-publish.yml must publish @a5c-ai/agent-catalog as a public staging package.");
+if (!stagingWorkflow.includes("@a5c-ai/agent-catalog")) {
+  fail("publish-packages-from-tag.yml must include @a5c-ai/agent-catalog in the publish list.");
 }
 
 console.log(

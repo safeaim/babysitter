@@ -101,10 +101,7 @@ jobs:
             `gh pr comment <number> --body "<markdown>"`
             Otherwise, print results to stdout.
             Use: `gh pr comment ${{ github.event.issue.number }} --body "<markdown>"`
-          trigger-query: |
-            event: issue_comment
-            action: created
-            body: /^\/qa/
+          trigger-query: ''
         env:
           AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com

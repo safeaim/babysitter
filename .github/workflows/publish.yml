@@ -2130,6 +2130,26 @@ jobs:
           kubectl -n "$KUBE_NAMESPACE" delete service krate --ignore-not-found
           kubectl -n "$KUBE_NAMESPACE" delete deployment krate --ignore-not-found
 
+      - name: Install KubeVela
+        if: steps.config.outputs.deploy_enabled == 'true'
+        run: |
+          helm repo add kubevela https://kubevela.github.io/charts 2>/dev/null || true
+          helm repo update
+          helm upgrade --install kubevela kubevela/vela-core \
+            --namespace vela-system --create-namespace \
+            --set installCRDs=true \
+            --timeout 300s --wait 2>&1 || echo "::notice::KubeVela install skipped or already present"
+
+      - name: Install Kyverno
+        if: steps.config.outputs.deploy_enabled == 'true'
+        run: |
+          helm repo add kyverno https://kyverno.github.io/kyverno/ 2>/dev/null || true
+          helm repo update
+          helm upgrade --install kyverno kyverno/kyverno \
+            --namespace kyverno --create-namespace \
+            --set admissionController.replicas=1 \
+            --timeout 300s --wait 2>&1 || echo "::notice::Kyverno install skipped or already present"
+
       - name: Update Krate CRDs
         if: steps.config.outputs.deploy_enabled == 'true'
         run: kubectl apply -f packages/krate/charts/crds/ --server-side --force-conflicts
@@ -2166,7 +2186,9 @@ jobs:
             --set demo.enabled=false \
             --set gitea.enabled=false \
             --set argocd.enabled=false \
-            --set kubevela.enabled=false \
+            --set kubevela.enabled=true \
+            --set "externalDependencies.kyverno.enabled=true" \
+            --set "externalDependencies.kyverno.discoverExisting=true" \
             --set networkPolicy.enabled=false \
             --set apiService.enabled=false \
             --timeout 300s \

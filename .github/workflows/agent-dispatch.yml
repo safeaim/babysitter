@@ -46,12 +46,13 @@ jobs:
 
       - uses: a5c-ai/babysitter/packages/triggers@staging
         with:
-          harness: claude-code
+          harness: codex
           provider: foundry
           model: gpt-5.5
-          interaction-mode: non-interactive
+          interaction-mode: bridged-hooks
           babysitter-plugin: 'true'
           max-turns: '9999'
+          babysitter-prompt-prefix: 'babysitter:yolo'
           prompt: |
             You are an autonomous coding agent.
             Trigger: ${{ github.event_name == 'workflow_dispatch' && 'manual dispatch' || format('/agent on #{0}', github.event.issue.number) }}

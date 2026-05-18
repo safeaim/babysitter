@@ -28,12 +28,11 @@ jobs:
 
       - uses: a5c-ai/babysitter/packages/triggers@staging
         with:
-          harness: claude-code
+          harness: codex
           provider: foundry
           model: gpt-5.5
-          interaction-mode: non-interactive
+          interaction-mode: bridged-hooks
           babysitter-plugin: 'true'
-          babysitter-prompt-prefix: '/babysitter:yolo'
           max-turns: '15'
           prompt: |
             A Live Stack CI run has failed. Your job is ONLY to triage — do NOT fix code.

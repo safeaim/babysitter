@@ -287,6 +287,9 @@ jobs:
           - @a5c-ai/babysitter-tui-plugins
           - @a5c-ai/transport-mux (build + lint + typecheck + test + migration scorecard)
 
+      - name: Build atlas (agent-catalog prerequisite)
+        run: npm run build --workspace=@a5c-ai/atlas
+
       - name: Validate agent-catalog public package policy
         run: |
           set -euo pipefail

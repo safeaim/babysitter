@@ -101,7 +101,7 @@ function renderCodexConfigToml() {
     'writable_roots = [".a5c", ".codex"]',
     '',
     '[features]',
-    'codex_hooks = true',
+    'hooks = true',
     'multi_agent = true',
     '',
     '[agents]',
@@ -210,7 +210,7 @@ function mergeCodexConfig(existing) {
   content = insertRootKey(content, 'sandbox_mode', 'sandbox_mode = "workspace-write"');
   content = insertRootKey(content, 'project_doc_max_bytes', 'project_doc_max_bytes = 65536');
   content = ensureWritableRoots(content);
-  content = ensureSectionLine(content, 'features', 'codex_hooks', 'codex_hooks = true');
+  content = ensureSectionLine(content, 'features', 'hooks', 'hooks = true');
   content = ensureSectionLine(content, 'features', 'multi_agent', 'multi_agent = true');
   content = ensureSectionLine(content, 'agents', 'max_depth', 'max_depth = 3');
   content = ensureSectionLine(content, 'agents', 'max_threads', 'max_threads = 4');

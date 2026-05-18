@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import test, { describe, it } from 'node:test';
 import { createAgentDispatchController, createAgentMuxClient, createResource } from '../src/index.js';
 
 function makeStack(name, spec = {}) {
@@ -303,4 +303,192 @@ test('Successful launch creates jobRef on run', async () => {
   assert.ok(result.attempt.status.jobName, 'Attempt should have jobName');
   assert.equal(result.attempt.status.jobSubmitted, true, 'Job should be submitted');
   assert.equal(result.jobResult.submitted, true, 'jobResult.submitted should be true');
+});
+
+// ─── Budget Enforcement Tests ───────────────────────────────────────────────
+
+describe('checkBudget', () => {
+  const controller = createAgentDispatchController();
+
+  function makeRunWithBudget(name, budget = {}) {
+    const run = createResource('AgentDispatchRun', { name, namespace: 'default' }, {
+      organizationRef: 'default', repository: 'repo', sourceRefs: [], agentStack: 'stack', taskKind: 'diagnostic',
+      budget,
+    });
+    run.status = { phase: 'Running' };
+    return run;
+  }
+
+  it('returns exceeded=false when no budget set and event has no usage', () => {
+    const run = makeRunWithBudget('r1');
+    const result = controller.checkBudget(run, { type: 'message', role: 'assistant', content: 'hi' });
+    assert.equal(result.exceeded, false);
+  });
+
+  it('returns exceeded=false when tokens under maxTokens limit', () => {
+    const run = makeRunWithBudget('r2', { maxTokens: 10000 });
+    const result = controller.checkBudget(run, { usage: { inputTokens: 100, outputTokens: 50 } });
+    assert.equal(result.exceeded, false);
+    assert.equal(result.totalTokens, 150);
+  });
+
+  it('returns exceeded=true reason=token_limit when tokens exceed maxTokens', () => {
+    const run = makeRunWithBudget('r3', { maxTokens: 100 });
+    const result = controller.checkBudget(run, { usage: { inputTokens: 80, outputTokens: 50 } });
+    assert.equal(result.exceeded, true);
+    assert.equal(result.reason, 'token_limit');
+    assert.equal(result.current, 130);
+    assert.equal(result.limit, 100);
+  });
+
+  it('returns exceeded=false when cost under maxCostUsd', () => {
+    const run = makeRunWithBudget('r4', { maxCostUsd: 1.0 });
+    // claude-sonnet: 0.003/1k input, 0.015/1k output → 100 input + 50 output = 0.0003 + 0.00075 = ~$0.00105
+    const result = controller.checkBudget(run, { usage: { inputTokens: 100, outputTokens: 50 } });
+    assert.equal(result.exceeded, false);
+  });
+
+  it('returns exceeded=true reason=cost_limit when cost exceeds maxCostUsd', () => {
+    const run = makeRunWithBudget('r5', { maxCostUsd: 0.001 });
+    // 1M input tokens at $0.003/1k = $3.00 → exceeds $0.001
+    const result = controller.checkBudget(run, { usage: { inputTokens: 1000000, outputTokens: 0 } });
+    assert.equal(result.exceeded, true);
+    assert.equal(result.reason, 'cost_limit');
+  });
+
+  it('accumulates existing run.status.tokenUsage.totalTokens with event tokens', () => {
+    const run = makeRunWithBudget('r6', { maxTokens: 10000 });
+    run.status.tokenUsage = { inputTokens: 900, outputTokens: 100, totalTokens: 1000 };
+    const result = controller.checkBudget(run, { usage: { inputTokens: 50, outputTokens: 50 } });
+    assert.equal(result.exceeded, false);
+    assert.equal(result.totalTokens, 1100);
+  });
+
+  it('accumulates existing run.status.costUsd with event cost', () => {
+    const run = makeRunWithBudget('r7', { maxCostUsd: 100 });
+    run.status.costUsd = 50;
+    const result = controller.checkBudget(run, { usage: { inputTokens: 1000, outputTokens: 500 } });
+    assert.equal(result.exceeded, false);
+    assert.ok(result.totalCost > 50, 'totalCost should include existing costUsd');
+  });
+
+  it('uses Infinity limits when budget not set in spec', () => {
+    const run = makeRunWithBudget('r8');
+    // Very large usage — should not exceed Infinity
+    const result = controller.checkBudget(run, { usage: { inputTokens: 999999999, outputTokens: 999999999 } });
+    assert.equal(result.exceeded, false);
+  });
+});
+
+describe('persistSessionEvent — budget enforcement', () => {
+  const controller = createAgentDispatchController();
+
+  function makeRunWithBudget(name, budget = {}) {
+    const run = createResource('AgentDispatchRun', { name, namespace: 'default' }, {
+      organizationRef: 'default', repository: 'repo', sourceRefs: [], agentStack: 'stack', taskKind: 'diagnostic',
+      budget,
+    });
+    run.status = { phase: 'Running' };
+    return run;
+  }
+
+  function makeAttempt(runName) {
+    const attempt = createResource('AgentDispatchAttempt', { name: `${runName}-attempt-1` }, {
+      organizationRef: 'default', agentDispatchRun: runName, attemptReason: 'initial', agentStackSnapshot: {},
+    });
+    attempt.status = { agentMuxSessionId: 'sess-1', agentMuxRunId: 'amux-1' };
+    return attempt;
+  }
+
+  it('returns Failed run with failureReason=budget_exceeded when token limit exceeded', () => {
+    const run = makeRunWithBudget('bp1', { maxTokens: 10 });
+    const attempt = makeAttempt('bp1');
+    const result = controller.persistSessionEvent(
+      { type: 'message', role: 'assistant', content: 'hi', usage: { inputTokens: 5, outputTokens: 10 } },
+      run, attempt
+    );
+    assert.equal(result.run.status.phase, 'Failed');
+    assert.equal(result.run.status.failureReason, 'budget_exceeded');
+    assert.ok(result.run.status.budgetExceeded);
+    assert.equal(result.run.status.budgetExceeded.reason, 'token_limit');
+  });
+
+  it('budget-exceeded notification has reason=budget_exceeded', () => {
+    const run = makeRunWithBudget('bp2', { maxTokens: 1 });
+    const attempt = makeAttempt('bp2');
+    const result = controller.persistSessionEvent(
+      { type: 'message', role: 'assistant', content: 'hi', usage: { inputTokens: 5, outputTokens: 5 } },
+      run, attempt
+    );
+    assert.ok(result.notification, 'notification should be returned');
+    assert.equal(result.notification.reason, 'budget_exceeded');
+    assert.equal(result.notification.status, 'failed');
+  });
+
+  it('normal event with usage accumulates tokenUsage on run.status', () => {
+    const run = makeRunWithBudget('bp3', { maxTokens: 100000 });
+    const attempt = makeAttempt('bp3');
+    controller.persistSessionEvent(
+      { type: 'message', role: 'assistant', content: 'hello', usage: { inputTokens: 100, outputTokens: 50 } },
+      run, attempt
+    );
+    assert.ok(run.status.tokenUsage, 'run.status.tokenUsage should be set');
+    assert.equal(run.status.tokenUsage.inputTokens, 100);
+    assert.equal(run.status.tokenUsage.outputTokens, 50);
+    assert.equal(run.status.tokenUsage.totalTokens, 150);
+  });
+
+  it('event with usage accumulates costUsd on run.status', () => {
+    const run = makeRunWithBudget('bp4', { maxCostUsd: 1000 });
+    const attempt = makeAttempt('bp4');
+    controller.persistSessionEvent(
+      { type: 'message', role: 'assistant', content: 'hello', usage: { inputTokens: 1000, outputTokens: 500 }, model: 'claude-sonnet-4-20250514' },
+      run, attempt
+    );
+    // 1000 input at $0.003/1k + 500 output at $0.015/1k = $0.003 + $0.0075 = $0.0105
+    assert.ok(run.status.costUsd > 0, 'run.status.costUsd should be set');
+    assert.ok(Math.abs(run.status.costUsd - 0.0105) < 0.0001, `costUsd should be ~0.0105 but got ${run.status.costUsd}`);
+  });
+
+  it('budget check prevents event from being appended when limit exceeded', () => {
+    const run = makeRunWithBudget('bp5', { maxTokens: 10 });
+    const attempt = makeAttempt('bp5');
+    // Pre-set transcript to check it is NOT mutated
+    const existingTranscript = { spec: { messages: [] } };
+    const result = controller.persistSessionEvent(
+      { type: 'message', role: 'assistant', content: 'hi', usage: { inputTokens: 100, outputTokens: 100 } },
+      run, attempt, { transcript: existingTranscript }
+    );
+    // Budget exceeded before appending — messages should still be empty
+    assert.equal(result.transcript.spec.messages.length, 0);
+    assert.equal(result.run.status.phase, 'Failed');
+  });
+});
+
+describe('estimateCost — via checkBudget', () => {
+  const controller = createAgentDispatchController();
+
+  function makeRunWithBudget(name, budget = {}) {
+    const run = createResource('AgentDispatchRun', { name, namespace: 'default' }, {
+      organizationRef: 'default', repository: 'repo', sourceRefs: [], agentStack: 'stack', taskKind: 'diagnostic', budget,
+    });
+    run.status = { phase: 'Running' };
+    return run;
+  }
+
+  it('cost is 0 when event has no usage', () => {
+    const run = makeRunWithBudget('ec1');
+    const result = controller.checkBudget(run, { type: 'message', role: 'assistant', content: 'hi' });
+    assert.equal(result.totalCost, 0);
+  });
+
+  it('cost computed correctly for claude-sonnet-4-20250514 rates', () => {
+    const run = makeRunWithBudget('ec2');
+    // 1000 input @ $0.003/1k + 1000 output @ $0.015/1k = $0.003 + $0.015 = $0.018
+    const result = controller.checkBudget(run, {
+      usage: { inputTokens: 1000, outputTokens: 1000 },
+      model: 'claude-sonnet-4-20250514',
+    });
+    assert.ok(Math.abs(result.totalCost - 0.018) < 0.0001, `totalCost should be ~0.018 but got ${result.totalCost}`);
+  });
 });

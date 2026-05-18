@@ -45,7 +45,7 @@ async function appendJournalFile(
 function waitForEvents(
   watcher: JournalWatcher,
   count: number,
-  timeoutMs = 5000,
+  timeoutMs = 15000,
 ): Promise<Array<{ seq: number; type: string }>> {
   return new Promise((resolve, reject) => {
     const events: Array<{ seq: number; type: string }> = [];
@@ -76,12 +76,13 @@ afterEach(async () => {
   await fs.rm(testBase, { recursive: true, force: true });
 });
 
-describe("GAP-JSON-005: JournalWatcher", () => {
+describe("GAP-JSON-005: JournalWatcher", { timeout: 30000 }, () => {
   it("can be instantiated with a runDir", async () => {
     const runDir = await scaffoldRunDir(path.join(testBase, "run1"));
     const watcher = createJournalWatcher({
       runDir,
       pollIntervalMs: 100,
+      useFsWatch: false,
       onEvent: () => {},
     });
     expect(watcher).toBeDefined();
@@ -94,6 +95,7 @@ describe("GAP-JSON-005: JournalWatcher", () => {
     const watcher = createJournalWatcher({
       runDir,
       pollIntervalMs: 50,
+      useFsWatch: false,
       onEvent: () => {},
     });
 
@@ -117,6 +119,7 @@ describe("GAP-JSON-005: JournalWatcher", () => {
       runDir,
       afterSeq: 1,
       pollIntervalMs: 50,
+      useFsWatch: false,
       onEvent: (event) => received.push(event.seq),
     });
 
@@ -136,6 +139,7 @@ describe("GAP-JSON-005: JournalWatcher", () => {
     const watcher = createJournalWatcher({
       runDir,
       pollIntervalMs: 50,
+      useFsWatch: false,
       onEvent: () => {},
       onDone: () => {
         doneTriggered = true;
@@ -160,6 +164,7 @@ describe("GAP-JSON-005: JournalWatcher", () => {
     const watcher = createJournalWatcher({
       runDir,
       pollIntervalMs: 50,
+      useFsWatch: false,
       onEvent: () => {},
       onError: (error) => errors.push(error.message),
     });

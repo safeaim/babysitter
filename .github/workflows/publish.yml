@@ -690,7 +690,7 @@ jobs:
         run: |
           set -euo pipefail
           BASE_VERSION=$(node -p "require('./package.json').version.split('-')[0]")
-          SHORT_SHA=$(git rev-parse --short HEAD)
+          SHORT_SHA=$(git rev-parse --short=12 HEAD)
           case "${GITHUB_REF_NAME}" in
             main)
               PUBLISH_VERSION="$BASE_VERSION"

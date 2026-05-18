@@ -53,10 +53,8 @@ jobs:
           harness: claude-code
           provider: foundry
           model: gpt-5.5
-          interaction-mode: bridged-hooks
-          babysitter-plugin: 'true'
-          babysitter-prompt-prefix: '/babysitter:call'
-          max-turns: '50'
+          interaction-mode: non-interactive
+          max-turns: '9999'
           prompt: |
             You are a QA automation agent.
             Trigger: ${{ github.event_name == 'workflow_dispatch' && 'manual dispatch' || format('/qa on PR #{0}', github.event.issue.number) }}

@@ -146,11 +146,16 @@ runs:
     - name: Resolve action runtime
       id: resolve-runtime
       shell: bash
+      env:
+        ACTION_REF: ${{ github.action_ref }}
       run: |
         set -euo pipefail
         WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
         if [ -d "$WORKSPACE/packages/agent-mux/cli" ] && [ -f "$WORKSPACE/packages/triggers/action.yml" ]; then
           echo "mode=monorepo" >> "$GITHUB_OUTPUT"
+          echo "tag=staging" >> "$GITHUB_OUTPUT"
+        elif [ "$ACTION_REF" = "staging" ]; then
+          echo "mode=external" >> "$GITHUB_OUTPUT"
           echo "tag=staging" >> "$GITHUB_OUTPUT"
         else
           echo "mode=external" >> "$GITHUB_OUTPUT"

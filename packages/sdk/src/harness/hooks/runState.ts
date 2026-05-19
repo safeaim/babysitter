@@ -13,6 +13,7 @@ export interface HookRunStateSummary {
   completionProof: string;
   pendingKinds: string;
   onlyBreakpointsPending: boolean;
+  currentPendingEffectId?: string;
 }
 
 function resolveRunDir(runId: string, runsDir: string, log?: { info(message: string): void }): string {
@@ -39,6 +40,12 @@ export async function resolveHookRunState(args: {
     const pendingKinds = Object.keys(pendingByKind).join(", ");
     const onlyBreakpointsPending =
       pendingRecords.length > 0 && isOnlyBreakpoints(pendingByKind);
+    const currentPendingEffectId = pendingRecords
+      .filter((record) => record.kind !== "breakpoint")
+      .sort((left, right) =>
+        (left.requestedAt ?? "").localeCompare(right.requestedAt ?? "")
+        || left.effectId.localeCompare(right.effectId),
+      )[0]?.effectId;
 
     if (runState === "completed") {
       return {
@@ -46,6 +53,7 @@ export async function resolveHookRunState(args: {
         completionProof: resolveCompletionProof(metadata),
         pendingKinds,
         onlyBreakpointsPending,
+        currentPendingEffectId,
       };
     }
     if (runState === "failed") {
@@ -54,6 +62,7 @@ export async function resolveHookRunState(args: {
         completionProof: "",
         pendingKinds,
         onlyBreakpointsPending,
+        currentPendingEffectId,
       };
     }
     if (runState === "waiting") {
@@ -62,6 +71,7 @@ export async function resolveHookRunState(args: {
         completionProof: "",
         pendingKinds,
         onlyBreakpointsPending,
+        currentPendingEffectId,
       };
     }
 
@@ -70,6 +80,7 @@ export async function resolveHookRunState(args: {
       completionProof: "",
       pendingKinds,
       onlyBreakpointsPending,
+      currentPendingEffectId,
     };
   } catch {
     return {

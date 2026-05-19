@@ -24,6 +24,7 @@ import {
   isTerminalRunState,
 } from "../../runtime/runLifecycleState";
 import { loadJournal } from "../../storage/journal";
+import type { JournalEvent } from "../../storage/types";
 import { readRunMetadata } from "../../storage/runFiles";
 import type { HookHandlerArgs } from "../types";
 import {
@@ -84,6 +85,142 @@ interface MissingSessionRunCandidate {
   runDir: string;
   runState: string;
   prompt: string;
+}
+
+interface StopHookBackoffResult {
+  effectId?: string;
+  fireCount?: number;
+  delaySeconds?: number;
+  interrupted?: boolean;
+}
+
+const DEFAULT_BACKOFF_BASE_SECONDS = 10;
+const DEFAULT_BACKOFF_CAP_SECONDS = 300;
+const MAX_BACKOFF_POLL_SECONDS = 1;
+
+function parsePositiveNumberEnv(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function computeBackoffDelaySeconds(fireCount: number): number {
+  const base = parsePositiveNumberEnv(
+    "BABYSITTER_HOOK_BACKOFF_BASE",
+    DEFAULT_BACKOFF_BASE_SECONDS,
+  );
+  const cap = parsePositiveNumberEnv(
+    "BABYSITTER_HOOK_BACKOFF_CAP",
+    DEFAULT_BACKOFF_CAP_SECONDS,
+  );
+  const delay = base * (3 ** Math.max(0, fireCount));
+  return Math.min(delay, cap);
+}
+
+function countPriorStopHookFires(events: JournalEvent[], effectId: string): number {
+  let latestRequestIndex = -1;
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    const data = event.data as Record<string, unknown> | undefined;
+    if (event.type === "EFFECT_REQUESTED" && data?.effectId === effectId) {
+      latestRequestIndex = index;
+      break;
+    }
+  }
+  if (latestRequestIndex < 0) return 0;
+
+  let count = 0;
+  for (let index = latestRequestIndex + 1; index < events.length; index += 1) {
+    const event = events[index];
+    const data = event.data as Record<string, unknown> | undefined;
+    if (
+      (event.type === "EFFECT_RESOLVED" || event.type === "EFFECT_CANCELLED")
+      && data?.effectId === effectId
+    ) {
+      return 0;
+    }
+    if (event.type === "STOP_HOOK_INVOKED" && data?.effectId === effectId) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+function isEffectStillPending(events: JournalEvent[], effectId: string): boolean {
+  let pending = false;
+  for (const event of events) {
+    const data = event.data as Record<string, unknown> | undefined;
+    if (event.type === "RUN_COMPLETED" || event.type === "RUN_FAILED") {
+      pending = false;
+    }
+    if (event.type === "EFFECT_REQUESTED" && data?.effectId === effectId) {
+      pending = true;
+    }
+    if (
+      (event.type === "EFFECT_RESOLVED" || event.type === "EFFECT_CANCELLED")
+      && data?.effectId === effectId
+    ) {
+      pending = false;
+    }
+  }
+  return pending;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function applyStopHookBackoff(args: {
+  runDir: string;
+  effectId?: string;
+  runState: string;
+  log: HookLogger;
+}): Promise<StopHookBackoffResult> {
+  if (args.runState !== "waiting" || !args.effectId) {
+    return {};
+  }
+
+  let events: JournalEvent[];
+  try {
+    events = await loadJournal(args.runDir);
+  } catch {
+    return { effectId: args.effectId };
+  }
+
+  const fireCount = countPriorStopHookFires(events, args.effectId);
+  const plannedDelaySeconds = computeBackoffDelaySeconds(fireCount);
+  const startedAt = Date.now();
+  let interrupted = false;
+
+  while ((Date.now() - startedAt) / 1000 < plannedDelaySeconds) {
+    const remainingMs = plannedDelaySeconds * 1000 - (Date.now() - startedAt);
+    const pollSeconds = Math.min(MAX_BACKOFF_POLL_SECONDS, Math.max(0.001, plannedDelaySeconds / 10));
+    await sleep(Math.min(pollSeconds * 1000, Math.max(0, remainingMs)));
+    try {
+      const latestEvents = await loadJournal(args.runDir);
+      if (!isEffectStillPending(latestEvents, args.effectId)) {
+        interrupted = true;
+        break;
+      }
+    } catch {
+      break;
+    }
+  }
+
+  const actualDelaySeconds = Math.min(
+    plannedDelaySeconds,
+    Math.max(0, (Date.now() - startedAt) / 1000),
+  );
+  args.log.info(
+    `Stop-hook backoff applied for effect ${args.effectId}: planned=${plannedDelaySeconds}s actual=${actualDelaySeconds}s count=${fireCount}`,
+  );
+  return {
+    effectId: args.effectId,
+    fireCount,
+    delaySeconds: interrupted ? actualDelaySeconds : plannedDelaySeconds,
+    interrupted,
+  };
 }
 
 function resolveSessionIdFromInput(
@@ -474,6 +611,7 @@ export async function handleStopHookCommon(
   let completionProof = "";
   let pendingKinds = "";
   let onlyBreakpointsPending = false;
+  let currentPendingEffectId: string | undefined;
 
   if (options.useDetailedRunState) {
     runStateDetails = await resolveStopHookRunState({
@@ -486,12 +624,14 @@ export async function handleStopHookCommon(
     completionProof = runStateDetails.completionProof;
     pendingKinds = runStateDetails.pendingKinds;
     onlyBreakpointsPending = runStateDetails.onlyBreakpointsPending;
+    currentPendingEffectId = runStateDetails.currentPendingEffectId;
   } else {
     runStateSummary = await resolveHookRunState({ runId, runsDir, log });
     runState = runStateSummary.runState;
     completionProof = runStateSummary.completionProof;
     pendingKinds = runStateSummary.pendingKinds;
     onlyBreakpointsPending = runStateSummary.onlyBreakpointsPending;
+    currentPendingEffectId = runStateSummary.currentPendingEffectId;
   }
 
   const runEventDir = runStateDetails?.runDir || boundRunDir || path.join(runsDir, runId);
@@ -572,6 +712,13 @@ export async function handleStopHookCommon(
     }
   }
 
+  const backoff = await applyStopHookBackoff({
+    runDir: runEventDir,
+    effectId: currentPendingEffectId,
+    runState,
+    log,
+  });
+
   await appendStopHookEvent(runEventDir, {
     sessionId: activeSessionId,
     iteration: state.iteration,
@@ -580,6 +727,10 @@ export async function handleStopHookCommon(
     runState,
     pendingKinds,
     hasPromise,
+    effectId: backoff.effectId,
+    hookBackoffFireCount: backoff.fireCount,
+    hookBackoffDelaySeconds: backoff.delaySeconds,
+    hookBackoffInterrupted: backoff.interrupted,
   }, options.harness);
 
   return { shouldContinue: true, exitCode: 0, sessionId: activeSessionId, filePath, state: updatedState,

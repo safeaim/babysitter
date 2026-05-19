@@ -2133,6 +2133,10 @@ jobs:
           kubectl -n "$KUBE_NAMESPACE" delete service krate --ignore-not-found
           kubectl -n "$KUBE_NAMESPACE" delete deployment krate --ignore-not-found
 
+      - name: Remove standalone KubeVela release (now managed as krate subchart)
+        if: steps.config.outputs.deploy_enabled == 'true'
+        run: helm uninstall kubevela -n vela-system 2>/dev/null || true
+
       - name: Build Helm chart dependencies
         if: steps.config.outputs.deploy_enabled == 'true'
         run: helm dependency build packages/krate/charts 2>&1 || true
@@ -2173,7 +2177,7 @@ jobs:
             --set demo.enabled=false \
             --set gitea.enabled=false \
             --set argocd.enabled=false \
-            --set kubevela.install=false \
+            --set kubevela.install=true \
             --set kubevela.enabled=true \
             --set kyverno.install=false \
             --set "externalDependencies.kyverno.enabled=true" \

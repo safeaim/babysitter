@@ -85,7 +85,7 @@ Required assertions:
 - Missing credentials should skip model-backed jobs before any provider call begins.
 - A selected setup job should fail if installer preconditions are unavailable.
 - A selected babysitter-agent runtime job should fail if it tries to run installer commands.
-- Use of the deprecated `harness:call` alias in new runtime tests should fail review; use `babysitter-agent call` for babysitter-agent runtime or `amux run` for agent-mux session E2E.
+- Use of the deprecated `babysitter harness:call` alias in new runtime tests should fail review; use `babysitter-agent call` for babysitter-agent runtime or `amux run` for agent-mux session E2E.
 - Any log containing a raw secret must fail the job and block artifact upload until redaction is fixed.
 
 ## `install-plugins` Wrapper Acceptance Criteria

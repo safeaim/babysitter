@@ -37,9 +37,9 @@ The `babysitter` binary is shipped by [`@a5c-ai/babysitter`](../../packages/baby
 
 The optional runtime binary comes from [`@a5c-ai/babysitter-agent`](../../packages/babysitter-agent/package.json) and is registered as `babysitter-agent` with `babysitter-harness` kept only as a compatibility binary.
 
-Use abysitter-agent call for new runtime orchestration examples. The legacy abysitter harness:call alias is deprecated and should not be introduced in new tests or docs.
+Use `babysitter-agent call` for new runtime orchestration examples. The legacy `babysitter harness:call` alias has been removed and must not appear in new tests or docs.
 
-Setup remains on the core CLI through abysitter harness:install and abysitter harness:install-plugin.
+Setup remains on the core CLI through `babysitter harness:install` and `babysitter harness:install-plugin`.
 
 Use it for human-invoked orchestration sessions and runtime services:
 

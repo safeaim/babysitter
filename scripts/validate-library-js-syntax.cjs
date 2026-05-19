@@ -56,16 +56,12 @@ async function validateFile(filePath) {
   const messages = linter.verify(
     source,
     {
-      env: {
-        es2022: true,
-        node: true
-      },
-      parserOptions: {
+      languageOptions: {
         ecmaVersion: 2022,
-        sourceType: 'module'
-      }
+        sourceType: 'module',
+      },
     },
-    relativePath
+    { filename: relativePath }
   );
 
   return messages.filter((message) => message.fatal || message.severity === 2);

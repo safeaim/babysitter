@@ -506,8 +506,8 @@ defineTask('security-scan', (args, taskCtx) => ({
 | Field | Scope | Description |
 |-------|-------|-------------|
 | `execution.model` | Universal | Preferred model for the task. Used by both plugins and internal harness. |
-| `execution.harness` | Internal harness only | Preferred harness CLI. ONLY used by `harness:create-run`. Ignored by plugins. |
-| `execution.permissions` | Internal harness only | Free-form permission list. ONLY used by `harness:create-run`. |
+| `execution.harness` | Internal harness only | Preferred harness CLI. ONLY used by `babysitter-agent create-run`. Ignored by plugins. |
+| `execution.permissions` | Internal harness only | Free-form permission list. ONLY used by `babysitter-agent create-run`. |
 
 **Note:** In plugin SKILL.md files, the `harness` field is ignored. Only `model` is considered for subagent selection.
 

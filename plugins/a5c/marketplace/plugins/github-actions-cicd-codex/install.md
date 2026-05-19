@@ -144,7 +144,7 @@ jobs:
             - Performance implications
             - Test coverage
 
-            Run: babysitter harness:call --harness codex --prompt "review this PR" --workspace .
+            Run: babysitter-agent call --harness codex --prompt "review this PR" --workspace .
 ```
 
 ### Workflow: Feature Development TDD (`babysitter-feature-tdd.yml`)

@@ -11,7 +11,7 @@
 Chain processes sequentially where output of one becomes input of next. Define reusable pipelines.
 
 ## Current State
-Processes are standalone. Chaining requires manual harness:call sequences.
+Processes are standalone. Chaining requires manual `babysitter-agent call` sequences.
 
 ## Target State
 Pipeline definitions chain processes. Output of process N becomes input of process N+1. Pipelines reusable and parameterized. Pipeline execution tracked as a single session.

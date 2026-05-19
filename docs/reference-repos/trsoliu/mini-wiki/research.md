@@ -50,7 +50,7 @@ The wiki generation workflow is a genuine multi-phase process: project analysis 
 - **wiki-generator**: Automated project documentation generator
   - What install.md would do: Copy the wiki generation process definition, create .mini-wiki/ scaffolding script, register the process for invocation via "generate wiki" / "create docs" commands
   - Processes it would copy: project-wiki-generation, progressive-project-scanning
-  - Configs/hooks it would create: PostToolUse hook on project initialization that suggests wiki generation; process alias for `babysitter harness:call --process wiki-generation`; config for output directory and language preference
+  - Configs/hooks it would create: PostToolUse hook on project initialization that suggests wiki generation; process alias for `babysitter-agent call --process wiki-generation`; config for output directory and language preference
   - Source evidence: SKILL.md workflow sections, output structure specification, quality standards
   - Category: Knowledge Management
 

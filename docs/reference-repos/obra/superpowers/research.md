@@ -62,7 +62,7 @@ Superpowers is already installed as a plugin in the babysitter project (skills a
 - **Branch finalization** (specializations/shared/): finishing-a-development-branch describes the decision tree for squash vs merge vs rebase and cleanup. Useful as a lightweight babysitter process.
 
 ### Plugin Ideas
-- **Superpowers methodology bridge plugin:** Since superpowers is already installed as a plugin, the value is in converting its skill-based methodology into deterministic babysitter processes that can be replayed, journal-tracked, and state-cached. A marketplace plugin could provide `babysitter harness:call --process superpowers-tdd` etc.
+- **Superpowers methodology bridge plugin:** Since superpowers is already installed as a plugin, the value is in converting its skill-based methodology into deterministic babysitter processes that can be replayed, journal-tracked, and state-cached. A marketplace plugin could provide `babysitter-agent call --process superpowers-tdd` etc.
 
 ## Library Mapping
 

@@ -2173,7 +2173,7 @@ jobs:
             --set demo.enabled=false \
             --set gitea.enabled=false \
             --set argocd.enabled=false \
-            --set kubevela.install=true \
+            --set kubevela.install=false \
             --set kubevela.enabled=true \
             --set kyverno.install=false \
             --set "externalDependencies.kyverno.enabled=true" \

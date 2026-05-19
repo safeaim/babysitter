@@ -55,52 +55,12 @@ jobs:
           model: gpt-5.5
           interaction-mode: bridged-hooks
           babysitter-plugin: 'true'
+          process-file: .a5c/processes/ci-qa-review.mjs
           babysitter-prompt-prefix: '$babysitter:yolo '
           max-turns: '9999'
           prompt: |
-            You are a QA automation agent.
-            Trigger: ${{ github.event_name == 'workflow_dispatch' && 'manual dispatch' || format('/qa on PR #{0}', github.event.issue.number) }}
-            Branch: ${{ inputs.branch || github.head_ref || github.event.repository.default_branch }}
-            PR/Issue: #${{ inputs.pr_number || github.event.issue.number || 'none' }}
-            Instructions: ${{ inputs.instructions || github.event.comment.body || 'Run default QA based on changed files' }}
-
-            STEP 0 — READ THE PR/ISSUE FOR CONTEXT:
-            Run `gh pr view ${{ inputs.pr_number || github.event.issue.number }} --json files,title,body,comments,labels` to understand what changed and any discussion.
-            If it's an issue, run `gh issue view ${{ inputs.pr_number || github.event.issue.number }} --json title,body,labels,comments`.
-            This context informs which test scenarios to select.
-
-            STEP 1 — READ THE QA GUIDE:
-            Read docs/development/07-live-stack-qa-guide.md thoroughly. It describes:
-            - Available test axes (agents, models, modes, install types)
-            - How to dispatch the live-stack workflow with a JSON matrix
-            - When to test which scenarios
-
-            STEP 2 — ANALYZE THE PR:
-            Run `gh pr view ${{ github.event.issue.number }} --json files,title,body` to understand what changed.
-            Determine which components are affected:
-            - transport-mux changes → test multiple providers/models
-            - adapter changes → test the specific harness that changed
-            - launch.ts changes → test multiple harnesses across modes
-            - atlas/agent-catalog changes → test adapters that read from the graph
-            - babysitter SDK/plugin changes → test BP mode (predefined + create)
-            - hooks-mux changes → test bridged-hooks mode
-            If the `/qa` comment includes specific instructions, follow those instead.
-
-            STEP 3 — DISPATCH THE LIVE-STACK WORKFLOW:
-            Use `gh workflow run live-stack.yml --ref ${{ inputs.branch || github.head_ref || 'staging' }} -f matrix='<JSON>'` with the appropriate test matrix.
-            The JSON format is: [{"agent":"...","model":"...","mode":"...","install":"...","live":true}]
-            Choose a focused set — not the full cross-product, but enough to cover the affected paths.
-
-            STEP 4 — WAIT FOR RESULTS:
-            After dispatching, poll with `gh run list --workflow=live-stack.yml --limit=1 --json databaseId,status,conclusion` until the run completes.
-            Check every 60 seconds. Timeout after 20 minutes.
-
-            STEP 5 — REPORT RESULTS:
-            Get the results: `gh run view <id> --json jobs --jq '.jobs[] | {name, conclusion}'`
-            If a PR number is available (${{ inputs.pr_number || github.event.issue.number || '' }}), post results as a PR comment:
-            `gh pr comment <number> --body "<markdown>"`
-            Otherwise, print results to stdout.
-            Use: `gh pr comment ${{ github.event.issue.number }} --body "<markdown>"`
+            Execute the predefined QA process at .a5c/processes/ci-qa-review.mjs with these inputs:
+            { "prNumber": ${{ inputs.pr_number || github.event.issue.number || 0 }}, "branch": "${{ inputs.branch || github.head_ref || 'staging' }}", "instructions": "${{ inputs.instructions || github.event.comment.body || 'Run default QA based on changed files' }}" }
           trigger-query: ''
         env:
           AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}

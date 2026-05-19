@@ -52,76 +52,11 @@ jobs:
           interaction-mode: bridged-hooks
           babysitter-plugin: 'true'
           max-turns: '9999'
+          process-file: .a5c/processes/ci-issue-triage.mjs
           babysitter-prompt-prefix: '$babysitter:yolo '
           prompt: |
-            You are an issue triage agent. You do NOT write code or create PRs.
-            Your job is to research, classify, label, prioritize, and prepare issues for development.
-
-            Issue: #${{ inputs.issue_number || github.event.issue.number }}
-            Trigger: ${{ github.event_name == 'workflow_dispatch' && 'manual dispatch' || '/triage comment' }}
-
-            STEP 1 — READ THE ISSUE:
-            Run `gh issue view ${{ inputs.issue_number || github.event.issue.number }} --json title,body,labels,comments,assignees,state` to get the full issue.
-            Read everything carefully — title, body, all comments, existing labels.
-
-            STEP 2 — RESEARCH THE CODEBASE:
-            Based on the issue description, search the codebase for relevant files, functions, and patterns.
-            Use `grep`, `find`, and file reads to understand the affected area.
-            Check if the issue describes a real bug, a feature request, a question, or something unclear.
-
-            STEP 3 — CHECK FOR DUPLICATES:
-            Search for similar issues:
-            - `gh issue list --state all --search "<key terms>" --json number,title,state,labels`
-            - Check both open and closed issues for duplicates or related work.
-            - If a duplicate exists, add a comment noting the duplicate and add the "duplicate" label:
-              `gh issue edit ${{ inputs.issue_number || github.event.issue.number }} --add-label "duplicate"`
-              `gh issue comment ${{ inputs.issue_number || github.event.issue.number }} --body "Duplicate of #<number>"`
-              Then stop — do not continue triage.
-
-            STEP 4 — CHECK IF ALREADY FIXED:
-            - Check `git log --oneline --all --grep="<issue keywords>" | head -20` for related commits.
-            - Check if staging branch has fixes: `git log origin/staging --oneline --grep="<keywords>"`.
-            - Check closed PRs: `gh pr list --state closed --search "<keywords>" --json number,title,mergedAt`.
-            - If already fixed, comment with the fix details and close the issue:
-              `gh issue comment ${{ inputs.issue_number || github.event.issue.number }} --body "This was fixed in <commit/PR>. Closing."`
-              `gh issue close ${{ inputs.issue_number || github.event.issue.number }} --reason completed`
-              Then stop.
-
-            STEP 5 — CLASSIFY AND LABEL:
-            Apply appropriate labels. Create labels if they don't exist yet.
-            Categories to consider:
-            - Type: bug, feature, enhancement, question, documentation, refactor, test
-            - Component: sdk, agent-mux, transport-mux, hooks-mux, breakpoints-mux, atlas, agent-catalog, triggers, ci, plugins
-            - Priority: priority:critical, priority:high, priority:medium, priority:low
-            - Effort: effort:small, effort:medium, effort:large
-            Use: `gh label create "<name>" --description "<desc>" --color "<hex>" 2>/dev/null || true` for new labels.
-            Use: `gh issue edit ${{ inputs.issue_number || github.event.issue.number }} --add-label "<label1>,<label2>,..."`
-
-            STEP 6 — ASSESS PRIORITY:
-            Determine priority based on:
-            - Impact: how many users/workflows affected?
-            - Severity: crash/data loss vs cosmetic vs nice-to-have?
-            - Urgency: blocking other work? regression on main/staging?
-            - Complexity: is the fix straightforward or requires design?
-
-            STEP 7 — PREPARE FOR DEVELOPMENT:
-            Write a detailed triage comment on the issue with:
-            - **Summary**: one-line description of the issue
-            - **Root Cause Analysis**: what the research found — affected files, functions, likely cause
-            - **Affected Components**: which packages/modules are involved
-            - **Reproduction**: steps to reproduce (if a bug)
-            - **Suggested Approach**: how to fix/implement (high-level, not code)
-            - **Estimated Effort**: small/medium/large with justification
-            - **Related Issues/PRs**: links to related work
-            - **Priority**: the assigned priority with reasoning
-
-            If the issue is well-understood, reproducible (for bugs), and ready for a developer:
-            - Assign the "a5c-agent" user: `gh issue edit ${{ inputs.issue_number || github.event.issue.number }} --add-assignee "a5c-agent"`
-            - Add the "ready-for-dev" label
-            - Include "/agent ready for development" at the end of your triage comment so the agent dispatch can pick it up.
-
-            If the issue needs more information from the reporter, add the "needs-info" label and ask clarifying questions in the comment instead.
-
+            Execute the predefined triage process at .a5c/processes/ci-issue-triage.mjs with these inputs:
+            { "issueNumber": ${{ inputs.issue_number || github.event.issue.number }}, "repo": "a5c-ai/babysitter" }
             ${{ inputs.instructions || '' }}
           trigger-query: ''
         env:

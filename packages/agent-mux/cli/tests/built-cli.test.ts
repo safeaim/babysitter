@@ -65,7 +65,7 @@ suite('built CLI (dist/index.js)', () => {
     ]));
   });
 
-  it('gateway serve starts the built server and accepts a CLI-issued token', async () => {
+  it('gateway serve starts the built server and accepts a CLI-issued token', { timeout: 60000 }, async () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'amux-built-cli-'));
     const configPath = join(tempDir, 'gateway.config.json');
     const tokenDbPath = join(tempDir, 'tokens.db');

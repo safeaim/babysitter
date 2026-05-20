@@ -128,13 +128,13 @@ jobs:
           wait_all
 
       - name: Package dist directories
-        run: find packages -path '*/dist' -type d | tar czf /tmp/build-all-dist.tar.gz -T -
+        run: find packages -path '*/dist' -type d | tar czf ${RUNNER_TEMP}/build-all-dist.tar.gz -T -
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
           name: build-all-dist
-          path: /tmp/build-all-dist.tar.gz
+          path: ${RUNNER_TEMP}/build-all-dist.tar.gz
           if-no-files-found: error
 
   setup:
@@ -342,7 +342,7 @@ jobs:
 
       - name: Extract build artifacts
         if: ${{ matrix.scenario.skip != 'true' }}
-        run: tar xzf /tmp/build-all-dist.tar.gz
+        run: tar xzf ${RUNNER_TEMP}/build-all-dist.tar.gz
 
       - name: Install node-pty for TTY-based tool use
         if: ${{ matrix.scenario.skip != 'true' }}
@@ -417,7 +417,7 @@ jobs:
         timeout-minutes: 1
         uses: actions/upload-artifact@v7
         with:
-          name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.id }}
+          name: live-stack-${{ github.run_id }}-${{ matrix.install_mode.id }}-${{ matrix.interaction_mode.id }}-${{ matrix.scenario.process_mode || 'predefined' }}-${{ matrix.scenario.id }}
           path: artifacts/live-stack
           if-no-files-found: error
 

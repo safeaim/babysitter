@@ -148,9 +148,14 @@ export function buildPrimaryLiveStackCommands(
       prompt,
       '--max-turns',
       String(resolveLaunchMaxTurns(scenario)),
-      ...(isInteractive
-        ? (process.stdin.isTTY ? [] : ['--no-interactive'])
-        : ['--no-interactive', ...bridgeFlags(options.env)]),
+      ...(() => {
+        if (isInteractive && process.stdin.isTTY) return [];
+        if (isInteractive && !process.stdin.isTTY) {
+          commandEnv['LIVE_STACK_INTERACTIVE'] = 'false';
+          return ['--no-interactive'];
+        }
+        return ['--no-interactive', ...bridgeFlags(options.env)];
+      })(),
       ...harnessApprovalPassthrough(installTarget),
     ],
     options.cwd,
@@ -187,7 +192,7 @@ export function buildPrimaryLiveStackCommands(
     const resumeRunDir = path.join(options.cwd, '.a5c', 'runs', resumeRunId);
     setupCommands.push(
       { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'runs')} && cp -r ${path.join(fixturesDir, 'resume-run')} ${resumeRunDir} && find ${resumeRunDir} -name '*.json' -exec sed -i.bak 's/RESUME_FIXTURE_RUN/${resumeRunId}/g' {} + && find ${resumeRunDir} -name '*.bak' -delete`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'runs')} && cp -r ${path.join(fixturesDir, 'resume-run')} ${resumeRunDir} && find ${resumeRunDir} -name '*.json' -exec sed -i.bak 's/RESUME_FIXTURE_RUN/${resumeRunId}/g' {} + && find ${resumeRunDir} -name '*.bak' -delete && echo '{"traceId":"${traceId}","outputDir":".a5c-live-test"}' > ${resumeRunDir}/inputs.json`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
     );
     commandEnv['LIVE_STACK_RESUME_RUN_ID'] = resumeRunId;
   } else {

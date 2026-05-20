@@ -1,8 +1,9 @@
 import { createControllerUiModel, createKrateApiController } from '@a5c-ai/krate-sdk';
+import { withAuth } from '../../lib/api-auth.js';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export const GET = withAuth(async () => {
   const controller = createKrateApiController();
   try {
     const model = createControllerUiModel(await controller.snapshot());
@@ -10,9 +11,9 @@ export async function GET() {
   } catch (error) {
     return Response.json({ error: 'operation_failed', message: error.message }, { status: error.message?.includes('not found') ? 404 : 500 });
   }
-}
+});
 
-export async function POST(request) {
+export const POST = withAuth(async (request) => {
   const controller = createKrateApiController();
   try {
     const input = await request.json();
@@ -20,4 +21,4 @@ export async function POST(request) {
   } catch (error) {
     return Response.json({ error: 'operation_failed', message: error.message }, { status: error.message?.includes('not found') ? 404 : 500 });
   }
-}
+});

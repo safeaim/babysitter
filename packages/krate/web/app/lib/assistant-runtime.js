@@ -5,9 +5,10 @@
  * The runtime delegates actual generation to the krate API controller's
  * agent dispatch pipeline when a controller is supplied, or falls back
  * to a simple echo / stub response for development.
+ *
+ * Sessions persist across Next.js hot reloads via globalThis.
  */
 
-const sessions = new Map();
 let idCounter = 1;
 
 function generateId() {
@@ -15,6 +16,8 @@ function generateId() {
 }
 
 export function createAssistantRuntime() {
+  // Each call returns a fresh facade but they all share the same sessions Map
+  const sessions = getSessionStore();
   return {
     getSession(id) {
       return sessions.get(id) || null;
@@ -138,6 +141,28 @@ export function createAssistantRuntime() {
   };
 }
 
+// ---------- Singleton session store (persists across Next.js hot reloads) ----------
+
+function getSessionStore() {
+  if (!globalThis.__krateAssistantSessions) {
+    globalThis.__krateAssistantSessions = new Map();
+  }
+  return globalThis.__krateAssistantSessions;
+}
+
+// Use globalThis to persist across Next.js hot reloads
+if (!globalThis.__krateAssistantRuntime) {
+  globalThis.__krateAssistantRuntime = createAssistantRuntime();
+}
+
+/**
+ * Returns the singleton assistant runtime instance.
+ * Prefer this over createAssistantRuntime() in route handlers.
+ */
+export function getAssistantRuntime() {
+  return globalThis.__krateAssistantRuntime;
+}
+
 function buildGeneratePrompt(task, context, outputType) {
   let prompt = `Task: ${task}\n`;
   if (context) prompt += `Context: ${JSON.stringify(context)}\n`;
@@ -167,7 +192,11 @@ function escapeHtml(str) {
 }
 
 // Artifact store for generated content served via /artifacts/:id
-const artifacts = new Map();
+// Persists across Next.js hot reloads via globalThis
+if (!globalThis.__krateArtifacts) {
+  globalThis.__krateArtifacts = new Map();
+}
+const artifacts = globalThis.__krateArtifacts;
 
 export function storeArtifact(content, contentType) {
   const id = generateId();

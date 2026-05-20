@@ -1,11 +1,11 @@
 import { createKrateApiController, orgNamespaceName } from '@a5c-ai/krate-sdk';
 import { withAuth } from '../../../../../lib/api-auth.js';
 import { errorResponse } from '../../../../../lib/api-errors.js';
-import { createAssistantRuntime } from '../../../../../lib/assistant-runtime.js';
+import { getAssistantRuntime } from '../../../../../lib/assistant-runtime.js';
 
 export const dynamic = 'force-dynamic';
 
-const runtime = createAssistantRuntime();
+const runtime = getAssistantRuntime();
 
 export const POST = withAuth(async (request, { params }) => {
   const { org } = await params;

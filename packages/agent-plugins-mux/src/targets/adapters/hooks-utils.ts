@@ -46,13 +46,13 @@ export function resolveCmd(
   pattern?: string
 ): string {
   if (handlerValue === 'proxy') {
-    return `${proxyBin} invoke --adapter ${adapter} --json`;
+    return `npx -y ${proxyPkg} invoke --adapter ${adapter} --json`;
   }
   const p = resolveHookPath(handlerValue, hookSlug, pluginName, nativeHook, pattern);
   if (p) {
     const scriptRef = rootRef.startsWith('$') || rootRef.startsWith('\\$')
       ? `${rootRef}/${p}` : `./${p}`;
-    return `${proxyBin} invoke --adapter ${adapter} --handler "bash ${scriptRef}" --json`;
+    return `npx -y ${proxyPkg} invoke --adapter ${adapter} --handler "bash ${scriptRef}" --json`;
   }
   return `echo '{}'`;
 }

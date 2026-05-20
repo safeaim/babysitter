@@ -3,7 +3,7 @@ import * as path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { executeChildProcessCommand, executePtyCommand, runPrimaryLiveStackScenario } from './primary-live-runner';
+import { executeChildProcessCommand, runPrimaryLiveStackScenario } from './primary-live-runner';
 import { liveStackScenarioFromEnv } from './scenario-contract';
 
 describe('pipeline-owned live stack scenario execution', () => {
@@ -19,9 +19,6 @@ describe('pipeline-owned live stack scenario execution', () => {
       executeLiveProvider: process.env['LIVE_STACK_RUN_MODEL_TESTS'] === '1',
       requireRunnable: requireLiveEvidence,
       executeCommand: executeChildProcessCommand,
-      executeLaunchCommand: process.env['LIVE_STACK_INTERACTIVE'] === 'true' && !process.stdin.isTTY
-        ? executePtyCommand
-        : undefined,
       timeoutMs: Number(process.env['LIVE_STACK_COMMAND_TIMEOUT_MS'] ?? 10 * 60 * 1000),
     });
 

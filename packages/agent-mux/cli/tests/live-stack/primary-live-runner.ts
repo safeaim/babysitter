@@ -32,7 +32,6 @@ export interface PrimaryLiveRunOptions {
   readonly cwd: string;
   readonly artifactsDir: string;
   readonly executeCommand: (execution: CommandExecution) => Promise<CommandResult>;
-  readonly executeLaunchCommand?: (execution: CommandExecution) => Promise<CommandResult>;
   readonly executeLiveProvider?: boolean;
   readonly requireRunnable?: boolean;
   readonly timeoutMs?: number;
@@ -149,7 +148,9 @@ export function buildPrimaryLiveStackCommands(
       prompt,
       '--max-turns',
       String(resolveLaunchMaxTurns(scenario)),
-      ...(isInteractive ? [] : ['--no-interactive', ...bridgeFlags(options.env)]),
+      ...(isInteractive
+        ? (process.stdin.isTTY ? [] : ['--no-interactive', '--bridge-interactive'])
+        : ['--no-interactive', ...bridgeFlags(options.env)]),
       ...harnessApprovalPassthrough(installTarget),
     ],
     options.cwd,
@@ -269,9 +270,7 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
   const commandResults: CommandResult[] = [];
   for (let cmdIdx = 0; cmdIdx < commands.length; cmdIdx++) {
     const command = commands[cmdIdx]!;
-    const isLastCommand = cmdIdx === commands.length - 1;
-    const executor = isLastCommand && options.executeLaunchCommand ? options.executeLaunchCommand : options.executeCommand;
-    const result = await executor(command);
+    const result = await options.executeCommand(command);
     commandResults.push(result);
     await writeCommandTranscript(options.artifactsDir, scenario, commandResults);
     if (result.status !== 0) {
@@ -279,7 +278,7 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
       // was created with real content despite non-zero exit, continue to
       // verification. Many harnesses exit non-zero after producing valid output
       // (e.g., Gemini CLI errors on 2nd turn after writing content on 1st).
-      if (isLastCommand) {
+      if (cmdIdx === commands.length - 1) {
         const traceId = command.env['LIVE_STACK_TRACE_ID'];
         if (traceId) {
           const expectedFile = path.join(options.cwd, '.a5c-live-test', `${traceId}-odyssey.md`);

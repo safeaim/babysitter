@@ -178,6 +178,10 @@ export function buildPrimaryLiveStackCommands(
     setupCommands.push(
       { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
     );
+  } else if (processMode === 'create') {
+    setupCommands.push(
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'create-process-skeleton.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'odyssey-live-test.skeleton.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+    );
   } else if (processMode === 'resume') {
     const resumeRunId = `resume-${traceId}`;
     const resumeRunDir = path.join(options.cwd, '.a5c', 'runs', resumeRunId);
@@ -492,16 +496,20 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
     const processMode = env['LIVE_STACK_PROCESS_MODE'] ?? 'predefined';
     if (processMode === 'create') {
       const createInstructions = [
-        'STEP 1 — Create a NEW babysitter process file at .a5c/processes/odyssey-live-test.mjs from scratch.',
-        'Do NOT use any existing process file. Research the process library at .a5c/process-library/ for patterns and examples.',
-        'The process must: import defineTask from @a5c-ai/babysitter-sdk; export an async process(inputs, ctx) function;',
-        'use parallel steps (ctx.parallel.all); have agent kind tasks for content generation;',
-        'have shell kind tasks for file I/O with expectedExitCode; have at least 3 iterations.',
-        'Include a // @reference comment near the top listing which library processes you used as inspiration (e.g. library paths you read).',
-        'Write this file to disk before proceeding to step 2.',
+        'STEP 1 — Read the skeleton at .a5c/processes/odyssey-live-test.skeleton.mjs.',
+        'Also read .a5c/processes/summarize-translate-test.mjs as a working reference.',
+        'Create .a5c/processes/odyssey-live-test.mjs by filling in the skeleton:',
+        '- Replace all <FILL> placeholders with real implementations',
+        '- Define at least 3 tasks using defineTask()',
+        '- Use ctx.parallel.all() for concurrent work',
+        '- Write the final markdown to <outputDir>/<traceId>-odyssey.md',
+        '- The document must have 12 paragraph headings and Greek characters',
+        'Write this file to disk before proceeding.',
         '',
-        `STEP 2 — After the process file is written: ${coreTask}.`,
-        'Use the process you just created at .a5c/processes/odyssey-live-test.mjs',
+        'STEP 2 — Verify your process file: run `node -e "import(\'.a5c/processes/odyssey-live-test.mjs\').then(m => console.log(typeof m.process))"` — it must print "function".',
+        'If it fails, fix the syntax error and retry.',
+        '',
+        `STEP 3 — ${coreTask}. Use the process you created at .a5c/processes/odyssey-live-test.mjs`,
       ].join('\n');
       if (scenario.agent.agent === 'claude-code') return `/babysitter:call ${createInstructions}`;
       if (scenario.agent.agent === 'codex') return `$babysitter:call ${createInstructions}`;

@@ -355,7 +355,8 @@ jobs:
           for pair in \
             "amux:packages/agent-mux/cli/dist/index.js" \
             "babysitter-agent:packages/babysitter-agent/dist/cli/main.js" \
-            "babysitter:packages/sdk/dist/cli/main.js"
+            "babysitter:packages/sdk/dist/cli/main.js" \
+            "a5c-hooks-mux:packages/hooks-mux/cli/dist/index.js"
           do
             name="${pair%%:*}"
             script="${pair#*:}"

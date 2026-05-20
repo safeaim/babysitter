@@ -455,6 +455,8 @@ describe("bindSession stale session handling", () => {
   });
 
   afterEach(async () => {
+    delete process.env.BABYSITTER_HOOK_BACKOFF_BASE;
+    delete process.env.BABYSITTER_HOOK_BACKOFF_CAP;
     await fs.rm(tmpDir, { recursive: true, force: true });
   });
 
@@ -1056,6 +1058,8 @@ describe("stop hook allows exit when only breakpoints are pending", () => {
   });
 
   it("blocks exit when breakpoints AND other effects are pending", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.001";
     const sessionId = "bp-session-002";
     const runId = "bp-run-002";
 

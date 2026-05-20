@@ -86,6 +86,7 @@ export interface StopHookRunStateDetails {
   completionProof: string;
   pendingKinds: string;
   onlyBreakpointsPending: boolean;
+  currentPendingEffectId?: string;
   entrypointImportPath?: string;
   runDir: string;
   lookupError?: string;
@@ -160,6 +161,7 @@ export async function resolveStopHookRunState(
   let completionProof = "";
   let pendingKinds = "";
   let onlyBreakpointsPending = false;
+  let currentPendingEffectId: string | undefined;
   let entrypointImportPath: string | undefined;
 
   try {
@@ -175,6 +177,12 @@ export async function resolveStopHookRunState(
       pendingKinds = kindKeys.join(", ");
     }
     onlyBreakpointsPending = pendingRecords.length > 0 && isOnlyBreakpoints(pendingByKind);
+    currentPendingEffectId = pendingRecords
+      .filter((record) => record.kind !== "breakpoint")
+      .sort((left, right) =>
+        (left.requestedAt ?? "").localeCompare(right.requestedAt ?? "")
+        || left.effectId.localeCompare(right.effectId),
+      )[0]?.effectId;
 
     if (runState === "completed") {
       completionProof = resolveCompletionProof(metadata);
@@ -188,6 +196,7 @@ export async function resolveStopHookRunState(
     completionProof,
     pendingKinds,
     onlyBreakpointsPending,
+    currentPendingEffectId,
     entrypointImportPath,
     runDir,
     lookupError: runState ? undefined : `Unable to inspect run ${runId} at ${runDir}`,

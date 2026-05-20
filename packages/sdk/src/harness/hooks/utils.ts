@@ -118,6 +118,10 @@ export async function appendStopHookEvent(
     runState: string;
     pendingKinds: string;
     hasPromise: boolean;
+    effectId?: string;
+    hookBackoffFireCount?: number;
+    hookBackoffDelaySeconds?: number;
+    hookBackoffInterrupted?: boolean;
   },
   harness?: string,
 ): Promise<void> {

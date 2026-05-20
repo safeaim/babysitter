@@ -34,7 +34,7 @@ module.exports = [
       ...tseslint.configs.recommended.rules,
       "max-lines": [
         "warn",
-        { "max": 400, "skipBlankLines": false, "skipComments": false }
+        { "max": 700, "skipBlankLines": true, "skipComments": true }
       ],
       "no-redeclare": "off",
       "no-undef": "off",

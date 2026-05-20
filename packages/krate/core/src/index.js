@@ -56,3 +56,4 @@ export * from './agent-secret-config-grant-controller.js';
 export * from './runner-controller.js';
 export * from './notification-controller.js';
 export * from './hooks-lifecycle.js';
+export * from './assistant-runtime.js';

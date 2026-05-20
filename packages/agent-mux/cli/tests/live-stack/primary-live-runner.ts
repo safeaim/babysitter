@@ -171,10 +171,19 @@ export function buildPrimaryLiveStackCommands(
     generatedPluginInstallCommand(commandEnv, scenario, options.cwd, SETUP_TIMEOUT_MS),
     ensureLiveArtifactDirCommand(commandEnv, options.cwd),
   ];
+  const fixturesDir = path.join(options.cwd, 'packages', 'agent-mux', 'cli', 'tests', 'live-stack', 'fixtures');
   if (processMode === 'predefined') {
     setupCommands.push(
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(options.cwd, 'packages', 'agent-mux', 'cli', 'tests', 'live-stack', 'fixtures', 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
     );
+  } else if (processMode === 'resume') {
+    const resumeRunId = `resume-${traceId}`;
+    const resumeRunDir = path.join(options.cwd, '.a5c', 'runs', resumeRunId);
+    setupCommands.push(
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      { command: 'bash', args: ['-c', `cp -r ${path.join(fixturesDir, 'resume-run')} ${resumeRunDir} && sed -i.bak 's/RESUME_FIXTURE_RUN/${resumeRunId}/g' ${resumeRunDir}/run.json ${resumeRunDir}/inputs.json && rm -f ${resumeRunDir}/*.bak`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+    );
+    commandEnv['LIVE_STACK_RESUME_RUN_ID'] = resumeRunId;
   } else {
     setupCommands.push(
       { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
@@ -496,6 +505,13 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
       if (scenario.agent.agent === 'claude-code') return `/babysitter:call ${createInstructions}`;
       if (scenario.agent.agent === 'codex') return `$babysitter:call ${createInstructions}`;
       return createInstructions;
+    }
+    if (processMode === 'resume') {
+      const resumeRunId = env['LIVE_STACK_RESUME_RUN_ID'] ?? `resume-${traceId}`;
+      const resumeInstructions = `Resume the stalled babysitter run at .a5c/runs/${resumeRunId}. The run has completed outline planning and summary writing but stalled during translation. Complete the remaining translation tasks, assemble the document, and verify it. The process file is at .a5c/processes/summarize-translate-test.mjs`;
+      if (scenario.agent.agent === 'claude-code') return `/babysitter:resume ${resumeInstructions}`;
+      if (scenario.agent.agent === 'codex') return `$babysitter:resume ${resumeInstructions}`;
+      return `Invoke the babysitter:resume command to: ${resumeInstructions}`;
     }
     const processHint = 'A process definition is available at .a5c/processes/summarize-translate-test.mjs';
     if (scenario.agent.agent === 'claude-code') return `/babysitter:yolo ${coreTask}. ${processHint}`;

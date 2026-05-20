@@ -373,3 +373,41 @@ test('SDK exports all external controller factory functions', () => {
   assert.equal(typeof sdk.createConflictController, 'function');
   assert.equal(typeof sdk.createExternalBackendProvider, 'function');
 });
+
+// ---------------------------------------------------------------------------
+// New exports: KServe inference, artifact registry, assistant runtime
+// ---------------------------------------------------------------------------
+
+test('createInferenceServiceController exists and is a function', () => {
+  assert.equal(typeof sdk.createInferenceServiceController, 'function');
+});
+
+test('createInferenceServiceController returns a controller with expected methods', () => {
+  const ctrl = sdk.createInferenceServiceController();
+  assert.ok(ctrl, 'controller must not be null');
+  assert.equal(typeof ctrl, 'object');
+});
+
+test('createArtifactRegistryController exists and is a function', () => {
+  assert.equal(typeof sdk.createArtifactRegistryController, 'function');
+});
+
+test('createArtifactRegistryController returns a controller with expected methods', () => {
+  const ctrl = sdk.createArtifactRegistryController();
+  assert.ok(ctrl, 'controller must not be null');
+  assert.equal(typeof ctrl, 'object');
+});
+
+test('createAssistantRuntime exists and is a function', () => {
+  assert.equal(typeof sdk.createAssistantRuntime, 'function');
+});
+
+test('createAssistantRuntime returns a runtime with expected methods', () => {
+  const runtime = sdk.createAssistantRuntime({ apiKey: 'test-key' });
+  assert.ok(runtime, 'runtime must not be null');
+  assert.equal(typeof runtime.chat, 'function');
+  assert.equal(typeof runtime.listSessions, 'function');
+  assert.equal(typeof runtime.createSession, 'function');
+  assert.equal(typeof runtime.deleteSession, 'function');
+  assert.equal(typeof runtime.structuredCall, 'function');
+});

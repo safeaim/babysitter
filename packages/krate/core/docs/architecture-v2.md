@@ -2671,3 +2671,89 @@ The persistFn is called with a fully-formed K8s-style CRD resource. Errors are s
 | `updateCheck({ repo, checkRunId, status, conclusion, output })` | PATCH `/repos/{owner}/{repo}/check-runs/{id}` |
 
 All GitHub classes use `X-GitHub-Api-Version: 2022-11-28` header and Bearer token auth.
+
+---
+
+## 32. KServe Model Inference Pipeline
+
+### KrateInferenceService Controller (`krate-inference-service-controller.js`)
+
+- `KrateInferenceService` wraps KServe `InferenceService` CRDs under `serving.kserve.io/v1beta1`
+- Endpoint discovery from K8s status after KServe readiness
+- V1 and V2 inference protocol support (`/v1/models/{name}:predict`, `/v2/models/{name}/infer`)
+- `toProviderConfig` creates an `AgentProviderConfig` with `type: 'kserve'` for agent stack integration
+- Agent stacks can reference on-cluster models alongside cloud LLMs via the provider bridge
+- Supported model frameworks: `sklearn`, `xgboost`, `lightgbm`, `tensorflow`, `pytorch`, `onnx`, `triton`, `huggingface`, `custom`
+
+**Boundary:**
+```javascript
+export const KRATE_INFERENCE_SERVICE_CONTROLLER_BOUNDARY = {
+  role: 'krate-inference-service-controller',
+  owns: ['inference service validation', 'KServe manifest generation', 'endpoint resolution',
+         'provider config bridge', 'inference protocol handling', 'health checks'],
+  delegatesTo: ['resource-model', 'agent-provider-config-controller'],
+};
+```
+
+**Key exports:** `createInferenceServiceController`, `KRATE_INFERENCE_SERVICE_CONTROLLER_BOUNDARY`, `SUPPORTED_MODEL_FORMATS`, `INFERENCE_PROTOCOLS`, `KSERVE_API_GROUP`, `KSERVE_API_VERSION`
+
+---
+
+## 33. Artifact Registry System
+
+### Artifact Registry Controller (`artifact-registry-controller.js`)
+
+Five resource kinds:
+
+| Kind | Description |
+|------|-------------|
+| `ArtifactRegistry` | Top-level registry scoped to an org |
+| `ArtifactFeed` | Named feed within a registry (e.g. `npm`, `pip`, `docker`) |
+| `ArtifactAccessPolicy` | Per-feed access control (read/write/admin per subject) |
+| `ArtifactVersion` | Immutable published artifact version record |
+| `ArtifactDownload` | Audit record for each artifact download |
+
+- Supports `npm`, `pip`, `docker`, and `generic` artifact types
+- Internal storage backend plus external integrations (`s3`, `azure-blob`, `gcs`)
+- External backend modes: `read-only`, `read-write`, `mirror` (e.g. GitHub Packages proxy)
+- Protocol-specific install command generation per feed type
+- Access policy enforcement: `read`, `write`, `admin` permissions per feed per subject
+
+**Boundary:**
+```javascript
+export const ARTIFACT_REGISTRY_CONTROLLER_BOUNDARY = {
+  role: 'artifact-registry-controller',
+  owns: ['registry validation', 'feed management', 'access policy enforcement',
+         'artifact publish', 'artifact version listing', 'artifact deletion', 'download audit'],
+  delegatesTo: ['resource-model', 'external-backend-binding'],
+  mustNotOwn: ['secret values', 'blob storage I/O', 'network transport'],
+};
+```
+
+**Key exports:** `createArtifactRegistryController`, `ARTIFACT_REGISTRY_CONTROLLER_BOUNDARY`
+
+---
+
+## 34. Assistant Agent
+
+### Assistant Runtime (`assistant-runtime.js`)
+
+- In-process runtime using the Anthropic API (no K8s Job dispatch)
+- Chat sessions with message history persisted via `globalThis` session store
+- `createAssistantRuntime` returns: `chat`, `generate`, `listSessions`, `clearSession`
+- Structured generation endpoint (`generate`) for dynamic content and tool-augmented agentic calls
+- Default `assistant` AgentStack deployed via the Helm chart (`values.yaml` default stacks)
+- Stack selector allows different `AgentStack` CRDs per conversation context
+- `callModel` handles HTTP to Anthropic API with support for tool definitions and response format constraints
+
+**Boundary:**
+```javascript
+export const ASSISTANT_RUNTIME_BOUNDARY = {
+  role: 'assistant-runtime',
+  owns: ['chat sessions', 'message history', 'model API calls', 'structured agentic calls', 'session lifecycle'],
+  delegatesTo: ['resource-model', 'agent-stack-controller', 'agent-mux-client'],
+  mustNotOwn: ['secret values', 'K8s Job dispatch', 'resource persistence'],
+};
+```
+
+**Key exports:** `createAssistantRuntime`, `ASSISTANT_RUNTIME_BOUNDARY`, `defaultAssistantConfig`, `defaultSystemPrompt`, `callModel`

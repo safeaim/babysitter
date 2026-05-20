@@ -19,7 +19,7 @@ Krate is split into 4 packages under `packages/krate/`:
 
 ```bash
 npm run build     # Generate dist/ JSON snapshots
-npm test          # Unit + integration tests (node:test) — 1300 tests
+npm test          # Unit + integration tests (node:test) — 1501 tests
 npm run e2e       # End-to-end package validation — 3 tests
 npm run smoke     # MVP smoke assertions — 21 checks
 npm run serve     # Start HTTP API on port 3080
@@ -29,7 +29,7 @@ npm run demo      # Print handoff summary
 ### SDK (`packages/krate/sdk`)
 
 ```bash
-node --test tests/*.test.js   # SDK export + integration tests — 73 tests
+node --test tests/*.test.js   # SDK export + integration tests — 78 tests
 ```
 
 ### CLI (`packages/krate/cli`)
@@ -45,6 +45,7 @@ krate mcp                     # Start MCP (Model Context Protocol) server over s
 ```bash
 npm run build     # Next.js production build (Turbopack)
 npm run dev       # Development server
+npm test          # Route and API utility tests — 64 tests
 ```
 
 ## Architecture
@@ -83,7 +84,7 @@ The CLI provides an MCP server (`krate mcp`) that exposes 14 tools, 3 prompts, a
 - SDK re-exports core helpers for web/CLI consumers; web imports from `@a5c-ai/krate-sdk`
 - Web console is in ../web/ (Next.js 16 + React 19)
 - Helm chart is in ../charts/ (not an npm workspace)
-- Resource taxonomy: 76 kinds across config (etcd) and aggregated (Postgres) storage, 75 CRDs
+- Resource taxonomy: 83 kinds across config (etcd) and aggregated (Postgres) storage, 75 CRDs
 - Web console split into 7 modules (lib/krate-ui, lib/page-frame, pages/agent, pages/repo, pages/manage, pages/settings, pages/external)
 - Auth middleware on all mutating API routes
 - Async kubectl snapshot with stale-while-revalidate cache (30s TTL)
@@ -109,6 +110,38 @@ The dispatch flow:
 **Key new SDK exports:** `createAgentJob`, `submitAgentJob`, `getJobStatus`, `getJobLogs`,
 `deleteJob`, `resolveStack`, `persistSessionEvent`, `createHooksLifecycleEmitter`,
 `checkBudget`, `estimateCost`, `resolveTransport`
+
+## Inference (KServe Integration)
+
+- `krate-inference-service-controller.js` wraps KServe `InferenceService` CRDs under `serving.kserve.io/v1beta1`
+- Validates and generates KServe manifests for `KrateInferenceService` and `KrateServingRuntime` resources
+- Endpoint discovery from K8s status (resolves URL after KServe readiness)
+- Supports V1 and V2 inference protocols (`/v1/models/{name}:predict`, `/v2/models/{name}/infer`)
+- `toProviderConfig` bridges an inference service to an `AgentProviderConfig` with `type: 'kserve'`
+- Supported model frameworks: `sklearn`, `xgboost`, `lightgbm`, `tensorflow`, `pytorch`, `onnx`, `triton`, `huggingface`, `custom`
+- Agent stacks can reference on-cluster models alongside cloud LLMs via the provider bridge
+- **Key exports:** `createInferenceServiceController`, `KRATE_INFERENCE_SERVICE_CONTROLLER_BOUNDARY`, `SUPPORTED_MODEL_FORMATS`, `INFERENCE_PROTOCOLS`
+
+## Artifact Registry
+
+- `artifact-registry-controller.js` manages 5 resource kinds: `ArtifactRegistry`, `ArtifactFeed`, `ArtifactAccessPolicy`, `ArtifactVersion`, `ArtifactDownload`
+- Supports `npm`, `pip`, `docker`, and `generic` registry types
+- Storage backends: `internal`, `s3`, `azure-blob`, `gcs`
+- External integration modes (GitHub Packages, etc.): `read-only`, `read-write`, `mirror`
+- Protocol-specific install command generation per feed type
+- Access policy enforcement: `read`, `write`, `admin` permissions per feed
+- **Key exports:** `createArtifactRegistryController`, `ARTIFACT_REGISTRY_CONTROLLER_BOUNDARY`
+
+## Assistant Agent
+
+- `assistant-runtime.js` provides an in-process runtime using the Anthropic API
+- Chat sessions with persistent message history (`globalThis`-based session store)
+- `createAssistantRuntime` returns an object with `chat`, `generate`, `listSessions`, `clearSession` methods
+- Structured generation endpoint (`generate`) for dynamic content and agentic calls
+- Default `assistant` AgentStack configuration deployed via Helm chart
+- Stack selector allows using different `AgentStack` CRDs for different conversation contexts
+- Supports tool definitions passed through to model calls
+- **Key exports:** `createAssistantRuntime`, `ASSISTANT_RUNTIME_BOUNDARY`, `defaultAssistantConfig`, `defaultSystemPrompt`, `callModel`
 
 ## Agent Mux Integration
 

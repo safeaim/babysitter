@@ -220,3 +220,28 @@ export {
   getOntologyNodeKinds,
   getOntologyEdgeKinds
 } from '../../core/src/agent-memory-import.js';
+
+// KServe Inference Service Controller
+export {
+  createInferenceServiceController,
+  KRATE_INFERENCE_SERVICE_CONTROLLER_BOUNDARY,
+  SUPPORTED_MODEL_FORMATS,
+  INFERENCE_PROTOCOLS,
+  KSERVE_API_GROUP,
+  KSERVE_API_VERSION
+} from '../../core/src/krate-inference-service-controller.js';
+
+// Artifact Registry Controller
+export {
+  createArtifactRegistryController,
+  ARTIFACT_REGISTRY_CONTROLLER_BOUNDARY
+} from '../../core/src/artifact-registry-controller.js';
+
+// Assistant Runtime
+export {
+  createAssistantRuntime,
+  ASSISTANT_RUNTIME_BOUNDARY,
+  defaultAssistantConfig,
+  defaultSystemPrompt,
+  callModel
+} from '../../core/src/assistant-runtime.js';

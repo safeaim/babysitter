@@ -3,7 +3,7 @@ import os from "os";
 import path from "path";
 import { promises as fs } from "fs";
 import { createRunDir } from "../../storage/createRunDir";
-import { appendEvent } from "../../storage/journal";
+import { appendEvent, loadJournal } from "../../storage/journal";
 import { orchestrateIteration } from "../orchestrateIteration";
 import { commitEffectResult } from "../commitEffectResult";
 
@@ -167,6 +167,45 @@ describe("orchestrateIteration integration", () => {
     if (result.status === "waiting") {
       expect(result.nextActions.length).toBeGreaterThan(0);
     }
+  });
+
+  test("completes non-interactive breakpoints that append PROCESS_LOG events concurrently", async () => {
+    const processDir = path.join(tmpRoot, "processes-breakpoints");
+    await fs.mkdir(processDir, { recursive: true });
+
+    const processPath = path.join(processDir, "parallel-breakpoints.mjs");
+    await fs.writeFile(
+      processPath,
+      `
+      export async function process(_inputs, ctx) {
+        await Promise.all([
+          ctx.breakpoint({ label: "deploy gate" }, { label: "deploy gate" }),
+          ctx.breakpoint({ label: "pr gate" }, { label: "pr gate" })
+        ]);
+        return { ok: true };
+      }
+      `,
+      "utf8",
+    );
+
+    const { runDir } = await createRunDir({
+      runsRoot: tmpRoot,
+      runId: "run-non-interactive-breakpoints",
+      request: "parallel breakpoint test",
+      processPath,
+      inputs: {},
+      extraMetadata: { nonInteractive: true },
+    });
+
+    await appendEvent({ runDir, eventType: "RUN_CREATED", event: { runId: "run-non-interactive-breakpoints" } });
+
+    const result = await orchestrateIteration({ runDir });
+    expect(result.status).toBe("completed");
+
+    const journal = await loadJournal(runDir);
+    expect(journal.map((event) => event.seq)).toEqual(journal.map((_, index) => index + 1));
+    expect(journal.filter((event) => event.type === "PROCESS_LOG")).toHaveLength(2);
+    expect(journal.some((event) => event.type === "RUN_FAILED")).toBe(false);
   });
 
   test("completes replay correctly after cwd changes when the run was created from a relative runsDir", async () => {

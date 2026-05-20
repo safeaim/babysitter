@@ -110,6 +110,9 @@ export const KRATE_RESOURCES = [
   // Artifact registry resources (postgres-stored)
   { kind: 'ArtifactVersion', plural: 'artifactversions', namespaced: true, storage: 'postgres' },
   { kind: 'ArtifactDownload', plural: 'artifactdownloads', namespaced: true, storage: 'postgres' },
+  // Inference resources (etcd-stored, krate.a5c.ai group)
+  { kind: 'KrateInferenceService', plural: 'krateinferenceservices', namespaced: true, storage: 'etcd' },
+  { kind: 'KrateServingRuntime', plural: 'krateservingruntimes', namespaced: true, storage: 'etcd' },
   // Core Kubernetes resources (group: '' — no API group prefix for kubectl).
   // These are excluded from snapshot discovery (storage: 'core') but are
   // available for list/get/delete via findResourceDefinition.

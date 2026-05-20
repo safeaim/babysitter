@@ -59,6 +59,12 @@ rules:
 
     verbs: ["get", "list", "watch"]
 
+  - apiGroups: ["serving.kserve.io"]
+
+    resources: ["inferenceservices", "servingruntimes"]
+
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
   - apiGroups: ["apps"]
 
     resources: ["deployments"]

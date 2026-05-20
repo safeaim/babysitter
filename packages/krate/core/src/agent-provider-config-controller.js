@@ -10,7 +10,7 @@ export const AGENT_PROVIDER_CONFIG_CONTROLLER_BOUNDARY = {
   mustNotOwn: ['secret values', 'dispatch execution', 'Agent Mux sessions', 'adapter implementation']
 };
 
-const VALID_PROVIDER_TYPES = ['anthropic', 'openai', 'azure-openai', 'google-vertex', 'foundry', 'custom'];
+const VALID_PROVIDER_TYPES = ['anthropic', 'openai', 'azure-openai', 'google-vertex', 'foundry', 'custom', 'kserve'];
 
 const DEFAULT_ENDPOINTS = Object.freeze({
   anthropic: 'https://api.anthropic.com/v1',
@@ -18,7 +18,8 @@ const DEFAULT_ENDPOINTS = Object.freeze({
   'azure-openai': null,   // requires explicit endpoint (tenant-specific)
   'google-vertex': 'https://us-central1-aiplatform.googleapis.com/v1',
   foundry: null,          // requires explicit endpoint
-  custom: null            // requires explicit endpoint
+  custom: null,           // requires explicit endpoint
+  kserve: null            // requires explicit endpoint from InferenceService discovery
 });
 
 const DEFAULT_FEATURE_FLAGS = Object.freeze({

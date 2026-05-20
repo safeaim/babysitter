@@ -273,6 +273,10 @@ argocd:
 kyverno:
   install: false
 
+kserve:
+  enabled: false
+  discoverExisting: true
+
 agents:
   enabled: true
   agentMux:

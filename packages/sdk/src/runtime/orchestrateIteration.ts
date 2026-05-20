@@ -179,6 +179,14 @@ async function loadProcessFunction(options: OrchestrateOptions, defaults: Entryp
   const exportName = options.process?.exportName ?? defaults.exportName ?? "process";
   const resolvedPath = path.isAbsolute(importPath) ? importPath : path.resolve(runDir, importPath);
   const moduleUrl = pathToFileURL(resolvedPath).href;
+  // Ensure NODE_PATH includes the workspace node_modules so ESM import() can
+  // resolve bare specifiers like '@a5c-ai/babysitter-sdk' from process files.
+  if (!process.env['NODE_PATH']?.includes('node_modules')) {
+    const cwd = process.cwd();
+    const sep = process.platform === 'win32' ? ';' : ':';
+    process.env['NODE_PATH'] = [path.join(cwd, 'node_modules'), process.env['NODE_PATH']].filter(Boolean).join(sep);
+    try { (require('module') as { _initPaths?: () => void })._initPaths?.(); } catch { /* node internals */ }
+  }
   let mod: Record<string, unknown>;
   try { mod = await dynamicImportModule(moduleUrl); }
   catch (error) { throw new RunFailedError(`Failed to load process module at ${resolvedPath}`, { details: { error: serializeUnknownError(error) }, cause: error instanceof Error ? error : undefined }); }

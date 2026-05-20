@@ -14,6 +14,7 @@ import { globalTaskRegistry } from "../tasks/registry";
 import { serializeAndWriteTaskResult } from "../tasks/serializer";
 import { readTaskDefinition } from "../storage/tasks";
 import { rebuildStateCache } from "./replay/stateCache";
+import { checkRunWorkDirLeak } from "./workDirLeak";
 
 export async function commitEffectResult(options: CommitEffectResultOptions): Promise<CommitEffectResultArtifacts> {
   return await withRunLock(options.runDir, "runtime:commitEffectResult", async () => {
@@ -89,6 +90,7 @@ export async function commitEffectResult(options: CommitEffectResultOptions): Pr
       hasStdout: Boolean(stdoutRef),
       hasStderr: Boolean(stderrRef),
     });
+    await checkRunWorkDirLeak(options.runDir, options.logger, "effect-resolved");
 
     return {
       resultRef,
@@ -158,6 +160,7 @@ export async function commitEffectCancellation(
       runDir: options.runDir,
       reason: options.reason,
     });
+    await checkRunWorkDirLeak(options.runDir, options.logger, "effect-cancelled");
 
     return { resultRef };
   });

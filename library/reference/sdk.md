@@ -512,6 +512,8 @@ export const codeReviewAgentTask = defineTask<
 export interface ProcessContext {
   now(): Date;                               // uses provided `now` or Date.now
 
+  onCleanup(callback: () => void | Promise<void>): void;
+
   task<TArgs, TResult>(
     taskFn: DefinedTask<TArgs, TResult>,
     args: TArgs,
@@ -539,6 +541,12 @@ export interface ProcessContext {
   log?(...args: any[]): void;
 }
 ```
+
+`ctx.onCleanup(callback)` registers a process-local cleanup callback for
+scratch resources such as `/tmp/<descriptive-name>/` clones. Callbacks are not
+serialized into task definitions or journals. They run once when the process
+execution reaches a terminal completed, failed, or process-error path, and they
+do not run during ordinary waiting iterations.
 
 ### 6.2 Intrinsic behavior details
 

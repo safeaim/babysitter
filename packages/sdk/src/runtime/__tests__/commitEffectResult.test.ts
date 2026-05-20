@@ -238,6 +238,85 @@ describe("commitEffectResult", () => {
     expect(stateCache?.pendingEffectsByKind).toEqual({});
   });
 
+  test("reports non-empty run work directories after resolving an effect", async () => {
+    const effect = await requestSampleEffect();
+    const workDir = path.join(effect.runDir, "work", "leftover");
+    await fs.mkdir(workDir, { recursive: true });
+    await fs.writeFile(path.join(workDir, "artifact.txt"), "large clone placeholder", "utf8");
+
+    const metrics: Record<string, unknown>[] = [];
+    await commitEffectResult({
+      runDir: effect.runDir,
+      effectId: effect.effectId,
+      logger: (entry) => metrics.push(entry),
+      result: {
+        status: "ok",
+        value: { doubled: 4 },
+      },
+    });
+
+    expect(metrics).toContainEqual(
+      expect.objectContaining({
+        metric: "run.workdir_leak",
+        runDir: effect.runDir,
+        workDir: path.join(effect.runDir, "work"),
+        entryCount: 1,
+      }),
+    );
+    await expect(fs.stat(workDir)).resolves.toBeDefined();
+  });
+
+  test("does not report absent or empty run work directories after resolving an effect", async () => {
+    const absent = await requestSampleEffect();
+    const absentMetrics: Record<string, unknown>[] = [];
+    await commitEffectResult({
+      runDir: absent.runDir,
+      effectId: absent.effectId,
+      logger: (entry) => absentMetrics.push(entry),
+      result: { status: "ok", value: { doubled: 4 } },
+    });
+    expect(absentMetrics.some((entry) => entry.metric === "run.workdir_leak")).toBe(false);
+
+    const empty = await requestSampleEffect();
+    await fs.mkdir(path.join(empty.runDir, "work"), { recursive: true });
+    const emptyMetrics: Record<string, unknown>[] = [];
+    await commitEffectResult({
+      runDir: empty.runDir,
+      effectId: empty.effectId,
+      logger: (entry) => emptyMetrics.push(entry),
+      result: { status: "ok", value: { doubled: 4 } },
+    });
+    expect(emptyMetrics.some((entry) => entry.metric === "run.workdir_leak")).toBe(false);
+  });
+
+  test("reports non-empty run work directories after cancelling an effect", async () => {
+    const mod = await import("../commitEffectResult");
+    const commitEffectCancellation = (mod as Record<string, unknown>).commitEffectCancellation as (options: {
+      runDir: string;
+      effectId: string;
+      reason?: string;
+      logger?: (...args: any[]) => void;
+    }) => Promise<{ resultRef: string }>;
+    const effect = await requestSampleEffect();
+    await fs.mkdir(path.join(effect.runDir, "work", "leftover"), { recursive: true });
+
+    const metrics: Record<string, unknown>[] = [];
+    await commitEffectCancellation({
+      runDir: effect.runDir,
+      effectId: effect.effectId,
+      reason: "stale",
+      logger: (entry) => metrics.push(entry),
+    });
+
+    expect(metrics).toContainEqual(
+      expect.objectContaining({
+        metric: "run.workdir_leak",
+        phase: "effect-cancelled",
+        entryCount: 1,
+      }),
+    );
+  });
+
   test("logs rejection metrics when payload validation fails", async () => {
     const effect = await requestSampleEffect();
     const metrics: Record<string, unknown>[] = [];

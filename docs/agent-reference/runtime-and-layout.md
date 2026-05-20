@@ -74,6 +74,16 @@ Processes request work through `ProcessContext` intrinsics such as:
 - `ctx.sleepUntil()`
 - `ctx.orchestratorTask()`
 - `ctx.hook()`
+- `ctx.onCleanup()`
 - `ctx.parallel.all()` and `ctx.parallel.map()`
 
 Those APIs are part of the SDK runtime contract, not ad hoc process behavior. Changes here need replay, serialization, and state-cache discipline.
+
+Use `ctx.onCleanup()` for process-local scratch cleanup such as removing
+`/tmp/<descriptive-name>/` clones. Cleanup callbacks are functions, so they must
+remain in runtime memory only and must not be serialized into task definitions,
+journals, or state cache entries.
+
+Subagent scratch work must not live under `<runDir>/work`. Runtime task
+resolution emits a non-destructive warning when `<runDir>/work` exists and is
+non-empty; the SDK reports the leak but does not delete user data.

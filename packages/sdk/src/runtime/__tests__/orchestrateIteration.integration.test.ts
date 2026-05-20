@@ -36,6 +36,177 @@ function writeProcessFile(dir: string, filename: string) {
 }
 
 describe("orchestrateIteration integration", () => {
+  test("runs ctx.onCleanup callbacks after successful completion", async () => {
+    const processDir = path.join(tmpRoot, "processes-cleanup-success");
+    const cleanupDir = path.join(tmpRoot, "scratch-success");
+    await fs.mkdir(processDir, { recursive: true });
+    await fs.mkdir(cleanupDir, { recursive: true });
+
+    const processPath = path.join(processDir, "cleanup-success.mjs");
+    await fs.writeFile(
+      processPath,
+      `
+      import { promises as fs } from "fs";
+
+      export async function process(inputs, ctx) {
+        ctx.onCleanup(async () => {
+          await fs.rm(inputs.cleanupDir, { recursive: true, force: true });
+        });
+        return { ok: true };
+      }
+      `,
+      "utf8",
+    );
+
+    const { runDir } = await createRunDir({
+      runsRoot: tmpRoot,
+      runId: "run-cleanup-success",
+      request: "cleanup success",
+      processPath,
+      inputs: { cleanupDir },
+    });
+    await appendEvent({ runDir, eventType: "RUN_CREATED", event: { runId: "run-cleanup-success" } });
+
+    const result = await orchestrateIteration({ runDir });
+    expect(result.status).toBe("completed");
+    await expect(fs.stat(cleanupDir)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  test("does not run ctx.onCleanup callbacks while waiting for effects", async () => {
+    const processDir = path.join(tmpRoot, "processes-cleanup-waiting");
+    const cleanupDir = path.join(tmpRoot, "scratch-waiting");
+    await fs.mkdir(processDir, { recursive: true });
+    await fs.mkdir(cleanupDir, { recursive: true });
+
+    const processPath = path.join(processDir, "cleanup-waiting.mjs");
+    await fs.writeFile(
+      processPath,
+      `
+      import { promises as fs } from "fs";
+
+      const echoTask = {
+        id: "cleanup-waiting-task",
+        async build() {
+          return { kind: "node", title: "cleanup waiting" };
+        }
+      };
+
+      export async function process(inputs, ctx) {
+        ctx.onCleanup(async () => {
+          await fs.rm(inputs.cleanupDir, { recursive: true, force: true });
+        });
+        await ctx.task(echoTask, {});
+        return { ok: true };
+      }
+      `,
+      "utf8",
+    );
+
+    const { runDir } = await createRunDir({
+      runsRoot: tmpRoot,
+      runId: "run-cleanup-waiting",
+      request: "cleanup waiting",
+      processPath,
+      inputs: { cleanupDir },
+    });
+    await appendEvent({ runDir, eventType: "RUN_CREATED", event: { runId: "run-cleanup-waiting" } });
+
+    const waiting = await orchestrateIteration({ runDir });
+    expect(waiting.status).toBe("waiting");
+    await expect(fs.stat(cleanupDir)).resolves.toBeDefined();
+  });
+
+  test("runs ctx.onCleanup callbacks for failed and process-error terminal paths", async () => {
+    const processDir = path.join(tmpRoot, "processes-cleanup-failures");
+    const failedDir = path.join(tmpRoot, "scratch-failed");
+    const processErrorDir = path.join(tmpRoot, "scratch-process-error");
+    await fs.mkdir(processDir, { recursive: true });
+    await fs.mkdir(failedDir, { recursive: true });
+    await fs.mkdir(processErrorDir, { recursive: true });
+
+    const processPath = path.join(processDir, "cleanup-failures.mjs");
+    await fs.writeFile(
+      processPath,
+      `
+      import { promises as fs } from "fs";
+      import { RunFailedError } from "${path.resolve("src/runtime/exceptions.ts").replace(/\\/g, "\\\\")}";
+
+      export async function process(inputs, ctx) {
+        ctx.onCleanup(async () => {
+          await fs.rm(inputs.cleanupDir, { recursive: true, force: true });
+        });
+        if (inputs.mode === "failed") {
+          throw new RunFailedError("planned failure");
+        }
+        throw new Error("planned process error");
+      }
+      `,
+      "utf8",
+    );
+
+    const failedRun = await createRunDir({
+      runsRoot: tmpRoot,
+      runId: "run-cleanup-failed",
+      request: "cleanup failed",
+      processPath,
+      inputs: { cleanupDir: failedDir, mode: "failed" },
+    });
+    await appendEvent({ runDir: failedRun.runDir, eventType: "RUN_CREATED", event: { runId: "run-cleanup-failed" } });
+    const failed = await orchestrateIteration({ runDir: failedRun.runDir });
+    expect(failed.status).toBe("failed");
+    await expect(fs.stat(failedDir)).rejects.toMatchObject({ code: "ENOENT" });
+
+    const processErrorRun = await createRunDir({
+      runsRoot: tmpRoot,
+      runId: "run-cleanup-process-error",
+      request: "cleanup process error",
+      processPath,
+      inputs: { cleanupDir: processErrorDir, mode: "process-error" },
+    });
+    await appendEvent({ runDir: processErrorRun.runDir, eventType: "RUN_CREATED", event: { runId: "run-cleanup-process-error" } });
+    const processError = await orchestrateIteration({ runDir: processErrorRun.runDir });
+    expect(processError.status).toBe("process-error");
+    await expect(fs.stat(processErrorDir)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  test("reports ctx.onCleanup callback errors without masking completion", async () => {
+    const processDir = path.join(tmpRoot, "processes-cleanup-error");
+    await fs.mkdir(processDir, { recursive: true });
+    const processPath = path.join(processDir, "cleanup-error.mjs");
+    await fs.writeFile(
+      processPath,
+      `
+      export async function process(_inputs, ctx) {
+        ctx.onCleanup(() => {
+          throw new Error("cleanup exploded");
+        });
+        return { ok: true };
+      }
+      `,
+      "utf8",
+    );
+
+    const { runDir } = await createRunDir({
+      runsRoot: tmpRoot,
+      runId: "run-cleanup-error",
+      request: "cleanup error",
+      processPath,
+      inputs: {},
+    });
+    await appendEvent({ runDir, eventType: "RUN_CREATED", event: { runId: "run-cleanup-error" } });
+
+    const metrics: Record<string, unknown>[] = [];
+    const result = await orchestrateIteration({ runDir, logger: (entry) => metrics.push(entry) });
+    expect(result.status).toBe("completed");
+    expect(metrics).toContainEqual(
+      expect.objectContaining({
+        metric: "process.cleanup",
+        status: "error",
+        message: "cleanup exploded",
+      }),
+    );
+  });
+
   test("waits for effects and completes after commit", async () => {
     const processDir = path.join(tmpRoot, "processes");
     await fs.mkdir(processDir, { recursive: true });

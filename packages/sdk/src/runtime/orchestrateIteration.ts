@@ -8,7 +8,7 @@ import { extractCostEvents, computeRunCostStats } from "../cost/journal";
 import { withRunLock } from "../storage/lock";
 import { createReplayEngine, type ReplayEngine } from "./replay/createReplayEngine";
 import { rebuildStateCache } from "./replay/stateCache";
-import { withProcessContext } from "./processContext";
+import { flushProcessCleanup, withProcessContext } from "./processContext";
 import { RunFailedError } from "./exceptions";
 import { validateAgainstSchema } from "./schemaValidator";
 import type {
@@ -29,6 +29,7 @@ import {
   annotateWaitingActions,
   createIterationMetadata,
 } from "./orchestrateHelpers";
+import { checkRunWorkDirLeak } from "./workDirLeak";
 
 // Re-export for backward compatibility
 export { asWaitingResult } from "./orchestrateHelpers";
@@ -63,6 +64,7 @@ export async function orchestrateIteration(options: OrchestrateOptions): Promise
     const terminalResult = await getTerminalReplayResult(options.runDir, engine);
     if (terminalResult) {
       finalStatus = terminalResult.status;
+      await checkRunWorkDirLeak(options.runDir, logger, "terminal-replay");
       emitRuntimeMetric(logger, "replay.iteration", {
         duration_ms: Date.now() - iterationStartedAt,
         status: finalStatus,
@@ -160,6 +162,10 @@ export async function orchestrateIteration(options: OrchestrateOptions): Promise
       return result;
     } finally {
       process.removeListener("unhandledRejection", strayEffectHandler);
+      if (finalStatus !== "waiting") {
+        await flushProcessCleanup(engine.internalContext, finalStatus);
+        await checkRunWorkDirLeak(options.runDir, logger, `terminal-${finalStatus}`);
+      }
       emitRuntimeMetric(logger, "replay.iteration", { duration_ms: Date.now() - iterationStartedAt, status: finalStatus, runId: engine.runId, stepCount: engine.replayCursor.value });
       await callRuntimeHook("on-iteration-end", { runId: engine.runId, iteration: engine.replayCursor.value, status: finalStatus }, { cwd: projectRoot, logger });
     }

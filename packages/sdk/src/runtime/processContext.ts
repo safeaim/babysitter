@@ -12,6 +12,8 @@ import { MissingProcessContextError } from "./exceptions";
 import { appendRunLog } from "../logging/runLogger";
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
+import { emitRuntimeMetric } from "./instrumentation";
+import { serializeUnknownError } from "./errorUtils";
 
 export interface ProcessContextInit extends Omit<TaskIntrinsicContext, "now"> {
   processId: string;
@@ -38,6 +40,8 @@ export interface InternalProcessContext extends TaskIntrinsicContext {
   /** When true, breakpoints are auto-approved without human interaction. */
   nonInteractive: boolean;
   subprocessSupport: "disabled" | "babysitter-agent";
+  cleanupCallbacks: Array<() => void | Promise<void>>;
+  cleanupFlushed: boolean;
 }
 
 const contextStorage = new AsyncLocalStorage<InternalProcessContext>();
@@ -57,6 +61,8 @@ export function createProcessContext(init: ProcessContextInit): CreateProcessCon
     recordedLogSeqs: init.recordedLogSeqs ?? new Set(),
     nonInteractive: init.nonInteractive ?? false,
     subprocessSupport: init.subprocessSupport ?? "disabled",
+    cleanupCallbacks: [],
+    cleanupFlushed: false,
   };
 
   const parallelHelpers: ParallelHelpers = {
@@ -79,6 +85,12 @@ export function createProcessContext(init: ProcessContextInit): CreateProcessCon
     runDir: internal.runDir,
     artifactsDir,
     now: () => internal.now(),
+    onCleanup: (callback) => {
+      if (typeof callback !== "function") {
+        throw new TypeError("ctx.onCleanup(callback) requires a function callback");
+      }
+      internal.cleanupCallbacks.push(callback);
+    },
     task: (task, args, options) =>
       runTaskIntrinsic({
         task,
@@ -163,6 +175,37 @@ export function createProcessContext(init: ProcessContextInit): CreateProcessCon
     context: processContext,
     internalContext: internal,
   };
+}
+
+export async function flushProcessCleanup(
+  internal: InternalProcessContext,
+  phase: string,
+): Promise<void> {
+  if (internal.cleanupFlushed) return;
+  internal.cleanupFlushed = true;
+  const callbacks = internal.cleanupCallbacks.splice(0);
+  if (callbacks.length === 0) return;
+
+  for (let index = callbacks.length - 1; index >= 0; index -= 1) {
+    try {
+      await callbacks[index]();
+    } catch (error) {
+      const serialized = serializeUnknownError(error);
+      emitRuntimeMetric(internal.logger, "process.cleanup", {
+        status: "error",
+        phase,
+        runId: internal.runId,
+        runDir: internal.runDir,
+        processId: internal.processId,
+        callbackIndex: index,
+        message: serialized.message,
+        error: serialized,
+      });
+      console.warn(
+        `[babysitter] Process cleanup callback failed for run ${internal.runId}: ${serialized.message ?? "Unknown cleanup error"}`,
+      );
+    }
+  }
 }
 
 export function withProcessContext<T>(internal: InternalProcessContext, fn: () => Promise<T> | T): Promise<T> {

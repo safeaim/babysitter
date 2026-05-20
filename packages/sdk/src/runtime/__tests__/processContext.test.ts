@@ -75,6 +75,7 @@ describe("ProcessContext runtime identity surface", () => {
     expect(context.runId).toBe("01TESTRUNID");
     expect(context.runDir).toBe("/tmp/01TESTRUNID");
     expect(context.artifactsDir).toBe(path.join("/tmp/01TESTRUNID", "artifacts"));
+    expect(typeof context.onCleanup).toBe("function");
   });
 
   test("artifactsDir is always <runDir>/artifacts regardless of runDir shape", () => {

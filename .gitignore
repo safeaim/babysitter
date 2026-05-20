@@ -98,4 +98,4 @@ packages/atlas/webui/.atlas-local/atlas-webui/local-dev.db
 coverage/
 artifacts/external-plugin-repos/
 {}
-artifacts/
+/artifacts/

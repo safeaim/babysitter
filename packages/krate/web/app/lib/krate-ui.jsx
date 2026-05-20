@@ -12,7 +12,8 @@ export const orgNavigationGroups = [
       ['/repositories', 'Code', 'Repositories and files'],
       ['/inbox', 'Reviews & issues', 'Pull requests and triage'],
       ['/runs', 'Runs', 'Checks and jobs'],
-      ['/deployments', 'Deploy', 'Releases and environments']
+      ['/deployments', 'Deploy', 'Releases and environments'],
+      ['/artifacts', 'Artifacts', 'Package registries and build artifacts']
     ]
   },
   {

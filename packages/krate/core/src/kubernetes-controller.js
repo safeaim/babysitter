@@ -103,6 +103,13 @@ export const KRATE_RESOURCES = [
   { kind: 'ExternalBackendProvider', plural: 'externalbackendproviders', namespaced: true, storage: 'etcd' },
   { kind: 'ExternalBackendBinding', plural: 'externalbackendbindings', namespaced: true, storage: 'etcd' },
   { kind: 'ExternalBackendSyncPolicy', plural: 'externalbackendsyncpolicies', namespaced: true, storage: 'etcd' },
+  // Artifact registry resources (etcd-stored)
+  { kind: 'ArtifactRegistry', plural: 'artifactregistries', namespaced: true, storage: 'etcd' },
+  { kind: 'ArtifactFeed', plural: 'artifactfeeds', namespaced: true, storage: 'etcd' },
+  { kind: 'ArtifactAccessPolicy', plural: 'artifactaccesspolicies', namespaced: true, storage: 'etcd' },
+  // Artifact registry resources (postgres-stored)
+  { kind: 'ArtifactVersion', plural: 'artifactversions', namespaced: true, storage: 'postgres' },
+  { kind: 'ArtifactDownload', plural: 'artifactdownloads', namespaced: true, storage: 'postgres' },
   // Core Kubernetes resources (group: '' — no API group prefix for kubectl).
   // These are excluded from snapshot discovery (storage: 'core') but are
   // available for list/get/delete via findResourceDefinition.

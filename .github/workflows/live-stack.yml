@@ -308,6 +308,7 @@ jobs:
         if: ${{ matrix.scenario.skip != 'true' }}
         uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.ref || github.ref }}
           fetch-depth: 0
 
       - name: Setup Node.js

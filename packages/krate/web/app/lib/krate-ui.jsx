@@ -45,6 +45,12 @@ export const orgNavigationGroups = [
     ]
   },
   {
+    title: 'Assistant',
+    items: [
+      ['/assistant', 'Assistant', 'AI assistant with krate tools']
+    ]
+  },
+  {
     title: 'Observe',
     items: [
       ['/insights', 'Insights', 'Health and activity'],

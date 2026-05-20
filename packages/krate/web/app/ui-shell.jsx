@@ -6,6 +6,7 @@ export * from './pages/repo-pages.jsx';
 export * from './pages/manage-pages.jsx';
 export * from './pages/settings-pages.jsx';
 export * from './pages/external-pages.jsx';
+export * from './pages/assistant-pages.jsx';
 
 // Issue workspace components — explicitly re-exported for discovery.
 // IssueWorkspace renders the repo/project scoped issue list with <IssueCreateForm inline at top.

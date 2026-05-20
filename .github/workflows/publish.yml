@@ -769,10 +769,59 @@ jobs:
           path: artifacts/publish-source/publish-source.tgz
           if-no-files-found: error
 
+  publish_staging_atlas:
+    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
+    name: Publish Foundation - atlas
+    needs: prepare_staging_publish
+    runs-on: ubuntu-latest-l
+    permissions:
+      contents: read
+    steps:
+      - name: Download publish workspace
+        uses: actions/download-artifact@v8
+        with:
+          name: publish-source
+          path: artifacts/publish-source
+
+      - name: Extract publish workspace
+        run: |
+          set -euo pipefail
+          tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+          registry-url: https://registry.npmjs.org/
+          always-auth: true
+
+      - name: Restore node_modules cache
+        id: nm-cache
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.nm-cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build atlas
+        run: npm run build --workspace=@a5c-ai/atlas
+
+      - name: Publish atlas
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@a5c-ai/atlas --access public --tag "$NPM_TAG"
+
   publish_staging_foundation:
     if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Foundation - ${{ matrix.name }}
-    needs: prepare_staging_publish
+    needs: [prepare_staging_publish, publish_staging_atlas]
     runs-on: ubuntu-latest-l
     permissions:
       contents: read
@@ -780,9 +829,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: atlas
-            build: npm run build --workspace=@a5c-ai/atlas
-            publish: npm publish --workspace=@a5c-ai/atlas --access public --tag "$NPM_TAG"
           - name: agent-catalog
             build: npm run build --workspace=@a5c-ai/atlas && npm run build --workspace=@a5c-ai/agent-catalog
             publish: npm publish --workspace=@a5c-ai/agent-catalog --access public --tag "$NPM_TAG"

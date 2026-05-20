@@ -149,7 +149,7 @@ export function buildPrimaryLiveStackCommands(
       '--max-turns',
       String(resolveLaunchMaxTurns(scenario)),
       ...(isInteractive
-        ? (process.stdin.isTTY ? [] : ['--no-interactive', '--bridge-interactive'])
+        ? (process.stdin.isTTY ? [] : ['--no-interactive'])
         : ['--no-interactive', ...bridgeFlags(options.env)]),
       ...harnessApprovalPassthrough(installTarget),
     ],

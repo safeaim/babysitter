@@ -187,7 +187,7 @@ export function buildPrimaryLiveStackCommands(
     const resumeRunDir = path.join(options.cwd, '.a5c', 'runs', resumeRunId);
     setupCommands.push(
       { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
-      { command: 'bash', args: ['-c', `cp -r ${path.join(fixturesDir, 'resume-run')} ${resumeRunDir} && sed -i.bak 's/RESUME_FIXTURE_RUN/${resumeRunId}/g' ${resumeRunDir}/run.json ${resumeRunDir}/inputs.json && rm -f ${resumeRunDir}/*.bak`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'runs')} && cp -r ${path.join(fixturesDir, 'resume-run')} ${resumeRunDir} && find ${resumeRunDir} -name '*.json' -exec sed -i.bak 's/RESUME_FIXTURE_RUN/${resumeRunId}/g' {} + && find ${resumeRunDir} -name '*.bak' -delete`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
     );
     commandEnv['LIVE_STACK_RESUME_RUN_ID'] = resumeRunId;
   } else {

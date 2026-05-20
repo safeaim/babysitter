@@ -10,15 +10,33 @@ These tests catch integration regressions that unit tests and mocked pipelines c
 
 Every push to `staging` or `main` automatically runs the following matrix:
 
-| Agent | Model | Modes | Install |
-|-------|-------|-------|---------|
-| Claude Code | foundry-gpt55 | NI + bridged-interactive | vanilla |
-| Codex | google-gemini31 | NI + bridged-interactive | vanilla |
-| Pi | foundry-Kimi-K2.6 | NI + bridged-interactive | vanilla |
-| Claude Code | (default) | interactive + bridged-hooks | bp |
-| Codex | (default) | interactive + bridged-hooks | bp |
+| Agent | Model | Modes | Install | Process Mode |
+|-------|-------|-------|---------|--------------|
+| Claude Code | foundry-gpt55 | NI + bridged-interactive | vanilla | — |
+| Codex | google-gemini31 | NI + bridged-interactive | vanilla | — |
+| Pi | foundry-Kimi-K2.6 | NI + bridged-interactive | vanilla | — |
+| Claude Code | foundry-gpt55 | interactive | bp | predefined |
+| Codex | google-gemini31 | interactive | bp | predefined |
+| Claude Code | foundry-gpt55 | interactive | bp | resume |
+| Codex | google-gemini31 | interactive | bp | resume |
+| Claude Code | foundry-gpt55 | bridged-hooks | bp | predefined |
+| Codex | google-gemini31 | bridged-hooks | bp | predefined |
 
-The first three rows test harness adapters against different model providers. The last two rows (BP install) verify the babysitter-plugin integration with interactive and bridged-hooks modes.
+The first three rows test harness adapters against different model providers. The BP rows verify the babysitter-plugin integration across predefined and resume process modes.
+
+## Dispatch Inputs
+
+The workflow supports three inputs for `workflow_dispatch`:
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `ref` | Branch or ref to check out and test | dispatched ref (staging) |
+| `os` | Runner OS: `ubuntu-latest-l`, `macos-latest`, `windows-latest` | `ubuntu-latest-l` |
+| `matrix` | JSON array of test combinations | push defaults |
+
+The `ref` input allows testing a PR branch's code without merging. Both the build and test jobs check out the specified ref.
+
+The `os` input allows cross-platform testing on macOS or Windows runners. When running interactive mode on macOS CI (no TTY available), the test runner automatically falls back to `--bridge-interactive` mode.
 
 ## When to Run Manual Dispatch
 
@@ -29,13 +47,27 @@ Trigger a manual dispatch in the following situations:
 - **After modifying provider translations** — target the affected provider across multiple agents.
 - **Before releases (full matrix)** — run all agents against all providers to establish a complete compatibility baseline.
 - **When investigating a specific harness failure** — isolate the failing combination for faster iteration.
+- **Cross-platform validation** — dispatch with `os=macos-latest` to test macOS compatibility.
 
 ## How to Dispatch
+
+### Via GitHub UI
 
 1. Go to **Actions** in the repository.
 2. Select the **Live Stack** workflow.
 3. Click **Run workflow**.
-4. Paste a JSON array into the **matrix** input field.
+4. Fill in the inputs: `ref`, `os`, and `matrix` JSON.
+
+### Via CLI
+
+```bash
+gh workflow run live-stack.yml --ref staging \
+  -f os=ubuntu-latest-l \
+  -f ref=feat/my-branch \
+  -f 'matrix=[{"agent":"codex","model":"foundry-gpt55","mode":"interactive","install":"bp","live":true,"process_mode":"predefined"}]'
+```
+
+### Matrix JSON Format
 
 Each entry in the array defines one scenario:
 
@@ -47,7 +79,7 @@ Each entry in the array defines one scenario:
     "mode": "<mode>",
     "install": "<vanilla|bp>",
     "live": true,
-    "process_mode": "<predefined|create>"
+    "process_mode": "<predefined|create|resume>"
   }
 ]
 ```
@@ -59,7 +91,7 @@ Each entry in the array defines one scenario:
 | `mode` | yes | Interaction mode |
 | `install` | yes | `vanilla` for agent-mux only, `bp` for babysitter-plugin |
 | `live` | yes | `true` for real model calls, `false` for mock/dry-run |
-| `process_mode` | bp only | `predefined` or `create` |
+| `process_mode` | bp only | `predefined`, `create`, or `resume` |
 
 ## Available Axes
 
@@ -91,8 +123,17 @@ Each entry in the array defines one scenario:
 
 | Value | Description |
 |-------|-------------|
-| `predefined` | Uses an existing process definition |
-| `create` | Creates a new process definition during the run |
+| `predefined` | Uses the existing `summarize-translate-test.mjs` process fixture |
+| `create` | Agent creates a new process definition during the run |
+| `resume` | Resumes a stalled run from a pre-populated journal fixture (15 events: outline + summaries done, first translation pending) |
+
+### Runner OS
+
+| Value | Description |
+|-------|-------------|
+| `ubuntu-latest-l` | Default Linux runner (large) |
+| `macos-latest` | macOS ARM64 runner — interactive mode auto-bridges when no TTY |
+| `windows-latest` | Windows runner |
 
 ### Live
 
@@ -105,10 +146,38 @@ Each entry in the array defines one scenario:
 
 ### Test a single harness
 
-Run one agent against one model in non-interactive mode:
-
 ```json
 [{"agent":"hermes","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true}]
+```
+
+### Test a PR branch
+
+```bash
+gh workflow run live-stack.yml --ref staging -f ref=feat/my-branch \
+  -f 'matrix=[{"agent":"codex","model":"foundry-gpt55","mode":"interactive","install":"bp","live":true}]'
+```
+
+### macOS compatibility check
+
+```bash
+gh workflow run live-stack.yml --ref staging -f os=macos-latest \
+  -f 'matrix=[{"agent":"codex","model":"foundry-gpt55","mode":"interactive","install":"bp","live":true}]'
+```
+
+### BP resume mode
+
+Test babysitter resume from a stalled run:
+
+```json
+[{"agent":"claude","model":"foundry-gpt55","mode":"interactive","install":"bp","live":true,"process_mode":"resume"}]
+```
+
+### BP create mode
+
+Test babysitter-plugin with on-the-fly process creation:
+
+```json
+[{"agent":"claude","model":"foundry-gpt55","mode":"interactive","install":"bp","live":true,"process_mode":"create"}]
 ```
 
 ### Full harness sweep
@@ -122,13 +191,7 @@ Run all agents against foundry to validate every adapter:
   {"agent":"pi","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
   {"agent":"gemini","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
   {"agent":"copilot","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
-  {"agent":"hermes","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
-  {"agent":"cursor","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
-  {"agent":"opencode","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
-  {"agent":"openclaw","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
-  {"agent":"omp","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
-  {"agent":"droid","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true},
-  {"agent":"amp","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true}
+  {"agent":"hermes","model":"foundry-gpt55","mode":"ni","install":"vanilla","live":true}
 ]
 ```
 
@@ -138,14 +201,6 @@ Test Claude Code against the Anthropic provider directly (bypasses foundry):
 
 ```json
 [{"agent":"claude","model":"anthropic-sonnet46","mode":"ni","install":"vanilla","live":true}]
-```
-
-### BP create mode
-
-Test babysitter-plugin with on-the-fly process creation:
-
-```json
-[{"agent":"claude","model":"foundry-gpt55","mode":"interactive","install":"bp","live":true,"process_mode":"create"}]
 ```
 
 ## Reading Results
@@ -158,6 +213,7 @@ The **Live Stack Report** job runs after all scenarios complete. It generates a 
 | Provider | Model provider |
 | Model | Model identifier |
 | Mode | Interaction mode |
+| Process Mode | predefined, create, or resume |
 | Runtime | Execution duration |
 | Status | Pass/fail result |
 
@@ -166,6 +222,7 @@ Failed scenarios include expandable details with error logs, transport-mux trace
 - **Transport errors** — usually indicate a proxy routing or translation issue.
 - **Timeout failures** — may indicate a hung agent or unresponsive model endpoint.
 - **Assertion failures** — the agent completed but produced unexpected output.
+- **posix_spawnp / tcgetattr errors** — PTY allocation failures, typically on macOS CI runners.
 
 ## Concurrency
 
@@ -179,3 +236,5 @@ This means you can safely dispatch a manual run while a push-triggered run is in
 - **Cursor requires `CURSOR_API_KEY`** — this secret is not provisioned in the default CI environment. Cursor scenarios will fail unless the key is added to the repository secrets.
 - **Pi NI requires `--mode json` flag** — the Pi harness adapter must pass `--mode json` for non-interactive runs. This is handled automatically by the adapter, but be aware of it when debugging Pi NI failures.
 - **Some harnesses install via pip/curl, not npm** — `hermes` and `cursor` (among others) are installed through pip or curl rather than npm. Their installation steps take longer and depend on external package registries outside the npm ecosystem.
+- **macOS CI runners lack TTY devices** — neither `node-pty` nor the macOS `script` command can allocate a PTY on GitHub Actions macOS runners. Interactive mode tests auto-fall back to `--bridge-interactive` on macOS.
+- **Create mode is flaky** — depends on the agent authoring a correct process file. May fail if the agent doesn't follow the process creation instructions precisely.

@@ -38,11 +38,11 @@ function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDragging }) {
       <strong style={{ fontSize: '0.8125rem', display: 'block', marginBottom: '0.25rem' }}>{title}</strong>
       {item.spec?.priority ? (
         <span className="pill neutral" style={{ fontSize: '0.6875rem', marginRight: '0.25rem' }}>
-          {item.spec.priority}
+          {item.spec?.priority}
         </span>
       ) : null}
       {item.spec?.assignee ? (
-        <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>{item.spec.assignee}</small>
+        <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>{item.spec?.assignee}</small>
       ) : null}
       <div style={{ display: 'flex', gap: '0.375rem', marginTop: '0.25rem' }}>
         {item.status?.linkedSessions ? (

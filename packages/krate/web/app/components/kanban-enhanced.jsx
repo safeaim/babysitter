@@ -329,7 +329,7 @@ export function EnhancedKanbanBoard({
 
   const allAssignees = useMemo(() => {
     const set = new Set();
-    issues.forEach((item) => { if (item.spec?.assignee) set.add(item.spec.assignee); });
+    issues.forEach((item) => { if (item.spec?.assignee) set.add(item.spec?.assignee); });
     return Array.from(set).sort();
   }, [issues]);
 

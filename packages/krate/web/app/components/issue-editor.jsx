@@ -15,7 +15,7 @@ export function IssueCreateForm({ org, repo = null, project = null }) {
   async function createIssue(event) {
     event.preventDefault();
     const resource = buildIssueResource(form, { repo, project });
-    if (!resource.metadata.name || !resource.spec.title) return;
+    if (!resource.metadata?.name || !resource.spec?.title) return;
     setBusy(true);
     setMessage('');
     setCreatedHref('');
@@ -27,7 +27,7 @@ export function IssueCreateForm({ org, repo = null, project = null }) {
       });
       const body = await response.json().catch(() => ({}));
       if (response.ok) {
-        const name = body.resource?.metadata?.name || resource.metadata.name;
+        const name = body.resource?.metadata?.name || resource.metadata?.name;
         setCreatedHref(issueHref(org, name, { repo, project }));
         setMessage(`Created Issue/${name}`);
         setForm({ name: '', title: '', description: '', labels: '', repositories: repo || '', projects: project || '' });

@@ -23,6 +23,14 @@ RUN apk add --no-cache curl \
     && chmod +x /usr/local/bin/kubectl \
     && apk del curl
 WORKDIR /app
+
+# Runtime env vars (set via Helm values or ConfigMap):
+# KRATE_CONTROLLER_URL - API container URL (set by Helm)
+# KRATE_ADMIN_ORG - Admin org slug (set by Helm)
+# KRATE_SESSION_SECRET - HMAC secret for cookies (optional)
+# ANTHROPIC_API_KEY - For assistant agent (optional)
+# ATLAS_BASE_URL - Atlas graph API (optional)
+
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0

@@ -196,11 +196,15 @@ CMD ["node", "src/index.js"]
 `,
   };
 
+  // For files not in the curated mock set, return a placeholder stub.
+  // This is intentional demo-mode behavior: the real content is served by Gitea
+  // when KRATE_GITEA_HTTP_URL is configured. The stub keeps the UI functional
+  // without a live Gitea backend.
   return (
     mockContents[filePath] ||
     `// File: ${filePath}
-// Content not available in mock mode.
-// TODO: Wire to real Gitea API to serve actual file content.
+// Content not available in demo mode.
+// Configure KRATE_GITEA_HTTP_URL to serve real file content.
 // Gitea endpoint: GET /api/v1/repos/{owner}/{repo}/raw/${filePath}?ref=${branch}
 `
   );

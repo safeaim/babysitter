@@ -186,7 +186,7 @@ export function UserManagementPanel({ namespace, org, identity = {}, repositorie
         body: JSON.stringify(resource)
       });
       const body = await response.json();
-      setMessage(response.ok ? `Saved ${body.resource?.kind || resource.kind}/${body.resource?.metadata?.name || resource.metadata.name}` : body.message || body.error || 'Save failed');
+      setMessage(response.ok ? `Saved ${body.resource?.kind || resource.kind}/${body.resource?.metadata?.name || resource.metadata?.name}` : body.message || body.error || 'Save failed');
     } catch (error) {
       setMessage(error.message);
     } finally {

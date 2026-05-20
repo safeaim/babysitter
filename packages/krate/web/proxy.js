@@ -12,15 +12,33 @@ function applySecurityHeaders(response) {
   return response;
 }
 
+function applyCorsHeaders(request, response) {
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    response.headers.set('Access-Control-Allow-Origin', request.headers.get('origin') || '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+  }
+  return response;
+}
+
 export function proxy(request) {
   const { pathname, search } = request.nextUrl;
+
+  // Handle CORS preflight requests for API routes
+  if (request.method === 'OPTIONS' && pathname.startsWith('/api/')) {
+    const preflightResponse = new NextResponse(null, { status: 204 });
+    applyCorsHeaders(request, preflightResponse);
+    return preflightResponse;
+  }
+
   if (isPublicPath(pathname)) {
-    return applySecurityHeaders(NextResponse.next());
+    return applyCorsHeaders(request, applySecurityHeaders(NextResponse.next()));
   }
 
   const cookieName = process.env.KRATE_AUTH_COOKIE_NAME || 'krate_session';
   if (request.cookies.has(cookieName)) {
-    return applySecurityHeaders(NextResponse.next());
+    return applyCorsHeaders(request, applySecurityHeaders(NextResponse.next()));
   }
 
   const loginUrl = new URL('/login', request.url);

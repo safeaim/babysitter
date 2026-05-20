@@ -140,7 +140,7 @@ export function generateCodexHooksJson(
 
   iterateHooks(manifest, targetProfile, (canonical, native, handler) => {
     const slug = slugify(canonical);
-    const cmd = resolveCmd(handler, slug, targetProfile.adapterName, '.', manifest.name, native, sdk.proxyPackage, sdk.proxyBinary, pat);
+    const cmd = resolveCmd(handler, slug, targetProfile.adapterName, '.codex', manifest.name, native, sdk.proxyPackage, sdk.proxyBinary, pat);
     hooks[native] = [{ matcher: '.*', hooks: [{ type: 'command', command: cmd }] }];
   });
 

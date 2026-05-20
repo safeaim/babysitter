@@ -50,8 +50,7 @@ export function resolveCmd(
   }
   const p = resolveHookPath(handlerValue, hookSlug, pluginName, nativeHook, pattern);
   if (p) {
-    const scriptRef = rootRef.startsWith('$') || rootRef.startsWith('\\$')
-      ? `${rootRef}/${p}` : `./${p}`;
+    const scriptRef = `${rootRef}/${p}`;
     return `${proxyBin} invoke --adapter ${adapter} --handler "bash ${scriptRef}" --json`;
   }
   return `echo '{}'`;

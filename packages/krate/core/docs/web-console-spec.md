@@ -1,4 +1,4 @@
-# Krate Web Console Specification
+﻿# Krate Web Console Specification
 
 > Exhaustive reference for the Krate web console.
 > Source: `packages/krate/web/`
@@ -395,3 +395,139 @@ Source: `packages/krate/web/app/error.jsx`
 - Displays error message and stack trace (dev mode)
 - "Try Again" button to reset error state
 - Falls back to minimal UI on catastrophic failure
+
+
+---
+
+## ML Navigation Group
+
+### Inference Service List
+
+**Route:** `/orgs/{org}/inference/services`
+
+**Components:**
+- Service table: name, model format badge, inference protocol, phase badge (Pending/Ready/Failed), endpoint URL
+- Create button opens an inline form
+
+**Actions:** Create service, delete (confirmation dialog)
+
+**Data source:** `GET /api/orgs/{org}/inference/services`
+
+### Inference Service Detail
+
+**Route:** `/orgs/{org}/inference/services/{name}`
+
+**Sections:**
+- Spec viewer: predictor model config (modelFormat, storageUri, protocolVersion), resource limits/requests
+- Status panel: phase, endpoint URL, conditions timeline, error message
+- Test panel: send inference request (JSON input editor -> response panel), protocol selector (V1/V2)
+
+**Data source:** `GET /api/orgs/{org}/inference/services/{name}`
+
+### Inference Test Panel
+
+Embedded within service detail. Sends `POST /api/orgs/{org}/inference/services/{name}/infer`.
+
+- Input: JSON editor with schema hint for the selected model format
+- Output: formatted JSON response panel
+- Protocol toggle: V1 / V2
+- Response time display
+
+### Serving Runtime Manager
+
+**Route:** `/orgs/{org}/inference/runtimes`
+
+**Components:**
+- Runtime table: name, supported model formats (comma-separated), container image
+- Create runtime button and form
+
+**Data source:** `GET /api/orgs/{org}/inference/runtimes`
+
+---
+
+## Artifacts Navigation Group
+
+### Registry List
+
+**Route:** `/orgs/{org}/artifacts/registries`
+
+**Components:**
+- Registry cards: name, type badge (npm/pip/docker/generic), storage backend, feed count
+- Create registry button and modal form
+
+**Data source:** `GET /api/orgs/{org}/artifacts/registries`
+
+### Feed Browser
+
+**Route:** `/orgs/{org}/artifacts/registries/{registry}/feeds`
+
+**Components:**
+- Feed list: name, visibility badge (public/private), version count, install command code snippet
+- Create feed button, manage access policies button
+
+**Data source:** `GET /api/orgs/{org}/artifacts/feeds`
+
+### Version Table
+
+**Route:** `/orgs/{org}/artifacts/registries/{registry}/feeds/{feed}`
+
+**Components:**
+- Paginated version table: package name, version, size (human-readable), publishedBy, publishedAt, checksum (truncated SHA-256)
+- Publish version button (file upload + metadata form)
+- Download button per version
+
+**Data source:** `GET /api/orgs/{org}/artifacts/feeds/{feed}/versions`
+
+### Access Policies
+
+Embedded as a tab within feed detail.
+
+- Table: subject, permission badge (read/write/admin), expiresAt
+- Add policy form, revoke button per entry
+
+---
+
+## Assistant Navigation Group
+
+### Chat Interface
+
+**Route:** `/orgs/{org}/assistant`
+
+**Components:**
+- Session sidebar: scrollable list of sessions (org:sessionId), new session button, session delete button
+- Chat panel: message thread with user/assistant bubbles, SSE streaming renders chunks in real time
+- Input bar: expandable textarea, send button, model selector dropdown
+
+**Data source:**
+- `POST /api/orgs/{org}/assistant/chat` (SSE stream)
+- `GET /api/orgs/{org}/assistant/sessions` (session list)
+
+### Generation Form
+
+**Route:** `/orgs/{org}/assistant/generate`
+
+**Components:**
+- Prompt textarea
+- Optional JSON schema editor (collapsible)
+- Generate button
+- Response viewer: formatted JSON when schema provided, markdown otherwise
+
+**Data source:** `POST /api/orgs/{org}/assistant/generate`
+
+### Session Sidebar
+
+Embedded in the chat interface. Lists all sessions for the current org. Clicking a session loads its message history. Delete button calls `DELETE /api/orgs/{org}/assistant/sessions/{sessionId}` and clears the thread.
+
+---
+
+## Updated Navigation Structure
+
+| Group | Routes |
+|-------|--------|
+| Repositories | `/repos`, `/repos/{name}/*` |
+| Agents | `/agents`, `/agents/stacks`, `/agents/runs`, `/agents/memory` |
+| **ML** | `/inference/services`, `/inference/runtimes` |
+| **Artifacts** | `/artifacts/registries`, feeds, versions |
+| **Assistant** | `/assistant`, `/assistant/generate` |
+| Policy | `/policies`, `/policy-exceptions` |
+| Settings | `/settings/*` |

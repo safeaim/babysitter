@@ -3,6 +3,10 @@ import { errorResponse } from '../../../../../../../lib/api-errors.js';
 
 export const dynamic = 'force-dynamic';
 
+// Intentionally unauthenticated: this endpoint is called by agent pods (Kubernetes Jobs)
+// that have no user session. Identity is verified via the run name + namespace binding.
+// Do not add withAuth here.
+
 /**
  * POST /api/orgs/[org]/agents/runs/[name]/callback
  *

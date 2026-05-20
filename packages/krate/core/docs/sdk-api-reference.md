@@ -1,4 +1,4 @@
-# Krate SDK API Reference
+﻿# Krate SDK API Reference
 
 > Exhaustive API reference for `@a5c-ai/krate-sdk`.
 > Source: `packages/krate/sdk/src/index.js` — 65+ re-exports from core.
@@ -988,3 +988,121 @@ import {
 ```
 
 Each exports `{ role, scope, owns, delegatesTo, mustNotOwn }`.
+
+
+---
+
+## Inference Service Controller
+
+### `createInferenceServiceController(config)`
+
+**Import:** `import { createInferenceServiceController } from '@a5c-ai/krate';`
+
+Returns an inference service controller with methods:
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `createService` | `(spec) => Promise<resource>` | Create KrateInferenceService and apply KServe manifest |
+| `getService` | `(name) => Promise<resource>` | Get service with resolved endpoint URL |
+| `listServices` | `() => Promise<resource[]>` | List all KrateInferenceServices |
+| `deleteService` | `(name) => Promise<void>` | Delete service and underlying KServe resource |
+| `runInference` | `(name, payload) => Promise<result>` | Proxy inference request to the resolved endpoint |
+| `toProviderConfig` | `(name) => Promise<AgentProviderConfig>` | Bridge service to AgentProviderConfig |
+
+**Constants exported:**
+- `KRATE_INFERENCE_SERVICE_CONTROLLER_BOUNDARY` -- boundary identifier string
+- `SUPPORTED_MODEL_FORMATS` -- array of supported format names: `['sklearn', 'xgboost', 'lightgbm', 'tensorflow', 'pytorch', 'onnx', 'triton', 'huggingface', 'custom']`
+- `INFERENCE_PROTOCOLS` -- `{ V1: 'v1', V2: 'v2' }`
+
+---
+
+## Artifact Registry Controller
+
+### `createArtifactRegistryController(config)`
+
+**Import:** `import { createArtifactRegistryController } from '@a5c-ai/krate';`
+
+Returns an artifact registry controller with methods:
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `createRegistry` | `(spec) => Promise<resource>` | Create ArtifactRegistry |
+| `listRegistries` | `() => Promise<resource[]>` | List registries |
+| `createFeed` | `(registryRef, spec) => Promise<resource>` | Create ArtifactFeed |
+| `listFeeds` | `(registryRef?) => Promise<resource[]>` | List feeds, optionally filtered by registry |
+| `publishVersion` | `(feedRef, spec) => Promise<resource>` | Publish ArtifactVersion |
+| `listVersions` | `(feedRef) => Promise<resource[]>` | List versions for a feed |
+| `trackDownload` | `(versionRef, context) => Promise<resource>` | Record ArtifactDownload |
+| `setAccessPolicy` | `(feedRef, subject, permission) => Promise<resource>` | Create or update ArtifactAccessPolicy |
+| `getInstallCommand` | `(feedRef) => Promise<string>` | Generate protocol-specific install command |
+
+**Constants exported:**
+- `ARTIFACT_REGISTRY_CONTROLLER_BOUNDARY` -- boundary identifier string
+
+---
+
+## Assistant Runtime
+
+### `createAssistantRuntime(config)`
+
+**Import:** `import { createAssistantRuntime } from '@a5c-ai/krate';`
+
+Returns an assistant runtime object with methods:
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `chat` | `(opts) => AsyncIterable<chunk>` | SSE stream of assistant response chunks. `opts`: `{ org, sessionId, messages, system?, tools?, model? }` |
+| `generate` | `(opts) => Promise<object>` | Structured generation. `opts`: `{ org, prompt, schema?, system?, tools?, model? }` |
+| `listSessions` | `(org) => Array<session>` | List active sessions for org |
+| `clearSession` | `(org, sessionId) => void` | Remove session from in-process store |
+
+**Constants exported:**
+- `ASSISTANT_RUNTIME_BOUNDARY` -- boundary identifier string
+- `defaultAssistantConfig` -- default model and system prompt config object
+- `defaultSystemPrompt` -- default system prompt string
+- `callModel` -- low-level Anthropic API call function: `callModel(messages, opts) => AsyncIterable<chunk>`
+
+**Session store:** `globalThis.__krateSessions` keyed by `org:sessionId`. Not persisted across process restarts.
+
+---
+
+## New Model Types
+
+```javascript
+// KrateInferenceService spec
+{
+  predictor: {
+    model: {
+      modelFormat: { name: 'pytorch' },
+      storageUri: 's3://bucket/model',
+      runtime: 'optional-runtime-name',
+      protocolVersion: 'v2'
+    },
+    resources: { limits: { cpu: '2', memory: '4Gi' } }
+  },
+  features: {}
+}
+
+// ArtifactRegistry spec
+{
+  organizationRef: 'my-org',
+  displayName: 'My Registry',
+  type: 'npm',
+  storageBackend: 's3',
+  storageConfig: { bucket: 'artifacts', prefix: 'npm/' }
+}
+
+// ArtifactVersion spec
+{
+  organizationRef: 'my-org',
+  feedRef: 'my-feed',
+  name: 'my-package',
+  version: '1.2.3',
+  packageType: 'npm',
+  size: 12345,
+  checksums: { sha256: 'abc...', md5: 'def...' },
+  metadata: { dependencies: {}, tags: [], description: '' },
+  publishedBy: 'username',
+  publishedAt: '2026-05-20T00:00:00Z'
+}
+```

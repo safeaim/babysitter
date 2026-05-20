@@ -1,4 +1,5 @@
 import { createKrateApiController, createControllerUiModel, orgNamespaceName, clearSnapshotCache } from '@a5c-ai/krate-sdk';
+import { withAuth } from '../../../../lib/api-auth.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +14,7 @@ export async function GET(_request, { params }) {
   }
 }
 
-export async function POST(request, { params }) {
+export const POST = withAuth(async (request, { params }) => {
   const { org } = await params;
   const namespace = orgNamespaceName(org);
   const controller = createKrateApiController({ namespace });
@@ -46,4 +47,4 @@ export async function POST(request, { params }) {
   } catch (error) {
     return Response.json({ error: 'operation_failed', message: error.message }, { status: error.message?.includes('not found') ? 404 : 500 });
   }
-}
+});

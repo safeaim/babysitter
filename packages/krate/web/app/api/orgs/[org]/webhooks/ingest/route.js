@@ -3,6 +3,10 @@
 // Accepts inbound webhook payloads from GitHub and Gitea.
 // Verifies HMAC-SHA256 signature, normalizes the event, and enqueues it
 // via the webhook controller for downstream processing.
+//
+// Intentionally unauthenticated: HMAC signature on X-Hub-Signature-256 header
+// is used instead of session auth. Webhook senders (GitHub, Gitea) do not
+// carry Krate session cookies. Do not add withAuth here.
 
 import { createWebhookController } from '@a5c-ai/krate-sdk';
 

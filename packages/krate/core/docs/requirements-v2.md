@@ -1,4 +1,4 @@
-# Krate Requirements Specification v2
+﻿# Krate Requirements Specification v2
 
 > Exhaustive requirements derived from implemented functionality.
 > Every requirement corresponds to verified source code behavior.
@@ -185,3 +185,51 @@
 | TEST-E2E-001 | End-to-end package validation | npm run e2e | 3 | `packages/krate/core/package.json` |
 | TEST-SMOKE-001 | MVP smoke assertions | npm run smoke | 21 | `packages/krate/core/package.json` |
 | TEST-WEB-001 | Web console build validation | npm run build | 1 | `packages/krate/web/package.json` |
+
+
+---
+
+## Inference Management Requirements
+
+| ID | Title | Priority | Description |
+|----|-------|----------|-------------|
+| REQ-FUNC-INFERENCE-001 | KrateInferenceService CRUD | Must | Create, read, update, delete KrateInferenceService resources via Krate API |
+| REQ-FUNC-INFERENCE-002 | KServe manifest generation | Must | Translate KrateInferenceService spec to valid KServe InferenceService CRD manifest and apply it |
+| REQ-FUNC-INFERENCE-003 | Serving runtime management | Must | Create and manage KrateServingRuntime resources referencing KServe ServingRuntime CRDs |
+| REQ-FUNC-INFERENCE-004 | Endpoint discovery | Must | Resolve inference endpoint URL from KServe status.url after service readiness |
+| REQ-FUNC-INFERENCE-005 | Inference proxy | Should | Proxy V1/V2 inference requests through the API to the resolved service endpoint |
+| REQ-FUNC-INFERENCE-006 | Provider bridge | Must | Convert KrateInferenceService to AgentProviderConfig with type kserve for agent stack integration |
+| REQ-FUNC-INFERENCE-007 | Model format validation | Must | Validate model format against SUPPORTED_MODEL_FORMATS before applying KServe manifest |
+| REQ-FUNC-INFERENCE-008 | Web console inference pages | Should | Service list, detail, test panel, runtime manager pages in the web console |
+
+---
+
+## Artifact Registry Requirements
+
+| ID | Title | Priority | Description |
+|----|-------|----------|-------------|
+| REQ-FUNC-ARTIFACT-001 | Registry CRUD | Must | Create, read, update, delete ArtifactRegistry resources |
+| REQ-FUNC-ARTIFACT-002 | Feed management | Must | Create and manage ArtifactFeed resources within a registry |
+| REQ-FUNC-ARTIFACT-003 | Version publishing | Must | Publish ArtifactVersion records with checksums (sha256, md5) and metadata |
+| REQ-FUNC-ARTIFACT-004 | Access policy enforcement | Must | Enforce ArtifactAccessPolicy (read/write/admin) per feed and subject |
+| REQ-FUNC-ARTIFACT-005 | Download tracking | Should | Record ArtifactDownload for each package download with IP, userAgent, clientId |
+| REQ-FUNC-ARTIFACT-006 | Storage backend support | Must | Support internal (etcd), S3, Azure Blob, and GCS storage backends |
+| REQ-FUNC-ARTIFACT-007 | External integration | Should | Sync/mirror feeds with external providers (GitHub Packages, etc.) |
+| REQ-FUNC-ARTIFACT-008 | Install command generation | Should | Generate protocol-specific install commands per feed type (npm, pip, docker) |
+| REQ-FUNC-ARTIFACT-009 | Retention policy | Should | Prune old versions based on maxVersions or maxAgeDays retention policy on publish |
+| REQ-FUNC-ARTIFACT-010 | Web console artifact pages | Should | Registry list, feed browser, version table, access policy pages |
+
+---
+
+## Assistant Agent Requirements
+
+| ID | Title | Priority | Description |
+|----|-------|----------|-------------|
+| REQ-FUNC-ASSISTANT-001 | In-process chat runtime | Must | Provide assistant chat via in-process Anthropic API calls, not K8s Job dispatch |
+| REQ-FUNC-ASSISTANT-002 | Session persistence | Must | Maintain message history per org:sessionId in process memory (globalThis) across requests |
+| REQ-FUNC-ASSISTANT-003 | SSE streaming | Must | Stream chat responses as Server-Sent Events with real-time chunk delivery |
+| REQ-FUNC-ASSISTANT-004 | Structured generation | Should | Support structured JSON output via generate endpoint with optional JSON schema |
+| REQ-FUNC-ASSISTANT-005 | Session management | Must | List and clear sessions per org; sessions expire with process restart |
+| REQ-FUNC-ASSISTANT-006 | AgentStack selector | Should | Allow using different AgentStack CRDs for different conversation contexts |
+| REQ-FUNC-ASSISTANT-007 | Tool definitions | Should | Pass tool definitions through to Anthropic API model calls |
+| REQ-FUNC-ASSISTANT-008 | Web console assistant pages | Should | Chat interface, generation form, session sidebar |

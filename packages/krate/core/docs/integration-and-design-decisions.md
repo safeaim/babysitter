@@ -1,4 +1,4 @@
-# Integration & Design Decisions
+﻿# Integration & Design Decisions
 
 Supplementary specification covering external dependencies, scope boundaries,
 architectural trade-offs, and system nuances for the Krate project.
@@ -1472,3 +1472,59 @@ termination path independent of the callback mechanism.
 - **Log retention:** K8s deletes completed Job pods after TTL. Krate must ship
   logs to an external store (or use `persistSessionEvent` artifact logging) before
   the TTL expires.
+
+
+---
+
+## KServe Integration: CRD Wrapper Architecture
+
+**Decision:** Wrap KServe `InferenceService` and `ServingRuntime` CRDs via Krate resources (`KrateInferenceService`, `KrateServingRuntime`) rather than exposing KServe CRDs directly to Krate users.
+
+**Rationale:**
+- Krate resources follow the standard Krate CRD model (`apiVersion: krate.a5c.ai/v1alpha1`), keeping a consistent API surface for all platform resources
+- The wrapper validates model formats, generates correct KServe manifests, and abstracts away KServe-specific versioning (`serving.kserve.io/v1beta1`)
+- `toProviderConfig()` creates a seamless bridge to `AgentProviderConfig`, allowing agent stacks to reference on-cluster models without knowing they are backed by KServe
+- Enables future backend swap (e.g., Seldon, Triton standalone) without changing consumer API
+
+**Alternative considered:** Direct KServe CRD exposure via kubectl pass-through. Rejected because it breaks the Krate CRD model and makes agent integration harder.
+
+---
+
+## Artifact Registry: Internal + External Dual-Mode Design
+
+**Decision:** Support both internal storage (Krate-managed etcd/S3/GCS/Azure Blob) and external integration (GitHub Packages, etc.) within the same `ArtifactRegistry` resource via `storageBackend` and `externalIntegration` fields.
+
+**Rationale:**
+- Teams often have existing external registries (npm, PyPI, GitHub Packages) they need to access; forcing migration to internal storage would block adoption
+- Internal storage (especially S3/GCS) provides full control over retention, access policy, and cost; external-only would lose that control
+- Mirror mode syncs published versions to external backends, enabling gradual migration or dual-publish workflows
+- A single resource kind covering both modes reduces API surface complexity
+
+**Alternative considered:** External-only (proxy to existing registries). Rejected because Krate needs to enforce access policies and track download analytics that external registries do not expose.
+
+---
+
+## Assistant Runtime: In-Process vs. K8s Job
+
+**Decision:** Implement the assistant as an in-process runtime (`assistant-runtime.js`) using the Anthropic API directly, rather than dispatching K8s Jobs.
+
+**Rationale:**
+- Assistant chat requires low latency (< 1s to first token); K8s Job startup overhead (5-30s) is unacceptable for interactive chat
+- Session state (message history) must survive across requests within a session; in-process `globalThis` store achieves this trivially without distributed state management
+- Streaming (SSE) is native to the Anthropic API and the Next.js runtime; routing through K8s Jobs would require complex proxying
+- Assistant workloads are lightweight (API calls, no GPU) and do not benefit from the isolation that K8s Jobs provide for agent workloads
+
+**Alternative considered:** K8s Job dispatch (same as agent dispatch). Rejected due to latency, streaming complexity, and session state management overhead.
+
+**Trade-off accepted:** In-process runtime means the assistant does not get the resource isolation and budget enforcement of K8s Jobs. This is acceptable because the assistant uses a shared Anthropic API key with org-level rate limiting.
+
+---
+
+## Integration Gap Status Update
+
+| Gap | Status | Notes |
+|-----|--------|-------|
+| KServe inference | **Implemented** | KrateInferenceService + KrateServingRuntime controllers, 7 API routes, web console pages |
+| Artifact registry | **Implemented** | 5 resource kinds, 6 API routes, web console pages |
+| Assistant runtime | **Implemented** | In-process runtime, SSE streaming, session management, 5 API routes |
+| Auth on mutating routes | **Implemented** | withAuth applied to all POST/DELETE/PUT handlers; webhook HMAC and agent callback intentionally unauthenticated |

@@ -3784,4 +3784,143 @@ The `getControllerSnapshot()` function produces a comprehensive cluster state:
 **In-Cluster Detection:**
 - Checks `KUBERNETES_SERVICE_HOST` + service account token
 - Auto-configures kubectl with in-cluster credentials
+
+---
+
+## Part 10: Inference Domain
+
+### 10.1 KrateInferenceService Behavior
+
+`KrateInferenceService` is a Krate-owned wrapper around the KServe `InferenceService` CRD in the `serving.kserve.io/v1beta1` API group. The controller (`krate-inference-service-controller.js`) manages the full lifecycle:
+
+**On create/update:**
+1. Validates `spec.predictor.model.modelFormat.name` against `SUPPORTED_MODEL_FORMATS`
+2. Generates a complete KServe `InferenceService` manifest including predictor, resources, and protocol version
+3. Applies the manifest to Kubernetes via `kubectl apply`
+4. Sets `status.phase = 'Pending'`
+
+**Phase transitions:**
+- `Pending` → `Ready`: When KServe readiness probe passes and the service URL is available
+- `Pending` / `Ready` → `Failed`: On error during manifest apply or when KServe reports failure
+- Status transitions are driven by polling `status.url` from the underlying `InferenceService` resource
+
+**Endpoint discovery:**
+- `status.url` is resolved from the underlying KServe `InferenceService.status.url` field
+- Available only after the service reaches `Ready` phase
+- Used by `toProviderConfig()` to bridge to `AgentProviderConfig`
+
+**`toProviderConfig()` bridge:**
+- Returns an `AgentProviderConfig` with `spec.type: 'kserve'`
+- Includes the resolved endpoint URL and inference protocol version
+- Allows `AgentStack` CRDs to route requests to on-cluster inference services alongside cloud LLMs
+
+**Deletion:**
+- Deleting the `KrateInferenceService` resource cascades to deletion of the underlying KServe `InferenceService`
+
+### 10.2 KrateServingRuntime Behavior
+
+`KrateServingRuntime` wraps the KServe `ServingRuntime` (or `ClusterServingRuntime`) CRD:
+
+**On create/update:**
+1. Validates `supportedModelFormats` entries
+2. Generates and applies the KServe `ServingRuntime` manifest
+3. Runtime is registered in the KServe runtime registry
+
+**Lifecycle:**
+- Independent of individual inference services — a runtime can be referenced by multiple `KrateInferenceService` instances
+- Deleted only when explicitly removed; does not cascade from inference service deletion
+
+**Reference from KrateInferenceService:**
+- `spec.predictor.model.runtime` field names the runtime
+- KServe uses the runtime to determine the serving container image and configuration
+
+---
+
+## Part 11: Artifact Domain
+
+### 11.1 ArtifactRegistry Lifecycle
+
+`ArtifactRegistry` is the top-level scope for artifact storage:
+
+**On create:**
+1. Allocates storage in the configured backend:
+   - `internal`: uses etcd (small artifacts, dev/test)
+   - `s3` / `gcs` / `azure-blob`: creates/configures cloud bucket paths from `storageConfig`
+2. If `externalIntegration` is set, establishes connection to external provider
+3. Sets `status.phase = 'Ready'` when storage is accessible
+
+**External integration modes:**
+- `read-only`: proxies reads to external provider; writes are rejected
+- `read-write`: both reads and writes flow to the external provider
+- `mirror`: internal storage is primary; published versions are also synced to the external provider
+
+**Deletion:**
+- Cascades to all child `ArtifactFeed` resources
+- Cloud storage data is NOT automatically deleted (requires manual cleanup)
+
+### 11.2 Feed Management
+
+`ArtifactFeed` belongs to exactly one `ArtifactRegistry`:
+
+**Visibility enforcement:**
+- `public` feeds: all authenticated users can read (download)
+- `private` feeds: read access requires an `ArtifactAccessPolicy` with `permission: 'read'`
+
+**Retention policy:**
+- Enforced on each version publish: after storing the new version, the controller checks `maxVersions` and `maxAgeDays`
+- Oldest versions pruned first; versions are soft-deleted (phase set to `Archived`) before hard-delete
+
+**Access policy resolution:**
+- Fine-grained permissions via `ArtifactAccessPolicy` resources
+- `write` permission required to publish versions
+- `admin` permission required to modify feed settings or revoke other policies
+
+### 11.3 Version Publishing
+
+`ArtifactVersion` is created via `POST /api/orgs/{org}/artifacts/feeds/{feed}/publish`:
+
+1. `withAuth` middleware populates `spec.publishedBy` from the session user
+2. `spec.publishedAt` is set to current ISO 8601 timestamp
+3. Checksums (`sha256`, `md5`) are computed from the uploaded content and stored
+4. Version name is derived from `name@version` string; immutable once set
+5. Retention policy check runs post-publish
+
+### 11.4 Download Tracking
+
+`ArtifactDownload` records are written on each package download:
+
+- Created by the download handler in the artifact feed controller
+- Captures: `downloadedBy`, `downloadedAt`, `ipAddress`, `userAgent`, `clientId`
+- Used for analytics dashboards and rate-limiting enforcement
+- Records are append-only; not modified after creation
+
+---
+
+## Part 12: Cross-Domain Relationships
+
+### 12.1 Inference → Agent
+
+The inference domain integrates with the agent domain via the provider config bridge:
+
+1. `KrateInferenceService.toProviderConfig()` creates an `AgentProviderConfig` with:
+   - `spec.type: 'kserve'`
+   - `spec.endpoint`: resolved `status.url` from the inference service
+   - `spec.protocolVersion`: V1 or V2
+
+2. `AgentStack` references the provider config in `spec.providers[]`
+
+3. When an agent is dispatched, `resolveStack()` resolves all provider configs and injects the KServe endpoint URL as an env var into the K8s Job
+
+4. This allows agent stacks to mix cloud LLMs (Anthropic, OpenAI) with on-cluster models (KServe-hosted sklearn, PyTorch, etc.) in the same stack definition
+
+### 12.2 Artifacts → Repositories
+
+Artifact feeds can integrate with Krate repositories:
+
+- **Version tagging**: ArtifactVersion publish can create a git tag in the associated repository
+- **Release integration**: In `mirror` mode, published versions are synced to repository releases (GitHub Releases / Gitea Releases)
+- **Internal feeds**: use Krate storage (etcd or cloud blob); no repository dependency required
+- **External feeds**: proxy to the configured provider (e.g., npm registry, PyPI, GitHub Packages); repository serves as the source of truth for release metadata
+
+The relationship is optional: artifact feeds do not require a repository reference and can operate as standalone package registries.
 - Falls back to kubeconfig if not in-cluster

@@ -1,12 +1,14 @@
+import { withAuth } from '../../lib/api-auth.js';
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   return proxyGitRequest(request);
 }
 
-export async function POST(request) {
+export const POST = withAuth(async (request, context, session) => {
   return proxyGitRequest(request);
-}
+});
 
 async function proxyGitRequest(request) {
   const upstream = process.env.KRATE_GITEA_HTTP_URL;

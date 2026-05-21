@@ -81,7 +81,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
@@ -206,7 +205,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -280,7 +278,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -369,7 +366,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -407,12 +403,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install Playwright Chromium
-        if: steps.pw-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
-
-      - name: Install Playwright system deps
-        if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
 
       - name: agent-mux webui browser e2e
         run: npm run test:e2e --workspace=@a5c-ai/agent-mux-webui
@@ -462,7 +453,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -523,7 +513,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -675,7 +664,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -775,7 +763,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -853,7 +840,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -914,7 +900,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -986,7 +971,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -1039,7 +1023,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -1118,7 +1101,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -1166,7 +1148,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -1267,7 +1248,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -1325,7 +1305,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -1384,7 +1363,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -1537,14 +1515,11 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Run docs QA
-        env:
-          AGENT_CATALOG_SKIP_VENDOR_WEB_CHECK: "1"
         run: npm run docs:qa
 
       - name: Build docs
@@ -2198,7 +2173,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
@@ -2286,7 +2260,6 @@ jobs:
           key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true

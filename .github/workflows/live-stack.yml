@@ -38,7 +38,6 @@ concurrency:
 
 jobs:
   build_all:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
     name: Build All
     runs-on: ${{ inputs.os || 'ubuntu-latest-l' }}
     permissions:
@@ -140,7 +139,6 @@ jobs:
           if-no-files-found: error
 
   setup:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
     name: Compute Matrix
     runs-on: ubuntu-latest
     outputs:
@@ -224,7 +222,7 @@ jobs:
                 else vanillaNi.push(combo);
               }
 
-              const wrap = (arr) => JSON.stringify({include: arr.length > 0 ? arr : [{scenario:{skip:'true'}}]});
+              const wrap = (arr) => JSON.stringify({include: arr});
               const fs = require('fs');
               fs.appendFileSync(process.env.GITHUB_OUTPUT, 'vanilla_ni=' + wrap(vanillaNi) + '\n');
               fs.appendFileSync(process.env.GITHUB_OUTPUT, 'vanilla_interactive=' + wrap(vanillaInt) + '\n');
@@ -297,7 +295,6 @@ jobs:
           fi
 
   live_stack_vanilla_ni:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
     needs: [build_all, setup]
     name: "Live Stack (${{ inputs.os || 'ubuntu' }}, vanilla, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ${{ inputs.os || 'ubuntu-latest-m' }}
@@ -311,19 +308,13 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.setup.outputs.vanilla_ni) }}
     steps: &live_stack_steps
-      - name: Skip marker
-        if: ${{ matrix.scenario.skip == 'true' }}
-        run: echo "LIVE_STACK_SKIP=1" >> "$GITHUB_ENV"
-
       - name: Checkout repository
-        if: ${{ matrix.scenario.skip != 'true' }}
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref || github.ref }}
           fetch-depth: 0
 
       - name: Setup Node.js
-        if: ${{ matrix.scenario.skip != 'true' }}
         uses: actions/setup-node@v6
         with:
           node-version: 22
@@ -331,30 +322,25 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        if: ${{ matrix.scenario.skip != 'true' }}
         run: |
           npm ci
           npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
         uses: actions/download-artifact@v8
         with:
           name: build-all-dist
           path: ${{ runner.temp }}
 
       - name: Extract build artifacts
-        if: ${{ matrix.scenario.skip != 'true' }}
         run: |
           TEMP_DIR=$(echo "${RUNNER_TEMP}" | sed 's|\\|/|g')
           tar xzf "${TEMP_DIR}/build-all-dist.tar.gz" --force-local
 
       - name: Install node-pty for TTY-based tool use
-        if: ${{ matrix.scenario.skip != 'true' }}
         run: npm install node-pty --no-save
 
       - name: Link workspace CLIs to PATH
-        if: ${{ matrix.scenario.skip != 'true' }}
         run: |
           mkdir -p "$HOME/.local/bin"
           for pair in \
@@ -372,7 +358,6 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run selected live stack E2E
-        if: ${{ matrix.scenario.skip != 'true' }}
         timeout-minutes: 18
         env:
           LIVE_STACK_SCENARIO_ID: ${{ matrix.scenario.id }}
@@ -419,7 +404,7 @@ jobs:
           echo "${ELAPSED}" > artifacts/live-stack/duration-seconds.txt
 
       - name: Upload live stack artifacts
-        if: ${{ always() && matrix.scenario.skip != 'true' }}
+        if: ${{ always() }}
         timeout-minutes: 1
         uses: actions/upload-artifact@v7
         with:
@@ -428,7 +413,6 @@ jobs:
           if-no-files-found: error
 
   live_stack_vanilla_interactive:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
     needs: [build_all, setup]
     name: "Live Stack (${{ inputs.os || 'ubuntu' }}, vanilla, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ${{ inputs.os || 'ubuntu-latest-m' }}
@@ -444,7 +428,6 @@ jobs:
     steps: *live_stack_steps
 
   live_stack_bp_interactive:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
     needs: [build_all, setup]
     name: "Live Stack (${{ inputs.os || 'ubuntu' }}, bp/${{ matrix.scenario.process_mode || 'predefined' }}, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ${{ inputs.os || 'ubuntu-latest-m' }}
@@ -460,7 +443,6 @@ jobs:
     steps: *live_stack_steps
 
   live_stack_bp_bridged:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip publish]') }}
     needs: [build_all, setup]
     name: "Live Stack (${{ inputs.os || 'ubuntu' }}, bp/${{ matrix.scenario.process_mode || 'predefined' }}, ${{ matrix.scenario.agent }}/${{ matrix.scenario.model }}, ${{ matrix.interaction_mode.id }})"
     runs-on: ${{ inputs.os || 'ubuntu-latest-m' }}
@@ -476,7 +458,7 @@ jobs:
     steps: *live_stack_steps
 
   live_stack_report:
-    if: ${{ always() && !contains(github.event.head_commit.message || '', '[skip publish]') }}
+    if: ${{ always() }}
     needs: [live_stack_bp_interactive, live_stack_bp_bridged, live_stack_vanilla_ni, live_stack_vanilla_interactive]
     name: Live Stack Report
     runs-on: ubuntu-latest
@@ -504,8 +486,8 @@ jobs:
           echo "**Run:** [#${RUN_ID}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${RUN_ID})" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
 
-          bp_pass=0; bp_fail=0; bp_skip=0
-          van_pass=0; van_fail=0; van_skip=0
+          bp_pass=0; bp_fail=0
+          van_pass=0; van_fail=0
 
           echo "## Babysitter-Plugin Matrix" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -617,13 +599,12 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           total_pass=$((bp_pass + van_pass))
           total_fail=$((bp_fail + van_fail))
-          total_skip=$((bp_skip + van_skip))
-          total=$((total_pass + total_fail + total_skip))
-          echo "| Matrix | Passed | Failed | Skipped | Total |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|--------|--------|--------|---------|-------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Babysitter-Plugin | ${bp_pass} | ${bp_fail} | ${bp_skip} | $((bp_pass + bp_fail + bp_skip)) |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Agent-Mux | ${van_pass} | ${van_fail} | ${van_skip} | $((van_pass + van_fail + van_skip)) |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Total** | **${total_pass}** | **${total_fail}** | **${total_skip}** | **${total}** |" >> "$GITHUB_STEP_SUMMARY"
+          total=$((total_pass + total_fail))
+          echo "| Matrix | Passed | Failed | Total |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|--------|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Babysitter-Plugin | ${bp_pass} | ${bp_fail} | $((bp_pass + bp_fail)) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Agent-Mux | ${van_pass} | ${van_fail} | $((van_pass + van_fail)) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Total** | **${total_pass}** | **${total_fail}** | **${total}** |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$total_fail" -gt 0 ]; then
@@ -647,6 +628,11 @@ jobs:
 
           echo "---" >> "$GITHUB_STEP_SUMMARY"
           echo "*Generated at $(date -u '+%Y-%m-%d %H:%M:%S UTC')*" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$total" -eq 0 ]; then
+            echo "::error::no live stack scenario reports were found"
+            exit 1
+          fi
 
           if [ "$total_fail" -gt 0 ]; then
             echo "::error::${total_fail} scenario(s) failed"

@@ -11,11 +11,11 @@ const repoRoot = resolve(__dirname, '..', '..', '..', '..', '..');
 const scriptPath = resolve(repoRoot, 'scripts', 'live-stack-coverage-report.cjs');
 
 describe('scripts/live-stack-coverage-report.cjs', () => {
-  it('fails skipped scenarios when live evidence is required', () => {
+  it('fails non-passing scenarios when live evidence is required', () => {
     const { result, cleanup } = runCoverageReport({
       execution: {
-        status: 'skipped',
-        skipReason: 'upstream command failed before evidence was produced',
+        status: 'failed',
+        failure: 'agent output did not produce required evidence',
         evidence: {
           artifacts: {},
         },
@@ -25,60 +25,14 @@ describe('scripts/live-stack-coverage-report.cjs', () => {
     try {
       expect(result.status).toBe(1);
       expect(JSON.parse(result.stdout)).toMatchObject({
-        status: 'skipped',
+        status: 'failed',
         missingArtifacts: [
           'agent-mux-events',
           'transport-mux-trace',
           'provider-trace-redacted',
         ],
       });
-      expect(result.stderr).toContain('live scenario did not pass:');
-    } finally {
-      cleanup();
-    }
-  });
-
-  it('fails additional skipped scenarios when live evidence is required', () => {
-    const { result, cleanup } = runCoverageReport({
-      execution: {
-        status: 'skipped',
-        skipReason: 'agent output did not produce required evidence',
-        evidence: {
-          artifacts: {},
-        },
-      },
-    });
-
-    try {
-      expect(result.status).toBe(1);
-      expect(JSON.parse(result.stdout)).toMatchObject({
-        status: 'skipped',
-        missingArtifacts: [
-          'agent-mux-events',
-          'transport-mux-trace',
-          'provider-trace-redacted',
-        ],
-      });
-      expect(result.stderr).toContain('live scenario did not pass:');
-    } finally {
-      cleanup();
-    }
-  });
-
-  it('still fails unexpected skipped scenarios when live evidence is required', () => {
-    const { result, cleanup } = runCoverageReport({
-      execution: {
-        status: 'skipped',
-        skipReason: 'runner setup incomplete',
-        evidence: {
-          artifacts: {},
-        },
-      },
-    });
-
-    try {
-      expect(result.status).toBe(1);
-      expect(result.stderr).toContain('live scenario did not pass: runner setup incomplete');
+      expect(result.stderr).toContain('live scenario did not pass: agent output did not produce required evidence');
     } finally {
       cleanup();
     }

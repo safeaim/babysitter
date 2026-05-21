@@ -37,7 +37,7 @@ export interface LiveStackScenario {
 export interface CapabilityStatus {
   readonly runnable: boolean;
   readonly missingEnv: readonly string[];
-  readonly skipReason?: string;
+  readonly failureReason?: string;
 }
 
 export interface LiveStackEvidenceBundle {
@@ -161,7 +161,7 @@ export function getScenarioCapabilityStatus(scenario: LiveStackScenario, env: Re
   const missingEnv = scenario.model.requiredEnv.filter((name) => !env[name]);
   return missingEnv.length === 0
     ? { runnable: true, missingEnv }
-    : { runnable: false, missingEnv, skipReason: `missing live-model credential env: ${missingEnv.join(', ')}` };
+    : { runnable: false, missingEnv, failureReason: `missing live-model credential env: ${missingEnv.join(', ')}` };
 }
 
 export function createEvidenceBundle(

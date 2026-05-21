@@ -59,15 +59,15 @@ console.log(JSON.stringify(report, null, 2));
 if (requireEvidence) {
   if (!execution) fail(`missing live scenario artifact: ${scenarioArtifact}`);
   if (execution.status !== 'passed') {
-    fail(`live scenario did not pass: ${execution.failure || execution.skipReason || execution.status}`);
+    fail(`live scenario did not pass: ${execution.failure || execution.status}`);
   } else {
     if ((execution.missingTraceIds || []).length > 0) fail(`missing trace ids: ${execution.missingTraceIds.join(', ')}`);
     if (missingArtifacts.length > 0) fail(`missing live evidence artifacts: ${missingArtifacts.map((artifact) => artifact.name).join(', ')}`);
   }
 }
 
-function listEnv(name, fallback) {
-  return process.env[name] ? process.env[name].split(',').map((value) => value.trim()).filter(Boolean) : fallback;
+function listEnv(name, defaultValues) {
+  return process.env[name] ? process.env[name].split(',').map((value) => value.trim()).filter(Boolean) : defaultValues;
 }
 
 function safeFileName(value) {

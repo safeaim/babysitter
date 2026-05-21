@@ -142,7 +142,7 @@ describe('live stack scenario contract primitives', () => {
     expect(getScenarioCapabilityStatus(scenario, {})).toEqual({
       runnable: false,
       missingEnv: ['AZURE_API_KEY', 'AMUX_API_BASE'],
-      skipReason: 'missing live-model credential env: AZURE_API_KEY, AMUX_API_BASE',
+      failureReason: 'missing live-model credential env: AZURE_API_KEY, AMUX_API_BASE',
     });
 
     expect(getScenarioCapabilityStatus(scenario, { AZURE_API_KEY: 'present', AMUX_API_BASE: 'https://example.services.ai.azure.com' })).toEqual({

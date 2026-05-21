@@ -41,7 +41,7 @@ describe('pipeline-owned live stack scenario execution', () => {
       }
       console.log('└─────────────────────────────────────────────────\n');
     }
-    expect(result.status, result.failure ?? result.skipReason).toBe('passed');
+    expect(result.status, result.failure).toBe('passed');
     expect(result.missingTraceIds).toEqual([]);
     expect(result.missingArtifacts ?? []).toEqual([]);
     expect(result.artifactPath).toBeDefined();
@@ -53,7 +53,7 @@ describe('pipeline-owned live stack scenario execution', () => {
     expect(artifact.status).toBe('passed');
   }, Number(process.env['LIVE_STACK_TEST_TIMEOUT_MS'] ?? 11 * 60 * 1000));
 
-  it('keeps local non-live runs cheap and explicit', async () => {
+  it('keeps local non-live runs cheap and explicit without reporting success', async () => {
     if (process.env['LIVE_STACK_REQUIRE_EVIDENCE'] === '1') return;
 
     const result = await runPrimaryLiveStackScenario({
@@ -65,7 +65,8 @@ describe('pipeline-owned live stack scenario execution', () => {
       },
     });
 
-    expect(result.status).toBe('skipped');
+    expect(result.status).toBe('failed');
+    expect(result.failure).toContain('missing live-model credential env');
     expect(result.commands.length).toBe(7);
   });
 });

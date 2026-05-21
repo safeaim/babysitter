@@ -39,14 +39,13 @@ export interface PrimaryLiveRunOptions {
 
 export interface VerificationEntry {
   readonly name: string;
-  readonly status: 'passed' | 'failed' | 'skipped';
+  readonly status: 'passed' | 'failed';
   readonly detail?: string;
 }
 
 export interface PrimaryLiveRunResult {
-  readonly status: 'skipped' | 'passed' | 'failed';
+  readonly status: 'passed' | 'failed';
   readonly scenarioId: string;
-  readonly skipReason?: string;
   readonly commands: readonly CommandExecution[];
   readonly evidence?: LiveStackEvidenceBundle;
   readonly missingTraceIds?: readonly string[];
@@ -253,27 +252,17 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
   const commands = buildPrimaryLiveStackCommands(scenario, options);
 
   if (!capability.runnable) {
-    if (options.requireRunnable === true) {
-      await fs.mkdir(options.artifactsDir, { recursive: true });
-      const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, { status: 'failed', skipReason: capability.skipReason, commands: redactCommands(commands) });
-      return { status: 'failed', scenarioId: scenario.scenarioId, skipReason: capability.skipReason, commands: redactCommands(commands), artifactPath, failure: capability.skipReason };
-    }
-    return { status: 'skipped', scenarioId: scenario.scenarioId, skipReason: capability.skipReason, commands: redactCommands(commands) };
+    const failure = capability.failureReason ?? `missing live-model credential env: ${capability.missingEnv.join(', ')}`;
+    await fs.mkdir(options.artifactsDir, { recursive: true });
+    const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, { status: 'failed', failure, commands: redactCommands(commands) });
+    return { status: 'failed', scenarioId: scenario.scenarioId, commands: redactCommands(commands), artifactPath, failure };
   }
 
   if (options.executeLiveProvider !== true) {
-    const skipReason = 'set LIVE_STACK_RUN_MODEL_TESTS=1 to execute live provider scenario';
-    if (options.requireRunnable === true) {
-      await fs.mkdir(options.artifactsDir, { recursive: true });
-      const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, { status: 'failed', skipReason, commands: redactCommands(commands) });
-      return { status: 'failed', scenarioId: scenario.scenarioId, skipReason, commands: redactCommands(commands), artifactPath, failure: skipReason };
-    }
-    return {
-      status: 'skipped',
-      scenarioId: scenario.scenarioId,
-      skipReason,
-      commands: redactCommands(commands),
-    };
+    const failure = 'LIVE_STACK_RUN_MODEL_TESTS=1 is required to execute live provider scenario';
+    await fs.mkdir(options.artifactsDir, { recursive: true });
+    const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, { status: 'failed', failure, commands: redactCommands(commands) });
+    return { status: 'failed', scenarioId: scenario.scenarioId, commands: redactCommands(commands), artifactPath, failure };
   }
 
   await fs.mkdir(options.artifactsDir, { recursive: true });
@@ -440,11 +429,11 @@ export async function executePtyCommand(execution: CommandExecution): Promise<Co
   });
 }
 
-function commandExecution(env: Record<string, string>, overrideKey: string, fallbackCommand: string, args: readonly string[], cwd: string, timeoutMs: number): CommandExecution {
+function commandExecution(env: Record<string, string>, overrideKey: string, defaultCommand: string, args: readonly string[], cwd: string, timeoutMs: number): CommandExecution {
   const overrideBin = env[overrideKey];
   return overrideBin
     ? { command: process.execPath, args: [overrideBin, ...args], env, cwd, timeoutMs }
-    : { command: fallbackCommand, args, env, cwd, timeoutMs };
+    : { command: defaultCommand, args, env, cwd, timeoutMs };
 }
 
 function buildCommandEnv(env: Record<string, string | undefined>, cwd: string): Record<string, string> {
@@ -757,7 +746,7 @@ async function validateAgentBehavior(
       entries.push({ name: 'file-creation', status: 'failed', detail: `agent did not create .a5c-live-test/${traceId}-odyssey.md (output: ${output.length} chars)` });
     }
   } else {
-    entries.push({ name: 'file-creation', status: 'skipped', detail: 'no trace ID available' });
+    entries.push({ name: 'file-creation', status: 'failed', detail: 'no trace ID available' });
   }
 
   // --- process-creation: verify agent created a process file (create mode only) ---
@@ -827,7 +816,7 @@ async function validateAgentBehavior(
 
     // stop-hooks and hooks-mux-session: verify hooks evidence.
     // Hooks are required when the harness drives iterations (interactive/bridged-hooks).
-    // When babysitter-agent drives the loop internally (NI with bridge-hooks fallback),
+    // When babysitter-agent drives the loop internally (NI with bridge-hooks),
     // hooks are desirable but the run completing is the primary signal.
     // We defer the hooks verdict until after run-completion is known.
     const deferredHooksEntries: VerificationEntry[] = [];
@@ -998,7 +987,6 @@ async function writeVerificationReport(
     switch (status) {
       case 'passed': return '✓';
       case 'failed': return '✗';
-      case 'skipped': return '⊘';
     }
   };
   const hasFailures = verifications.some((v) => v.status === 'failed');

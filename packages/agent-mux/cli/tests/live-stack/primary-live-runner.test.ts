@@ -275,22 +275,22 @@ describe('primary live stack runner contract', () => {
     expect(launch?.env['GOOGLE_API_KEY']).toBe('google-secret');
   });
 
-  it('skips safely without Foundry credentials and never calls the command executor', async () => {
+  it('fails without Foundry credentials and never calls the command executor', async () => {
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
-      artifactsDir: path.join(os.tmpdir(), 'live-stack-skipped'),
+      artifactsDir: path.join(os.tmpdir(), 'live-stack-missing-credentials'),
       env: {},
       executeCommand: async () => {
         throw new Error('should not execute commands when credentials are missing');
       },
     });
 
-    expect(result.status).toBe('skipped');
-    expect(result.skipReason).toContain('missing live-model credential env');
+    expect(result.status).toBe('failed');
+    expect(result.failure).toContain('missing live-model credential env');
     expect(result.commands.at(-1)?.command).toBe('amux');
   });
 
-  it('skips credential-present runs unless the explicit live execution flag is set', async () => {
+  it('fails credential-present runs unless the explicit live execution flag is set', async () => {
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
       artifactsDir: path.join(os.tmpdir(), 'live-stack-opt-in'),
@@ -300,8 +300,8 @@ describe('primary live stack runner contract', () => {
       },
     });
 
-    expect(result.status).toBe('skipped');
-    expect(result.skipReason).toBe('set LIVE_STACK_RUN_MODEL_TESTS=1 to execute live provider scenario');
+    expect(result.status).toBe('failed');
+    expect(result.failure).toBe('LIVE_STACK_RUN_MODEL_TESTS=1 is required to execute live provider scenario');
     expect(JSON.stringify(result)).not.toContain('sk-live-secret');
   });
 
@@ -787,7 +787,7 @@ describe('primary live stack runner contract', () => {
   });
 
   it('fails provider-backed live runs when the upstream service reports exhausted credits', async () => {
-    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-skip-'));
+    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-fail-'));
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
       artifactsDir,
@@ -804,7 +804,7 @@ describe('primary live stack runner contract', () => {
   });
 
   it('fails provider-backed live runs when configured credentials are rejected upstream', async () => {
-    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-auth-skip-'));
+    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-auth-fail-'));
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
       artifactsDir,
@@ -821,7 +821,7 @@ describe('primary live stack runner contract', () => {
   });
 
   it('fails Codex live runs when upstream OpenAI auth is missing', async () => {
-    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-codex-auth-skip-'));
+    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-provider-codex-auth-fail-'));
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
       artifactsDir,
@@ -868,9 +868,8 @@ describe('primary live stack runner contract', () => {
     expect(result.stderr).toContain('Timed out after 50ms');
   });
 
-  const liveIt = process.env['LIVE_STACK_RUN_MODEL_TESTS'] === '1' ? it : it.skip;
-
-  liveIt('executes the primary live provider scenario when explicitly enabled', async () => {
+  it('executes the primary live provider scenario when explicitly enabled', async () => {
+    if (process.env['LIVE_STACK_RUN_MODEL_TESTS'] !== '1') return;
     const result = await runPrimaryLiveStackScenario({
       cwd: process.cwd(),
       artifactsDir: 'artifacts/live-stack',

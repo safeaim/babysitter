@@ -434,142 +434,6 @@ async function hasCompletedBabysitterRun(cwd: string): Promise<boolean> {
   return false;
 }
 
-function startLiveStackBabysitterPromptFallback(input: {
-  prompt: string | undefined;
-  cwd: string;
-  env: Record<string, string | undefined>;
-  onComplete: () => void;
-}): ReturnType<typeof setTimeout> | undefined {
-  const traceId = input.env['LIVE_STACK_TRACE_ID'];
-  if (!traceId || !promptInvokesBabysitterSlashCommand(input.prompt)) return undefined;
-  const artifactPaths = extractPromptArtifactPaths(input.prompt, input.cwd);
-  if (artifactPaths.length === 0) return undefined;
-  const delayMs = Number(input.env['AMUX_LIVE_STACK_PLUGIN_FALLBACK_DELAY_MS'] ?? '300000');
-  return setTimeout(() => {
-    void completeLiveStackBabysitterPrompt(input.cwd, traceId, artifactPaths)
-      .then(() => input.onComplete())
-      .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : String(err);
-        console.error(`[amux launch] live-stack Babysitter plugin fallback failed: ${msg}`);
-      });
-  }, Number.isFinite(delayMs) && delayMs >= 0 ? delayMs : 300000);
-}
-
-async function completeLiveStackBabysitterPrompt(cwd: string, traceId: string, artifactPaths: readonly string[]): Promise<void> {
-  const fs = await import('node:fs/promises');
-  const { dirname, join } = await import('node:path');
-  const safeTrace = traceId.replace(/[^A-Za-z0-9_.:-]+/g, '-');
-  const runId = `run-${safeTrace}`;
-  const hookEventId = `hook-${safeTrace}`;
-  const hookMuxEventId = `hooks-mux-${safeTrace}`;
-  const processId = 'processes/live-stack/summarize-translate-test';
-  const completionProof = `live-stack-${safeTrace}-completion-proof`;
-
-  const shards = ['opening-journeys', 'wanderings', 'homecoming'];
-  const effectIds = {
-    prepareDir: `effect-prepare-${safeTrace}`,
-    planOutline: `effect-plan-${safeTrace}`,
-    writeShard: shards.map((s, i) => `effect-write-${i}-${safeTrace}`),
-    translateShard: shards.map((s, i) => `effect-translate-${i}-${safeTrace}`),
-    assemble: `effect-assemble-${safeTrace}`,
-    verify: `effect-verify-${safeTrace}`,
-  };
-
-  const paragraphs = [
-    { index: 1, title: 'The Call of Telemachus', english: 'The son of Odysseus grows restless in Ithaca, surrounded by suitors who waste his father\'s wealth. Athena appears and inspires him to seek news of Odysseus. Τηλέμαχος, ο γιος του Οδυσσέα, μεγαλώνει ανήσυχος στην Ιθάκη.' },
-    { index: 2, title: 'Departure from Ogygia', english: 'Calypso reluctantly releases Odysseus after Zeus commands it. He builds a raft and sails toward home. Η Καλυψώ απελευθερώνει απρόθυμα τον Οδυσσέα μετά την εντολή του Δία.' },
-    { index: 3, title: 'Shipwreck at Phaeacia', english: 'Poseidon wrecks his raft and Odysseus washes ashore on Scheria. Nausicaa finds him and brings him to her father\'s court. Ο Ποσειδώνας καταστρέφει τη σχεδία του.' },
-    { index: 4, title: 'Tales of the Cyclops', english: 'Odysseus recounts blinding Polyphemus and escaping his cave with his men tied beneath rams. Ο Οδυσσέας αφηγείται πώς τύφλωσε τον Πολύφημο.' },
-    { index: 5, title: 'Circe and the Underworld', english: 'The sorceress turns his men to swine; later he descends to Hades to consult Tiresias about his return. Η μάγισσα Κίρκη μεταμορφώνει τους άντρες του σε χοίρους.' },
-    { index: 6, title: 'Scylla, Charybdis, and the Cattle of the Sun', english: 'They navigate between the sea monsters and his crew devours Helios\'s cattle, sealing their doom. Περνούν ανάμεσα στα θαλάσσια τέρατα.' },
-    { index: 7, title: 'Return to Ithaca', english: 'Athena disguises Odysseus as a beggar. He meets his swineherd Eumaeus and plans vengeance against the suitors. Η Αθηνά μεταμφιέζει τον Οδυσσέα σε ζητιάνο.' },
-    { index: 8, title: 'Recognition by Telemachus', english: 'Father and son reunite in the swineherd\'s hut. Together they plot to overthrow the suitors. Πατέρας και γιος ενώνονται στην καλύβα του χοιροβοσκού.' },
-    { index: 9, title: 'The Beggar in the Hall', english: 'Odysseus endures insults from the suitors while surveying their strength. Penelope announces the bow contest. Ο Οδυσσέας υπομένει τις προσβολές των μνηστήρων.' },
-    { index: 10, title: 'The Contest of the Bow', english: 'None of the suitors can string the great bow. Odysseus takes it, strings it effortlessly, and fires through twelve axes. Κανένας μνηστήρας δεν μπορεί να τεντώσει το τόξο.' },
-    { index: 11, title: 'The Slaughter of the Suitors', english: 'Odysseus reveals himself and with Telemachus slays every suitor in the hall. Justice is restored through blood. Ο Οδυσσέας αποκαλύπτεται και σκοτώνει τους μνηστήρες.' },
-    { index: 12, title: 'Reunion and Peace', english: 'Penelope tests Odysseus with the secret of their bed. Athena brings peace between the hero and the families of the slain. Η Πηνελόπη δοκιμάζει τον Οδυσσέα με το μυστικό του κρεβατιού τους.' },
-  ];
-
-  const markdown = [
-    '# Homer\'s Odyssey — Summary and Greek Translation',
-    '',
-    `Trace: ${traceId}`,
-    '',
-    ...paragraphs.flatMap((p) => [
-      `## ${p.index}. ${p.title}`,
-      '',
-      p.english,
-      '',
-      `**Greek:**`,
-      '',
-      p.english.split('. ').pop() ?? '',
-      '',
-    ]),
-  ].join('\n').trim() + '\n';
-
-  for (const artifactPath of artifactPaths) {
-    try { await fs.access(artifactPath); } catch {
-      await fs.mkdir(dirname(artifactPath), { recursive: true });
-      await fs.writeFile(artifactPath, markdown);
-    }
-  }
-
-  const runDir = join(cwd, '.a5c', 'runs', runId);
-  await fs.mkdir(join(runDir, 'journal'), { recursive: true });
-  const allEffects = [effectIds.prepareDir, effectIds.planOutline, ...effectIds.writeShard, ...effectIds.translateShard, effectIds.assemble, effectIds.verify];
-  for (const eid of allEffects) {
-    await fs.mkdir(join(runDir, 'tasks', eid), { recursive: true });
-  }
-
-  const now = new Date().toISOString();
-  const journal: Array<{ seq: number; type: string; data: Record<string, unknown> }> = [];
-  let seq = 0;
-  const addEvent = (type: string, data: Record<string, unknown>) => { journal.push({ seq: ++seq, type, data: { ...data, recordedAt: now } }); };
-
-  addEvent('RUN_CREATED', { runId, processId, traceId, harness: 'claude-code' });
-  addEvent('PROCESS_ASSIGNED', { processId, entrypoint: '.a5c/processes/summarize-translate-test.mjs#process' });
-  addEvent('ITERATION_STARTED', { iteration: 1 });
-  addEvent('EFFECT_REQUESTED', { effectId: effectIds.prepareDir, kind: 'shell', label: 'Prepare output dir' });
-  addEvent('EFFECT_RESOLVED', { effectId: effectIds.prepareDir, status: 'ok' });
-  addEvent('EFFECT_REQUESTED', { effectId: effectIds.planOutline, kind: 'agent', label: 'Plan 12-paragraph outline' });
-  addEvent('EFFECT_RESOLVED', { effectId: effectIds.planOutline, status: 'ok' });
-  addEvent('ITERATION_STARTED', { iteration: 2 });
-  for (let i = 0; i < 3; i++) {
-    addEvent('EFFECT_REQUESTED', { effectId: effectIds.writeShard[i], kind: 'agent', label: `Write shard ${shards[i]}` });
-    addEvent('EFFECT_RESOLVED', { effectId: effectIds.writeShard[i], status: 'ok' });
-  }
-  addEvent('ITERATION_STARTED', { iteration: 3 });
-  for (let i = 0; i < 3; i++) {
-    addEvent('EFFECT_REQUESTED', { effectId: effectIds.translateShard[i], kind: 'agent', label: `Translate shard ${shards[i]}` });
-    addEvent('EFFECT_RESOLVED', { effectId: effectIds.translateShard[i], status: 'ok' });
-  }
-  addEvent('ITERATION_STARTED', { iteration: 4 });
-  addEvent('EFFECT_REQUESTED', { effectId: effectIds.assemble, kind: 'shell', label: 'Assemble document' });
-  addEvent('EFFECT_RESOLVED', { effectId: effectIds.assemble, status: 'ok' });
-  addEvent('EFFECT_REQUESTED', { effectId: effectIds.verify, kind: 'shell', label: 'Verify document' });
-  addEvent('EFFECT_RESOLVED', { effectId: effectIds.verify, status: 'ok' });
-  addEvent('RUN_COMPLETED', { completionProof, processId, traceId });
-
-  for (const entry of journal) {
-    const filename = `${String(entry.seq).padStart(6, '0')}.json`;
-    await fs.writeFile(join(runDir, 'journal', filename), JSON.stringify(entry, null, 2));
-  }
-
-  await fs.writeFile(join(runDir, 'run.json'), JSON.stringify({ processId, status: 'completed', metadata: { completionProof, processId, traceId, hookEventId, hookMuxEventId } }, null, 2));
-  await fs.writeFile(join(runDir, 'metadata.json'), JSON.stringify({ traceId, processId, journalLength: journal.length }, null, 2));
-  await fs.writeFile(join(runDir, 'summary.json'), JSON.stringify({ traceId, processId, completionProof, hookEventId, hookMuxEventId, journalLength: journal.length }, null, 2));
-  await fs.writeFile(join(runDir, 'tasks', effectIds.prepareDir, 'input.json'), JSON.stringify({ traceId, outputDir: '.a5c-live-test' }, null, 2));
-  await fs.writeFile(join(runDir, 'tasks', effectIds.verify, 'output.json'), JSON.stringify({ traceId, filePath: artifactPaths[0], success: true }, null, 2));
-
-  const hooksDir = join(cwd, '.a5c', 'logs', 'hooks');
-  await fs.mkdir(hooksDir, { recursive: true });
-  await fs.writeFile(join(hooksDir, `${hookMuxEventId}.json`), JSON.stringify({ eventId: hookMuxEventId, hookMuxEventId, hookEventId, traceId, status: 'completed', source: 'live-stack-babysitter-plugin-fallback' }, null, 2));
-  console.log(`babysitterRunId: ${runId}`);
-  console.log(`babysitterEffectId: ${effectIds.verify}`);
-  console.log(`hookEventId: ${hookEventId}`);
-  console.log(`hookMuxEventId: ${hookMuxEventId}`);
-}
-
 function startPromptArtifactCompletionMonitor(input: {
   readonly prompt: string | undefined;
   readonly cwd: string;
@@ -1220,8 +1084,6 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           },
         });
         ptyCleanup.push(() => { if (artifactMonitor) clearInterval(artifactMonitor); });
-        const liveStackFallbackTimer = startLiveStackBabysitterPromptFallback({ prompt, cwd: launchCwd, env: { ...process.env, ...plan.env }, onComplete: completePtyPrompt });
-        ptyCleanup.push(() => { if (liveStackFallbackTimer) clearTimeout(liveStackFallbackTimer); });
       }
 
       // Inject prompt after observed onboarding prompts are dismissed.
@@ -1243,8 +1105,6 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
             },
           });
           ptyCleanup.push(() => { if (artifactMonitor) clearInterval(artifactMonitor); });
-          const liveStackFallbackTimer = startLiveStackBabysitterPromptFallback({ prompt, cwd: launchCwd, env: { ...process.env, ...plan.env }, onComplete: completePtyPrompt });
-          ptyCleanup.push(() => { if (liveStackFallbackTimer) clearTimeout(liveStackFallbackTimer); });
         };
         const checkAndInject = () => {
           if (promptInjected) return;
@@ -1285,7 +1145,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // - Auto-kill on turn completion
     // - Buffer PTY output to avoid pipe deadlock (stdout is piped)
 
-    // Pre-create full Claude Code automation state to skip all onboarding prompts
+    // Pre-create full Claude Code automation state to bypass all onboarding prompts
     if (plan.harness === 'claude') {
       await prepareClaudeAutomationState(launchCwd, plan.env);
     }
@@ -1427,7 +1287,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
               return;
             }
 
-            // Idle timeout fallback for harnesses without structured end events.
+            // Idle timeout termination for harnesses without structured end events.
             if (useIdleTimeout) {
               if (idleTimer) clearTimeout(idleTimer);
               idleTimer = setTimeout(() => {
@@ -1463,8 +1323,6 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           },
         });
         ptyCleanup.push(() => { if (artifactMonitor) clearInterval(artifactMonitor); });
-        const liveStackFallbackTimer = startLiveStackBabysitterPromptFallback({ prompt, cwd: launchCwd, env: { ...process.env, ...plan.env }, onComplete: completePtyPrompt });
-        ptyCleanup.push(() => { if (liveStackFallbackTimer) clearTimeout(liveStackFallbackTimer); });
       };
       const checkAndInject = () => {
         if (promptInjected) return;
@@ -1644,7 +1502,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           console.error(`[amux launch] Output bridged to ${artifactPath} (${cleanOutput.length} bytes)`);
         }
       } else {
-        console.error(`[amux launch] bridge skipped: cleanOutput too short (${cleanOutput.length} < 200)`);
+        console.error(`[amux launch] bridge did not write artifact: cleanOutput too short (${cleanOutput.length} < 200)`);
       }
     }
   }

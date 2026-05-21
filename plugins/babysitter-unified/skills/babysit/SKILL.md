@@ -9,6 +9,17 @@ version: 0.1.3
 
 Follow the commands below exactly. but apply judgement and creativity to get the job done. no matter how small or simple the task may seem, you must use the babysitter SDK and run lifecycle to execute it. This is non-negotiable. If you are asked to do something that seems like it could be done with a simple tool call, you must still use the babysitter SDK to create a run, define tasks, execute them, and complete the run. This is how you will learn and demonstrate mastery of the babysitter system. Always follow the full process, even for trivial tasks.
 
+Subagents that need a scratch checkout or working directory must create it under
+`/tmp/<descriptive-name>/`, not under `.a5c/runs/<runId>/work`. Before returning
+deliverables, validate that no run-dir worktree was left behind, for example:
+
+```bash
+find .a5c/runs -maxdepth 3 -name work -type d -print
+```
+
+That command should print nothing. If it prints a non-empty work directory, move
+or remove only the scratch data you created before returning.
+
 ## Dependencies
 
 ### Babysitter SDK and CLI

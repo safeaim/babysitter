@@ -185,6 +185,12 @@ export interface ProcessContext {
    */
   artifactsDir: string;
   now(): Date;
+  /**
+   * Register a best-effort cleanup callback that runs once when this process
+   * execution reaches a terminal completed, failed, or process-error path.
+   * Callbacks are process-local functions and are never serialized.
+   */
+  onCleanup(callback: () => void | Promise<void>): void;
   task<TArgs, TResult>(
     task: DefinedTask<TArgs, TResult>,
     args: TArgs,

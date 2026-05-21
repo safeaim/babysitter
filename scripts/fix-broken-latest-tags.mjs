@@ -77,6 +77,44 @@ function findLastNonStaging(name, minFiles, minSize) {
   return null;
 }
 
+function pluginHasBrokenSdkVersion(name, version) {
+  const tarball = run(`npm pack ${name}@${version} --pack-destination /tmp 2>/dev/null`);
+  if (!tarball) return false;
+  const tarPath = `/tmp/${tarball}`;
+  const versionsContent = run(`tar xzf ${tarPath} --to-stdout package/versions.json 2>/dev/null`);
+  run(`rm -f ${tarPath}`);
+  if (!versionsContent) return false;
+  try {
+    const { sdkVersion } = JSON.parse(versionsContent);
+    if (!sdkVersion || sdkVersion === 'latest') return false;
+    const sdkExists = run(`npm view @a5c-ai/babysitter-sdk@${sdkVersion} version`);
+    if (!sdkExists) {
+      console.log(`    [probe] ${name}@${version} references SDK ${sdkVersion} which does not exist on npm`);
+      return true;
+    }
+    const fc = parseInt(run(`npm view @a5c-ai/babysitter-sdk@${sdkVersion} dist.fileCount`)) || 0;
+    if (fc < MIN_FILES) {
+      console.log(`    [probe] ${name}@${version} references SDK ${sdkVersion} which is empty (${fc} files)`);
+      return true;
+    }
+    return false;
+  } catch { return false; }
+}
+
+function findLastGoodPlugin(name) {
+  const allVersions = JSON.parse(run(`npm view ${name} versions --json`) || '[]');
+  const nonStaging = allVersions.filter(v => !isStaging(v));
+
+  for (let i = nonStaging.length - 1; i >= 0; i--) {
+    const v = nonStaging[i];
+    if (!pluginHasBrokenSdkVersion(name, v)) {
+      const fc = parseInt(run(`npm view ${name}@${v} dist.fileCount`)) || 0;
+      return { version: v, fileCount: fc, size: 0 };
+    }
+  }
+  return null;
+}
+
 function retag(name, version) {
   console.log(`    Retagging: npm dist-tag add ${name}@${version} latest`);
   const result = run(`npm dist-tag add ${name}@${version} latest`);
@@ -106,16 +144,21 @@ async function main() {
     }
   }
 
-  // Check plugin packages for staging latest
+  // Check plugin packages for staging latest or broken sdkVersion
   for (const name of pluginPackageNames) {
     const latest = run(`npm view ${name}@latest version`);
     if (!latest) continue;
 
-    if (isStaging(latest)) {
-      const lastGood = findLastNonStaging(name, 0, 0);
-      const fileCount = parseInt(run(`npm view ${name}@${latest} dist.fileCount`)) || 0;
-      const size = parseInt(run(`npm view ${name}@${latest} dist.unpackedSize`)) || 0;
-      issues.push({ name, latest, reason: 'staging', fileCount, size, lastGood });
+    const fileCount = parseInt(run(`npm view ${name}@${latest} dist.fileCount`)) || 0;
+    const size = parseInt(run(`npm view ${name}@${latest} dist.unpackedSize`)) || 0;
+
+    const isStagingLatest = isStaging(latest);
+    const hasBrokenSdk = pluginHasBrokenSdkVersion(name, latest);
+
+    if (isStagingLatest || hasBrokenSdk) {
+      const reason = isStagingLatest ? 'staging' : 'broken-sdk';
+      const lastGood = findLastGoodPlugin(name);
+      issues.push({ name, latest, reason, fileCount, size, lastGood });
     }
   }
 

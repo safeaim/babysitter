@@ -28,10 +28,12 @@ Read the SDK version from `versions.json` to ensure version compatibility:
 
 ```bash
 SDK_VERSION=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('${CLAUDE_PLUGIN_ROOT}/versions.json','utf8')).sdkVersion||'latest')}catch{console.log('latest')}")
-npm i -g @a5c-ai/babysitter-sdk@$SDK_VERSION
+npm i -g @a5c-ai/babysitter-sdk@$SDK_VERSION || npm i -g @a5c-ai/babysitter-sdk@latest
 
 CLI="npx -y @a5c-ai/babysitter-sdk@$SDK_VERSION"
 ```
+
+If the pinned version fails to install (e.g. not yet published), the fallback installs `latest`.
 
 If `babysitter` is already installed globally at the correct version, you may use `CLI="babysitter"` instead.
 

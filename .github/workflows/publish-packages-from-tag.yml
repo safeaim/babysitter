@@ -98,7 +98,7 @@ jobs:
 
           run_many "Build foundation packages" \
             @a5c-ai/agent-catalog \
-            @a5c-ai/breakpoints-mux \
+            @a5c-ai/tasks-mux \
             @a5c-ai/cloud \
             @a5c-ai/agent-mux-observability \
             @a5c-ai/triggers \
@@ -186,7 +186,7 @@ jobs:
           publish_many "Publish foundation packages" \
             @a5c-ai/atlas \
             @a5c-ai/agent-catalog \
-            @a5c-ai/breakpoints-mux \
+            @a5c-ai/tasks-mux \
             @a5c-ai/cloud \
             @a5c-ai/agent-mux-observability \
             @a5c-ai/triggers \

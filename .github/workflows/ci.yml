@@ -99,20 +99,20 @@ jobs:
           set -euo pipefail
           npm run test:sdk 2>&1 | tee artifacts/test-logs/unit-tests.log
 
-      - name: Build breakpoints-mux
+      - name: Build tasks-mux
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/breakpoints-mux 2>&1 | tee artifacts/test-logs/breakpoints-mux-build.log
+          npm run build --workspace=@a5c-ai/tasks-mux 2>&1 | tee artifacts/test-logs/tasks-mux-build.log
 
-      - name: Typecheck breakpoints-mux
+      - name: Typecheck tasks-mux
         run: |
           set -euo pipefail
-          npm run typecheck --workspace=@a5c-ai/breakpoints-mux 2>&1 | tee artifacts/test-logs/breakpoints-mux-typecheck.log
+          npm run typecheck --workspace=@a5c-ai/tasks-mux 2>&1 | tee artifacts/test-logs/tasks-mux-typecheck.log
 
-      - name: breakpoints-mux tests
+      - name: tasks-mux tests
         run: |
           set -euo pipefail
-          npm run test --workspace=@a5c-ai/breakpoints-mux 2>&1 | tee artifacts/test-logs/breakpoints-mux-tests.log
+          npm run test --workspace=@a5c-ai/tasks-mux 2>&1 | tee artifacts/test-logs/tasks-mux-tests.log
 
       - name: Build hooks-mux
         run: |
@@ -274,7 +274,7 @@ jobs:
 
           Release-critical workspaces validated in other CI/release jobs:
           - @a5c-ai/babysitter-sdk -> test + packages-sdk + release/staging publish
-          - @a5c-ai/breakpoints-mux -> test + release/staging publish
+          - @a5c-ai/tasks-mux -> test + release/staging publish
           - @a5c-ai/extension-mux -> test + release/staging publish
           - @a5c-ai/babysitter-observer-dashboard -> observer-dashboard + release/staging publish
           - @a5c-ai/cloud -> workspace-coverage + release/staging publish + deploy-hook paths

@@ -788,9 +788,9 @@ jobs:
           - name: agent-catalog
             build: npm run build --workspace=@a5c-ai/atlas && npm run build --workspace=@a5c-ai/agent-catalog
             publish: npm publish --workspace=@a5c-ai/agent-catalog --access public --tag "$NPM_TAG"
-          - name: breakpoints-mux
-            build: npm run build --workspace=@a5c-ai/breakpoints-mux
-            publish: npm publish --workspace=@a5c-ai/breakpoints-mux --access public --tag "$NPM_TAG"
+          - name: tasks-mux
+            build: npm run build --workspace=@a5c-ai/tasks-mux
+            publish: npm publish --workspace=@a5c-ai/tasks-mux --access public --tag "$NPM_TAG"
           - name: agent-mux-observability
             build: npm run build --workspace=@a5c-ai/agent-mux-observability
             publish: npm publish --workspace=@a5c-ai/agent-mux-observability --access public --tag "$NPM_TAG"

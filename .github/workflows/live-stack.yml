@@ -98,7 +98,7 @@ jobs:
             wait
             npm run build --workspace=@a5c-ai/hooks-mux-cli
           '
-          run_bg npm run build --workspace=@a5c-ai/agent-plugins-mux
+          run_bg npm run build --workspace=@a5c-ai/extension-mux
           run_bg npm run build --workspace=@a5c-ai/triggers
           run_bg npm run build:observer
           run_bg npm run build:cloud

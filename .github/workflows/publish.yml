@@ -26,7 +26,6 @@ concurrency:
 
 jobs:
   lint:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Lint
     runs-on: ubuntu-latest-l
     permissions:
@@ -57,7 +56,6 @@ jobs:
         run: npm run verify:metadata
 
   build_all:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Build All
     runs-on: ubuntu-latest-l
     permissions:
@@ -182,7 +180,6 @@ jobs:
           if-no-files-found: error
 
   validate_core:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: [build_all, lint]
     name: Validate Core Runtime
     runs-on: ubuntu-latest-l
@@ -257,7 +254,6 @@ jobs:
           if-no-files-found: warn
 
   validate_mux:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Mux Surfaces
     runs-on: ubuntu-latest-l
@@ -341,7 +337,6 @@ jobs:
           if-no-files-found: warn
 
   e2e_integration:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs:
       - validate_core
       - validate_mux
@@ -441,7 +436,6 @@ jobs:
           if-no-files-found: warn
 
   validate_cloud:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Cloud Workspace
     runs-on: ubuntu-latest-l
@@ -503,7 +497,6 @@ jobs:
           if-no-files-found: warn
 
   validate_krate:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Krate
     runs-on: ubuntu-latest-l
@@ -566,7 +559,6 @@ jobs:
           if-no-files-found: warn
 
   validate_observer_and_compiler:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     needs: build_all
     name: Validate Observer And Compiler
     runs-on: ubuntu-latest-l
@@ -637,11 +629,11 @@ jobs:
   prepare_staging_publish:
     if: >-
       !cancelled()
-      && !contains(github.event.head_commit.message || '', '[skip publish]')
       && needs.lint.result == 'success'
       && needs.build_all.result == 'success'
       && needs.validate_core.result == 'success'
       && needs.validate_mux.result == 'success'
+      && needs.e2e_integration.result == 'success'
       && needs.validate_cloud.result == 'success'
       && needs.validate_krate.result == 'success'
       && needs.validate_observer_and_compiler.result == 'success'
@@ -723,27 +715,6 @@ jobs:
           echo "Setting ${GITHUB_REF_NAME} publish version: $PUBLISH_VERSION"
           node scripts/sync-workspace-versions.mjs --version "$PUBLISH_VERSION"
 
-      - name: Commit sdkVersion to publish branch
-        if: ${{ github.ref_name != 'main' }}
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add plugins/babysitter-unified/versions.json
-          if git diff --cached --quiet; then
-            echo "No sdkVersion changes to commit."
-          else
-            git commit -m "chore: set sdkVersion to ${{ steps.version.outputs.staging_version_sdk }} [skip publish]"
-            if git push origin HEAD:"${GITHUB_REF_NAME}" 2>/dev/null; then
-              echo "sdkVersion committed and pushed."
-            elif git pull --rebase --autostash origin "${GITHUB_REF_NAME}" 2>/dev/null && git push origin HEAD:"${GITHUB_REF_NAME}" 2>/dev/null; then
-              echo "sdkVersion committed after rebase."
-            else
-              echo "::warning::Could not push sdkVersion commit (concurrent run conflict). Skipping — npm publish already succeeded."
-              git rebase --abort 2>/dev/null || true
-            fi
-          fi
-
       - name: Prepare workspace manifests for publish
         run: |
           set -euo pipefail
@@ -770,7 +741,6 @@ jobs:
           if-no-files-found: error
 
   publish_staging_atlas:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Foundation - atlas
     needs: prepare_staging_publish
     runs-on: ubuntu-latest-l
@@ -819,7 +789,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/atlas --access public --tag "$NPM_TAG"
 
   publish_staging_foundation:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Foundation - ${{ matrix.name }}
     needs: [prepare_staging_publish, publish_staging_atlas]
     runs-on: ubuntu-latest-l
@@ -898,7 +867,6 @@ jobs:
         run: ${{ matrix.publish }}
 
   publish_staging_hooks_and_core:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Hooks/Core Base - ${{ matrix.name }}
     needs: publish_staging_foundation
     runs-on: ubuntu-latest-l
@@ -960,7 +928,6 @@ jobs:
         run: ${{ matrix.publish }}
 
   publish_staging_hooks_adapters:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Hooks Adapter - ${{ matrix.name }}
     needs: publish_staging_hooks_and_core
     runs-on: ubuntu-latest-l
@@ -1038,7 +1005,6 @@ jobs:
         run: npm publish --workspace=${{ matrix.workspace }} --access public --tag "$NPM_TAG"
 
   publish_staging_hooks_cli:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Hooks Mux CLI
     needs: publish_staging_hooks_adapters
     runs-on: ubuntu-latest-l
@@ -1087,7 +1053,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/hooks-mux-cli --access public --tag "$NPM_TAG"
 
   publish_staging_agent_mux_leaf:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux Leaf - ${{ matrix.name }}
     needs: publish_staging_hooks_and_core
     runs-on: ubuntu-latest-l
@@ -1167,7 +1132,6 @@ jobs:
         run: npm publish --workspace=${{ matrix.workspace }} --access public --tag "$NPM_TAG"
 
   publish_staging_agent_mux_gateway:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux Gateway
     needs: publish_staging_agent_mux_leaf
     runs-on: ubuntu-latest-l
@@ -1223,7 +1187,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/agent-mux-gateway --access public --tag "$NPM_TAG"
 
   publish_staging_agent_mux_cli:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux CLI
     needs: publish_staging_agent_mux_gateway
     runs-on: ubuntu-latest-l
@@ -1270,7 +1233,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/agent-mux-cli --access public --tag "$NPM_TAG"
 
   publish_staging_agent_mux_root:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux Root
     needs: publish_staging_agent_mux_cli
     runs-on: ubuntu-latest-l
@@ -1329,7 +1291,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/agent-mux --access public --tag "$NPM_TAG"
 
   publish_staging_agent_mux_tui:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Mux TUI
     needs: publish_staging_agent_mux_root
     runs-on: ubuntu-latest-l
@@ -1389,7 +1350,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/agent-mux-tui --access public --tag "$NPM_TAG"
 
   publish_staging_sdk:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Babysitter SDK
     needs: publish_staging_agent_mux_root
     runs-on: ubuntu-latest-l
@@ -1444,7 +1404,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/babysitter-sdk --access public --tag "$NPM_TAG"
 
   publish_staging_agent_core:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Agent Core
     needs: publish_staging_sdk
     runs-on: ubuntu-latest-l
@@ -1496,7 +1455,6 @@ jobs:
         run: npm publish --workspace=@a5c-ai/agent-core --access public --tag "$NPM_TAG"
 
   publish_staging_babysitter_agent:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Babysitter Agent
     needs: publish_staging_agent_core
     runs-on: ubuntu-latest-l
@@ -1549,7 +1507,7 @@ jobs:
         run: npm publish --workspace=@a5c-ai/babysitter-agent --access public --tag "$NPM_TAG"
 
   deploy_docs_site:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') && github.ref_name != 'develop' }}
+    if: ${{ github.ref_name != 'develop' }}
     name: Deploy Docs Site
     needs:
       - build_all
@@ -1602,7 +1560,6 @@ jobs:
         uses: actions/deploy-pages@v5
 
   deploy_atlas_webui:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Deploy Atlas WebUI To AKS
     needs:
       - build_all
@@ -1629,15 +1586,12 @@ jobs:
           [[ -n "${AZURE_CLIENT_ID_VAR}" ]] || missing+=("AZURE_APPLICATION_CLIENT_ID")
           [[ -n "${AZURE_CLIENT_SECRET}" ]] || missing+=("AZURE_APPLICATION_CLIENT_SECRET")
           [[ -n "${ACR_NAME}" ]] || missing+=("AZURE_ACR_NAME")
-          if (( ${#missing[@]} == 0 )); then
-            echo "deploy_enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "deploy_enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Atlas WebUI deploy skipped — missing: ${missing[*]}"
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::Atlas WebUI deploy missing required configuration: ${missing[*]}"
+            exit 1
           fi
 
       - name: Resolve deployment target
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           case "${GITHUB_REF_NAME}" in
             main)    NS=atlas;         HOST=atlas.a5c.ai;         RG="${{ vars.A5C_CLOUD_PROD_RESOURCE_GROUP }}" ;;
@@ -1650,24 +1604,20 @@ jobs:
           echo "AZURE_RESOURCE_GROUP=$RG" >> "$GITHUB_ENV"
 
       - name: Configure kubectl
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           mkdir -p "$HOME/.kube"
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > "$HOME/.kube/config"
           chmod 600 "$HOME/.kube/config"
 
       - name: Azure login for ACR push
-        if: steps.config.outputs.deploy_enabled == 'true'
         uses: azure/login@v2
         with:
           creds: '{"clientId":"${{ vars.AZURE_APPLICATION_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_APPLICATION_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
 
       - name: Set up Docker Buildx
-        if: steps.config.outputs.deploy_enabled == 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push image
-        if: steps.config.outputs.deploy_enabled == 'true'
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -1682,7 +1632,6 @@ jobs:
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Create ACR pull secret
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
           ACR_TOKEN=$(az acr login --name "$ACR_NAME" --expose-token --output tsv --query accessToken)
@@ -1693,7 +1642,6 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Create Atlas auth secret
-        if: steps.config.outputs.deploy_enabled == 'true'
         env:
           ATLAS_GITHUB_CLIENT_ID: ${{ vars.ATLAS_GITHUB_CLIENT_ID }}
           ATLAS_GITHUB_CLIENT_SECRET: ${{ secrets.ATLAS_GITHUB_CLIENT_SECRET }}
@@ -1705,11 +1653,10 @@ jobs:
               --from-literal=AUTH_SECRET="$(openssl rand -hex 32)" \
               --dry-run=client -o yaml | kubectl apply -f -
           else
-            echo "::notice::Skipping atlas-auth secret — GitHub OAuth not configured"
+            echo "::notice::Atlas GitHub OAuth not configured"
           fi
 
       - name: Provision Atlas Postgres
-        if: steps.config.outputs.deploy_enabled == 'true'
         env:
           ATLAS_POSTGRES_STORAGE_ACCOUNT: ${{ vars.ATLAS_POSTGRES_STORAGE_ACCOUNT }}
           ATLAS_POSTGRES_STORAGE_KEY: ${{ secrets.ATLAS_POSTGRES_STORAGE_KEY }}
@@ -1908,7 +1855,6 @@ jobs:
           fi
 
       - name: Initialize Atlas database
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           kubectl -n "$KUBE_NAMESPACE" delete job atlas-webui-db-init --ignore-not-found
           cat <<EOF | kubectl apply -f -
@@ -1951,7 +1897,6 @@ jobs:
           fi
 
       - name: Deploy Atlas WebUI
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           cat <<EOF | kubectl apply -f -
           apiVersion: apps/v1
@@ -2056,7 +2001,6 @@ jobs:
           kubectl -n "$KUBE_NAMESPACE" rollout status deployment/"$APP_NAME" --timeout=600s
 
   deploy_krate:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Deploy Krate To AKS
     needs:
       - validate_krate
@@ -2096,15 +2040,12 @@ jobs:
           [[ -n "${ACR_NAME}" ]] || missing+=("AZURE_ACR_NAME")
           [[ -n "${KRATE_GITHUB_CLIENT_ID}" ]] || echo "::notice::KRATE_GITHUB_CLIENT_ID not set — GitHub OAuth will be disabled"
           [[ -n "${KRATE_GITHUB_CLIENT_SECRET}" ]] || echo "::notice::KRATE_GITHUB_CLIENT_SECRET not set — GitHub OAuth will be disabled"
-          if (( ${#missing[@]} == 0 )); then
-            echo "deploy_enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "deploy_enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Krate deploy skipped — missing: ${missing[*]}"
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::Krate deploy missing required configuration: ${missing[*]}"
+            exit 1
           fi
 
       - name: Resolve deployment target
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           case "${GITHUB_REF_NAME}" in
             main)    NS=krate;         HOST=krate.a5c.ai ;;
@@ -2116,24 +2057,20 @@ jobs:
           echo "APP_HOST=$HOST" >> "$GITHUB_ENV"
 
       - name: Configure kubectl
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           mkdir -p "$HOME/.kube"
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > "$HOME/.kube/config"
           chmod 600 "$HOME/.kube/config"
 
       - name: Azure login for ACR push
-        if: steps.config.outputs.deploy_enabled == 'true'
         uses: azure/login@v2
         with:
           creds: '{"clientId":"${{ vars.AZURE_APPLICATION_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_APPLICATION_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
 
       - name: Set up Docker Buildx
-        if: steps.config.outputs.deploy_enabled == 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push krate-controller image
-        if: steps.config.outputs.deploy_enabled == 'true'
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -2148,7 +2085,6 @@ jobs:
           echo "KRATE_CONTROLLER_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Build and push krate-web image
-        if: steps.config.outputs.deploy_enabled == 'true'
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -2162,7 +2098,6 @@ jobs:
           echo "KRATE_WEB_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Create ACR pull secret
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
           ACR_TOKEN=$(az acr login --name "$ACR_NAME" --expose-token --output tsv --query accessToken)
@@ -2173,27 +2108,22 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Clean up pre-Helm resources
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           kubectl -n "$KUBE_NAMESPACE" delete ingress krate --ignore-not-found
           kubectl -n "$KUBE_NAMESPACE" delete service krate --ignore-not-found
           kubectl -n "$KUBE_NAMESPACE" delete deployment krate --ignore-not-found
 
       - name: Remove standalone KubeVela release (now managed as krate subchart)
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: helm uninstall kubevela -n vela-system 2>/dev/null || true
 
       - name: Build Helm chart dependencies
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: |
           helm dependency update packages/krate/charts 2>&1 || echo "::notice::Helm dependency update completed (some repos may be unavailable)"
 
       - name: Update Krate CRDs
-        if: steps.config.outputs.deploy_enabled == 'true'
         run: kubectl apply -f packages/krate/charts/crds/ --server-side --force-conflicts
 
       - name: Deploy Krate via Helm
-        if: steps.config.outputs.deploy_enabled == 'true'
         env:
           KRATE_GITHUB_CLIENT_ID: ${{ vars.KRATE_GITHUB_CLIENT_ID }}
           KRATE_GITHUB_CLIENT_SECRET: ${{ secrets.KRATE_GITHUB_CLIENT_SECRET }}
@@ -2237,7 +2167,6 @@ jobs:
             | xargs -r kubectl -n "$KUBE_NAMESPACE" delete --force --grace-period=0 2>/dev/null || true
 
   deploy_staging_cloud:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Deploy Cloud
     needs:
       - prepare_staging_publish
@@ -2319,7 +2248,6 @@ jobs:
           npm run deploy:cloud:prod
 
   publish_staging_metapackage:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Publish Metapackage
     needs:
       - publish_staging_agent_mux_tui
@@ -2372,7 +2300,6 @@ jobs:
         working-directory: packages/babysitter
 
   create_release_tag:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Create Release Tag
     needs:
       - publish_staging_metapackage
@@ -2380,7 +2307,6 @@ jobs:
     secrets: inherit
 
   sync_external_plugins:
-    if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
     name: Sync External Plugins
     needs:
       - create_release_tag

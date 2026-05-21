@@ -37,14 +37,12 @@ function encodePayload(value) {
   return Buffer.from(JSON.stringify(value), 'utf8').toString('base64');
 }
 
-function parseShellJson(result, fallback = {}) {
+function parseShellJson(result) {
   const stdout = typeof result === 'string' ? result : result?.stdout;
-  if (!stdout || typeof stdout !== 'string') return fallback;
-  try {
-    return JSON.parse(stdout.trim());
-  } catch {
-    return fallback;
+  if (!stdout || typeof stdout !== 'string') {
+    throw new Error('task did not produce JSON stdout');
   }
+  return JSON.parse(stdout.trim());
 }
 
 const prepareOutputDirScript = String.raw`
@@ -59,19 +57,20 @@ const fs = require('node:fs');
 const path = require('node:path');
 const payload = JSON.parse(Buffer.from(process.argv[1], 'base64').toString('utf8'));
 const paragraphs = new Map();
-for (const shard of payload.summaryShards || []) {
-  for (const paragraph of shard?.paragraphs || []) {
-    paragraphs.set(Number(paragraph.index), {
-      index: Number(paragraph.index),
-      title: String(paragraph.title || 'Paragraph ' + paragraph.index),
-      english: String(paragraph.english || '').trim(),
+for (const shard of payload.summaryShards) {
+  for (const paragraph of shard.paragraphs) {
+    const index = Number(paragraph.index);
+    paragraphs.set(index, {
+      index,
+      title: String(paragraph.title).trim(),
+      english: String(paragraph.english).trim(),
     });
   }
 }
 const translations = new Map();
-for (const shard of payload.translationShards || []) {
-  for (const translation of shard?.translations || []) {
-    translations.set(Number(translation.index), String(translation.greek || '').trim());
+for (const shard of payload.translationShards) {
+  for (const translation of shard.translations) {
+    translations.set(Number(translation.index), String(translation.greek).trim());
   }
 }
 const lines = [
@@ -81,8 +80,11 @@ const lines = [
   '',
 ];
 for (let index = 1; index <= 12; index += 1) {
-  const paragraph = paragraphs.get(index) || { index, title: 'Paragraph ' + index, english: '' };
-  const greek = translations.get(index) || '';
+  const paragraph = paragraphs.get(index);
+  const greek = translations.get(index);
+  if (!paragraph || !paragraph.title || !paragraph.english || !greek) {
+    throw new Error('missing assembled paragraph or translation for index ' + index);
+  }
   lines.push('## ' + index + '. ' + paragraph.title, '', paragraph.english, '', '**Greek:**', '', greek, '');
 }
 const markdown = lines.join('\n').trim() + '\n';
@@ -100,7 +102,8 @@ const fs = require('node:fs');
 const payload = JSON.parse(Buffer.from(process.argv[1], 'base64').toString('utf8'));
 const content = fs.readFileSync(payload.filePath, 'utf8');
 const size = Buffer.byteLength(content, 'utf8');
-const headingCount = (content.match(/^##\s+\d+\./gm) || []).length;
+const headingMatches = content.match(/^##\s+\d+\./gm);
+const headingCount = headingMatches ? headingMatches.length : 0;
 const hasGreek = /[\u0370-\u03ff]/.test(content);
 if (size <= 500) throw new Error('document too small: ' + size + ' bytes');
 if (headingCount !== 12) throw new Error('expected 12 paragraph headings, found ' + headingCount);

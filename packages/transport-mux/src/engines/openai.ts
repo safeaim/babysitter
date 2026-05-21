@@ -287,8 +287,9 @@ export function createOpenAICompletionEngine(options: {
               };
               return;
             }
-          } catch {
-            // skip malformed chunks
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error(`Failed to parse OpenAI chat stream chunk: ${message}`);
           }
         }
       }

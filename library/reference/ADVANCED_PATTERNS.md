@@ -569,12 +569,140 @@ All task kinds use the same `ctx.task()` API - the orchestrator routes based on 
 
 ---
 
+---
+
+## Pattern 8: `page.setContent` Stub for Playwright Structural Specs
+
+### Concept
+
+When a babysitter run authors new UI features that need Playwright coverage, the temptation is to write full end-to-end tests that boot a browser, sign in, hit the real auth provider, seed a database, and click through the actual UI. That's the right test for *behaviour*, but it's the wrong test for the *structural contract* — "the new `pantry-sticky-header` testid exists, the merge banner is inside the sticky region, the path-switcher has 3 tiles instead of 2." Those are markup invariants. Boot-the-world tests for markup invariants are slow, flaky, and tightly coupled to auth + DB seed plumbing.
+
+A faster, more reliable pattern from production usage of babysitter on the [cookbook project](https://github.com/rogelsm/cookbook):
+
+**Use `page.setContent(html)` to inject the expected markup atomically, then assert testids and class shapes — no navigation, no DB, no flakes.**
+
+### The pattern, side by side
+
+```ts
+// ❌ Flaky pattern (race between navigation + DOM injection)
+async function stubFlaky(page) {
+  await page.goto('/login');
+  await page.evaluate(() => {
+    document.body.innerHTML = '';
+  });
+  await page.evaluate(() => {
+    const root = document.createElement('div');
+    root.innerHTML = `<section data-testid="my-feature">…</section>`;
+    document.body.appendChild(root);
+  });
+}
+```
+
+```ts
+// ✅ Atomic pattern (no navigation, no race)
+async function stubAtomic(page) {
+  const html = `<!doctype html>
+    <html><head><style>/* inline css for the assertions you care about */</style></head>
+    <body>
+      <section data-testid="my-feature">…</section>
+      <div style="height: 2000px"></div>  <!-- tall sentinel for scroll tests -->
+    </body></html>`;
+  await page.setContent(html, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('[data-testid="my-feature"]', { state: 'attached' });
+}
+```
+
+### Why it works
+
+- `page.setContent()` replaces the entire document in one operation — no race with hydration, no leftover login-page markup, no router replacing your DOM.
+- `waitUntil: 'domcontentloaded'` returns as soon as the markup is parsed (faster than `networkidle`).
+- The follow-up `waitForSelector(..., { state: 'attached' })` is belt-and-braces: it ensures any synchronous assertions immediately after the stub call see the markup.
+
+### Real-world measurement
+
+One cookbook run (`01KS3BNJ` · 2026-05-20) used the original `goto + evaluate + appendChild` pattern:
+- 4/6 tests passing (2 unexpected failures + 2 flaky on retry)
+- 1 minute 42 seconds total wall time across the spec
+
+After switching to `page.setContent`:
+- 6/6 tests passing cleanly, zero retries
+- 5.5 seconds total wall time
+
+That's **~20× faster** with **no flakes**. The pattern was then adopted from the start in the next four playwright spec authoring rounds and remained flake-free through all of them.
+
+### When NOT to use this
+
+- **You're testing behaviour that depends on real auth or DB state.** A stub can't catch RLS bugs, server-action validation errors, or auth-gate redirects. Keep your full e2e specs for those.
+- **You're testing client-side hydration or React state.** Stub markup is dead HTML; React doesn't mount.
+- **You're testing scroll behaviour that depends on the real CSS bundle.** Inlining a huge chunk of Tailwind defeats the purpose; a real navigation is cheaper at that point.
+
+### When TO use this
+
+- **Markup contract tests** — "this testid exists, this aria-label is set, this href points where it should."
+- **Layout invariants** — "the responsive grid renders 3 columns at 1440px, 1 at 390px."
+- **Sticky / scroll invariants** — works fine because `setContent` honours your inlined CSS.
+- **Wire-up assertions** — "the merge banner is rendered inside the sticky header container, not as a sibling."
+
+### Spec scaffold
+
+```ts
+import { test, expect } from '@playwright/test';
+
+const STICKY_CLASSES =
+  'sticky top-0 z-20 -mx-3 px-3 pb-3 pt-2 bg-white/90 backdrop-blur-sm border-b';
+
+async function stubMyFeature(page: import('@playwright/test').Page) {
+  const html = `<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>stub</title>
+    <style>
+      .sticky { position: sticky; }
+      .top-0 { top: 0; }
+      .z-20 { z-index: 20; }
+      /* inline only what your assertions need */
+    </style>
+  </head>
+  <body>
+    <section data-testid="pantry-view">
+      <div data-testid="my-feature-header" class="${STICKY_CLASSES}">
+        <input data-testid="my-feature-input" />
+      </div>
+      <div style="height: 2000px"></div>
+    </section>
+  </body>
+</html>`;
+  await page.setContent(html, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('[data-testid="my-feature-header"]', { state: 'attached' });
+}
+
+test.describe('my feature · structural contract', () => {
+  test('the feature header is present', async ({ page }) => {
+    await stubMyFeature(page);
+    await expect(page.getByTestId('my-feature-header')).toBeVisible();
+    await expect(page.getByTestId('my-feature-input')).toBeVisible();
+  });
+});
+```
+
+### Trade-offs
+
+- **Coupling to markup.** Refactoring the component changes the stub. That's a feature, not a bug — it forces the stub to track the contract. But it does mean stubs need maintenance.
+- **Not a hydration test.** Anything that requires `useEffect`, `useState`, or Next.js client hydration won't fire. Real e2e specs cover that surface separately.
+- **No router context.** `useRouter()`, `useSearchParams()`, etc. won't work. If your component reads from them, pass equivalent data via props in the stub or set the URL beforehand with `page.goto('about:blank')` followed by `page.setContent`.
+
+### Reference
+
+The pattern crystallized during a multi-run development sprint on the cookbook project (May 2026), where it converted a flaky 1m42s spec into a 5.5s clean one. Four subsequent playwright spec authoring rounds adopted the pattern from the start; all stayed flake-free.
+
+---
+
 ## Summary
 
-These three patterns extend babysitter's capabilities:
+These patterns extend babysitter's capabilities:
 
 1. **Agent tasks** - LLM-powered work with structured I/O
 2. **Skill tasks** - Composable skill invocation
 3. **Iterative convergence** - Score-based improvement loops with safety mechanisms
+4. **`page.setContent` stub** - Atomic Playwright markup injection for structural-contract testing (Pattern 8)
 
-All patterns use the same SDK API (`ctx.task()`), maintaining consistency while enabling sophisticated workflows.
+All patterns use the same SDK API (`ctx.task()`) or standard Playwright APIs, maintaining consistency while enabling sophisticated workflows.

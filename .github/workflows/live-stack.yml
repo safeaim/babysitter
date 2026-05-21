@@ -512,22 +512,25 @@ jobs:
 
           for dir in all-artifacts/live-stack-*-babysitter-plugin-*/ ; do
             [ -d "$dir" ] || continue
+            mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
+            proc_mode=$(echo "$dir" | grep -oP '(?<=interactive-|hooks-)(predefined|create|resume)' | head -1)
+            [ -z "$proc_mode" ] && proc_mode="predefined"
+            dur_file=$(find "$dir" -name "duration-seconds.txt" | head -1)
+            if [ -n "$dur_file" ] && [ -f "$dur_file" ]; then
+              dur_s=$(cat "$dur_file"); runtime="$((dur_s / 60))m$((dur_s % 60))s"
+            else
+              runtime="—"
+            fi
+
             report=$(find "$dir" -name "verification-report.md" | head -1)
+            json_artifact=$(find "$dir" -name "live.agent-mux.*.json" | head -1)
+
             if [ -n "$report" ] && [ -f "$report" ]; then
               agent=$(grep -oP '(?<=\*\*Agent:\*\* ).*' "$report" | head -1 || echo "?")
               provider=$(grep -oP '(?<=\*\*Provider:\*\* ).*' "$report" | head -1 || echo "?")
               model=$(grep -oP '(?<=\*\*Model:\*\* ).*' "$report" | head -1 || echo "?")
-              mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
-              proc_mode=$(echo "$dir" | grep -oP '(?<=interactive-)(predefined|create|resume)' | head -1)
-              [ -z "$proc_mode" ] && proc_mode="predefined"
               failures=$(grep -c '✗' "$report" 2>/dev/null || true)
               passes=$(grep -c '✓' "$report" 2>/dev/null || true)
-              dur_file=$(find "$dir" -name "duration-seconds.txt" | head -1)
-              if [ -n "$dur_file" ] && [ -f "$dur_file" ]; then
-                dur_s=$(cat "$dur_file"); runtime="$((dur_s / 60))m$((dur_s % 60))s"
-              else
-                runtime="—"
-              fi
               if [ "${failures:-0}" -gt 0 ]; then
                 status="❌"; bp_fail=$((bp_fail + 1))
                 detail=$(grep '✗' "$report" | head -1 | sed 's/.*| //;s/ |.*//' || echo "")
@@ -535,7 +538,21 @@ jobs:
                 status="✅"; bp_pass=$((bp_pass + 1))
                 detail="${passes:-0} checks"
               fi
-              echo "| ${agent} | ${provider} | ${model} | ${mode} | ${proc_mode} | ${runtime} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
+            elif [ -n "$json_artifact" ] && [ -f "$json_artifact" ]; then
+              agent=$(node -e "const d=JSON.parse(require('fs').readFileSync('$json_artifact','utf8')); console.log(d.evidence?.scenarioId?.split('.')[2] || '?')" 2>/dev/null || echo "?")
+              provider=$(node -e "const d=JSON.parse(require('fs').readFileSync('$json_artifact','utf8')); console.log(d.evidence?.provider || '?')" 2>/dev/null || echo "?")
+              model=$(node -e "const d=JSON.parse(require('fs').readFileSync('$json_artifact','utf8')); console.log(d.evidence?.model || '?')" 2>/dev/null || echo "?")
+              result_status=$(node -e "const d=JSON.parse(require('fs').readFileSync('$json_artifact','utf8')); console.log(d.status || 'unknown')" 2>/dev/null || echo "unknown")
+              if [ "$result_status" = "passed" ]; then
+                status="✅"; bp_pass=$((bp_pass + 1)); detail="passed (json)"
+              else
+                status="❌"; bp_fail=$((bp_fail + 1)); detail="$result_status (json)"
+              fi
+            else
+              agent="?"; provider="—"; model="—"
+              status="⊘"; bp_skip=$((bp_skip + 1)); detail="no report"
+            fi
+            echo "| ${agent} | ${provider} | ${model} | ${mode} | ${proc_mode} | ${runtime} | ${status} | ${detail} |" >> "$GITHUB_STEP_SUMMARY"
             else
               mode=$(echo "$dir" | grep -oP '(bridged-hooks|bridged-interactive|interactive|non-interactive)' | head -1 || echo "?")
               echo "| ? | — | — | ${mode} | — | — | ⊘ | skipped |" >> "$GITHUB_STEP_SUMMARY"

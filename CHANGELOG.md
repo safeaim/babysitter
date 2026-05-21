@@ -8,6 +8,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - 2026-05-21
 
 ### feat
+- c44ac9b52 feat(ci): add fix-broken-latest-tags script and workflow (Tal Muskal, 56 minutes ago)
+- 30895c64c feat: v6.1 graph alignment babysitter process definition (Tal Muskal, 9 hours ago)
+- e3ace9f1b feat(mcp): add initial MCP server configuration for atlas (Tal Muskal, 11 hours ago)
+- e920fef11 feat(live-stack): add OS to job names and report tables (Tal Muskal, 13 hours ago)
+
+### fix
+- a2e883985 fix(ci): rename breakpoints-mux → tasks-mux in all workflows (Tal Muskal, 9 minutes ago)
+- c231e9e09 fix(npm): also flag plugin 5.0.0 as bad publish batch (Tal Muskal, 18 minutes ago)
+- 5294f1f23 fix(npm): validate plugin sdkVersion references actual published SDK (Tal Muskal, 24 minutes ago)
+- 60d7727cf fix(npm): add SDK install fallback and fix staging-on-latest detection (Tal Muskal, 35 minutes ago)
+- 9abaa9513 fix(ci): run publish install steps explicitly (Tal Muskal, 6 hours ago)
+- c2c0dbae4 fix(ci): remove publish skip gates (Tal Muskal, 6 hours ago)
+- 28347f861 fix(transport-mux): terminate responses SSE streams (Tal Muskal, 6 hours ago)
+- 8737c45a8 fix(live-stack): remove output bridge fallback (Tal Muskal, 6 hours ago)
+- 7cb50207f fix(ci): align workflows with extension mux rename (Tal Muskal, 7 hours ago)
+- b0bc4c35e fix(live-stack): build extension mux workspace (Tal Muskal, 7 hours ago)
+- 6f865e961 fix(live-stack): remove skip fallbacks (Tal Muskal, 7 hours ago)
+- 15b26de69 fix(live-stack): remove live fallback skips (Tal Muskal, 7 hours ago)
+- d60ea34a8 fix(live-stack): fail live evidence gaps (Tal Muskal, 8 hours ago)
+- 42336868f fix(live-stack): reset create-mode process scope (Tal Muskal, 8 hours ago)
+- 142e76f60 fix(agent-plan-dispatch): update process execution command in comments (Tal Muskal, 8 hours ago)
+- d6938a962 fix(live-stack): summarize skipped live-agent lanes (Tal Muskal, 8 hours ago)
+- 59f3a98d0 fix(live-stack): allow agent-unavailable coverage skips (Tal Muskal, 8 hours ago)
+- 235879270 fix(live-stack): skip invalid bridged transcripts (Tal Muskal, 9 hours ago)
+- 11987bc84 fix(live-stack): classify bridged transcript artifacts (Tal Muskal, 9 hours ago)
+- 3f3d6fccf fix(live-stack): skip login and empty tool-use transcripts (Tal Muskal, 9 hours ago)
+- c1fec6ceb fix(live-stack): classify transient live agent failures (Tal Muskal, 10 hours ago)
+- 5db31fee5 fix(live-stack): remove reference process in create mode setup (Tal Muskal, 12 hours ago)
+- 416aa66e5 fix(live-stack): stricter create mode — no reference process, clearer prompt (Tal Muskal, 12 hours ago)
+- 63253deb1 fix(agent-mux): use shell on Windows for npm install commands (Tal Muskal, 13 hours ago)
+- 297873662 fix(live-stack): push defaults use create only (no predefined), add pi+kimi to BP (Tal Muskal, 13 hours ago)
+- 945f4649b fix(live-stack): replace resume with create in push defaults (Tal Muskal, 13 hours ago)
+- 31ea47fdc fix(live-stack): report falls back to JSON artifact when no markdown report (Tal Muskal, 13 hours ago)
+- 05d599a10 fix(live-stack): set LIVE_STACK_BRIDGE_HOOKS=true in interactive fallback (Tal Muskal, 14 hours ago)
+- 659b2a4c3 fix(ci): add push trigger to qa-daily for workflow discovery (Tal Muskal, 14 hours ago)
+- 22c3fc507 fix(ci): add --force-local to tar for Windows drive letter paths (Tal Muskal, 19 hours ago)
+
+### refactor
+- fd222f1ce refactor: rename breakpoints-mux → tasks-mux (Tal Muskal, 7 hours ago)
+- 6fa60bb7e refactor: rename agent-plugins-mux → extension-mux (Tal Muskal, 7 hours ago)
+
+### docs
+- 9e0ad1f88 docs: v6.1 agent layer capabilities — what core/runtime/platform should do (Tal Muskal, 8 hours ago)
+- 5183b3caf docs: v6.1 agent stack decomposition — babysitter-agent, agent-core, SDK (Tal Muskal, 9 hours ago)
+- 909da7cf4 docs: v6.1 graph alignment task list — 66 tasks across 5 phases (Tal Muskal, 9 hours ago)
+- 3070405aa docs: v6.1 mux architecture deep dive — 9 canonical muxes vs packages (Tal Muskal, 10 hours ago)
+- 8170b0775 docs: v6.1 spec — layer-to-package gap analysis (Tal Muskal, 11 hours ago)
+- effad49e6 docs: daily changelog update (github-actions[bot], 14 hours ago)
+
+### chore
+- b1a6542a2 chore: set sdkVersion to 5.0.1-staging.28347f861706 [skip publish] (github-actions[bot], 6 hours ago)
+- 46733254c chore: set sdkVersion to 5.0.1-staging.8737c45a8424 [skip publish] (github-actions[bot], 6 hours ago)
+- e5bf90164 chore: set sdkVersion to 5.0.1-staging.7cb50207f287 [skip publish] (github-actions[bot], 6 hours ago)
+- 9d9d98838 chore: set sdkVersion to 5.0.1-staging.132f1714ba54 [skip publish] (github-actions[bot], 7 hours ago)
+- d4435ef57 Complete transport-mux codec architecture (a5c agent, 7 hours ago)
+- 132f1714b chore: remove v6.1 process file — work tracked via GitHub issues (Tal Muskal, 8 hours ago)
+- bfe9083b0 chore: set sdkVersion to 5.0.1-staging.59f3a98d09ae [skip publish] (github-actions[bot], 8 hours ago)
+- 6d25bb238 chore: set sdkVersion to 5.0.1-staging.5183b3caf612 [skip publish] (github-actions[bot], 9 hours ago)
+- 1a6fde4ae chore: set sdkVersion to 5.0.1-staging.c1fec6cebbe7 [skip publish] (github-actions[bot], 9 hours ago)
+- 544743aee chore: set sdkVersion to 5.0.1-staging.8170b077568f [skip publish] (github-actions[bot], 11 hours ago)
+- 26db07fcd chore: set sdkVersion to 5.0.1-staging.5db31fee5f41 [skip publish] (github-actions[bot], 12 hours ago)
+- 144e41f5b chore: set sdkVersion to 5.0.1-staging.e920fef118ef [skip publish] (github-actions[bot], 12 hours ago)
+- c6c2eff27 chore: set sdkVersion to 5.0.1-staging.945f4649b501 [skip publish] (github-actions[bot], 13 hours ago)
+- 3c004881b chore: set sdkVersion to 5.0.1-staging.659b2a4c3b27 [skip publish] (github-actions[bot], 14 hours ago)
+- d3bea7003 chore: set sdkVersion to 5.0.1-staging.22c3fc50735d [skip publish] (github-actions[bot], 19 hours ago)
+
+## [Unreleased] - 2026-05-21
+
+### feat
 - f493c5821 feat(ci): add QA Daily workflow — comprehensive daily automation (Tal Muskal, 14 hours ago)
 - 1531be36b feat(krate-web): KServe inference service UI, test panel, agent stack integration (Tal Muskal, 17 hours ago)
 - 208eb148d feat(krate): KServe inference service integration with model serving, V2 protocol, provider config (Tal Muskal, 18 hours ago)

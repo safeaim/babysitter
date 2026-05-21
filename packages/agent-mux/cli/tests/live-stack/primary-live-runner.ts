@@ -153,6 +153,7 @@ export function buildPrimaryLiveStackCommands(
         if (isInteractive && !process.stdin.isTTY) {
           commandEnv['LIVE_STACK_INTERACTIVE'] = 'false';
           commandEnv['LIVE_STACK_BRIDGE_INTERACTIVE'] = 'true';
+          commandEnv['LIVE_STACK_BRIDGE_HOOKS'] = 'true';
           return ['--no-interactive', '--bridge-hooks'];
         }
         return ['--no-interactive', ...bridgeFlags(options.env)];

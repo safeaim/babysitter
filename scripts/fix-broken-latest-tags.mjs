@@ -103,10 +103,10 @@ function pluginHasBrokenSdkVersion(name, version) {
 
 function findLastGoodPlugin(name) {
   const allVersions = JSON.parse(run(`npm view ${name} versions --json`) || '[]');
-  const nonStaging = allVersions.filter(v => !isStaging(v));
+  const candidates = allVersions.filter(v => !isStaging(v) && v !== '5.0.0');
 
-  for (let i = nonStaging.length - 1; i >= 0; i--) {
-    const v = nonStaging[i];
+  for (let i = candidates.length - 1; i >= 0; i--) {
+    const v = candidates[i];
     if (!pluginHasBrokenSdkVersion(name, v)) {
       const fc = parseInt(run(`npm view ${name}@${v} dist.fileCount`)) || 0;
       return { version: v, fileCount: fc, size: 0 };
@@ -153,10 +153,11 @@ async function main() {
     const size = parseInt(run(`npm view ${name}@${latest} dist.unpackedSize`)) || 0;
 
     const isStagingLatest = isStaging(latest);
-    const hasBrokenSdk = pluginHasBrokenSdkVersion(name, latest);
+    const isBadPublish = latest === '5.0.0';
+    const hasBrokenSdk = !isBadPublish && pluginHasBrokenSdkVersion(name, latest);
 
-    if (isStagingLatest || hasBrokenSdk) {
-      const reason = isStagingLatest ? 'staging' : 'broken-sdk';
+    if (isStagingLatest || isBadPublish || hasBrokenSdk) {
+      const reason = isStagingLatest ? 'staging' : isBadPublish ? 'bad-publish-5.0.0' : 'broken-sdk';
       const lastGood = findLastGoodPlugin(name);
       issues.push({ name, latest, reason, fileCount, size, lastGood });
     }
@@ -169,7 +170,8 @@ async function main() {
 
   console.log(`Found ${issues.length} package(s) with issues:\n`);
   for (const b of issues) {
-    const reasonLabel = b.reason === 'staging' ? 'STAGING on latest' : 'EMPTY/BROKEN';
+    const reasonLabels = { staging: 'STAGING on latest', 'bad-publish-5.0.0': 'BAD PUBLISH 5.0.0', 'broken-sdk': 'BROKEN SDK REF', empty: 'EMPTY/BROKEN' };
+    const reasonLabel = reasonLabels[b.reason] || 'EMPTY/BROKEN';
     console.log(`  ${b.name}@${b.latest} — ${reasonLabel} (${b.fileCount} files, ${b.size} bytes)`);
     if (b.lastGood) {
       console.log(`    Best non-staging: ${b.lastGood.version}${b.lastGood.fileCount ? ` (${b.lastGood.fileCount} files, ${b.lastGood.size} bytes)` : ''}`);

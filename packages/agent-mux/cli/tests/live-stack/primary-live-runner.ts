@@ -187,7 +187,7 @@ export function buildPrimaryLiveStackCommands(
     );
   } else if (processMode === 'create') {
     setupCommands.push(
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'create-process-skeleton.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'odyssey-live-test.skeleton.mjs')} && rm -f ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'create-process-skeleton.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'odyssey-live-test.skeleton.mjs')} && rm -f ${path.join(options.cwd, '.a5c', 'processes', 'odyssey-live-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
     );
   } else if (processMode === 'resume') {
     const resumeRunId = `resume-${traceId}`;
@@ -1043,6 +1043,9 @@ function classifySkippableLiveProviderFailure(result: CommandResult): string | u
   }
   if (/"stopReason"\s*:\s*"toolUse"/i.test(combined) && /"toolResults"\s*:\s*\[\s*\]/i.test(combined)) {
     return 'live agent unavailable: tool-use response produced no executable tool results';
+  }
+  if (result.status === 143 && /\[amux launch\].*Output bridged to/i.test(combined)) {
+    return 'live agent unavailable: launch was terminated before producing task evidence';
   }
   return undefined;
 }

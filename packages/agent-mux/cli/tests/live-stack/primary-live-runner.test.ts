@@ -220,6 +220,29 @@ describe('primary live stack runner contract', () => {
     expect(createRun).toBeUndefined();
   });
 
+  it('removes stale create-mode process files before exposing only the skeleton', () => {
+    const scenario = primaryLiveStackScenario();
+    const commands = buildPrimaryLiveStackCommands(scenario, {
+      cwd: '/repo',
+      timeoutMs: 1000,
+      env: {
+        AZURE_API_KEY: 'sk-live-secret',
+        AMUX_API_BASE: 'https://foundry.example.test',
+        LIVE_STACK_TRACE_ID: 'trace-1',
+        LIVE_STACK_PROCESS_MODE: 'create',
+      },
+    });
+
+    const createSetup = commands.find((command) => command.args.join(' ').includes('odyssey-live-test.skeleton.mjs'));
+    const setupScript = createSetup?.args.at(-1) ?? '';
+
+    expect(setupScript).toContain('create-process-skeleton.mjs');
+    expect(setupScript).toContain('odyssey-live-test.skeleton.mjs');
+    expect(setupScript).toContain('rm -f');
+    expect(setupScript).toContain('odyssey-live-test.mjs');
+    expect(setupScript).toContain('summarize-translate-test.mjs');
+  });
+
   it('passes explicit Google env to Gemini 3.1 Pro live lanes', () => {
     const scenario = liveStackScenarioFromEnv({
       LIVE_STACK_SCENARIO_ID: 'live.agent-mux.claude-code.google.gemini-3.1-pro',
@@ -651,6 +674,53 @@ describe('primary live stack runner contract', () => {
 
     expect(result.status).toBe('skipped');
     expect(result.skipReason).toContain('tool-use response produced no executable tool results');
+  });
+
+  it('skips terminated bridged launches that only bridge transcripts', async () => {
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-terminated-bridge-'));
+    const artifactsDir = path.join(cwd, 'artifacts');
+    const traceId = 'trace-terminated-bridge';
+
+    const result = await runPrimaryLiveStackScenario({
+      cwd,
+      artifactsDir,
+      executeLiveProvider: true,
+      requireRunnable: true,
+      env: {
+        AZURE_API_KEY: 'sk-live-secret',
+        AMUX_API_BASE: 'https://foundry.example.test',
+        LIVE_STACK_TRACE_ID: traceId,
+        LIVE_STACK_PROCESS_MODE: 'create',
+        LIVE_STACK_SCENARIO_ID: 'live.agent-mux.pi.foundry-openai.Kimi-K2.6',
+        LIVE_STACK_AGENT_PATH: 'agent-mux',
+        LIVE_STACK_AGENT: 'pi',
+        LIVE_STACK_AMUX_AGENT: 'pi',
+        LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+        LIVE_STACK_INSTALL_MODE: 'babysitter-plugin',
+        LIVE_STACK_PROVIDER: 'foundry-openai',
+        LIVE_STACK_AMUX_PROVIDER: 'foundry',
+        LIVE_STACK_MODEL: 'Kimi-K2.6',
+        LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+        LIVE_STACK_REQUIRED_ENV: 'AZURE_API_KEY,AMUX_API_BASE',
+        LIVE_STACK_LAYERS: 'babysitter-plugin',
+        LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+        LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted',
+      },
+      executeCommand: async (command) => {
+        if (!command.args.includes('launch')) return { status: 0, stdout: '{}', stderr: '' };
+        const transcript = '{"type":"message_start","message":{"role":"assistant","content":[],"stopReason":"stop"}}';
+        await fs.mkdir(path.join(cwd, '.a5c-live-test'), { recursive: true });
+        await fs.writeFile(path.join(cwd, '.a5c-live-test', `${traceId}-odyssey.md`), transcript.repeat(80));
+        return {
+          status: 143,
+          stdout: transcript,
+          stderr: '[amux launch] exit=143 captured=3444 chunks=6\n[amux launch] Output bridged to artifact',
+        };
+      },
+    });
+
+    expect(result.status).toBe('skipped');
+    expect(result.skipReason).toContain('terminated before producing task evidence');
   });
 
   it('skips successful bridged launches that only bridge non-task transcripts', async () => {

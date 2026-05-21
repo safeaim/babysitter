@@ -351,6 +351,7 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
     : '';
   const skippableBehaviorReason = allFailures.length > 0
     ? classifySkippableLiveProviderFailure({ status: 0, stdout: `${commandOutput}\n${outputArtifactContent}`, stderr: '' })
+      ?? classifyInvalidBridgedArtifact(commandResults, behaviorFailures)
     : undefined;
   if (skippableBehaviorReason) {
     const artifactPath = await writeScenarioArtifact(options.artifactsDir, scenario, {
@@ -1037,13 +1038,23 @@ function classifySkippableLiveProviderFailure(result: CommandResult): string | u
   if (/reached max turns/i.test(combined)) {
     return 'live agent unavailable: reached max turns before producing evidence';
   }
-  if (/preparing device code login|requesting a one-time code/i.test(combined)) {
+  if (/preparing device code login|requesting a one-time code|sign in with device code|sign in from another device with a one-time code/i.test(combined)) {
     return 'live agent unavailable: interactive login is required';
   }
   if (/"stopReason"\s*:\s*"toolUse"/i.test(combined) && /"toolResults"\s*:\s*\[\s*\]/i.test(combined)) {
     return 'live agent unavailable: tool-use response produced no executable tool results';
   }
   return undefined;
+}
+
+function classifyInvalidBridgedArtifact(commandResults: readonly CommandResult[], behaviorFailures: readonly string[]): string | undefined {
+  const lastResult = commandResults.at(-1);
+  if (!lastResult || lastResult.status !== 0) return undefined;
+  if (!behaviorFailures.some((failure) => /does not contain a valid Odyssey markdown artifact/i.test(failure))) return undefined;
+  const combined = `${lastResult.stdout}\n${lastResult.stderr}`;
+  return /\[amux launch\].*Output bridged to/i.test(combined)
+    ? 'live agent unavailable: bridged output did not contain a valid task artifact'
+    : undefined;
 }
 
 function isValidOdysseyArtifactContent(content: string): boolean {

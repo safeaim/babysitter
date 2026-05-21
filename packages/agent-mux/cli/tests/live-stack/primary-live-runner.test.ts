@@ -653,6 +653,47 @@ describe('primary live stack runner contract', () => {
     expect(result.skipReason).toContain('tool-use response produced no executable tool results');
   });
 
+  it('skips successful bridged launches that only bridge non-task transcripts', async () => {
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-invalid-bridge-'));
+    const artifactsDir = path.join(cwd, 'artifacts');
+    const traceId = 'trace-invalid-bridge';
+
+    const result = await runPrimaryLiveStackScenario({
+      cwd,
+      artifactsDir,
+      executeLiveProvider: true,
+      requireRunnable: true,
+      env: {
+        GOOGLE_API_KEY: 'google-secret',
+        LIVE_STACK_TRACE_ID: traceId,
+        LIVE_STACK_PROCESS_MODE: 'create',
+        LIVE_STACK_SCENARIO_ID: 'live.agent-mux.codex.google.gemini-3.1-pro-preview',
+        LIVE_STACK_AGENT_PATH: 'agent-mux',
+        LIVE_STACK_AGENT: 'codex',
+        LIVE_STACK_AMUX_AGENT: 'codex',
+        LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+        LIVE_STACK_INSTALL_MODE: 'babysitter-plugin',
+        LIVE_STACK_PROVIDER: 'google',
+        LIVE_STACK_AMUX_PROVIDER: 'google',
+        LIVE_STACK_MODEL: 'gemini-3.1-pro-preview',
+        LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+        LIVE_STACK_REQUIRED_ENV: 'GOOGLE_API_KEY',
+        LIVE_STACK_LAYERS: 'babysitter-plugin',
+        LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+        LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted',
+      },
+      executeCommand: async (command) => {
+        if (!command.args.includes('launch')) return { status: 0, stdout: '{}', stderr: '' };
+        await fs.mkdir(path.join(cwd, '.a5c-live-test'), { recursive: true });
+        await fs.writeFile(path.join(cwd, '.a5c-live-test', `${traceId}-odyssey.md`), 'terminal transcript without greek markdown\n'.repeat(80));
+        return { status: 0, stdout: 'terminal transcript without task output', stderr: '[amux launch] Output bridged to /tmp/out.md (2400 bytes)' };
+      },
+    });
+
+    expect(result.status).toBe('skipped');
+    expect(result.skipReason).toContain('bridged output did not contain a valid task artifact');
+  });
+
   it('writes a redacted failed artifact when live output lacks required joined trace IDs', async () => {
     const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-artifacts-'));
     const result = await runPrimaryLiveStackScenario({

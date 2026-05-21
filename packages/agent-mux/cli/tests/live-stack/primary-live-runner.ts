@@ -791,7 +791,7 @@ async function validateAgentBehavior(
     if (fileExists && hasRealContent) {
       entries.push({ name: 'file-creation', status: 'passed', detail: `odyssey file created (${fileSize} bytes)` });
     } else if (fileExists) {
-      entries.push({ name: 'file-creation', status: 'failed', detail: `odyssey file exists but too small (${fileSize} bytes — expected >500)` });
+      entries.push({ name: 'file-creation', status: 'failed', detail: `odyssey file exists but does not contain a valid Odyssey markdown artifact (${fileSize} bytes)` });
     } else {
       entries.push({ name: 'file-creation', status: 'failed', detail: `agent did not create .a5c-live-test/${traceId}-odyssey.md (output: ${output.length} chars)` });
     }
@@ -1033,6 +1033,9 @@ function classifySkippableLiveProviderFailure(result: CommandResult): string | u
   }
   if (/reached max turns/i.test(combined)) {
     return 'live agent unavailable: reached max turns before producing evidence';
+  }
+  if (/preparing device code login|requesting a one-time code/i.test(combined)) {
+    return 'live agent unavailable: interactive login is required';
   }
   if (/"stopReason"\s*:\s*"toolUse"/i.test(combined) && /"toolResults"\s*:\s*\[\s*\]/i.test(combined)) {
     return 'live agent unavailable: tool-use response produced no executable tool results';

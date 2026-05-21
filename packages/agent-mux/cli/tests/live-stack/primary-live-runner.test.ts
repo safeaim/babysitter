@@ -569,6 +569,90 @@ describe('primary live stack runner contract', () => {
     expect(result.skipReason).toContain('configured credentials were rejected');
   });
 
+  it('skips live agents that emit login UI instead of task output', async () => {
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-login-ui-'));
+    const artifactsDir = path.join(cwd, 'artifacts');
+    const traceId = 'trace-login-ui';
+
+    const result = await runPrimaryLiveStackScenario({
+      cwd,
+      artifactsDir,
+      executeLiveProvider: true,
+      requireRunnable: true,
+      env: {
+        GOOGLE_API_KEY: 'google-secret',
+        LIVE_STACK_TRACE_ID: traceId,
+        LIVE_STACK_PROCESS_MODE: 'create',
+        LIVE_STACK_SCENARIO_ID: 'live.agent-mux.codex.google.gemini-3.1-pro-preview',
+        LIVE_STACK_AGENT_PATH: 'agent-mux',
+        LIVE_STACK_AGENT: 'codex',
+        LIVE_STACK_AMUX_AGENT: 'codex',
+        LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+        LIVE_STACK_INSTALL_MODE: 'babysitter-plugin',
+        LIVE_STACK_PROVIDER: 'google',
+        LIVE_STACK_AMUX_PROVIDER: 'google',
+        LIVE_STACK_MODEL: 'gemini-3.1-pro-preview',
+        LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+        LIVE_STACK_REQUIRED_ENV: 'GOOGLE_API_KEY',
+        LIVE_STACK_LAYERS: 'babysitter-plugin',
+        LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+        LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted',
+      },
+      executeCommand: async (command) => {
+        if (!command.args.includes('launch')) return { status: 0, stdout: '{}', stderr: '' };
+        await fs.mkdir(path.join(cwd, '.a5c-live-test'), { recursive: true });
+        await fs.writeFile(path.join(cwd, '.a5c-live-test', `${traceId}-odyssey.md`), '# Welcome to Codex\n\nPreparing device code login\nRequesting a one-time code\n'.repeat(40));
+        return { status: 0, stdout: 'Welcome to Codex\nPreparing device code login\nRequesting a one-time code', stderr: '' };
+      },
+    });
+
+    expect(result.status).toBe('skipped');
+    expect(result.skipReason).toContain('interactive login is required');
+  });
+
+  it('skips live agents that request tools without executable tool results', async () => {
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-empty-tool-use-'));
+    const artifactsDir = path.join(cwd, 'artifacts');
+    const traceId = 'trace-empty-tool-use';
+
+    const result = await runPrimaryLiveStackScenario({
+      cwd,
+      artifactsDir,
+      executeLiveProvider: true,
+      requireRunnable: true,
+      env: {
+        AZURE_API_KEY: 'sk-live-secret',
+        AMUX_API_BASE: 'https://foundry.example.test',
+        LIVE_STACK_TRACE_ID: traceId,
+        LIVE_STACK_PROCESS_MODE: 'create',
+        LIVE_STACK_SCENARIO_ID: 'live.agent-mux.pi.foundry-openai.Kimi-K2.6',
+        LIVE_STACK_AGENT_PATH: 'agent-mux',
+        LIVE_STACK_AGENT: 'pi',
+        LIVE_STACK_AMUX_AGENT: 'pi',
+        LIVE_STACK_INTEGRATION_TYPE: 'third-party-plugin',
+        LIVE_STACK_INSTALL_MODE: 'babysitter-plugin',
+        LIVE_STACK_PROVIDER: 'foundry-openai',
+        LIVE_STACK_AMUX_PROVIDER: 'foundry',
+        LIVE_STACK_MODEL: 'Kimi-K2.6',
+        LIVE_STACK_CREDENTIAL_MODE: 'github-org-secrets-and-vars',
+        LIVE_STACK_REQUIRED_ENV: 'AZURE_API_KEY,AMUX_API_BASE',
+        LIVE_STACK_LAYERS: 'babysitter-plugin',
+        LIVE_STACK_REQUIRED_TRACE_IDS: 'agentMuxRunId,agentMuxSessionId,transportTraceId',
+        LIVE_STACK_EXPECTED_ARTIFACTS: 'agent-mux-events,plugin-command-transcript,transport-mux-trace,provider-trace-redacted',
+      },
+      executeCommand: async (command) => {
+        if (!command.args.includes('launch')) return { status: 0, stdout: '{}', stderr: '' };
+        const transcript = '{"type":"turn_end","message":{"stopReason":"toolUse"},"toolResults":[]}';
+        await fs.mkdir(path.join(cwd, '.a5c-live-test'), { recursive: true });
+        await fs.writeFile(path.join(cwd, '.a5c-live-test', `${traceId}-odyssey.md`), transcript.repeat(80));
+        return { status: 0, stdout: transcript, stderr: '' };
+      },
+    });
+
+    expect(result.status).toBe('skipped');
+    expect(result.skipReason).toContain('tool-use response produced no executable tool results');
+  });
+
   it('writes a redacted failed artifact when live output lacks required joined trace IDs', async () => {
     const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'live-stack-artifacts-'));
     const result = await runPrimaryLiveStackScenario({

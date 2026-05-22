@@ -303,21 +303,13 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
             }
           }
           // Look for .exe reference (Bun-compiled packages like Claude Code)
-          // npm .cmd shims use %~dp0 prefix for paths
-          const exePatterns = [
-            /"([^"]+\.exe)"/,
-            /%~dp0\\([^\s"]+\.exe)/,
-            /%~dp0([^\s"]+\.exe)/,
-          ];
-          for (const pattern of exePatterns) {
-            const exeMatch = cmdContent.match(pattern);
-            if (exeMatch?.[1]) {
-              const rawPath = exeMatch[1].replace(/%~dp0\\?/g, '');
-              const exePath = pathMod.resolve(pathMod.dirname(resolved), rawPath);
-              if (existsSync(exePath)) {
-                console.error(`[amux launch] resolved .cmd → .exe: ${exePath}`);
-                return { command: exePath, args, shell: false };
-              }
+          // npm .cmd shims use %dp0% or %~dp0 for the directory
+          const exeMatch = cmdContent.match(/"%(?:~?dp0)%\\([^"]+\.exe)"/);
+          if (exeMatch?.[1]) {
+            const exePath = pathMod.resolve(pathMod.dirname(resolved), exeMatch[1]);
+            if (existsSync(exePath)) {
+              console.error(`[amux launch] resolved .cmd → .exe: ${exePath}`);
+              return { command: exePath, args, shell: false };
             }
           }
         } catch { /* couldn't parse .cmd */ }

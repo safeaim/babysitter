@@ -77,6 +77,17 @@ attributes:
   supportsPersistedEnv: false
   envPersistenceMode: wrapper_only
   toolInterceptionScope: all
+  launchBehavior:
+    promptDelivery: cli-flag
+    promptFlag: "--prompt"
+    execSubcommand: null
+    resumeDelivery: null
+    resumeFlag: null
+    sessionIdFlag: null
+    maxTurnsFlag: null
+    stdinBehavior: close-after-prompt
+    selfExits: true
+    needsIdleKill: false
 
 edges:
   hosted_by:

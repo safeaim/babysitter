@@ -14,6 +14,7 @@ import {
 } from '@a5c-ai/agent-mux-core';
 import type { ProviderId, TransportId } from '@a5c-ai/agent-mux-core';
 import { translateForHarness } from '@a5c-ai/agent-mux-adapters';
+import { getLaunchBehavior } from '@a5c-ai/agent-catalog';
 import {
   getAutomationEnv,
   getBridgeCapabilities,
@@ -222,31 +223,42 @@ function insertCodexOptionArgs(plan: LaunchPlan, optionArgs: string[]): void {
 }
 function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void {
   const interactive = session.interactive !== false;
+  const lb = getLaunchBehavior(plan.harness);
 
-  switch (plan.harness) {
-    case 'claude':
-      if (session.resumeId) plan.args.push('--resume', session.resumeId);
-      if (session.sessionId) plan.args.push('--session-id', session.sessionId);
-      if (session.prompt && !interactive) {
-        plan.args.push('-p', session.prompt);
+  if (lb) {
+    // Resume handling
+    if (session.resumeId) {
+      if (lb.resumeDelivery === 'subcommand' && lb.resumeSubcommand) {
+        plan.args.unshift(lb.resumeSubcommand, session.resumeId);
+      } else if (lb.resumeDelivery === 'flag' && lb.resumeFlag) {
+        plan.args.push(lb.resumeFlag, session.resumeId);
       }
-      if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
-      break;
-    case 'codex':
-      if (session.resumeId) {
-        plan.args.unshift('resume', session.resumeId);
-      } else if (session.prompt && !interactive) {
-        plan.args.unshift('exec', session.prompt);
+    }
+
+    // Session ID
+    if (session.sessionId && lb.sessionIdFlag) {
+      plan.args.push(lb.sessionIdFlag, session.sessionId);
+    }
+
+    // Prompt delivery (non-interactive only for cli-flag/exec-subcommand)
+    if (session.prompt && !session.resumeId) {
+      if (lb.promptDelivery === 'cli-flag' && lb.promptFlag && !interactive) {
+        plan.args.push(lb.promptFlag, session.prompt);
+      } else if (lb.promptDelivery === 'exec-subcommand' && lb.execSubcommand && !interactive) {
+        plan.args.unshift(lb.execSubcommand, session.prompt);
       }
-      break;
-    case 'gemini':
-      if (session.prompt) plan.args.push('--prompt', session.prompt);
-      break;
-    case 'pi':
-      break;
-    case 'opencode':
-      if (session.resumeId) plan.args.push('--session', session.resumeId);
-      break;
+      // stdin delivery is handled after spawn via stdin.write()
+    }
+
+    // Max turns
+    if (session.maxTurns && lb.maxTurnsFlag) {
+      plan.args.push(lb.maxTurnsFlag, String(session.maxTurns));
+    }
+  } else {
+    // Fallback for unknown harnesses: prompt via stdin (handled after spawn)
+    if (session.resumeId) plan.args.push('--resume', session.resumeId);
+    if (session.sessionId) plan.args.push('--session-id', session.sessionId);
+    if (session.maxTurns) plan.args.push('--max-turns', String(session.maxTurns));
   }
 }
 
@@ -1381,7 +1393,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // Pipe stdout through + idle-timeout kill for harnesses that don't exit
     // after completing a non-interactive task (e.g., Pi doesn't exit on its own).
     // Harnesses with proper exit behavior (claude -p, codex exec) don't need this.
-    const niUseIdleKill = !new Set(['claude', 'codex', 'gemini', 'opencode']).has(plan.harness);
+    const _lb = getLaunchBehavior(plan.harness);
+    const niUseIdleKill = _lb ? _lb.needsIdleKill : true;
     let niIdleTimer: ReturnType<typeof setTimeout> | null = null;
     let niHasOutput = false;
     const NI_IDLE_TIMEOUT_MS = 30_000;
@@ -1442,27 +1455,25 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     process.on('exit', () => { try { ptyProcess.kill('SIGKILL'); } catch { /* */ } });
   }
 
-  const promptPassedAsFlag =
-    (plan.harness === 'pi' && !isInteractive && plan.args.includes('-p')) ||
-    (plan.harness === 'codex' && !isInteractive && plan.args.includes('exec')) ||
-    (plan.harness === 'claude' && !isInteractive && plan.args.includes('-p')) ||
-    (plan.harness === 'gemini' && !isInteractive && plan.args.includes('--prompt'));
-  if (prompt && child.stdin && !ptyProcess && !promptPassedAsFlag) {
+  const launchBehavior = getLaunchBehavior(plan.harness);
+  const promptDeliveredViaArgs = launchBehavior
+    ? launchBehavior.promptDelivery !== 'stdin'
+    : false;
+  const keepStdinOpen = launchBehavior?.stdinBehavior === 'keep-open';
+
+  if (prompt && child.stdin && !ptyProcess && !promptDeliveredViaArgs) {
     child.stdin.write(prompt + '\n');
-    const keepStdinOpen = plan.harness === 'pi' || plan.harness === 'hermes' || plan.harness === 'oh-my-pi';
     if (!isInteractive && !keepStdinOpen) {
       child.stdin.end();
     } else if (!isInteractive && keepStdinOpen) {
-      // Pi-family CLIs need stdin open to run tool-use loops; idle-kill handles termination
+      // Harnesses that need stdin open for tool-use loops; idle-kill handles termination
     } else {
       // Interactive with stdin pipe (no PTY): reconnect terminal stdin after prompt injection
       process.stdin.resume();
       process.stdin.pipe(child.stdin);
     }
   }
-  // Close stdin for harnesses where prompt was passed as a CLI flag (not via stdin)
-  // to prevent the process from hanging waiting for interactive input.
-  if (promptPassedAsFlag && child.stdin && !ptyProcess) {
+  if (promptDeliveredViaArgs && child.stdin && !ptyProcess) {
     child.stdin.end();
   }
 

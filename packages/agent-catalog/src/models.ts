@@ -612,8 +612,23 @@ export interface PluginTargetDescriptor {
   supportsPersistedEnv?: boolean;
   envPersistenceMode?: string;
   toolInterceptionScope?: string;
+  launchBehavior?: LaunchBehaviorDescriptor;
   supportedHooks: Record<string, string>;
   evidenceIds: string[];
+}
+
+export interface LaunchBehaviorDescriptor {
+  promptDelivery: 'cli-flag' | 'exec-subcommand' | 'stdin';
+  promptFlag?: string | null;
+  execSubcommand?: string | null;
+  resumeDelivery?: 'flag' | 'subcommand' | null;
+  resumeFlag?: string | null;
+  resumeSubcommand?: string | null;
+  sessionIdFlag?: string | null;
+  maxTurnsFlag?: string | null;
+  stdinBehavior: 'close-after-prompt' | 'keep-open';
+  selfExits: boolean;
+  needsIdleKill: boolean;
 }
 
 export interface HostDetectionRule {

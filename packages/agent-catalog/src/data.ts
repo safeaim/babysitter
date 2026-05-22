@@ -960,6 +960,21 @@ function buildPluginTargetDescriptors(_hooks: HookDescriptor[]): PluginTargetDes
       supportsPersistedEnv: node.supportsPersistedEnv === true || node.supportsPersistedEnv === "true" ? true : node.supportsPersistedEnv === false || node.supportsPersistedEnv === "false" ? false : undefined,
       envPersistenceMode: valueAsString(node.envPersistenceMode) || undefined,
       toolInterceptionScope: valueAsString(node.toolInterceptionScope) || undefined,
+      launchBehavior: node.launchBehavior && typeof node.launchBehavior === "object"
+        ? {
+            promptDelivery: (valueAsString((node.launchBehavior as GraphNode).promptDelivery) as "cli-flag" | "exec-subcommand" | "stdin") || "stdin",
+            promptFlag: valueAsString((node.launchBehavior as GraphNode).promptFlag) || null,
+            execSubcommand: valueAsString((node.launchBehavior as GraphNode).execSubcommand) || null,
+            resumeDelivery: (valueAsString((node.launchBehavior as GraphNode).resumeDelivery) as "flag" | "subcommand" | null) || null,
+            resumeFlag: valueAsString((node.launchBehavior as GraphNode).resumeFlag) || null,
+            resumeSubcommand: valueAsString((node.launchBehavior as GraphNode).resumeSubcommand) || null,
+            sessionIdFlag: valueAsString((node.launchBehavior as GraphNode).sessionIdFlag) || null,
+            maxTurnsFlag: valueAsString((node.launchBehavior as GraphNode).maxTurnsFlag) || null,
+            stdinBehavior: (valueAsString((node.launchBehavior as GraphNode).stdinBehavior) as "close-after-prompt" | "keep-open") || "close-after-prompt",
+            selfExits: (node.launchBehavior as GraphNode).selfExits === true || (node.launchBehavior as GraphNode).selfExits === "true",
+            needsIdleKill: (node.launchBehavior as GraphNode).needsIdleKill === true || (node.launchBehavior as GraphNode).needsIdleKill === "true",
+          }
+        : undefined,
       supportedHooks: supportedHooksForTarget(targetId),
       evidenceIds: [],
     };

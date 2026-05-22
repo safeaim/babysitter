@@ -76,6 +76,17 @@ attributes:
   supportsPersistedEnv: false
   envPersistenceMode: wrapper_only
   toolInterceptionScope: none
+  launchBehavior:
+    promptDelivery: stdin
+    promptFlag: null
+    execSubcommand: null
+    resumeDelivery: null
+    resumeFlag: null
+    sessionIdFlag: null
+    maxTurnsFlag: null
+    stdinBehavior: keep-open
+    selfExits: false
+    needsIdleKill: true
 
 edges:
   hosted_by:

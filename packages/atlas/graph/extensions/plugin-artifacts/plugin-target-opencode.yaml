@@ -76,6 +76,17 @@ attributes:
   supportsPersistedEnv: true
   envPersistenceMode: runtime_hook
   toolInterceptionScope: all
+  launchBehavior:
+    promptDelivery: stdin
+    promptFlag: null
+    execSubcommand: null
+    resumeDelivery: flag
+    resumeFlag: "--session"
+    sessionIdFlag: null
+    maxTurnsFlag: null
+    stdinBehavior: close-after-prompt
+    selfExits: true
+    needsIdleKill: false
 
 edges:
   hosted_by:

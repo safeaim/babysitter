@@ -63,6 +63,7 @@ import type {
   PackageSurfaceDescriptor,
   PackageTopology,
   PathDescriptorRecord,
+  LaunchBehaviorDescriptor,
   PluginTargetDescriptor,
   ProcessDescriptor,
   ProviderModelTopology,
@@ -1238,6 +1239,11 @@ export function getPluginTargetDescriptor(targetIdOrAdapterName: string): Plugin
   const target = PLUGIN_TARGETS.find((entry) => entry.targetId === targetIdOrAdapterName)
     ?? PLUGIN_TARGETS.find((entry) => entry.adapterName === targetIdOrAdapterName);
   return target ? clone(target) : undefined;
+}
+
+export function getLaunchBehavior(harnessName: string): LaunchBehaviorDescriptor | undefined {
+  const target = getPluginTargetDescriptor(harnessName);
+  return target?.launchBehavior;
 }
 
 export function listHookMappingsByAdapterFamily(adapterFamily: string): HookMappingDescriptor[] {

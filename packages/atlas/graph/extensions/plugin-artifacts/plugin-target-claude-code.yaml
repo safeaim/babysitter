@@ -92,6 +92,17 @@ attributes:
   supportsPersistedEnv: true
   envPersistenceMode: native_env_file
   toolInterceptionScope: all
+  launchBehavior:
+    promptDelivery: cli-flag
+    promptFlag: "-p"
+    execSubcommand: null
+    resumeDelivery: flag
+    resumeFlag: "--resume"
+    sessionIdFlag: "--session-id"
+    maxTurnsFlag: "--max-turns"
+    stdinBehavior: close-after-prompt
+    selfExits: true
+    needsIdleKill: false
   description: |
     Claude Code as a plugin host — accepts plugin.json + marketplace
     manifests + container/binary plugin artifacts. Native plugin

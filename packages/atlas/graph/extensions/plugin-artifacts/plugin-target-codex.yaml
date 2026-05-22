@@ -82,6 +82,17 @@ attributes:
   supportsPersistedEnv: false
   envPersistenceMode: wrapper_only
   toolInterceptionScope: partial_shell_only
+  launchBehavior:
+    promptDelivery: exec-subcommand
+    promptFlag: null
+    execSubcommand: exec
+    resumeDelivery: subcommand
+    resumeSubcommand: resume
+    sessionIdFlag: null
+    maxTurnsFlag: null
+    stdinBehavior: close-after-prompt
+    selfExits: true
+    needsIdleKill: false
 
 edges:
   hosted_by:

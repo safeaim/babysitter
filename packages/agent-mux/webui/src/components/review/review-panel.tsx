@@ -19,7 +19,7 @@ import type {
   KanbanReviewDecision,
   KanbanReviewFeedbackSource,
   KanbanReviewSnapshot,
-} from "@a5c-ai/agent-mux-core/kanban";
+} from "@a5c-ai/agent-comm-mux/kanban";
 
 function decisionLabel(decision: KanbanReviewArtifact["decision"]): string {
   switch (decision) {

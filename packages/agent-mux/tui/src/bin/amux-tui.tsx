@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import React from 'react';
 import { render } from 'ink';
-import { createClient } from '@a5c-ai/agent-mux-core';
+import { createClient } from '@a5c-ai/agent-comm-mux';
 import { registerBuiltInAdapters } from '@a5c-ai/agent-mux-cli/bootstrap';
 import { reconfigureLogger } from '@a5c-ai/agent-mux-observability';
 import { App, builtinPlugins, defaultExternalPluginsDir, loadExternalPlugins } from '../index.js';

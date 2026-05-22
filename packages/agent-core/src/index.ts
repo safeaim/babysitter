@@ -25,3 +25,45 @@ export {
   filterByRelevance,
 } from "./tools";
 export { DeferredToolRegistry } from "./deferredToolRegistry";
+
+// L4 Agent-Core interfaces
+export type {
+  AgentLoopStrategyKind,
+  SequentialStrategy,
+  ConcurrentStrategy,
+  GroupChatStrategy,
+  HandoffStrategy,
+  AgentLoopStrategy,
+  AgentLoopState,
+  AgentLoopIterationResult,
+  AgentLoopConfig,
+  AgentLoop,
+} from "./loop";
+export type {
+  InvocationMode,
+  SubagentDescriptor,
+  OversightConfig,
+  SubagentResult,
+  SubagentInvocationOptions,
+  SubagentInvoker,
+} from "./subagent";
+export type {
+  CompactionStrategyKind,
+  PriorityCompactionStrategy,
+  SlidingCompactionStrategy,
+  SummaryCompactionStrategy,
+  CompactionStrategy,
+  ContextEntry,
+  ContextManagerConfig,
+  ContextManager,
+} from "./context";
+export type {
+  SynthesisStrategyKind,
+  MergeSynthesisStrategy,
+  VoteSynthesisStrategy,
+  RankSynthesisStrategy,
+  SynthesisStrategy,
+  SynthesisInput,
+  SynthesisOutput,
+  ResultSynthesizer,
+} from "./synthesis";

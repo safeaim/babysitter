@@ -15,6 +15,29 @@ describe("cloneProcessLibrary", () => {
     execFileMock.mockReset();
   });
 
+  it("rejects refs that would be parsed as git options", async () => {
+    const tmpRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "process-library-invalid-ref-"),
+    );
+    const cloneDir = path.join(tmpRoot, "clone");
+
+    try {
+      const { cloneProcessLibrary } = await import("../active");
+
+      await expect(
+        cloneProcessLibrary({
+          repo: "https://example.com/process-library.git",
+          dir: cloneDir,
+          ref: "--upload-pack=sh",
+        }),
+      ).rejects.toThrow("Invalid process-library git ref");
+
+      expect(execFileMock).not.toHaveBeenCalled();
+    } finally {
+      await fs.rm(tmpRoot, { recursive: true, force: true });
+    }
+  });
+
   it("removes a partial clone directory when git clone fails", async () => {
     const tmpRoot = await fs.mkdtemp(
       path.join(os.tmpdir(), "process-library-clone-failure-"),

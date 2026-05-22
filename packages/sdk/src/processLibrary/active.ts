@@ -91,6 +91,21 @@ async function readGitMetadata(dir: string): Promise<{ repoUrl?: string; revisio
   return { repoUrl, revision };
 }
 
+function assertSafeGitRef(ref: string): void {
+  if (!ref || ref.startsWith("-") || ref.includes("..") || ref.includes("@{") || ref.includes("\\")) {
+    throw new Error(`Invalid process-library git ref: ${ref}`);
+  }
+  for (const char of ref) {
+    const code = char.charCodeAt(0);
+    const isDigit = code >= 48 && code <= 57;
+    const isUpper = code >= 65 && code <= 90;
+    const isLower = code >= 97 && code <= 122;
+    if (!isDigit && !isUpper && !isLower && !"/._-".includes(char)) {
+      throw new Error(`Invalid process-library git ref: ${ref}`);
+    }
+  }
+}
+
 export function getDefaultProcessLibrarySpec(options: { stateDir?: string; repo?: string; cloneDir?: string; processDir?: string; ref?: string; } = {}): DefaultProcessLibrarySpec {
   const stateDir = resolveStateDir(options.stateDir);
   const repo = options.repo?.trim() || process.env.BABYSITTER_PROCESS_LIBRARY_REPO?.trim() || DEFAULT_PROCESS_LIBRARY_REPO;
@@ -134,7 +149,7 @@ export async function cloneProcessLibrary(options: CloneProcessLibraryOptions): 
   await fs.mkdir(path.dirname(dir), { recursive: true });
   if (await pathExists(dir)) throw new Error(`Process-library directory already exists at ${dir}. Choose a new --dir or update it instead.`);
   const cloneArgs = ["clone", "--depth", "1"];
-  if (options.ref) cloneArgs.push("--branch", options.ref);
+  if (options.ref) { assertSafeGitRef(options.ref); cloneArgs.push("--branch", options.ref); }
   cloneArgs.push(options.repo, dir);
   try { await runGit(cloneArgs); } catch (error) { await fs.rm(dir, { recursive: true, force: true }); throw error; }
   const { revision } = await readGitMetadata(dir);
@@ -145,6 +160,7 @@ export async function cloneProcessLibrary(options: CloneProcessLibraryOptions): 
 export async function updateProcessLibrary(options: UpdateProcessLibraryOptions): Promise<UpdateProcessLibraryResult> {
   const dir = await ensureDirectoryExists(options.dir);
   if (options.ref) {
+    assertSafeGitRef(options.ref);
     await runGit(["fetch", "--depth", "1", "origin", options.ref], dir);
     await runGit(["checkout", "--force", "FETCH_HEAD"], dir);
   } else { await runGit(["pull", "--ff-only"], dir); }

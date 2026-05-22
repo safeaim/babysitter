@@ -21,11 +21,33 @@ import { resolveManifestPath, normalizeManifest } from "./marketplaceHelpers";
 
 const execFile = promisify(execFileCb);
 
+function trimMarketplaceUrl(url: string): string {
+  let cleaned = url.trimEnd();
+  if (cleaned.endsWith(".git")) cleaned = cleaned.slice(0, -4);
+  while (cleaned.endsWith("/")) cleaned = cleaned.slice(0, -1);
+  return cleaned;
+}
+
+function assertSafeGitRef(ref: string): void {
+  if (!ref || ref.startsWith("-") || ref.includes("..") || ref.includes("@{") || ref.includes("\\")) {
+    throw new Error(`Invalid git ref: ${ref}`);
+  }
+  for (const char of ref) {
+    const code = char.charCodeAt(0);
+    const isDigit = code >= 48 && code <= 57;
+    const isUpper = code >= 65 && code <= 90;
+    const isLower = code >= 97 && code <= 122;
+    if (!isDigit && !isUpper && !isLower && !"/._-".includes(char)) {
+      throw new Error(`Invalid git ref: ${ref}`);
+    }
+  }
+}
+
 /**
  * Derives a short marketplace name from a git URL.
  */
 export function deriveMarketplaceName(url: string): string {
-  const cleaned = url.replace(/\.git\s*$/, "").replace(/\/+$/, "");
+  const cleaned = trimMarketplaceUrl(url);
   const lastSegment = cleaned.split("/").pop() ?? "";
   const afterColon = lastSegment.split(":").pop() ?? lastSegment;
   if (!afterColon) {
@@ -68,7 +90,10 @@ export async function cloneMarketplace(
 
   try {
     const cloneArgs = ["clone", "--depth", "1"];
-    if (branch) { cloneArgs.push("--branch", branch); }
+    if (branch) {
+      assertSafeGitRef(branch);
+      cloneArgs.push("--branch", branch);
+    }
     cloneArgs.push(url, targetDir);
     await execFile("git", cloneArgs);
   } catch (error: unknown) {
@@ -79,7 +104,7 @@ export async function cloneMarketplace(
   if (manifestPath) {
     await fs.writeFile(
       path.join(targetDir, MANIFEST_PATH_FILENAME),
-      manifestPath.replace(/\\/g, "/"),
+      manifestPath.split("\\").join("/"),
       "utf8"
     );
   }
@@ -104,6 +129,7 @@ export async function updateMarketplace(
 
   try {
     if (branch) {
+      assertSafeGitRef(branch);
       await execFile("git", ["-C", dir, "fetch", "--depth", "1", "origin", branch]);
       try {
         await execFile("git", ["-C", dir, "checkout", branch]);

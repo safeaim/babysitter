@@ -69,6 +69,12 @@ describe("parseMigrationFilename", () => {
       parseMigrationFilename("1.0.0_to_1.1.0.py")
     ).toBeUndefined();
   });
+
+  it("rejects ambiguous migration separators without regex backtracking", () => {
+    expect(
+      parseMigrationFilename("1.0.0_to_1.1.0_to_1.2.0.md")
+    ).toBeUndefined();
+  });
 });
 
 describe("listMigrations", () => {

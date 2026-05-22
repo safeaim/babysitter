@@ -33,6 +33,7 @@ vi.mock("node:os", () => ({
 
 import { promises as fs } from "node:fs";
 import {
+  cloneMarketplace,
   deriveMarketplaceName,
   readMarketplaceManifest,
   listMarketplacePlugins,
@@ -98,10 +99,33 @@ describe("deriveMarketplaceName", () => {
     expect(name).toBe("my-plugins");
   });
 
+  it("extracts name from URL with .git suffix followed by whitespace", () => {
+    const name = deriveMarketplaceName(
+      "https://github.com/a5c-ai/marketplace.git   "
+    );
+    expect(name).toBe("marketplace");
+  });
+
   it("throws on empty derivation", () => {
     expect(() =>
       deriveMarketplaceName("")
     ).toThrow("Unable to derive marketplace name from URL");
+  });
+});
+
+describe("cloneMarketplace", () => {
+  it("rejects branch names that would be parsed as git options", async () => {
+    mockedAccess.mockRejectedValueOnce(enoent());
+
+    await expect(
+      cloneMarketplace(
+        "https://github.com/a5c-ai/marketplace.git",
+        "global",
+        undefined,
+        undefined,
+        "--upload-pack=sh",
+      ),
+    ).rejects.toThrow("Invalid git ref");
   });
 });
 

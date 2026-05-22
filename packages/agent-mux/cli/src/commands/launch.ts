@@ -243,9 +243,6 @@ function appendHarnessSessionArgs(plan: LaunchPlan, session: SessionArgs): void 
       if (session.prompt) plan.args.push('--prompt', session.prompt);
       break;
     case 'pi':
-      if (session.prompt && !interactive && !session.bridgeInteractive) {
-        plan.args.push('-p', session.prompt, '--mode', 'json');
-      }
       break;
     case 'opencode':
       if (session.resumeId) plan.args.push('--session', session.resumeId);
@@ -1452,8 +1449,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     (plan.harness === 'gemini' && !isInteractive && plan.args.includes('--prompt'));
   if (prompt && child.stdin && !ptyProcess && !promptPassedAsFlag) {
     child.stdin.write(prompt + '\n');
-    if (!isInteractive) {
+    const keepStdinOpen = plan.harness === 'pi' || plan.harness === 'hermes' || plan.harness === 'oh-my-pi';
+    if (!isInteractive && !keepStdinOpen) {
       child.stdin.end();
+    } else if (!isInteractive && keepStdinOpen) {
+      // Pi-family CLIs need stdin open to run tool-use loops; idle-kill handles termination
     } else {
       // Interactive with stdin pipe (no PTY): reconnect terminal stdin after prompt injection
       process.stdin.resume();

@@ -287,10 +287,8 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
         return { command: process.execPath, args: [resolved, ...args], shell: false };
       }
       if (/\.(cmd|bat)$/i.test(resolved)) {
-        const ps1 = resolved.replace(/\.(cmd|bat)$/i, '.ps1');
-        if (existsSync(ps1)) {
-          return { command: 'powershell.exe', args: ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps1, ...args], shell: false };
-        }
+        // First try to find the .js entry point in the .cmd shim — spawn via
+        // node.exe directly to avoid cmd.exe/powershell argument mangling.
         const { readFileSync } = await import('node:fs');
         try {
           const cmdContent = readFileSync(resolved, 'utf8');
@@ -301,7 +299,9 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
               return { command: process.execPath, args: [jsPath, ...args], shell: false };
             }
           }
-        } catch { /* couldn't parse .cmd — fall through */ }
+        } catch { /* couldn't parse .cmd */ }
+        // Fallback: use cmd.exe /c with the .cmd file
+        return { command: resolved, args, shell: true };
       }
       if (/\.exe$/i.test(resolved)) {
         return { command: resolved, args, shell: false };

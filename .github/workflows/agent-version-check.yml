@@ -7,6 +7,9 @@
 name: Agent Version Check
 
 on:
+  push:
+    branches: [main, staging]
+    paths: ['.github/workflows/agent-version-check.yml']
   schedule:
     - cron: '30 6 * * *'
   workflow_dispatch:

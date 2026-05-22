@@ -102,6 +102,7 @@ vi.mock('@a5c-ai/agent-catalog', () => ({
   getAutomationEnv: vi.fn(() => ({})),
   getAdapterMetadata: vi.fn(() => null),
   getSessionConfig: vi.fn(() => ({})),
+  getLaunchBehavior: vi.fn(() => undefined),
 }));
 
 // ---------------------------------------------------------------------------

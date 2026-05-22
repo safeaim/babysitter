@@ -33,6 +33,24 @@ vi.mock('@a5c-ai/agent-mux-adapters', () => ({
   })),
 }));
 
+vi.mock('@a5c-ai/agent-catalog', () => ({
+  getLaunchBehavior: vi.fn((harness: string) => {
+    const behaviors: Record<string, unknown> = {
+      claude: { promptDelivery: 'cli-flag', promptFlag: '-p', stdinBehavior: 'close-after-prompt', selfExits: true, needsIdleKill: false, sessionIdFlag: '--session-id', maxTurnsFlag: '--max-turns', resumeDelivery: 'flag', resumeFlag: '--resume' },
+      codex: { promptDelivery: 'exec-subcommand', execSubcommand: 'exec', stdinBehavior: 'close-after-prompt', selfExits: true, needsIdleKill: false, resumeDelivery: 'subcommand', resumeSubcommand: 'resume' },
+      pi: { promptDelivery: 'stdin', stdinBehavior: 'keep-open', selfExits: false, needsIdleKill: true },
+      gemini: { promptDelivery: 'cli-flag', promptFlag: '--prompt', stdinBehavior: 'close-after-prompt', selfExits: true, needsIdleKill: false },
+    };
+    return behaviors[harness] ?? undefined;
+  }),
+  getBridgeCapabilities: vi.fn(() => ({})),
+  getYoloLaunchArgs: vi.fn(() => []),
+  getAutomationEnv: vi.fn(() => ({})),
+  getHookSupport: vi.fn(() => ({})),
+  getAdapterMetadata: vi.fn(() => null),
+  getSessionConfig: vi.fn(() => ({})),
+}));
+
 vi.mock('@a5c-ai/agent-mux-core', () => ({
   PROVIDER_DEFAULTS: {
     bedrock: { envKey: undefined },
@@ -148,11 +166,14 @@ describe('launchCommand transport-mux integration', () => {
     expect(spawnMock.mock.calls[0]?.[1]).toContain('model_providers.amux-proxy.env_key="OPENAI_API_KEY"');
     expect(spawnMock.mock.calls[0]?.[1]).toContain('model_providers.amux-proxy.wire_api="responses"');
     expect(runtimeStop).toHaveBeenCalledTimes(1);
-    expect(child.stdin.write).toHaveBeenCalledWith('hello\n');
+    const spawnedArgs = spawnMock.mock.calls[0]?.[1] as string[];
+    expect(spawnedArgs).toContain('exec');
+    expect(spawnedArgs).toContain('hello');
+    expect(child.stdin.write).not.toHaveBeenCalled();
     expect(child.stdin.end).toHaveBeenCalledTimes(1);
   });
 
-  it('passes non-interactive Pi prompts through Pi print mode', async () => {
+  it('passes non-interactive Pi prompts through stdin injection', async () => {
     const runtimeStop = vi.fn(async () => {});
     const originalHome = process.env['HOME'];
     const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'amux-pi-home-'));
@@ -221,10 +242,9 @@ describe('launchCommand transport-mux integration', () => {
       expect(code).toBe(0);
       expect(spawnMock).toHaveBeenCalledTimes(1);
       const spawnedArgs = spawnMock.mock.calls[0]?.[1] as string[];
-      expect(spawnedArgs).toContain('-p');
-      expect(spawnedArgs).toContain('write the file');
-      expect(child.stdin.write).not.toHaveBeenCalled();
-      expect(child.stdin.end).toHaveBeenCalledTimes(1);
+      expect(spawnedArgs).not.toContain('-p');
+      expect(child.stdin.write).toHaveBeenCalledWith('write the file\n');
+      expect(child.stdin.end).not.toHaveBeenCalled();
       expect(runtimeStop).toHaveBeenCalledTimes(1);
     } finally {
       if (originalHome === undefined) delete process.env['HOME'];

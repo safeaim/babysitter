@@ -276,8 +276,12 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
   try {
     const whereOutput = execSync(`where ${command}`, { encoding: 'utf8', timeout: 5000 });
     const allPaths = whereOutput.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-    const resolved = allPaths[0];
-    console.error(`[amux launch] where ${command} → ${allPaths.join(', ')}`);
+    // Prefer .exe > .cmd > .ps1 > extensionless (npm bash shim won't work with shell:false)
+    const resolved = allPaths.find(p => /\.exe$/i.test(p))
+      ?? allPaths.find(p => /\.(cmd|bat)$/i.test(p))
+      ?? allPaths.find(p => /\.(ps1|js)$/i.test(p))
+      ?? allPaths[0];
+    console.error(`[amux launch] where ${command} → ${allPaths.join(', ')} (selected: ${resolved})`);
     if (resolved) {
       if (/\.js$/i.test(resolved)) {
         return { command: process.execPath, args: [resolved, ...args], shell: false };

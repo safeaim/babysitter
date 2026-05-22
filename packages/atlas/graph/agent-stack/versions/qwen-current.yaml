@@ -2,8 +2,9 @@ nodeKind: AgentVersion
 id: agent-version:qwen@current
 attributes:
   agentProductId: agent:qwen
-  versionRange: ">=0.0.1"
-  releasedAt: "2025-01-01"
+  sourcePackage: "@qwen-code/qwen-code"
+  versionRange: ">=0.16.0"
+  releasedAt: "2026-05-21"
   cliCommand: "qwen"
   installMethods:
     - install:npm

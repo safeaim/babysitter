@@ -8,14 +8,14 @@ attributes:
   releaseChannel: "stable"
   displayName: "OMP (oh-my-pi)"
   summary: "Oh-My-Pi terminal coding agent"
-  sourcePackage: "omp"
+  sourcePackage: "@oh-my-pi/pi-coding-agent"
   osSupport:
     - "linux"
     - "macos"
     - "windows"
   agentProductId: agent:omp
-  versionRange: ">=0.0.0"
-  releasedAt: "2025-01-01"
+  versionRange: ">=15.2.4"
+  releasedAt: "2026-05-22"
   cliCommand: "omp"
   installMethods:
     - install:npm

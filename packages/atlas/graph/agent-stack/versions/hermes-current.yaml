@@ -7,7 +7,7 @@ attributes:
   summary: "NousResearch agentic CLI"
   sourcePackage: "hermes-agent"
   versionRange: ">=0.14.0"
-  releasedAt: "2025-01-01"
+  releasedAt: "2026-05-16"
   cliCommand: "hermes"
   installMethods:
     - install:pip

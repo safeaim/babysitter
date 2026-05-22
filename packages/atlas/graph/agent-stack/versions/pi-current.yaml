@@ -7,14 +7,14 @@ attributes:
   releaseChannel: "stable"
   displayName: "Pi"
   summary: "Pi CLI coding agent — harness with skills, compaction, prompt templates, and session management"
-  sourcePackage: "pi"
+  sourcePackage: "@earendil-works/pi-coding-agent"
   osSupport:
     - "linux"
     - "macos"
     - "windows"
   agentProductId: agent:pi
-  versionRange: ">=0.0.0"
-  releasedAt: "2025-01-01"
+  versionRange: ">=0.75.4"
+  releasedAt: "2026-05-20"
   cliCommand: "pi"
   installMethods:
     - install:npm

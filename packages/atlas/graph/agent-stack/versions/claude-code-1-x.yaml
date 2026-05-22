@@ -14,8 +14,8 @@ attributes:
     - "macos"
     - "windows"
   agentProductId: agent:claude-code
-  versionRange: ">=0.0.0"
-  releasedAt: "2025-05-22"
+  versionRange: ">=2.1.148"
+  releasedAt: "2026-05-22"
   cliCommand: "claude"
   installMethods:
     - install:npm

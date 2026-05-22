@@ -2,8 +2,9 @@ nodeKind: AgentVersion
 id: agent-version:claude-agent-sdk@current
 attributes:
   agentProductId: agent:claude-agent-sdk
-  versionRange: ">=0.1.0"
-  releasedAt: "2025-01-01"
+  sourcePackage: "@anthropic-ai/claude-agent-sdk"
+  versionRange: ">=0.3.148"
+  releasedAt: "2026-05-22"
   cliCommand: "<sdk:@anthropic-ai/claude-agent-sdk>"
   installMethods:
     - install:npm

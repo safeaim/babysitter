@@ -7,14 +7,14 @@ attributes:
   releaseChannel: "stable"
   displayName: "OpenCode"
   summary: "Terminal-native coding agent with configurable providers"
-  sourcePackage: "opencode"
+  sourcePackage: "opencode-ai"
   osSupport:
     - "linux"
     - "macos"
     - "windows"
   agentProductId: agent:opencode
-  versionRange: ">=0.0.0"
-  releasedAt: "2025-01-01"
+  versionRange: ">=1.15.7"
+  releasedAt: "2026-05-21"
   cliCommand: "opencode"
   installMethods:
     - install:npm

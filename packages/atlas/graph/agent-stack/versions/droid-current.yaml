@@ -2,8 +2,9 @@ nodeKind: AgentVersion
 id: agent-version:droid@current
 attributes:
   agentProductId: agent:droid
-  versionRange: ">=1.0.0"
-  releasedAt: "2025-01-01"
+  sourcePackage: "@factory/cli"
+  versionRange: ">=0.131.0"
+  releasedAt: "2026-05-21"
   cliCommand: "droid"
   installMethods:
     - install:npm

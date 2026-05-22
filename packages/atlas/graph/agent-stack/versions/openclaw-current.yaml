@@ -13,8 +13,8 @@ attributes:
     - "macos"
     - "windows"
   agentProductId: agent:openclaw
-  versionRange: ">=0.0.0"
-  releasedAt: "2025-01-01"
+  versionRange: ">=2026.5.20"
+  releasedAt: "2026-05-21"
   cliCommand: "openclaw"
   installMethods:
     - install:npm

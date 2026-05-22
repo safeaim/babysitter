@@ -479,6 +479,9 @@ describe('primary live stack runner contract', () => {
         await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
         await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId: 'processes/live-stack/summarize-translate-test', metadata: { completionProof: `${runId}-proof` } }));
         await writeMinimalJournal(path.join(runDir, 'journal'), true);
+        const hooksDir = path.join(cwd, '.a5c', 'logs', 'hooks');
+        await fs.mkdir(hooksDir, { recursive: true });
+        await fs.writeFile(path.join(hooksDir, 'session-start.json'), JSON.stringify({ eventId: 'hook-1', status: 'completed' }));
 
         return {
           status: 0,
@@ -498,7 +501,7 @@ describe('primary live stack runner contract', () => {
 
     expect(result.status).toBe('passed');
     const hookCheck = result.verifications?.find(v => v.name === 'stop-hooks');
-    expect(hookCheck?.detail).toContain('run completed');
+    expect(hookCheck?.detail).toContain('hooks-mux log files found');
   });
 
   it('accepts create-mode plugin lanes when Babysitter run proof exists without a persisted process file', async () => {
@@ -529,6 +532,9 @@ describe('primary live stack runner contract', () => {
         await fs.mkdir(path.join(runDir, 'journal'), { recursive: true });
         await fs.writeFile(path.join(runDir, 'run.json'), JSON.stringify({ processId: 'processes/live-stack/summarize-translate-test', metadata: { completionProof: `${runId}-proof` } }));
         await writeMinimalJournal(path.join(runDir, 'journal'), true);
+        const hooksDir = path.join(cwd, '.a5c', 'logs', 'hooks');
+        await fs.mkdir(hooksDir, { recursive: true });
+        await fs.writeFile(path.join(hooksDir, 'session-start.json'), JSON.stringify({ eventId: 'hook-1', status: 'completed' }));
 
         return {
           status: 0,

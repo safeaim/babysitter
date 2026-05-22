@@ -21,14 +21,17 @@ type OpenAiFunctionTool = {
   };
 };
 
-function buildUrl(apiBase: string, model: string): string {
+function buildUrl(apiBase: string, model: string, serverless?: boolean): string {
+  if (serverless) {
+    return `${apiBase}/models/chat/completions?api-version=2025-04-01-preview`;
+  }
   return `${apiBase}/openai/deployments/${model}/chat/completions?api-version=2025-04-01-preview`;
 }
 
-function buildHeaders(apiKey: string): Record<string, string> {
+function buildHeaders(apiKey: string, serverless?: boolean): Record<string, string> {
   return {
     'Content-Type': 'application/json',
-    'api-key': apiKey,
+    ...(serverless ? { 'Authorization': `Bearer ${apiKey}` } : { 'api-key': apiKey }),
   };
 }
 
@@ -150,15 +153,16 @@ export function createOpenAICompletionEngine(options: {
   apiBase: string;
   apiKey: string;
   targetModel: string;
+  serverless?: boolean;
 }): CompletionEngine {
   return {
     async complete(request: CompletionRequest): Promise<CompletionResult> {
       const messages = translateMessagesToOpenAi(request.messages);
       const response = await fetch(
-        buildUrl(options.apiBase, options.targetModel),
+        buildUrl(options.apiBase, options.targetModel, options.serverless),
         {
           method: 'POST',
-          headers: buildHeaders(options.apiKey),
+          headers: buildHeaders(options.apiKey, options.serverless),
           body: buildBody(messages, options.targetModel, false, request.tools, request.toolChoice),
         },
       );
@@ -204,10 +208,10 @@ export function createOpenAICompletionEngine(options: {
     async *stream(request: CompletionRequest): AsyncIterable<CompletionStreamEvent> {
       const messages = translateMessagesToOpenAi(request.messages);
       const response = await fetch(
-        buildUrl(options.apiBase, options.targetModel),
+        buildUrl(options.apiBase, options.targetModel, options.serverless),
         {
           method: 'POST',
-          headers: buildHeaders(options.apiKey),
+          headers: buildHeaders(options.apiKey, options.serverless),
           body: buildBody(messages, options.targetModel, true, request.tools, request.toolChoice),
         },
       );

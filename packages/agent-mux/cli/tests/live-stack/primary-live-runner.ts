@@ -942,15 +942,9 @@ async function validateAgentBehavior(
       }
     }
 
-    // Resolve deferred hooks entries: if the run completed successfully,
-    // hooks are not required (babysitter-agent drove the loop internally)
     for (const he of deferredHooksEntries) {
       if (he.status === ('pending' as string)) {
-        if (runCompleted || completionProofFound) {
-          entries.push({ ...he, status: 'passed', detail: `${he.detail} (run completed — babysitter-agent drove loop internally)` });
-        } else {
-          entries.push({ ...he, status: 'failed' });
-        }
+        entries.push({ ...he, status: 'failed' });
       } else {
         entries.push(he);
       }

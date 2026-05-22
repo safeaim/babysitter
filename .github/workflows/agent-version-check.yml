@@ -1,0 +1,168 @@
+# Agent Version Check — daily scan for new agent CLI releases
+#
+# Checks all supported agent CLIs for version updates. When a new version is
+# detected that isn't in the atlas graph, creates a PR to add the version
+# record and opens an issue for full assimilation.
+
+name: Agent Version Check
+
+on:
+  schedule:
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — detect versions but do not create PRs or issues'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: agent-version-check
+  cancel-in-progress: false
+
+jobs:
+  check-versions:
+    name: Check Agent Versions
+    runs-on: ubuntu-latest-l
+    steps:
+      - name: Generate a5c GitHub App token
+        id: a5c-token
+        continue-on-error: true
+        uses: a5c-ai/generate-token-action@main
+
+      - uses: actions/checkout@v6
+        with:
+          ref: staging
+          fetch-depth: 0
+          token: ${{ steps.a5c-token.outputs.a5c_token || github.token }}
+
+      - uses: a5c-ai/babysitter/packages/triggers@staging
+        with:
+          harness: codex
+          provider: foundry
+          model: gpt-5.5
+          interaction-mode: bridged-hooks
+          babysitter-plugin: 'true'
+          max-turns: '9999'
+          babysitter-prompt-prefix: '$babysitter:yolo '
+          prompt: |
+            You are an agent version tracker. Your job is to detect new releases
+            of all supported agent CLIs and update the atlas graph accordingly.
+            ${{ inputs.dry_run == 'true' && 'DRY RUN: report findings but do NOT create PRs or issues.' || '' }}
+
+            ## Supported Agents
+
+            Check each of these agent CLIs for their latest version:
+
+            | Agent | Install Command | npm Package |
+            |-------|----------------|-------------|
+            | Claude Code | `npm install -g @anthropic-ai/claude-code` | @anthropic-ai/claude-code |
+            | Codex | `npm install -g @openai/codex` | @openai/codex |
+            | Pi | `npm install -g @mariozechner/pi-coding-agent` | @mariozechner/pi-coding-agent |
+            | Hermes | `npm install -g @anthropic-ai/hermes` | @anthropic-ai/hermes |
+            | Gemini CLI | `npm install -g @anthropic-ai/gemini-cli` | @google/gemini-cli |
+            | Cursor Agent | `npm install -g cursor-agent` | cursor-agent |
+            | Aider | `pip install aider-chat` | aider-chat (PyPI) |
+            | OpenCode | `npm install -g opencode-ai` | opencode-ai |
+            | Goose | `npm install -g @anthropic-ai/goose` | @anthropic-ai/goose |
+            | Roo Code | `npm install -g @anthropic-ai/roo-code` | @anthropic-ai/roo-code |
+
+            ## Step 1 — Detect Current Versions
+
+            For each npm agent, run:
+            ```bash
+            npm view <package>@latest version 2>/dev/null || echo "NOT_FOUND"
+            ```
+
+            For aider (PyPI):
+            ```bash
+            pip index versions aider-chat 2>/dev/null | head -1 || echo "NOT_FOUND"
+            ```
+
+            Also search the web for recent release announcements for each agent
+            (e.g., "codex cli release notes", "claude code changelog").
+
+            Record: agent name, detected version, source (npm/pypi/web).
+
+            ## Step 2 — Check Atlas Graph
+
+            For each detected version, check if it's already recorded:
+            ```bash
+            grep -r "version.*<detected_version>" packages/atlas/graph/agent-stack/ || echo "NOT_IN_GRAPH"
+            ```
+
+            Also check the AgentVersion YAML files:
+            ```bash
+            ls packages/atlas/graph/agent-stack/agent-versions/
+            cat packages/atlas/graph/agent-stack/agent-versions/<agent>*.yaml
+            ```
+
+            ## Step 3 — Update Graph for New Versions
+
+            For each version NOT in the graph:
+
+            1. Create or update the AgentVersion YAML file at
+               `packages/atlas/graph/agent-stack/agent-versions/<agent>-<version>.yaml`
+               with the detected version, release date, and any known changes.
+
+            2. If release notes were found, extract key changes:
+               - New capabilities
+               - Breaking changes
+               - New CLI flags or behaviors
+               - Transport/API changes
+
+            3. Update the agent's PluginTarget if capabilities changed.
+
+            ## Step 4 — Create PR
+
+            If any graph changes were made:
+            1. Create a branch: `agent-versions/daily-<date>`
+            2. Commit all changes
+            3. Create a PR against staging with title:
+               "feat(graph): update agent versions — <date>"
+            4. Include a summary table of all version changes in the PR body
+
+            ## Step 5 — Open Issues for New Versions
+
+            For each NEW agent+version pair (not previously in graph):
+            1. Check if an issue already exists:
+               `gh issue list --label "agent-version-update" --search "<agent> <version>"`
+            2. If no existing issue, create one:
+               ```
+               gh issue create \
+                 --label "agent-version-update,graph-update" \
+                 --title "Assimilate <agent> v<version> into atlas graph" \
+                 --body "New version detected: <agent> v<version>
+
+               ## Tasks
+               - [ ] Review release notes and changelog
+               - [ ] Update AgentVersion record with full capability details
+               - [ ] Update PluginTarget if new capabilities or behaviors
+               - [ ] Update ProviderTranslation if transport changes
+               - [ ] Update HookMapping if hook behavior changes
+               - [ ] Update launchBehavior if CLI flag changes
+               - [ ] Run live-stack tests with new version
+               - [ ] Update adapter code if needed
+
+               Release notes: <url if found>
+               Detected version: <version>
+               Previous version: <previous if known>"
+               ```
+
+            ## Step 6 — Report
+
+            Print a summary table:
+            | Agent | Current | Previous | Status | Action |
+            |-------|---------|----------|--------|--------|
+          trigger-query: ''
+        env:
+          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ steps.a5c-token.outputs.a5c_token || github.token }}

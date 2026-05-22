@@ -103,39 +103,28 @@ jobs:
 
             STEP 7: For each new agent+version pair, check for existing issue:
             `gh issue list --label "agent-version-update" --search "<agent> <version>"`
-            If none exists, create one:
-            ```
-            gh issue create \
-              --label "agent-version-update,graph-update" \
-              --title "Assimilate <Agent Name> v<version> into atlas graph" \
-              --body "## New Version Detected
 
-            **Agent:** <agent display name>
-            **Package:** <npm/pip package name>
-            **New Version:** <version>
-            **Previous Version:** <version or 'none recorded'>
-            **Release Notes:** <URL if found, or 'not found'>
-            **Detection Date:** $(date +%Y-%m-%d)
+            If none exists, create an issue. The issue body must NOT be a static
+            template — fill it with the ACTUAL research you did. Include:
 
-            ## Key Changes
-            <bullet list of notable changes from release notes, or 'pending investigation'>
+            - The exact version numbers (old and new)
+            - Links to the actual release notes / changelog / blog post you found
+            - A summary of REAL changes you read from those release notes —
+              new features, breaking changes, new CLI flags, deprecated flags,
+              API/transport changes, new tool capabilities, new supported models
+            - Which parts of our system are likely affected based on what changed
+              (be specific: "new --foo flag means launchBehavior needs updating",
+              "switched from REST to WebSocket means transport-mux proxy affected")
+            - Whether the new version changes install method or package name
+            - Any migration steps mentioned in the release notes
 
-            ## Assimilation Checklist
-            - [ ] Review full release notes and changelog
-            - [ ] Update AgentVersion YAML with capabilities, constraints, known issues
-            - [ ] Update AgentProduct record if product-level attributes changed
-            - [ ] Update PluginTarget if hook registration, manifest format, or CLI flags changed
-            - [ ] Update launchBehavior if prompt delivery, stdin behavior, or exit behavior changed
-            - [ ] Update ProviderTranslation if supported providers/transports changed
-            - [ ] Update adapter source code if install detection or spawn behavior changed
-            - [ ] Update HookMapping if hook surface or event format changed
-            - [ ] Run live-stack tests with new version to verify compatibility
-            - [ ] Update CHANGELOG.md with integration notes
+            End the issue body with the assimilation checklist — but make the
+            checklist items SPECIFIC to what actually changed, not generic.
+            For example, if the release notes mention a new CLI flag, the
+            checklist should say "Update launchBehavior: add --newFlag to
+            promptExtraFlags" not just "Update launchBehavior if changed".
 
-            ## Context
-            This issue was auto-created by the daily agent version check workflow.
-            The agent version YAML has been created/updated in the associated PR."
-            ```
+            Use label `agent-version-update,graph-update`.
 
             STEP 8: Print a summary table with ALL agents checked.
 

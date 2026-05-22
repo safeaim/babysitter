@@ -77,14 +77,14 @@ attributes:
   envPersistenceMode: runtime_hook
   toolInterceptionScope: all
   launchBehavior:
-    promptDelivery: stdin
-    promptFlag: null
+    promptDelivery: cli-flag
+    promptFlag: "-p"
     execSubcommand: null
     resumeDelivery: null
     resumeFlag: null
     sessionIdFlag: null
     maxTurnsFlag: null
-    stdinBehavior: keep-open
+    stdinBehavior: close-after-prompt
     selfExits: false
     needsIdleKill: true
 

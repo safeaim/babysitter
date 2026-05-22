@@ -1,29 +1,40 @@
-export { startDaemon, stopDaemon, getDaemonStatus } from "./lifecycle";
-export { loadDaemonConfig, writeDaemonConfig } from "./config";
-export { createFileWatcher } from "./fileWatcher";
-export { createWebhookListener } from "./webhookListener";
-export { createTimerScheduler } from "./timerScheduler";
-export { runDaemonLoop, readDaemonLoopStatus } from "./loop";
-export { appendDaemonLog, readDaemonLog } from "./daemonLog";
-export type {
-  DaemonConfig,
-  DaemonStartOptions,
-  DaemonStartOutput,
-  DaemonStopOptions,
-  DaemonStopOutput,
-  DaemonStatusOptions,
-  DaemonStatusOutput,
-  DaemonMetadata,
-  TriggerConfig,
-  TriggerEvent,
-  FileTriggerEvent,
-  AutomationTriggerEvent,
-  FileTriggerConfig,
-  FileWatcherHandle,
-  WebhookListenerOptions,
-  WebhookListenerHandle,
-  TriggerCallback,
-} from "./types";
-export type { TimerSchedulerHandle } from "./timerScheduler";
-export type { DaemonLoopOptions, DaemonLoopStatus } from "./loop";
-export type { DaemonLogEntry } from "./daemonLog";
+/**
+ * Re-export shim — canonical implementation lives in @a5c-ai/agent-runtime.
+ * Internal babysitter-agent consumers continue to import via relative paths
+ * through this barrel file.
+ */
+export {
+  startDaemon,
+  stopDaemon,
+  getDaemonStatus,
+  loadDaemonConfig,
+  writeDaemonConfig,
+  createFileWatcher,
+  createWebhookListener,
+  createTimerScheduler,
+  runDaemonLoop,
+  readDaemonLoopStatus,
+  appendDaemonLog,
+  readDaemonLog,
+  type DaemonConfig,
+  type DaemonStartOptions,
+  type DaemonStartOutput,
+  type DaemonStopOptions,
+  type DaemonStopOutput,
+  type DaemonStatusOptions,
+  type DaemonStatusOutput,
+  type DaemonMetadata,
+  type TriggerConfig,
+  type TriggerEvent,
+  type FileTriggerEvent,
+  type AutomationTriggerEvent,
+  type FileTriggerConfig,
+  type FileWatcherHandle,
+  type WebhookListenerOptions,
+  type WebhookListenerHandle,
+  type TriggerCallback,
+  type TimerSchedulerHandle,
+  type DaemonLoopOptions,
+  type DaemonLoopStatus,
+  type DaemonLogEntry,
+} from "@a5c-ai/agent-runtime/daemon";

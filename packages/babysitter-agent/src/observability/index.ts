@@ -1,25 +1,27 @@
-export { buildPhaseTimeline, buildPhaseTimelineFromEvents } from "./timeline";
-export { computeRunHealthFromEvents } from "./health";
+/**
+ * Re-export shim — canonical implementation lives in @a5c-ai/agent-runtime.
+ * Internal babysitter-agent consumers continue to import via relative paths
+ * through this barrel file.
+ */
 export {
+  buildPhaseTimeline,
+  buildPhaseTimelineFromEvents,
+  computeRunHealthFromEvents,
   getRunHealthSnapshot,
   getOrchestrationStatus,
   getPendingWorkItems,
   type OrchestrationStatus,
   type OrchestrationPhase,
   type PendingWorkItem,
-} from "./runStatus";
-export type {
-  PhaseTimeline,
-  PhaseEntry,
-  PhaseName,
-  Milestone,
-  IterationTimeline,
-  RunHealthSnapshot,
-  RunHealthStatus,
-  RunHealthMetrics,
-  HealthConfig,
-} from "./types";
-export {
+  type PhaseTimeline,
+  type PhaseEntry,
+  type PhaseName,
+  type Milestone,
+  type IterationTimeline,
+  type RunHealthSnapshot,
+  type RunHealthStatus,
+  type RunHealthMetrics,
+  type HealthConfig,
   registerWebhook,
   unregisterWebhook,
   listWebhooks,
@@ -34,4 +36,4 @@ export {
   type WebhookRegistry,
   type WebhookRegistrationInput,
   WEBHOOK_SCHEMA_VERSION,
-} from "./webhooks";
+} from "@a5c-ai/agent-runtime/observability";

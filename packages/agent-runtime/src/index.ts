@@ -12,3 +12,18 @@ export {
   getBackgroundRegistry,
   disposeBackgroundRegistry,
 } from "./background/state";
+
+// Result envelope utility (used by daemon lifecycle/config)
+export { ok, fail, type ApiResult } from "./apiResult";
+
+// Daemon management (moved from babysitter-agent)
+export * from "./daemon";
+
+// Session state management (moved from babysitter-agent)
+export * from "./session";
+
+// Cost tracking (moved from babysitter-agent)
+export * from "./cost";
+
+// Observability (moved from babysitter-agent)
+export * from "./observability";

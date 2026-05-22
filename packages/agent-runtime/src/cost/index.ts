@@ -1,7 +1,15 @@
 /**
- * Re-export shim — canonical implementation lives in @a5c-ai/agent-runtime.
- * Internal babysitter-agent consumers continue to import via relative paths
- * through this barrel file.
+ * Cost tracking module for Babysitter SDK.
+ *
+ * Provides type definitions, pricing constants, and cost calculation utilities
+ * for Anthropic Claude API token usage.
+ *
+ * @example
+ * ```ts
+ * import { calculateCostUsd, MODEL_PRICING } from '../cost';
+ *
+ * const cost = calculateCostUsd('claude-opus-4-6', 1000, 500, 200, 100);
+ * ```
  */
 export {
   // Event-level types
@@ -25,25 +33,32 @@ export {
 
   // CLI options
   type CostStatsOptions,
+} from "./types";
 
+export {
   // Journal helpers
   COST_TRACKED_EVENT_TYPE,
   appendCostEvent,
   extractCostEvents,
   computeRunCostStats,
+} from "./journal";
 
+export {
   // Claude Code JSONL parser
   parseClaudeCodeSession,
   parseClaudeCodeSessionWithSubagents,
   aggregateUsageData,
   type AggregatedUsage,
+} from "./claudeCodeParser";
 
+export {
   // Cost data collector
   collectCostDataForRun,
   resolveClaudeCodeSessionDir,
+} from "./collector";
 
-  // Effect cost
+export {
   computeEffectCosts,
   type EffectCostSummary,
   type EffectCostResult,
-} from "@a5c-ai/agent-runtime/cost";
+} from "./effectCost";

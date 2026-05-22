@@ -1,33 +1,31 @@
 /**
- * Session state management module.
- * Provides utilities for managing babysitter orchestration session state.
+ * Re-export shim — canonical implementation lives in @a5c-ai/agent-runtime.
+ * Internal babysitter-agent consumers continue to import via relative paths
+ * through this barrel file.
  */
-
-// Types
-export type {
-  SessionState,
-  SessionFile,
-  SessionContext,
-  SessionDecision,
-  SessionRunSummary,
-  SessionContextSnapshot,
-  SessionHistory,
-  SessionInitOptions,
-  SessionAssociateOptions,
-  SessionResumeOptions,
-  SessionStateOptions,
-  SessionUpdateOptions,
-  SessionInitResult,
-  SessionAssociateResult,
-  SessionResumeResult,
-  SessionStateResult,
-  SessionUpdateResult,
-} from './types';
-
-export { SessionError, SessionErrorCode } from './types';
-
-// Parsing utilities
 export {
+  // Types
+  type SessionState,
+  type SessionFile,
+  type SessionContext,
+  type SessionDecision,
+  type SessionRunSummary,
+  type SessionContextSnapshot,
+  type SessionHistory,
+  type SessionInitOptions,
+  type SessionAssociateOptions,
+  type SessionResumeOptions,
+  type SessionStateOptions,
+  type SessionUpdateOptions,
+  type SessionInitResult,
+  type SessionAssociateResult,
+  type SessionResumeResult,
+  type SessionStateResult,
+  type SessionUpdateResult,
+  SessionError,
+  SessionErrorCode,
+
+  // Parsing utilities
   DEFAULT_SESSION_STATE,
   parseYamlFrontmatter,
   parseSessionState,
@@ -35,10 +33,8 @@ export {
   sessionFileExists,
   validateSessionState,
   getSessionFilePath,
-} from './parse';
 
-// Writing utilities
-export {
+  // Writing utilities
   serializeSessionState,
   createSessionFileContent,
   writeSessionFile,
@@ -48,38 +44,28 @@ export {
   updateIterationTimes,
   addRunToSession,
   getSessionRuns,
-} from './write';
 
-// Context persistence (GAP-SESSION-001)
-export {
+  // Context persistence (GAP-SESSION-001)
   getSessionContextPath,
   getSessionContext,
   updateSessionContext,
-} from './context';
 
-// Discovery (autodiscovery from markers + env)
-export {
+  // Discovery (autodiscovery from markers + env)
   HARNESS_ENV_VARS,
   resolveAmbientSessionId,
-} from './discovery';
 
-// History persistence (GAP-SESSION-002)
-export {
+  // History persistence (GAP-SESSION-002)
   getSessionHistoryPath,
   addDecision,
   addRunSummary,
   saveContextSnapshot,
   getSessionHistory,
-} from './history';
 
-// Persistent state (GAP-STATE-003)
-export type {
-  SessionFinding,
-  SessionFileModification,
-  SessionBreakpointPattern,
-  SessionPersistentState,
-} from './persistence';
-export {
+  // Persistent state (GAP-STATE-003)
+  type SessionFinding,
+  type SessionFileModification,
+  type SessionBreakpointPattern,
+  type SessionPersistentState,
   SESSION_PERSISTENT_SCHEMA_VERSION,
   getSessionPersistentStatePath,
   getSessionPersistentState,
@@ -88,16 +74,12 @@ export {
   recordFileModification,
   recordBreakpointInteraction,
   buildResumeContext,
-} from './persistence';
 
-// Continuity state (GAP-PERF-008)
-export type {
-  ContinuityPhase,
-  ContinuityDecision,
-  ContinuityWorkingContext,
-  ContinuityState,
-} from './continuityState';
-export {
+  // Continuity state (GAP-PERF-008)
+  type ContinuityPhase,
+  type ContinuityDecision,
+  type ContinuityWorkingContext,
+  type ContinuityState,
   CONTINUITY_STATE_SCHEMA_VERSION,
   getContinuityStatePath,
   getContinuityState,
@@ -105,40 +87,30 @@ export {
   upsertDecision,
   updateWorkingContext,
   buildContinuityResumePrompt,
-} from './continuityState';
 
-// Long-term memory extraction (GAP-STATE-001)
-export type {
-  MemoryCategory,
-  MemoryConfidence,
-  MemoryEntry,
-  LongTermMemoryStore,
-  MemoryExtractionInput,
-} from './memoryExtraction';
-export {
+  // Long-term memory extraction (GAP-STATE-001)
+  type MemoryCategory,
+  type MemoryConfidence,
+  type MemoryEntry,
+  type LongTermMemoryStore,
+  type MemoryExtractionInput,
   LONG_TERM_MEMORY_SCHEMA_VERSION,
   extractMemoriesFromSession,
   readLongTermMemory,
   persistMemories,
   queryMemories,
   pruneMemories,
-} from './memoryExtraction';
 
-// Cost tracking (GAP-SESSION-004)
-export type {
-  SessionBudget,
-  SessionCostState,
-  SessionBudgetAlert,
-  BudgetCheckResult,
-  RunCostUpdate,
-} from './cost';
-export {
+  // Cost tracking (GAP-SESSION-004)
+  type SessionBudget,
+  type SessionCostState,
+  type SessionBudgetAlert,
+  type BudgetCheckResult,
+  type RunCostUpdate,
   getSessionCostPath,
   getSessionCost,
   updateSessionCost,
   setSessionBudget,
   checkBudget,
   markThresholdsTriggered,
-} from './cost';
-
-
+} from "@a5c-ai/agent-runtime/session";

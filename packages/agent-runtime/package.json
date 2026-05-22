@@ -12,7 +12,35 @@
       "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./daemon": {
+      "types": "./dist/daemon/index.d.ts",
+      "require": "./dist/daemon/index.js",
+      "default": "./dist/daemon/index.js"
+    },
+    "./session": {
+      "types": "./dist/session/index.d.ts",
+      "require": "./dist/session/index.js",
+      "default": "./dist/session/index.js"
+    },
+    "./cost": {
+      "types": "./dist/cost/index.d.ts",
+      "require": "./dist/cost/index.js",
+      "default": "./dist/cost/index.js"
+    },
+    "./observability": {
+      "types": "./dist/observability/index.d.ts",
+      "require": "./dist/observability/index.js",
+      "default": "./dist/observability/index.js"
+    },
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "daemon": ["dist/daemon/index.d.ts"],
+      "session": ["dist/session/index.d.ts"],
+      "cost": ["dist/cost/index.d.ts"],
+      "observability": ["dist/observability/index.d.ts"]
+    }
   },
   "files": [
     "dist/",
@@ -27,6 +55,7 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "@a5c-ai/agent-mux-core": "5.0.0",
     "@a5c-ai/babysitter-sdk": "5.0.0"
   },
   "devDependencies": {

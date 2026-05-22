@@ -1520,6 +1520,12 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     }
   }
   if (promptInArgs && child.stdin && !ptyProcess) {
+    // On Windows, also pipe the prompt via stdin as a fallback — some harness
+    // .exe binaries (Bun-compiled) have issues receiving long -p arguments
+    // through Windows argument parsing.
+    if (process.platform === 'win32' && prompt) {
+      child.stdin.write(prompt + '\n');
+    }
     child.stdin.end();
   }
 

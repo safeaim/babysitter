@@ -84,8 +84,7 @@ jobs:
         run: |
           npm ci
           # Workaround: npm ci on Windows-generated lockfile may miss linux optional deps
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
-          npm install --no-save --ignore-scripts @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Restore framework cache
         uses: actions/cache@v5
@@ -208,7 +207,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v8
@@ -281,7 +280,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v8
@@ -369,7 +368,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v8
@@ -456,7 +455,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v8
@@ -516,7 +515,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v8
@@ -577,7 +576,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v8
@@ -667,7 +666,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Set publish version
         id: version
@@ -766,7 +765,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build atlas
         run: npm run build --workspace=@a5c-ai/atlas
@@ -843,7 +842,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
         run: ${{ matrix.build }}
@@ -903,7 +902,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
         run: ${{ matrix.build }}
@@ -974,7 +973,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build hooks adapter workspace
         run: |
@@ -1026,7 +1025,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build hooks-mux CLI dependency chain
         run: npm run build:hooks-mux
@@ -1104,7 +1103,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build package workspace
         run: ${{ matrix.build }}
@@ -1151,7 +1150,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux gateway workspace
         run: |
@@ -1199,7 +1198,7 @@ jobs:
         run: |
           set -euo pipefail
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
           npm run build --workspace=@a5c-ai/atlas
           npm run build --workspace=@a5c-ai/agent-catalog
           npm run build --workspace=@a5c-ai/agent-mux-observability
@@ -1251,7 +1250,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux root workspace
         run: |
@@ -1308,7 +1307,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-mux TUI workspace
         run: |
@@ -1366,7 +1365,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build SDK workspace
         run: |
@@ -1419,7 +1418,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-core workspace
         run: |
@@ -1470,7 +1469,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build agent-platform workspace
         run: |
@@ -1518,7 +1517,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Run docs QA
         run: npm run docs:qa
@@ -2176,7 +2175,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Build cloud workspace
         if: >-
@@ -2263,7 +2262,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu 2>/dev/null || true
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
 
       - name: Publish babysitter metapackage to npm ($NPM_TAG tag)
         env:

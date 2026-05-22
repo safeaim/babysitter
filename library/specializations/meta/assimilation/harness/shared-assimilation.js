@@ -7,7 +7,7 @@
  *   - Plugin structure (hooks, configs, manifest)
  *   - Skill porting from reference plugins
  *   - Installation and distribution method
- *   - Harness wrapper for babysitter-agent create-run
+ *   - Harness wrapper for agent-platform create-run
  *   - README and documentation
  *   - Adapter unit tests (Vitest, following SDK harness test patterns)
  *   - Plugin integration tests (syntax, packaged install, hooks, skills, config)
@@ -205,7 +205,7 @@ export const researchHarnessTask = defineTask('research-harness', (args, taskCtx
         '  - HARNESS_CLI_MAP: per-harness { cli, workspaceFlag?, supportsModel, promptStyle ("flag"|"positional"), baseArgs? }. This determines how buildHarnessArgs() constructs CLI arguments.',
         '  - buildHarnessArgs(name, options): pure function that maps HarnessInvokeOptions to CLI argument array using HARNESS_CLI_MAP. Must produce valid CLI invocations for each harness.',
         '  - invokeHarness(name, options): spawns the CLI as a child process with timeout, workspace, model, env override. Returns HarnessInvokeResult with success, output, exitCode, duration.',
-        'This wrapping is what enables babysitter-agent invoke and babysitter-agent create-run to use any harness as a tool for delegating work.',
+        'This wrapping is what enables agent-platform invoke and agent-platform create-run to use any harness as a tool for delegating work.',
 
         // ── Study the adapter registry ──
         'Read registry.ts — understand the auto-detection and lookup system:',
@@ -280,7 +280,7 @@ export const researchHarnessTask = defineTask('research-harness', (args, taskCtx
         '  - supportsModel: does it accept a --model flag?',
         '  - promptStyle: "flag" (--prompt "text") or "positional" ("text" as last arg)',
         '  - baseArgs: any required args for headless/non-interactive mode (e.g. codex uses ["exec", "--dangerously-bypass-approvals-and-sandbox", "--skip-git-repo-check"])',
-        'These determine how buildHarnessArgs() constructs CLI arguments and how invokeHarness() spawns the process. Both are used by babysitter-agent invoke and babysitter-agent create-run.',
+        'These determine how buildHarnessArgs() constructs CLI arguments and how invokeHarness() spawns the process. Both are used by agent-platform invoke and agent-platform create-run.',
 
         // ── Plugin structure (verified from official docs per steps D and E above) ──
         `Determine the plugin/extension directory layout expected by ${args.harnessName}: where manifests go, where hooks go, where skills/agents go, where config goes. This MUST be verified from official documentation (step D above), not assumed from other harnesses.`,
@@ -427,7 +427,7 @@ export const implementAdapterTask = defineTask('implement-adapter', (args, taskC
         'Implement getPromptContext(opts?): create or use the appropriate PromptContext factory from prompts/context.ts. If a new factory is needed, create it in context.ts following the pattern of createClaudeCodeContext/createCodexContext/createPiContext. Respect the interactive tri-state (true/false/undefined).',
 
         // ── If programmatic API exists ──
-        'If the harness supports programmatic (non-CLI) sessions, create a wrapper similar to piWrapper.ts (createPiSession → SessionHandle with .prompt(), .followUp(), .dispose()). This enables babysitter-agent create-run to use the harness programmatically.',
+        'If the harness supports programmatic (non-CLI) sessions, create a wrapper similar to piWrapper.ts (createPiSession → SessionHandle with .prompt(), .followUp(), .dispose()). This enables agent-platform create-run to use the harness programmatically.',
 
         // ── Register in discovery subsystem (BOTH mechanisms) ──
         `Add a KNOWN_HARNESSES entry in discovery.ts: { name: "${args.adapterName}", cli: "<command>", callerEnvVars: [...env vars that uniquely identify running inside this harness...], capabilities: [...HarnessCapability values...] }.`,
@@ -438,7 +438,7 @@ export const implementAdapterTask = defineTask('implement-adapter', (args, taskC
         // ── Register in invocation/wrapping subsystem ──
         `Add a HARNESS_CLI_MAP entry in invoker.ts: { cli: "<command>", workspaceFlag: "<flag>"|undefined, supportsModel: <bool>, promptStyle: "flag"|"positional", baseArgs: [...] }.`,
         'This entry enables buildHarnessArgs() to construct valid CLI invocations for this harness.',
-        'This enables invokeHarness() to spawn the harness as a child process — used by babysitter-agent invoke and babysitter-agent create-run.',
+        'This enables invokeHarness() to spawn the harness as a child process — used by agent-platform invoke and agent-platform create-run.',
         'Verify buildHarnessArgs produces correct arguments for common invocation patterns (with/without workspace, model, prompt).',
 
         // ── Register in adapter registry ──
@@ -667,19 +667,19 @@ export const createInstallDistTask = defineTask('create-install-dist', (args, ta
 }));
 
 // ---------------------------------------------------------------------------
-// PHASE 5: Harness wrapper (for babysitter-agent create-run)
+// PHASE 5: Harness wrapper (for agent-platform create-run)
 // ---------------------------------------------------------------------------
 
 export const implementHarnessWrapperTask = defineTask('implement-harness-wrapper', (args, taskCtx) => ({
   kind: 'agent',
-  title: `Verify ${args.harnessName} discovery, wrapping, and babysitter-agent create-run integration`,
-  description: 'Verify both discovery mechanisms (installed + in-session), CLI wrapping via invoker, programmatic session API, and prompt context for babysitter-agent create-run',
+  title: `Verify ${args.harnessName} discovery, wrapping, and agent-platform create-run integration`,
+  description: 'Verify both discovery mechanisms (installed + in-session), CLI wrapping via invoker, programmatic session API, and prompt context for agent-platform create-run',
 
   agent: {
     name: 'general-purpose',
     prompt: {
       role: 'senior SDK engineer',
-      task: `Ensure ${args.harnessName} works correctly with harness:discover, babysitter-agent invoke, and babysitter-agent create-run`,
+      task: `Ensure ${args.harnessName} works correctly with harness:discover, agent-platform invoke, and agent-platform create-run`,
       context: {
         projectDir: args.projectDir,
         harnessName: args.harnessName,
@@ -694,7 +694,7 @@ export const implementHarnessWrapperTask = defineTask('implement-harness-wrapper
         '  1. discoverHarnesses(): probes each KNOWN_HARNESSES entry via checkCliAvailable (which/where + --version). Returns HarnessDiscoveryResult[] with installed, version, cliPath, configFound.',
         '  2. detectCallerHarness(): checks callerEnvVars against process.env. Returns CallerHarnessResult with name, matchedEnvVars, capabilities. First match wins.',
         'Read invoker.ts — understand how invokeHarness() spawns the CLI using buildHarnessArgs() with HARNESS_CLI_MAP flag mapping. This is the wrapping layer.',
-        'Read babysitter-agent create-run (harnessPrompts.ts) — understand how buildProcessDefinitionSystemPrompt and buildOrchestrationSystemPrompt use the adapter getPromptContext() to build prompts for invoking harnesses as orchestration tools.',
+        'Read agent-platform create-run (harnessPrompts.ts) — understand how buildProcessDefinitionSystemPrompt and buildOrchestrationSystemPrompt use the adapter getPromptContext() to build prompts for invoking harnesses as orchestration tools.',
         'Read piWrapper.ts — understand createPiSession and PiSessionHandle for programmatic harness invocation (used when the harness has Programmatic capability).',
         'Read registry.ts — understand detectAdapter() priority order and getAdapterByName() lookup.',
 
@@ -713,7 +713,7 @@ export const implementHarnessWrapperTask = defineTask('implement-harness-wrapper
         // ── Verify CLI WRAPPING (invoker) ──
         `Verify the HARNESS_CLI_MAP entry for ${args.harnessName} has correct: cli, workspaceFlag, supportsModel, promptStyle, baseArgs.`,
         'Verify buildHarnessArgs() produces valid CLI arguments for this harness with various option combinations (workspace, model, prompt).',
-        `Test: run babysitter-agent invoke ${args.adapterName} --prompt "test" --json and verify it produces a valid CLI invocation.`,
+        `Test: run agent-platform invoke ${args.adapterName} --prompt "test" --json and verify it produces a valid CLI invocation.`,
 
         // ── Verify PROMPT CONTEXT ──
         `If the adapter implements getPromptContext(), verify it returns a PromptContext with correct: harness, harnessLabel, platform, hookDriven, loopControlTerm, interactive tri-state, capabilities array, sessionBindingFlags, sessionEnvVars, pluginRootVar, and all required template variables.`,
@@ -723,7 +723,7 @@ export const implementHarnessWrapperTask = defineTask('implement-harness-wrapper
         // ── Verify PROGRAMMATIC API (if applicable) ──
         'If the harness has Programmatic capability, verify a PiWrapper-style session wrapper exists or is created:',
         '  - createHarnessSession(options) → SessionHandle with .prompt(), .followUp(), .dispose()',
-        '  - The wrapper must be importable from harness/index.ts and usable by babysitter-agent create-run.',
+        '  - The wrapper must be importable from harness/index.ts and usable by agent-platform create-run.',
         'If the harness does NOT have Programmatic capability, verify invokeHarness() is the correct invocation path.',
 
         // ── Fix issues ──

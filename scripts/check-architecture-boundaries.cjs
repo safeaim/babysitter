@@ -10,7 +10,7 @@ const packageFamilies = {
   "orchestration-core": [
     "@a5c-ai/babysitter-sdk",
     "@a5c-ai/babysitter",
-    "@a5c-ai/babysitter-agent",
+    "@a5c-ai/agent-platform",
     "@a5c-ai/agent-core",
   ],
   "dispatch-core": [

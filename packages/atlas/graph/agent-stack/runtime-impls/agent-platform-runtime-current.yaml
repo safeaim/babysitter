@@ -1,8 +1,8 @@
 nodeKind: AgentRuntimeImpl
-id: agent-runtime-impl:babysitter-agent.runtime@current
+id: agent-runtime-impl:agent-platform.runtime@current
 attributes:
-  displayName: "babysitter-agent Runtime (current) — SDK runtime + daemon"
-  agentVersionId: agentVersion:babysitter-agent:ge-5-0-0
+  displayName: "agent-platform Runtime (current) — SDK runtime + daemon"
+  agentVersionId: agentVersion:agent-platform:ge-5-0-0
   packageRef: source-ref:babysitter-github
   subagentDispatchMechanism: agent-as-tool
   subagentChildSessionPolicy: persistent-child-session
@@ -28,14 +28,14 @@ attributes:
     - mcp-transport:http-sse
   supportsStreaming: true
   notes: |
-    babysitter-agent reuses the babysitter SDK runtime (journal-replay,
+    agent-platform reuses the babysitter SDK runtime (journal-replay,
     breakpoint policy engine, harness adapters) and adds long-running
     daemon, observer, and MCP-server surfaces.
 edges:
   realizes:
     - target: layer:5-agent-runtime
   composes:
-    - target: agent:babysitter-agent
+    - target: agent:agent-platform
       role: runtime
   bundles:
     - target: tool-descriptor:bash

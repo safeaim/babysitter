@@ -71,10 +71,10 @@ The atlas graph defines 14 stack layers (`stack-layers` cluster). Each layer rep
 
 | Aspect | Value |
 |--------|-------|
-| Packages | `@a5c-ai/babysitter-agent`, `@a5c-ai/agent-mux-core` |
+| Packages | `@a5c-ai/agent-platform`, `@a5c-ai/agent-mux-core` |
 | Node Kinds | AgentRuntimeImpl (agent-stack) |
 | Graph Cluster | agent-stack |
-| Maturity | **Mature** — babysitter-agent hosts the unified runtime; agent-mux-core hosts harness dispatch |
+| Maturity | **Mature** — agent-platform hosts the unified runtime; agent-mux-core hosts harness dispatch |
 | Spec Coverage | v6.0 unified-stack-architecture.md |
 
 ---
@@ -84,13 +84,13 @@ The atlas graph defines 14 stack layers (`stack-layers` cluster). Each layer rep
 
 | Aspect | Value |
 |--------|-------|
-| Packages | `@a5c-ai/extension-mux`, `@a5c-ai/agent-catalog`, `@a5c-ai/babysitter-agent` |
+| Packages | `@a5c-ai/extension-mux`, `@a5c-ai/agent-catalog`, `@a5c-ai/agent-platform` |
 | Node Kinds | AgentPlatformImpl, Plugin, PluginTarget, PluginMarketplace, PluginArtifact (agent-stack + extensions) |
 | Graph Cluster | agent-stack, extensions |
 | Maturity | Partial — plugin compiler mature; deeper platform (team agents, marketplace identity) deferred |
 | Spec Coverage | v6.0 plugin-ecosystem.md |
 
-**Gap:** AgentPlatformImpl is defined in graph but has no standalone implementation package. Platform concerns are scattered across babysitter-agent, extension-mux, and agent-catalog.
+**Gap:** AgentPlatformImpl is defined in graph but has no standalone implementation package. Platform concerns are scattered across agent-platform, extension-mux, and agent-catalog.
 
 ---
 
@@ -99,7 +99,7 @@ The atlas graph defines 14 stack layers (`stack-layers` cluster). Each layer rep
 
 | Aspect | Value |
 |--------|-------|
-| Packages | `@a5c-ai/babysitter-sdk` (run dirs), `@a5c-ai/babysitter-agent` (workspace management) |
+| Packages | `@a5c-ai/babysitter-sdk` (run dirs), `@a5c-ai/agent-platform` (workspace management) |
 | Node Kinds | Workspace, Worktree, WorktreeSession (lifecycle) |
 | Graph Cluster | lifecycle |
 | Maturity | Partial — SDK owns `.a5c/runs/` layout; workspace materialization policy not formalized |
@@ -114,7 +114,7 @@ The atlas graph defines 14 stack layers (`stack-layers` cluster). Each layer rep
 
 | Aspect | Value |
 |--------|-------|
-| Packages | `@a5c-ai/babysitter-sdk` (effects, tasks), `@a5c-ai/babysitter-agent` (tool dispatch) |
+| Packages | `@a5c-ai/babysitter-sdk` (effects, tasks), `@a5c-ai/agent-platform` (tool dispatch) |
 | Node Kinds | Execution, Effect, Invocation (lifecycle) |
 | Graph Cluster | lifecycle |
 | Maturity | **Mature** — Effect model, task dispatch, shell/agent/orchestrator task kinds |
@@ -183,7 +183,7 @@ The atlas graph defines 14 stack layers (`stack-layers` cluster). Each layer rep
 
 | Aspect | Value |
 |--------|-------|
-| Packages | `@a5c-ai/babysitter-sdk`, `@a5c-ai/babysitter-agent` |
+| Packages | `@a5c-ai/babysitter-sdk`, `@a5c-ai/agent-platform` |
 | Node Kinds | OrchestrationPrimitive, Run, Phase, PhaseMachine, PhaseTransition, OrchestratorState (lifecycle) |
 | Graph Cluster | lifecycle |
 | Maturity | **Mature** — SDK owns effect model, replay engine, deterministic execution, event sourcing |
@@ -198,13 +198,13 @@ The atlas graph defines 14 stack layers (`stack-layers` cluster). Each layer rep
 
 | Aspect | Value |
 |--------|-------|
-| Packages | `@a5c-ai/babysitter-agent` (governance module), `@a5c-ai/tasks-mux` (approval routing), `@a5c-ai/atlas` (evidence/claims) |
+| Packages | `@a5c-ai/agent-platform` (governance module), `@a5c-ai/tasks-mux` (approval routing), `@a5c-ai/atlas` (evidence/claims) |
 | Node Kinds | AgentGovernanceImpl, EvidencePolicy, Claim, TrustLevel (agent-stack + catalog-meta + trust) |
 | Graph Cluster | agent-stack, catalog-meta, trust |
 | Maturity | Partial — approval gates, evidence claims, trust levels defined; broader policy framework (NIST AI RMF, OWASP) aspirational |
 | Spec Coverage | v6.0 security-architecture.md |
 
-**Gap:** AgentGovernanceImpl is defined but implementation examples are sparse. The governance module in babysitter-agent exists but covers a narrow surface (plugin governance, hook validation).
+**Gap:** AgentGovernanceImpl is defined but implementation examples are sparse. The governance module in agent-platform exists but covers a narrow surface (plugin governance, hook validation).
 
 ## Maturity Summary
 

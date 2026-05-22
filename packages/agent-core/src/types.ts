@@ -26,13 +26,13 @@ export interface AgentCoreSessionOptions {
   /**
    * @deprecated Ignored by the agent-mux-backed agent-core runtime.
    * Use agent-mux-specific configuration, or the PI wrapper in
-   * `@a5c-ai/babysitter-agent`, if you still need tool-surface control.
+   * `@a5c-ai/agent-platform`, if you still need tool-surface control.
    */
   toolsMode?: "default" | "coding" | "readonly";
   /**
    * @deprecated Ignored by the agent-mux-backed agent-core runtime.
    * Use `createAgentCoreToolDefinitions()` in the host integration or the PI
-   * wrapper in `@a5c-ai/babysitter-agent` for custom tool injection.
+   * wrapper in `@a5c-ai/agent-platform` for custom tool injection.
    */
   customTools?: unknown[];
   /** Enables interactive approval mode when a host UI context is present. */
@@ -43,7 +43,7 @@ export interface AgentCoreSessionOptions {
   appendSystemPrompt?: string[];
   /**
    * @deprecated Ignored by the agent-mux-backed agent-core runtime.
-   * Use the PI wrapper in `@a5c-ai/babysitter-agent` if you still need
+   * Use the PI wrapper in `@a5c-ai/agent-platform` if you still need
    * extension and skills isolation controls.
    */
   isolated?: boolean;

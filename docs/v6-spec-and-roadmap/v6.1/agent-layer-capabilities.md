@@ -42,7 +42,7 @@ The renames and restructuring are plumbing. This document defines the **capabili
 **Graph node kind:** `AgentRuntimeImpl`
 **Graph attributes:** daemon, observer, MCP-server surfaces
 
-**Current reality:** `babysitter-agent` — CLI binary with daemon, observer, MCP server, harness bridge
+**Current reality:** `agent-platform` — CLI binary with daemon, observer, MCP server, harness bridge
 
 **What it should be:**
 
@@ -84,7 +84,7 @@ The renames and restructuring are plumbing. This document defines the **capabili
 **Graph node kind:** `AgentPlatformImpl`
 **Graph attributes:** defineTask + plugin/skill registry
 
-**Current reality:** `extension-mux` (plugin compiler) + `agent-catalog` (metadata) + babysitter-agent platform module
+**Current reality:** `extension-mux` (plugin compiler) + `agent-catalog` (metadata) + agent-platform platform module
 
 **What it should be:**
 

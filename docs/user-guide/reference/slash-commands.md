@@ -252,7 +252,7 @@ Opens a web-based dashboard showing:
 - Journal events as they happen
 - Orchestration state visualization
 
-**Package:** This command launches the first-party `@a5c-ai/babysitter-observer-dashboard` package. The core `babysitter` CLI does not provide a `babysitter observe` fallback; optional harness runtimes may expose their own `babysitter-agent observe` surface.
+**Package:** This command launches the first-party `@a5c-ai/babysitter-observer-dashboard` package. The core `babysitter` CLI does not provide a `babysitter observe` fallback; optional harness runtimes may expose their own `agent-platform observe` surface.
 
 **Technical:** Runs a local server and opens your browser. Blocking process — runs until stopped.
 

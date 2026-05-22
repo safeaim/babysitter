@@ -145,7 +145,7 @@ export async function apiIterate(
 
     const result = await orchestrateIteration({
       runDir: input.runDir,
-      subprocessSupport: "babysitter-agent",
+      subprocessSupport: "agent-platform",
     });
 
     const output: ApiIterateOutput = { status: result.status };

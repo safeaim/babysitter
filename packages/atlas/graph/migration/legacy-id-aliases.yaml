@@ -21,7 +21,7 @@ aliases:
   # legacy: `agent:<slug>` → v6: `agent:<slug>` (same prefix)
   # Host renames: gemini→gemini-cli, copilot→copilot-cli (CLI disambiguation).
   # ─────────────────────────────────────────────────────────────────
-  - { legacyId: agent:babysitter-agent, v6Id: agent:babysitter-agent, nodeKind: AgentProduct }
+  - { legacyId: agent:agent-platform, v6Id: agent:agent-platform, nodeKind: AgentProduct }
   - { legacyId: agent:claude,           v6Id: agent:claude-code,      nodeKind: AgentProduct, notes: "host rename: claude → claude-code" }
   - { legacyId: agent:codex,            v6Id: agent:codex,            nodeKind: AgentProduct }
   - { legacyId: agent:copilot,          v6Id: agent:copilot-cli,      nodeKind: AgentProduct, notes: "host rename: copilot → copilot-cli" }
@@ -37,7 +37,7 @@ aliases:
   # legacy: `agent-version:<slug>@<range>` (kebab + @semver suffix)
   # v6:     `agentVersion:<slug>:ge-X-Y-Z[-lt-A-B-C]`
   # ─────────────────────────────────────────────────────────────────
-  - { legacyId: "agent-version:babysitter-agent@current",  v6Id: "agentVersion:babysitter-agent:ge-5-0-0",          nodeKind: AgentVersion }
+  - { legacyId: "agent-version:agent-platform@current",  v6Id: "agentVersion:agent-platform:ge-5-0-0",          nodeKind: AgentVersion }
   - { legacyId: "agent-version:claude-code@1.x",            v6Id: "agentVersion:claude:ge-0-0-0",                    nodeKind: AgentVersion, notes: "host rename + range collapse" }
   - { legacyId: "agent-version:codex@1.x",                  v6Id: "agentVersion:codex:ge-0-0-0-lt-0-119-0",          nodeKind: AgentVersion, notes: "v6 splits codex < 0.119; legacy collapsed to 1.x" }
   - { legacyId: "agent-version:codex@1.x",                  v6Id: "agentVersion:codex:ge-0-119-0",                   nodeKind: AgentVersion }

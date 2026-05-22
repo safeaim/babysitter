@@ -89,7 +89,7 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(metadata).toBeDefined();
     expect(metadata!.adapterName).toBe("claude");
     expect(metadata!.capabilities.supportsMCP).toBe(true);
-    expect(getFallbackHarnessMetadata("babysitter-agent")).toBeUndefined();
+    expect(getFallbackHarnessMetadata("agent-platform")).toBeUndefined();
   });
 
   it("exposes hooks-mux detection rules from discovery-signal nodes", () => {
@@ -202,8 +202,8 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(claims.get("repo-transport-mux-readme")?.status).toBe("current");
   });
 
-  it("includes babysitter-agent as a distinct non-harness runtime agent and records richer Claude web evidence", () => {
-    const babysitterAgent = listAgentVersions().find((agent) => agent.agentId === "babysitter-agent");
+  it("includes agent-platform as a distinct non-harness runtime agent and records richer Claude web evidence", () => {
+    const babysitterAgent = listAgentVersions().find((agent) => agent.agentId === "agent-platform");
     expect(babysitterAgent).toBeDefined();
     expect(babysitterAgent!.transportIds).toContain("terminal-cli");
     expect(babysitterAgent!.modalityIds).toContain("mcp");

@@ -11,7 +11,7 @@ This document provides an architectural comparison between the current a5c.ai ag
 ### Current Architecture Philosophy
 
 **Monolithic Integration**
-- Single large package (`babysitter-agent`) containing all functionality
+- Single large package (`agent-platform`) containing all functionality
 - Tight coupling between components
 - All-or-nothing deployment model
 - Shared state and configuration across all features
@@ -42,7 +42,7 @@ This document provides an architectural comparison between the current a5c.ai ag
 
 ```
 Monolithic Package Structure
-├── @a5c-ai/babysitter-agent (all functionality)
+├── @a5c-ai/agent-platform (all functionality)
 │   ├── governance/ (policies, authorities, sandbox)
 │   ├── session/ (state, context, history, memory)
 │   ├── mcp/ (channels, transport, client tools)
@@ -72,7 +72,7 @@ Layered Architecture
 ├── Orchestration Layer (Domain-Specific)
 │   ├── @a5c-ai/agent-platform-orchestration-plugin
 │   ├── @a5c-ai/babysitter-sdk (unchanged)
-│   └── @a5c-ai/babysitter-agent (complete solution)
+│   └── @a5c-ai/agent-platform (complete solution)
 └── Supporting Packages
     ├── @a5c-ai/catalog
     ├── @a5c-ai/observer-dashboard
@@ -111,7 +111,7 @@ Layered Architecture
 ### Current Deployment
 
 **Single Package Model**:
-- Install `@a5c-ai/babysitter-agent`
+- Install `@a5c-ai/agent-platform`
 - Get all functionality regardless of needs
 - Large bundle size for all use cases
 - Monolithic configuration
@@ -126,7 +126,7 @@ Layered Architecture
 **Selective Deployment**:
 - **Runtime Only**: `@a5c-ai/agent-runtime` for embedded use
 - **Platform Core**: Add `@a5c-ai/agent-platform` for plugin hosting
-- **Complete Solution**: Add `@a5c-ai/babysitter-agent` for full orchestration
+- **Complete Solution**: Add `@a5c-ai/agent-platform` for full orchestration
 
 **Bundle Characteristics**:
 - Runtime, platform, and complete deployments can be measured independently once slice-specific commands exist

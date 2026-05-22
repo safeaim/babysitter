@@ -21,7 +21,7 @@ Only decisions that have crossed from design exploration into accepted direction
 
 ## Current Record
 
-- [ADR-001: Babysitter-Agent Seam Contract As The First Executable V6 Slice](./ADR-001-babysitter-agent-seam-contract.md)
+- [ADR-001: Agent-Platform Seam Contract As The First Executable V6 Slice](./ADR-001-agent-platform-seam-contract.md)
 
 ## Next Steps
 

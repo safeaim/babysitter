@@ -25,10 +25,10 @@ const seamAdrPath = path.resolve(
   "docs",
   "v6-spec-and-roadmap",
   "decisions",
-  "ADR-001-babysitter-agent-seam-contract.md",
+  "ADR-001-agent-platform-seam-contract.md",
 );
 
-describe("babysitter-agent seam contract", () => {
+describe("agent-platform seam contract", () => {
   test("assigns every top-level src directory to exactly one seam", async () => {
     const topLevelEntries = await fs.readdir(srcRoot, { withFileTypes: true });
     const topLevelDirectories = topLevelEntries
@@ -88,21 +88,21 @@ describe("babysitter-agent seam contract", () => {
     ) as { bin?: Record<string, string> };
 
     expect(packageJson.bin).toEqual({
-      "babysitter-agent": "dist/cli/main.js",
+      "agent-platform": "dist/cli/main.js",
       "babysitter-harness": "dist/cli/main.js",
     });
   });
 
   test("keeps the validation gate stable for every seam", () => {
     expect(BABYSITTER_AGENT_SEAM_VALIDATION_COMMANDS).toEqual([
-      "npm run build --workspace=@a5c-ai/babysitter-agent",
-      "npm run test --workspace=@a5c-ai/babysitter-agent",
+      "npm run build --workspace=@a5c-ai/agent-platform",
+      "npm run test --workspace=@a5c-ai/agent-platform",
     ]);
 
     for (const contract of babysitterAgentSeamContracts) {
       expect(contract.validationCommands).toEqual([
-        "npm run build --workspace=@a5c-ai/babysitter-agent",
-        "npm run test --workspace=@a5c-ai/babysitter-agent",
+        "npm run build --workspace=@a5c-ai/agent-platform",
+        "npm run test --workspace=@a5c-ai/agent-platform",
       ]);
     }
   });
@@ -110,7 +110,7 @@ describe("babysitter-agent seam contract", () => {
   test("anchors the seam contract in the V6 current-state doc", async () => {
     const currentStateDoc = await fs.readFile(currentStateDocPath, "utf8");
 
-    expect(currentStateDoc).toContain("`packages/babysitter-agent/src/seams/contract.ts`");
+    expect(currentStateDoc).toContain("`packages/agent-platform/src/seams/contract.ts`");
     expect(currentStateDoc).toContain("`runtime-foundation`");
     expect(currentStateDoc).toContain("`governance-control`");
     expect(currentStateDoc).toContain("`integration-bridges`");
@@ -121,9 +121,9 @@ describe("babysitter-agent seam contract", () => {
   test("keeps the accepted ADR aligned with the seam validation command", async () => {
     const seamAdr = await fs.readFile(seamAdrPath, "utf8");
 
-    expect(seamAdr).toContain("# ADR-001: Babysitter-Agent Seam Contract As The First Executable V6 Slice");
-    expect(seamAdr).toContain("`packages/babysitter-agent/src/seams/contract.ts`");
+    expect(seamAdr).toContain("# ADR-001: Agent-Platform Seam Contract As The First Executable V6 Slice");
+    expect(seamAdr).toContain("`packages/agent-platform/src/seams/contract.ts`");
     expect(seamAdr).toContain("npm run verify:v6:seams");
-    expect(seamAdr).toContain("`@a5c-ai/babysitter-agent`");
+    expect(seamAdr).toContain("`@a5c-ai/agent-platform`");
   });
 });

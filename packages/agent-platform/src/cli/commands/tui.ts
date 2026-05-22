@@ -1,7 +1,7 @@
 /**
  * tui command -- stub redirecting to agent-mux TUI with babysitter plugins.
  *
- * The babysitter-agent dashboard has been removed. Use the agent-mux TUI
+ * The agent-platform dashboard has been removed. Use the agent-mux TUI
  * with babysitter-tui-plugins instead (packages/babysitter-tui-plugins/).
  *
  * `babysitter tui --json` still works as a non-interactive JSON fallback
@@ -179,11 +179,11 @@ export async function handleTui(args: TuiArgs): Promise<number> {
 
   // Interactive TUI: redirect to agent-mux TUI
   console.error(
-    "The babysitter-agent TUI has been removed.\n" +
+    "The agent-platform TUI has been removed.\n" +
     "Use agent-mux TUI with babysitter plugins instead:\n" +
     "  npx agent-mux tui --workspace .\n" +
     "\n" +
-    "For non-interactive run listing, use: babysitter-agent tui --json"
+    "For non-interactive run listing, use: agent-platform tui --json"
   );
   return 1;
 }

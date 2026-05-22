@@ -11,8 +11,8 @@ export interface BabysitterAgentSeamContract {
 }
 
 export const BABYSITTER_AGENT_SEAM_VALIDATION_COMMANDS = [
-  "npm run build --workspace=@a5c-ai/babysitter-agent",
-  "npm run test --workspace=@a5c-ai/babysitter-agent",
+  "npm run build --workspace=@a5c-ai/agent-platform",
+  "npm run test --workspace=@a5c-ai/agent-platform",
 ] as const;
 
 export const babysitterAgentSeamContracts = [

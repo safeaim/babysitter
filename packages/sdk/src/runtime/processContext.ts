@@ -26,8 +26,8 @@ export interface ProcessContextInit extends Omit<TaskIntrinsicContext, "now"> {
   recordedLogSeqs?: Set<number>;
   /** When true, breakpoints are auto-approved without human interaction. */
   nonInteractive?: boolean;
-  /** Internal-only gate for babysitter-agent owned subprocess orchestration. */
-  subprocessSupport?: "disabled" | "babysitter-agent";
+  /** Internal-only gate for agent-platform owned subprocess orchestration. */
+  subprocessSupport?: "disabled" | "agent-platform";
 }
 
 export interface InternalProcessContext extends TaskIntrinsicContext {
@@ -39,7 +39,7 @@ export interface InternalProcessContext extends TaskIntrinsicContext {
   recordedLogSeqs: Set<number>;
   /** When true, breakpoints are auto-approved without human interaction. */
   nonInteractive: boolean;
-  subprocessSupport: "disabled" | "babysitter-agent";
+  subprocessSupport: "disabled" | "agent-platform";
   cleanupCallbacks: Array<() => void | Promise<void>>;
   cleanupFlushed: boolean;
 }

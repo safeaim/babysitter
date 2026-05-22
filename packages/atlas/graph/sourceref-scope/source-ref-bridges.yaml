@@ -95,7 +95,7 @@ nodes:
     edges:
       source_of:
         - target: agent:babysitter
-  - id: source-ref:babysitter-agent-mux-reference
+  - id: source-ref:agent-platform-mux-reference
     kind: SourceRef
     edges:
       source_of:

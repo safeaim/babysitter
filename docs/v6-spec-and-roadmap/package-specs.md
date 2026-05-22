@@ -34,7 +34,7 @@ This document defines package responsibilities for the current V6 stage. It inte
 - Constraints:
 - must preserve install and operational expectations for existing users.
 
-### `@a5c-ai/babysitter-agent`
+### `@a5c-ai/agent-platform`
 
 - State: Current
 - Role: agent runtime and orchestration-facing execution layer
@@ -44,7 +44,7 @@ This document defines package responsibilities for the current V6 stage. It inte
 - orchestration runtime behaviors that are not yet proven as standalone packages.
 - Constraints:
 - still contains multiple concerns,
-- any rename away from `@a5c-ai/babysitter-agent` is deferred until a decision record defines the target name, migration plan, and validation path,
+- any rename away from `@a5c-ai/agent-platform` is deferred until a decision record defines the target name, migration plan, and validation path,
 - should be improved by internal seam clarification before broad extraction.
 
 ### `plugins/*`
@@ -78,7 +78,7 @@ These are plausible extraction or rename candidates, but not yet committed deliv
 
 - State: Candidate
 - Why it might be worth doing:
-- `babysitter-agent` likely contains modules with cleaner ownership than the package boundary suggests.
+- `agent-platform` likely contains modules with cleaner ownership than the package boundary suggests.
 - Extraction trigger:
 - a subsystem has isolated tests, narrow dependencies, and clear consumers.
 - Do not extract if:
@@ -105,7 +105,7 @@ The following names may be useful as future concepts, but they are not current p
 - `@a5c-ai/agent-platform-orchestration-plugin`
 
 For now, they should be treated as directional language only. Any one of them needs a decision record, validation plan, and migration story before it becomes normative.
-Deferred vocabulary refers only to possible future rename or re-scope targets, not to the current package itself. The current package remains `@a5c-ai/babysitter-agent` unless a later decision record promotes one of the deferred names into scope with an explicit migration plan.
+Deferred vocabulary refers only to possible future rename or re-scope targets, not to the current package itself. The current package remains `@a5c-ai/agent-platform` unless a later decision record promotes one of the deferred names into scope with an explicit migration plan.
 Implementation-phase documents must therefore describe work in current-package terms unless such a decision record has already promoted the deferred name into scope. A deferred package name is not a deliverable placeholder.
 
 This does not block metaplugins as an implemented pattern. In current V6 terms, metaplugins are higher-order capability abstractions over existing plugin and hook packaging surfaces, including on legacy non-Babysitter agents. The deferred item here is the standalone package name `@a5c-ai/agent-platform-meta-plugins`, not the ability to ship capability bundles for concerns like memory systems, governance, or policy enforcement. `@a5c-ai/extension-mux` remains the compiler that emits the concrete per-harness plugin outputs those metaplugins rely on.

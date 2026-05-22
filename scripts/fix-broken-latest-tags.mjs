@@ -19,7 +19,7 @@ const MIN_FILES = 5;
 const MIN_SIZE = 10000;
 
 const packageDirs = [
-  'packages/sdk', 'packages/babysitter', 'packages/babysitter-agent',
+  'packages/sdk', 'packages/babysitter', 'packages/agent-platform',
   'packages/agent-core', 'packages/agent-catalog', 'packages/atlas',
   'packages/transport-mux', 'packages/extension-mux', 'packages/tasks-mux',
   'packages/triggers', 'packages/cloud', 'packages/observer-dashboard',

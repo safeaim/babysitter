@@ -151,7 +151,7 @@ npm list -g @a5c-ai/babysitter-sdk
 
 Update all packages to the latest versions:
 ```bash
-npm install -g @a5c-ai/babysitter@latest @a5c-ai/babysitter-agent@latest
+npm install -g @a5c-ai/babysitter@latest @a5c-ai/agent-platform@latest
 ```
 
 **Prevention:** Update all packages together, not individually.
@@ -834,7 +834,7 @@ cat .a5c/runs/<runId>/tasks/<effectId>/result.json | jq .
 babysitter --version
 
 # Check installed packages
-npm list -g @a5c-ai/babysitter @a5c-ai/babysitter-agent
+npm list -g @a5c-ai/babysitter @a5c-ai/agent-platform
 
 # Check plugin status
 claude plugin list | grep babysitter

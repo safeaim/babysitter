@@ -514,7 +514,7 @@ spec deferred to Phase 2 (extension-interfaces track).
 ### NodeKind: `DeploymentTarget`
 
 Cluster 13. A named Kubernetes-cluster (or local minikube) target that the
-babysitter cloud package can deploy the kanban / gateway / babysitter-agent
+babysitter cloud package can deploy the kanban / gateway / agent-platform
 components to. Reifies the union of `TargetConfig` variants
 (`minikube` | `existing` | `eks` | `aks` | `gke`) declared in
 `packages/cloud/src/types.ts` so cluster fleets, cost reports, and multi-tenant

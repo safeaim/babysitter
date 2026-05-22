@@ -225,8 +225,8 @@ export interface OrchestrateOptions {
   now?: Date | (() => Date);
   context?: Record<string, unknown>;
   logger?: ProcessLogger;
-  /** Internal-only gate for subprocess effects resolved by babysitter-agent. */
-  subprocessSupport?: "disabled" | "babysitter-agent";
+  /** Internal-only gate for subprocess effects resolved by agent-platform. */
+  subprocessSupport?: "disabled" | "agent-platform";
 }
 
 export interface IterationMetadata {

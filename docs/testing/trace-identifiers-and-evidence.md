@@ -1,6 +1,6 @@
 ---
 title: Trace Identifiers And Evidence
-description: Identifiers, logs, files, and artifacts required to correlate primary E2E flows across agent-mux, babysitter-agent, Babysitter SDK, hooks-mux, and transport-mux.
+description: Identifiers, logs, files, and artifacts required to correlate primary E2E flows across agent-mux, agent-platform, Babysitter SDK, hooks-mux, and transport-mux.
 last_updated: 2026-05-07
 ---
 
@@ -14,8 +14,8 @@ Use this document as the evidence checklist for tests described in [Primary Flow
 | --- | --- | --- | --- |
 | `agentMuxRunId` / `runId` | Agent-mux | CLI result, gateway runtime state, event log filename or event body | Joins agent-mux session events to launch/transport evidence |
 | `agentMuxSessionId` / `sessionId` | Agent-mux/external harness | CLI args, session runtime, harness transcript | Proves continuity across prompts, plugin command, and hook events |
-| `babysitterRunId` / SDK `runId` | Babysitter SDK and babysitter-agent | `run:create` output, `.a5c/runs/<runId>/`, `babysitter-agent` progress events | Primary key for SDK journal, tasks, and terminal state |
-| `runDir` | Babysitter SDK | `run:create` output, `babysitter-agent` progress events | Filesystem root for journal, tasks, outputs, and replay state |
+| `babysitterRunId` / SDK `runId` | Babysitter SDK and agent-platform | `run:create` output, `.a5c/runs/<runId>/`, `agent-platform` progress events | Primary key for SDK journal, tasks, and terminal state |
+| `runDir` | Babysitter SDK | `run:create` output, `agent-platform` progress events | Filesystem root for journal, tasks, outputs, and replay state |
 | `babysitterSessionId` | SDK session binding or harness adapter | `session:init`, `session:associate`, run-create session block, hooks env | Joins harness session to SDK run loop |
 | `effectId` | Babysitter SDK | `run:iterate` next actions, `task:list`, `task:post`, `tasks/<effectId>/` | Joins requested work to posted results |
 | `taskId` / `stepId` | Babysitter process runtime | `task:list`, task definition refs | Names process step semantics independently of generated effect ID |
@@ -56,7 +56,7 @@ A passing artifact bundle should include:
 
 A passing artifact bundle should include:
 
-- `babysitter-agent call` or `babysitter-agent create-run` command and parsed options.
+- `agent-platform call` or `agent-platform create-run` command and parsed options.
 - Progress events for planning/process path, run creation, session binding, iteration start, effect resolution, and completion.
 - Selected harness/backend: `agent-core` for internal primary tests, external harness name for bridge tests.
 - Generated/provided process path and process fingerprint or file digest.
@@ -132,7 +132,7 @@ Use deterministic artifact names so CI and local runs can be compared:
 
 Before a scenario is labeled complete, verify:
 
-- [ ] The primary path is declared: agent-mux plugin, babysitter-agent runtime, SDK run loop, hooks-mux fixture, or transport-mux route.
+- [ ] The primary path is declared: agent-mux plugin, agent-platform runtime, SDK run loop, hooks-mux fixture, or transport-mux route.
 - [ ] All required identifiers for that path are present and joinable.
 - [ ] The terminal condition is owned by the correct layer.
 - [ ] Any capability gate or model credential requirement is explicit.

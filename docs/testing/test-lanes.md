@@ -15,7 +15,7 @@ No-model tests must run without provider secrets, paid model calls, or installed
 | Scope | Primary tools | What it covers | CI timing |
 | --- | --- | --- | --- |
 | Package unit tests | Vitest | Pure functions, schema parsing, protocol serialization, command helpers, state machines | Every PR and push |
-| Contract tests | Vitest + fixtures | Stable boundaries between SDK, hooks-mux, agent-mux, transport-mux, agent-core, and babysitter-agent, including transport-mux route matrix and runtime env injection contracts | Every PR and push |
+| Contract tests | Vitest + fixtures | Stable boundaries between SDK, hooks-mux, agent-mux, transport-mux, agent-core, and agent-platform, including transport-mux route matrix and runtime env injection contracts | Every PR and push |
 | Mock harness tests | Vitest + existing mock adapters | Session lifecycle, adapter dispatch, tool-call translation, stop-hook semantics, plugin discovery, fallback metadata | Every PR and push |
 | Browser/UI E2E | Playwright + mock gateway | Agent-mux WebUI session flows, transcript rendering, model picker behavior, approvals, reconnect behavior | PRs touching WebUI/gateway/session code; staging before publish |
 | CLI smoke tests | Node subprocess tests | `babysitter`, `amux`, hooks-mux CLI, package entrypoints, help output, dry-run paths | Every PR for touched packages; staging before publish |
@@ -43,9 +43,9 @@ Model-backed tests exercise real provider integrations, real installed harnesses
 
 | Scope | Required setup | What it covers | CI timing |
 | --- | --- | --- | --- |
-| SDK harness/plugin setup smoke | `babysitter harness:install <name>` and `babysitter harness:install-plugin <name>` | Installer delegation, plugin target resolution, idempotent manifests; not babysitter-agent runtime | Scheduled, manual, staging gate |
+| SDK harness/plugin setup smoke | `babysitter harness:install <name>` and `babysitter harness:install-plugin <name>` | Installer delegation, plugin target resolution, idempotent manifests; not agent-platform runtime | Scheduled, manual, staging gate |
 | Agent-mux plugin/session E2E | Provider secrets, installed external CLI, and plugin precondition where supported | `amux run` or `createClient().run` starts a session, plugin command creates a Babysitter run, and hooks/process lifecycle are asserted | Scheduled, manual, staging gate |
-| Babysitter-agent live orchestration | Preinstalled/mocked backend plus `OPENAI_API_KEY`, configured Foundry/OpenAI credentials, or configured cloud equivalents where needed | `@a5c-ai/babysitter-agent` can plan, execute, post task results, and close a run without executing harness installer commands | `publish.yml` staging/main preflight, manual |
+| Babysitter-agent live orchestration | Preinstalled/mocked backend plus `OPENAI_API_KEY`, configured Foundry/OpenAI credentials, or configured cloud equivalents where needed | `@a5c-ai/agent-platform` can plan, execute, post task results, and close a run without executing harness installer commands | `publish.yml` staging/main preflight, manual |
 | Agent-mux live adapters | Provider-specific credentials | Claude Code and Codex adapters produce protocol events that match the mux contracts | Scheduled/manual first, then `publish.yml` release preflight after quarantine |
 | Transport-mux live transport | Local process ports plus provider/harness credentials | Transport-mux carries real agent-core streams and agent-mux-launched external harness traffic through proxy routes with redacted launch/env/metrics artifacts | Scheduled/manual first, then `publish.yml` after quarantine |
 

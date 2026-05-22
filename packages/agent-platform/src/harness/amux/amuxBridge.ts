@@ -1,9 +1,9 @@
 /**
- * agent-mux integration bridge for babysitter-agent.
+ * agent-mux integration bridge for agent-platform.
  *
  * Replaces the direct child-process invocation in `invoker.ts` for
  * external harnesses by delegating to an AmuxClient instance. The
- * client is injected so babysitter-agent never imports @agent-mux/core
+ * client is injected so agent-platform never imports @agent-mux/core
  * directly -- it only depends on the interfaces defined in amuxTypes.ts.
  *
  * @module harness/amux/amuxBridge

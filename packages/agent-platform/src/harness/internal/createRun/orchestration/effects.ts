@@ -639,7 +639,7 @@ export async function orchestrateIterationWithProcessLoadRetry(args: {
     try {
       return await orchestrateIteration({
         runDir: args.runDir,
-        subprocessSupport: "babysitter-agent",
+        subprocessSupport: "agent-platform",
       });
     } catch (error: unknown) {
       if (

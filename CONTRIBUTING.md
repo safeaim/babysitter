@@ -153,7 +153,7 @@ babysitter plugin:uninstall <plugin-name> --global
 
 ```bash
 babysitter harness:discover --json
-babysitter-agent invoke <name> --prompt "<text>"
+agent-platform invoke <name> --prompt "<text>"
 ```
 
 See the full [CLI Reference](docs/user-guide/reference/cli-reference.md) and [Slash Commands Reference](docs/user-guide/reference/slash-commands.md) for details.

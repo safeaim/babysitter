@@ -66,7 +66,7 @@ attributes:
 edges:
   spoken_by:
     - target: agent-runtime-impl:a5c.runtime@current
-    - target: agent-runtime-impl:babysitter-agent.runtime@current
+    - target: agent-runtime-impl:agent-platform.runtime@current
     - target: agent-runtime-impl:babysitter.runtime@current
     - target: agent-runtime-impl:babysitter-sdk.runtime@current
     - target: agent-runtime-impl:claude-agent-sdk.runtime@current

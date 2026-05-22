@@ -467,7 +467,7 @@ into atlas as `supports` edges on the corresponding AgentVersion nodes (the
 after catalog pass 9c remodel collapsed CapabilitySupport into a direct edge from
 version-bearing entities to Capability).
 
-Source files (10 total): babysitter-agent, claude, codex, copilot, cursor,
+Source files (10 total): agent-platform, claude, codex, copilot, cursor,
 gemini, omp, openclaw, opencode, pi.
 
 - Total source entries: 83
@@ -512,7 +512,7 @@ records the same renaming convention applied during the original import of
 | agentVersion:openclaw                         | agent-version:openclaw@current |
 | agentVersion:opencode                         | agent-version:opencode@1.x    |
 | agentVersion:pi                               | agent-version:pi@current      |
-| agentVersion:babysitter-agent                 | agent-version:babysitter@current |
+| agentVersion:agent-platform                 | agent-version:babysitter@current |
 
 (*) The agent-catalog splits codex at `0.119.0` (`>=0.0.0 <0.119.0` and
 `>=0.119.0`). atlas splits codex at the major version boundary
@@ -1155,7 +1155,7 @@ partial-stack files; identical pattern to existing catalog pass 30 entries).
 
 Restructured `agent:babysitter` from a headless single-product into a
 multi-surface umbrella. Authored sibling products for the babysitter SDK,
-the babysitter-agent CLI binary, and the agent-mux multi-surface UI
+the agent-platform CLI binary, and the agent-mux multi-surface UI
 suite, plus a per-surface Presentation set for agent-mux.
 
 ### Schema additions
@@ -1178,9 +1178,9 @@ suite, plus a per-surface Presentation set for agent-mux.
 - `presentation:agent-mux-watch-watchos` (kind: watch)
 - `presentation:agent-mux-watch-wearos` (kind: watch)
 
-`graph/agent-stack/presentations/babysitter-agent-presentation.yaml`:
+`graph/agent-stack/presentations/agent-platform-presentation.yaml`:
 
-- `presentation:babysitter-agent-cli` (kind: cli)
+- `presentation:agent-platform-cli` (kind: cli)
 
 ### New AgentProducts + AgentVersions + impls
 
@@ -1188,7 +1188,7 @@ suite, plus a per-surface Presentation set for agent-mux.
 |---|---|---|---|
 | agent:agent-mux | multi-surface-suite | full | core, runtime, platform, ui |
 | agent:babysitter-sdk | sdk | core-runtime | core, runtime |
-| agent:babysitter-agent | full-cli-agent | full | core, runtime, platform, ui |
+| agent:agent-platform | full-cli-agent | full | core, runtime, platform, ui |
 
 `agent:agent-mux` is distinct from the pre-existing `agent:agent-mux-remote`
 (transport-only adapter); the new product is the broader multi-surface UI
@@ -1202,10 +1202,10 @@ suite that uses the agent-mux transport to bridge to remote agents.
   carry per-surface detail.
 - `agent-ui-impl:babysitter.ui@current` rewritten from `headless` to
   `multi-surface` and now bundles all 9 agent-mux presentations plus
-  `presentation:babysitter-agent-cli`.
+  `presentation:agent-platform-cli`.
 - `agent-version:babysitter@current.composed_of` left untouched —
   babysitter's own core/runtime/platform/ui impls remain the canonical
-  composition; `agent:babysitter-sdk` / `agent:babysitter-agent` /
+  composition; `agent:babysitter-sdk` / `agent:agent-platform` /
   `agent:agent-mux` are sibling AgentProducts that complement (not
   replace) babysitter's stack.
 
@@ -1221,10 +1221,10 @@ identical pattern to catalog pass 43 partial-stack additions).
 ### Outstanding TODOs
 
 - `releasedAt` placeholders on `agent-mux@current`, `babysitter-sdk@current`,
-  `babysitter-agent@current` — confirm with vendor docs.
+  `agent-platform@current` — confirm with vendor docs.
 - `bundleSize` placeholders on all 10 new Presentations.
 - `interactionPrimitivesSupported: []` on `agent-mux.ui@current`,
-  `babysitter-agent.ui@current`, and the rewritten `babysitter.ui@current`
+  `agent-platform.ui@current`, and the rewritten `babysitter.ui@current`
   — to be enumerated (slash commands, model picker, prompt input,
   command palette, session list, run detail, kanban board, hook inbox,
   breakpoint approval, run-create, iterate, observer-dashboard,
@@ -1260,7 +1260,7 @@ The flat list attribute was scaffolding before edges existed (catalog pass 37 cl
 Removed from `AgentUIImpl` schema and from the meta-registry. Top-6 canonical UIs
 (claude-code, codex, gemini-cli, copilot-cli, cursor, opencode) migrated to edge form.
 Other UIs (omp, openclaw, hermes, pi, qwen, amp, droid, agent-mux, agent-mux-remote, a5c,
-babysitter, babysitter-agent) carry `# TODO: enumerate interaction primitives` comments
+babysitter, agent-platform) carry `# TODO: enumerate interaction primitives` comments
 in their `edges:` block — data not yet well-known.
 
 ### 45.3 — Canonical InteractionPrimitives authored
@@ -1292,14 +1292,14 @@ relates to the parent's. Two new optional attributes on `AgentRuntimeImpl`:
 - `subagentToolScopePolicy: enum<inherit-parent,explicit-allowlist,fresh-defaults,none>`
 
 Backfilled on canonical agents (claude-code, codex, gemini-cli, copilot-cli, cursor,
-opencode, agent-mux-remote, babysitter, babysitter-agent, a5c). Codex toolScopePolicy
+opencode, agent-mux-remote, babysitter, agent-platform, a5c). Codex toolScopePolicy
 is annotated with a `# TODO: verify` — could be `inherit-parent` or `fresh-defaults`.
 
 ### Open TODOs out of catalog pass 45
 
 - Enumerate interaction primitives for the 12 non-top-6 AgentUIImpls
   (omp, openclaw, hermes, pi, qwen, amp, droid, agent-mux, agent-mux-remote, a5c,
-  babysitter, babysitter-agent).
+  babysitter, agent-platform).
 - Verify codex `subagentToolScopePolicy` (inherit-parent vs fresh-defaults).
 - Decide whether to grow `InteractionPrimitiveCategory` enum to include
   `human-in-loop`, `lifecycle`, `configuration`, `observability`, `content-input`,
@@ -1371,8 +1371,8 @@ Replaced the `# TODO: enumerate interaction primitives` comment with concrete
 `supports_interaction_primitive` edge sets in:
 
 - `babysitter-ui-current.yaml` — 12 primitives (8 babysitter + 4 aggregated
-  agent-mux navigation primitives, since babysitter UI = agent-mux + babysitter-agent).
-- `babysitter-agent-ui-current.yaml` — 5 primitives, all `mechanism: native-api`
+  agent-mux navigation primitives, since babysitter UI = agent-mux + agent-platform).
+- `agent-platform-ui-current.yaml` — 5 primitives, all `mechanism: native-api`
   (CLI subcommands).
 - `agent-mux-ui-current.yaml` — 13 primitives (10 agent-mux + 3 canonical:
   command-palette, model-picker, prompt-input).
@@ -2400,7 +2400,7 @@ that the reference-data tail is expected.
 | Category | Wirings | Mechanism |
 | --- | --- | --- |
 | Benchmark → SkillArea (`covers`) | 15 | `covers` edges added on the 15 orphan benchmarks (knowledge / reasoning / safety / tool-use / leaderboards) |
-| Presentation ← AgentUIImpl (`bundled_with`) | 10 | 9 agent-mux surfaces wired from `agent-ui-impl:agent-mux.ui@current`; 1 `presentation:babysitter-agent-cli` wired from `agent-ui-impl:babysitter-agent.ui@current` |
+| Presentation ← AgentUIImpl (`bundled_with`) | 10 | 9 agent-mux surfaces wired from `agent-ui-impl:agent-mux.ui@current`; 1 `presentation:agent-platform-cli` wired from `agent-ui-impl:agent-platform.ui@current` |
 | HookSurface ← HookMapping (`maps_hook`) | 6 | New file `graph/channels-hooks/hook-mappings/babysitter-canonical.yaml` adds 6 HookMappings binding the canonical surfaces (start, done, wake, phase-change, phase-change-check, decision-point) to `agent-version:babysitter@current` |
 | ObservabilityBackend ← AgentRuntimeImpl (`emits_signals_to`) | 6 | `agent-runtime-impl:claude-code.runtime@1.x` now `emits_signals_to` the 6 orphan obs backends (datadog / grafana-cloud / splunk / new-relic / prometheus / jaeger). Speculative — backends are reference impls, not vendor commitments |
 | ProcessDescriptor ← PackageSurface (`surfaces_process`) | 21 | `package:a5c-ai-babysitter` `surfaces_process` the 21 orphan a5c-marketplace process descriptors |
@@ -5237,7 +5237,7 @@ itself with n=0).
 | agent-mux/sdk umbrella (catalog pass 97 list) | confirmed wrapper | existing PackageSurface accurate |
 | agent-mux/ui + webui (catalog pass 97 list) | structured-deferral | deferred-work:agent-mux-ui-webui-react-components (status: abandoned, presentation-only) |
 | agent-catalog package (catalog pass 97 list) | structured-deferral | deferred-work:agent-catalog-library-functions (status: abandoned, projection-over-graph) |
-| babysitter platform packages (catalog pass 97 list) | partial-authored | PackageSurface enriched + 13 InteractionPrimitive command-group records (run / task / session / plugin / skill / process-library / profile / instructions / compression / breakpoint / hook / harness-runtime / mcp-server) wired to babysitter-sdk + babysitter-agent surfaces |
+| babysitter platform packages (catalog pass 97 list) | partial-authored | PackageSurface enriched + 13 InteractionPrimitive command-group records (run / task / session / plugin / skill / process-library / profile / instructions / compression / breakpoint / hook / harness-runtime / mcp-server) wired to babysitter-sdk + agent-platform surfaces |
 | JournalEvent for LangGraph (catalog pass 93) | structured-deferral | deferred-work:journal-event-langgraph (status: open, needs vendor evidence) |
 | JournalEvent for OAI Agents SDK (catalog pass 93) | structured-deferral | deferred-work:journal-event-openai-agents-sdk (status: open) |
 | ProtocolMessage Gemini/Cohere/Mistral/Ollama (catalog pass 93) | structured-deferral | 4 deferred work items (status: open per vendor) |
@@ -5257,7 +5257,7 @@ itself with n=0).
 
 ### Edges wired
 
-- exposes_subcommand: 17 (tasks-mux leaves) + 8 (harness-mock) + 12 (babysitter-sdk) + 1 (babysitter-agent) = 38 new
+- exposes_subcommand: 17 (tasks-mux leaves) + 8 (harness-mock) + 12 (babysitter-sdk) + 1 (agent-platform) = 38 new
 - exposes_endpoint: 8 (tasks-mux outbound-client)
 - exposed_by: 8 (APIEndpoint to PackageSurface)
 
@@ -5354,7 +5354,7 @@ catalog pass but cheap to unblock individually.
 - graph/catalog-meta/package-surfaces/tasks-mux.yaml (extended exposes_subcommand + exposes_endpoint)
 - graph/catalog-meta/package-surfaces/agent-mux-harness-mock.yaml (extended exposes_subcommand)
 - graph/catalog-meta/package-surfaces/babysitter-sdk.yaml (rewritten with bins + 12 subcommand groups)
-- graph/catalog-meta/package-surfaces/babysitter-agent.yaml (rewritten with babysitter-harness bin)
+- graph/catalog-meta/package-surfaces/agent-platform.yaml (rewritten with babysitter-harness bin)
 - migration/legacy-vs-atlas-coverage-matrix.md (catalog pass 98 section appended)
 - REMODEL-NOTES.md (this section)
 

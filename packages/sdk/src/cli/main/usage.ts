@@ -81,9 +81,9 @@ function coreHumanUsage(commandName: string): string {
   ${commandName} configure [show|validate|paths] [--json] [--defaults-only]
   ${commandName} version
 
-Harness runtime commands are provided by the optional ${"@a5c-ai/babysitter-agent"} package:
-  babysitter-agent call --harness claude-code --prompt "implement feature X" --workspace .
-  babysitter-agent start-server [--transport <stdio|websocket>]`;
+Harness runtime commands are provided by the optional ${"@a5c-ai/agent-platform"} package:
+  agent-platform call --harness claude-code --prompt "implement feature X" --workspace .
+  agent-platform start-server [--transport <stdio|websocket>]`;
 }
 
 function harnessAgentUsage(commandName: string): string {

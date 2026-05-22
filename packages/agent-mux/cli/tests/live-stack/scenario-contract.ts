@@ -1,9 +1,9 @@
 export type LiveStackProvider = 'foundry-openai' | 'anthropic-direct' | 'google-vertex' | 'google';
 export type AgentMuxProviderId = 'foundry' | 'anthropic' | 'vertex' | 'google';
-export type LiveStackAgentPath = 'agent-mux' | 'babysitter-agent';
+export type LiveStackAgentPath = 'agent-mux' | 'agent-platform';
 export type LiveStackIntegrationType = 'third-party-plugin' | 'runtime-cli';
 export type LiveStackInstallMode = 'babysitter-plugin' | 'vanilla';
-export type LiveStackAgentId = 'claude-code' | 'codex' | 'gemini-cli' | 'pi' | 'babysitter-agent' | 'internal';
+export type LiveStackAgentId = 'claude-code' | 'codex' | 'gemini-cli' | 'pi' | 'agent-platform' | 'internal';
 export type LiveStackAgentMuxAgentId = 'claude' | 'codex' | 'gemini' | 'pi' | 'babysitter';
 
 export interface LiveStackModelEntry {
@@ -196,8 +196,8 @@ export function assertEvidenceBundleComplete(scenario: LiveStackScenario, bundle
 }
 
 function setupCommandsFor(agentPath: LiveStackAgentPath, agent: LiveStackAgentId, agentMuxAgent: LiveStackAgentMuxAgentId, installMode: LiveStackInstallMode): readonly string[] {
-  if (agentPath === 'babysitter-agent') return ['babysitter-agent create-run --harness internal'];
-  if (installMode === 'vanilla') return [`amux install ${agentMuxAgent}`, agent === 'babysitter-agent' ? 'amux run babysitter' : `amux launch ${agentMuxAgent}`];
+  if (agentPath === 'agent-platform') return ['agent-platform create-run --harness internal'];
+  if (installMode === 'vanilla') return [`amux install ${agentMuxAgent}`, agent === 'agent-platform' ? 'amux run babysitter' : `amux launch ${agentMuxAgent}`];
   return [
     'npm run generate:plugins',
     `amux install ${agentMuxAgent}`,
@@ -205,7 +205,7 @@ function setupCommandsFor(agentPath: LiveStackAgentPath, agent: LiveStackAgentId
     `babysitter harness:install-plugin ${agent}`,
     'mkdir -p .a5c-live-test',
     'cp fixtures/summarize-translate-test.mjs .a5c/processes/',
-    agent === 'babysitter-agent' ? 'amux run babysitter' : `amux launch ${agentMuxAgent}`,
+    agent === 'agent-platform' ? 'amux run babysitter' : `amux launch ${agentMuxAgent}`,
   ];
 }
 
@@ -218,7 +218,7 @@ function agentMuxAgentFor(agent: LiveStackAgentId): LiveStackAgentMuxAgentId {
     case 'codex':
     case 'pi':
       return agent;
-    case 'babysitter-agent':
+    case 'agent-platform':
       return 'babysitter';
     case 'internal':
       return 'babysitter';

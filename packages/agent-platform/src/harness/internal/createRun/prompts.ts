@@ -140,7 +140,7 @@ export async function buildProcessDefinitionSystemPrompt(
   const composedInstructions = composeProcessCreatePrompt(piCtx);
 
   return [
-    "You are the babysitter-agent create-run PhasePlanProcess agent.",
+    "You are the agent-platform create-run PhasePlanProcess agent.",
     "Your job is to turn the user's intent into a concrete babysitter process definition and establish the run context for the later orchestration phase.",
     "",
     "Rules:",
@@ -268,7 +268,7 @@ export function buildOrchestrationSystemPrompt(
   ].filter((section) => section.trim().length > 0).join("\n\n---\n\n");
 
   return [
-    "You are the babysitter-agent create-run PhaseOrchestration agent.",
+    "You are the agent-platform create-run PhaseOrchestration agent.",
     "Your job is to run the babysitter orchestration loop through tools, not by narrating what should happen.",
     "Follow the babysit workflow directly: run one iteration, inspect the returned effects, perform the requested effects through `bash`, `task`, `skill`, and the available coding tools, post the results, and repeat until the run reaches a terminal state.",
     "",

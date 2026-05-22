@@ -110,7 +110,7 @@ Switch from weekly to follow-the-sun:
 Run:
 
 ```bash
-babysitter-agent call \
+agent-platform call \
   --harness claude-code \
   --process .a5c/processes/runbooks/scaffold-service.js#process \
   --prompt "Generate runbook entries for every alert in prometheus/rules/<service>.yml"

@@ -232,7 +232,7 @@ async function handleHarnessDiscover(parsed: HarnessParsedArgs): Promise<number>
 async function handleHarnessInvoke(parsed: HarnessParsedArgs): Promise<number> {
   const harnessName = parsed.positional?.[0];
   if (!harnessName || !parsed.prompt) {
-    console.error('Usage: babysitter-agent invoke <name> --prompt "<text>"');
+    console.error('Usage: agent-platform invoke <name> --prompt "<text>"');
     return 1;
   }
   const normalizedHarnessName = normalizeBuiltInHarnessName(harnessName);

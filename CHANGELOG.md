@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### docs
 - 9e0ad1f88 docs: v6.1 agent layer capabilities — what core/runtime/platform should do (Tal Muskal, 8 hours ago)
-- 5183b3caf docs: v6.1 agent stack decomposition — babysitter-agent, agent-core, SDK (Tal Muskal, 9 hours ago)
+- 5183b3caf docs: v6.1 agent stack decomposition — agent-platform, agent-core, SDK (Tal Muskal, 9 hours ago)
 - 909da7cf4 docs: v6.1 graph alignment task list — 66 tasks across 5 phases (Tal Muskal, 9 hours ago)
 - 3070405aa docs: v6.1 mux architecture deep dive — 9 canonical muxes vs packages (Tal Muskal, 10 hours ago)
 - 8170b0775 docs: v6.1 spec — layer-to-package gap analysis (Tal Muskal, 11 hours ago)

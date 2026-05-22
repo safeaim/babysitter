@@ -106,7 +106,7 @@ Ship one small architecture improvement that proves the V6 method works.
 
 ### Selected Slice
 
-The currently selected first executable slice is documented in [ADR-001: Babysitter-Agent Seam Contract As The First Executable V6 Slice](./decisions/ADR-001-babysitter-agent-seam-contract.md).
+The currently selected first executable slice is documented in [ADR-001: Babysitter-Agent Seam Contract As The First Executable V6 Slice](./decisions/ADR-001-agent-platform-seam-contract.md).
 
 Current validation command:
 
@@ -242,7 +242,7 @@ Only `npm run test:architecture` is a current repository guarantee in this slice
 
 `npm run test:architecture` currently enforces:
 
-- the `@a5c-ai/babysitter-agent` seam contract already accepted in ADR-001,
+- the `@a5c-ai/agent-platform` seam contract already accepted in ADR-001,
 - repo package-family dependency direction across the orchestration core, dispatch layer, cross-harness support systems, downstream consumers, and first-class install bundles.
 
 The gate runs in:

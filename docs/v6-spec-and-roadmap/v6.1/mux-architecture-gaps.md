@@ -184,7 +184,7 @@ The Atlas graph defines **9 canonical muxes** as the bridging abstractions of th
 **Graph description:** CLI→MCP gateway, CLI→MCP gateway, and tool-level hooks layered on hooks-mux PreToolUse / PostToolUse.
 
 **Implementation reality:**
-- Tool dispatch is embedded in agent-mux-core and babysitter-agent
+- Tool dispatch is embedded in agent-mux-core and agent-platform
 - MCP tool serving is in babysitter-sdk (mcp module)
 - No unified tool-mux abstraction
 
@@ -199,14 +199,14 @@ The Atlas graph defines **9 canonical muxes** as the bridging abstractions of th
 
 ## Agent Stack Implementation Layers (L4-L6)
 
-### agent-core vs agent-mux-core vs babysitter-agent
+### agent-core vs agent-mux-core vs agent-platform
 
 The graph defines three implementation node kinds for the agent stack:
 
 | Node Kind | Layer | Package | Role |
 |-----------|-------|---------|------|
 | AgentCoreImpl | L4 | `agent-core` | Unified agent loop (babysitter-native) |
-| AgentRuntimeImpl | L5 | `babysitter-agent` | Host process, CLI, seam contracts |
+| AgentRuntimeImpl | L5 | `agent-platform` | Host process, CLI, seam contracts |
 | AgentPlatformImpl | L6 | `extension-mux` + `agent-catalog` | Extensions, distribution, ecosystem |
 
 But `agent-mux-core` also implements L4-L5 concerns (event dispatch, session management, adapter registry) without being an "AgentCoreImpl" in the graph.

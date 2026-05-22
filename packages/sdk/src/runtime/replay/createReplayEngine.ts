@@ -22,7 +22,7 @@ export interface CreateReplayEngineOptions {
   now?: () => Date;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logger?: (...args: any[]) => void;
-  subprocessSupport?: "disabled" | "babysitter-agent";
+  subprocessSupport?: "disabled" | "agent-platform";
 }
 
 export interface ReplayEngine {

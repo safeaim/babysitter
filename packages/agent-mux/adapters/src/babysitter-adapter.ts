@@ -1,7 +1,7 @@
 /**
  * BabysitterAdapter — Babysitter orchestration harness adapter.
  *
- * Spawns the `babysitter-agent` CLI (`invoke` / `call`) and
+ * Spawns the `agent-platform` CLI (`invoke` / `call`) and
  * parses its JSONL output into normalized AgentEvent streams.
  */
 
@@ -34,7 +34,7 @@ export class BabysitterAdapter extends BaseAgentAdapter {
   constructor(agent?: string, cliCommand?: string) {
     super();
     this.agent = agent ?? 'babysitter';
-    this.cliCommand = cliCommand ?? 'babysitter-agent';
+    this.cliCommand = cliCommand ?? 'agent-platform';
   }
   readonly hostEnvSignals = ['BABYSITTER_SESSION_ID', 'AGENT_SESSION_ID'] as const;
 
@@ -92,7 +92,7 @@ export class BabysitterAdapter extends BaseAgentAdapter {
     ],
     authFiles: [],
     installMethods: [
-      { platform: 'all', type: 'npm', command: 'npm install -g @a5c-ai/babysitter-agent' },
+      { platform: 'all', type: 'npm', command: 'npm install -g @a5c-ai/agent-platform' },
     ],
   };
 
@@ -318,12 +318,12 @@ export class BabysitterAdapter extends BaseAgentAdapter {
       agent: 'babysitter',
       providerName: 'Babysitter',
       steps: [
-        { step: 1, description: 'Install babysitter agent CLI', command: 'npm i -g @a5c-ai/babysitter-agent' },
-        { step: 2, description: 'Configure the underlying harness auth (e.g., Claude, Codex)', command: 'babysitter-agent discover' },
+        { step: 1, description: 'Install babysitter agent CLI', command: 'npm i -g @a5c-ai/agent-platform' },
+        { step: 2, description: 'Configure the underlying harness auth (e.g., Claude, Codex)', command: 'agent-platform discover' },
       ],
       envVars: [],
       documentationUrls: ['https://github.com/a5c-ai/babysitter'],
-      verifyCommand: 'babysitter-agent version',
+      verifyCommand: 'agent-platform version',
     };
   }
 

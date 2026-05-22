@@ -1,6 +1,6 @@
 /**
  * Re-export shim — canonical implementation lives in @a5c-ai/agent-runtime.
- * Internal babysitter-agent consumers continue to import via relative paths
+ * Internal agent-platform consumers continue to import via relative paths
  * through this barrel file.
  */
 export {

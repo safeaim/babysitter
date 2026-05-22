@@ -33,8 +33,8 @@ For agent runtime orchestration commands such as `call`, `yolo`,
 `invoke`, `resume`, `start-server`, and `tui`, install the optional agent CLI:
 
 ```bash
-npm install -g @a5c-ai/babysitter-agent
-babysitter-agent --help-human
+npm install -g @a5c-ai/agent-platform
+agent-platform --help-human
 ```
 
 ## What's Included

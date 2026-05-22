@@ -11,7 +11,7 @@
 Adapt prompt personality and style per orchestration mode (interactive, headless, resume, worker, plan-only) so that harness behavior matches the operational context.
 
 ## Current State
-Interactive/non-interactive/resume prompts exist but are bespoke. The wrapper commands (`babysitter-agent plan`, `babysitter-agent yolo`, `babysitter-agent forever`) imply different modes but prompt adaptation is minimal.
+Interactive/non-interactive/resume prompts exist but are bespoke. The wrapper commands (`agent-platform plan`, `agent-platform yolo`, `agent-platform forever`) imply different modes but prompt adaptation is minimal.
 
 ## Target State
 Formal personality overlays per mode. A `plan` overlay emphasizes exploration and analysis. A `yolo` overlay emphasizes speed and action. A `resume` overlay emphasizes context restoration. A `worker` overlay emphasizes task focus and output quality.

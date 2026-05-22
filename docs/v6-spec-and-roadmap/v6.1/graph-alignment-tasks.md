@@ -86,9 +86,9 @@ The graph layer is "Orchestration" and the concept of "session-storage-mux" live
 - [ ] Add `"atlas": { "layers": ["L13-orchestration"], "muxes": ["session-storage-mux"] }` to sdk `package.json`
 - [ ] Extract session-storage-mux interface (not implementation) for documentation
 
-### 1.5 babysitter-agent — align to graph
+### 1.5 agent-platform — align to graph
 
-Graph has `AgentRuntimeImpl` and `AgentPlatformImpl`. babysitter-agent implements both.
+Graph has `AgentRuntimeImpl` and `AgentPlatformImpl`. agent-platform implements both.
 
 **Tasks:**
 - [ ] Add `"atlas": { "layers": ["L5-agent-runtime", "L6-agent-platform"], "nodeKinds": ["AgentRuntimeImpl"] }` to package.json
@@ -106,7 +106,7 @@ Graph: `mux:tool-mux` — CLI→MCP gateway, tool-level hooks, tool dispatch pol
 
 Currently scattered across:
 - `babysitter-sdk/src/mcp/` (MCP server)
-- `babysitter-agent/` (tool dispatch)
+- `agent-platform/` (tool dispatch)
 - `agent-mux-core/` (tool call events)
 
 **Tasks:**
@@ -250,7 +250,7 @@ Phase 5 (metadata) — do last, sweep pass
 | 1.2 tasks-mux rename | 8 | Medium | Low |
 | 1.3 agent-mux decomposition | 5 | **Large** | Medium (API surface changes) |
 | 1.4 SDK annotation | 2 | Small | None |
-| 1.5 babysitter-agent annotation | 2 | Small | None |
+| 1.5 agent-platform annotation | 2 | Small | None |
 | 2.1 tool-mux package | 6 | **Large** | Medium (new abstraction) |
 | 2.2 event schema | 4 | Medium | Low |
 | 3.1 9-state lifecycle | 8 | **Large** | High (runtime behavior change) |

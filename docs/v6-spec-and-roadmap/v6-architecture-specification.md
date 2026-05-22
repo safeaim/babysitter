@@ -82,7 +82,7 @@ The next stage keeps the current monorepo shape and improves it in place:
 
 - `packages/sdk`: continue as the durable runtime/orchestration core.
 - `packages/babysitter`: remain the primary CLI package.
-- `packages/babysitter-agent`: remain the agent runtime while internal seams are clarified.
+- `packages/agent-platform`: remain the agent runtime while internal seams are clarified.
 - `plugins/*`: remain first-class integration boundaries and packaging reality checks.
 - `.a5c/processes` and process-library integration: remain orchestration delivery mechanisms.
 
@@ -104,7 +104,7 @@ The following may become real later, but are not part of the current normative t
 - `agent-platform`,
 - `agent-platform-meta-plugins`,
 - `agent-platform-orchestration-plugin`,
-- `babysitter-agent` as a renamed or re-scoped top-level package.
+- `agent-platform` as a renamed or re-scoped top-level package.
 
 These names can remain as exploratory vocabulary, but they are not yet committed deliverables.
 Implementation plans may mention them only as exploratory labels or appendix material. They must not appear as phase deliverables, package-creation steps, or success criteria unless a later decision record explicitly promotes them into scope.

@@ -16,16 +16,16 @@ export {
 // Result envelope utility (used by daemon lifecycle/config)
 export { ok, fail, type ApiResult } from "./apiResult";
 
-// Daemon management (moved from babysitter-agent)
+// Daemon management (moved from agent-platform)
 export * from "./daemon";
 
-// Session state management (moved from babysitter-agent)
+// Session state management (moved from agent-platform)
 export * from "./session";
 
-// Cost tracking (moved from babysitter-agent)
+// Cost tracking (moved from agent-platform)
 export * from "./cost";
 
-// Observability (moved from babysitter-agent)
+// Observability (moved from agent-platform)
 export * from "./observability";
 
 // Telemetry (L5 type stubs — issue #217)

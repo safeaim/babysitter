@@ -33,7 +33,7 @@ An Ink `StatusLine` component rendered at terminal bottom showing:
 babysitter | run:01KNKDVE | iter 5/65000 | 3 effects (1 pending) | 45k tokens | $0.12 | 3m 22s
 ```
 
-Updates in real-time during `babysitter-agent call`, `babysitter-agent resume`, and embedded SDK
+Updates in real-time during `agent-platform call`, `agent-platform resume`, and embedded SDK
 dashboard sessions. Shows: run ID (abbreviated), iteration count, effect
 summary, token usage, estimated cost, elapsed time. Color-coded: green=healthy,
 yellow=slow, red=error.

@@ -29,7 +29,7 @@ attributes:
   thinkingChannelHandling: delegated-to-remote
   notes: |
     @a5c-ai/babysitter-sdk is the programmatic surface of babysitter — a
-    library imported by host harnesses (and by the babysitter-agent CLI).
+    library imported by host harnesses (and by the agent-platform CLI).
     Layer-3 (model transport) concerns are delegated to whichever harness
     subprocess is spawned for kind: 'agent' tasks.
 edges:

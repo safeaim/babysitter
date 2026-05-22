@@ -126,8 +126,8 @@ describe('primary live stack runner contract', () => {
   it('uses the direct harness runner for yolo plugin commands', async () => {
     const yoloCommand = await fs.readFile(path.join(process.cwd(), 'plugins', 'babysitter-unified', 'commands', 'yolo.md'), 'utf8');
 
-    expect(yoloCommand).toContain('babysitter-agent yolo --harness claude-code');
-    expect(yoloCommand).toContain('babysitter-agent yolo --harness codex');
+    expect(yoloCommand).toContain('agent-platform yolo --harness claude-code');
+    expect(yoloCommand).toContain('agent-platform yolo --harness codex');
     expect(yoloCommand).not.toContain('instructions:babysit-skill');
     expect(yoloCommand).not.toContain('Invoke the babysitter:babysit skill');
   });

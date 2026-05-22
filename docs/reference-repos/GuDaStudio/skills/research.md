@@ -13,7 +13,7 @@ A Chinese-language collection of agent skills enabling Claude Code to collaborat
 
 ## Assessment
 
-Conceptually relevant to babysitter's multi-harness architecture. The pattern of delegating tasks from one AI model to another maps directly to babysitter's harness adapter system. However, the implementation is simple (just skill installation scripts) compared to babysitter's sophisticated harness abstraction. The cross-model delegation concept is already better implemented in babysitter-agent's `invoke` command and adapter system.
+Conceptually relevant to babysitter's multi-harness architecture. The pattern of delegating tasks from one AI model to another maps directly to babysitter's harness adapter system. However, the implementation is simple (just skill installation scripts) compared to babysitter's sophisticated harness abstraction. The cross-model delegation concept is already better implemented in agent-platform's `invoke` command and adapter system.
 
 ## Extraction Priority
 - Low

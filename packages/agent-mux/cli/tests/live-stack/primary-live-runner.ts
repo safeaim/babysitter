@@ -74,11 +74,11 @@ export function buildPrimaryLiveStackCommands(
 
   if (scenario.agent.integrationType === 'runtime-cli') {
     return [
-      commandExecution(commandEnv, 'LIVE_STACK_BABYSITTER_AGENT_BIN', 'babysitter-agent', ['create-run', '--harness', 'internal', '--workspace', options.cwd, '--model', scenario.model.model, '--prompt', prompt, '--json'], options.cwd, timeoutMs),
+      commandExecution(commandEnv, 'LIVE_STACK_AGENT_PLATFORM_BIN', 'agent-platform', ['create-run', '--harness', 'internal', '--workspace', options.cwd, '--model', scenario.model.model, '--prompt', prompt, '--json'], options.cwd, timeoutMs),
     ];
   }
 
-  if (scenario.agent.agent === 'babysitter-agent') {
+  if (scenario.agent.agent === 'agent-platform') {
     const runCommand = commandExecution(
       { ...commandEnv, AMUX_PROVIDER: scenario.model.amuxProvider },
       'LIVE_STACK_AMUX_BIN',
@@ -224,7 +224,7 @@ function bridgeFlags(env: Record<string, string | undefined>): string[] {
 }
 
 function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {
-  if (scenario.agent.agent === 'babysitter-agent') {
+  if (scenario.agent.agent === 'agent-platform') {
     return 1;
   }
   if (scenario.agent.installMode === 'babysitter-plugin') {
@@ -466,7 +466,7 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
     ? conciseTask
     : `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek. Combine the English and Greek versions into one markdown document and save the entire result in a single file write to .a5c-live-test/${traceId}-odyssey.md`;
 
-  if (scenario.agent.agent === 'babysitter-agent') {
+  if (scenario.agent.agent === 'agent-platform') {
     return `Write a 12-paragraph summary of Homer's Odyssey, then translate each paragraph to Greek.`;
   }
 
@@ -499,7 +499,7 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
     }
     if (processMode === 'resume') {
       const resumeRunId = env['LIVE_STACK_RESUME_RUN_ID'] ?? `resume-${traceId}`;
-      const resumeInstructions = `Run this command and wait for it to complete: babysitter-agent resume --run-id ${resumeRunId} --harness codex --workspace "$PWD" --non-interactive --json. The process file is at .a5c/processes/summarize-translate-test.mjs. After the command completes, write the output file to .a5c-live-test/${traceId}-odyssey.md if it doesn't already exist.`;
+      const resumeInstructions = `Run this command and wait for it to complete: agent-platform resume --run-id ${resumeRunId} --harness codex --workspace "$PWD" --non-interactive --json. The process file is at .a5c/processes/summarize-translate-test.mjs. After the command completes, write the output file to .a5c-live-test/${traceId}-odyssey.md if it doesn't already exist.`;
       if (scenario.agent.agent === 'claude-code') return `/babysitter:yolo ${resumeInstructions}`;
       if (scenario.agent.agent === 'codex') return `$babysitter:yolo ${resumeInstructions}`;
       return resumeInstructions;
@@ -704,18 +704,18 @@ async function validateAgentBehavior(
   env: Record<string, string | undefined>,
 ): Promise<VerificationEntry[]> {
   const entries: VerificationEntry[] = [];
-  const isBabysitterAgent = scenario.agent.agent === 'babysitter-agent';
+  const isBabysitterAgent = scenario.agent.agent === 'agent-platform';
   const isBabysitterPlugin = scenario.agent.installMode === 'babysitter-plugin';
   const deferredProcessCreationEntries: VerificationEntry[] = [];
 
-  // --- babysitter-agent: verify model responded with content ---
+  // --- agent-platform: verify model responded with content ---
   if (isBabysitterAgent) {
     if (output.trim().length > 0) {
       entries.push({ name: 'model-response', status: 'passed', detail: `agent responded (${output.trim().length} chars)` });
     } else {
       entries.push({ name: 'model-response', status: 'failed', detail: 'no output from agent (empty response)' });
     }
-    // Fall through to file-creation check — babysitter-agent gets the same
+    // Fall through to file-creation check — agent-platform gets the same
     // odyssey task and should produce the file or at least substantial content.
   }
 
@@ -814,7 +814,7 @@ async function validateAgentBehavior(
 
     // stop-hooks and hooks-mux-session: verify hooks evidence.
     // Hooks are required when the harness drives iterations (interactive/bridged-hooks).
-    // When babysitter-agent drives the loop internally (NI with bridge-hooks),
+    // When agent-platform drives the loop internally (NI with bridge-hooks),
     // hooks are desirable but the run completing is the primary signal.
     // We defer the hooks verdict until after run-completion is known.
     const deferredHooksEntries: VerificationEntry[] = [];

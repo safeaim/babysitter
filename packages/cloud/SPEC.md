@@ -23,14 +23,14 @@ The package is responsible for making the repo's deployable utilities work toget
    - newly created managed cluster on EKS, AKS, or GKE
 3. Support install, upgrade, reconfigure, and drift-aware reconciliation.
 4. Make `agent-mux` Kubernetes mode a first-class deployment option.
-5. Optionally configure `babysitter-agent` providers and model routing.
+5. Optionally configure `agent-platform` providers and model routing.
 6. Optionally install agent binaries and their Babysitter plugins when the target runtime needs them.
 7. Provide a non-local authentication bootstrap path, including a default admin password flow.
 8. Fit existing repo CI/release conventions with staging and production automation.
 
 ## 3. Non-Goals
 
-- Replacing deep runtime logic that belongs in `agent-mux`, `kanban`, or `babysitter-agent`
+- Replacing deep runtime logic that belongs in `agent-mux`, `kanban`, or `agent-platform`
 - Becoming a general-purpose IaC framework outside this monorepo
 - Owning application business logic for kanban, gateway, or Babysitter orchestration
 - Hiding provider credentials inside the repo; secrets must come from the environment, secret stores, or explicit config files
@@ -41,7 +41,7 @@ The package is responsible for making the repo's deployable utilities work toget
 
 - `@a5c-ai/kanban`
 - `@a5c-ai/agent-mux-gateway`
-- `@a5c-ai/babysitter-agent` as an optional service/runtime
+- `@a5c-ai/agent-platform` as an optional service/runtime
 - optional observer and supporting runtime components when enabled
 
 The baseline topology is:
@@ -134,7 +134,7 @@ packages/cloud/
     adapters/
       kanban.ts
       agent-mux-gateway.ts
-      babysitter-agent.ts
+      agent-platform.ts
   tests/
     unit/
     integration/
@@ -271,7 +271,7 @@ The deployment package must own the cross-service wiring:
 
 - kanban receives the gateway base URL automatically
 - gateway receives storage paths and auth bootstrap config automatically
-- optional babysitter-agent receives gateway URL, provider config, and model config automatically
+- optional agent-platform receives gateway URL, provider config, and model config automatically
 - agent-mux Kubernetes invocation mode is selectable in generated runtime config
 
 ### 10.3 Auth Bootstrap
@@ -308,7 +308,7 @@ Upgrade sequence:
 
 ## 12. Provider and Model Configuration
 
-Optional `babysitter-agent` setup should support:
+Optional `agent-platform` setup should support:
 
 - provider credentials references
 - provider enable/disable lists
@@ -320,7 +320,7 @@ This should be represented as declarative config, not one-off shell scripts.
 
 Open dependency:
 
-- some provider/model automation may require new non-interactive config surfaces in `babysitter-agent` and/or `agent-mux`
+- some provider/model automation may require new non-interactive config surfaces in `agent-platform` and/or `agent-mux`
 
 ## 13. Optional Agent + Plugin Installation
 
@@ -400,7 +400,7 @@ Suggested minimum scripts:
 
 - gateway auth/runtime semantics
 - kanban application behavior
-- babysitter-agent orchestration/runtime behavior
+- agent-platform orchestration/runtime behavior
 - agent-mux adapter capabilities and installation semantics
 
 ## 17. Dependency Gaps Identified During Spec
@@ -411,7 +411,7 @@ The following areas should be tracked outside `packages/cloud` implementation:
    Tracking: `ACA-234`
 2. `kanban` needs cloud bootstrap behavior so it can connect to a provisioned gateway without manual local-storage token pasting as the only path.
    Tracking: `ACA-235`
-3. `babysitter-agent` and/or `agent-mux` need stronger non-interactive provider/model and harness/plugin installation/configuration surfaces.
+3. `agent-platform` and/or `agent-mux` need stronger non-interactive provider/model and harness/plugin installation/configuration surfaces.
    Tracking: `ACA-236`
 4. Root CI/release automation needs explicit support for the new cloud workspace.
    Tracking: `ACA-237`
@@ -433,7 +433,7 @@ The following areas should be tracked outside `packages/cloud` implementation:
 
 ### Phase 3
 
-- add optional babysitter-agent provider/model setup
+- add optional agent-platform provider/model setup
 - add optional harness/plugin install flow
 - wire staging/prod pipelines
 

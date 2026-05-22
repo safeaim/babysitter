@@ -1,19 +1,19 @@
-# Agent Stack Decomposition — babysitter-agent, agent-core, SDK, and agent-mux
+# Agent Stack Decomposition — agent-platform, agent-core, SDK, and agent-mux
 
-The atlas graph models two AgentProducts (`babysitter-agent`, `agent-mux`) each decomposed into Core/Runtime/Platform/UI implementations. This document maps the graph's decomposition to the actual packages and identifies what needs to change.
+The atlas graph models two AgentProducts (`agent-platform`, `agent-mux`) each decomposed into Core/Runtime/Platform/UI implementations. This document maps the graph's decomposition to the actual packages and identifies what needs to change.
 
 ## Graph Model: Two Agent Products
 
-### babysitter-agent (full-cli-agent, stackScope: full)
+### agent-platform (full-cli-agent, stackScope: full)
 
-The graph decomposes `agent:babysitter-agent` into 4 implementation layers:
+The graph decomposes `agent:agent-platform` into 4 implementation layers:
 
 | Graph Node | Kind | Layer | Description |
 |-----------|------|-------|-------------|
-| `agent-core-impl:babysitter-agent.core@current` | AgentCoreImpl | L4 | SDK-backed CLI loop — delegates to babysitter-sdk process functions |
-| `agent-runtime-impl:babysitter-agent.runtime@current` | AgentRuntimeImpl | L5 | SDK runtime + daemon — daemon, observer, MCP server surfaces |
-| `agent-platform-impl:babysitter-agent.platform@current` | AgentPlatformImpl | L6 | defineTask + plugin/skill registry |
-| `agent-ui-impl:babysitter-agent.ui@current` | AgentUIImpl | L11 | CLI binary presentation |
+| `agent-core-impl:agent-platform.core@current` | AgentCoreImpl | L4 | SDK-backed CLI loop — delegates to babysitter-sdk process functions |
+| `agent-runtime-impl:agent-platform.runtime@current` | AgentRuntimeImpl | L5 | SDK runtime + daemon — daemon, observer, MCP server surfaces |
+| `agent-platform-impl:agent-platform.platform@current` | AgentPlatformImpl | L6 | defineTask + plugin/skill registry |
+| `agent-ui-impl:agent-platform.ui@current` | AgentUIImpl | L11 | CLI binary presentation |
 
 ### agent-mux (full-cli-agent + remote)
 
@@ -39,37 +39,37 @@ The graph has `agent:agent-mux` and `agent:agent-mux-remote`:
 |---------|----------|----------------------|
 | `packages/sdk/` | `@a5c-ai/babysitter-sdk` | Orchestration engine: runs, replay, storage, tasks, hooks, plugins, profiles, session, compression, MCP, CLI commands |
 | `packages/agent-core/` | `@a5c-ai/agent-core` | Thin: agentic tools, background process registry, session binding, deferred tool registry |
-| `packages/babysitter-agent/` | `@a5c-ai/babysitter-agent` | Fat CLI: wraps SDK + agent-core, adds daemon, observer, governance, harness bridge, cost, interaction |
+| `packages/agent-platform/` | `@a5c-ai/agent-platform` | Fat CLI: wraps SDK + agent-core, adds daemon, observer, governance, harness bridge, cost, interaction |
 
 ### The confusion:
 
 1. **`agent-core` is tiny** — 6 source files. It's NOT the "core" of anything in the graph sense. The graph's `AgentCoreImpl` (SDK-backed CLI loop) lives in `babysitter-sdk`, not `agent-core`.
 
-2. **`babysitter-sdk` is the real core** — runtime, replay, storage, tasks, hooks, process context, effect model. This is what the graph calls `agent-core-impl:babysitter-agent.core`.
+2. **`babysitter-sdk` is the real core** — runtime, replay, storage, tasks, hooks, process context, effect model. This is what the graph calls `agent-core-impl:agent-platform.core`.
 
-3. **`babysitter-agent` is core + runtime + platform + UI** — it exports 14 sub-modules (api, cli, cost, daemon, governance, harness, interaction, observability, runtime, seams, session, storage, tasks). The graph correctly decomposes it into 4 layers but the code is one monolithic package.
+3. **`agent-platform` is core + runtime + platform + UI** — it exports 14 sub-modules (api, cli, cost, daemon, governance, harness, interaction, observability, runtime, seams, session, storage, tasks). The graph correctly decomposes it into 4 layers but the code is one monolithic package.
 
 ---
 
 ## Target: Graph-Aligned Package Structure
 
-### babysitter-agent decomposition
+### agent-platform decomposition
 
-The graph says babysitter-agent has Core, Runtime, Platform, and UI. The code should reflect this:
+The graph says agent-platform has Core, Runtime, Platform, and UI. The code should reflect this:
 
 | Graph Layer | Target Package | Current Location | What Moves |
 |-------------|---------------|------------------|------------|
-| L4 AgentCoreImpl | `@a5c-ai/babysitter-sdk` (stays) | `packages/sdk/` | Nothing — SDK IS the core. agent-core package contents fold into SDK or babysitter-agent. |
-| L5 AgentRuntimeImpl | `@a5c-ai/babysitter-agent` (stays, slimmed) | `packages/babysitter-agent/` | Keep: daemon, session, harness bridge, runtime. Remove: things that belong in other layers. |
+| L4 AgentCoreImpl | `@a5c-ai/babysitter-sdk` (stays) | `packages/sdk/` | Nothing — SDK IS the core. agent-core package contents fold into SDK or agent-platform. |
+| L5 AgentRuntimeImpl | `@a5c-ai/agent-platform` (stays, slimmed) | `packages/agent-platform/` | Keep: daemon, session, harness bridge, runtime. Remove: things that belong in other layers. |
 | L6 AgentPlatformImpl | `@a5c-ai/extension-mux` (renamed from extension-mux) + `@a5c-ai/agent-catalog` | `packages/extension-mux/`, `packages/agent-catalog/` | Plugin compilation, skill discovery, marketplace |
-| L11 AgentUIImpl | `@a5c-ai/babysitter-agent` CLI entry | `packages/babysitter-agent/src/cli/` | CLI stays in babysitter-agent — it's the binary |
+| L11 AgentUIImpl | `@a5c-ai/agent-platform` CLI entry | `packages/agent-platform/src/cli/` | CLI stays in agent-platform — it's the binary |
 
 ### agent-core package fate
 
 `@a5c-ai/agent-core` is confusingly named — it's not the agent core, it's a small utility package. Options:
 
-**Option A: Fold into babysitter-agent** (recommended)
-- Move agentic tools, background process registry, session binding into babysitter-agent
+**Option A: Fold into agent-platform** (recommended)
+- Move agentic tools, background process registry, session binding into agent-platform
 - Delete agent-core package
 - Update imports
 
@@ -106,33 +106,33 @@ The tasks-mux scope is broader than breakpoints — it's the trust chain for ALL
 | Create `packages/tool-mux/` with seed from agent-core | Medium |
 | Move `agenticTools/` from agent-core to tool-mux | Small |
 | Move `deferredToolRegistry.ts` from agent-core to tool-mux | Small |
-| Move `backgroundProcessRegistry.ts` to babysitter-agent (runtime concern) | Small |
-| Move `session.ts` to babysitter-agent (runtime concern) | Small |
+| Move `backgroundProcessRegistry.ts` to agent-platform (runtime concern) | Small |
+| Move `session.ts` to agent-platform (runtime concern) | Small |
 | Update all imports from `@a5c-ai/agent-core` across monorepo | Medium |
 | Deprecate `@a5c-ai/agent-core` on npm | Small |
 | Update graph: remove agent-core SourceRef, add tool-mux SourceRef | Small |
 
-### T2: Slim babysitter-agent to match graph Runtime+UI scope
+### T2: Slim agent-platform to match graph Runtime+UI scope
 
-babysitter-agent currently exports 14 modules. Per graph, it should own Runtime (L5) and UI (L11):
+agent-platform currently exports 14 modules. Per graph, it should own Runtime (L5) and UI (L11):
 
 | Module | Current | Target Owner | Reason |
 |--------|---------|-------------|--------|
-| `api` | babysitter-agent | babysitter-agent | Runtime API surface |
-| `cli` | babysitter-agent | babysitter-agent | UI (L11) |
-| `cost` | babysitter-agent | babysitter-agent | Runtime telemetry |
-| `daemon` | babysitter-agent | babysitter-agent | Runtime (L5) |
-| `governance` | babysitter-agent | babysitter-agent or tasks-mux | Governance could move to tasks-mux if it's approval-centric |
-| `harness` | babysitter-agent | babysitter-agent | Runtime harness bridge |
-| `interaction` | babysitter-agent | babysitter-agent | UI (L11) |
-| `observability` | babysitter-agent | babysitter-agent | Runtime telemetry |
-| `runtime` | babysitter-agent | babysitter-agent | Core runtime (L5) |
-| `seams` | babysitter-agent | babysitter-agent | Architecture seam contracts |
-| `session` | babysitter-agent | babysitter-agent | Runtime session (L5) |
-| `storage` | babysitter-agent | babysitter-agent | Runtime storage |
-| `tasks` | babysitter-agent | babysitter-agent | Task execution |
+| `api` | agent-platform | agent-platform | Runtime API surface |
+| `cli` | agent-platform | agent-platform | UI (L11) |
+| `cost` | agent-platform | agent-platform | Runtime telemetry |
+| `daemon` | agent-platform | agent-platform | Runtime (L5) |
+| `governance` | agent-platform | agent-platform or tasks-mux | Governance could move to tasks-mux if it's approval-centric |
+| `harness` | agent-platform | agent-platform | Runtime harness bridge |
+| `interaction` | agent-platform | agent-platform | UI (L11) |
+| `observability` | agent-platform | agent-platform | Runtime telemetry |
+| `runtime` | agent-platform | agent-platform | Core runtime (L5) |
+| `seams` | agent-platform | agent-platform | Architecture seam contracts |
+| `session` | agent-platform | agent-platform | Runtime session (L5) |
+| `storage` | agent-platform | agent-platform | Runtime storage |
+| `tasks` | agent-platform | agent-platform | Task execution |
 
-**Result:** babysitter-agent keeps most modules — they ARE runtime/UI concerns. The `governance` module is the only candidate for extraction (to tasks-mux), but only if it's purely about approval policies.
+**Result:** agent-platform keeps most modules — they ARE runtime/UI concerns. The `governance` module is the only candidate for extraction (to tasks-mux), but only if it's purely about approval policies.
 
 ### T3: babysitter-sdk layer annotation
 
@@ -181,14 +181,14 @@ As described in graph-alignment-tasks.md Phase 1.3, split into graph-aligned sub
 ```
 1. Rename tasks-mux → tasks-mux
 2. Rename extension-mux → extension-mux  
-3. Dissolve agent-core → tool-mux seed + babysitter-agent
+3. Dissolve agent-core → tool-mux seed + agent-platform
    ↓
 4. Extract agent-launch-mux from agent-mux-cli
 5. Extract agent-config-mux from agent-mux-cli + agent-mux-adapters
 6. Rename agent-mux-core → agent-comm-mux
    ↓
 7. Annotate babysitter-sdk with layer metadata
-8. Annotate babysitter-agent with layer metadata
+8. Annotate agent-platform with layer metadata
    ↓
 9. Implement tool-mux: schema translation, dispatch policies
 10. Implement agent-launch-mux: 9-state lifecycle, retry
@@ -203,7 +203,7 @@ As described in graph-alignment-tasks.md Phase 1.3, split into graph-aligned sub
 | Package | Graph Alignment | Layer(s) |
 |---------|----------------|----------|
 | `@a5c-ai/babysitter-sdk` | Orchestration engine (annotated, not renamed) | L4, L7, L8, L13 |
-| `@a5c-ai/babysitter-agent` | AgentRuntimeImpl + AgentUIImpl | L5, L11 |
+| `@a5c-ai/agent-platform` | AgentRuntimeImpl + AgentUIImpl | L5, L11 |
 | `@a5c-ai/babysitter` | Metapackage (unchanged) | — |
 | `@a5c-ai/agent-launch-mux` | `mux:agent-launch-mux` | L8 |
 | `@a5c-ai/agent-comm-mux` | `mux:agent-comm-mux` | L4-L5 |
@@ -227,7 +227,7 @@ As described in graph-alignment-tasks.md Phase 1.3, split into graph-aligned sub
 | `@a5c-ai/krate-*` | Project management | L6 |
 
 **Dissolved:**
-- `@a5c-ai/agent-core` → absorbed into `@a5c-ai/tool-mux` (tools) + `@a5c-ai/babysitter-agent` (session/registry)
+- `@a5c-ai/agent-core` → absorbed into `@a5c-ai/tool-mux` (tools) + `@a5c-ai/agent-platform` (session/registry)
 - `@a5c-ai/agent-mux-adapters` → absorbed into `@a5c-ai/agent-config-mux`
 - `@a5c-ai/extension-mux` → renamed to `@a5c-ai/extension-mux`
 - `@a5c-ai/tasks-mux` → renamed to `@a5c-ai/tasks-mux`

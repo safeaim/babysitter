@@ -231,7 +231,7 @@ const workspaceManifestPaths = [
   "packages/agent-core/package.json",
   "packages/sdk/package.json",
   "packages/babysitter/package.json",
-  "packages/babysitter-agent/package.json",
+  "packages/agent-platform/package.json",
   "packages/extension-mux/package.json",
   "packages/tasks-mux/package.json",
   "packages/babysitter-tui-plugins/package.json",
@@ -326,7 +326,7 @@ for (const path of agentMuxManifestPaths) {
 for (const path of [
   "package.json",
   "packages/babysitter/package.json",
-  "packages/babysitter-agent/package.json",
+  "packages/agent-platform/package.json",
   "packages/babysitter-tui-plugins/package.json",
 ]) {
   syncDependencyVersion(path, "@a5c-ai/babysitter-sdk", newVersion);
@@ -336,7 +336,7 @@ for (const path of [
   "package.json",
   "packages/agent-core/package.json",
   "packages/sdk/package.json",
-  "packages/babysitter-agent/package.json",
+  "packages/agent-platform/package.json",
   "packages/agent-mux/adapters/package.json",
   "packages/agent-mux/cli/package.json",
   "packages/agent-mux/core/package.json",
@@ -353,7 +353,7 @@ for (const path of [
   "packages/babysitter-tui-plugins/package.json",
 ]) {
   syncDependencyVersion(path, "@a5c-ai/agent-core", newVersion);
-  syncDependencyVersion(path, "@a5c-ai/babysitter-agent", newVersion);
+  syncDependencyVersion(path, "@a5c-ai/agent-platform", newVersion);
   syncDependencyVersion(path, "@a5c-ai/agent-mux", newAgentMuxVersion);
   syncDependencyVersion(path, "@a5c-ai/agent-mux-adapters", newAgentMuxVersion);
   syncDependencyVersion(path, "@a5c-ai/agent-mux-cli", newAgentMuxVersion);

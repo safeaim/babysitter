@@ -10,7 +10,7 @@ import { normalizeBuiltInHarnessName } from "../builtInHarness";
  */
 
 /**
- * Maps babysitter-agent harness names to the
+ * Maps agent-platform harness names to the
  * corresponding agent-mux adapter identifier.
  */
 export const HARNESS_TO_AMUX_ADAPTER: Readonly<Record<string, string>> = {

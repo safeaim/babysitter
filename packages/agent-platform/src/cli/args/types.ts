@@ -9,6 +9,6 @@ export interface HarnessParsedArgs extends CoreParsedArgs {
   anycliMcp?: boolean;
   anycliAuthFile?: string;
   anycliTransport?: string;
-  /** Output format for babysitter-agent invoke results. */
+  /** Output format for agent-platform invoke results. */
   outputFormat?: HarnessOutputFormat;
 }

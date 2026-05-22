@@ -51,9 +51,9 @@ export function runSubprocessIntrinsic(
   context: TaskIntrinsicContext,
   options?: TaskInvokeOptions,
 ): Promise<SubprocessResult> {
-  if (context.subprocessSupport !== "babysitter-agent") {
+  if (context.subprocessSupport !== "agent-platform") {
     throw new RunFailedError(
-      "Subprocess effects are only supported when the run is iterated by babysitter-agent.",
+      "Subprocess effects are only supported when the run is iterated by agent-platform.",
       {
         runId: context.runId,
         processId: context.processId,

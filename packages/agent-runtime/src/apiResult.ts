@@ -1,8 +1,8 @@
 /**
  * Lightweight result envelope used by daemon lifecycle and config modules.
  *
- * Duplicated from babysitter-agent's api/utils to avoid a circular
- * dependency between agent-runtime and babysitter-agent.
+ * Duplicated from agent-platform's api/utils to avoid a circular
+ * dependency between agent-runtime and agent-platform.
  */
 
 export type ApiResult<T> =

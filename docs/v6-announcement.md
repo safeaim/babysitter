@@ -71,7 +71,7 @@ Breakpoints Mux (108 files, 26K lines) replaces the former `breakpoints-pro` pac
 
 The SDK (453 files, 58K lines) remains the foundation of every babysitter process. v6 expands the public API from 9 to 46+ exports while keeping `defineTask` backward-compatible with the existing object-form spec.
 
-The CLI is now split: core commands stay in the `babysitter` binary, while orchestration commands move to `babysitter-agent`, with `babysitter-harness` retained as a compatibility binary. A new `babysitter-mcp-server` binary provides native MCP integration. Session resolution has been overhauled: PID-scoped session markers now take precedence over environment variables, with `BABYSITTER_TRUST_ENV_SESSION=1` available as an escape hatch for CI environments.
+The CLI is now split: core commands stay in the `babysitter` binary, while orchestration commands move to `agent-platform`, with `babysitter-harness` retained as a compatibility binary. A new `babysitter-mcp-server` binary provides native MCP integration. Session resolution has been overhauled: PID-scoped session markers now take precedence over environment variables, with `BABYSITTER_TRUST_ENV_SESSION=1` available as an escape hatch for CI environments.
 
 - New dependencies: `@a5c-ai/agent-catalog`, `@a5c-ai/agent-mux`, `@modelcontextprotocol/sdk`, `zod@4`, `ws`.
 - `defineTask` remains backward-compatible with object-form specs.
@@ -81,8 +81,8 @@ The CLI is now split: core commands stay in the `babysitter` binary, while orche
 ```bash
 # New CLI surface in v6
 npx babysitter run my-process          # core: execute a process
-npx babysitter-agent call my-process   # harness: orchestrate a run with breakpoints
-npx babysitter-agent yolo my-process   # harness: non-interactive orchestration
+npx agent-platform call my-process   # harness: orchestrate a run with breakpoints
+npx agent-platform yolo my-process   # harness: non-interactive orchestration
 npx babysitter-mcp-server              # MCP: expose babysitter as an MCP server
 ```
 
@@ -209,14 +209,14 @@ Five architectural decisions define v6:
 |--------|---------------|
 | **Version 0.0.175 to 5.0.0** | Update your `package.json` range. `^0.0.x` will not resolve to 5.x. |
 | **License: UNLICENSED to MIT** | No action required. Your usage rights are now broader. |
-| **CLI split: `babysitter` / `babysitter-agent`** | Orchestration commands (`call`, `yolo`, `resume`, `plan`, `forever`) now live in `babysitter-agent`. Update scripts and CI configs. |
+| **CLI split: `babysitter` / `agent-platform`** | Orchestration commands (`call`, `yolo`, `resume`, `plan`, `forever`) now live in `agent-platform`. Update scripts and CI configs. |
 | **`BABYSITTER_SESSION_ID` to `AGENT_SESSION_ID`** | Rename the env var in your CI configs. The SDK no longer reads the old name; agent-mux still recognizes it as a detection signal. |
 | **PID-scoped session resolution** | Sessions are now resolved via PID-scoped markers by default. Set `BABYSITTER_TRUST_ENV_SESSION=1` to restore env-var-first behavior in CI. |
 | **`.a5c/functions/` removed** | Migrate to the current effect and hook APIs. The old function API is gone. |
 | **Paperclip VS Code extension removed** | Use Breakpoints Mux or Observer Dashboard for in-IDE observability. |
 | **`--plugin-root` flag removed** | Plugin discovery is now automatic. Remove the flag from your CLI invocations. |
 | **Public API: 9 to 46+ exports** | No breaking change for existing imports. New exports are additive. |
-| **`compaction`, `mcpClient`, `mcpChannels` moved** | Import from `@a5c-ai/babysitter-agent` instead of the root SDK. |
+| **`compaction`, `mcpClient`, `mcpChannels` moved** | Import from `@a5c-ai/agent-platform` instead of the root SDK. |
 | **zod@4 required** | Upgrade from zod@3. Schema APIs have minor breaking changes; see the [zod@4 migration guide](https://zod.dev/v4). |
 
 ---

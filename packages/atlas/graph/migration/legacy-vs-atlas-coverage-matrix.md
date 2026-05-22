@@ -148,14 +148,14 @@ catalog pass 98 promoted the catalog pass 97c group-level tasks-mux records to l
 authored outbound-client APIEndpoints, promoted harness-mock error +
 runtime-hook fixtures to InteractionPrimitive[mock-scenario], and added
 PackageSurface command-group enrichment for babysitter-sdk and
-babysitter-agent.
+agent-platform.
 
 | Package | catalog pass 98 delta |
 | --- | --- |
 | `tasks-mux` | 17 leaf CLI subcommand records authored (auth login/logout/status/keygen/key-push/keys/server set/server clear/token set/token clear; breakpoints pending/answer/status/poll; responders list/show; server start) + 8 outbound-client APIEndpoint records (POST/GET/DELETE under /api/v1/{questions,experts,...}). |
 | `agent-mux/harness-mock` | 5 `error:*` + 3 `runtimeHook*` scenarios promoted from data fixtures to InteractionPrimitive[mock-scenario]. |
 | `babysitter-sdk` | PackageSurface enriched with bins (babysitter, babysitter-sdk, babysitter-mcp-server) + 12 top-level CLI command-group records spanning run:/task:/session:/plugin:/skill:/process-library:/profile:/instructions:/compression:/breakpoint:/hook:/mcp-server. |
-| `babysitter-agent` | PackageSurface enriched with bin (babysitter-harness) + harness-runtime command-set primitive (HARNESS_RUNTIME_COMMANDS literal). |
+| `agent-platform` | PackageSurface enriched with bin (babysitter-harness) + harness-runtime command-set primitive (HARNESS_RUNTIME_COMMANDS literal). |
 | `babysitter` (metapackage) | Confirmed wrapper-over-graph (bin/babysitter.js aliases babysitter-sdk CLI); existing PackageSurface remains accurate. |
 | `cloud`, `observer-dashboard` | Existing PackageSurface (Next.js apps) confirmed accurate; per-route HTTP endpoints intentionally not enumerated (would couple atlas to deploy-time UI surface). |
 

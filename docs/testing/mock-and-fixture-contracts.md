@@ -6,17 +6,17 @@ last_updated: 2026-05-07
 
 # Mock And Fixture Contracts
 
-No-model tests are only valuable if their mocks describe the same contracts live providers must satisfy. This document defines fixture expectations for Codex, Claude Code, agent-core, agent-mux, transport-mux, hooks muxes, and babysitter-agent.
+No-model tests are only valuable if their mocks describe the same contracts live providers must satisfy. This document defines fixture expectations for Codex, Claude Code, agent-core, agent-mux, transport-mux, hooks muxes, and agent-platform.
 
 ## Fixture Families
 
 | Fixture family | Producer | Consumers | Required contents |
 | --- | --- | --- | --- |
 | Harness discovery | Babysitter CLI | Harness setup tests, docs snippets, CI summaries | Harness name, installed flag, capabilities, version when available, redacted paths |
-| Codex transcript | Codex adapter or fixture generator | Agent-mux adapters, transport-mux, WebUI, babysitter-agent | Prompt, text deltas, final message, status, usage if safe, error envelope |
-| Claude Code transcript | Claude Code adapter or fixture generator | Agent-mux adapters, transport-mux, WebUI, babysitter-agent | Prompt, text deltas, tool-call events, stop reason, final message, error envelope |
-| Agent-core event stream | Agent-core tests | Transport-mux, babysitter-agent, agent-mux gateway | Session start, deltas, tool calls, cancellation, completion, usage, transport replay metadata |
-| Run journal | Core SDK and babysitter-agent tests | Journal rebuild/repair, observer, docs reporting, babysitter-agent runtime | Run created, effect requested, task posted, run completed, artifact references |
+| Codex transcript | Codex adapter or fixture generator | Agent-mux adapters, transport-mux, WebUI, agent-platform | Prompt, text deltas, final message, status, usage if safe, error envelope |
+| Claude Code transcript | Claude Code adapter or fixture generator | Agent-mux adapters, transport-mux, WebUI, agent-platform | Prompt, text deltas, tool-call events, stop reason, final message, error envelope |
+| Agent-core event stream | Agent-core tests | Transport-mux, agent-platform, agent-mux gateway | Session start, deltas, tool calls, cancellation, completion, usage, transport replay metadata |
+| Run journal | Core SDK and agent-platform tests | Journal rebuild/repair, observer, docs reporting, agent-platform runtime | Run created, effect requested, task posted, run completed, artifact references |
 | Babysitter plugin session | Agent-mux plugin/session tests | Agent-mux plugin E2E, hooks-mux, SDK run-loop checks | Plugin command text, originating agent, Babysitter run ID, terminal state, stop-hook evidence |
 | Transport-mux route transcript | Transport-mux tests | Transport-mux route/codec tests, agent-mux launch tests, coverage summaries | Exposed transport, route, request class, status, response envelope, streaming flag, auth result, metrics delta, redaction status |
 | Transport-mux launch/env artifact | Agent-mux launch tests | Agent-mux CLI, transport-mux runtime, pipeline summaries | Harness, provider, `proxyNeeded`, `proxyReason`, exposed transport, redacted proxy URL/token fields, changed env keys |

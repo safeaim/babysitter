@@ -161,7 +161,7 @@ async buildSpawnArgs(options: RunOptions): Promise<SpawnArgs> {
   const timeout = options.timeout || 120000;
 
   return {
-    command: 'babysitter-agent',
+    command: 'agent-platform',
     args,
     env: {
       ...options.env,
@@ -190,7 +190,7 @@ parseEvent(line: string, context: ParseContext): AgentEvent | null {
       return data as AgentEvent;
     }
 
-    // Legacy format: babysitter-agent invoke output
+    // Legacy format: agent-platform invoke output
     if (data.status === 'completed') {
       return {
         type: 'session_end',
@@ -287,10 +287,10 @@ For agent-mux to parse babysitter output, babysitter-harness must support output
 
 ```bash
 # Standard babysitter output (existing)
-babysitter-agent invoke --harness claude-code --prompt "..." --json
+agent-platform invoke --harness claude-code --prompt "..." --json
 
 # Agent-mux compatible output (new)
-babysitter-agent invoke --harness claude-code --prompt "..." --json --output-format amux-events
+agent-platform invoke --harness claude-code --prompt "..." --json --output-format amux-events
 ```
 
 When `--output-format amux-events` is set, babysitter-harness outputs one `AgentEvent` JSON per line to stdout:

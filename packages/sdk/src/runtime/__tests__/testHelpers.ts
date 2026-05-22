@@ -24,7 +24,7 @@ export interface BuildTaskContextOptions {
   now?: () => Date;
   processId?: string;
   logger?: (...args: any[]) => void;
-  subprocessSupport?: "disabled" | "babysitter-agent";
+  subprocessSupport?: "disabled" | "agent-platform";
 }
 
 export async function buildTaskContext(

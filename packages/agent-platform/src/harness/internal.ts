@@ -3,7 +3,7 @@
  *
  * The 'agent-core' harness represents the SDK's built-in programmatic execution
  * engine (agent-core). It is always available, requires no external CLI, and is
- * the default harness for `babysitter-agent create-run`.
+ * the default harness for `agent-platform create-run`.
  *
  * Unlike the 'pi' harness (which invokes the pi CLI as a child process), the
  * agent-core harness calls agent-core.prompt() directly in-process.

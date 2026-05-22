@@ -100,7 +100,7 @@ The agent-mux UI, TUI, mobile, TV, and watch packages are downstream consumers o
 
 These may still become important later, but V6 does not treat them as settled:
 
-- whether any deeper package split is justified inside `babysitter-agent`,
+- whether any deeper package split is justified inside `agent-platform`,
 - whether some agent-mux support subsystems should be promoted into stronger standalone boundaries,
 - whether future naming should formalize a larger runtime/platform/application vocabulary.
 

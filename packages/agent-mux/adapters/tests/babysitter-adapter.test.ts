@@ -41,7 +41,7 @@ describe('BabysitterAdapter', () => {
     });
 
     it('has correct CLI command', () => {
-      expect(adapter.cliCommand).toBe('babysitter-agent');
+      expect(adapter.cliCommand).toBe('agent-platform');
     });
   });
 
@@ -110,7 +110,7 @@ describe('BabysitterAdapter', () => {
         nonInteractive: true,
       });
 
-      expect(result.command).toBe('babysitter-agent');
+      expect(result.command).toBe('agent-platform');
       expect(result.args).toContain('invoke');
       expect(result.args).toContain('claude-code');
       expect(result.args).toContain('--output-format');

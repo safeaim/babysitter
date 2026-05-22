@@ -113,10 +113,10 @@ claude plugin install --scope user babysitter@a5c.ai && \
 claude plugin enable --scope user babysitter@a5c.ai
 ```
 
-If you also want headless runtime commands such as `babysitter-agent call`, install the optional runtime CLI too:
+If you also want headless runtime commands such as `agent-platform call`, install the optional runtime CLI too:
 
 ```bash
-npm install -g @a5c-ai/babysitter-agent@latest
+npm install -g @a5c-ai/agent-platform@latest
 ```
 
 Then restart Claude Code and skip to [Verification](#verification).
@@ -147,15 +147,15 @@ babysitter --version
 
 #### Step 2: Install the Optional Runtime CLI
 
-Install this only if you need `babysitter-agent` commands for headless orchestration, the internal harness, daemon utilities, MCP serving, or the TUI:
+Install this only if you need `agent-platform` commands for headless orchestration, the internal harness, daemon utilities, MCP serving, or the TUI:
 
 ```bash
-npm install -g @a5c-ai/babysitter-agent@latest
+npm install -g @a5c-ai/agent-platform@latest
 ```
 
 **Verify installation:**
 ```bash
-babysitter-agent --version
+agent-platform --version
 ```
 
 #### Step 3: Install the Claude Code Plugin
@@ -419,10 +419,10 @@ babysitter --version
 
 #### 2. Optional Runtime CLI Installed
 
-If you installed `@a5c-ai/babysitter-agent`:
+If you installed `@a5c-ai/agent-platform`:
 
 ```bash
-babysitter-agent --version
+agent-platform --version
 ```
 
 **Expected:** Current release version (for this repository, `5.0.0`)
@@ -447,7 +447,7 @@ claude "/babysitter:call echo hello world"
 |-------|---------|----------|
 | jq | `jq --version` | jq-1.6 or higher |
 | Core CLI | `babysitter --version` | `5.0.0` |
-| Runtime CLI | `babysitter-agent --version` | `5.0.0` if installed |
+| Runtime CLI | `agent-platform --version` | `5.0.0` if installed |
 | Plugin | `/skills` in Claude Code | "babysit" listed |
 
 **All checks passed?** You're ready for the [Quickstart](./quickstart.md)!
@@ -461,7 +461,7 @@ Babysitter is actively developed. Keep your installation current for the latest 
 ### Update CLI Packages
 
 ```bash
-npm update -g @a5c-ai/babysitter @a5c-ai/babysitter-agent
+npm update -g @a5c-ai/babysitter @a5c-ai/agent-platform
 ```
 
 ### Update Claude Code Plugin
@@ -483,7 +483,7 @@ claude plugin update babysitter@a5c.ai
 babysitter --version
 
 # Runtime CLI version (if installed)
-babysitter-agent --version
+agent-platform --version
 
 # Plugin version
 claude plugin list | grep babysitter
@@ -618,6 +618,6 @@ claude "/babysitter:call <your request>"
 claude "/babysitter:call resume the babysitter run"
 
 # Update everything
-npm update -g @a5c-ai/babysitter @a5c-ai/babysitter-agent
+npm update -g @a5c-ai/babysitter @a5c-ai/agent-platform
 claude plugin update babysitter@a5c.ai
 ```

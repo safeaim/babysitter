@@ -978,28 +978,28 @@ MCP Apps extend the Model Context Protocol by enabling interactive UIs that rend
 
 **Create a new MCP App from scratch:**
 ```bash
-babysitter-agent call --harness claude-code \
+agent-platform call --harness claude-code \
   --process library/specializations/ai-agents-conversational/create-mcp-app.js#process \
   --workspace .
 ```
 
 **Add UI to an existing MCP server:**
 ```bash
-babysitter-agent call --harness claude-code \
+agent-platform call --harness claude-code \
   --process library/specializations/ai-agents-conversational/add-app-to-mcp-server.js#process \
   --workspace .
 ```
 
 **Convert a web app to hybrid MCP App:**
 ```bash
-babysitter-agent call --harness claude-code \
+agent-platform call --harness claude-code \
   --process library/specializations/ai-agents-conversational/convert-web-app-to-mcp.js#process \
   --workspace .
 ```
 
 **Migrate from OpenAI Apps SDK:**
 ```bash
-babysitter-agent call --harness claude-code \
+agent-platform call --harness claude-code \
   --process library/specializations/ai-agents-conversational/migrate-openai-app-to-mcp.js#process \
   --workspace .
 ```

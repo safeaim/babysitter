@@ -1,8 +1,8 @@
 export { createBabysitterMcpServer } from "./server";
 
-// MCP Client moved to @a5c-ai/babysitter-agent (GAP-REMOTE-006, GAP-TOOLS-025)
-// MCP WebSocket transport moved to @a5c-ai/babysitter-agent (GAP-REMOTE-003)
-// MCP Channels moved to @a5c-ai/babysitter-agent (interactive feature)
+// MCP Client moved to @a5c-ai/agent-platform (GAP-REMOTE-006, GAP-TOOLS-025)
+// MCP WebSocket transport moved to @a5c-ai/agent-platform (GAP-REMOTE-003)
+// MCP Channels moved to @a5c-ai/agent-platform (interactive feature)
 
 /**
  * Start the MCP server on stdio transport.

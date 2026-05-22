@@ -1,6 +1,6 @@
 ---
 title: Harness And Plugin E2E
-description: Separate SDK harness setup, agent-mux plugin/session E2E, and babysitter-agent runtime E2E boundaries.
+description: Separate SDK harness setup, agent-mux plugin/session E2E, and agent-platform runtime E2E boundaries.
 last_updated: 2026-05-07
 ---
 
@@ -11,11 +11,11 @@ This document covers harness setup and plugin-enabled sessions. It intentionally
 1. **SDK harness/plugin setup integration** uses `babysitter harness:install` and `babysitter harness:install-plugin`.
 2. **Agent-mux plugin/session E2E** starts an agent session through `agent-mux` and verifies plugin behavior inside that session.
 
-`babysitter-agent` runtime E2E is a third path and is covered in [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md). It must not require `harness:install` or `harness:install-plugin` steps.
+`agent-platform` runtime E2E is a third path and is covered in [Agent Mux And Runtime E2E](./agent-mux-and-runtime-e2e.md). It must not require `harness:install` or `harness:install-plugin` steps.
 
 ## Path A: SDK Harness And Plugin Setup
 
-This path tests the SDK install surfaces. It does not prove that `babysitter-agent` can run a process.
+This path tests the SDK install surfaces. It does not prove that `agent-platform` can run a process.
 
 ```bash
 babysitter harness:install codex --workspace . --json
@@ -38,7 +38,7 @@ The SDK installer path may delegate harness CLI install to agent-mux adapter ins
 
 ## Path B: Agent-Mux Plugin And Session E2E
 
-This path tests a real or mocked agent session controlled by `agent-mux`. It should use `amux run <agent>` or `createClient().run({ agent })`, not `babysitter-agent call`.
+This path tests a real or mocked agent session controlled by `agent-mux`. It should use `amux run <agent>` or `createClient().run({ agent })`, not `agent-platform call`.
 
 | Phase | Required action | Required assertions |
 | --- | --- | --- |
@@ -60,19 +60,19 @@ This path tests a real or mocked agent session controlled by `agent-mux`. It sho
 
 ## Path C: Babysitter-Agent Runtime E2E
 
-This path validates `@a5c-ai/babysitter-agent` runtime behavior. It starts from preconditions, not installers.
+This path validates `@a5c-ai/agent-platform` runtime behavior. It starts from preconditions, not installers.
 
 Valid commands include:
 
 ```bash
-babysitter-agent call --harness agent-core --workspace . --prompt "run the bounded runtime fixture" --json
-babysitter-agent call --harness claude-code --workspace . --prompt "run the bounded runtime fixture" --json
-babysitter-agent invoke codex --workspace . --prompt "return BABYSITTER_AGENT_BRIDGE_OK" --json
+agent-platform call --harness agent-core --workspace . --prompt "run the bounded runtime fixture" --json
+agent-platform call --harness claude-code --workspace . --prompt "run the bounded runtime fixture" --json
+agent-platform invoke codex --workspace . --prompt "return BABYSITTER_AGENT_BRIDGE_OK" --json
 ```
 
 Required assertions:
 
-- no `harness:install` or `harness:install-plugin` command is executed as part of the babysitter-agent runtime test,
+- no `harness:install` or `harness:install-plugin` command is executed as part of the agent-platform runtime test,
 - selected backend is recorded (`agent-core`, `pi`, or mapped external harness),
 - run is created when the command is `call/create-run`,
 - task effects are emitted and posted for process runs,
@@ -84,8 +84,8 @@ Required assertions:
 
 - Missing credentials should skip model-backed jobs before any provider call begins.
 - A selected setup job should fail if installer preconditions are unavailable.
-- A selected babysitter-agent runtime job should fail if it tries to run installer commands.
-- Use of the deprecated `babysitter harness:call` alias in new runtime tests should fail review; use `babysitter-agent call` for babysitter-agent runtime or `amux run` for agent-mux session E2E.
+- A selected agent-platform runtime job should fail if it tries to run installer commands.
+- Use of the deprecated `babysitter harness:call` alias in new runtime tests should fail review; use `agent-platform call` for agent-platform runtime or `amux run` for agent-mux session E2E.
 - Any log containing a raw secret must fail the job and block artifact upload until redaction is fixed.
 
 ## `install-plugins` Wrapper Acceptance Criteria
@@ -100,4 +100,4 @@ If the project adds an aggregate `install-plugins` command, test it only as setu
 | Failure isolation | Failure to install one harness plugin reports that harness without masking other completed installs |
 | JSON evidence | Wrapper emits machine-readable installed/skipped/failed entries for CI artifacts |
 
-Do not use the wrapper as a hidden prerequisite for babysitter-agent runtime E2E.
+Do not use the wrapper as a hidden prerequisite for agent-platform runtime E2E.

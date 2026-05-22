@@ -1,1 +1,1 @@
-// WebSocket transport moved to @a5c-ai/babysitter-agent (GAP-REMOTE-003)
+// WebSocket transport moved to @a5c-ai/agent-platform (GAP-REMOTE-003)

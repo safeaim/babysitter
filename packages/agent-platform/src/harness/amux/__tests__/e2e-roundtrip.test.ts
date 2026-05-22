@@ -1,9 +1,9 @@
 /**
  * End-to-end integration test verifying the full round-trip:
  *
- *   babysitter-agent (invokeViaAgentMux)
+ *   agent-platform (invokeViaAgentMux)
  *     -> mock AmuxClient event stream
- *     -> babysitter-agent event processing (text accumulation, cost, errors)
+ *     -> agent-platform event processing (text accumulation, cost, errors)
  *     -> formatResultAsAmuxEvents (JSONL output)
  *     -> parseable by agent-mux's babysitter adapter
  *
@@ -62,7 +62,7 @@ function createMockClient(
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("E2E: babysitter-agent <-> agent-mux round-trip", () => {
+describe("E2E: agent-platform <-> agent-mux round-trip", () => {
   it("full invocation round-trip with text, tool use, and cost", async () => {
     // Simulate a Claude run with text deltas, tool use, and cost events
     const mockEvents: AmuxAgentEvent[] = [
@@ -77,14 +77,14 @@ describe("E2E: babysitter-agent <-> agent-mux round-trip", () => {
 
     const client = createMockClient(mockEvents);
 
-    // Step 1: babysitter-agent invokes via amux bridge
+    // Step 1: agent-platform invokes via amux bridge
     const result = await invokeViaAgentMux(client, "claude-code", {
       prompt: "Fix the bug",
       model: "claude-opus-4-6",
       workspace: "/project",
     });
 
-    // Step 2: Verify babysitter-agent processed events correctly
+    // Step 2: Verify agent-platform processed events correctly
     expect(result.success).toBe(true);
     expect(result.lastMessage).toBe("I will fix the bug.");
     expect(result.output).toBe("I will fix the bug.");

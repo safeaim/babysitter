@@ -453,7 +453,7 @@ A `Mux` is treated as `ExtensionInterface` (a5c-flavored contract) plus implemen
 | Cline | universal/03-products.md | `AgentProduct id=agent:cline` | ✅ | |
 | Goose | universal/03-products.md | `AgentProduct id=agent:goose` | ✅ | |
 | Devin | universal/03-products.md | `AgentProduct id=agent:devin` | ✅ | cloud-hosted |
-| babysitter-agent (special Layer-6 entry) | a5c/00-overview.md, 01-component-map.md, ADR-001 | `AgentProduct id=agent:babysitter-agent` | ✅ | semantic contract per ADR-001 |
+| agent-platform (special Layer-6 entry) | a5c/00-overview.md, 01-component-map.md, ADR-001 | `AgentProduct id=agent:agent-platform` | ✅ | semantic contract per ADR-001 |
 | a5c integration column (catalog / adapter / none) | universal/03-products.md (table footnote) | attribute `AgentVersion.a5cIntegration` enum | ✅ | |
 | Per-product comparison-table fields (Vendor, Layers, Surface, Plugin formats, MCP, Hooks, Execution typical, Sandbox default, Resume, Fork) | universal/03-products.md | populated as `Claim`s on `AgentVersion`/`AgentProduct` | ✅ | derivable matrix |
 
@@ -465,7 +465,7 @@ A `Mux` is treated as `ExtensionInterface` (a5c-flavored contract) plus implemen
 | `@a5c-ai/catalog` (UI) | a5c/01-component-map.md | `PackageSurface` + `CiSurface` | ✅ | |
 | `@a5c-ai/agent-core` | a5c/01-component-map.md | `PackageSurface` | ✅ | |
 | `@a5c-ai/agent-mux-core/adapters/cli/sdk/gateway/harness-mock/observability/tui/webui` | a5c/01-component-map.md | one `PackageSurface` each | ✅ | |
-| `@a5c-ai/babysitter-agent` | a5c/01-component-map.md, ADR-001 | covered above as AgentProduct | ✅ | |
+| `@a5c-ai/agent-platform` | a5c/01-component-map.md, ADR-001 | covered above as AgentProduct | ✅ | |
 | `@a5c-ai/transport-mux` | a5c/01-component-map.md | `ProcessDescriptor` | ✅ | |
 | `@a5c-ai/hooks-mux` | a5c/01-component-map.md | `ProcessDescriptor` | ✅ | |
 | `@a5c-ai/extension-mux` | a5c/01-component-map.md | `ProcessDescriptor` | ✅ | |

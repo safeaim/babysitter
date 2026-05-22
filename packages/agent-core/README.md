@@ -5,16 +5,16 @@ Built-in programmatic session wrapper and agentic tool surface for Babysitter ru
 <!-- docs-status:start -->
 > Status: Public advanced/runtime package.
 > Canonical docs home: [Package and Plugin Docs Map](../../docs/package-and-plugin-map.md).
-> This README defines the package contract for runtime consumers and published dependents such as `@a5c-ai/babysitter-agent`.
+> This README defines the package contract for runtime consumers and published dependents such as `@a5c-ai/agent-platform`.
 <!-- docs-status:end -->
 
 ## Package role
 
-`@a5c-ai/agent-core` sits between `@a5c-ai/babysitter-agent`, `@a5c-ai/agent-mux`, and `@a5c-ai/babysitter-sdk`:
+`@a5c-ai/agent-core` sits between `@a5c-ai/agent-platform`, `@a5c-ai/agent-mux`, and `@a5c-ai/babysitter-sdk`:
 
 - `createAgentCoreSession()` wraps an `@a5c-ai/agent-mux` client for in-process prompt execution.
 - `createAgentCoreToolDefinitions()` assembles the built-in Babysitter-flavored tool surface that host runtimes can inject into planning, resume, or delegated-task flows.
-- `@a5c-ai/babysitter-agent` re-exports these APIs from `src/harness/index.ts`, uses `createAgentCoreSession()` for direct `agent-core` harness invocation in `src/harness/invoker.ts`, and injects tool definitions into plan-process and resume-run flows.
+- `@a5c-ai/agent-platform` re-exports these APIs from `src/harness/index.ts`, uses `createAgentCoreSession()` for direct `agent-core` harness invocation in `src/harness/invoker.ts`, and injects tool definitions into plan-process and resume-run flows.
 - `@a5c-ai/babysitter-sdk` still owns run directories, journals, task/effect lifecycle, and config defaults. `agent-core` does not replace the SDK orchestration layer.
 
 This package is published as a runtime dependency surface for higher-level Babysitter runtimes. It is still an advanced/operator-facing building block rather than the primary entrypoint for new users.
@@ -98,7 +98,7 @@ These fields remain on `AgentCoreSessionOptions` for compatibility, but the curr
 
 | Option | Status | Migration note |
 | --- | --- | --- |
-| `toolsMode` | Deprecated, ignored by agent-core | Use backend-native configuration, or the PI wrapper in `@a5c-ai/babysitter-agent`, if you still need tool-surface control. |
+| `toolsMode` | Deprecated, ignored by agent-core | Use backend-native configuration, or the PI wrapper in `@a5c-ai/agent-platform`, if you still need tool-surface control. |
 | `customTools` | Deprecated, ignored by agent-core | Register host-side tools with `createAgentCoreToolDefinitions()` or use the PI wrapper for runtime custom-tool injection. |
 | `isolated` | Deprecated, ignored by agent-core | Use the PI wrapper if you still need extension/skills isolation controls. |
 | `ephemeral` | Deprecated, ignored by agent-core | Session persistence is determined by the selected agent-mux backend. |
@@ -106,7 +106,7 @@ These fields remain on `AgentCoreSessionOptions` for compatibility, but the curr
 | `enableCompaction` | Deprecated, ignored by agent-core | Compaction behavior belongs to the selected backend/runtime. |
 | `agentDir` | Deprecated, ignored by agent-core | Configure agent directories through the target backend instead. |
 
-If you still need the PI-era controls above, use the PI wrapper exposed from `@a5c-ai/babysitter-agent` rather than `@a5c-ai/agent-core`.
+If you still need the PI-era controls above, use the PI wrapper exposed from `@a5c-ai/agent-platform` rather than `@a5c-ai/agent-core`.
 
 ## Tool-definition API
 
@@ -192,7 +192,7 @@ Source disambiguation uses `(source, sourceQualifier, name)`, so duplicate tool 
 
 Current downstream integration boundaries in this repo:
 
-- `@a5c-ai/babysitter-agent`
+- `@a5c-ai/agent-platform`
   - re-exports the session/tool APIs from `src/harness/index.ts`
   - uses `createAgentCoreSession()` for the direct `agent-core` harness path in `src/harness/invoker.ts`
   - injects `createAgentCoreToolDefinitions()` into plan-process and delegated-task flows in `src/harness/internal/createRun/planProcess/*`
@@ -202,7 +202,7 @@ Current downstream integration boundaries in this repo:
 - `@a5c-ai/babysitter-sdk`
   - provides config defaults/env wiring used by the `config` tool and remains the owner of orchestration/run-state semantics outside this package
 
-In practice, use `agent-core` when you need an in-process runtime wrapper or bundled tool surface. Use `babysitter-agent` when you need the higher-level harness CLI/runtime entrypoints.
+In practice, use `agent-core` when you need an in-process runtime wrapper or bundled tool surface. Use `agent-platform` when you need the higher-level harness CLI/runtime entrypoints.
 
 ## Build, test, and CI
 

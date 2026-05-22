@@ -1,31 +1,31 @@
-# @a5c-ai/babysitter-agent
+# @a5c-ai/agent-platform
 
-Optional CLI package for Babysitter agent runtime commands.
+Agent Platform layer — harness integration, governance, CLI hosting, interaction, storage.
 
 <!-- docs-status:start -->
 > Status: Public advanced/runtime package.
 > Canonical docs home: [Package and Plugin Docs Map](../../docs/package-and-plugin-map.md).
-> This README is the canonical runtime CLI contract for operator-facing `babysitter-agent` workflows.
+> This README is the canonical runtime CLI contract for operator-facing `agent-platform` workflows.
 <!-- docs-status:end -->
 
 ## Installation
 
 ```bash
-npm install -g @a5c-ai/babysitter-agent
+npm install -g @a5c-ai/agent-platform
 ```
 
 ## Usage
 
-This package provides the `babysitter-agent` command. Use it for runtime orchestration.
+This package provides the `agent-platform` command. Use it for runtime orchestration.
 
 ```bash
-babysitter-agent --help
-babysitter-agent call --harness claude-code --prompt "implement feature X" --workspace .
+agent-platform --help
+agent-platform call --harness claude-code --prompt "implement feature X" --workspace .
 babysitter session:init --session-id demo --state-dir .a5c --run-id run-123
-babysitter-agent start-server --transport stdio
-babysitter-agent discover --json
-babysitter-agent invoke claude-code --prompt "implement feature X" --workspace .
-babysitter-agent tui --workspace .
+agent-platform start-server --transport stdio
+agent-platform discover --json
+agent-platform invoke claude-code --prompt "implement feature X" --workspace .
+agent-platform tui --workspace .
 ```
 
 Use the main `babysitter` CLI for harness installation and session-state commands:
@@ -41,10 +41,10 @@ babysitter session:state --session-id demo --state-dir .a5c
 From the repo root, run:
 
 ```bash
-npm run build --workspace=@a5c-ai/babysitter-agent
+npm run build --workspace=@a5c-ai/agent-platform
 ```
 
-This package now builds with `tsc --build` project references for workspace-owned TypeScript packages, and it explicitly invokes the root `build:runtime:babysitter-agent-deps` entrypoint to prepare the runtime chain, including the `@a5c-ai/agent-mux` SDK surface. A fresh-checkout build no longer requires prebuilt upstream `dist/` output.
+This package now builds with `tsc --build` project references for workspace-owned TypeScript packages, and it explicitly invokes the root `build:runtime:agent-platform-deps` entrypoint to prepare the runtime chain, including the `@a5c-ai/agent-mux` SDK surface. A fresh-checkout build no longer requires prebuilt upstream `dist/` output.
 
 For the release/CI runtime chain, use the shared root entrypoint:
 

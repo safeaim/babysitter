@@ -27,19 +27,19 @@ edges:
     - target: capability:supports-mcp
       versionRange: ">=5.0.0"
       level: full
-      notes: babysitter-agent can launch a built-in MCP server and agent-facing MCP integration surfaces.
+      notes: agent-platform can launch a built-in MCP server and agent-facing MCP integration surfaces.
     - target: capability:interactive-mode
       versionRange: ">=5.0.0"
       level: full
-      notes: babysitter-agent is a terminal-first runtime CLI with interactive create-run, observe, and orchestration flows.
+      notes: agent-platform is a terminal-first runtime CLI with interactive create-run, observe, and orchestration flows.
     - target: capability:stdin-injection
       versionRange: ">=5.0.0"
       level: full
-      notes: babysitter-agent accepts prompts, command templates, and harness invocations via CLI input arguments.
+      notes: agent-platform accepts prompts, command templates, and harness invocations via CLI input arguments.
     - target: capability:can-resume
       versionRange: ">=5.0.0"
       level: full
-      notes: babysitter-agent resumes runs and sessions through explicit resume-run and session-history command surfaces.
+      notes: agent-platform resumes runs and sessions through explicit resume-run and session-history command surfaces.
   uses_memory_system:
     - target: memory-system:auto-dream-consolidation-pattern
     - target: memory-system:claude-code-auto-memory

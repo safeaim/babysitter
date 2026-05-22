@@ -5,6 +5,77 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [Unreleased] - 2026-05-22
+
+### feat
+- 3b7851ee5 feat(agent-runtime): move daemon, session, cost, observability from babysitter-agent (#210) (Tal Muskal, 18 minutes ago)
+- 108ffeb16 feat(ci): add daily agent version check pipeline (Tal Muskal, 32 minutes ago)
+- 2ae6e96d4 feat(agent-runtime): scaffold agent-runtime package (L5) and move runtime files from agent-core (#210) (Tal Muskal, 41 minutes ago)
+- d0d0968a5 feat(graph): add launchBehavior to PluginTarget, drive launch.ts from graph (Tal Muskal, 3 hours ago)
+- c44ac9b52 feat(ci): add fix-broken-latest-tags script and workflow (Tal Muskal, 15 hours ago)
+- 30895c64c feat: v6.1 graph alignment babysitter process definition (Tal Muskal, 24 hours ago)
+
+### fix
+- a7fd1e1c8 fix(workflow): update GitHub token generation and checkout action version (Tal Muskal, 14 minutes ago)
+- d0934222a fix(video): update vulnerable fast-uri lock entry (Tal Muskal, 16 minutes ago)
+- 949d9609b fix(ci): agent version check discovers agents from atlas graph at runtime (Tal Muskal, 29 minutes ago)
+- 24e50bb6c fix(ci): add a5c GitHub App token to all trigger-based workflows (Tal Muskal, 49 minutes ago)
+- eb8c0c551 fix(transport-mux): add stream error handling, fix Pi proxy API type (Tal Muskal, 50 minutes ago)
+- 73b53ae76 fix(amux): restore Pi --mode json, resolve Windows spawn without shell (Tal Muskal, 80 minutes ago)
+- 4edff3e2e fix(amux): deliver prompts via stdin on Windows to avoid cmd.exe mangling (Tal Muskal, 2 hours ago)
+- f09793644 fix(live-stack): use platform-native mkdir instead of node -e on Windows (Tal Muskal, 2 hours ago)
+- ae29cffaf fix(graph): Pi uses -p flag for prompt delivery, not stdin (Tal Muskal, 2 hours ago)
+- fa900f15b fix(test): update launch tests for graph-driven launchBehavior (Tal Muskal, 3 hours ago)
+- 39422c79d fix(amux): let Pi run in interactive mode for tool-use support (Tal Muskal, 4 hours ago)
+- a64b877f0 fix(ci): align download-artifact version with upload, add debug listing (Tal Muskal, 4 hours ago)
+- f73d12684 fix(amux): don't duplicate prompt via stdin when already passed as CLI arg (Tal Muskal, 5 hours ago)
+- 0cf58b544 fix(ci): conditionally use --force-local tar flag (Windows only) (Tal Muskal, 14 hours ago)
+- a2e883985 fix(ci): rename breakpoints-mux → tasks-mux in all workflows (Tal Muskal, 15 hours ago)
+- c231e9e09 fix(npm): also flag plugin 5.0.0 as bad publish batch (Tal Muskal, 15 hours ago)
+- 5294f1f23 fix(npm): validate plugin sdkVersion references actual published SDK (Tal Muskal, 15 hours ago)
+- 60d7727cf fix(npm): add SDK install fallback and fix staging-on-latest detection (Tal Muskal, 15 hours ago)
+- 9abaa9513 fix(ci): run publish install steps explicitly (Tal Muskal, 20 hours ago)
+- c2c0dbae4 fix(ci): remove publish skip gates (Tal Muskal, 20 hours ago)
+- 28347f861 fix(transport-mux): terminate responses SSE streams (Tal Muskal, 21 hours ago)
+- 8737c45a8 fix(live-stack): remove output bridge fallback (Tal Muskal, 21 hours ago)
+- 7cb50207f fix(ci): align workflows with extension mux rename (Tal Muskal, 21 hours ago)
+- b0bc4c35e fix(live-stack): build extension mux workspace (Tal Muskal, 21 hours ago)
+- 6f865e961 fix(live-stack): remove skip fallbacks (Tal Muskal, 21 hours ago)
+- 15b26de69 fix(live-stack): remove live fallback skips (Tal Muskal, 22 hours ago)
+- d60ea34a8 fix(live-stack): fail live evidence gaps (Tal Muskal, 22 hours ago)
+- 42336868f fix(live-stack): reset create-mode process scope (Tal Muskal, 22 hours ago)
+- 142e76f60 fix(agent-plan-dispatch): update process execution command in comments (Tal Muskal, 23 hours ago)
+- d6938a962 fix(live-stack): summarize skipped live-agent lanes (Tal Muskal, 23 hours ago)
+- 59f3a98d0 fix(live-stack): allow agent-unavailable coverage skips (Tal Muskal, 23 hours ago)
+- 235879270 fix(live-stack): skip invalid bridged transcripts (Tal Muskal, 23 hours ago)
+- 11987bc84 fix(live-stack): classify bridged transcript artifacts (Tal Muskal, 23 hours ago)
+- 3f3d6fccf fix(live-stack): skip login and empty tool-use transcripts (Tal Muskal, 24 hours ago)
+
+### refactor
+- fd222f1ce refactor: rename breakpoints-mux → tasks-mux (Tal Muskal, 22 hours ago)
+- 6fa60bb7e refactor: rename agent-plugins-mux → extension-mux (Tal Muskal, 22 hours ago)
+
+### docs
+- ace734b12 docs: remove duplicate daily changelog section (github-actions[bot], 14 hours ago)
+- cb12a39a0 docs: daily changelog update (github-actions[bot], 14 hours ago)
+- 71e2ebb95 docs(reference): add Pattern 8 — page.setContent stub for playwright structural specs (rogelsm, 17 hours ago)
+- 9e0ad1f88 docs: v6.1 agent layer capabilities — what core/runtime/platform should do (Tal Muskal, 23 hours ago)
+- 5183b3caf docs: v6.1 agent stack decomposition — babysitter-agent, agent-core, SDK (Tal Muskal, 24 hours ago)
+- 909da7cf4 docs: v6.1 graph alignment task list — 66 tasks across 5 phases (Tal Muskal, 24 hours ago)
+
+### chore
+- 49e3946a2 Fix staging code scanning findings (Tal Muskal, 49 minutes ago)
+- b1a6542a2 chore: set sdkVersion to 5.0.1-staging.28347f861706 [skip publish] (github-actions[bot], 20 hours ago)
+- 46733254c chore: set sdkVersion to 5.0.1-staging.8737c45a8424 [skip publish] (github-actions[bot], 21 hours ago)
+- e5bf90164 chore: set sdkVersion to 5.0.1-staging.7cb50207f287 [skip publish] (github-actions[bot], 21 hours ago)
+- 9d9d98838 chore: set sdkVersion to 5.0.1-staging.132f1714ba54 [skip publish] (github-actions[bot], 22 hours ago)
+- d4435ef57 Complete transport-mux codec architecture (a5c agent, 22 hours ago)
+- 132f1714b chore: remove v6.1 process file — work tracked via GitHub issues (Tal Muskal, 22 hours ago)
+- bfe9083b0 chore: set sdkVersion to 5.0.1-staging.59f3a98d09ae [skip publish] (github-actions[bot], 23 hours ago)
+- 6d25bb238 chore: set sdkVersion to 5.0.1-staging.5183b3caf612 [skip publish] (github-actions[bot], 23 hours ago)
+- 1a6fde4ae chore: set sdkVersion to 5.0.1-staging.c1fec6cebbe7 [skip publish] (github-actions[bot], 24 hours ago)
+
 ## [Unreleased] - 2026-05-21
 
 ### feat

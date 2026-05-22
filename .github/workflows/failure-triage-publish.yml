@@ -11,7 +11,7 @@ on:
     types: [completed]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 jobs:
@@ -22,9 +22,15 @@ jobs:
       contains(fromJSON('["main","staging","develop"]'), github.event.workflow_run.head_branch)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Generate a5c GitHub App token
+        id: a5c-token
+        continue-on-error: true
+        uses: a5c-ai/generate-token-action@main
+
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
+          token: ${{ steps.a5c-token.outputs.a5c_token || github.token }}
 
       - uses: a5c-ai/babysitter/packages/triggers@staging
         with:
@@ -65,4 +71,4 @@ jobs:
         env:
           AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           AMUX_API_BASE: https://${{ vars.AZURE_OPENAI_PROJECT_NAME }}.services.ai.azure.com
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.a5c-token.outputs.a5c_token || github.token }}

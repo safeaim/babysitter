@@ -209,13 +209,11 @@ function harnessApprovalPassthrough(_harness: string): string[] {
 }
 
 function ensureLiveArtifactDirCommand(env: Record<string, string>, cwd: string): CommandExecution {
-  return {
-    command: process.execPath,
-    args: ['-e', "require('node:fs').mkdirSync(process.argv[1], { recursive: true })", path.join(cwd, '.a5c-live-test')],
-    env,
-    cwd,
-    timeoutMs: SETUP_TIMEOUT_MS,
-  };
+  const targetDir = path.join(cwd, '.a5c-live-test');
+  if (process.platform === 'win32') {
+    return { command: 'cmd.exe', args: ['/c', `if not exist "${targetDir}" mkdir "${targetDir}"`], env, cwd, timeoutMs: SETUP_TIMEOUT_MS };
+  }
+  return { command: 'mkdir', args: ['-p', targetDir], env, cwd, timeoutMs: SETUP_TIMEOUT_MS };
 }
 
 function bridgeFlags(env: Record<string, string | undefined>): string[] {

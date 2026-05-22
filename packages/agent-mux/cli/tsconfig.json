@@ -5,6 +5,9 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
+      "@a5c-ai/agent-config-mux": [
+        "../config/src/index.ts"
+      ],
       "@a5c-ai/agent-launch-mux": [
         "../launch/src/index.ts"
       ],
@@ -17,6 +20,7 @@
   "references": [
     { "path": "../core" },
     { "path": "../adapters" },
+    { "path": "../config" },
     { "path": "../gateway" },
     { "path": "../launch" },
     { "path": "../../transport-mux" }

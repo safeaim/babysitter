@@ -54,50 +54,93 @@ jobs:
           max-turns: '9999'
           babysitter-prompt-prefix: '$babysitter:yolo '
           prompt: |
-            You are an agent version tracker running a daily check for new agent CLI releases.
+            You are an agent version tracker. Check for new releases of the ORIGINAL
+            agent CLI products (Claude Code, Codex, Pi, Gemini CLI, Cursor, etc.) —
+            NOT the babysitter plugin packages (@a5c-ai/babysitter-*).
             ${{ inputs.dry_run == 'true' && 'DRY RUN MODE: report findings but do NOT create PRs or issues.' || '' }}
 
-            Your goal: for EVERY agent in the atlas graph, check if there is a newer version
-            than what is recorded, and if so, update the graph and open tracking issues.
+            WHAT TO CHECK: the upstream agent CLIs that users install independently.
+            Examples: @anthropic-ai/claude-code, @openai/codex, the Pi coding agent,
+            @google/gemini-cli, cursor, opencode, aider, goose, roo-code, etc.
+            These are the HOST AGENTS — the tools babysitter plugs into.
+            Do NOT check @a5c-ai/* packages — those are ours.
 
-            Work through these steps methodically. Cover ALL agents, not just a few.
-
-            STEP 1: Build the atlas and agent-catalog so you can query the graph.
+            STEP 1: Build atlas and agent-catalog.
             ```
             npm run build --workspace=@a5c-ai/atlas
             npm run build --workspace=@a5c-ai/agent-catalog
             ```
 
-            STEP 2: Query the graph for ALL plugin targets and their install methods.
-            Use the agent-catalog SDK and also check the adapter source code for
-            install commands. Build a complete list of every agent with its npm/pip
-            package name. Do not hardcode — discover from the actual code and graph.
+            STEP 2: Discover the original agent CLI packages.
+            Look at the adapter source code to find install commands:
+            ```
+            grep -r 'npm install -g' packages/agent-mux/adapters/src/ | grep -v node_modules | grep -v test
+            ```
+            Also check the PluginTarget records in the graph — each has a `hostAgent`
+            field pointing to the original agent product, and the adapters reference
+            the upstream npm package in their `installMethods`.
+            Build a table: agent name, upstream npm/pip package, current install command.
+            EXCLUDE all @a5c-ai/* packages from this list.
 
-            STEP 3: For EACH agent discovered, check the latest published version.
-            Use `npm view <package>@latest version` for npm packages. Search the web
-            for agents not on npm. Record every result.
+            STEP 3: For EACH upstream agent, check the latest published version.
+            `npm view <package>@latest version` for npm packages.
+            Search the web for agents distributed differently (pip, binary, etc.).
 
-            STEP 4: Compare each discovered version against existing AgentVersion
-            records in `packages/atlas/graph/agent-stack/agent-versions/`. Read
-            the YAML files to see what is already recorded.
+            STEP 4: Compare against AgentVersion records in the graph.
+            Read files in `packages/atlas/graph/agent-stack/agent-versions/` and
+            `packages/atlas/graph/agent-stack/products/` to see what versions
+            are already recorded.
 
-            STEP 5: For each NEW version not in the graph:
-            - Search the web for release notes and changelog
-            - Create or update the AgentVersion YAML file
-            - Note any capability changes, new CLI flags, or breaking changes
+            STEP 5: For new versions not in the graph:
+            - Search the web for release notes, changelog, blog posts
+            - Create or update the AgentVersion YAML
+            - Note capability changes, new CLI flags, breaking changes, transport/API changes
 
-            STEP 6: If any graph files were changed:
-            - Rebuild atlas index
-            - Create a branch, commit, and open a PR against staging
+            STEP 6: If graph files changed:
+            - Rebuild: `npm run build --workspace=@a5c-ai/atlas`
+            - Branch: `agent-versions/daily-$(date +%Y-%m-%d)`
+            - Commit all changes, create ONE PR against staging
 
-            STEP 7: For each new agent+version pair, open a GitHub issue titled
-            "Assimilate <agent> v<version> into atlas graph" with label
-            `agent-version-update,graph-update` (check for duplicates first).
+            STEP 7: For each new agent+version pair, check for existing issue:
+            `gh issue list --label "agent-version-update" --search "<agent> <version>"`
+            If none exists, create one:
+            ```
+            gh issue create \
+              --label "agent-version-update,graph-update" \
+              --title "Assimilate <Agent Name> v<version> into atlas graph" \
+              --body "## New Version Detected
 
-            STEP 8: Print a final summary table covering ALL agents checked.
+            **Agent:** <agent display name>
+            **Package:** <npm/pip package name>
+            **New Version:** <version>
+            **Previous Version:** <version or 'none recorded'>
+            **Release Notes:** <URL if found, or 'not found'>
+            **Detection Date:** $(date +%Y-%m-%d)
 
-            IMPORTANT: You must cover every single agent in the graph, not just one or two.
-            Process them systematically in a loop. Do not stop after the first agent. One PR for all the run.
+            ## Key Changes
+            <bullet list of notable changes from release notes, or 'pending investigation'>
+
+            ## Assimilation Checklist
+            - [ ] Review full release notes and changelog
+            - [ ] Update AgentVersion YAML with capabilities, constraints, known issues
+            - [ ] Update AgentProduct record if product-level attributes changed
+            - [ ] Update PluginTarget if hook registration, manifest format, or CLI flags changed
+            - [ ] Update launchBehavior if prompt delivery, stdin behavior, or exit behavior changed
+            - [ ] Update ProviderTranslation if supported providers/transports changed
+            - [ ] Update adapter source code if install detection or spawn behavior changed
+            - [ ] Update HookMapping if hook surface or event format changed
+            - [ ] Run live-stack tests with new version to verify compatibility
+            - [ ] Update CHANGELOG.md with integration notes
+
+            ## Context
+            This issue was auto-created by the daily agent version check workflow.
+            The agent version YAML has been created/updated in the associated PR."
+            ```
+
+            STEP 8: Print a summary table with ALL agents checked.
+
+            IMPORTANT: Cover every upstream agent systematically. Do not stop after one.
+            One PR for all changes in this run.
           trigger-query: ''
         env:
           AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}

@@ -747,6 +747,7 @@ function openAiResponsesStreamResponse(
         );
 
         try {
+          let toolCallIndex = 0;
           for await (const event of stream) {
             if (event.type === 'text-delta' && event.text) {
               outputText += event.text;
@@ -761,6 +762,41 @@ function openAiResponsesStreamResponse(
                   }),
                 ),
               );
+            } else if (event.type === 'tool-call') {
+              const toolItemId = `fc_${randomUUID()}`;
+              controller.enqueue(
+                encoder.encode(
+                  encodeSseChunk('event: response.output_item.added\ndata: ', {
+                    type: 'response.output_item.added',
+                    output_index: toolCallIndex + 1,
+                    item: {
+                      type: 'function_call',
+                      id: toolItemId,
+                      call_id: event.id ?? toolItemId,
+                      name: event.name,
+                      arguments: event.arguments ?? '',
+                      status: 'completed',
+                    },
+                  }),
+                ),
+              );
+              controller.enqueue(
+                encoder.encode(
+                  encodeSseChunk('event: response.output_item.done\ndata: ', {
+                    type: 'response.output_item.done',
+                    output_index: toolCallIndex + 1,
+                    item: {
+                      type: 'function_call',
+                      id: toolItemId,
+                      call_id: event.id ?? toolItemId,
+                      name: event.name,
+                      arguments: event.arguments ?? '',
+                      status: 'completed',
+                    },
+                  }),
+                ),
+              );
+              toolCallIndex++;
             }
           }
         } catch (streamError: unknown) {

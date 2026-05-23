@@ -316,17 +316,21 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
           // npm .cmd shims use %dp0% or %~dp0 for the directory
           const exeMatch = cmdContent.match(/"%(?:~?dp0)%\\([^"]+\.exe)"/);
           if (exeMatch?.[1]) {
-            const exePath = pathMod.resolve(pathMod.dirname(resolved), exeMatch[1]);
+            const exePath = pathMod.resolve(cmdDir, exeMatch[1]);
             if (existsSync(exePath)) {
               const { statSync } = await import('node:fs');
               const exeSize = statSync(exePath).size;
-              // Tiny shims (<10KB) are npm launchers that don't reliably process
-              // CLI args when spawned from child_process. Skip to .cmd fallback.
-              if (exeSize > 10240) {
+              // Bun-compiled binaries (>50MB, e.g. Claude Code 234MB) don't
+              // reliably process CLI args from child_process.spawn on Windows.
+              // Fall through to the .cmd shell fallback for these.
+              if (exeSize > 50_000_000) {
+                console.error(`[amux launch] .exe is Bun binary (${exeSize} bytes), using .cmd shim instead`);
+              } else if (exeSize > 10240) {
                 console.error(`[amux launch] resolved .cmd → .exe: ${exePath} (${exeSize} bytes)`);
                 return { command: exePath, args, shell: false };
+              } else {
+                console.error(`[amux launch] .exe shim too small (${exeSize} bytes), using .cmd fallback`);
               }
-              console.error(`[amux launch] .exe shim too small (${exeSize} bytes), using .cmd with stdin`);
             }
           }
         } catch { /* couldn't parse .cmd */ }
@@ -1464,34 +1468,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // internally (claude -p, codex exec, gemini --prompt, pi -p).
     const { spawn } = await import('node:child_process');
     const resolvedSpawn = await resolveSpawnCommand(plan.command, plan.args);
-    // On Windows, Bun-compiled .exe binaries (Claude Code) ignore -p args
-    // from child_process.spawn. For these, deliver the prompt via file redirect.
-    // Node.js-based agents (Pi, Codex) work fine with -p args — no override needed.
-    if (process.platform === 'win32' && prompt && /\.exe$/i.test(resolvedSpawn.command)) {
-      const { statSync } = await import('node:fs');
-      const exeSize = statSync(resolvedSpawn.command).size;
-      if (exeSize > 50_000_000) {
-        const launchBeh = getLaunchBehavior(plan.harness);
-        if (launchBeh?.promptDelivery === 'cli-flag' && launchBeh.promptFlag) {
-          const flagIdx = resolvedSpawn.args.indexOf(launchBeh.promptFlag);
-          if (flagIdx >= 0 && resolvedSpawn.args[flagIdx + 1] === prompt) {
-            const { writeFileSync } = await import('node:fs');
-            const { join } = await import('node:path');
-            const os = await import('node:os');
-            const promptFile = join(os.tmpdir(), `amux-prompt-${Date.now()}.txt`);
-            writeFileSync(promptFile, prompt);
-            resolvedSpawn.args.splice(flagIdx + 1, 1);
-            const quoteIfNeeded = (s: string) => s.includes(' ') ? `"${s}"` : s;
-            const quotedArgs = resolvedSpawn.args.map(quoteIfNeeded).join(' ');
-            const innerCmd = `${quoteIfNeeded(resolvedSpawn.command)} ${quotedArgs} < "${promptFile}"`;
-            resolvedSpawn.command = process.env['ComSpec'] ?? 'cmd.exe';
-            resolvedSpawn.args = ['/c', innerCmd];
-            resolvedSpawn.shell = false;
-            console.error(`[amux launch] Windows Bun .exe: prompt via file redirect: ${promptFile}`);
-          }
-        }
-      }
-    }
+    // No special Windows prompt override needed — Bun binaries are handled via
+    // .cmd shim fallback in resolveSpawnCommand (shell:true + escapeCmdArg).
     console.error(`[amux launch] spawn: ${resolvedSpawn.command} shell=${resolvedSpawn.shell} args[0..2]=${resolvedSpawn.args.slice(0, 3).join(' ')} totalArgs=${resolvedSpawn.args.length}${stdinPromptOverride ? ' (prompt→stdin)' : ''}`);
     child = spawn(resolvedSpawn.command, resolvedSpawn.args, {
       stdio: ['pipe', 'pipe', 'pipe'],

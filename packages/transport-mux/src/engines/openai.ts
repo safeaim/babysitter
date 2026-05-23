@@ -217,6 +217,7 @@ export function createOpenAICompletionEngine(options: {
         },
       );
 
+      console.error(`[transport-mux] OpenAI engine stream response: ${response.status} ${response.statusText}`);
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`[transport-mux] OpenAI API error ${response.status}: ${errorText.slice(0, 500)}`);
@@ -228,6 +229,7 @@ export function createOpenAICompletionEngine(options: {
 
       const decoder = new TextDecoder();
       let buffer = '';
+      let chunkCount = 0;
       const pendingToolCalls: Array<{ id: string; name: string; arguments: string } | undefined> = [];
 
       while (true) {
@@ -248,6 +250,7 @@ export function createOpenAICompletionEngine(options: {
           }
 
           try {
+            chunkCount++;
             const chunk = JSON.parse(payload) as {
               choices: Array<{
                 delta: {
@@ -300,6 +303,7 @@ export function createOpenAICompletionEngine(options: {
         }
       }
 
+      console.error(`[transport-mux] OpenAI stream ended without finish_reason (${chunkCount} chunks received)`);
       yield { type: 'done' };
     },
   };

@@ -1258,7 +1258,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       return ExitCode.GENERAL_ERROR;
     }
 
-    ptyProcess = nodePty.spawn(plan.command, plan.args, {
+    const resolvedPty = await resolveSpawnCommand(plan.command, plan.args);
+    ptyProcess = nodePty.spawn(resolvedPty.command, resolvedPty.args, {
       name: 'xterm-256color',
       cols: 120,
       rows: 40,

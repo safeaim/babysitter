@@ -150,9 +150,9 @@ export function ObservabilityView({ eventStream, filter }: TuiViewProps) {
             <Text dimColor>[{new Date(ev.timestamp).toISOString().split('T')[1].split('Z')[0]}] </Text>
             <Text color="magenta">{ev.type.padEnd(15)} </Text>
             <Text wrap="truncate">
-              {ev.type === 'log' ? (ev as any).message : 
-               ev.type === 'debug' ? (ev as any).message :
-               JSON.stringify((ev as any).data || ev).slice(0, 100)}
+              {ev.type === 'log' ? ev.line :
+               ev.type === 'debug' ? ev.message :
+               JSON.stringify(ev).slice(0, 100)}
             </Text>
           </Box>
         ))}

@@ -1476,8 +1476,10 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           writeFileSync(promptFile, prompt);
           // Replace the prompt value with '-' (read from stdin)
           resolvedSpawn.args[flagIdx + 1] = '-';
-          // Rebuild as: cmd /c "type <promptFile> | <command> <args>"
-          const innerCmd = `type "${promptFile}" | "${resolvedSpawn.command}" ${resolvedSpawn.args.map(a => `"${a}"`).join(' ')}`;
+          // Rebuild as: cmd /c type <promptFile> | <command> <args>
+          const quoteIfNeeded = (s: string) => s.includes(' ') ? `"${s}"` : s;
+          const quotedArgs = resolvedSpawn.args.map(quoteIfNeeded).join(' ');
+          const innerCmd = `type "${promptFile}" | ${quoteIfNeeded(resolvedSpawn.command)} ${quotedArgs}`;
           resolvedSpawn.command = process.env['ComSpec'] ?? 'cmd.exe';
           resolvedSpawn.args = ['/c', innerCmd];
           resolvedSpawn.shell = false;

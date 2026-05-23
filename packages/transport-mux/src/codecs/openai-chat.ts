@@ -45,11 +45,38 @@ function normalizeMessages(raw: unknown): CompletionRequest['messages'] {
   }
 
   return raw.map((entry) => {
-    const record = entry as { role?: unknown; content?: unknown };
-    return {
-      role: typeof record.role === 'string' ? record.role : 'user',
-      content: parseMessageContent(record.content),
-    };
+    const record = entry as Record<string, unknown>;
+    const role = typeof record.role === 'string' ? record.role : 'user';
+    const content = parseMessageContent(record.content);
+
+    // Preserve tool_calls on assistant messages and tool_call_id on tool messages
+    // as rawContent so translateMessagesToOpenAi can reconstruct them.
+    if (role === 'assistant' && Array.isArray(record.tool_calls) && record.tool_calls.length > 0) {
+      const rawContent = (record.tool_calls as Array<Record<string, unknown>>).map(tc => {
+        const fn = tc.function as Record<string, unknown> | undefined;
+        return {
+          type: 'tool_use',
+          id: String(tc.id ?? ''),
+          name: String(fn?.name ?? ''),
+          input: fn?.arguments ? (typeof fn.arguments === 'string' ? JSON.parse(fn.arguments as string) : fn.arguments) : {},
+        };
+      });
+      if (content) {
+        rawContent.unshift({ type: 'text', text: content } as unknown as typeof rawContent[0]);
+      }
+      return { role, content, rawContent };
+    }
+
+    if (role === 'tool' && record.tool_call_id) {
+      const rawContent = [{
+        type: 'tool_result',
+        tool_use_id: String(record.tool_call_id),
+        content: record.content,
+      }];
+      return { role, content, rawContent };
+    }
+
+    return { role, content };
   });
 }
 

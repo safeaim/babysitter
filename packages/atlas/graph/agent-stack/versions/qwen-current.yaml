@@ -24,19 +24,19 @@ edges:
   sourced_from: []
   supports:
     - target: capability:can-multi-turn
-      versionRange: '>=0.0.1'
+      versionRange: '>=0.16.0'
       level: full
       notes: Qwen agent runs multi-turn coding sessions.
     - target: capability:supports-text-streaming
-      versionRange: '>=0.0.1'
+      versionRange: '>=0.16.0'
       level: full
       notes: Qwen agent streams model output in the terminal.
     - target: capability:supports-tool-use
-      versionRange: '>=0.0.1'
+      versionRange: '>=0.16.0'
       level: full
       notes: Qwen agent drives file edits and commands via tool-use.
     - target: capability:supports-mcp
-      versionRange: '>=0.0.1'
+      versionRange: '>=0.16.0'
       level: full
       notes: Qwen agent supports MCP server integration.
   uses_memory_system:

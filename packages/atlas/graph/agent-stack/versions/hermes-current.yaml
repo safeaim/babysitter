@@ -125,15 +125,15 @@ edges:
   sourced_from: []
   supports:
     - target: capability:can-multi-turn
-      versionRange: '>=1.0.0'
+      versionRange: '>=0.14.0'
       level: full
       notes: Hermes runs multi-turn agent conversations.
     - target: capability:supports-text-streaming
-      versionRange: '>=1.0.0'
+      versionRange: '>=0.14.0'
       level: full
       notes: Hermes streams output in real time.
     - target: capability:supports-tool-use
-      versionRange: '>=1.0.0'
+      versionRange: '>=0.14.0'
       level: full
       notes: Hermes dispatches tool calls per turn.
   uses_memory_system:

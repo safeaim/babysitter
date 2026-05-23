@@ -26,19 +26,19 @@ edges:
   sourced_from: []
   supports:
     - target: capability:can-multi-turn
-      versionRange: '>=1.0.0'
+      versionRange: '>=0.131.0'
       level: full
       notes: Droid operates as a multi-turn coding agent.
     - target: capability:supports-text-streaming
-      versionRange: '>=1.0.0'
+      versionRange: '>=0.131.0'
       level: full
       notes: Droid streams model output in the terminal.
     - target: capability:supports-tool-use
-      versionRange: '>=1.0.0'
+      versionRange: '>=0.131.0'
       level: full
       notes: Droid drives file edits and commands via tool-use.
     - target: capability:supports-mcp
-      versionRange: '>=1.0.0'
+      versionRange: '>=0.131.0'
       level: full
       notes: Droid supports MCP server integration.
   uses_memory_system:

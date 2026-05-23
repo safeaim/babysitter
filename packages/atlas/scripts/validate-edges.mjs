@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const indexPath = path.resolve(__dirname, '..', 'src', 'index.json');
+const indexPath = path.resolve(__dirname, '..', 'dist', 'index.json');
 
 const args = process.argv.slice(2);
 const summaryOnly = args.includes('--summary');

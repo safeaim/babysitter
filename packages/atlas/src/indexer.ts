@@ -511,7 +511,7 @@ function readArg(name: string, fallback?: string): string | undefined {
 
 if (require.main === module) {
   const catalogDir = readArg("--catalog-dir", process.env.CATALOG_DIR ?? path.resolve(process.cwd(), "../../graph"));
-  const outFile = readArg("--out", path.resolve(process.cwd(), "src/index.json"));
+  const outFile = readArg("--out", path.resolve(process.cwd(), "dist/index.json"));
   const index = buildIndex({ catalogDir: catalogDir as string, outFile });
   console.log(`[atlas:indexer] wrote ${outFile}`);
   console.log(`[atlas:indexer] stats ${JSON.stringify(index.stats)}`);

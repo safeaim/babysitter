@@ -5,7 +5,7 @@ import { execSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..', '..', '..');
-const indexPath = path.resolve(__dirname, '..', 'src', 'index.json');
+const indexPath = path.resolve(__dirname, '..', 'dist', 'index.json');
 
 const args = process.argv.slice(2);
 const strict = args.includes('--strict');

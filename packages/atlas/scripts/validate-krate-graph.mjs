@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const packageRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(packageRoot, '..', '..');
-const indexPath = path.join(packageRoot, 'src', 'index.json');
+const indexPath = path.join(packageRoot, 'dist', 'index.json');
 const crdDir = path.join(repoRoot, 'packages', 'krate', 'charts', 'crds');
 const krateWebApiDir = path.join(repoRoot, 'packages', 'krate', 'web', 'app', 'api');
 

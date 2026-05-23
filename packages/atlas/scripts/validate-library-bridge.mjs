@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const indexPath = path.resolve(__dirname, '..', 'src', 'index.json');
+const indexPath = path.resolve(__dirname, '..', 'dist', 'index.json');
 
 if (!fs.existsSync(indexPath)) {
   console.error('index.json not found — run npm run build first');

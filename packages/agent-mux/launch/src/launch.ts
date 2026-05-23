@@ -275,6 +275,23 @@ function escapeCmdArg(arg: string): string {
 
 async function resolveSpawnCommand(command: string, args: string[]): Promise<{ command: string; args: string[]; shell: boolean }> {
   if (process.platform !== 'win32') {
+    // On macOS/Linux, resolve wrapper scripts to their underlying binary.
+    // node-pty's posix_spawnp can fail on some script wrappers.
+    try {
+      const { execSync } = await import('node:child_process');
+      const whichOutput = execSync(`which ${command}`, { encoding: 'utf8', timeout: 5000 }).trim();
+      if (whichOutput && whichOutput !== command) {
+        const { readFileSync } = await import('node:fs');
+        const content = readFileSync(whichOutput, 'utf8').slice(0, 500);
+        // Bash wrapper scripts (e.g. CI-generated shims): extract the node script path
+        const execNodeMatch = content.match(/exec\s+node\s+"([^"]+)"/);
+        if (execNodeMatch?.[1]) {
+          console.error(`[amux launch] resolved wrapper → node ${execNodeMatch[1]}`);
+          return { command: process.execPath, args: [execNodeMatch[1], ...args], shell: false };
+        }
+        return { command: whichOutput, args, shell: false };
+      }
+    } catch { /* which failed, use original */ }
     return { command, args, shell: false };
   }
   const { execSync } = await import('node:child_process');

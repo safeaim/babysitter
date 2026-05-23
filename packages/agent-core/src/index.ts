@@ -98,4 +98,12 @@ export type {
   SynthesisInput,
   SynthesisOutput,
   ResultSynthesizer,
+  ResultSynthesizerImplOptions,
+  RankSynthesisConfig,
+} from "./synthesis";
+export {
+  ResultSynthesizerImpl,
+  applyMergeSynthesis,
+  applyVoteSynthesis,
+  applyRankSynthesis,
 } from "./synthesis";

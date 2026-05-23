@@ -197,6 +197,7 @@ jobs:
                 'google-gemini31': {provider:'google', amux_provider:'google', model:'gemini-3.5-flash', required_env:'GOOGLE_API_KEY'},
                 'anthropic-sonnet46': {provider:'anthropic', amux_provider:'anthropic', model:'claude-sonnet-4-6', required_env:'ANTHROPIC_API_KEY'},
                 'foundry-kimi': {provider:'foundry-openai', amux_provider:'foundry', model:'Kimi-K2.6', required_env:'AZURE_API_KEY,AMUX_API_BASE'},
+                'foundry-gpt54mini': {provider:'foundry-openai', amux_provider:'foundry', model:'gpt-5.4-mini', required_env:'AZURE_API_KEY,AMUX_API_BASE'},
               };
               const modes = {
                 'ni': {id:'non-interactive', interactive:'false', bridge_interactive:'false', bridge_hooks:'false'},

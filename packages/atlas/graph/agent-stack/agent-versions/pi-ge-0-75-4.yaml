@@ -1,22 +1,21 @@
 nodeKind: AgentVersion
-id: agentVersion:omp:ge-0-0-0
+id: agentVersion:pi:ge-0-75-4
 attributes:
-  agentId: "omp"
-  aliases:
-    - "oh-my-pi"
+  agentId: "pi"
+  aliases: []
   runtimeFamily: "cli-harness"
   releaseChannel: "stable"
-  displayName: "OMP (oh-my-pi)"
-  summary: "Oh-My-Pi terminal coding agent"
-  sourcePackage: "@oh-my-pi/pi-coding-agent"
+  displayName: "Pi CLI (>=0.75.4)"
+  summary: "Pi CLI coding agent current npm line with read, bash, edit, write tools and session management"
+  sourcePackage: "@earendil-works/pi-coding-agent"
   osSupport:
     - "linux"
     - "macos"
     - "windows"
-  agentProductId: agent:omp
-  versionRange: ">=15.2.4"
-  releasedAt: "2026-05-22"
-  cliCommand: "omp"
+  agentProductId: agent:pi
+  versionRange: ">=0.75.4"
+  releasedAt: "2026-05-20"
+  cliCommand: "pi"
   installMethods:
     - install:npm
   minSchemaVersion: "6.0.0"
@@ -26,17 +25,17 @@ attributes:
         name: "Provider API Key"
         envVars: [ANTHROPIC_API_KEY, OPENAI_API_KEY]
     authFiles:
-      - "~/.omp/agent/settings.json"
+      - "~/.pi/agent/settings.json"
     hostEnvSignals:
-      - OMP_RUN_ID
-      - OMP_SESSION_ID
-    sessionDir: "~/.omp/agent/sessions"
+      - PI_RUN_ID
+      - PI_SESSION_ID
+    sessionDir: "~/.pi/agent/sessions"
     sessionPersistence: file
     approvalModes:
       - yolo
       - prompt
     capabilityFlags:
-      canResume: false
+      canResume: true
       canFork: false
       supportsMultiTurn: true
       sessionPersistence: file
@@ -77,9 +76,14 @@ attributes:
     configSchema:
       configFormat: json
       configFilePaths:
-        - "~/.omp/agent/settings.json"
-    displayName: "OMP"
+        - "~/.pi/agent/settings.json"
+    displayName: "Pi"
     defaultModelId: "default"
+  interactiveSignals:
+    turnCompletePattern: "^>"
+    exitOnNonInteractive: false
+    nonInteractiveMode: ""
+    interactiveMode: ""
   hookSupport:
     interactive:
       sessionStart: unsupported
@@ -89,46 +93,55 @@ attributes:
       sessionEnd: unsupported
     nonInteractive: {}
   bridgeCapabilities:
-    interactiveBridge: false
+    interactiveBridge: true
     sessionResume: true
     positionalPrompt: false
 edges:
   version_of:
-    - agent:omp
+    - agent:pi
   composed_of:
-    - target: agent-core-impl:omp.core@current
+    - target: agent-core-impl:pi.core@current
       role: core
-    - target: agent-runtime-impl:omp.runtime@current
+    - target: agent-runtime-impl:pi.runtime@current
       role: runtime
-    - target: agent-platform-impl:omp.platform@current
+    - target: agent-platform-impl:pi.platform@current
       role: platform
-    - target: agent-ui-impl:omp.ui@current
+    - target: agent-ui-impl:pi.ui@current
       role: ui
-  sourced_from: []
-  supports:
-    - target: capability:skills
-      versionRange: ">=15.2.4"
-      level: full
-      notes: Oh-My-Pi documents file-backed skills explicitly.
-    - target: capability:supports-thinking
-      versionRange: ">=15.2.4"
-      level: full
-      notes: Oh-My-Pi publicly described as a terminal coding agent with broad tool surface.
-    - target: capability:interactive-mode
-      versionRange: ">=15.2.4"
-      level: full
-      notes: Interactive terminal behavior grounded in upstream product README.
-    - target: capability:stdin-injection
-      versionRange: ">=15.2.4"
-      level: full
-      notes: Public operator docs are thin; local fallback metadata remains primary source of truth.
-    - target: capability:vision-input
-      versionRange: ">=15.2.4"
-      level: full
-      notes: Public README advertises image support; technical detail is thinner.
-    - target: capability:can-resume
-      versionRange: ">=15.2.4"
-      level: full
-      notes: Oh-My-Pi documents resume, continue, fork, and session switching as first-class session operations.
+    - target: knowledge-fabric-impl:pi.knowledge@current
+      role: knowledge-fabric
   uses_memory_system:
     - target: memory-system:pi-memory
+  sourced_from: []
+  supports:
+    - target: capability:interactive-mode
+      versionRange: ">=0.75.4"
+      level: full
+      notes: Pi fallback harness with interactive sessions.
+    - target: capability:stdin-injection
+      versionRange: ">=0.75.4"
+      level: full
+      notes: Pi fallback harness.
+    - target: capability:can-resume
+      versionRange: ">=0.75.4"
+      level: full
+      notes: |
+        Multi-turn JSONL-tree sessions with resume, fork, and branch operations.
+    - target: capability:supports-compaction
+      versionRange: ">=0.75.4"
+      level: full
+      notes: |
+        Client-side branch-summarization compaction via AgentHarness.
+        Configurable threshold and summarization strategy.
+    - target: capability:supports-prompt-templates
+      versionRange: ">=0.75.4"
+      level: full
+      notes: |
+        Parameterized prompt-template system for system prompts,
+        tool descriptions, and context injection.
+    - target: capability:supports-session-management
+      versionRange: ">=0.75.4"
+      level: full
+      notes: |
+        Harness-managed session lifecycle with JSONL-tree persistence,
+        session resume, fork, and execution-env abstraction.

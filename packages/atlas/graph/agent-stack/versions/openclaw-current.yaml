@@ -13,8 +13,8 @@ attributes:
     - "macos"
     - "windows"
   agentProductId: agent:openclaw
-  versionRange: ">=0.0.0"
-  releasedAt: "2025-01-01"
+  versionRange: ">=2026.5.20"
+  releasedAt: "2026-05-21"
   cliCommand: "openclaw"
   installMethods:
     - install:npm
@@ -116,26 +116,26 @@ edges:
   sourced_from: []
   supports:
     - target: capability:skills
-      versionRange: ">=0.0.0"
+      versionRange: ">=2026.5.20"
       level: full
       notes: OpenClaw fallback metadata; runtime hooks and stop hooks remain unsupported in current shared metadata.
     - target: capability:supports-thinking
-      versionRange: ">=0.0.0"
+      versionRange: ">=2026.5.20"
       level: full
       notes: OpenClaw fallback metadata.
     - target: capability:interactive-mode
-      versionRange: ">=0.0.0"
+      versionRange: ">=2026.5.20"
       level: full
       notes: OpenClaw fallback metadata.
     - target: capability:stdin-injection
-      versionRange: ">=0.0.0"
+      versionRange: ">=2026.5.20"
       level: full
       notes: OpenClaw fallback metadata.
     - target: capability:vision-input
-      versionRange: ">=0.0.0"
+      versionRange: ">=2026.5.20"
       level: full
       notes: OpenClaw fallback metadata.
     - target: capability:can-resume
-      versionRange: ">=0.0.0"
+      versionRange: ">=2026.5.20"
       level: full
       notes: OpenClaw fallback metadata.

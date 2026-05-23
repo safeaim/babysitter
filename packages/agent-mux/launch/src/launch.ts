@@ -301,10 +301,14 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
           const cmdContent = readFileSync(resolved, 'utf8');
           console.error(`[amux launch] .cmd content (first 300): ${cmdContent.slice(0, 300).replace(/\n/g, '\\n')}`);
           // Look for .js entry point (node/npm packages)
+          const cmdDir = pathMod.dirname(resolved);
           const jsMatch = cmdContent.match(/"([^"]+\.js)"/);
           if (jsMatch?.[1]) {
-            const jsPath = pathMod.resolve(pathMod.dirname(resolved), jsMatch[1]);
+            // npm .cmd shims use %dp0% for the .cmd file's directory
+            const jsRaw = jsMatch[1].replace(/%~?dp0%/gi, cmdDir + pathMod.sep);
+            const jsPath = pathMod.resolve(cmdDir, jsRaw);
             if (existsSync(jsPath)) {
+              console.error(`[amux launch] resolved .cmd → .js: ${jsPath}`);
               return { command: process.execPath, args: [jsPath, ...args], shell: false };
             }
           }
@@ -1460,31 +1464,31 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     // internally (claude -p, codex exec, gemini --prompt, pi -p).
     const { spawn } = await import('node:child_process');
     const resolvedSpawn = await resolveSpawnCommand(plan.command, plan.args);
-    // On Windows with shell:true, long prompts get mangled by cmd.exe.
-    // Move the prompt from -p flag to stdin delivery instead.
-    if (process.platform === 'win32' && prompt) {
-      const launchBeh = getLaunchBehavior(plan.harness);
-      if (launchBeh?.promptDelivery === 'cli-flag' && launchBeh.promptFlag) {
-        const flagIdx = resolvedSpawn.args.indexOf(launchBeh.promptFlag);
-        if (flagIdx >= 0 && resolvedSpawn.args[flagIdx + 1] === prompt) {
-          // Write prompt to temp file and pipe it via 'type' command.
-          // Bun .exe on Windows doesn't read piped stdin from child_process.
-          const { writeFileSync } = await import('node:fs');
-          const { join } = await import('node:path');
-          const os = await import('node:os');
-          const promptFile = join(os.tmpdir(), `amux-prompt-${Date.now()}.txt`);
-          writeFileSync(promptFile, prompt);
-          // Remove the prompt value entirely — -p alone triggers print mode
-          // and Claude Code reads the prompt from stdin
-          resolvedSpawn.args.splice(flagIdx + 1, 1);
-          // Rebuild as: cmd /c type <promptFile> | <command> <args>
-          const quoteIfNeeded = (s: string) => s.includes(' ') ? `"${s}"` : s;
-          const quotedArgs = resolvedSpawn.args.map(quoteIfNeeded).join(' ');
-          const innerCmd = `type "${promptFile}" | ${quoteIfNeeded(resolvedSpawn.command)} ${quotedArgs}`;
-          resolvedSpawn.command = process.env['ComSpec'] ?? 'cmd.exe';
-          resolvedSpawn.args = ['/c', innerCmd];
-          resolvedSpawn.shell = false;
-          console.error(`[amux launch] Windows prompt file: ${promptFile}`);
+    // On Windows, Bun-compiled .exe binaries (Claude Code) ignore -p args
+    // from child_process.spawn. For these, deliver the prompt via file redirect.
+    // Node.js-based agents (Pi, Codex) work fine with -p args — no override needed.
+    if (process.platform === 'win32' && prompt && /\.exe$/i.test(resolvedSpawn.command)) {
+      const { statSync } = await import('node:fs');
+      const exeSize = statSync(resolvedSpawn.command).size;
+      if (exeSize > 50_000_000) {
+        const launchBeh = getLaunchBehavior(plan.harness);
+        if (launchBeh?.promptDelivery === 'cli-flag' && launchBeh.promptFlag) {
+          const flagIdx = resolvedSpawn.args.indexOf(launchBeh.promptFlag);
+          if (flagIdx >= 0 && resolvedSpawn.args[flagIdx + 1] === prompt) {
+            const { writeFileSync } = await import('node:fs');
+            const { join } = await import('node:path');
+            const os = await import('node:os');
+            const promptFile = join(os.tmpdir(), `amux-prompt-${Date.now()}.txt`);
+            writeFileSync(promptFile, prompt);
+            resolvedSpawn.args.splice(flagIdx + 1, 1);
+            const quoteIfNeeded = (s: string) => s.includes(' ') ? `"${s}"` : s;
+            const quotedArgs = resolvedSpawn.args.map(quoteIfNeeded).join(' ');
+            const innerCmd = `${quoteIfNeeded(resolvedSpawn.command)} ${quotedArgs} < "${promptFile}"`;
+            resolvedSpawn.command = process.env['ComSpec'] ?? 'cmd.exe';
+            resolvedSpawn.args = ['/c', innerCmd];
+            resolvedSpawn.shell = false;
+            console.error(`[amux launch] Windows Bun .exe: prompt via file redirect: ${promptFile}`);
+          }
         }
       }
     }

@@ -280,14 +280,23 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
     try {
       const { execSync } = await import('node:child_process');
       const whichOutput = execSync(`which ${command}`, { encoding: 'utf8', timeout: 5000 }).trim();
-      if (whichOutput && whichOutput !== command) {
-        const { readFileSync } = await import('node:fs');
+      if (whichOutput) {
+        const { readFileSync, statSync } = await import('node:fs');
+        const stat = statSync(whichOutput);
+        console.error(`[amux launch] which ${command} → ${whichOutput} (${stat.size} bytes, mode ${stat.mode.toString(8)})`);
         const content = readFileSync(whichOutput, 'utf8').slice(0, 500);
+        console.error(`[amux launch] script content (first 200): ${content.slice(0, 200).replace(/\n/g, '\\n')}`);
         // Bash wrapper scripts (e.g. CI-generated shims): extract the node script path
         const execNodeMatch = content.match(/exec\s+node\s+"([^"]+)"/);
         if (execNodeMatch?.[1]) {
           console.error(`[amux launch] resolved wrapper → node ${execNodeMatch[1]}`);
           return { command: process.execPath, args: [execNodeMatch[1], ...args], shell: false };
+        }
+        // Also handle: node "path" or exec "path/node" "script"
+        const nodeScriptMatch = content.match(/(?:exec\s+)?(?:"\$[^"]*node[^"]*"|node)\s+"([^"]+\.js)"/);
+        if (nodeScriptMatch?.[1]) {
+          console.error(`[amux launch] resolved wrapper → node ${nodeScriptMatch[1]}`);
+          return { command: process.execPath, args: [nodeScriptMatch[1], ...args], shell: false };
         }
         return { command: whichOutput, args, shell: false };
       }

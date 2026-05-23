@@ -334,8 +334,13 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
             }
           }
         } catch { /* couldn't parse .cmd */ }
-        // Fallback: use cmd.exe with escaped args
-        return { command: resolved, args: args.map(escapeCmdArg), shell: true };
+        // Fallback: invoke .cmd via cmd.exe /c with shell:false to avoid
+        // Node.js shell:true double-quoting (Node wraps in outer quotes for
+        // cmd /s /c "...", which breaks inner escaped quotes in args).
+        const quoteIfNeeded = (s: string) => s.includes(' ') || /[&|<>^()%!"',;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        const cmdLine = `${quoteIfNeeded(resolved)} ${args.map(quoteIfNeeded).join(' ')}`;
+        console.error(`[amux launch] .cmd fallback cmdLine (first 300): ${cmdLine.slice(0, 300)}`);
+        return { command: process.env['ComSpec'] ?? 'cmd.exe', args: ['/c', cmdLine], shell: false };
       }
       if (/\.exe$/i.test(resolved)) {
         return { command: resolved, args, shell: false };

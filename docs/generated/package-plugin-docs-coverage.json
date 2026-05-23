@@ -299,6 +299,16 @@
       "note": "README is the canonical package-level contract."
     },
     {
+      "surface": "packages/tool-mux",
+      "packageName": "@a5c-ai/tool-mux",
+      "description": "Tool multiplexer — ToolDescriptor registry, dispatch policies, schema translation, MCP bridge.",
+      "hasReadme": true,
+      "status": "Public package",
+      "canonicalHome": "../packages/tool-mux/README.md",
+      "supporting": [],
+      "note": "New package from tool-mux build (#215)."
+    },
+    {
       "surface": "packages/tasks-mux",
       "packageName": "@a5c-ai/tasks-mux",
       "description": "Serverless breakpoint multiplexing system with pluggable backends and cryptographic signing.",

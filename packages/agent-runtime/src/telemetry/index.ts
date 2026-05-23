@@ -1,5 +1,6 @@
 /**
- * Telemetry module — OpenTelemetry-aligned structured telemetry interfaces.
+ * Telemetry module — OpenTelemetry-aligned structured telemetry interfaces
+ * and in-memory implementations.
  */
 export {
   TelemetrySpanStatus,
@@ -8,3 +9,17 @@ export {
   type TelemetryProvider,
   type TelemetryConfig,
 } from "./types";
+
+export { InMemoryTelemetryProvider } from "./provider";
+
+export {
+  AuditLog,
+  type AuditEntry,
+  type AuditFilter,
+} from "./audit-log";
+
+export {
+  SpanTree,
+  type SpanTreeNode,
+  type SerializedSpanTreeNode,
+} from "./span-tree";

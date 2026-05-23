@@ -320,12 +320,7 @@ async function resolveSpawnCommand(command: string, args: string[]): Promise<{ c
             if (existsSync(exePath)) {
               const { statSync } = await import('node:fs');
               const exeSize = statSync(exePath).size;
-              // Bun-compiled binaries (>50MB, e.g. Claude Code 234MB) don't
-              // reliably process CLI args from child_process.spawn on Windows.
-              // Fall through to the .cmd shell fallback for these.
-              if (exeSize > 50_000_000) {
-                console.error(`[amux launch] .exe is Bun binary (${exeSize} bytes), using .cmd shim instead`);
-              } else if (exeSize > 10240) {
+              if (exeSize > 10240) {
                 console.error(`[amux launch] resolved .cmd → .exe: ${exePath} (${exeSize} bytes)`);
                 return { command: exePath, args, shell: false };
               } else {

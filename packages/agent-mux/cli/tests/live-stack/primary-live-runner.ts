@@ -211,10 +211,8 @@ function harnessApprovalPassthrough(_harness: string): string[] {
 
 function ensureLiveArtifactDirCommand(env: Record<string, string>, cwd: string): CommandExecution {
   const targetDir = path.join(cwd, '.a5c-live-test');
-  if (process.platform === 'win32') {
-    return { command: 'cmd.exe', args: ['/c', `if not exist "${targetDir}" mkdir "${targetDir}"`], env, cwd, timeoutMs: SETUP_TIMEOUT_MS };
-  }
-  return { command: 'mkdir', args: ['-p', targetDir], env, cwd, timeoutMs: SETUP_TIMEOUT_MS };
+  // Use node -e for cross-platform mkdir -p (avoids cmd.exe quoting issues on Windows)
+  return { command: process.execPath, args: ['-e', `require("fs").mkdirSync(${JSON.stringify(targetDir)},{recursive:true})`], env, cwd, timeoutMs: SETUP_TIMEOUT_MS };
 }
 
 function bridgeFlags(env: Record<string, string | undefined>): string[] {

@@ -38,6 +38,21 @@ export type {
   AgentLoopIterationResult,
   AgentLoopConfig,
   AgentLoop,
+  PromptFn,
+  SequentialLoopRunnerConfig,
+  ConcurrentLoopRunnerConfig,
+  ConcurrentIterationOutput,
+  GroupChatLoopRunnerConfig,
+  HandoffLoopRunnerConfig,
+  HandoffCapableOutput,
+} from "./loop";
+export {
+  AgentLoopImpl,
+  createAgentLoop,
+  SequentialLoopRunner,
+  ConcurrentLoopRunner,
+  GroupChatLoopRunner,
+  HandoffLoopRunner,
 } from "./loop";
 export type {
   InvocationMode,

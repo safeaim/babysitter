@@ -1484,6 +1484,93 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --workspace=@a5c-ai/agent-platform --access public --tag "$NPM_TAG"
 
+  publish_staging_agent_runtime:
+    name: Publish Agent Runtime
+    needs: publish_staging_agent_core
+    runs-on: ubuntu-latest-l
+    permissions:
+      contents: read
+    steps:
+      - name: Download publish workspace
+        uses: actions/download-artifact@v8
+        with:
+          name: publish-source
+          path: artifacts/publish-source
+
+      - name: Extract publish workspace
+        run: |
+          set -euo pipefail
+          tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+          registry-url: https://registry.npmjs.org/
+          token: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build agent-runtime
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-runtime
+
+      - name: Publish agent-runtime
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@a5c-ai/agent-runtime --access public --tag "$NPM_TAG"
+
+  publish_staging_omni:
+    name: Publish Omni
+    needs: [publish_staging_babysitter_agent, publish_staging_agent_runtime]
+    runs-on: ubuntu-latest-l
+    permissions:
+      contents: read
+    steps:
+      - name: Download publish workspace
+        uses: actions/download-artifact@v8
+        with:
+          name: publish-source
+          path: artifacts/publish-source
+
+      - name: Extract publish workspace
+        run: |
+          set -euo pipefail
+          tar -xzf artifacts/publish-source/publish-source.tgz -C "$GITHUB_WORKSPACE"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+          registry-url: https://registry.npmjs.org/
+          token: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu 2>/dev/null || true
+
+      - name: Build omni
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/agent-runtime
+          npm run build --workspace=@a5c-ai/agent-core
+          npm run build --workspace=@a5c-ai/agent-platform
+          npm run build --workspace=@a5c-ai/omni
+
+      - name: Publish omni
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@a5c-ai/omni --access public --tag "$NPM_TAG"
+
   deploy_docs_site:
     if: ${{ github.ref_name != 'develop' }}
     name: Deploy Docs Site

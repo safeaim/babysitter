@@ -186,7 +186,31 @@ const updateLockVersion = (path, version) => {
       version,
       dependencies: {
         "@a5c-ai/agent-mux": version,
+        "@a5c-ai/agent-runtime": version,
         "@a5c-ai/babysitter-sdk": version
+      }
+    },
+    "packages/agent-runtime": {
+      version,
+      dependencies: {
+        "@a5c-ai/babysitter-sdk": version,
+        "@a5c-ai/agent-comm-mux": version
+      }
+    },
+    "packages/omni": {
+      version,
+      dependencies: {
+        "@a5c-ai/agent-core": version,
+        "@a5c-ai/agent-runtime": version,
+        "@a5c-ai/agent-platform": version,
+        "@a5c-ai/agent-mux": version,
+        "@a5c-ai/babysitter-sdk": version
+      }
+    },
+    "packages/tool-mux": {
+      version,
+      dependencies: {
+        "@a5c-ai/transport-mux": version
       }
     },
     "packages/tasks-mux": {
@@ -229,6 +253,9 @@ const workspaceManifestPaths = [
   "packages/agent-catalog/package.json",
   "packages/atlas/package.json",
   "packages/agent-core/package.json",
+  "packages/agent-runtime/package.json",
+  "packages/omni/package.json",
+  "packages/tool-mux/package.json",
   "packages/sdk/package.json",
   "packages/babysitter/package.json",
   "packages/agent-platform/package.json",
@@ -327,6 +354,8 @@ for (const path of [
   "package.json",
   "packages/babysitter/package.json",
   "packages/agent-platform/package.json",
+  "packages/agent-runtime/package.json",
+  "packages/omni/package.json",
   "packages/babysitter-tui-plugins/package.json",
 ]) {
   syncDependencyVersion(path, "@a5c-ai/babysitter-sdk", newVersion);
@@ -350,9 +379,15 @@ for (const path of [
   "packages/agent-mux/ui/package.json",
   "packages/agent-mux/webui/package.json",
   "packages/transport-mux/package.json",
+  "packages/agent-runtime/package.json",
+  "packages/omni/package.json",
+  "packages/tool-mux/package.json",
+  "packages/agent-mux/launch/package.json",
+  "packages/agent-mux/config/package.json",
   "packages/babysitter-tui-plugins/package.json",
 ]) {
   syncDependencyVersion(path, "@a5c-ai/agent-core", newVersion);
+  syncDependencyVersion(path, "@a5c-ai/agent-runtime", newVersion);
   syncDependencyVersion(path, "@a5c-ai/agent-platform", newVersion);
   syncDependencyVersion(path, "@a5c-ai/agent-mux", newAgentMuxVersion);
   syncDependencyVersion(path, "@a5c-ai/agent-mux-adapters", newAgentMuxVersion);

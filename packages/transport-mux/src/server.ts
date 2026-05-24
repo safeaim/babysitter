@@ -1366,6 +1366,7 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
       // Gemini CLI sends the API key as a ?key= query parameter
       const queryKey = c.req.query('key');
       if (!queryKey || queryKey !== config.authToken) {
+        console.error(`[transport-mux] AUTH REJECT: path=${c.req.path} queryKey=${queryKey ? queryKey.slice(0,8) + '...' : 'null'} expectedToken=${config.authToken?.slice(0,8)}... headers: x-api-key=${c.req.header('x-api-key')?.slice(0,8) ?? 'null'} auth=${c.req.header('authorization')?.slice(0,20) ?? 'null'}`);
         return c.json({ error: { message: 'Unauthorized' } }, 401);
       }
     }

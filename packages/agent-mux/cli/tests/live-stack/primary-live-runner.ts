@@ -818,8 +818,8 @@ async function validateAgentBehavior(
       deferredHooksEntries.push({ name: 'stop-hooks', status: 'passed', detail: 'hooks-mux log files found' });
     } else if (hasStopHookInJournal) {
       deferredHooksEntries.push({ name: 'stop-hooks', status: 'passed', detail: 'stop hook event found in run journal (no log files on disk)' });
-    } else if (!isBridgeHooksMode) {
-      deferredHooksEntries.push({ name: 'stop-hooks', status: 'passed', detail: 'no hooks-mux logs (hooks only expected in bridged-hooks mode)' });
+    } else if (!isInteractiveInvocation && !isBridgeHooksMode) {
+      deferredHooksEntries.push({ name: 'stop-hooks', status: 'passed', detail: 'no hooks-mux logs (expected in non-interactive mode — hooks require TTY session)' });
     } else {
       deferredHooksEntries.push({ name: 'stop-hooks', status: 'pending' as 'passed', detail: 'no hooks-mux log files found' });
     }
@@ -829,8 +829,8 @@ async function validateAgentBehavior(
       if (hasSessionLogs) parts.push('hooks-mux log files found');
       if (hasStopHookInJournal) parts.push('stop hook event in run journal');
       deferredHooksEntries.push({ name: 'hooks-mux-session', status: 'passed', detail: parts.join('; ') });
-    } else if (!isBridgeHooksMode) {
-      deferredHooksEntries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'no hooks-mux evidence (hooks only expected in bridged-hooks mode)' });
+    } else if (!isInteractiveInvocation && !isBridgeHooksMode) {
+      deferredHooksEntries.push({ name: 'hooks-mux-session', status: 'passed', detail: 'no hooks-mux evidence (expected in non-interactive — hooks require TTY)' });
     } else {
       deferredHooksEntries.push({ name: 'hooks-mux-session', status: 'pending' as 'passed', detail: 'no hooks-mux logs or stop hook events' });
     }

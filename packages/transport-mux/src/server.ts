@@ -1364,8 +1364,7 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
 
     if (!isAuthorized(c.req.raw, config.authToken)) {
       // Gemini CLI sends the API key as a ?key= query parameter
-      const url = new URL(c.req.url, 'http://localhost');
-      const queryKey = url.searchParams.get('key');
+      const queryKey = c.req.query('key');
       if (!queryKey || queryKey !== config.authToken) {
         return c.json({ error: { message: 'Unauthorized' } }, 401);
       }

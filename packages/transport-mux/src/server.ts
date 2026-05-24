@@ -1363,7 +1363,12 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
     }
 
     if (!isAuthorized(c.req.raw, config.authToken)) {
-      return c.json({ error: { message: 'Unauthorized' } }, 401);
+      // Gemini CLI sends the API key as a ?key= query parameter
+      const url = new URL(c.req.url, 'http://localhost');
+      const queryKey = url.searchParams.get('key');
+      if (!queryKey || queryKey !== config.authToken) {
+        return c.json({ error: { message: 'Unauthorized' } }, 401);
+      }
     }
 
     await next();

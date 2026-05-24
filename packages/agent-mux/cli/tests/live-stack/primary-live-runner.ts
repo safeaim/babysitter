@@ -227,7 +227,8 @@ function resolveLaunchMaxTurns(scenario: LiveStackScenario): number {
     return 1;
   }
   if (scenario.agent.installMode === 'babysitter-plugin') {
-    return 30;
+    // Claude-code needs more turns through the proxy for babysitter orchestration
+    return scenario.agent.agent === 'claude-code' ? 60 : 30;
   }
   return 15;
 }

@@ -28,7 +28,8 @@
     { "path": "packages/agent-mux/webui" },
     { "path": "packages/agent-mux/harness-mock" },
     { "path": "packages/triggers" },
-    { "path": "packages/agent-mux/tui" }
+    { "path": "packages/agent-mux/tui" },
+    { "path": "packages/tool-mux" }
   ],
   "files": []
 }

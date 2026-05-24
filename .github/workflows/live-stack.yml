@@ -61,9 +61,17 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
+      - name: Setup Python (for pip-based agent installs like hermes)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Install dependencies
         run: |
           npm install --legacy-peer-deps --prefer-offline
+          # Ensure pip user-bin is on PATH for hermes and other pip-installed agents
+          export PATH="$HOME/.local/bin:$PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           NATIVE_PKGS=""
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             NATIVE_PKGS="@rollup/rollup-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu @next/swc-linux-x64-gnu @rolldown/binding-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu"

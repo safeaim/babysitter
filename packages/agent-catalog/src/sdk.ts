@@ -1590,7 +1590,7 @@ export function getInstallMethods(harness: string): ResolvedInstallMethod[] {
     switch (type) {
       case 'npm': command = `npm install -g ${sourcePackage}`; break;
       case 'gh-extension': command = `gh extension install ${sourcePackage.replace(/^@/, '')}`; break;
-      case 'pip': command = `pip install ${sourcePackage}`; break;
+      case 'pip': command = `python3 -m pip install --user ${sourcePackage}`; break;
       case 'brew': command = `brew install ${sourcePackage}`; break;
       case 'manual': command = `Download from ${sourcePackage}`; break;
       default: command = `${type} install ${sourcePackage}`; break;

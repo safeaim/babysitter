@@ -16,7 +16,7 @@ attributes:
   adapterMetadata:
     installCommands:
       - type: pip
-        command: "pip install hermes-agent"
+        command: "python3 -m pip install --user hermes-agent"
       - type: curl
         command: "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash"
     authMethods:

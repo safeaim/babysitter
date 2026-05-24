@@ -494,7 +494,7 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
     }
     if (processMode === 'resume') {
       const resumeRunId = env['LIVE_STACK_RESUME_RUN_ID'] ?? `resume-${traceId}`;
-      const resumeInstructions = `Run this command and wait for it to complete: agent-platform resume --run-id ${resumeRunId} --harness codex --workspace "$PWD" --non-interactive --json. The process file is at .a5c/processes/summarize-translate-test.mjs. After the command completes, write the output file to .a5c-live-test/${traceId}-odyssey.md if it doesn't already exist.`;
+      const resumeInstructions = `Resume the babysitter run with ID ${resumeRunId}. The process file is at .a5c/processes/summarize-translate-test.mjs. After the run completes, write the output file to .a5c-live-test/${traceId}-odyssey.md if it doesn't already exist.`;
       if (scenario.agent.agent === 'claude-code') return `/babysitter:yolo ${resumeInstructions}`;
       if (scenario.agent.agent === 'codex') return `$babysitter:yolo ${resumeInstructions}`;
       return resumeInstructions;

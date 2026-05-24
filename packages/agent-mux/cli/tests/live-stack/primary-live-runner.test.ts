@@ -123,13 +123,13 @@ describe('primary live stack runner contract', () => {
     expect(codexPrompt).toContain('.a5c/processes/summarize-translate-test.mjs');
   });
 
-  it('uses the direct harness runner for yolo plugin commands', async () => {
+  it('uses babysitter instructions for yolo plugin commands', async () => {
     const yoloCommand = await fs.readFile(path.join(process.cwd(), 'plugins', 'babysitter-unified', 'commands', 'yolo.md'), 'utf8');
 
-    expect(yoloCommand).toContain('agent-platform yolo --harness claude-code');
-    expect(yoloCommand).toContain('agent-platform yolo --harness codex');
-    expect(yoloCommand).not.toContain('instructions:babysit-skill');
-    expect(yoloCommand).not.toContain('Invoke the babysitter:babysit skill');
+    expect(yoloCommand).toContain('babysitter instructions:babysit-skill');
+    expect(yoloCommand).toContain('--harness claude-code');
+    expect(yoloCommand).toContain('--harness codex');
+    expect(yoloCommand).not.toContain('agent-platform');
   });
 
   it('keeps Claude TTY live prompts bounded for interactive and bridged-interactive lanes', () => {

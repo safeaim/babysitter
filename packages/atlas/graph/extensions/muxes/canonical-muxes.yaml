@@ -84,10 +84,10 @@ edges:
     - target: agentVersion:cursor:ge-0-0-0
     - target: agentVersion:gemini:ge-0-0-0
     - target: agentVersion:opencode:ge-0-0-0
-    - target: agentVersion:copilot:ge-0-0-0
-    - target: agentVersion:pi:ge-0-0-0
-    - target: agentVersion:omp:ge-0-0-0
-    - target: agentVersion:openclaw:ge-0-0-0
+    - target: agentVersion:copilot:ge-1-0-51
+    - target: agentVersion:pi:ge-0-75-4
+    - target: agentVersion:omp:ge-15-2-4
+    - target: agentVersion:openclaw:ge-2026-5-20
     - target: agent-version:hermes@current
     - target: agent-version:qwen@current
     - target: agent-version:droid@current
@@ -139,10 +139,10 @@ edges:
     - target: agentVersion:cursor:ge-0-0-0
     - target: agentVersion:gemini:ge-0-0-0
     - target: agentVersion:opencode:ge-0-0-0
-    - target: agentVersion:copilot:ge-0-0-0
-    - target: agentVersion:pi:ge-0-0-0
-    - target: agentVersion:omp:ge-0-0-0
-    - target: agentVersion:openclaw:ge-0-0-0
+    - target: agentVersion:copilot:ge-1-0-51
+    - target: agentVersion:pi:ge-0-75-4
+    - target: agentVersion:omp:ge-15-2-4
+    - target: agentVersion:openclaw:ge-2026-5-20
     - target: agent-version:hermes@current
 ---
 nodeKind: Mux
@@ -219,7 +219,7 @@ edges:
     - target: agentVersion:cursor:ge-0-0-0
     - target: agentVersion:gemini:ge-0-0-0
     - target: agentVersion:opencode:ge-0-0-0
-    - target: agentVersion:copilot:ge-0-0-0
+    - target: agentVersion:copilot:ge-1-0-51
 ---
 nodeKind: Mux
 id: mux:hooks-mux
@@ -263,10 +263,10 @@ edges:
     - target: agentVersion:cursor:ge-0-0-0
     - target: agentVersion:gemini:ge-0-0-0
     - target: agentVersion:opencode:ge-0-0-0
-    - target: agentVersion:copilot:ge-0-0-0
-    - target: agentVersion:pi:ge-0-0-0
-    - target: agentVersion:omp:ge-0-0-0
-    - target: agentVersion:openclaw:ge-0-0-0
+    - target: agentVersion:copilot:ge-1-0-51
+    - target: agentVersion:pi:ge-0-75-4
+    - target: agentVersion:omp:ge-15-2-4
+    - target: agentVersion:openclaw:ge-2026-5-20
     - target: agent-version:hermes@current
 ---
 nodeKind: Mux
@@ -307,8 +307,8 @@ edges:
     - target: agentVersion:codex:ge-0-119-0
     - target: agentVersion:cursor:ge-0-0-0
     - target: agentVersion:opencode:ge-0-0-0
-    - target: agentVersion:pi:ge-0-0-0
-    - target: agentVersion:omp:ge-0-0-0
+    - target: agentVersion:pi:ge-0-75-4
+    - target: agentVersion:omp:ge-15-2-4
 ---
 nodeKind: Mux
 id: mux:tool-mux

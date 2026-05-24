@@ -1,5 +1,5 @@
 nodeKind: AgentVersion
-id: agentVersion:copilot:ge-0-0-0
+id: agentVersion:copilot:ge-1-0-51
 attributes:
   agentId: "copilot"
   aliases:

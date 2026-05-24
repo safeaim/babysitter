@@ -194,7 +194,27 @@ function buildStaticFallbackMetadata(): Record<string, AmuxAdapterMetadata> {
         },
       ]),
     );
-    return Object.keys(catalogMetadata).length > 0 ? catalogMetadata : LOCAL_FALLBACK_METADATA;
+    if (Object.keys(catalogMetadata).length === 0) return LOCAL_FALLBACK_METADATA;
+
+    // Merge: use catalog data for host signals and session dir, but prefer
+    // LOCAL_FALLBACK_METADATA for capabilities when catalog returns all-false
+    // (graph schema mismatch between supports edges and capability lookups).
+    const merged: Record<string, AmuxAdapterMetadata> = { ...LOCAL_FALLBACK_METADATA };
+    for (const [name, catalogEntry] of Object.entries(catalogMetadata)) {
+      const local = LOCAL_FALLBACK_METADATA[name];
+      if (local) {
+        const anyCatalogCapTrue = Object.values(catalogEntry.capabilities).some(v => v === true);
+        merged[name] = {
+          ...local,
+          hostEnvSignals: catalogEntry.hostEnvSignals.length > 0 ? catalogEntry.hostEnvSignals : local.hostEnvSignals,
+          sessionDir: catalogEntry.sessionDir,
+          capabilities: anyCatalogCapTrue ? catalogEntry.capabilities : local.capabilities,
+        };
+      } else {
+        merged[name] = catalogEntry;
+      }
+    }
+    return merged;
   } catch {
     return LOCAL_FALLBACK_METADATA;
   }

@@ -1,5 +1,5 @@
 nodeKind: AgentVersion
-id: agentVersion:omp:ge-0-0-0
+id: agentVersion:omp:ge-15-2-4
 attributes:
   agentId: "omp"
   aliases:

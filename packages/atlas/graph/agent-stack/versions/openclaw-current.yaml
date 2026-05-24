@@ -1,5 +1,5 @@
 nodeKind: AgentVersion
-id: agentVersion:openclaw:ge-0-0-0
+id: agentVersion:openclaw:ge-2026-5-20
 attributes:
   agentId: "openclaw"
   aliases: []

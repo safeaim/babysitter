@@ -7,7 +7,7 @@ id: hook-mapping:copilot-pre-tool-native
 attributes:
   mappingId: hook-mapping:copilot-pre-tool-native
   hookId: hook-surface:copilot.pre-tool
-  targetId: agentVersion:copilot:ge-0-0-0
+  targetId: agentVersion:copilot:ge-1-0-51
   nativeName: pre_tool
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: false
@@ -23,14 +23,14 @@ edges:
   maps_hook:
     - target: hook-surface:copilot.pre-tool
   emits_hook:
-    - target: agentVersion:copilot:ge-0-0-0
+    - target: agentVersion:copilot:ge-1-0-51
 ---
 nodeKind: HookMapping
 id: hook-mapping:copilot-post-tool-native
 attributes:
   mappingId: hook-mapping:copilot-post-tool-native
   hookId: hook-surface:copilot.post-tool
-  targetId: agentVersion:copilot:ge-0-0-0
+  targetId: agentVersion:copilot:ge-1-0-51
   nativeName: post_tool
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: false
@@ -46,7 +46,7 @@ edges:
   maps_hook:
     - target: hook-surface:copilot.post-tool
   emits_hook:
-    - target: agentVersion:copilot:ge-0-0-0
+    - target: agentVersion:copilot:ge-1-0-51
 ---
 # ── OpenCode native hooks ──
 nodeKind: HookMapping
@@ -1073,7 +1073,7 @@ id: hook-mapping:omp-on-event-native
 attributes:
   mappingId: hook-mapping:omp-on-event-native
   hookId: hook-surface:omp.on-event
-  targetId: agentVersion:omp:ge-0-0-0
+  targetId: agentVersion:omp:ge-15-2-4
   nativeName: onEvent
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: false
@@ -1089,7 +1089,7 @@ edges:
   maps_hook:
     - target: hook-surface:omp.on-event
   emits_hook:
-    - target: agentVersion:omp:ge-0-0-0
+    - target: agentVersion:omp:ge-15-2-4
 ---
 # ── OpenClaw onEvent hook ──
 nodeKind: HookMapping
@@ -1097,7 +1097,7 @@ id: hook-mapping:openclaw-on-event-native
 attributes:
   mappingId: hook-mapping:openclaw-on-event-native
   hookId: hook-surface:openclaw.on-event
-  targetId: agentVersion:openclaw:ge-0-0-0
+  targetId: agentVersion:openclaw:ge-2026-5-20
   nativeName: onEvent
   versionRange: ">=0.0.0"
   requiresRuntimeHooks: false
@@ -1113,7 +1113,7 @@ edges:
   maps_hook:
     - target: hook-surface:openclaw.on-event
   emits_hook:
-    - target: agentVersion:openclaw:ge-0-0-0
+    - target: agentVersion:openclaw:ge-2026-5-20
 ---
 # ── BeforePromptBuild canonical hook ──
 nodeKind: HookMapping

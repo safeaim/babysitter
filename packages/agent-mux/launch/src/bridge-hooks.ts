@@ -1,10 +1,10 @@
 /**
  * Bridge hook emulation for non-interactive mode.
  *
- * When --bridge-hooks is set, emulates lifecycle hooks (session-start, stop
- * with block-continue, session-end) that the underlying CLI harness may not
- * support natively.  The emulator shells out to the babysitter CLI to trigger
- * hook handling and run-status queries.
+ * When --bridge-hooks is set, emulates lifecycle hooks by invoking
+ * hooks-mux, which reads the harness's hook configuration (settings.json,
+ * hooks.json, etc.), resolves ALL registered handlers from ALL installed
+ * plugins, and executes them through the proper chain.
  */
 
 import { getHookSupport, type HookSupportLevel } from '@a5c-ai/agent-catalog';
@@ -37,16 +37,35 @@ export interface StopResult {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-/** Resolve the babysitter CLI binary path from env or default. */
 function resolveBabysitterBin(env: Record<string, string>): string {
   return env['BABYSITTER_BIN'] || 'babysitter';
 }
 
-/** Run a babysitter CLI command and return stdout. Throws on non-zero exit. */
-async function execBabysitterCommand(
+function resolveHooksMuxBin(env: Record<string, string>): string {
+  return env['HOOKS_MUX_BIN'] || 'a5c-hooks-mux';
+}
+
+/** Map harness name to the hooks-mux adapter name. */
+function harnessToAdapter(harness: string): string {
+  const map: Record<string, string> = {
+    'claude-code': 'claude',
+    'claude': 'claude',
+    'codex': 'codex',
+    'pi': 'pi',
+    'gemini-cli': 'gemini',
+    'gemini': 'gemini',
+    'hermes': 'hermes',
+    'copilot-cli': 'copilot',
+    'opencode': 'opencode',
+    'cursor-cli': 'cursor',
+  };
+  return map[harness] ?? harness;
+}
+
+async function execCommand(
   bin: string,
   args: string[],
-  options: { cwd: string; env: Record<string, string>; verbose?: boolean },
+  options: { cwd: string; env: Record<string, string>; verbose?: boolean; stdin?: string },
 ): Promise<string> {
   const { execFileSync } = await import('node:child_process');
 
@@ -61,17 +80,14 @@ async function execBabysitterCommand(
     env: mergedEnv,
     encoding: 'utf-8',
     timeout: 30_000,
-    stdio: ['pipe', 'pipe', 'pipe'],
+    stdio: [options.stdin ? 'pipe' : 'ignore', 'pipe', 'pipe'],
+    input: options.stdin,
+    shell: process.platform === 'win32',
   });
 
   return result;
 }
 
-/**
- * Query the agent-catalog for hook support in non-interactive mode.
- * Returns the support level for a given hook, or undefined if the catalog
- * is not available.
- */
 async function getHookSupportLevel(
   harness: string,
   hookName: string,
@@ -80,9 +96,6 @@ async function getHookSupportLevel(
   return support?.[hookName as keyof typeof support];
 }
 
-/**
- * Parse JSON output from a babysitter CLI command, returning null on failure.
- */
 function parseJsonOutput<T>(output: string): T | null {
   try {
     return JSON.parse(output.trim()) as T;
@@ -96,19 +109,74 @@ function parseJsonOutput<T>(output: string): T | null {
 // ---------------------------------------------------------------------------
 
 export class BridgeHookEmulator {
-  private readonly bin: string;
+  private readonly babysitterBin: string;
+  private readonly hooksMuxBin: string;
+  private readonly adapter: string;
   private runId: string | undefined;
 
   constructor(private readonly ctx: BridgeHookContext) {
-    this.bin = resolveBabysitterBin(ctx.env);
+    this.babysitterBin = resolveBabysitterBin(ctx.env);
+    this.hooksMuxBin = resolveHooksMuxBin(ctx.env);
+    this.adapter = harnessToAdapter(ctx.harness);
+  }
+
+  /**
+   * Invoke a hook event through hooks-mux, which reads the harness's
+   * hook configuration and runs ALL registered handlers from ALL plugins.
+   *
+   * Falls back to direct babysitter CLI if hooks-mux is not available.
+   */
+  private async invokeHookEvent(nativeEvent: string): Promise<string> {
+    try {
+      const args = [
+        'invoke',
+        '--adapter', this.adapter,
+        '--native-event', nativeEvent,
+        '--json',
+      ];
+
+      return await execCommand(this.hooksMuxBin, args, {
+        cwd: this.ctx.cwd,
+        env: this.ctx.env,
+        verbose: this.ctx.verbose,
+        stdin: JSON.stringify({ event: nativeEvent }),
+      });
+    } catch (err) {
+      if (this.ctx.verbose) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[bridge-hooks] hooks-mux invoke failed (${nativeEvent}), falling back to babysitter: ${msg}`);
+      }
+
+      // Fallback: direct babysitter hook:run (no hooks-mux in chain)
+      const hookType = nativeEvent === 'SessionStart' ? 'session-start'
+        : nativeEvent === 'Stop' ? 'stop'
+        : nativeEvent === 'SessionEnd' ? 'session-end'
+        : nativeEvent.toLowerCase().replace(/([A-Z])/g, '-$1').replace(/^-/, '');
+
+      const args = [
+        'hook:run',
+        '--hook-type', hookType,
+        '--harness', this.ctx.harness,
+        '--json',
+      ];
+      if (this.ctx.runsDir) {
+        args.push('--runs-dir', this.ctx.runsDir);
+      }
+
+      return await execCommand(this.babysitterBin, args, {
+        cwd: this.ctx.cwd,
+        env: this.ctx.env,
+        verbose: this.ctx.verbose,
+      });
+    }
   }
 
   /**
    * Emulate the session-start lifecycle hook.
    *
-   * If the harness supports session-start natively, this is a no-op.
-   * If emulated, it invokes `babysitter hook:run --hook-type session-start`
-   * which creates a bare run and initializes session state.
+   * Invokes hooks-mux with the SessionStart event, which reads the
+   * harness's hook configuration and runs all registered session-start
+   * handlers from all installed plugins.
    */
   async emulateSessionStart(): Promise<SessionStartResult> {
     const level = await getHookSupportLevel(this.ctx.harness, 'sessionStart');
@@ -119,22 +187,7 @@ export class BridgeHookEmulator {
 
     if (level === 'unsupported' || level === 'emulated' || level === undefined) {
       try {
-        const args = [
-          'hook:run',
-          '--hook-type', 'session-start',
-          '--harness', this.ctx.harness,
-          '--json',
-        ];
-
-        if (this.ctx.runsDir) {
-          args.push('--runs-dir', this.ctx.runsDir);
-        }
-
-        const output = await execBabysitterCommand(this.bin, args, {
-          cwd: this.ctx.cwd,
-          env: this.ctx.env,
-          verbose: this.ctx.verbose,
-        });
+        const output = await this.invokeHookEvent('SessionStart');
 
         const result = parseJsonOutput<{ runId?: string }>(output);
         if (result?.runId) {
@@ -151,7 +204,6 @@ export class BridgeHookEmulator {
           const msg = err instanceof Error ? err.message : String(err);
           console.error(`[bridge-hooks] session-start emulation failed: ${msg}`);
         }
-        // Non-fatal: continue without a run ID
         return { emulated: true };
       }
     }
@@ -162,12 +214,7 @@ export class BridgeHookEmulator {
   /**
    * Emulate the stop lifecycle hook.
    *
-   * If the harness supports stop natively, this is a no-op.
-   * If emulated:
-   *   1. Queries `babysitter run:status <runDir> --json` to check run state
-   *   2. If run has pending effects or is not completed: shouldContinue=true
-   *   3. If run is completed: shouldContinue=false
-   *   4. Returns a resumeId for session resume if continuing
+   * Invokes hooks-mux with the Stop event, then queries run status.
    */
   async emulateStop(runId?: string): Promise<StopResult> {
     const effectiveRunId = runId ?? this.runId;
@@ -186,13 +233,19 @@ export class BridgeHookEmulator {
 
     if (level === 'unsupported' || level === 'emulated' || level === undefined) {
       try {
+        // Invoke the Stop hook through hooks-mux (all plugins)
+        try {
+          await this.invokeHookEvent('Stop');
+        } catch {
+          // stop hook may fail if no active run — continue to status check
+        }
+
+        // Query run status to decide whether to continue
         const runDir = this.ctx.runsDir
           ? `${this.ctx.runsDir}/${effectiveRunId}`
           : effectiveRunId;
 
-        const args = ['run:status', runDir, '--json'];
-
-        const output = await execBabysitterCommand(this.bin, args, {
+        const statusOutput = await execCommand(this.babysitterBin, ['run:status', runDir, '--json'], {
           cwd: this.ctx.cwd,
           env: this.ctx.env,
           verbose: this.ctx.verbose,
@@ -202,7 +255,7 @@ export class BridgeHookEmulator {
           state?: string;
           needsMoreIterations?: boolean;
           pendingEffectsSummary?: { totalPending?: number };
-        }>(output);
+        }>(statusOutput);
 
         if (!status) {
           if (this.ctx.verbose) {
@@ -233,7 +286,6 @@ export class BridgeHookEmulator {
           const msg = err instanceof Error ? err.message : String(err);
           console.error(`[bridge-hooks] stop emulation failed: ${msg}`);
         }
-        // On error, don't continue — safer default
         return { shouldContinue: false, emulated: true };
       }
     }
@@ -243,9 +295,6 @@ export class BridgeHookEmulator {
 
   /**
    * Emulate the session-end lifecycle hook.
-   *
-   * If the harness supports session-end natively, this is a no-op.
-   * If emulated, invokes `babysitter hook:run --hook-type session-end`.
    */
   async emulateSessionEnd(): Promise<void> {
     const level = await getHookSupportLevel(this.ctx.harness, 'sessionEnd');
@@ -256,22 +305,7 @@ export class BridgeHookEmulator {
 
     if (level === 'unsupported' || level === 'emulated' || level === undefined) {
       try {
-        const args = [
-          'hook:run',
-          '--hook-type', 'session-end',
-          '--harness', this.ctx.harness,
-          '--json',
-        ];
-
-        if (this.ctx.runsDir) {
-          args.push('--runs-dir', this.ctx.runsDir);
-        }
-
-        await execBabysitterCommand(this.bin, args, {
-          cwd: this.ctx.cwd,
-          env: this.ctx.env,
-          verbose: this.ctx.verbose,
-        });
+        await this.invokeHookEvent('SessionEnd');
 
         if (this.ctx.verbose) {
           console.error('[bridge-hooks] session-end emulated');
@@ -281,7 +315,6 @@ export class BridgeHookEmulator {
           const msg = err instanceof Error ? err.message : String(err);
           console.error(`[bridge-hooks] session-end emulation failed: ${msg}`);
         }
-        // Non-fatal: swallow errors on session-end
       }
     }
   }

@@ -121,17 +121,39 @@ export class BridgeHookEmulator {
   }
 
   /**
-   * Invoke a hook event through hooks-mux, which reads the harness's
-   * hook configuration and runs ALL registered handlers from ALL plugins.
+   * Invoke a hook event through hooks-mux with explicit handler commands.
+   *
+   * The bridge emulator passes handler commands directly via --handler flags,
+   * since there's no harness runtime to read the hook config from. The
+   * handlers are the same scripts that the plugin.json defines for each event.
    *
    * Falls back to direct babysitter CLI if hooks-mux is not available.
    */
   private async invokeHookEvent(nativeEvent: string): Promise<string> {
+    const hookType = nativeEvent === 'SessionStart' ? 'session-start'
+      : nativeEvent === 'Stop' ? 'stop'
+      : nativeEvent === 'SessionEnd' ? 'session-end'
+      : nativeEvent.toLowerCase().replace(/([A-Z])/g, '-$1').replace(/^-/, '');
+
+    // Build the babysitter hook:run command that the hook script would call
+    const babysitterCmd = [
+      this.babysitterBin,
+      'hook:run',
+      '--hook-type', hookType,
+      '--harness', this.ctx.harness,
+      '--json',
+    ];
+    if (this.ctx.runsDir) {
+      babysitterCmd.push('--runs-dir', this.ctx.runsDir);
+    }
+    const handlerCommand = babysitterCmd.join(' ');
+
     try {
       const args = [
         'invoke',
         '--adapter', this.adapter,
         '--native-event', nativeEvent,
+        '--handler', `${handlerCommand}:babysitter-${hookType}`,
         '--json',
       ];
 
@@ -147,23 +169,8 @@ export class BridgeHookEmulator {
         console.error(`[bridge-hooks] hooks-mux invoke failed (${nativeEvent}), falling back to babysitter: ${msg}`);
       }
 
-      // Fallback: direct babysitter hook:run (no hooks-mux in chain)
-      const hookType = nativeEvent === 'SessionStart' ? 'session-start'
-        : nativeEvent === 'Stop' ? 'stop'
-        : nativeEvent === 'SessionEnd' ? 'session-end'
-        : nativeEvent.toLowerCase().replace(/([A-Z])/g, '-$1').replace(/^-/, '');
-
-      const args = [
-        'hook:run',
-        '--hook-type', hookType,
-        '--harness', this.ctx.harness,
-        '--json',
-      ];
-      if (this.ctx.runsDir) {
-        args.push('--runs-dir', this.ctx.runsDir);
-      }
-
-      return await execCommand(this.babysitterBin, args, {
+      // Fallback: direct babysitter hook:run
+      return await execCommand(this.babysitterBin, babysitterCmd.slice(1), {
         cwd: this.ctx.cwd,
         env: this.ctx.env,
         verbose: this.ctx.verbose,

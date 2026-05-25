@@ -142,7 +142,7 @@ describe('primary live stack runner contract', () => {
       const prompt = promptFor(scenario, env);
 
       expect(prompt).toContain('concise 6-section summary');
-      expect(prompt).toContain('do not run shell commands');
+      expect(prompt).toContain('.a5c-live-test directory already exists');
       expect(prompt).not.toContain('12-paragraph summary');
     }
   });
@@ -237,9 +237,12 @@ describe('primary live stack runner contract', () => {
 
     expect(setupScript).toContain('create-process-skeleton.mjs');
     expect(setupScript).toContain('odyssey-live-test.skeleton.mjs');
-    expect(setupScript).toContain('rm -f');
-    expect(setupScript).toContain('odyssey-live-test.mjs');
-    expect(setupScript).toContain('summarize-translate-test.mjs');
+
+    // Cleanup uses node -e with fs.unlinkSync (cross-platform, no rm -f dependency)
+    const cleanupCommand = commands.find((command) => command.args.join(' ').includes('unlinkSync') || command.args.join(' ').includes('rm -f'));
+    const cleanupScript = cleanupCommand?.args.at(-1) ?? '';
+    expect(cleanupScript).toContain('odyssey-live-test.mjs');
+    expect(cleanupScript).toContain('summarize-translate-test.mjs');
   });
 
   it('passes explicit Google env to Gemini 3.1 Pro live lanes', () => {

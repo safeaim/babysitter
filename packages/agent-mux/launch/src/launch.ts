@@ -1107,7 +1107,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
   if (isInteractive) {
     // Interactive mode: full TTY passthrough. If a prompt is provided, it's
     // injected as initial stdin after the harness starts (like typing it in).
+    // Skip node-pty on macOS ARM64 CI — posix_spawnp fails for all binaries
+    // and the native addon writes errors directly to stderr bypassing JS try/catch.
+    const skipPty = process.platform === 'darwin' && process.arch === 'arm64' && process.env['CI'] === 'true';
     try {
+      if (skipPty) throw new Error('Skipping node-pty on macOS ARM64 CI');
       const nodePty: any = await import('node-pty');
       const resolved = await resolveSpawnCommand(plan.command, plan.args);
       ptyProcess = nodePty.spawn(resolved.command, resolved.args, {
@@ -1180,7 +1184,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           interactiveBypassHandled = true;
           setTimeout(() => ptyProcess.write('\x1b[B\r'), 200);
         }
-        if (!interactiveHooksTrustHandled && (stripped.includes('hooksneedreview') || stripped.includes('Hooksneedreview') || stripped.includes('Hookscanrunoutsidethesandbox'))) {
+        if (!interactiveHooksTrustHandled && (stripped.includes('Hooks need review') || stripped.includes('hooks need review') || stripped.includes('Hooks can run outside the sandbox'))) {
           interactiveHooksTrustHandled = true;
           setTimeout(() => ptyProcess.write('2\r'), 300);
         }
@@ -1413,7 +1417,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       }
       // Codex hooks trust prompt: "Hooks can run outside the sandbox after you trust them"
       // or "hooks are new or changed. Hooks need review"
-      if (!hooksTrustHandled && (stripped.includes('hooksneedreview') || stripped.includes('Hooksneedreview') || stripped.includes('Hookscanrunoutsidethesandbox'))) {
+      if (!hooksTrustHandled && (stripped.includes('Hooks need review') || stripped.includes('hooks need review') || stripped.includes('Hooks can run outside the sandbox'))) {
         hooksTrustHandled = true;
         // Send "2" to select "Trust all" option, then Enter
         setTimeout(() => ptyProcess.write('2\r'), 300);

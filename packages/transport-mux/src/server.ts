@@ -1056,22 +1056,37 @@ function googleStreamResponse(stream: AsyncIterable<CompletionStreamEvent>): Res
     new ReadableStream({
       async start(controller) {
         for await (const event of stream) {
-          if (event.type !== 'text-delta' || !event.text) {
-            continue;
+          if (event.type === 'text-delta' && event.text) {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  candidates: [{ content: { parts: [{ text: event.text }], role: 'model' } }],
+                })}\n\n`,
+              ),
+            );
+          } else if (event.type === 'tool-call') {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  candidates: [{ content: { parts: [{ functionCall: { name: event.name, args: JSON.parse(event.arguments || '{}') } }], role: 'model' } }],
+                })}\n\n`,
+              ),
+            );
+          } else if (event.type === 'done') {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  candidates: [{ content: { parts: [], role: 'model' }, finishReason: event.finishReason?.toUpperCase() || 'STOP' }],
+                  usageMetadata: event.usage ? { promptTokenCount: event.usage.promptTokens, candidatesTokenCount: event.usage.completionTokens, totalTokenCount: event.usage.totalTokens } : undefined,
+                })}\n\n`,
+              ),
+            );
           }
-
-          controller.enqueue(
-            encoder.encode(
-              `${JSON.stringify({
-                candidates: [{ content: { parts: [{ text: event.text }], role: 'model' } }],
-              })}\n`,
-            ),
-          );
         }
         controller.close();
       },
     }),
-    { headers: { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-cache' } },
+    { headers: { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } },
   );
 }
 

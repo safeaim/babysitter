@@ -1289,16 +1289,17 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     } catch (ptyError: unknown) {
       // node-pty not available or posix_spawnp failed (macOS ARM64), fall back to stdio
       const ptyMsg = ptyError instanceof Error ? ptyError.message : String(ptyError);
-      console.error(`[amux launch] PTY spawn failed (${process.platform}/${process.arch}): ${ptyMsg} — falling back to stdio`);
+      console.error(`[amux launch] PTY fallback (${process.platform}/${process.arch}): ${ptyMsg}`);
       ptyProcess = null;
       const { spawn } = await import('node:child_process');
       const fallbackResolved = await resolveSpawnCommand(plan.command, plan.args);
+      console.error(`[amux launch] BI fallback spawn: ${fallbackResolved.command} args=${fallbackResolved.args.length} stdio=['pipe','pipe','pipe']`);
       child = spawn(fallbackResolved.command, fallbackResolved.args, {
-        stdio: prompt ? ['pipe', 'inherit', 'inherit'] : 'inherit',
+        stdio: ['pipe', 'pipe', 'pipe'],
         env: { ...process.env, ...plan.env },
         cwd: launchCwd,
-        shell: process.platform === 'win32',
       });
+      child.stderr?.on('data', (chunk: Buffer) => process.stderr.write(chunk));
     }
   } else if (bridgeInteractive) {
     // Bridge-interactive: spawn via PTY like interactive mode, but:

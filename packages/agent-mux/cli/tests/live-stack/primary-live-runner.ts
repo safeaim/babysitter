@@ -495,9 +495,9 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
     }
     if (processMode === 'resume') {
       const resumeRunId = env['LIVE_STACK_RESUME_RUN_ID'] ?? `resume-${traceId}`;
-      const resumeInstructions = `Resume the babysitter run with ID ${resumeRunId}. The process file is at .a5c/processes/summarize-translate-test.mjs. After the run completes, write the output file to .a5c-live-test/${traceId}-odyssey.md if it doesn't already exist.`;
-      if (scenario.agent.agent === 'claude-code') return `/babysitter:yolo ${resumeInstructions}`;
-      if (scenario.agent.agent === 'codex') return `$babysitter:yolo ${resumeInstructions}`;
+      const resumeInstructions = `Resume babysitter run ${resumeRunId}. The process is at .a5c/processes/summarize-translate-test.mjs. After completion, ensure the output is at .a5c-live-test/${traceId}-odyssey.md.`;
+      if (scenario.agent.agent === 'claude-code') return `/babysitter:resume ${resumeInstructions}`;
+      if (scenario.agent.agent === 'codex') return `$babysitter:resume ${resumeInstructions}`;
       return resumeInstructions;
     }
     const processHint = 'A process definition is available at .a5c/processes/summarize-translate-test.mjs';

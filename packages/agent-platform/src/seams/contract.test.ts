@@ -49,12 +49,12 @@ describe("agent-platform seam contract", () => {
       ".",
       "./anycli",
       "./api",
-      "./cli",
       "./cost",
       "./daemon",
       "./governance",
       "./harness",
       "./interaction",
+      "./mcp/transport",
       "./observability",
       "./package.json",
       "./plugins",
@@ -70,12 +70,12 @@ describe("agent-platform seam contract", () => {
     expect(listBabysitterAgentPublicExports().sort()).toEqual([
       "./anycli",
       "./api",
-      "./cli",
       "./cost",
       "./daemon",
       "./governance",
       "./harness",
       "./interaction",
+      "./mcp/transport",
       "./observability",
       "./plugins",
       "./processes",
@@ -88,15 +88,12 @@ describe("agent-platform seam contract", () => {
     ]);
   });
 
-  test("publishes both runtime CLI entrypoint aliases", async () => {
+  test("does not publish product CLI entrypoint aliases", async () => {
     const packageJson = JSON.parse(
       await fs.readFile(path.join(packageRoot, "package.json"), "utf8"),
     ) as { bin?: Record<string, string> };
 
-    expect(packageJson.bin).toEqual({
-      "agent-platform": "dist/cli/main.js",
-      "babysitter-harness": "dist/cli/main.js",
-    });
+    expect(packageJson.bin).toBeUndefined();
   });
 
   test("keeps the validation gate stable for every seam", () => {

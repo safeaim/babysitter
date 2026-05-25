@@ -1,4 +1,3 @@
-export * from "./cli/main";
 export * from "./harness";
 export * from "./runtime";
 export * from "./api";

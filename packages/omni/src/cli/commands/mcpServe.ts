@@ -5,7 +5,7 @@
  */
 
 import { createBabysitterMcpServer } from "@a5c-ai/babysitter-sdk";
-import { createWebSocketTransport } from "../../mcp/transport/websocket";
+import { createWebSocketTransport } from "@a5c-ai/agent-platform/mcp/transport";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 function installShutdownHandlers(shutdownFn: () => Promise<void>): void {

@@ -13,13 +13,13 @@ import {
   apiCommitEffect,
   apiRunStatus,
   apiRunEvents,
-} from "../../api/runs";
+} from "@a5c-ai/agent-platform/api";
 import {
   apiListEffects,
   apiShowEffect,
   apiCancelEffect,
   apiBatchCommitEffects,
-} from "../../api/effects";
+} from "@a5c-ai/agent-platform/api";
 import {
   apiListBreakpoints,
   apiShowBreakpoint,
@@ -28,13 +28,13 @@ import {
   apiAddAutoApprovalRule,
   apiRemoveAutoApprovalRule,
   apiEvaluateAutoApproval,
-} from "../../api/breakpoints";
+} from "@a5c-ai/agent-platform/api";
 import {
   apiSubscribeRunEvents,
   apiUnsubscribeRunEvents,
   closeAllSubscriptions,
-} from "../../api/eventStream";
-import type { ApiResult } from "../../api/runs";
+} from "@a5c-ai/agent-platform/api";
+import type { ApiResult } from "@a5c-ai/agent-platform/api";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

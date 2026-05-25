@@ -9,7 +9,7 @@ import { Type } from "@sinclair/typebox";
 import { createAgentCoreSession, AgentCoreSessionHandle } from "@a5c-ai/agent-core";
 import { createAgentCoreToolDefinitions } from "@a5c-ai/agent-core";
 import { resolveExistingRunDir, resolveRunsDir } from "@a5c-ai/babysitter-sdk";
-import type { AgentCoreSessionEvent } from "../../../harness/types";
+import type { AgentCoreSessionEvent } from "@a5c-ai/agent-platform/harness";
 import { handleHarnessCreateRun } from "./createRun";
 import {
   BOLD,
@@ -22,11 +22,11 @@ import {
   formatToolResult,
   writeVerboseBlock,
   writeVerboseLine,
-} from "../../../harness/internal/createRun/utils";
+} from "@a5c-ai/agent-platform/harness";
 import {
   assessRun,
   discoverRuns,
-} from "../../../harness/internal/createRun/resumeState";
+} from "@a5c-ai/agent-platform/harness";
 
 export interface SessionResumeArgs {
   runId?: string;

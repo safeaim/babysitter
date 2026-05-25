@@ -38,3 +38,5 @@ export {
   type DaemonLoopStatus,
   type DaemonLogEntry,
 } from "@a5c-ai/agent-runtime/daemon";
+export { executeAutomationTrigger } from "./automationExecutor";
+export { isAutomationTriggerEvent } from "./types";

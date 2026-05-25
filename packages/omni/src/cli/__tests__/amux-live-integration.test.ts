@@ -1,9 +1,9 @@
 /**
  * Live integration test: verifies the REAL round-trip by spawning the
- * actual agent-platform CLI with `--output-format amux-events` and parsing
+ * actual omni CLI with `--output-format amux-events` and parsing
  * its JSONL output.
  *
- * These tests are skipped when the agent-platform CLI is not available on
+ * These tests are skipped when the omni CLI is not available on
  * PATH, so they are safe to run in any environment (CI or local).
  *
  * @module harness/amux/__tests__/live-integration
@@ -18,7 +18,7 @@ import { execSync, spawn } from "child_process";
 
 const CLI_AVAILABLE = (() => {
   try {
-    execSync("agent-platform version", { stdio: "pipe", timeout: 10000 });
+    execSync("omni version", { stdio: "pipe", timeout: 10000 });
     return true;
   } catch {
     return false;
@@ -30,7 +30,7 @@ const CLI_AVAILABLE = (() => {
 // ---------------------------------------------------------------------------
 
 /**
- * Spawn agent-platform with the given args and collect stdout lines.
+ * Spawn omni with the given args and collect stdout lines.
  * Returns { lines, exitCode, stderr }.
  */
 function spawnBabysitter(
@@ -38,7 +38,7 @@ function spawnBabysitter(
   timeoutMs = 15000,
 ): Promise<{ lines: string[]; exitCode: number | null; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const child = spawn("agent-platform", args, {
+    const child = spawn("omni", args, {
       stdio: ["pipe", "pipe", "pipe"],
       shell: true,
       timeout: timeoutMs,
@@ -91,15 +91,15 @@ function tryParseJson(line: string): Record<string, unknown> | null {
 // ---------------------------------------------------------------------------
 
 describe(
-  "Live integration: agent-platform CLI amux-events output",
+  "Live integration: omni CLI amux-events output",
   { timeout: 30000 },
   () => {
-    describe.skipIf(!CLI_AVAILABLE)("with agent-platform CLI", () => {
+    describe.skipIf(!CLI_AVAILABLE)("with omni CLI", () => {
       it("invoke with --output-format amux-events produces valid JSONL", async () => {
         // Use invoke with a fast-failing prompt so no real harness is required for availability.
         // We invoke it with --output-format amux-events to test that the CLI
         // accepts the flag. If the command doesn't support --output-format,
-        // agent-platform should still emit session_start/session_end.
+        // omni should still emit session_start/session_end.
         //
         // NOTE: invoke requires a harness name and prompt, so we use
         // a command that will fail fast but still exercise the amux-events

@@ -1569,7 +1569,7 @@ jobs:
       - name: Publish omni
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --workspace=@a5c-ai/omni --access public --tag "$NPM_TAG"
+        run: node scripts/publish-package-from-tag.mjs --workspace=@a5c-ai/omni --skip-build
 
   deploy_docs_site:
     if: ${{ github.ref_name != 'develop' }}

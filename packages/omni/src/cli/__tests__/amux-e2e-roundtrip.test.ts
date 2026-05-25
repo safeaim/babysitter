@@ -1,7 +1,7 @@
 /**
  * End-to-end integration test verifying the full round-trip:
  *
- *   agent-platform (invokeViaAgentMux)
+ *   omni CLI (invokeViaAgentMux via agent-platform)
  *     -> mock AmuxClient event stream
  *     -> agent-platform event processing (text accumulation, cost, errors)
  *     -> formatResultAsAmuxEvents (JSONL output)
@@ -11,14 +11,14 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { invokeViaAgentMux } from "../amuxBridge";
-import { formatResultAsAmuxEvents } from "../../../cli/amuxEventsFormatter";
+import { invokeViaAgentMux } from "@a5c-ai/agent-platform/harness";
+import { formatResultAsAmuxEvents } from "../amuxEventsFormatter";
 import type {
   AmuxClient,
   AmuxRunHandle,
   AmuxAgentEvent,
   AmuxInteractionChannel,
-} from "../amuxTypes";
+} from "@a5c-ai/agent-platform/harness";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -62,7 +62,7 @@ function createMockClient(
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("E2E: agent-platform <-> agent-mux round-trip", () => {
+describe("E2E: omni <-> agent-mux round-trip", () => {
   it("full invocation round-trip with text, tool use, and cost", async () => {
     // Simulate a Claude run with text deltas, tool use, and cost events
     const mockEvents: AmuxAgentEvent[] = [
@@ -77,7 +77,7 @@ describe("E2E: agent-platform <-> agent-mux round-trip", () => {
 
     const client = createMockClient(mockEvents);
 
-    // Step 1: agent-platform invokes via amux bridge
+    // Step 1: omni invokes via the agent-platform amux bridge
     const result = await invokeViaAgentMux(client, "claude-code", {
       prompt: "Fix the bug",
       model: "claude-opus-4-6",

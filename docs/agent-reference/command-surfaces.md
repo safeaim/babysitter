@@ -33,11 +33,11 @@ The `babysitter` binary is shipped by [`@a5c-ai/babysitter`](../../packages/baby
 - `breakpoint:*`
 - `health`, `configure`, `version`
 
-## Harness Runtime CLI: `agent-platform`
+## Product CLI: `omni`
 
-The optional runtime binary comes from [`@a5c-ai/agent-platform`](../../packages/agent-platform/package.json) and is registered as `agent-platform` with `babysitter-harness` kept only as a compatibility binary.
+The product CLI implementation lives in [`@a5c-ai/omni`](../../packages/omni/package.json) and is exposed as `omni`.
 
-Use `agent-platform call` for new runtime orchestration examples. The legacy `babysitter harness:call` alias has been removed and must not appear in new tests or docs.
+Use `omni call` for new runtime orchestration examples. The legacy `babysitter harness:call` alias has been removed and must not appear in new tests or docs.
 
 Setup remains on the core CLI through `babysitter harness:install` and `babysitter harness:install-plugin`.
 

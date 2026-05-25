@@ -1,34 +1,29 @@
 # @a5c-ai/agent-platform
 
-Agent Platform layer — harness integration, governance, CLI hosting, interaction, storage.
+Agent Platform layer — harness integration, governance, interaction, storage.
 
 <!-- docs-status:start -->
 > Status: Public advanced/runtime package.
 > Canonical docs home: [Package and Plugin Docs Map](../../docs/package-and-plugin-map.md).
-> This README is the canonical runtime CLI contract for operator-facing `agent-platform` workflows.
+> This README is the canonical runtime/platform API contract. The product CLI implementation lives in `@a5c-ai/omni`.
 <!-- docs-status:end -->
 
 ## Installation
 
 ```bash
-npm install -g @a5c-ai/agent-platform
+npm install @a5c-ai/agent-platform
 ```
 
 ## Usage
 
-This package provides the `agent-platform` command. Use it for runtime orchestration.
+Use this package as the reusable platform API layer. Install `@a5c-ai/omni` for the product CLI.
 
-```bash
-agent-platform --help
-agent-platform call --harness claude-code --prompt "implement feature X" --workspace .
-babysitter session:init --session-id demo --state-dir .a5c --run-id run-123
-agent-platform start-server --transport stdio
-agent-platform discover --json
-agent-platform invoke claude-code --prompt "implement feature X" --workspace .
-agent-platform tui --workspace .
+```ts
+import { discoverHarnesses, invokeHarness } from "@a5c-ai/agent-platform/harness";
+import { apiRunStatus } from "@a5c-ai/agent-platform/api";
 ```
 
-Use the main `babysitter` CLI for harness installation and session-state commands:
+Use `@a5c-ai/omni` for the product CLI and the main `babysitter` CLI for harness installation and session-state commands:
 
 ```bash
 babysitter harness:install claude-code

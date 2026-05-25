@@ -6,11 +6,11 @@
  * daemon:status — Check daemon status
  */
 
-import { startDaemon, stopDaemon, getDaemonStatus, loadDaemonConfig, runDaemonLoop } from "../../daemon";
+import { startDaemon, stopDaemon, getDaemonStatus, loadDaemonConfig, runDaemonLoop } from "@a5c-ai/agent-platform/daemon";
 import * as path from "node:path";
 import * as os from "node:os";
-import { executeAutomationTrigger } from "../../daemon/automationExecutor";
-import { isAutomationTriggerEvent } from "../../daemon/types";
+import { executeAutomationTrigger } from "@a5c-ai/agent-platform/daemon";
+import { isAutomationTriggerEvent } from "@a5c-ai/agent-platform/daemon";
 
 function defaultDaemonDir(): string {
   return path.join(os.homedir(), ".a5c", "daemon");
@@ -116,11 +116,11 @@ export async function handleDaemonRun(args: {
   const daemonDir = args.daemonDir ?? defaultDaemonDir();
   const metadataPath = path.join(daemonDir, "daemon.json");
 
-  let config: import("../../daemon").DaemonConfig;
+  let config: import("@a5c-ai/agent-platform/daemon").DaemonConfig;
   try {
     const { promises: fsPromises } = await import("node:fs");
     const raw = await fsPromises.readFile(metadataPath, "utf-8");
-    const parsed = JSON.parse(raw) as import("../../daemon").DaemonConfig;
+    const parsed = JSON.parse(raw) as import("@a5c-ai/agent-platform/daemon").DaemonConfig;
     config = parsed;
   } catch {
     process.stderr.write(`daemon:run — failed to read ${metadataPath}\n`);

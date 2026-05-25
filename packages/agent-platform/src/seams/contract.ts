@@ -30,7 +30,6 @@ export const babysitterAgentSeamContracts = [
       "session",
       "storage",
       "tasks",
-      "prompts",
       "compression",
     ],
     packageExports: [
@@ -75,6 +74,7 @@ export const babysitterAgentSeamContracts = [
     packageExports: [
       "./harness",
       "./api",
+      "./mcp/transport",
       "./anycli",
     ],
     validationCommands: [...BABYSITTER_AGENT_SEAM_VALIDATION_COMMANDS],
@@ -84,18 +84,16 @@ export const babysitterAgentSeamContracts = [
     owner: "runtime-operations",
     visibility: "public",
     responsibilities: [
-      "Own operator-facing surfaces such as the CLI, daemon lifecycle, interaction UX, cost reporting, and observability helpers.",
-      "Contain operational changes so user-facing workflows can be validated without reopening every runtime concern.",
+      "Own operator-facing platform helpers such as daemon lifecycle, interaction UX, cost reporting, and observability helpers.",
+      "Contain operational support changes so user-facing workflows can be validated without reopening every runtime concern.",
     ],
     directories: [
-      "cli",
       "daemon",
       "interaction",
       "observability",
       "cost",
     ],
     packageExports: [
-      "./cli",
       "./daemon",
       "./interaction",
       "./observability",

@@ -1,5 +1,5 @@
 /**
- * Formats agent-platform invocation results as agent-mux compatible
+ * Formats omni invocation results as agent-mux compatible
  * JSONL events.
  *
  * When `--output-format amux-events` is used, the `invoke` command
@@ -9,8 +9,8 @@
  * @module cli/amuxEventsFormatter
  */
 
-import type { HarnessInvokeResult } from "../harness/types";
-import { mapHarnessToAmuxAdapter, hasAmuxAdapter } from "../harness/amux/amuxHarnessMap";
+import type { HarnessInvokeResult } from "@a5c-ai/agent-platform/harness";
+import { mapHarnessToAmuxAdapter, hasAmuxAdapter } from "@a5c-ai/agent-platform/harness";
 
 /**
  * Shape of a single JSONL event line emitted in amux-events format.

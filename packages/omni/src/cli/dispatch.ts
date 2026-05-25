@@ -6,13 +6,11 @@ import { handleHarnessCreateRun } from "./commands/harness/createRun";
 import { handleHarnessResumeRun } from "./commands/harness/resumeRun";
 import { handleJsonlInteractive } from "./commands/jsonlInteractive";
 import { handleTui } from "./commands/tui";
-import { invokeHarness } from "../harness/invoker";
-import { detectCallerHarness, discoverHarnesses } from "../harness";
+import { invokeHarness, detectCallerHarness, discoverHarnesses, normalizeBuiltInHarnessName } from "@a5c-ai/agent-platform/harness";
 import { handleDaemonRun, handleDaemonStart, handleDaemonStatus, handleDaemonStop } from "./commands/daemon";
 import { handleMcpServe } from "./commands/mcpServe";
 import { handleSessionHistory } from "./commands/session/history";
 import { formatResultAsAmuxEvents } from "./amuxEventsFormatter";
-import { normalizeBuiltInHarnessName } from "../harness/builtInHarness";
 
 type HarnessRunPromptKind =
   | "forever"
@@ -232,7 +230,7 @@ async function handleHarnessDiscover(parsed: HarnessParsedArgs): Promise<number>
 async function handleHarnessInvoke(parsed: HarnessParsedArgs): Promise<number> {
   const harnessName = parsed.positional?.[0];
   if (!harnessName || !parsed.prompt) {
-    console.error('Usage: agent-platform invoke <name> --prompt "<text>"');
+    console.error(`Usage: ${AGENT_PROGRAM.commandName} invoke <name> --prompt "<text>"`);
     return 1;
   }
   const normalizedHarnessName = normalizeBuiltInHarnessName(harnessName);

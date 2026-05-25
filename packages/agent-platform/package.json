@@ -1,7 +1,7 @@
 {
   "name": "@a5c-ai/agent-platform",
   "version": "5.0.0",
-  "description": "Agent Platform layer — harness integration, governance, CLI hosting, interaction, storage",
+  "description": "Agent Platform layer — harness integration, governance, interaction, storage",
   "license": "MIT",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -21,11 +21,6 @@
       "types": "./dist/api/index.d.ts",
       "require": "./dist/api/index.js",
       "default": "./dist/api/index.js"
-    },
-    "./cli": {
-      "types": "./dist/cli/main.d.ts",
-      "require": "./dist/cli/main.js",
-      "default": "./dist/cli/main.js"
     },
     "./cost": {
       "types": "./dist/cost/index.d.ts",
@@ -97,11 +92,12 @@
       "require": "./dist/tasks/index.js",
       "default": "./dist/tasks/index.js"
     },
-    "./package.json": "./package.json"
-  },
-  "bin": {
-    "agent-platform": "dist/cli/main.js",
-    "babysitter-harness": "dist/cli/main.js"
+    "./package.json": "./package.json",
+    "./mcp/transport": {
+      "types": "./dist/mcp/transport/index.d.ts",
+      "require": "./dist/mcp/transport/index.js",
+      "default": "./dist/mcp/transport/index.js"
+    }
   },
   "files": [
     "dist/",

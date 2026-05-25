@@ -1,21 +1,39 @@
 #!/usr/bin/env node
+import { executeAgentCliCommand, formatAgentHelp } from "./dispatch";
+import { parseHarnessArgs } from "./args";
+import { outputError } from "./ui";
 
-/**
- * Omni CLI — thin wrapper around agent-platform's CLI.
- *
- * Delegates all argument parsing, dispatch, and output to the platform layer.
- * Future versions will compose TUI plugins and agent-mux features here.
- */
-
-import { createBabysitterAgentCli } from "@a5c-ai/agent-platform";
-
-const cli = createBabysitterAgentCli();
-
-if (require.main === module) {
-  void cli.run().then((code: number) => {
-    process.exitCode = code;
-  });
+export function createBabysitterAgentCli() {
+  return {
+    async run(argv: string[] = process.argv.slice(2)): Promise<number> {
+      let parsedJson = false;
+      let parsedVerbose = false;
+      try {
+        const parsed = parseHarnessArgs(argv);
+        parsedJson = parsed.json;
+        parsedVerbose = parsed.verbose;
+        return await executeAgentCliCommand(parsed);
+      } catch (error) {
+        outputError(error instanceof Error ? error : new Error(String(error)), {
+          json: parsedJson,
+          verbose: parsedVerbose,
+        });
+        return 1;
+      }
+    },
+    formatHelp(): string {
+      return formatAgentHelp("agent");
+    },
+    formatHumanHelp(): string {
+      return formatAgentHelp("human");
+    },
+  };
 }
 
-export { cli };
-export { createBabysitterAgentCli } from "@a5c-ai/agent-platform";
+if (require.main === module) {
+  void createBabysitterAgentCli()
+    .run()
+    .then((code) => {
+      process.exitCode = code;
+    });
+}

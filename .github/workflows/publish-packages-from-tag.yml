@@ -114,8 +114,6 @@ jobs:
             @a5c-ai/agent-mux-harness-mock \
             @a5c-ai/transport-mux \
             @a5c-ai/agent-config-mux \
-            @a5c-ai/agent-launch-mux \
-            @a5c-ai/tool-mux \
             @a5c-ai/agent-mux-ui \
             @a5c-ai/hooks-mux-adapter-claude \
             @a5c-ai/hooks-mux-adapter-codex \
@@ -126,6 +124,10 @@ jobs:
             @a5c-ai/hooks-mux-adapter-oh-my-pi \
             @a5c-ai/hooks-mux-adapter-opencode \
             @a5c-ai/hooks-mux-adapter-openclaw
+
+          run_many "Build packages depending on leaf adapters" \
+            @a5c-ai/agent-launch-mux \
+            @a5c-ai/tool-mux
 
           echo "::group::Build aggregate packages"
           aggregate_pids=()

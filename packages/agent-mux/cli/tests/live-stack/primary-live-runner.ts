@@ -182,25 +182,43 @@ export function buildPrimaryLiveStackCommands(
     ensureLiveArtifactDirCommand(commandEnv, options.cwd),
   ];
   const fixturesDir = path.join(options.cwd, 'packages', 'agent-mux', 'cli', 'tests', 'live-stack', 'fixtures');
+  const processesDir = path.join(options.cwd, '.a5c', 'processes');
+  // Cross-platform file operations — bash backslash paths break on Windows
+  const nodeFileCopy = (src: string, dest: string) =>
+    ({ command: process.execPath, args: ['-e', `const fs=require("fs"),p=require("path");fs.mkdirSync(p.dirname(${JSON.stringify(dest)}),{recursive:true});fs.copyFileSync(${JSON.stringify(src)},${JSON.stringify(dest)})`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS });
+  const nodeMkdir = (dir: string) =>
+    ({ command: process.execPath, args: ['-e', `require("fs").mkdirSync(${JSON.stringify(dir)},{recursive:true})`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS });
+
   if (processMode === 'predefined') {
     setupCommands.push(
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      nodeFileCopy(path.join(fixturesDir, 'summarize-translate-test.mjs'), path.join(processesDir, 'summarize-translate-test.mjs')),
     );
   } else if (processMode === 'create') {
     setupCommands.push(
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'create-process-skeleton.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'odyssey-live-test.skeleton.mjs')} && rm -f ${path.join(options.cwd, '.a5c', 'processes', 'odyssey-live-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      nodeFileCopy(path.join(fixturesDir, 'create-process-skeleton.mjs'), path.join(processesDir, 'odyssey-live-test.skeleton.mjs')),
+      { command: process.execPath, args: ['-e', `const fs=require("fs"),p=${JSON.stringify(processesDir)};for(const f of["odyssey-live-test.mjs","summarize-translate-test.mjs"])try{fs.unlinkSync(require("path").join(p,f))}catch{}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
     );
   } else if (processMode === 'resume') {
     const resumeRunId = `resume-${traceId}`;
     const resumeRunDir = path.join(options.cwd, '.a5c', 'runs', resumeRunId);
     setupCommands.push(
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')} && cp ${path.join(fixturesDir, 'summarize-translate-test.mjs')} ${path.join(options.cwd, '.a5c', 'processes', 'summarize-translate-test.mjs')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'runs')} && cp -r ${path.join(fixturesDir, 'resume-run')} ${resumeRunDir} && find ${resumeRunDir} -name '*.json' -exec sed -i.bak 's/RESUME_FIXTURE_RUN/${resumeRunId}/g' {} + && find ${resumeRunDir} -name '*.bak' -delete && echo '{"traceId":"${traceId}","outputDir":".a5c-live-test"}' > ${resumeRunDir}/inputs.json`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      nodeFileCopy(path.join(fixturesDir, 'summarize-translate-test.mjs'), path.join(processesDir, 'summarize-translate-test.mjs')),
+      { command: process.execPath, args: ['-e', `
+const fs=require("fs"),p=require("path");
+const src=${JSON.stringify(path.join(fixturesDir, 'resume-run'))};
+const dest=${JSON.stringify(resumeRunDir)};
+const runId=${JSON.stringify(resumeRunId)};
+const traceId=${JSON.stringify(traceId)};
+function cpDir(s,d){fs.mkdirSync(d,{recursive:true});for(const e of fs.readdirSync(s,{withFileTypes:true})){const sp=p.join(s,e.name),dp=p.join(d,e.name);if(e.isDirectory())cpDir(sp,dp);else fs.copyFileSync(sp,dp)}}
+cpDir(src,dest);
+for(const f of fs.readdirSync(dest)){if(f.endsWith(".json")){const fp=p.join(dest,f);let c=fs.readFileSync(fp,"utf8");c=c.replace(/RESUME_FIXTURE_RUN/g,runId);fs.writeFileSync(fp,c)}}
+fs.writeFileSync(p.join(dest,"inputs.json"),JSON.stringify({traceId,outputDir:".a5c-live-test"}));
+`.replace(/\n/g, '')], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
     );
     commandEnv['LIVE_STACK_RESUME_RUN_ID'] = resumeRunId;
   } else {
     setupCommands.push(
-      { command: 'bash', args: ['-c', `mkdir -p ${path.join(options.cwd, '.a5c', 'processes')}`], env: commandEnv, cwd: options.cwd, timeoutMs: SETUP_TIMEOUT_MS },
+      nodeMkdir(processesDir),
     );
   }
   return [...setupCommands, executionCommand];
@@ -435,7 +453,7 @@ function commandExecution(env: Record<string, string>, overrideKey: string, defa
   }
   // On Windows, .cmd scripts (npm, npx) require shell: true to execute.
   // amux is resolved via resolveSpawnCommand and uses shell: false.
-  if (process.platform === 'win32' && ['npm', 'npx'].includes(defaultCommand)) {
+  if (process.platform === 'win32' && ['npm', 'npx', 'babysitter'].includes(defaultCommand)) {
     return { command: defaultCommand, args, env, cwd, timeoutMs, shell: true };
   }
   return { command: defaultCommand, args, env, cwd, timeoutMs };

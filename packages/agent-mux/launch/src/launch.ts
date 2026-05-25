@@ -1292,7 +1292,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       console.error(`[amux launch] PTY spawn failed (${process.platform}/${process.arch}): ${ptyMsg} — falling back to stdio`);
       ptyProcess = null;
       const { spawn } = await import('node:child_process');
-      child = spawn(plan.command, plan.args, {
+      const fallbackResolved = await resolveSpawnCommand(plan.command, plan.args);
+      child = spawn(fallbackResolved.command, fallbackResolved.args, {
         stdio: prompt ? ['pipe', 'inherit', 'inherit'] : 'inherit',
         env: { ...process.env, ...plan.env },
         cwd: launchCwd,

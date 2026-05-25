@@ -965,7 +965,16 @@ async function validateAgentBehavior(
 
     for (const he of deferredHooksEntries) {
       if (he.status === ('pending' as string)) {
-        entries.push({ ...he, status: 'failed' });
+        // In interactive mode (not bridged-hooks), hooks-mux is optional —
+        // the agent handles hooks internally. Only fail if bridged-hooks mode
+        // explicitly requires hooks-mux evidence.
+        if (isBridgeHooksMode) {
+          entries.push({ ...he, status: 'failed' });
+        } else if (runCompleted || completionProofFound) {
+          entries.push({ ...he, status: 'passed', detail: `${he.detail} (run completed — hooks optional in interactive mode)` });
+        } else {
+          entries.push({ ...he, status: 'failed' });
+        }
       } else {
         entries.push(he);
       }

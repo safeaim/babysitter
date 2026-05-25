@@ -1,5 +1,9 @@
 name: Live Stack (Published)
 on:
+  push:
+    branches: [staging, main, develop]
+    paths:
+      - '.github/workflows/live-stack-published.yml'
   workflow_dispatch:
     inputs:
       ref:

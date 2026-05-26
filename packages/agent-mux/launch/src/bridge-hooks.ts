@@ -75,15 +75,32 @@ async function execCommand(
     console.error(`[bridge-hooks] exec: ${bin} ${args.join(' ')}`);
   }
 
-  const { spawnSync } = await import('node:child_process');
-  const proc = spawnSync(bin, args, {
+  const { spawnSync, execFileSync } = await import('node:child_process');
+  // On Windows, shell:true splits --handler values at spaces. Resolve the
+  // binary to its .js entry and invoke via node directly.
+  let resolvedBin = bin;
+  let resolvedArgs = args;
+  if (process.platform === 'win32') {
+    try {
+      const which = execFileSync('where', [bin], { encoding: 'utf-8', timeout: 5000 }).trim().split(/\r?\n/)[0];
+      if (which.endsWith('.cmd')) {
+        const cmdContent = (await import('node:fs')).readFileSync(which, 'utf-8');
+        const jsMatch = cmdContent.match(/"([^"]+\.js)"/);
+        if (jsMatch) {
+          resolvedBin = process.execPath;
+          resolvedArgs = [jsMatch[1], ...args];
+        }
+      }
+    } catch { /* fallback to shell */ }
+  }
+  const proc = spawnSync(resolvedBin, resolvedArgs, {
     cwd: options.cwd,
     env: mergedEnv,
     encoding: 'utf-8',
     timeout: 30_000,
     stdio: [options.stdin ? 'pipe' : 'ignore', 'pipe', 'pipe'],
     input: options.stdin,
-    shell: process.platform === 'win32',
+    shell: resolvedBin === bin && process.platform === 'win32',
   });
   // Forward child stderr so hooks-mux logger diagnostics are visible
   console.error(`[bridge-hooks] spawnSync result: status=${proc.status}, stdout=${proc.stdout?.length ?? 0}c, stderr=${proc.stderr?.length ?? 0}c`);

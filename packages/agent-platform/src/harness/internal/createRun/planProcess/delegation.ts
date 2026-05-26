@@ -3,7 +3,7 @@ import { execFile } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { invokeHarness } from "../../../invoker";
 import {
-  PI_PARENT_PROMPT_TIMEOUT_MS,
+  PARENT_PROMPT_TIMEOUT_MS,
   createAgentCoreSession,
   promptPiWithRetry,
   type AgentCoreSessionOptions,
@@ -120,7 +120,7 @@ export async function runDelegatedHarnessTask(args: {
       const result = await promptPiWithRetry({
         session,
         message: prompt,
-        timeout: args.timeout ?? PI_PARENT_PROMPT_TIMEOUT_MS,
+        timeout: args.timeout ?? PARENT_PROMPT_TIMEOUT_MS,
         label: "delegated-task",
       });
       return {

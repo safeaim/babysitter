@@ -11,7 +11,7 @@ import {
 import {
   buildPiWorkerSessionOptions,
   createAgentCoreSession,
-  PI_WORKER_TIMEOUT_MS,
+  WORKER_TIMEOUT_MS,
   promptPiWithRetry,
   type EffectAction,
 } from "../utils";
@@ -72,7 +72,7 @@ export async function recoverExternalProcessError(args: {
     await promptPiWithRetry({
       session: recoverySession,
       message: recoveryPrompt,
-      timeout: PI_WORKER_TIMEOUT_MS,
+      timeout: WORKER_TIMEOUT_MS,
       label: "process-error-recovery",
     });
   } catch {

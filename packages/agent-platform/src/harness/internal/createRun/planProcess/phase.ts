@@ -3,7 +3,7 @@ import { buildProcessDefinitionSystemPrompt, buildProcessDefinitionUserPrompt } 
 import {
   DIM,
   RESET,
-  PI_PARENT_PROMPT_TIMEOUT_MS,
+  PARENT_PROMPT_TIMEOUT_MS,
   createAgentCoreSession,
   createReadlineAskUserQuestionUiContext,
   emitProgress,
@@ -130,7 +130,7 @@ export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanPr
     const intentResult = await runUnderstandIntentPhase({
       session: sessionRef.current,
       promptMessage: intentPrompt,
-      timeout: PI_PARENT_PROMPT_TIMEOUT_MS,
+      timeout: PARENT_PROMPT_TIMEOUT_MS,
       writeVerbose,
       writeVerboseData,
     });
@@ -154,7 +154,7 @@ export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanPr
     const result = await promptPhaseSession({
       session: sessionRef.current,
       message: planProcessPrompt,
-      timeout: PI_PARENT_PROMPT_TIMEOUT_MS,
+      timeout: PARENT_PROMPT_TIMEOUT_MS,
       label: "phasePlanProcess",
       writeVerbose,
       writeVerboseData,
@@ -199,7 +199,7 @@ export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanPr
       const recovery = await promptPhaseSession({
         session: sessionRef.current,
         message: recoveryPrompt,
-        timeout: PI_PARENT_PROMPT_TIMEOUT_MS,
+        timeout: PARENT_PROMPT_TIMEOUT_MS,
         label: "phasePlanProcess recovery",
         writeVerbose,
         writeVerboseData,
@@ -251,7 +251,7 @@ export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanPr
       const finalRecovery = await promptPhaseSession({
         session: sessionRef.current,
         message: finalRecoveryPrompt,
-        timeout: PI_PARENT_PROMPT_TIMEOUT_MS,
+        timeout: PARENT_PROMPT_TIMEOUT_MS,
         label: "phasePlanProcess final recovery",
         writeVerbose,
         writeVerboseData,
@@ -321,7 +321,7 @@ export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanPr
         const repair = await promptPhaseSession({
           session: sessionRef.current,
           message: conformancePrompt,
-          timeout: PI_PARENT_PROMPT_TIMEOUT_MS,
+          timeout: PARENT_PROMPT_TIMEOUT_MS,
           label: "phasePlanProcess conformance repair",
           writeVerbose,
           writeVerboseData,

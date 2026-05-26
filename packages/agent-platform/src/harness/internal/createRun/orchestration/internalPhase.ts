@@ -5,7 +5,7 @@ import {
   BabysitterRuntimeError,
   DIM,
   ErrorCategory,
-  PI_PARENT_PROMPT_TIMEOUT_MS,
+  PARENT_PROMPT_TIMEOUT_MS,
   compressInternalHarnessPrompt,
   createAgentCoreSession,
   createReadlineAskUserQuestionUiContext,
@@ -288,7 +288,7 @@ export async function runInternalOrchestrationPhase(
       result = await promptPiWithRetry({
         session: orchestrationSession,
         message: compressInternalHarnessPrompt(message, args.compressionConfig, "agent"),
-        timeout: PI_PARENT_PROMPT_TIMEOUT_MS,
+        timeout: PARENT_PROMPT_TIMEOUT_MS,
         label,
         writeVerbose,
         writeVerboseData,

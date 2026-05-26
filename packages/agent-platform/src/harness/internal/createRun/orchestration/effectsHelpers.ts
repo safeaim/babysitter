@@ -7,7 +7,7 @@ import { statSync } from "node:fs";
 import { invokeHarness } from "../../../invoker";
 import type { StreamingOutputOptions } from "../../../types";
 import {
-  PI_WORKER_TIMEOUT_MS,
+  WORKER_TIMEOUT_MS,
   compressInternalHarnessPrompt,
   isInternalHarness,
   promptPiWithRetry,
@@ -59,7 +59,7 @@ export async function invokePromptEffect(
     const piResult = await promptPiWithRetry({
       session: piSession,
       message: compressInternalHarnessPrompt(prompt, options.compressionConfig, "skill"),
-      timeout: PI_WORKER_TIMEOUT_MS, label: `effect ${action.effectId}`,
+      timeout: WORKER_TIMEOUT_MS, label: `effect ${action.effectId}`,
     });
     return {
       status: piResult.success ? "ok" : "error",

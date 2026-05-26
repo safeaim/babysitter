@@ -13,9 +13,15 @@ export const TRANSIENT_PI_PROMPT_RETRY_DELAYS_MS = process.env.VITEST
   ? [0, 0]
   : [1_000, 3_000];
 
-export const PI_PARENT_PROMPT_TIMEOUT_MS = 900_000;
-export const PI_DEFAULT_PROMPT_TIMEOUT_MS = 900_000;
-export const PI_WORKER_TIMEOUT_MS = 1_800_000;
+// Agent-core timeout constants (canonical names)
+export const PARENT_PROMPT_TIMEOUT_MS = 900_000;
+export const DEFAULT_PROMPT_TIMEOUT_MS = 900_000;
+export const WORKER_TIMEOUT_MS = 1_800_000;
+
+// Legacy Pi aliases — kept for backwards compat, prefer the canonical names above
+export const PI_PARENT_PROMPT_TIMEOUT_MS = PARENT_PROMPT_TIMEOUT_MS;
+export const PI_DEFAULT_PROMPT_TIMEOUT_MS = DEFAULT_PROMPT_TIMEOUT_MS;
+export const PI_WORKER_TIMEOUT_MS = WORKER_TIMEOUT_MS;
 
 export function readBooleanMetadata(
   metadata: Record<string, unknown> | undefined,

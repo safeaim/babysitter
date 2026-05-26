@@ -18,7 +18,7 @@ import {
 import {
   BOLD,
   DEFAULT_EFFECT_RETRY_CONFIG,
-  PI_WORKER_TIMEOUT_MS,
+  WORKER_TIMEOUT_MS,
   AgentCoreSessionHandle,
   YELLOW,
   buildPiWorkerSessionOptions,
@@ -206,7 +206,7 @@ export async function resolveEffect(
       const piResult = await promptPiWithRetry({
         session: piSession,
         message: prompt,
-        timeout: PI_WORKER_TIMEOUT_MS,
+        timeout: WORKER_TIMEOUT_MS,
         label: `effect ${action.effectId}`,
       });
       return {

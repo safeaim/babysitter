@@ -690,8 +690,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
 
   // Validate harness exists (via adapter registry or agent-catalog launch behavior)
   const adapter = client.adapters.get(harness);
-  const launchBehavior = getLaunchBehavior(harness);
-  if (!adapter && !launchBehavior) {
+  const catalogLaunchBehavior = getLaunchBehavior(harness);
+  if (!adapter && !catalogLaunchBehavior) {
     const available = client.adapters.list().map((a) => a.agent).join(', ');
     const msg = `Unknown harness '${harness}'. Available: ${available}`;
     if (jsonMode) printJsonError('AGENT_NOT_FOUND', msg);
@@ -711,7 +711,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     }
   }
 
-  if (flagStr(args.flags, 'resume') && adapter.capabilities && !adapter.capabilities.canResume) {
+  if (flagStr(args.flags, 'resume') && adapter?.capabilities && !adapter.capabilities.canResume) {
     const msg = `${harness} does not support session resumption`;
     if (jsonMode) printJsonError('CAPABILITY_ERROR', msg);
     else printError(msg);

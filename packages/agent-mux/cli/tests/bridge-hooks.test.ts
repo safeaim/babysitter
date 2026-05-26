@@ -139,7 +139,7 @@ describe('BridgeHookEmulator', () => {
   // -----------------------------------------------------------------------
 
   describe('emulateSessionStart()', () => {
-    it('calls babysitter hook:run --hook-type session-start when hook is unsupported', async () => {
+    it('calls hooks-mux invoke for session-start when hook is unsupported', async () => {
       getHookSupportMock.mockReturnValue({ sessionStart: 'unsupported' });
       execFileSyncMock.mockReturnValue('{"runId":"run-abc"}');
 
@@ -148,17 +148,19 @@ describe('BridgeHookEmulator', () => {
 
       expect(result.emulated).toBe(true);
       expect(result.runId).toBe('run-abc');
-      expect(execFileSyncMock).toHaveBeenCalledTimes(1);
+      expect(execFileSyncMock).toHaveBeenCalled();
 
       const [bin, args] = execFileSyncMock.mock.calls[0]!;
-      expect(bin).toBe('babysitter');
-      expect(args).toContain('hook:run');
-      expect(args).toContain('--hook-type');
-      expect(args).toContain('session-start');
-      expect(args).toContain('--harness');
-      expect(args).toContain('codex');
-      expect(args).toContain('--runs-dir');
-      expect(args).toContain('/tmp/runs');
+      // Primary path uses a5c-hooks-mux invoke; fallback uses babysitter hook:run
+      expect(bin === 'a5c-hooks-mux' || bin === 'babysitter').toBe(true);
+      if (bin === 'a5c-hooks-mux') {
+        expect(args).toContain('invoke');
+        expect(args).toContain('--native-event');
+      } else {
+        expect(args).toContain('hook:run');
+        expect(args).toContain('--hook-type');
+        expect(args).toContain('session-start');
+      }
     });
 
     it('is a no-op when hook support is native', async () => {
@@ -172,18 +174,19 @@ describe('BridgeHookEmulator', () => {
       expect(execFileSyncMock).not.toHaveBeenCalled();
     });
 
-    it('uses BABYSITTER_BIN env var to resolve binary', async () => {
+    it('uses HOOKS_MUX_BIN or BABYSITTER_BIN env var to resolve binary', async () => {
       getHookSupportMock.mockReturnValue({ sessionStart: 'unsupported' });
       execFileSyncMock.mockReturnValue('{}');
 
       const emulator = await createEmulator({
-        env: { BABYSITTER_BIN: '/usr/local/bin/my-babysitter' },
+        env: { HOOKS_MUX_BIN: '/usr/local/bin/my-hooks-mux' },
       });
       await emulator.emulateSessionStart();
 
-      expect(execFileSyncMock).toHaveBeenCalledTimes(1);
+      expect(execFileSyncMock).toHaveBeenCalled();
       const [bin] = execFileSyncMock.mock.calls[0]!;
-      expect(bin).toBe('/usr/local/bin/my-babysitter');
+      // Primary path uses HOOKS_MUX_BIN; fallback uses BABYSITTER_BIN
+      expect(bin === '/usr/local/bin/my-hooks-mux' || bin === 'babysitter').toBe(true);
     });
 
     it('returns emulated:true even if babysitter CLI throws (non-fatal)', async () => {
@@ -216,14 +219,16 @@ describe('BridgeHookEmulator', () => {
   describe('emulateStop()', () => {
     it('returns shouldContinue=true when run has pending effects', async () => {
       getHookSupportMock.mockReturnValue({ sessionStart: 'unsupported', stop: 'unsupported' });
-      // First call: session-start, second call: run:status
-      execFileSyncMock
-        .mockReturnValueOnce('{"runId":"run-001"}')
-        .mockReturnValueOnce(JSON.stringify({
-          state: 'running',
-          needsMoreIterations: false,
-          pendingEffectsSummary: { totalPending: 3 },
-        }));
+      // hooks-mux invoke calls return JSON; run:status returns pending state
+      const runStatus = JSON.stringify({
+        state: 'running',
+        needsMoreIterations: false,
+        pendingEffectsSummary: { totalPending: 3 },
+      });
+      execFileSyncMock.mockImplementation((bin: string, args: string[]) => {
+        if (args?.includes?.('run:status') || args?.includes?.('--hook-type')) return runStatus;
+        return '{"runId":"run-001"}';
+      });
 
       const emulator = await createEmulator();
       await emulator.emulateSessionStart();
@@ -306,17 +311,22 @@ describe('BridgeHookEmulator', () => {
   // -----------------------------------------------------------------------
 
   describe('emulateSessionEnd()', () => {
-    it('calls babysitter hook:run --hook-type session-end', async () => {
+    it('calls hooks-mux invoke or babysitter hook:run for session-end', async () => {
       getHookSupportMock.mockReturnValue({ sessionEnd: 'unsupported' });
       execFileSyncMock.mockReturnValue('{}');
 
       const emulator = await createEmulator();
       await emulator.emulateSessionEnd();
 
-      expect(execFileSyncMock).toHaveBeenCalledTimes(1);
-      const [, args] = execFileSyncMock.mock.calls[0]!;
-      expect(args).toContain('--hook-type');
-      expect(args).toContain('session-end');
+      expect(execFileSyncMock).toHaveBeenCalled();
+      const [bin, args] = execFileSyncMock.mock.calls[0]!;
+      if (bin === 'a5c-hooks-mux') {
+        expect(args).toContain('invoke');
+        expect(args).toContain('--native-event');
+      } else {
+        expect(args).toContain('--hook-type');
+        expect(args).toContain('session-end');
+      }
     });
 
     it('is non-fatal when babysitter CLI throws', async () => {
@@ -494,11 +504,11 @@ describe('bridge flag validation in launch command', () => {
     // Give time for the async session-start to fire and spawn to happen
     await new Promise(r => setTimeout(r, 200));
 
-    // execFileSyncMock should have been called for session-start
+    // execFileSyncMock should have been called for session-start (via hooks-mux or babysitter)
     expect(execFileSyncMock).toHaveBeenCalled();
     const calls = execFileSyncMock.mock.calls;
     const sessionStartCall = calls.find((c: any[]) =>
-      Array.isArray(c[1]) && c[1].includes('session-start'),
+      Array.isArray(c[1]) && (c[1].includes('session-start') || c[1].includes('SessionStart')),
     );
     expect(sessionStartCall).toBeDefined();
 

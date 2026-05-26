@@ -143,8 +143,9 @@ const publishTask = defineTask('issue-323.publish', (args, taskCtx) => ({
   shell: {
     command: [
       'set -euo pipefail',
-      'git add packages/agent-mux/adapters/src/amp-adapter.ts packages/agent-mux/adapters/tests/amp-adapter.test.ts docs/agent-mux/reference/agents/amp.md .a5c/processes/issue-323-amp-assimilation.js',
-      'if ! git diff --cached --quiet; then git commit -m "fix(amp): update CLI package metadata"; fi',
+      'git add packages/agent-mux/adapters/src/amp-adapter.ts packages/agent-mux/adapters/tests/amp-adapter.test.ts docs/agent-mux/reference/agents/amp.md',
+      'git add -f .a5c/processes/issue-323-amp-assimilation.js',
+      'if ! git diff --cached --quiet; then GIT_AUTHOR_NAME="a5c automation" GIT_AUTHOR_EMAIL="actions@users.noreply.github.com" GIT_COMMITTER_NAME="a5c automation" GIT_COMMITTER_EMAIL="actions@users.noreply.github.com" git commit -m "fix(amp): update CLI package metadata"; fi',
       `git push -u origin ${args.branchName}`,
       `PR_URL="$(gh pr list --head ${args.branchName} --json url --jq '.[0].url // empty' 2>/dev/null || true)"`,
       `if [ -z "$PR_URL" ]; then PR_URL="$(gh pr create --base staging --head ${args.branchName} --title "Fix Amp CLI package metadata" --body "Closes #${args.issueNumber}")"; fi`,

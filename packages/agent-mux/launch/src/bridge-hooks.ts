@@ -119,9 +119,7 @@ async function execCommand(
     input: options.stdin,
     shell: useShell,
   });
-  // Forward child stderr so hooks-mux logger diagnostics are visible
-  console.error(`[bridge-hooks] spawnSync result: status=${proc.status}, stdout=${proc.stdout?.length ?? 0}c, stderr=${proc.stderr?.length ?? 0}c`);
-  if (proc.stderr) {
+  if (proc.stderr && options.verbose) {
     console.error(`[bridge-hooks] child stderr: ${proc.stderr.substring(0, 500)}`);
   }
   if (proc.status !== 0) {
@@ -190,7 +188,9 @@ export class BridgeHookEmulator {
     }
     const handlerCommand = babysitterCmd.join(' ');
 
-    console.error(`[bridge-hooks] invokeHookEvent(${nativeEvent}): hooksMuxBin=${this.hooksMuxBin}, adapter=${this.adapter}`);
+    if (this.ctx.verbose) {
+      console.error(`[bridge-hooks] invokeHookEvent(${nativeEvent}): hooksMuxBin=${this.hooksMuxBin}, adapter=${this.adapter}`);
+    }
     try {
       const args = [
         'invoke',
@@ -200,14 +200,18 @@ export class BridgeHookEmulator {
         '--json',
       ];
 
-      console.error(`[bridge-hooks] exec: ${this.hooksMuxBin} ${args.join(' ')}`);
+      if (this.ctx.verbose) {
+        console.error(`[bridge-hooks] exec: ${this.hooksMuxBin} ${args.join(' ')}`);
+      }
       const result = await execCommand(this.hooksMuxBin, args, {
         cwd: this.ctx.cwd,
         env: this.ctx.env,
         verbose: this.ctx.verbose,
         stdin: JSON.stringify({ event: nativeEvent }),
       });
-      console.error(`[bridge-hooks] hooks-mux invoke succeeded for ${nativeEvent}`);
+      if (this.ctx.verbose) {
+        console.error(`[bridge-hooks] hooks-mux invoke succeeded for ${nativeEvent}`);
+      }
       return result;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

@@ -118,6 +118,7 @@ export interface LaunchPlan {
 const CLI_COMMAND_MAP: Record<string, string> = {
   'copilot': 'gh copilot',
   'cursor': 'cursor-agent',
+  'omni': 'omni yolo',
 };
 
 function resolveCliCommand(harness: string): { command: string; prefixArgs: string[] } {

@@ -77,7 +77,6 @@ attributes:
     promptDelivery: cli-flag
     promptFlag: "--prompt"
     promptExtraFlags:
-      - "--non-interactive"
       - "--json"
     execSubcommand: null
     resumeDelivery: flag

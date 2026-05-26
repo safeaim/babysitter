@@ -32,6 +32,7 @@ interface ResolvedEndpoint {
   apiKey: string;
   model: string;
   isAzure: boolean;
+  isAnthropic: boolean;
 }
 
 function resolveEndpoint(options: AgentCoreSessionOptions): ResolvedEndpoint {
@@ -47,23 +48,24 @@ function resolveEndpoint(options: AgentCoreSessionOptions): ResolvedEndpoint {
   if (amuxProvider === "foundry" || amuxProvider === "azure") {
     const apiBase = amuxApiBase ?? "";
     const apiKey = amuxApiKey ?? azureApiKey ?? "";
-    return { apiBase: `${apiBase}/openai`, apiKey, model, isAzure: true };
+    return { apiBase: `${apiBase}/openai`, apiKey, model, isAzure: true, isAnthropic: false };
   }
 
   if (amuxApiBase) {
     const apiKey = amuxApiKey ?? openaiApiKey ?? "";
-    return { apiBase: amuxApiBase, apiKey, model, isAzure: false };
+    return { apiBase: amuxApiBase, apiKey, model, isAzure: false, isAnthropic: false };
   }
 
   if (openaiApiKey) {
-    return { apiBase: "https://api.openai.com/v1", apiKey: openaiApiKey, model, isAzure: false };
+    return { apiBase: "https://api.openai.com/v1", apiKey: openaiApiKey, model, isAzure: false, isAnthropic: false };
   }
 
   if (anthropicApiKey) {
-    return { apiBase: "https://api.anthropic.com", apiKey: anthropicApiKey, model, isAzure: false };
+    const anthropicModel = model.startsWith("gpt") ? "claude-sonnet-4-6" : model;
+    return { apiBase: "https://api.anthropic.com", apiKey: anthropicApiKey, model: anthropicModel, isAzure: false, isAnthropic: true };
   }
 
-  return { apiBase: "https://api.openai.com/v1", apiKey: amuxApiKey ?? "", model, isAzure: false };
+  return { apiBase: "https://api.openai.com/v1", apiKey: amuxApiKey ?? "", model, isAzure: false, isAnthropic: false };
 }
 
 async function callCompletionApi(
@@ -77,20 +79,37 @@ async function callCompletionApi(
   try {
     let url: string;
     const headers: Record<string, string> = { "Content-Type": "application/json" };
+    let body: string;
 
-    if (endpoint.isAzure) {
+    if (endpoint.isAnthropic) {
+      url = `${endpoint.apiBase}/v1/messages`;
+      headers["x-api-key"] = endpoint.apiKey;
+      headers["anthropic-version"] = "2023-06-01";
+      const systemMsg = messages.find(m => m.role === "system");
+      const nonSystemMsgs = messages.filter(m => m.role !== "system");
+      body = JSON.stringify({
+        model: endpoint.model,
+        max_tokens: 16384,
+        ...(systemMsg ? { system: systemMsg.content } : {}),
+        messages: nonSystemMsgs.map(m => ({ role: m.role, content: m.content })),
+      });
+    } else if (endpoint.isAzure) {
       url = `${endpoint.apiBase}/deployments/${endpoint.model}/chat/completions?api-version=2025-04-01-preview`;
       headers["api-key"] = endpoint.apiKey;
+      body = JSON.stringify({
+        model: endpoint.model,
+        messages,
+        max_completion_tokens: 16384,
+      });
     } else {
       url = `${endpoint.apiBase}/chat/completions`;
       headers["Authorization"] = `Bearer ${endpoint.apiKey}`;
+      body = JSON.stringify({
+        model: endpoint.model,
+        messages,
+        max_completion_tokens: 16384,
+      });
     }
-
-    const body = JSON.stringify({
-      model: endpoint.model,
-      messages,
-      max_completion_tokens: 16384,
-    });
 
     const response = await fetch(url, {
       method: "POST",
@@ -102,6 +121,18 @@ async function callCompletionApi(
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`API request failed (${response.status}): ${errorText}`);
+    }
+
+    if (endpoint.isAnthropic) {
+      const data = await response.json() as {
+        content?: Array<{ type: string; text?: string }>;
+        usage?: { input_tokens?: number; output_tokens?: number };
+      };
+      const text = data.content?.find(c => c.type === "text")?.text ?? "";
+      const usage = data.usage
+        ? { promptTokens: data.usage.input_tokens ?? 0, completionTokens: data.usage.output_tokens ?? 0 }
+        : undefined;
+      return { text, usage };
     }
 
     const data = await response.json() as {

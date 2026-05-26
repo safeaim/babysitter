@@ -202,6 +202,19 @@ describe("agent-catalog graph-backed ontology", () => {
     expect(claims.get("repo-transport-mux-readme")?.status).toBe("current");
   });
 
+  it("records Claude Code 2.1.150 as a no-op user-facing assimilation", () => {
+    expect(getAgentVersion("claude-code", "2.1.150")?.versionRange).toBe(">=2.1.150");
+
+    const claim = getOntologyClaim("claude-code-2-1-150-no-user-facing-changes");
+    expect(claim).toBeDefined();
+    expect(claim!.subjectId).toBe("agentVersion:claude:ge-0-0-0");
+    expect(claim!.evidenceIds).toContain("claude-code-2-1-150-release");
+    expect(claim!.statement).toContain("no-op user-facing update");
+
+    const evidence = getOntologyEvidenceSource("claude-code-2-1-150-release");
+    expect(evidence?.sourcePathOrUrl).toContain("anthropics/claude-code/releases/tag/v2.1.150");
+  });
+
   it("includes agent-platform as a distinct non-harness runtime agent and records richer Claude web evidence", () => {
     const babysitterAgent = listAgentVersions().find((agent) => agent.agentId === "agent-platform");
     expect(babysitterAgent).toBeDefined();

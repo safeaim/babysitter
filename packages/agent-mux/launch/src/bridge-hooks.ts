@@ -148,6 +148,7 @@ export class BridgeHookEmulator {
     }
     const handlerCommand = babysitterCmd.join(' ');
 
+    console.error(`[bridge-hooks] invokeHookEvent(${nativeEvent}): hooksMuxBin=${this.hooksMuxBin}, adapter=${this.adapter}`);
     try {
       const args = [
         'invoke',
@@ -157,19 +158,21 @@ export class BridgeHookEmulator {
         '--json',
       ];
 
-      return await execCommand(this.hooksMuxBin, args, {
+      console.error(`[bridge-hooks] exec: ${this.hooksMuxBin} ${args.join(' ')}`);
+      const result = await execCommand(this.hooksMuxBin, args, {
         cwd: this.ctx.cwd,
         env: this.ctx.env,
         verbose: this.ctx.verbose,
         stdin: JSON.stringify({ event: nativeEvent }),
       });
+      console.error(`[bridge-hooks] hooks-mux invoke succeeded for ${nativeEvent}`);
+      return result;
     } catch (err) {
-      if (this.ctx.verbose) {
-        const msg = err instanceof Error ? err.message : String(err);
-        console.error(`[bridge-hooks] hooks-mux invoke failed (${nativeEvent}), falling back to babysitter: ${msg}`);
-      }
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[bridge-hooks] hooks-mux invoke FAILED (${nativeEvent}): ${msg}`);
 
       // Fallback: direct babysitter hook:run
+      console.error(`[bridge-hooks] falling back to: ${this.babysitterBin} ${babysitterCmd.slice(1).join(' ')}`);
       return await execCommand(this.babysitterBin, babysitterCmd.slice(1), {
         cwd: this.ctx.cwd,
         env: this.ctx.env,

@@ -1001,13 +1001,17 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       }
 
       // Omni (agent-core): set AMUX_* env vars to route through the proxy.
-      // agent-core's resolveEndpoint() checks AMUX_PROVIDER first.
+      // Use AMUX_API_BASE (non-Azure mode) so agent-core sends Authorization: Bearer
+      // instead of api-key header. The proxy validates Bearer tokens.
       if (plan.harness === 'omni') {
-        plan.env['AMUX_API_BASE'] = proxyRuntime.url;
+        plan.env['AMUX_API_BASE'] = `${proxyRuntime.url}/v1`;
         plan.env['AMUX_API_KEY'] = proxyRuntime.authToken ?? 'proxy-token';
-        plan.env['AMUX_PROVIDER'] = plan.proxy?.targetProvider ?? 'openai';
         plan.env['AMUX_MODEL'] = plan.proxy?.targetModel ?? plan.model ?? '';
-        console.error(`[amux launch] Omni proxy: AMUX_API_BASE=${proxyRuntime.url}, AMUX_PROVIDER=${plan.env['AMUX_PROVIDER']}, AMUX_MODEL=${plan.env['AMUX_MODEL']}`);
+        // Clear Azure env vars to prevent agent-core from using Azure mode
+        delete plan.env['AZURE_API_KEY'];
+        delete plan.env['AZURE_OPENAI_API_KEY'];
+        delete plan.env['AZURE_OPENAI_PROJECT_NAME'];
+        console.error(`[amux launch] Omni proxy: AMUX_API_BASE=${plan.env['AMUX_API_BASE']}, AMUX_MODEL=${plan.env['AMUX_MODEL']}`);
       }
 
       // Generic OpenAI-compatible harnesses: set OPENAI_API_KEY + OPENAI_BASE_URL

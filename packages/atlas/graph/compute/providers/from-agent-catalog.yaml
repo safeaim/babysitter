@@ -94,5 +94,6 @@ edges:
   realizes:
     - target: layer:2-provider
   serves:
+    - model:claude-mythos-preview@current
     - model:phi-3-medium@current
     - model:phi-3-mini@current

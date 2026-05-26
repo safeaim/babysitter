@@ -75,21 +75,40 @@ async function execCommand(
     console.error(`[bridge-hooks] exec: ${bin} ${args.join(' ')}`);
   }
   // On Windows, shell:true splits --handler values at spaces. Resolve the
-  // binary to its .js entry and invoke via node directly.
+  // binary to a node-invocable .js entry to avoid shell entirely.
   let resolvedBin = bin;
   let resolvedArgs = args;
+  let useShell = false;
   if (process.platform === 'win32') {
-    try {
-      const which = execFileSync('where', [bin], { encoding: 'utf-8', timeout: 5000 }).trim().split(/\r?\n/)[0];
-      if (which.endsWith('.cmd')) {
-        const cmdContent = (await import('node:fs')).readFileSync(which, 'utf-8');
-        const jsMatch = cmdContent.match(/"([^"]+\.js)"/);
+    // Try to find the .js entry point from the npm .cmd shim or PATH scripts
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const pathDirs = (mergedEnv['PATH'] || '').split(';');
+    for (const dir of pathDirs) {
+      // Check for .cmd shim (npm global install)
+      const cmdPath = path.join(dir, `${bin}.cmd`);
+      try {
+        const content = fs.readFileSync(cmdPath, 'utf-8');
+        const jsMatch = content.match(/"([^"]+\.js)"/);
         if (jsMatch) {
           resolvedBin = process.execPath;
           resolvedArgs = [jsMatch[1], ...args];
+          break;
         }
-      }
-    } catch { /* fallback to shell */ }
+      } catch { /* not found */ }
+      // Check for shell script (workspace link)
+      const shPath = path.join(dir, bin);
+      try {
+        const content = fs.readFileSync(shPath, 'utf-8');
+        const nodeMatch = content.match(/exec\s+node\s+"([^"]+)"/);
+        if (nodeMatch) {
+          resolvedBin = process.execPath;
+          resolvedArgs = [nodeMatch[1], ...args];
+          break;
+        }
+      } catch { /* not found */ }
+    }
+    if (resolvedBin === bin) useShell = true; // fallback
   }
   const proc = spawnSync(resolvedBin, resolvedArgs, {
     cwd: options.cwd,
@@ -98,7 +117,7 @@ async function execCommand(
     timeout: 30_000,
     stdio: [options.stdin ? 'pipe' : 'ignore', 'pipe', 'pipe'],
     input: options.stdin,
-    shell: resolvedBin === bin && process.platform === 'win32',
+    shell: useShell,
   });
   // Forward child stderr so hooks-mux logger diagnostics are visible
   console.error(`[bridge-hooks] spawnSync result: status=${proc.status}, stdout=${proc.stdout?.length ?? 0}c, stderr=${proc.stderr?.length ?? 0}c`);

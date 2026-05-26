@@ -87,8 +87,9 @@ export async function appendHooksLog(
     const logDir = getHooksLogDir();
     await fs.promises.mkdir(logDir, { recursive: true });
     await fs.promises.appendFile(getHooksLogPath(), JSON.stringify(entry) + '\n', 'utf8');
-  } catch {
-    // Logging must never interfere with hook execution.
+  } catch (err) {
+    // Log the error to stderr so we can diagnose CI failures
+    process.stderr.write(`[hooks-logger] FAILED to write log: ${err instanceof Error ? err.message : String(err)} (dir=${getHooksLogDir()}, home=${process.env.HOME ?? 'unset'})\n`);
   }
 }
 

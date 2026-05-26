@@ -74,7 +74,10 @@ async function callCompletionApi(
   timeout: number,
 ): Promise<{ text: string; usage?: { promptTokens: number; completionTokens: number } }> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeout);
+  const startTime = Date.now();
+  const timer = setTimeout(() => {
+    controller.abort(new Error(`Request timed out after ${Math.round((Date.now() - startTime) / 1000)}s (limit: ${Math.round(timeout / 1000)}s)`));
+  }, timeout);
 
   try {
     let url: string;
@@ -120,7 +123,7 @@ async function callCompletionApi(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`API request failed (${response.status}): ${errorText}`);
+      throw new Error(`API request failed (${response.status}) at ${url}: ${errorText.slice(0, 500)}`);
     }
 
     if (endpoint.isAnthropic) {
@@ -181,8 +184,8 @@ export class AgentCoreSessionHandle {
       ? [text, ...followUps.map((item) => `Follow-up instruction:\n${item}`)].join("\n\n")
       : text;
 
+    const endpoint = resolveEndpoint(this.options);
     try {
-      const endpoint = resolveEndpoint(this.options);
       const messages: Array<{ role: string; content: string }> = [];
 
       const systemPrompt = buildSystemPrompt(this.options);
@@ -209,7 +212,8 @@ export class AgentCoreSessionHandle {
       };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      this.emit({ type: "error", message });
+      const detail = `${message} [endpoint=${endpoint.apiBase} model=${endpoint.model} provider=${endpoint.isAnthropic ? 'anthropic' : endpoint.isAzure ? 'azure' : 'openai'}]`;
+      this.emit({ type: "error", message: detail });
       return {
         output: message,
         duration: Date.now() - start,

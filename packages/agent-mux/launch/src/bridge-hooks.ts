@@ -67,15 +67,13 @@ async function execCommand(
   args: string[],
   options: { cwd: string; env: Record<string, string>; verbose?: boolean; stdin?: string },
 ): Promise<string> {
-  const { execFileSync } = await import('node:child_process');
+  const { spawnSync, execFileSync } = await import('node:child_process');
 
   const mergedEnv = { ...process.env, ...options.env };
 
   if (options.verbose) {
     console.error(`[bridge-hooks] exec: ${bin} ${args.join(' ')}`);
   }
-
-  const { spawnSync, execFileSync } = await import('node:child_process');
   // On Windows, shell:true splits --handler values at spaces. Resolve the
   // binary to its .js entry and invoke via node directly.
   let resolvedBin = bin;

@@ -127,6 +127,20 @@ attributes:
 edges: {}
 ---
 nodeKind: SourceRef
+id: source-ref:qwen-code-github
+attributes:
+  description: "Qwen Code (GitHub)"
+  displayName: "Qwen Code (GitHub)"
+  repoUrl: https://github.com/QwenLM/qwen-code
+  ref: v0.16.1
+  path: "."
+  kind: github-repo
+  notes: |
+    Source repository and release tag for the npm package
+    `@qwen-code/qwen-code`.
+edges: {}
+---
+nodeKind: SourceRef
 id: source-ref:agent-mux-github
 attributes:
   description: "Agent Mux (GitHub)"

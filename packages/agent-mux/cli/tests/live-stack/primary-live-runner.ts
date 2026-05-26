@@ -177,8 +177,7 @@ export function buildPrimaryLiveStackCommands(
     commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['run', 'generate:plugins'], options.cwd, SETUP_TIMEOUT_MS),
     commandExecution(commandEnv, 'LIVE_STACK_AMUX_BIN', 'amux', ['install', installTarget, '--json'], options.cwd, SETUP_TIMEOUT_MS),
     commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['install', '--global', './packages/sdk'], options.cwd, SETUP_TIMEOUT_MS),
-    // hooks-mux-cli is linked to PATH by the CI workflow's "Link workspace CLIs" step.
-    // Do NOT npm install -g here — it copies a stale version that shadows the linked one.
+    commandExecution(commandEnv, 'LIVE_STACK_NPM_BIN', 'npm', ['install', '--global', './packages/hooks-mux/cli'], options.cwd, SETUP_TIMEOUT_MS),
     generatedPluginInstallCommand(commandEnv, scenario, options.cwd, SETUP_TIMEOUT_MS),
     ensureLiveArtifactDirCommand(commandEnv, options.cwd),
   ];

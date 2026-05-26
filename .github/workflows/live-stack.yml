@@ -376,7 +376,7 @@ jobs:
             "amux:packages/agent-mux/cli/dist/index.js" \
             "agent-platform:packages/omni/dist/cli/main.js" \
             "babysitter:packages/sdk/dist/cli/main.js" \
-            "a5c-hooks-mux:packages/hooks-mux/cli/dist/index.js"
+            "a5c-hooks-mux:packages/hooks-mux/cli/dist/cli/main.js"
           do
             name="${pair%%:*}"
             script="${pair#*:}"

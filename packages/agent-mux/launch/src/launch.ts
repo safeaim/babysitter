@@ -688,9 +688,10 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     return ExitCode.USAGE_ERROR;
   }
 
-  // Validate harness exists
+  // Validate harness exists (via adapter registry or agent-catalog launch behavior)
   const adapter = client.adapters.get(harness);
-  if (!adapter) {
+  const launchBehavior = getLaunchBehavior(harness);
+  if (!adapter && !launchBehavior) {
     const available = client.adapters.list().map((a) => a.agent).join(', ');
     const msg = `Unknown harness '${harness}'. Available: ${available}`;
     if (jsonMode) printJsonError('AGENT_NOT_FOUND', msg);
@@ -698,8 +699,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     return ExitCode.USAGE_ERROR;
   }
 
-  // Check harness is installed
-  if (adapter.detectInstallation) {
+  // Check harness is installed (only for adapter-backed harnesses)
+  if (adapter?.detectInstallation) {
     const installResult = await adapter.detectInstallation();
     if (!installResult.installed) {
       const installCmd = adapter.capabilities?.installMethods?.[0]?.command ?? `npm install -g ${harness}`;

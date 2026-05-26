@@ -285,6 +285,63 @@ edges:
     - trust-level:vendor-doc
 ---
 nodeKind: EvidenceSource
+id: evidence:mistral-large-3-model-card
+attributes:
+  displayName: "Mistral AI docs — Mistral Large 3 25.12 model card"
+  kindLabel: web
+  trustLevel: trust-level:vendor-doc
+  sourceUrl: https://docs.mistral.ai/models/model-cards/mistral-large-3-25-12
+  sourcePathOrUrl: https://docs.mistral.ai/models/model-cards/mistral-large-3-25-12
+  locator: "model card — overview, capabilities, pricing"
+  capturedAt: "2026-05-26T00:00:00Z"
+  observedAt: "2026-05-26T00:00:00Z"
+  observedBy: a5c-ai-team
+  freshnessWindowDays: 90
+  reviewOwner: "@a5c-ai/catalog"
+  reviewedAt: "2026-05-26T00:00:00Z"
+edges:
+  has_trust_level:
+    - trust-level:vendor-doc
+---
+nodeKind: EvidenceSource
+id: evidence:aws-bedrock-mistral-large-3
+attributes:
+  displayName: "AWS Bedrock docs — Mistral AI Mistral Large 3 model card"
+  kindLabel: web
+  trustLevel: trust-level:vendor-doc
+  sourceUrl: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-mistral-ai-mistral-large-3.html
+  sourcePathOrUrl: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-mistral-ai-mistral-large-3.html
+  locator: "model card — model availability"
+  capturedAt: "2026-05-26T00:00:00Z"
+  observedAt: "2026-05-26T00:00:00Z"
+  observedBy: a5c-ai-team
+  freshnessWindowDays: 90
+  reviewOwner: "@a5c-ai/catalog"
+  reviewedAt: "2026-05-26T00:00:00Z"
+edges:
+  has_trust_level:
+    - trust-level:vendor-doc
+---
+nodeKind: EvidenceSource
+id: evidence:mistral-medium-3-5-hf-model-card
+attributes:
+  displayName: "Hugging Face — mistralai/Mistral-Medium-3.5-128B"
+  kindLabel: web
+  trustLevel: trust-level:vendor-doc
+  sourceUrl: https://huggingface.co/mistralai/Mistral-Medium-3.5-128B
+  sourcePathOrUrl: https://huggingface.co/mistralai/Mistral-Medium-3.5-128B
+  locator: "model card — model summary and capabilities"
+  capturedAt: "2026-05-26T00:00:00Z"
+  observedAt: "2026-05-26T00:00:00Z"
+  observedBy: a5c-ai-team
+  freshnessWindowDays: 90
+  reviewOwner: "@a5c-ai/catalog"
+  reviewedAt: "2026-05-26T00:00:00Z"
+edges:
+  has_trust_level:
+    - trust-level:vendor-doc
+---
+nodeKind: EvidenceSource
 id: evidence:hf-model-card-mistral-large-2
 attributes:
   displayName: "Hugging Face — mistralai/Mistral-Large-Instruct-2407 (Mistral Large 2)"

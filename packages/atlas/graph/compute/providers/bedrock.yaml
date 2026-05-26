@@ -19,6 +19,7 @@ attributes:
     converse_stream: "https://bedrock-runtime.{region}.amazonaws.com/model/{modelId}/converse-stream"
     mantle_base: "https://bedrock-mantle.{region}.api.aws/v1"
     mantle_chat_completions: "https://bedrock-mantle.{region}.api.aws/v1/chat/completions"
+    bidirectional_stream: "https://bedrock-runtime.{region}.amazonaws.com/model/{modelId}/invoke-with-bidirectional-stream"
   pricing: |
     See https://aws.amazon.com/bedrock/pricing/ for region-specific pricing.
   pricingTiers:
@@ -82,6 +83,7 @@ edges:
     - target: layer:2-provider
   serves:
     - model:amazon-nova-2-lite@current
+    - model:amazon-nova-2-sonic@current
     - model:claude-mythos-preview@current
     - model:mistral-large-3@current
     - model:qwen3-coder-480b-a35b-instruct@current

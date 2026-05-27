@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: a5c-ai/babysitter/packages/triggers@main
+      - uses: a5c-ai/babysitter/packages/triggers-mux@main
         with:
           harness: ${{ matrix.harness }}
           provider: ${{ matrix.provider }}

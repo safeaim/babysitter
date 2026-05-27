@@ -1,4 +1,4 @@
-# Generated from packages/triggers/action.yml on the staging branch of a5c-ai/babysitter.
+# Generated from packages/triggers-mux/action.yml on the staging branch of a5c-ai/babysitter.
 # Consumer usage:
 #   steps:
 #     - template: azure-pipelines.yml@self
@@ -145,7 +145,7 @@ steps:
   - bash: |
       set -euo pipefail
       WORKSPACE="${WORKSPACE_DIR:-$(pwd)}"
-      if [ -d "$WORKSPACE/packages/agent-mux/cli" ] && [ -f "$WORKSPACE/packages/triggers/action.yml" ]; then
+      if [ -d "$WORKSPACE/packages/agent-mux/cli" ] && [ -f "$WORKSPACE/packages/triggers-mux/action.yml" ]; then
         echo "##vso[task.setvariable variable=mode;isOutput=true]monorepo"
         echo "##vso[task.setvariable variable=tag;isOutput=true]staging"
       elif [ "$ACTION_REF" = "staging" ]; then
@@ -164,7 +164,7 @@ steps:
   - bash: |
       set -euo pipefail
       echo "Installing @a5c-ai packages with tag: $NPM_TAG"
-      npm install -g --legacy-peer-deps @a5c-ai/agent-mux-cli@$NPM_TAG @a5c-ai/babysitter-sdk@$NPM_TAG @a5c-ai/triggers@$NPM_TAG
+      npm install -g --legacy-peer-deps @a5c-ai/agent-mux-cli@$NPM_TAG @a5c-ai/babysitter-sdk@$NPM_TAG @a5c-ai/triggers-mux@$NPM_TAG
       npm install -g --legacy-peer-deps @a5c-ai/hooks-mux-cli@$NPM_TAG 2>/dev/null || echo "hooks-mux-cli install skipped (optional)"
       which amux && amux --version || { echo "ERROR: amux not found after install"; exit 1; }
     name: installRuntime

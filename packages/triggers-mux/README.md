@@ -1,4 +1,4 @@
-# @a5c-ai/triggers
+# @a5c-ai/triggers-mux
 
 Trigger glue for running any coding agent from CI. Normalizes GitHub, GitLab, Bitbucket, and generic webhook payloads into one event shape, enriches GitHub events with changed files and optional diffs, and evaluates compact trigger queries before launching agent-mux.
 
@@ -11,12 +11,12 @@ triggers enrich --backend github --include-diff --output event.json
 
 ## GitHub Action
 
-The reusable action at `packages/triggers/action.yml` supports all harnesses, providers, and invocation modes.
+The reusable action at `packages/triggers-mux/action.yml` supports all harnesses, providers, and invocation modes.
 
 ### Quick Start
 
 ```yaml
-- uses: a5c-ai/babysitter/packages/triggers@main
+- uses: a5c-ai/babysitter/packages/triggers-mux@main
   with:
     harness: claude
     provider: foundry
@@ -61,7 +61,7 @@ Set `interaction-mode` to control how the harness runs in CI:
 Set `babysitter-plugin: true` to install the babysitter plugin before running:
 
 ```yaml
-- uses: a5c-ai/babysitter/packages/triggers@main
+- uses: a5c-ai/babysitter/packages/triggers-mux@main
   with:
     harness: claude
     provider: foundry

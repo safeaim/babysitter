@@ -66,8 +66,9 @@ attributes:
   notes: |
     Release notes list provider headerTimeout config, push-based experimental
     background-agent updates, partial modalities config, stable remote-backed
-    project identity, dynamic MCP server disconnect cleanup, and shell timeout
-    advertisement.
+    project identity, dynamic MCP server disconnect cleanup, DigitalOcean,
+    Google, OpenAI, Vertex, resumed-session, TUI, Desktop, extension, and
+    shell-timeout changes.
 edges:
   has_trust_level:
     - trust-level:official-web

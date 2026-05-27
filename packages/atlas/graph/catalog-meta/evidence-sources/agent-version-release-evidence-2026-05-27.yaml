@@ -97,3 +97,29 @@ edges:
     - trust-level:official-web
   references:
     - agentVersion:omp:ge-15-5-6
+---
+nodeKind: EvidenceSource
+id: evidence:droid-factory-cli-0-134-0-npm
+attributes:
+  displayName: "Droid @factory/cli 0.134.0 npm metadata"
+  kindLabel: npm-package-metadata
+  trustLevel: trust-level:official-web
+  sourceUrl: https://www.npmjs.com/package/@factory/cli/v/0.134.0
+  sourcePathOrUrl: https://www.npmjs.com/package/@factory/cli/v/0.134.0
+  locator: "npm:@factory/cli@0.134.0"
+  capturedAt: "2026-05-27T16:49:00Z"
+  observedAt: "2026-05-27T16:49:00Z"
+  observedBy: codex-babysitter-yolo
+  freshnessWindowDays: 45
+  reviewOwner: "@a5c-ai/catalog"
+  reviewedAt: "2026-05-27T16:49:00Z"
+  notes: |
+    npm metadata publishes @factory/cli 0.134.0 with the droid binary and
+    repository directory Factory-AI/factory apps/cli. No public release notes,
+    GitHub release, changelog entry, or install-method changes were found
+    during the upstream sweep.
+edges:
+  has_trust_level:
+    - trust-level:official-web
+  references:
+    - agent-version:droid@current

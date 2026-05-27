@@ -1433,9 +1433,38 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       else if (child?.stdin?.writable) child.stdin.write(text);
     };
 
+    let fatalErrorDetected = false;
+    const FATAL_ERROR_PATTERNS = [
+      'credit balance is too low',
+      'insufficient_quota',
+      'exceeded your current quota',
+      'billing_not_active',
+      'account has been deactivated',
+      'payment required',
+      'Your account does not have enough credits',
+      'rate_limit_exceeded',
+      'overloaded_error',
+    ];
+
     const handleOutputChunk = (data: string) => {
       outputBuf += data;
       capturedOutputChunks.push(data);
+
+      // Detect fatal API errors (credit exhaustion, billing) and fail fast
+      // instead of waiting for idle/artifact timeout.
+      if (!fatalErrorDetected && !turnComplete) {
+        const stripped = outputBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+        for (const pattern of FATAL_ERROR_PATTERNS) {
+          if (stripped.includes(pattern)) {
+            fatalErrorDetected = true;
+            console.error(`[amux launch] FATAL API ERROR detected: "${pattern}" — terminating agent`);
+            turnComplete = true;
+            if (idleTimer) clearTimeout(idleTimer);
+            setTimeout(completePtyPrompt, 500);
+            return;
+          }
+        }
+      }
 
       if (!assembler || !adapter || turnComplete) return;
 
@@ -1631,9 +1660,22 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       cwd: launchCwd,
       shell: resolvedSpawn.shell,
     });
+    let niStderrBuf = '';
     child.stderr?.on('data', (chunk: Buffer) => {
+      const text = chunk.toString('utf8');
       process.stderr.write(chunk);
-      capturedOutputChunks.push(chunk.toString('utf8'));
+      capturedOutputChunks.push(text);
+      niStderrBuf += text;
+      if (niStderrBuf.length > 10_000) niStderrBuf = niStderrBuf.slice(-10_000);
+      for (const pat of ['credit balance is too low', 'insufficient_quota', 'exceeded your current quota',
+        'billing_not_active', 'payment required', 'rate_limit_exceeded', 'overloaded_error']) {
+        if (niStderrBuf.includes(pat)) {
+          console.error(`[amux launch] FATAL API ERROR in stderr: "${pat}" — killing agent`);
+          try { child.kill('SIGTERM'); } catch { /* */ }
+          niStderrBuf = '';
+          return;
+        }
+      }
     });
 
     // Pipe stdout through + idle-timeout kill for harnesses that don't exit
@@ -1644,10 +1686,26 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     let niIdleTimer: ReturnType<typeof setTimeout> | null = null;
     let niHasOutput = false;
     const NI_IDLE_TIMEOUT_MS = 30_000;
+    let niFatalBuf = '';
     child.stdout?.on('data', (chunk: Buffer) => {
+      const text = chunk.toString('utf8');
       process.stdout.write(chunk);
-      capturedOutputChunks.push(chunk.toString('utf8'));
+      capturedOutputChunks.push(text);
       niHasOutput = true;
+      // Detect fatal API errors and kill fast
+      niFatalBuf += text;
+      if (niFatalBuf.length > 10_000) niFatalBuf = niFatalBuf.slice(-10_000);
+      const stripped = niFatalBuf.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+      for (const pat of ['credit balance is too low', 'insufficient_quota', 'exceeded your current quota',
+        'billing_not_active', 'payment required', 'Your account does not have enough credits',
+        'rate_limit_exceeded', 'overloaded_error']) {
+        if (stripped.includes(pat)) {
+          console.error(`[amux launch] FATAL API ERROR in NI mode: "${pat}" — killing agent`);
+          try { child.kill('SIGTERM'); } catch { /* */ }
+          niFatalBuf = '';
+          return;
+        }
+      }
       if (niUseIdleKill) {
         if (niIdleTimer) clearTimeout(niIdleTimer);
         niIdleTimer = setTimeout(() => {

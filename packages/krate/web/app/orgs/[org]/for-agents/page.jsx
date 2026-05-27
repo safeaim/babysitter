@@ -155,6 +155,7 @@ export default async function ForAgentsPage({ params }) {
 
       <Section title="Model Gateway">
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>The Krate Model Gateway provides unified model routing through Envoy AI Gateway. Agents request models by logical name and the gateway routes to the correct backend — either an internal KServe InferenceService or an external cloud LLM.</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>The <a href={orgHref(activeOrg, '/inference')} style={{ color: 'var(--accent)', fontWeight: 600 }}>Inference page</a> includes a curated model catalog with 15+ popular open models (Llama 3.1, Mistral, Phi-3, Code Llama, BGE, Whisper, and more) that you can deploy to your cluster with one click. Browse by category, review resource requirements, and deploy directly from the UI.</p>
         <CodeBlock title="Install Envoy AI Gateway (prerequisite)">{`kubectl apply -k "github.com/envoyproxy/ai-gateway/manifests?ref=main"`}</CodeBlock>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>Krate manages KrateModelRoute resources that generate AIGatewayRoute configs automatically.</p>
         <div className="resourceTable">

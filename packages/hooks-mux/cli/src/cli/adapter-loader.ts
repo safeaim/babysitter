@@ -175,10 +175,11 @@ function buildKnownAdapters(): string[] {
     const { listPluginTargetDescriptors } = require('@a5c-ai/agent-catalog') as {
       listPluginTargetDescriptors: () => Array<{ adapterName: string }>;
     };
+    const excludes = new Set(['omni', 'babysitter', 'agent-mux', 'agent-mux-remote', 'agent-platform']);
     const adapters = new Set(
       listPluginTargetDescriptors()
         .map(t => normalizeAdapterName(t.adapterName))
-        .filter(Boolean),
+        .filter(name => name && !excludes.has(name)),
     );
     if (adapters.size > 0) return [...adapters].sort();
   } catch {

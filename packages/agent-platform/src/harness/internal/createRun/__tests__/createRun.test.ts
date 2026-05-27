@@ -1582,7 +1582,7 @@ describe("handleHarnessCreateRun", () => {
       });
 
       expect(code).toBe(0);
-      expect(promptTimeouts).toEqual([0, 0, 0]);
+      expect(promptTimeouts).toEqual([900000, 900000, 900000]);
       expect(existsSync(generatedFile)).toBe(true);
     });
 

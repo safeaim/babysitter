@@ -31,7 +31,8 @@ function toHookRegistrationFormat(format: string | null | undefined) {
     format === 'github-copilot' ||
     format === 'hermes' ||
     format === 'opencode' ||
-    format === 'openclaw'
+    format === 'openclaw' ||
+    format === 'none'
   ) {
     return format;
   }

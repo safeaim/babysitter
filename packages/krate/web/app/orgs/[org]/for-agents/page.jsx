@@ -196,6 +196,8 @@ export default async function ForAgentsPage({ params }) {
         <CodeBlock>{`krate serve              # Start HTTP API server on port 3080
 krate mcp                # Start MCP server over stdio
 krate status             # Show workspace status
+krate models             # List model catalog (internal + external)
+krate routes             # List model routes
 krate stacks             # List agent stacks
 krate dispatch <stack>   # Dispatch an agent run
 krate apply <file>       # Apply a resource from YAML/JSON

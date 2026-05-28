@@ -10,6 +10,8 @@ const commands = {
   serve: 'Start HTTP API server',
   mcp: 'Start MCP server (stdio)',
   status: 'Show workspace status (org, resources, health)',
+  models: 'List model catalog (internal + external)',
+  routes: 'List model routes',
   stacks: 'List agent stacks',
   dispatch: 'Dispatch an agent run (requires --stack)',
   apply: 'Apply a resource from file (--file)',
@@ -253,6 +255,43 @@ async function cmdDelete(positional, flags) {
   }
 }
 
+async function cmdModels() {
+  const controller = await getController();
+  try {
+    const catalog = await controller.listModelCatalog('default');
+    const models = catalog?.models || [];
+    if (models.length === 0) {
+      console.log('No models in catalog. Deploy models via the web console or create KrateModelRoute resources.');
+      return;
+    }
+    console.log(`${'NAME'.padEnd(28)} ${'TYPE'.padEnd(10)} ${'PROVIDER'.padEnd(16)} ${'STATUS'.padEnd(12)} ENDPOINT`);
+    for (const m of models) {
+      console.log(`${(m.name || '-').padEnd(28)} ${(m.type || '-').padEnd(10)} ${(m.provider || '-').padEnd(16)} ${(m.status || '-').padEnd(12)} ${m.endpoint || '-'}`);
+    }
+  } catch (err) {
+    console.error(`Error listing models: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+async function cmdRoutes() {
+  const controller = await getController();
+  const result = await controller.listResource('KrateModelRoute');
+  const items = result?.items || [];
+  if (items.length === 0) {
+    console.log('No model routes configured.');
+    return;
+  }
+  console.log(`${'NAME'.padEnd(28)} ${'MODEL'.padEnd(24)} ${'TYPE'.padEnd(10)} ENABLED`);
+  for (const route of items) {
+    const name = route.metadata?.name || '-';
+    const modelName = route.spec?.modelName || '-';
+    const routeType = route.spec?.routeType || '-';
+    const enabled = route.spec?.enabled !== false ? 'yes' : 'no';
+    console.log(`${name.padEnd(28)} ${modelName.padEnd(24)} ${routeType.padEnd(10)} ${enabled}`);
+  }
+}
+
 function cmdVersion() {
   console.log(`krate v${getVersion()}`);
 }
@@ -372,6 +411,10 @@ if (command === 'serve' || !command) {
   server.start();
 } else if (command === 'status') {
   await cmdStatus();
+} else if (command === 'models') {
+  await cmdModels();
+} else if (command === 'routes') {
+  await cmdRoutes();
 } else if (command === 'stacks') {
   await cmdStacks();
 } else if (command === 'dispatch') {

@@ -64,7 +64,7 @@ attributes:
   cliSetupMode: default
   defaultStepCount: 8
   skillSystemLabel: "Installed skill"
-  defaultTransportId: null
+  defaultTransportId: openai-chat
   hooksMuxFamily: shell-hook
   sessionIdQuality: native
   supportsOrderedFanout: false

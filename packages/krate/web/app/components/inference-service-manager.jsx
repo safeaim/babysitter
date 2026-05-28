@@ -972,7 +972,9 @@ function ModelRouteCard({ route, onDelete }) {
   );
 }
 
-function CreateModelRouteForm({ services, onSubmit, onCancel, loading }) {
+const FALLBACK_PROVIDERS = ['anthropic', 'openai', 'azure-openai', 'google-vertex', 'custom'];
+
+function CreateModelRouteForm({ org, services, onSubmit, onCancel, loading }) {
   const [form, setForm] = useState({
     modelName: '',
     routeType: 'internal',
@@ -986,6 +988,40 @@ function CreateModelRouteForm({ services, onSubmit, onCancel, loading }) {
     rpmLimit: '',
     tpmLimit: '',
   });
+  const [providerOptions, setProviderOptions] = useState(FALLBACK_PROVIDERS);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadProviders() {
+      const seen = new Set(FALLBACK_PROVIDERS);
+      const merged = [...FALLBACK_PROVIDERS];
+      // Fetch from AgentProviderConfig resources
+      try {
+        const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources?kind=AgentProviderConfig`);
+        if (res.ok) {
+          const data = await res.json();
+          for (const item of (data?.items || data || [])) {
+            const p = item?.spec?.provider;
+            if (p && !seen.has(p)) { seen.add(p); merged.push(p); }
+          }
+        }
+      } catch {}
+      // Fetch from Atlas graph (Provider kind)
+      try {
+        const res = await fetch(`/api/atlas/search?q=&kinds=Provider,ModelProviderProduct&limit=50`);
+        if (res.ok) {
+          const data = await res.json();
+          for (const hit of (data?.hits || [])) {
+            const name = (hit?.displayName || hit?.id || '').toLowerCase().replace(/\s+/g, '-');
+            if (name && !seen.has(name)) { seen.add(name); merged.push(name); }
+          }
+        }
+      } catch {}
+      if (!cancelled) setProviderOptions(merged);
+    }
+    if (org) loadProviders();
+    return () => { cancelled = true; };
+  }, [org]);
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
 
@@ -1068,7 +1104,7 @@ function CreateModelRouteForm({ services, onSubmit, onCancel, loading }) {
           <div>
             <label style={labelStyle}>Provider *</label>
             <select style={inputStyle} value={form.provider} onChange={set('provider')}>
-              {['anthropic', 'openai', 'azure-openai', 'google-vertex', 'custom'].map(p => (
+              {providerOptions.map(p => (
                 <option key={p} value={p}>{p}</option>
               ))}
             </select>
@@ -1735,6 +1771,7 @@ export function InferenceServiceManager({ org, initialServiceName }) {
                 </div>
               )}
               <CreateModelRouteForm
+                org={org}
                 services={services}
                 onSubmit={handleCreateRoute}
                 onCancel={() => { setShowRouteForm(false); setCreateError(null); }}

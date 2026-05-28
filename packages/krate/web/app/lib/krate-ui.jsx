@@ -62,6 +62,7 @@ export const orgNavigationGroups = [
     title: 'Observe',
     items: [
       ['/insights', 'Insights', 'Health and activity'],
+      ['/costs', 'Costs', 'Token usage and cost tracking'],
       ['/operations-install', 'Readiness', 'Install and release checks'],
       ['/api-docs', 'API Docs', 'HTTP API reference and explorer'],
       ['/for-agents', 'For Agents', 'MCP server, tools, and integration']

@@ -67,7 +67,7 @@ export {
 } from '../../core/src/external/provider-resource-factory.js';
 
 // Event Bus
-export { createEventBus, globalEventBus } from '../../core/src/event-bus.js';
+export { createEventBus, globalEventBus, loadPersistedEvents } from '../../core/src/event-bus.js';
 
 // Agent Controllers
 export {

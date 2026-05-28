@@ -253,6 +253,13 @@ export {
   validateVirtualModel
 } from '../../core/src/virtual-model-controller.js';
 
+// Virtual Model Hook Bridge
+export {
+  createVirtualModelHookBridge,
+  VIRTUAL_MODEL_HOOK_TYPES,
+  VIRTUAL_MODEL_HOOK_BRIDGE_BOUNDARY
+} from '../../core/src/virtual-model-hook-bridge.js';
+
 // Artifact Registry Controller
 export {
   createArtifactRegistryController,

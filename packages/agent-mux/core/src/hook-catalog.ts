@@ -60,14 +60,31 @@ export const HOOK_CATALOG: Record<string, HookTypeEntry[]> = {
   hermes: [
     { name: 'onEvent', description: 'Generic event hook.', direction: 'event' },
   ],
+  '*': [
+    { name: 'VirtualModel.PreModelResolution', description: 'Before model lookup.', direction: 'pre' },
+    { name: 'VirtualModel.PreCompletion', description: 'Before forwarding to API.', direction: 'pre' },
+    { name: 'VirtualModel.PostCompletion', description: 'After response.', direction: 'post' },
+    { name: 'VirtualModel.PreToolUse', description: 'Before tool execution.', direction: 'pre' },
+    { name: 'VirtualModel.PostToolUse', description: 'After tool execution.', direction: 'post' },
+    { name: 'VirtualModel.TurnEnd', description: 'After assistant turn.', direction: 'post' },
+    { name: 'VirtualModel.SessionStart', description: 'Session begins.', direction: 'event' },
+    { name: 'VirtualModel.SessionEnd', description: 'Session ends.', direction: 'event' },
+    { name: 'VirtualModel.UserPromptSubmit', description: 'User sends message.', direction: 'pre' },
+    { name: 'VirtualModel.OnError', description: 'Error handling.', direction: 'post' },
+    { name: 'VirtualModel.OnCompact', description: 'Context compaction.', direction: 'post' },
+  ],
 };
 
 export function getHookCatalog(agent: AgentName | string): HookTypeEntry[] {
-  return HOOK_CATALOG[agent] ?? [];
+  const agentSpecific = HOOK_CATALOG[agent] ?? [];
+  const wildcard = HOOK_CATALOG['*'] ?? [];
+  return [...agentSpecific, ...wildcard];
 }
 
 export function isKnownHookType(agent: AgentName | string, hookType: string): boolean {
   const entries = HOOK_CATALOG[agent];
-  if (!entries) return false;
-  return entries.some((e) => e.name === hookType);
+  const wildcard = HOOK_CATALOG['*'];
+  if (entries && entries.some((e) => e.name === hookType)) return true;
+  if (wildcard && wildcard.some((e) => e.name === hookType)) return true;
+  return false;
 }

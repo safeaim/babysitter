@@ -1,4 +1,9 @@
-import { createKrateApiController, orgNamespaceName } from '@a5c-ai/krate-sdk';
+import {
+  createKrateApiController,
+  orgNamespaceName,
+  createVirtualModelHookBridge,
+  createVirtualModelController,
+} from '@a5c-ai/krate-sdk';
 import { withAuth } from '../../../../../../../lib/api-auth.js';
 import { errorResponse } from '../../../../../../../lib/api-errors.js';
 
@@ -9,7 +14,7 @@ export const POST = withAuth(async (request, { params }) => {
   const namespace = orgNamespaceName(org);
   const controller = createKrateApiController({ namespace });
   try {
-    const body = await request.json();
+    let body = await request.json();
 
     // Get the service to find its endpoint
     const service = await controller.getResource('KrateInferenceService', name);
@@ -23,6 +28,35 @@ export const POST = withAuth(async (request, { params }) => {
     }
 
     const modelName = service?.metadata?.name || name;
+
+    // ── Virtual Model Hook Bridge ──────────────────────────────────────
+    const vmController = createVirtualModelController();
+    const bridge = createVirtualModelHookBridge({ controller: vmController });
+
+    // Load virtual models and match by service name
+    let virtualModels = [];
+    try {
+      virtualModels = await controller.listResources('KrateVirtualModel') || [];
+    } catch {
+      // No virtual models available — proceed without hooks
+    }
+    const matchedVm = bridge.matchVirtualModel(modelName, virtualModels);
+
+    // PreCompletion hook — may modify request or deny
+    if (matchedVm) {
+      const preResult = bridge.handleHook('VirtualModel.PreCompletion', {
+        data: { request: body, context: { modelName, org, namespace } },
+      }, matchedVm);
+
+      if (preResult.decision === 'deny') {
+        return errorResponse(preResult.message || 'Request denied by virtual model hook', 403);
+      }
+      if (preResult.decision === 'modify' && preResult.modifiedInput?.request) {
+        body = preResult.modifiedInput.request;
+      }
+    }
+
+    // ── Forward to KServe ──────────────────────────────────────────────
     const protocol = service?.spec?.predictor?.model?.protocolVersion || 'v2';
     const inferUrl = protocol === 'v2'
       ? `${endpoint}/v2/models/${modelName}/infer`
@@ -34,7 +68,19 @@ export const POST = withAuth(async (request, { params }) => {
       body: JSON.stringify(body),
     });
 
-    const inferData = await inferRes.json().catch(() => inferRes.text());
+    let inferData = await inferRes.json().catch(() => inferRes.text());
+
+    // PostCompletion hook — may modify response
+    if (matchedVm) {
+      const postResult = bridge.handleHook('VirtualModel.PostCompletion', {
+        data: { response: inferData, context: { modelName, org, namespace } },
+      }, matchedVm);
+
+      if (postResult.decision === 'modify' && postResult.modifiedInput?.response) {
+        inferData = postResult.modifiedInput.response;
+      }
+    }
+
     return Response.json(
       { endpoint: inferUrl, response: inferData, status: inferRes.status },
       { headers: { 'Cache-Control': 'no-store' } }

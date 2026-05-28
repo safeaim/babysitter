@@ -73,15 +73,15 @@ export function buildPrimaryLiveStackCommands(
   const traceId = commandEnv['LIVE_STACK_TRACE_ID'];
   const prompt = buildPrompt(scenario, traceId, options.env);
 
-  if (scenario.agent.integrationType === 'runtime-cli') {
-    return [
-      commandExecution(commandEnv, 'LIVE_STACK_AGENT_PLATFORM_BIN', 'agent-platform', ['create-run', '--harness', 'internal', '--workspace', options.cwd, '--model', scenario.model.model, '--prompt', prompt, '--json'], options.cwd, timeoutMs),
-    ];
-  }
-
   if (scenario.agent.agent === 'omni') {
     return [
       commandExecution(commandEnv, 'LIVE_STACK_OMNI_BIN', 'omni', ['call', '--model', scenario.model.model, '--prompt', prompt, '--json'], options.cwd, timeoutMs),
+    ];
+  }
+
+  if (scenario.agent.integrationType === 'runtime-cli') {
+    return [
+      commandExecution(commandEnv, 'LIVE_STACK_AGENT_PLATFORM_BIN', 'agent-platform', ['create-run', '--harness', 'internal', '--workspace', options.cwd, '--model', scenario.model.model, '--prompt', prompt, '--json'], options.cwd, timeoutMs),
     ];
   }
 

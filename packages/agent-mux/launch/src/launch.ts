@@ -931,6 +931,12 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     }
   }
 
+  // Hermes: ensure structured jsonl output to stdout (hermes -z writes to
+  // session log by default, producing 0 stdout for the test harness)
+  if (plan.harness === 'hermes' && !plan.args.includes('--output-format')) {
+    plan.args.push('--output-format', 'jsonl');
+  }
+
   // Passthrough args after --
   const dashDashIdx = process.argv.indexOf('--');
   if (dashDashIdx >= 0) {
@@ -1069,10 +1075,6 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           });
           plan.env['HERMES_INFERENCE_PROVIDER'] = 'custom';
           plan.env['HERMES_INFERENCE_MODEL'] = plan.proxy?.targetModel ?? plan.model;
-          // Ensure hermes writes structured output to stdout (not just session log)
-          if (!plan.args.includes('--output-format')) {
-            plan.args.push('--output-format', 'jsonl');
-          }
         }
         console.error(`[amux launch] ${plan.harness} proxy: OPENAI_BASE_URL=${proxyRuntime.url}/v1`);
       }

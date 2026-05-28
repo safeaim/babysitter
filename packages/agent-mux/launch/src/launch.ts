@@ -989,7 +989,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       // API endpoints (see https://geminicli.com/docs/reference/configuration/).
       // The previously-used GOOGLE_AI_STUDIO_API_ENDPOINT was never recognised.
       if (plan.harness === 'gemini') {
-        const googleKey = process.env['GOOGLE_API_KEY'] || process.env['GEMINI_API_KEY'] || proxyRuntime.authToken || 'AIzaSyA-proxy-placeholder-key-for-transport-mux';
+        const envKey = process.env['GOOGLE_API_KEY'] || process.env['GEMINI_API_KEY'] || '';
+        const googleKey = envKey.startsWith('AIza') ? envKey : 'AIzaSyA-proxy-placeholder-key-000000000000';
         plan.env['GOOGLE_API_KEY'] = googleKey;
         plan.env['GEMINI_API_KEY'] = googleKey;
         const proxyOrigin = new URL(proxyRuntime.url).origin;

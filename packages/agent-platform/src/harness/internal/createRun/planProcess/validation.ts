@@ -117,11 +117,25 @@ export async function validateProcessExport(filePath: string): Promise<void> {
     );
   }
   await ensureSdkResolvable(path.dirname(path.resolve(filePath)));
-  const moduleUrl = `${pathToFileURL(path.resolve(filePath)).href}?t=${Date.now()}-${++processValidationImportNonce}`;
+  const resolvedPath = path.resolve(filePath);
+  const moduleUrl = `${pathToFileURL(resolvedPath).href}?t=${Date.now()}-${++processValidationImportNonce}`;
   resetGlobalTaskRegistry();
   let mod: Record<string, unknown>;
   try {
     mod = await dynamicImportModule(moduleUrl);
+  } catch {
+    // ESM import with cache-bust query string may fail on some Node configs
+    // (CJS fallback doesn't support file:// URLs with query strings).
+    // Retry with plain require() after clearing the module cache.
+    try {
+      delete require.cache[require.resolve(resolvedPath)];
+    } catch { /* not cached */ }
+    try {
+      mod = await dynamicImportModule(pathToFileURL(resolvedPath).href);
+    } catch {
+      // Last resort: CJS require
+      mod = require(resolvedPath) as Record<string, unknown>;
+    }
   } finally {
     resetGlobalTaskRegistry();
   }

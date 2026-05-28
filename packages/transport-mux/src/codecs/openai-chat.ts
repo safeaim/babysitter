@@ -111,6 +111,14 @@ export class OpenAiChatCodec implements TransportCodec {
   }
 
   encodeResult(result: CompletionResult): unknown {
+    const message: Record<string, unknown> = { role: 'assistant', content: result.text };
+    if (result.toolCalls && result.toolCalls.length > 0) {
+      message.tool_calls = result.toolCalls.map((tc, i) => ({
+        id: tc.id || `call_${i}`,
+        type: 'function',
+        function: { name: tc.name, arguments: tc.arguments },
+      }));
+    }
     return {
       id: result.id,
       object: 'chat.completion',
@@ -119,8 +127,8 @@ export class OpenAiChatCodec implements TransportCodec {
       choices: [
         {
           index: 0,
-          message: { role: 'assistant', content: result.text },
-          finish_reason: result.finishReason,
+          message,
+          finish_reason: result.toolCalls?.length ? 'tool_calls' : result.finishReason,
         },
       ],
       usage: {

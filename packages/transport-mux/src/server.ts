@@ -1299,14 +1299,20 @@ function openAiResponsesResponse(result: CompletionResult, config: ProxyConfig) 
 }
 
 function googleResponse(result: CompletionResult) {
+  const parts: Record<string, unknown>[] = [{ text: result.text }];
+  if (result.toolCalls && result.toolCalls.length > 0) {
+    for (const tc of result.toolCalls) {
+      parts.push({ functionCall: { name: tc.name, args: JSON.parse(tc.arguments || '{}') } });
+    }
+  }
   return {
     candidates: [
       {
         content: {
           role: 'model',
-          parts: [{ text: result.text }],
+          parts,
         },
-        finishReason: 'STOP',
+        finishReason: result.toolCalls?.length ? 'TOOL_CALLS' : 'STOP',
       },
     ],
     usageMetadata: {

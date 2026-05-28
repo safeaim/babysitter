@@ -48,7 +48,7 @@ export async function runOrchestrationPhase(
 }
 
 async function runCliOrchestration(args: RunOrchestrationPhaseArgs): Promise<number> {
-  const { execSync } = await import("node:child_process");
+  const { execFileSync } = await import("node:child_process");
   const path = await import("node:path");
 
   const processPath = args.processPath;
@@ -78,8 +78,11 @@ async function runCliOrchestration(args: RunOrchestrationPhaseArgs): Promise<num
   if (runsDir) createArgs.push("--runs-dir", runsDir);
 
   let runDir: string;
+  const babysitterBinParts = babysitterBin.split(" ");
+  const babysitterCmd = babysitterBinParts[0]!;
+  const babysitterPrefix = babysitterBinParts.slice(1);
   try {
-    const createResult = execSync(`${babysitterBin} ${createArgs.join(" ")}`, {
+    const createResult = execFileSync(babysitterCmd, [...babysitterPrefix, ...createArgs], {
       cwd: workspace,
       encoding: "utf8",
       timeout: 30_000,
@@ -102,7 +105,7 @@ async function runCliOrchestration(args: RunOrchestrationPhaseArgs): Promise<num
   const maxIterations = args.maxIterations ?? 20;
   for (let i = 1; i <= maxIterations; i++) {
     try {
-      const iterResult = execSync(`${babysitterBin} run:iterate "${runDir}" --json --iteration ${i}`, {
+      const iterResult = execFileSync(babysitterCmd, [...babysitterPrefix, "run:iterate", runDir, "--json", "--iteration", String(i)], {
         cwd: workspace,
         encoding: "utf8",
         timeout: 60_000,
@@ -155,8 +158,11 @@ async function resolveAndPostEffect(
   model?: string,
   babysitterBin = "babysitter",
 ): Promise<void> {
-  const { execSync } = await import("node:child_process");
+  const { execFileSync, execSync } = await import("node:child_process");
   const { createAgentCoreSession } = await import("../utils");
+  const babysitterParts = babysitterBin.split(" ");
+  const bCmd = babysitterParts[0]!;
+  const bPrefix = babysitterParts.slice(1);
 
   let value: string;
 
@@ -199,10 +205,9 @@ async function resolveAndPostEffect(
     const taskDir = path.join(runDir, "tasks", action.effectId);
     await fs.mkdir(taskDir, { recursive: true });
     await fs.writeFile(path.join(taskDir, "output.json"), value);
-    execSync(
-      `${babysitterBin} task:post "${runDir}" ${action.effectId} --status ok --value tasks/${action.effectId}/output.json --json`,
-      { cwd: workspace, encoding: "utf8", timeout: 30_000, env: { ...process.env } },
-    );
+    execFileSync(bCmd, [...bPrefix, "task:post", runDir, action.effectId, "--status", "ok", "--value", `tasks/${action.effectId}/output.json`, "--json"], {
+      cwd: workspace, encoding: "utf8", timeout: 30_000, env: { ...process.env },
+    });
   } catch {
     // Best effort
   }

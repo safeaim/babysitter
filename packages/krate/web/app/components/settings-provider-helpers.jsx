@@ -114,11 +114,13 @@ export function ProviderRow({ org, provider, onDeleted }) {
   const name = provider.metadata?.name;
   const [delStatus, setDelStatus] = useState('idle');
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [delError, setDelError] = useState('');
 
   async function handleDelete() {
     if (!confirmDelete) { setConfirmDelete(true); return; }
     setConfirmDelete(false);
     setDelStatus('deleting');
+    setDelError('');
     try {
       const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources/AgentProviderConfig/${encodeURIComponent(name)}`, {
         method: 'DELETE',
@@ -127,11 +129,11 @@ export function ProviderRow({ org, provider, onDeleted }) {
         onDeleted(name);
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.message || 'Failed to delete provider');
+        setDelError(data.message || 'Failed to delete provider');
         setDelStatus('idle');
       }
     } catch (err) {
-      alert(err.message || 'Network error');
+      setDelError(err.message || 'Network error');
       setDelStatus('idle');
     }
   }
@@ -184,6 +186,7 @@ export function ProviderRow({ org, provider, onDeleted }) {
           {delStatus === 'deleting' ? 'Deleting...' : 'Delete'}
         </button>
       )}
+      {delError && <span role="alert" style={{ fontSize: 12, color: 'var(--danger)' }}>{delError}</span>}
     </div>
   );
 }

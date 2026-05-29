@@ -26,11 +26,13 @@ function AdapterRow({ org, adapter, onDeleted }) {
   const name = adapter.metadata?.name;
   const [delStatus, setDelStatus] = useState('idle');
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [delError, setDelError] = useState('');
 
   async function handleDelete() {
     if (!confirmDelete) { setConfirmDelete(true); return; }
     setConfirmDelete(false);
     setDelStatus('deleting');
+    setDelError('');
     try {
       const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources/AgentAdapter/${encodeURIComponent(name)}`, {
         method: 'DELETE',
@@ -39,11 +41,11 @@ function AdapterRow({ org, adapter, onDeleted }) {
         onDeleted(name);
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.message || 'Failed to delete adapter');
+        setDelError(data.message || 'Failed to delete adapter');
         setDelStatus('idle');
       }
     } catch (err) {
-      alert(err.message || 'Network error');
+      setDelError(err.message || 'Network error');
       setDelStatus('idle');
     }
   }
@@ -94,6 +96,7 @@ function AdapterRow({ org, adapter, onDeleted }) {
           {delStatus === 'deleting' ? 'Deleting...' : 'Delete'}
         </button>
       )}
+      {delError && <span role="alert" style={{ fontSize: 12, color: 'var(--danger)' }}>{delError}</span>}
     </div>
   );
 }

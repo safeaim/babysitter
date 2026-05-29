@@ -26,11 +26,13 @@ function ServiceAccountRow({ org, sa, onDeleted }) {
   const ns = sa.spec?.namespace || `krate-org-${org}`;
   const [delStatus, setDelStatus] = useState('idle');
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [delError, setDelError] = useState('');
 
   async function handleDelete() {
     if (!confirmDelete) { setConfirmDelete(true); return; }
     setConfirmDelete(false);
     setDelStatus('deleting');
+    setDelError('');
     try {
       const rbName = `${name}-binding`;
       fetch(`/api/orgs/${encodeURIComponent(org)}/resources/AgentRoleBinding/${encodeURIComponent(rbName)}`, {
@@ -43,11 +45,11 @@ function ServiceAccountRow({ org, sa, onDeleted }) {
         onDeleted(name);
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.message || 'Failed to delete service account');
+        setDelError(data.message || 'Failed to delete service account');
         setDelStatus('idle');
       }
     } catch (err) {
-      alert(err.message || 'Network error');
+      setDelError(err.message || 'Network error');
       setDelStatus('idle');
     }
   }
@@ -94,6 +96,7 @@ function ServiceAccountRow({ org, sa, onDeleted }) {
           {delStatus === 'deleting' ? 'Deleting...' : 'Delete'}
         </button>
       )}
+      {delError && <span role="alert" style={{ fontSize: 12, color: 'var(--danger)' }}>{delError}</span>}
     </div>
   );
 }

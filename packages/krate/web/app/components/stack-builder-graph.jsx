@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   STACK_LAYERS, COMPOSITION_FACETS,
   labelStyle, inputStyle, textareaStyle,
+  buildStackResource,
 } from './stack-builder-graph-styles.jsx';
 import { LayerSection, ToolsLayerSection } from './stack-builder-graph-nodes.jsx';
 import { MemoryRepositorySection, ModelInferenceSection } from './stack-builder-graph-panels.jsx';
@@ -80,102 +81,11 @@ export function GraphStackBuilder({ org, atlasBaseUrl, existingStack = null }) {
     setStatus('saving');
     setMessage('');
 
-    // Build layer bindings from selections
-    const layerBindings = [];
-    for (const [layerKey, records] of Object.entries(selections)) {
-      for (const record of records) {
-        layerBindings.push({
-          primaryLayerId: layerKey,
-          atlasRecordId: record.id,
-          nodeKind: record.nodeKind,
-          displayName: record.displayName,
-          selectionRole: 'primary',
-          importance: 'primary',
-        });
-      }
-    }
-
-    // Derive fields from layer selections
-    const modelSelections = selections['layer:1-model'] || [];
-    const providerSelections = selections['layer:2-provider'] || [];
-    const platformSelections = selections['layer:4-platform'] || [];
-    const toolSelections = selections['layer:5-tools'] || [];
-    const pluginSelections = selections['layer:6-plugins'] || [];
-    const roleSelections = selections['facet:agent-role'] || [];
-    const skillSelections = selections['facet:skills-and-capabilities'] || [];
-
-    const resource = {
-      apiVersion: 'krate.a5c.ai/v1alpha1',
-      kind: 'AgentStack',
-      metadata: {
-        name,
-        labels: {
-          ...(displayName ? { 'krate.a5c.ai/display-name': displayName } : {}),
-        },
-      },
-      spec: {
-        // Platform: agent-mux supported target (claude-code, codex, gemini-cli, etc.)
-        baseAgent: platformSelections.find((r) => r.nodeKind === 'AgentProduct')?.id || 'claude-code',
-        adapter: platformSelections.find((r) => r.nodeKind === 'AgentPlatformImpl')?.id || 'default',
-        runtimeIdentity: {
-          serviceAccountRef: serviceAccount || 'default',
-          roleRef: role || 'edit',
-          namespace: rbacNamespace || `krate-org-${org}`,
-        },
-        // Model from model layer
-        ...(modelSelections.length ? { model: modelSelections[0].id } : {}),
-        // Provider from provider layer
-        ...(providerSelections.length ? { provider: providerSelections[0].id } : {}),
-        ...(displayName ? { displayName } : {}),
-        ...(systemPrompt ? { systemPrompt } : {}),
-        ...(developerPrompt ? { developerPrompt } : {}),
-        ...(taskPrompt ? { taskPrompt } : {}),
-        approvalMode: 'prompt',
-        // Agent role for policies and permissions
-        ...(roleSelections.length ? { agentRole: { refs: roleSelections.map((r) => ({ id: r.id, nodeKind: r.nodeKind, displayName: r.displayName })) } } : {}),
-        // Internal tools (Tool, ToolDescriptor) — structured filter
-        ...(toolSelections.filter((r) => r.nodeKind === 'Tool' || r.nodeKind === 'ToolDescriptor').length
-          ? { internalTools: { enabled: true, filter: toolSelections.filter((r) => r.nodeKind === 'Tool' || r.nodeKind === 'ToolDescriptor').map((r) => r.id) } }
-          : {}),
-        // External tools (ToolServer, MCPPrompt, MCPResource) — structured refs
-        ...(toolSelections.filter((r) => r.nodeKind === 'ToolServer' || r.nodeKind === 'MCPPrompt' || r.nodeKind === 'MCPResource').length
-          ? {
-            externalTools: {
-              mcpServerRefs: toolSelections.filter((r) => r.nodeKind === 'ToolServer' || r.nodeKind === 'MCPPrompt').map((r) => r.id),
-              cliToolRefs: [],
-              openApiRefs: toolSelections.filter((r) => r.nodeKind === 'MCPResource').map((r) => r.id),
-            },
-          }
-          : {}),
-        // Backward-compat flat mcpServerRefs
-        ...(toolSelections.filter((r) => r.nodeKind === 'ToolServer' || r.nodeKind === 'MCPPrompt').length
-          ? { mcpServerRefs: toolSelections.filter((r) => r.nodeKind === 'ToolServer' || r.nodeKind === 'MCPPrompt').map((r) => r.id) }
-          : {}),
-        // Memory repository associations
-        ...(selectedMemoryRepos.length
-          ? { memoryRepositoryRefs: selectedMemoryRepos.map((r) => r.name) }
-          : {}),
-        // Plugin refs from plugins layer
-        ...(pluginSelections.length
-          ? { pluginRefs: pluginSelections.map((r) => r.id) }
-          : {}),
-        // Skill refs from skills facet
-        ...(skillSelections.length
-          ? { skillRefs: skillSelections.map((r) => r.id) }
-          : {}),
-        // Atlas layer bindings for graph-aware consumers
-        atlasLayerBindings: layerBindings,
-        // KServe inference service binding
-        ...(selectedInference ? {
-          inference: {
-            provider: 'kserve',
-            service: selectedInference.name,
-            endpoint: selectedInference.endpoint,
-            modelFormat: selectedInference.modelFormat,
-          },
-        } : {}),
-      },
-    };
+    const resource = buildStackResource({
+      name, displayName, systemPrompt, developerPrompt, taskPrompt,
+      serviceAccount, role, rbacNamespace, org,
+      selections, selectedMemoryRepos, selectedInference,
+    });
 
     try {
       const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources`, {

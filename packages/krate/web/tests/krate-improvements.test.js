@@ -194,6 +194,7 @@ test('stack builder graph includes memory repository section', () => {
   // Read all split modules that compose the stack builder graph
   const source = [
     readWebFile('app', 'components', 'stack-builder-graph.jsx'),
+    readWebFile('app', 'components', 'stack-builder-graph-styles.jsx'),
     readWebFile('app', 'components', 'stack-builder-graph-panels.jsx'),
   ].join('\n');
   // MemoryRepositorySection component

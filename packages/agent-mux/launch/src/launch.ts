@@ -422,10 +422,11 @@ async function prepareHermesProxyConfig(input: {
   readonly baseUrl: string;
   readonly apiKey: string;
 }): Promise<string> {
-  const { tmpdir } = await import('node:os');
+  const { homedir } = await import('node:os');
   const { join } = await import('node:path');
   const fs = await import('node:fs/promises');
-  const hermesHome = await fs.mkdtemp(join(tmpdir(), 'amux-hermes-'));
+  const hermesHome = join(homedir(), '.hermes');
+  await fs.mkdir(hermesHome, { recursive: true });
   const yamlValue = (value: string) => JSON.stringify(value);
   await fs.writeFile(
     join(hermesHome, 'cli-config.yaml'),

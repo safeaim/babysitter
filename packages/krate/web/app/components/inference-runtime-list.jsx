@@ -16,7 +16,7 @@ export function RuntimeCard({ runtime }) {
   return (
     <div style={cardStyle}>
       <div style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{name}</div>
-      {image && <div style={{ fontSize: '0.8125rem', color: '#6b7280', fontFamily: 'monospace' }}>{image}</div>}
+      {image && <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{image}</div>}
       {formats.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
           {formats.map((f, i) => (

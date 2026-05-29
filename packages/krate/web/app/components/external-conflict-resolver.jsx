@@ -21,7 +21,7 @@ function ConflictCard({ conflict, onResolve, resolving }) {
     border: '1px solid #fde68a',
     borderRadius: '0.5rem',
     overflow: 'hidden',
-    background: '#fff',
+    background: 'var(--surface)',
   };
 
   const headerStyle = {
@@ -48,18 +48,18 @@ function ConflictCard({ conflict, onResolve, resolving }) {
   const valueStyle = {
     fontFamily: 'monospace',
     fontSize: '0.8125rem',
-    background: '#f9fafb',
+    background: 'var(--bg-subtle)',
     padding: '0.5rem',
     borderRadius: '0.375rem',
     marginTop: '0.375rem',
     wordBreak: 'break-all',
     minHeight: '2rem',
-    color: '#1f2937',
+    color: 'var(--text)',
   };
 
   const actionsStyle = {
     padding: '0.75rem 1rem',
-    borderTop: '1px solid #e5e7eb',
+    borderTop: '1px solid var(--border)',
     display: 'flex',
     gap: '0.5rem',
     justifyContent: 'flex-end',
@@ -83,10 +83,10 @@ function ConflictCard({ conflict, onResolve, resolving }) {
       <div style={headerStyle}>
         <div>
           <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{fieldName}</span>
-          {resource && <span style={{ marginLeft: '0.5rem', fontSize: '0.8125rem', color: '#6b7280' }}>{resource}</span>}
+          {resource && <span style={{ marginLeft: '0.5rem', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{resource}</span>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {detectedAt && <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Detected {detectedAt}</span>}
+          {detectedAt && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Detected {detectedAt}</span>}
           <span style={{ padding: '0.125rem 0.5rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: '#fef9c3', color: '#713f12' }}>Conflict</span>
         </div>
       </div>
@@ -94,11 +94,11 @@ function ConflictCard({ conflict, onResolve, resolving }) {
       <div style={bodyStyle}>
         <div style={valueColStyle('local')}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Local</div>
-          <div style={valueStyle}>{localValue === null ? <em style={{ color: '#9ca3af' }}>null</em> : String(localValue)}</div>
+          <div style={valueStyle}>{localValue === null ? <em style={{ color: 'var(--text-muted)' }}>null</em> : String(localValue)}</div>
         </div>
         <div style={valueColStyle('external')}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>External</div>
-          <div style={valueStyle}>{externalValue === null ? <em style={{ color: '#9ca3af' }}>null</em> : String(externalValue)}</div>
+          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>External</div>
+          <div style={valueStyle}>{externalValue === null ? <em style={{ color: 'var(--text-muted)' }}>null</em> : String(externalValue)}</div>
         </div>
       </div>
 
@@ -115,11 +115,11 @@ function ConflictHistory({ resolved }) {
   if (!resolved.length) return null;
   return (
     <div style={{ marginTop: '1rem' }}>
-      <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Resolved this session</h4>
+      <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>Resolved this session</h4>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         {resolved.map((entry, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.8125rem', color: '#6b7280', padding: '0.375rem 0.625rem', background: '#f9fafb', borderRadius: '0.375rem' }}>
-            <span style={{ fontWeight: 500, color: '#374151' }}>{entry.id}</span>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.8125rem', color: 'var(--text-muted)', padding: '0.375rem 0.625rem', background: 'var(--bg-subtle)', borderRadius: '0.375rem' }}>
+            <span style={{ fontWeight: 500, color: 'var(--text)' }}>{entry.id}</span>
             <span style={{ padding: '0.0625rem 0.375rem', borderRadius: '9999px', fontSize: '0.75rem', background: '#e0e7ff', color: '#3730a3', fontWeight: 600 }}>{RESOLUTION_LABELS[entry.resolution] || entry.resolution}</span>
             <span style={{ marginLeft: 'auto' }}>{entry.resolvedAt}</span>
           </div>
@@ -165,14 +165,14 @@ export function ExternalConflictResolver({ org, conflicts = [] }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Conflict resolution</h3>
-          <p style={{ margin: '0.25rem 0 0', fontSize: '0.8125rem', color: '#6b7280' }}>
+          <p style={{ margin: '0.25rem 0 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
             {localConflicts.length} open conflict{localConflicts.length !== 1 ? 's' : ''}
           </p>
         </div>
       </div>
 
       {error && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: '#dc2626', fontSize: '0.875rem' }}>
+        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
           {error}
         </div>
       )}

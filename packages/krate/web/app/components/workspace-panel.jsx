@@ -122,7 +122,7 @@ function FileSidebar({ fileTree, sidebarOpen, onToggle }) {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0.5rem 0.625rem',
-          borderBottom: '1px solid #e5e7eb',
+          borderBottom: '1px solid var(--border)',
           flexShrink: 0,
         }}
       >

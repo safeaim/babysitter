@@ -109,7 +109,7 @@ export function ToolCallInspector({ toolName, input, output, status = 'completed
           style={{
             fontFamily: 'monospace',
             fontSize: 11,
-            color: '#374151',
+            color: 'var(--text)',
             flex: 1,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -119,14 +119,14 @@ export function ToolCallInspector({ toolName, input, output, status = 'completed
           {summary}
         </span>
         {durationMs != null && (
-          <span style={{ fontSize: 10, color: '#9ca3af', flexShrink: 0 }}>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)', flexShrink: 0 }}>
             {durationMs < 1000 ? `${durationMs}ms` : `${(durationMs / 1000).toFixed(1)}s`}
           </span>
         )}
         <span
           style={{
             fontSize: 10,
-            color: '#6b7280',
+            color: 'var(--text-muted)',
             flexShrink: 0,
             marginLeft: 4,
           }}
@@ -141,7 +141,7 @@ export function ToolCallInspector({ toolName, input, output, status = 'completed
             style={{
               fontSize: 10,
               fontWeight: 600,
-              color: '#6b7280',
+              color: 'var(--text-muted)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               display: 'block',
@@ -176,7 +176,7 @@ export function ToolCallInspector({ toolName, input, output, status = 'completed
               style={{
                 fontSize: 10,
                 fontWeight: 600,
-                color: '#6b7280',
+                color: 'var(--text-muted)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
                 display: 'block',
@@ -217,7 +217,7 @@ export function ToolCallList({ messages }) {
 
   if (!toolMessages.length) {
     return (
-      <p style={{ fontSize: 13, color: '#9ca3af', padding: '8px 0' }}>No tool calls in this transcript.</p>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', padding: '8px 0' }}>No tool calls in this transcript.</p>
     );
   }
 

@@ -33,13 +33,13 @@ export function ServiceCard({ service, onView, onDelete }) {
 
       {endpoint && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f8fafc', borderRadius: '0.375rem', padding: '0.375rem 0.625rem' }}>
-          <code style={{ fontSize: '0.75rem', color: '#374151', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{endpoint}</code>
+          <code style={{ fontSize: '0.75rem', color: 'var(--text)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{endpoint}</code>
           <CopyButton text={endpoint} />
         </div>
       )}
 
       {(cpuLimit || memLimit || gpuLimit) && (
-        <div style={{ fontSize: '0.8125rem', color: '#6b7280', display: 'flex', gap: '0.75rem' }}>
+        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', display: 'flex', gap: '0.75rem' }}>
           {cpuLimit && <span>CPU: {cpuLimit}</span>}
           {memLimit && <span>Mem: {memLimit}</span>}
           {gpuLimit && <span>GPU: {gpuLimit}</span>}
@@ -47,7 +47,7 @@ export function ServiceCard({ service, onView, onDelete }) {
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button style={btnStyle()} onClick={() => onView(service)}>Details</button>
           <button style={btnStyle('#dc2626')} onClick={() => onDelete(service)}>Delete</button>
@@ -232,7 +232,7 @@ export function ServiceDetailPanel({ service, org, onClose }) {
               <CopyButton text={endpoint} />
             </div>
           ) : (
-            <div style={{ fontSize: '0.8125rem', color: '#9ca3af' }}>Not available (service not ready)</div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Not available (service not ready)</div>
           )}
         </div>
 
@@ -240,7 +240,7 @@ export function ServiceDetailPanel({ service, org, onClose }) {
         <div>
           <div style={{ fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.5rem' }}>Status Conditions</div>
           {conditions.length === 0 ? (
-            <div style={{ fontSize: '0.8125rem', color: '#9ca3af' }}>No conditions reported</div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>No conditions reported</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               {conditions.map((c, i) => (
@@ -249,8 +249,8 @@ export function ServiceDetailPanel({ service, org, onClose }) {
                     <span style={{ fontWeight: 600, fontSize: '0.8125rem' }}>{c.type}</span>
                     <span style={{ fontSize: '0.8125rem', color: c.status === 'True' ? '#16a34a' : '#dc2626' }}>{c.status}</span>
                   </div>
-                  {c.message && <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{c.message}</div>}
-                  {c.lastTransitionTime && <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{relativeTime(c.lastTransitionTime)}</div>}
+                  {c.message && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{c.message}</div>}
+                  {c.lastTransitionTime && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{relativeTime(c.lastTransitionTime)}</div>}
                 </div>
               ))}
             </div>
@@ -260,7 +260,7 @@ export function ServiceDetailPanel({ service, org, onClose }) {
         {/* Model Metadata */}
         <div>
           <div style={{ fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.5rem' }}>Model</div>
-          <div style={{ fontSize: '0.8125rem', color: '#374151', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--text)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             <div>Format: <strong>{modelFormat}</strong></div>
             {service.spec?.predictor?.model?.storageUri && (
               <div>Storage: <code style={{ fontSize: '0.75rem' }}>{service.spec.predictor.model.storageUri}</code></div>
@@ -288,13 +288,13 @@ export function ServiceDetailPanel({ service, org, onClose }) {
             {testLoading ? 'Sending...' : endpoint ? 'Send Test Request' : 'Service not ready'}
           </button>
           {testError && (
-            <div style={{ marginTop: '0.5rem', fontSize: '0.8125rem', color: '#dc2626', background: '#fef2f2', padding: '0.5rem', borderRadius: '0.375rem' }}>
+            <div style={{ marginTop: '0.5rem', fontSize: '0.8125rem', color: 'var(--danger)', background: '#fef2f2', padding: '0.5rem', borderRadius: '0.375rem' }}>
               {testError}
             </div>
           )}
           {testOutput && (
             <div style={{ marginTop: '0.5rem' }}>
-              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
                 Status: {testOutput.status} | Endpoint: {testOutput.endpoint}
               </div>
               <pre style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '0.375rem', padding: '0.75rem', fontSize: '0.75rem', overflow: 'auto', maxHeight: '12rem', margin: 0 }}>
@@ -312,7 +312,7 @@ export function ServiceDetailPanel({ service, org, onClose }) {
           >
             Use in Agent Stack
           </a>
-          <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.375rem' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.375rem' }}>
             Creates an AgentProviderConfig with type &apos;kserve&apos; linked to this service.
           </div>
         </div>

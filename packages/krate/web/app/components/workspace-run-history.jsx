@@ -61,7 +61,7 @@ export function RunHistorySection({ active = [], history = [], org }) {
   return (
     <div
       style={{
-        border: '1px solid #e5e7eb',
+        border: '1px solid var(--border)',
         borderRadius: '0.5rem',
         padding: '0.75rem',
       }}
@@ -70,7 +70,7 @@ export function RunHistorySection({ active = [], history = [], org }) {
         style={{
           fontSize: '0.75rem',
           fontWeight: 700,
-          color: '#374151',
+          color: 'var(--text)',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
           marginBottom: '0.5rem',
@@ -79,7 +79,7 @@ export function RunHistorySection({ active = [], history = [], org }) {
         Runs
       </div>
 
-      <div style={{ display: 'flex', gap: '0.25rem', borderBottom: '1px solid #e5e7eb', marginBottom: '0.5rem' }}>
+      <div style={{ display: 'flex', gap: '0.25rem', borderBottom: '1px solid var(--border)', marginBottom: '0.5rem' }}>
         <button onClick={() => setTab('active')} style={tabStyle(tab === 'active')}>
           Active ({active.length})
         </button>
@@ -106,7 +106,7 @@ export function RunHistorySection({ active = [], history = [], org }) {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '0.375rem 0.5rem',
-                  background: '#f9fafb',
+                  background: 'var(--bg-subtle)',
                   borderRadius: '0.25rem',
                   fontSize: '0.75rem',
                   gap: '0.5rem',
@@ -120,7 +120,7 @@ export function RunHistorySection({ active = [], history = [], org }) {
                       href={href}
                       style={{
                         fontFamily: 'var(--font-mono, monospace)',
-                        color: '#2563eb',
+                        color: 'var(--accent)',
                         textDecoration: 'none',
                         fontWeight: 600,
                         overflow: 'hidden',
@@ -133,9 +133,9 @@ export function RunHistorySection({ active = [], history = [], org }) {
                   ) : (
                     <span style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 600 }}>{name}</span>
                   )}
-                  <span style={{ color: '#6b7280', fontFamily: 'var(--font-mono, monospace)' }}>{stack}</span>
+                  <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono, monospace)' }}>{stack}</span>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', color: '#9ca3af', fontSize: '0.6875rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.6875rem' }}>
                   <span>{formatRelativeTime(started)}</span>
                   {duration ? <span>{duration}</span> : null}
                 </div>
@@ -144,7 +144,7 @@ export function RunHistorySection({ active = [], history = [], org }) {
           })}
         </div>
       ) : (
-        <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
+        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
           {tab === 'active' ? 'No active runs' : 'No run history'}
         </div>
       )}

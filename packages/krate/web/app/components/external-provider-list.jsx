@@ -33,7 +33,7 @@ function scopeBadgeColor(kind) {
     AppHostingProvider: { bg: '#ede9fe', color: '#5b21b6' },
     ArtifactRegistryProvider: { bg: '#fce7f3', color: '#9d174d' },
   };
-  return colors[kind] || { bg: '#f3f4f6', color: '#374151' };
+  return colors[kind] || { bg: '#f3f4f6', color: 'var(--text)' };
 }
 
 function PlatformGroupCard({ platform, providers, onDelete, removing }) {
@@ -42,10 +42,10 @@ function PlatformGroupCard({ platform, providers, onDelete, removing }) {
   const secretRef = providers[0]?.spec?.secretRef || '';
 
   const cardStyle = {
-    border: '1px solid #e5e7eb',
+    border: '1px solid var(--border)',
     borderRadius: '0.5rem',
     padding: '1rem',
-    background: '#fff',
+    background: 'var(--surface)',
     display: 'flex',
     flexDirection: 'column',
     gap: '0.75rem',
@@ -71,7 +71,7 @@ function PlatformGroupCard({ platform, providers, onDelete, removing }) {
     flexShrink: 0,
   };
 
-  const metaStyle = { fontSize: '0.8125rem', color: '#6b7280' };
+  const metaStyle = { fontSize: '0.8125rem', color: 'var(--text-muted)' };
 
   return (
     <div style={cardStyle}>
@@ -114,9 +114,9 @@ function PlatformGroupCard({ platform, providers, onDelete, removing }) {
       </div>
 
       {/* Metadata */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.8125rem', color: '#6b7280' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
         {secretRef && (
-          <span>Secret: <code style={{ background: '#f3f4f6', padding: '0.0625rem 0.25rem', borderRadius: '0.25rem', fontSize: '0.75rem' }}>{secretRef}</code></span>
+          <span>Secret: <code style={{ background: 'var(--bg-subtle)', padding: '0.0625rem 0.25rem', borderRadius: '0.25rem', fontSize: '0.75rem' }}>{secretRef}</code></span>
         )}
       </div>
 
@@ -129,11 +129,11 @@ function PlatformGroupCard({ platform, providers, onDelete, removing }) {
             disabled={!!removing}
             style={{
               background: 'none',
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--border)',
               borderRadius: '0.375rem',
               padding: '0.25rem 0.625rem',
               fontSize: '0.75rem',
-              color: '#6b7280',
+              color: 'var(--text-muted)',
               cursor: removing ? 'not-allowed' : 'pointer',
               opacity: removing ? 0.5 : 1,
             }}
@@ -182,7 +182,7 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
   const headerStyle = { display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
   const addBtnStyle = {
     padding: '0.5rem 1rem',
-    background: '#2563eb',
+    background: 'var(--accent)',
     color: '#fff',
     border: 'none',
     borderRadius: '0.375rem',
@@ -201,7 +201,7 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
       <div style={headerStyle}>
         <div>
           <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>External providers</h3>
-          <p style={{ margin: '0.25rem 0 0', fontSize: '0.8125rem', color: '#6b7280' }}>
+          <p style={{ margin: '0.25rem 0 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
             {providers.length} configured across {platformGroups.length} platform{platformGroups.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -213,13 +213,13 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
       </div>
 
       {error && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: '#dc2626', fontSize: '0.875rem' }}>
+        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
           {error}
         </div>
       )}
 
       {providers.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '2rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
+        <div style={{ textAlign: 'center', padding: '2rem', background: 'var(--bg-subtle)', borderRadius: '0.5rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
           No external providers configured. Click &quot;Add provider&quot; to connect a platform.
         </div>
       ) : (

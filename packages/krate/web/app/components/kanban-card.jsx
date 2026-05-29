@@ -39,7 +39,7 @@ export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDraggi
       aria-label={`Card: ${title}`}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCardClick(item); } }}
       style={{
-        background: '#fff',
+        background: 'var(--surface)',
         borderRadius: '0.375rem',
         padding: '0.625rem 0.75rem',
         borderLeft: `4px solid ${columnColor}`,
@@ -70,7 +70,7 @@ export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDraggi
           <span style={{ background: '#ede9fe', color: '#6d28d9', padding: '0.0625rem 0.375rem', borderRadius: '9999px', fontWeight: 600, flexShrink: 0 }}>
             WS
           </span>
-          <span style={{ color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+          <span style={{ color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
             {workspaceRef}
           </span>
           <span style={{
@@ -92,14 +92,14 @@ export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDraggi
         <a
           href={`/agents/sessions/${sessionRef}`}
           onClick={(e) => e.stopPropagation()}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem', fontSize: '0.6875rem', color: '#2563eb', textDecoration: 'none' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem', fontSize: '0.6875rem', color: 'var(--accent)', textDecoration: 'none' }}
         >
-          <span style={{ background: '#dbeafe', color: '#1d4ed8', padding: '0.0625rem 0.375rem', borderRadius: '9999px', fontWeight: 600, flexShrink: 0 }}>Session</span>
+          <span style={{ background: '#dbeafe', color: 'var(--accent)', padding: '0.0625rem 0.375rem', borderRadius: '9999px', fontWeight: 600, flexShrink: 0 }}>Session</span>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
             {sessionRef.slice(0, 12)}…
           </span>
           {sessionStatus ? (
-            <span style={{ fontSize: '0.5625rem', color: '#6b7280', flexShrink: 0 }}>{sessionStatus}</span>
+            <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', flexShrink: 0 }}>{sessionStatus}</span>
           ) : null}
         </a>
       ) : null}
@@ -135,17 +135,17 @@ export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDraggi
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.25rem' }}>
         {assignee ? (
-          <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>{assignee}</small>
+          <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{assignee}</small>
         ) : <span />}
         {storyPoints != null ? (
           <span
             style={{
-              background: '#f3f4f6',
+              background: 'var(--bg-subtle)',
               borderRadius: '9999px',
               padding: '0.0625rem 0.375rem',
               fontSize: '0.6875rem',
               fontWeight: 700,
-              color: '#374151',
+              color: 'var(--text)',
             }}
           >
             {storyPoints}
@@ -162,7 +162,7 @@ export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDraggi
             padding: '0.1875rem 0.5rem',
             fontSize: '0.6875rem',
             background: '#eff6ff',
-            color: '#1d4ed8',
+            color: 'var(--accent)',
             border: '1px solid #bfdbfe',
             borderRadius: '0.25rem',
             cursor: 'pointer',

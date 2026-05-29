@@ -31,14 +31,14 @@ export function VirtualModelCard({ vm, onDelete }) {
           {!enabled && <span style={badgeStyle('#9ca3af')}>disabled</span>}
         </div>
       </div>
-      <div style={{ fontSize: '0.8125rem', color: '#374151' }}>
+      <div style={{ fontSize: '0.8125rem', color: 'var(--text)' }}>
         Model: <strong>{modelName}</strong>
       </div>
       {spec.fallbackChain?.length > 0 && (
-        <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>Fallback: {spec.fallbackChain.join(' > ')}</div>
+        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Fallback: {spec.fallbackChain.join(' > ')}</div>
       )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
         <button style={btnStyle('#dc2626')} onClick={() => onDelete(vm)}>Delete</button>
       </div>
     </div>
@@ -54,10 +54,10 @@ export function CollapsibleSection({ title, children, defaultOpen = false }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        style={{ width: '100%', padding: '0.5rem 0.75rem', background: '#f8fafc', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem', fontWeight: 600, color: '#374151' }}
+        style={{ width: '100%', padding: '0.5rem 0.75rem', background: '#f8fafc', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text)' }}
       >
         {title}
-        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{open ? 'collapse' : 'expand'}</span>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{open ? 'collapse' : 'expand'}</span>
       </button>
       {open && <div style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>{children}</div>}
     </div>
@@ -230,7 +230,7 @@ export function CreateVirtualModelForm({ routes: availableRoutes, onSubmit, onCa
               </select>
               <button type="button" style={{ ...btnStyle('#dc2626'), padding: '0.375rem 0.5rem', fontSize: '0.75rem' }} onClick={() => removeRule(rIdx)}>X</button>
             </div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', marginBottom: '0.25rem' }}>Conditions:</div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Conditions:</div>
             {rule.conditions.map((cond, cIdx) => (
               <div key={cIdx} style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.25rem', alignItems: 'center' }}>
                 <input style={{ ...inputStyle, flex: 1 }} value={cond.field} onChange={(e) => updateCondition(rIdx, cIdx, 'field', e.target.value)} placeholder="field" />

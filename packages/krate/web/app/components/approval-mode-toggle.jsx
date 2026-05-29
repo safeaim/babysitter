@@ -25,7 +25,7 @@ const MODES = [
   {
     id: 'deny',
     label: 'Deny',
-    color: '#ef4444',
+    color: 'var(--danger)',
     bgColor: '#fef2f2',
     borderColor: '#fca5a5',
     dotColor: '#dc2626',
@@ -58,13 +58,13 @@ export function ApprovalModeToggle({ initialMode = 'prompt', onChange }) {
             boxShadow: `0 0 0 3px ${currentMeta.bgColor}`,
           }}
         />
-        <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Approval mode</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Approval mode</span>
       </div>
 
       <div
         style={{
           display: 'flex',
-          border: '1px solid #d1d5db',
+          border: '1px solid var(--border)',
           borderRadius: 6,
           overflow: 'hidden',
         }}
@@ -107,7 +107,7 @@ export function ApprovalModeToggle({ initialMode = 'prompt', onChange }) {
         <div
           style={{
             fontSize: 11,
-            color: '#374151',
+            color: 'var(--text)',
             backgroundColor: '#f8fafc',
             border: '1px solid #e2e8f0',
             borderLeft: `3px solid ${MODES.find((m) => m.id === tooltip)?.color || '#94a3b8'}`,

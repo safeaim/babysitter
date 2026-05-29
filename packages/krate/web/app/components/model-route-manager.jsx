@@ -54,19 +54,19 @@ export function ModelRouteCard({ route, onDelete }) {
           {!enabled && <span style={badgeStyle('#9ca3af')}>disabled</span>}
         </div>
       </div>
-      <div style={{ fontSize: '0.8125rem', color: '#374151' }}>
+      <div style={{ fontSize: '0.8125rem', color: 'var(--text)' }}>
         Model: <strong>{modelName}</strong>
       </div>
       {routeType === 'internal' && spec.inferenceServiceRef && (
-        <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>Service: {spec.inferenceServiceRef}</div>
+        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Service: {spec.inferenceServiceRef}</div>
       )}
       {routeType === 'external' && spec.external?.endpoint && (
-        <div style={{ fontSize: '0.8125rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           Endpoint: {spec.external.endpoint}
         </div>
       )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
         <button style={btnStyle('#dc2626')} onClick={() => onDelete(route)}>Delete</button>
       </div>
     </div>

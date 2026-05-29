@@ -67,7 +67,7 @@ export function StackActions({ org, stackName }) {
         </button>
         <button
           onClick={handleDelete}
-          style={{ color: '#ef4444' }}
+          style={{ color: 'var(--danger)' }}
           disabled={status === 'deleting'}
           aria-label={`Delete stack ${stackName}`}
           onKeyDown={e => e.key === 'Enter' && status !== 'deleting' && handleDelete()}
@@ -76,7 +76,7 @@ export function StackActions({ org, stackName }) {
         </button>
       </span>
       {errorMsg && (
-        <span style={{ color: '#ef4444', fontSize: '0.85em' }}>{errorMsg}</span>
+        <span style={{ color: 'var(--danger)', fontSize: '0.85em' }}>{errorMsg}</span>
       )}
     </span>
   );

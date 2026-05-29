@@ -42,9 +42,9 @@ function BindingRow({ binding, org, onSync }) {
     gap: '1rem',
     alignItems: 'center',
     padding: '0.75rem 1rem',
-    border: '1px solid #e5e7eb',
+    border: '1px solid var(--border)',
     borderRadius: '0.5rem',
-    background: '#fff',
+    background: 'var(--surface)',
     fontSize: '0.875rem',
   };
 
@@ -52,10 +52,10 @@ function BindingRow({ binding, org, onSync }) {
     <div style={rowStyle}>
       <div>
         <div style={{ fontWeight: 600 }}>{name}</div>
-        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
           {spec.providerRef || 'no provider'}{spec.repository ? ` / ${spec.repository}` : ''}
         </div>
-        {lastSync && <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.125rem' }}>Last sync: {lastSync}</div>}
+        {lastSync && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>Last sync: {lastSync}</div>}
       </div>
       <span style={pillStyle(t)}>{syncStatus}</span>
       <span style={{ fontSize: '0.8125rem', color: pendingWrites > 0 ? '#d97706' : '#9ca3af' }}>
@@ -66,7 +66,7 @@ function BindingRow({ binding, org, onSync }) {
       </span>
       <button
         onClick={() => onSync(name)}
-        style={{ padding: '0.25rem 0.625rem', background: '#fff', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '0.8125rem', cursor: 'pointer', color: '#374151' }}
+        style={{ padding: '0.25rem 0.625rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '0.375rem', fontSize: '0.8125rem', cursor: 'pointer', color: 'var(--text)' }}
       >
         Sync now
       </button>
@@ -115,8 +115,8 @@ export function ExternalSyncDashboard({ org, bindings = [] }) {
   };
 
   const statCardStyle = {
-    background: '#f9fafb',
-    border: '1px solid #e5e7eb',
+    background: 'var(--bg-subtle)',
+    border: '1px solid var(--border)',
     borderRadius: '0.5rem',
     padding: '0.75rem 1rem',
     textAlign: 'center',
@@ -126,25 +126,25 @@ export function ExternalSyncDashboard({ org, bindings = [] }) {
     <div style={containerStyle}>
       <div style={summaryStyle}>
         <div style={statCardStyle}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1f2937' }}>{bindings.length}</div>
-          <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>Bindings</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>{bindings.length}</div>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Bindings</div>
         </div>
         <div style={statCardStyle}>
           <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#166534' }}>{readyCount}</div>
-          <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>Ready</div>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Ready</div>
         </div>
         <div style={{ ...statCardStyle, borderColor: totalPendingWrites > 0 ? '#fde68a' : '#e5e7eb' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 700, color: totalPendingWrites > 0 ? '#d97706' : '#9ca3af' }}>{totalPendingWrites}</div>
-          <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>Pending writes</div>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Pending writes</div>
         </div>
         <div style={{ ...statCardStyle, borderColor: totalConflicts > 0 ? '#fca5a5' : '#e5e7eb' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 700, color: totalConflicts > 0 ? '#dc2626' : '#9ca3af' }}>{totalConflicts}</div>
-          <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>Conflicts</div>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Conflicts</div>
         </div>
       </div>
 
       {error && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: '#dc2626', fontSize: '0.875rem' }}>
+        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
           {error}
         </div>
       )}
@@ -156,7 +156,7 @@ export function ExternalSyncDashboard({ org, bindings = [] }) {
       )}
 
       {bindings.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '2rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
+        <div style={{ textAlign: 'center', padding: '2rem', background: 'var(--bg-subtle)', borderRadius: '0.5rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
           No external backend bindings found. Configure a provider (GitProvider, CiProvider, etc.) to enable sync.
         </div>
       ) : (

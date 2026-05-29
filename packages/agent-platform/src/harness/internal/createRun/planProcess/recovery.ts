@@ -139,6 +139,14 @@ async function recoverProcessDefinitionFromOutputs(args: {
     const recoveredName = `recovered-process-${Date.now()}.mjs`;
     const recoveredPath = path.join(resolvedDir, recoveredName);
     await fs.mkdir(resolvedDir, { recursive: true });
+    // Ensure the processes directory has a package.json with type:module
+    // so .mjs files are loaded as ESM by Node's module system
+    const pkgJsonPath = path.join(resolvedDir, "package.json");
+    try {
+      await fs.access(pkgJsonPath);
+    } catch {
+      await fs.writeFile(pkgJsonPath, '{"type":"module"}\n', "utf8");
+    }
     await fs.writeFile(recoveredPath, extracted, "utf8");
     return {
       processPath: recoveredPath,

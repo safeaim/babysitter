@@ -1,0 +1,49 @@
+nodeKind: ProviderTranslation
+id: provider-translation:hermes:foundry
+attributes:
+  harness: hermes
+  provider: foundry
+  proxyRequired: true
+  proxyExposedTransport: openai-chat
+  envMapping:
+    - envVar: OPENAI_API_KEY
+      source: auth.apiKey
+      condition: present
+  suppressNonAnthropicKey: true
+  args: []
+  notes: >
+    Hermes cannot call Azure Foundry directly — Foundry uses api-key header
+    (Azure style) while hermes sends Authorization: Bearer (OpenAI style).
+    Route through transport-mux proxy which handles the auth header translation.
+---
+nodeKind: ProviderTranslation
+id: provider-translation:hermes:anthropic
+attributes:
+  harness: hermes
+  provider: anthropic
+  proxyRequired: true
+  proxyExposedTransport: openai-chat
+  envMapping:
+    - envVar: OPENAI_API_KEY
+      source: auth.apiKey
+      condition: present
+  suppressNonAnthropicKey: false
+  args: []
+  notes: >
+    Hermes speaks OpenAI protocol, not Anthropic. Route through proxy.
+---
+nodeKind: ProviderTranslation
+id: provider-translation:hermes:google
+attributes:
+  harness: hermes
+  provider: google
+  proxyRequired: true
+  proxyExposedTransport: openai-chat
+  envMapping:
+    - envVar: OPENAI_API_KEY
+      source: auth.apiKey
+      condition: present
+  suppressNonAnthropicKey: true
+  args: []
+  notes: >
+    Hermes speaks OpenAI protocol, not Google. Route through proxy.

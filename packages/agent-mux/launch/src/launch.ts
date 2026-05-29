@@ -1371,7 +1371,16 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       await prepareClaudeAutomationState(launchCwd, plan.env);
     }
 
-    const resolvedBridge = await resolveSpawnCommand(plan.command, plan.args);
+    // For harnesses that accept prompts via CLI flag (not REPL typing),
+    // inject the prompt flag into args so both PTY and fallback paths work.
+    const bridgeLb = getLaunchBehavior(plan.harness);
+    const bridgeArgs = [...plan.args];
+    if (prompt && bridgeLb?.promptDelivery === 'cli-flag' && bridgeLb.promptFlag && !bridgeArgs.some(a => a === prompt)) {
+      bridgeArgs.push(bridgeLb.promptFlag, prompt, ...(bridgeLb.promptExtraFlags ?? []));
+      promptDeliveredInArgs = true;
+      console.error(`[amux launch] BI: injected prompt via ${bridgeLb.promptFlag} (cli-flag harness)`);
+    }
+    const resolvedBridge = await resolveSpawnCommand(plan.command, bridgeArgs);
     spawnedArgsForPromptCheck = resolvedBridge.args;
     // Skip node-pty on macOS ARM64 CI — posix_spawnp fails for all binaries
     const skipBridgePty = process.platform === 'darwin' && process.arch === 'arm64' && process.env['CI'] === 'true';

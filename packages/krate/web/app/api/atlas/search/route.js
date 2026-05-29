@@ -19,7 +19,7 @@ export async function GET(request) {
   const kinds = (url.searchParams.get('kinds') || '').trim();
   const mode = url.searchParams.get('mode') || '';
   const limit = url.searchParams.get('limit') || '';
-  const atlasUrl = process.env.ATLAS_BASE_URL || 'https://atlas-staging.a5c.ai';
+  const atlasUrl = process.env.ATLAS_BASE_URL || 'https://atlas.a5c.ai';
 
   try {
     // Browse mode: fetch instances by kind (no search query needed)

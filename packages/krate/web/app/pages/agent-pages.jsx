@@ -438,7 +438,7 @@ export async function AgentStackDetailPage({ org = null, name } = {}) {
 export async function AgentStackBuilderPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);
   const activeOrg = ui.model.org?.slug || org || 'default';
-  const atlasBaseUrl = process.env.ATLAS_BASE_URL || 'https://atlas-staging.a5c.ai';
+  const atlasBaseUrl = process.env.ATLAS_BASE_URL || 'https://atlas.a5c.ai';
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/agents" eyebrow="agent stack" title="New agent stack" text="Build an agent stack from Atlas knowledge-graph layers. Select models, providers, runtimes, tools, and more from the live catalog." actions={[['/agents/stacks', 'All stacks'], ['/agents', 'Overview']]} breadcrumbs={[['/', 'Krate'], ['/agents', 'Agents'], ['/agents/stacks', 'Stacks'], ['/agents/stacks/new', 'New']]}>
     <DegradedBanner model={ui.model} />
     <GraphStackBuilder org={activeOrg} atlasBaseUrl={atlasBaseUrl} />

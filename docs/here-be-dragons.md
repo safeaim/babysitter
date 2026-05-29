@@ -32,20 +32,20 @@ Files/modules that concentrate the most danger across multiple categories.
 
 `configureAzureOpenAiEnvDefaults()` writes `AZURE_OPENAI_RESOURCE_NAME`, `AZURE_OPENAI_BASE_URL`, `AZURE_OPENAI_DEPLOYMENT_NAME_MAP` to `process.env`. `setConfigValue()` with `scope: "global"` permanently mutates `process.env`. The CLI writes `AMUX_LOG_LEVEL`, `AMUX_OBSERVABILITY_MODE`. Any code reading these env vars is coupled to the initialization order of the writers. No central registry of these contracts.
 
-### globalThis shared mutable state with duplicate definitions
+### ~~globalThis shared mutable state with duplicate definitions~~
 **Files:** `packages/agent-mux/webui/src/lib/global-registry.ts`, `packages/observer-dashboard/src/lib/global-registry.ts`
 
-Both files define the same `globalThis.__kanban_registry__` keys with separate type definitions. If both run in the same Node process, whoever initializes first "wins" the singleton. If one file is updated, the other silently drifts. Race conditions on HMR reload. No ownership documentation.
+**FIXED:** Extracted `createGlobalRegistry<TMap>` factory. All three copies (webui, gateway, observer-dashboard) now use the same factory with domain-specific type maps. Factory is canonical source, copies marked.
 
-### Double-cast type assertions bypass all safety
+### ~~Double-cast type assertions bypass all safety~~
 **Files:** `packages/agent-core/src/loop/agent-loop.ts:209`, `packages/agent-platform/src/harness/internal/createRun/orchestration/effects.ts:128-129`, `packages/agent-platform/src/cost/journal.ts`
 
-`result as unknown as AgentLoopIterationResult<TOutput>` — comment acknowledges the danger but doesn't fix it. If `ConcurrentLoopRunner` changes output shape, all concurrent loop callers receive wrong data at runtime with no type error.
+**FIXED:** agent-loop.ts now validates shape at runtime before cast. effects.ts removed 3 double-casts (TaskDef has index sig, session has public abort). cost/journal.ts replaced blind cast with field-by-field validation.
 
-### Background process registry orphans on options object recreation
+### ~~Background process registry orphans on options object recreation~~
 **File:** `packages/agent-runtime/src/background/state.ts:13-35`
 
-Registry is keyed by exact options object reference (WeakMap). Create new options object → get new registry → old processes orphaned. Dispose on wrong reference silently does nothing (returns undefined from WeakMap).
+**FIXED:** Added `registryId` string key alongside WeakMap. Same logical owner with `registryId` reuses existing registry instead of creating a new one.
 
 ### ~~Silent stdout truncation at 50MB~~
 **File:** `packages/agent-core/src/agenticTools/shared/process.ts:55-84`
@@ -188,7 +188,7 @@ HERE BE DRAGONS comment added. `/bin/bash` hardcoded for non-Windows. Risk remai
 
 - **Re-export shims**: `agent-core/src/agenticTools/background/state.ts` re-exports from `agent-runtime` for backward compat (documented, but still fragile circular bridge)
 - **Deprecated-but-active**: 7 deprecated exports in `agent-core/src/types.ts` still consumed downstream. `SessionCreateArgs` deprecated in `agent-platform` but re-exported indefinitely
-- **Duplicate global registry**: `global-registry.ts` duplicated across webui and observer-dashboard with no shared module
+- ~~**Duplicate global registry**~~: extracted `createGlobalRegistry` factory, all three copies now thin wrappers
 - ~~**`noImplicitAny: false`** in `packages/agent-mux/gateway/tsconfig.json`~~ — **FIXED:** set to `true` along with `useUnknownInCatchVariables`
 - **`skipLibCheck: true`** in root `tsconfig.json` — dependency type incompatibilities invisible
 - **E2E gaps**: No end-to-end coverage for babysitter orchestration loop, hook-mux lifecycle, or trigger dispatching. Heavy reliance on unit tests

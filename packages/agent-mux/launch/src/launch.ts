@@ -1015,20 +1015,15 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       // API endpoints (see https://geminicli.com/docs/reference/configuration/).
       // The previously-used GOOGLE_AI_STUDIO_API_ENDPOINT was never recognised.
       if (plan.harness === 'gemini') {
+        plan.env['GOOGLE_API_KEY'] = proxyRuntime.authToken ?? 'proxy-token';
+        plan.env['GEMINI_API_KEY'] = proxyRuntime.authToken ?? 'proxy-token';
         const proxyOrigin = new URL(proxyRuntime.url).origin;
         plan.env['GOOGLE_GEMINI_BASE_URL'] = proxyOrigin;
         plan.env['GEMINI_CLI_TRUST_WORKSPACE'] = '1';
-        // Force non-Vertex-AI mode so gemini-cli uses GOOGLE_GEMINI_BASE_URL.
-        // Vertex AI mode ignores GOOGLE_GEMINI_BASE_URL entirely.
-        // Use a dummy API key that passes gemini-cli 0.44.0 format validation.
         plan.env['GOOGLE_GENAI_USE_VERTEXAI'] = 'false';
         plan.env['GOOGLE_CLOUD_PROJECT'] = '';
         plan.env['GOOGLE_CLOUD_LOCATION'] = '';
-        plan.env['GOOGLE_APPLICATION_CREDENTIALS'] = '';
-        plan.env['CLOUDSDK_CONFIG'] = '';
-        plan.env['GOOGLE_API_KEY'] = 'AIzaSyDproxy00000000000000000000000000';
-        plan.env['GEMINI_API_KEY'] = 'AIzaSyDproxy00000000000000000000000000';
-        console.error(`[amux launch] Gemini proxy: endpoint=${proxyOrigin}, key=AIzaSyDproxy...`);
+        console.error(`[amux launch] Gemini proxy: GOOGLE_API_KEY=${(plan.env['GOOGLE_API_KEY'] ?? '').slice(0, 8)}..., endpoint=${proxyOrigin}`);
       }
 
       // Omni (agent-core): set AMUX_* env vars to route through the proxy.

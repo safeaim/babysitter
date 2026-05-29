@@ -33,7 +33,7 @@ function ServiceAccountRow({ org, sa, onDeleted }) {
       const rbName = `${name}-binding`;
       fetch(`/api/orgs/${encodeURIComponent(org)}/resources/AgentRoleBinding/${encodeURIComponent(rbName)}`, {
         method: 'DELETE',
-      }).catch(() => {});
+      }).catch((err) => console.warn('[krate]', err.message || err));
       const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources/AgentServiceAccount/${encodeURIComponent(name)}`, {
         method: 'DELETE',
       });

@@ -420,7 +420,7 @@ export function EnhancedKanbanBoard({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: { column: targetColId } }),
-        }).catch(() => {});
+        }).catch((err) => console.warn('[krate]', err.message || err));
       }
 
       if (targetColId === 'in-progress' && !item.workspaceRef && !item.spec?.workspaceRef) {

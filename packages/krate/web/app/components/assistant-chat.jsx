@@ -198,7 +198,7 @@ function CopyButton({ text, style: extraStyle }) {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
-    }).catch(() => {});
+    }).catch((err) => console.warn('[krate]', err.message || err));
   }, [text]);
 
   return (

@@ -114,7 +114,7 @@ export function CuratedModelCatalog({ org, services, onDeploy }) {
           inferenceServiceRef: model.id,
           protocol: 'v2',
         }),
-      }).catch(() => {});
+      }).catch((err) => console.warn('[krate]', err.message || err));
       setDeployResult({ success: true, model });
       if (onDeploy) onDeploy();
     } catch (err) {

@@ -445,7 +445,7 @@ function MemoryRepositorySection({ org, selectedRepos, onToggleRepo }) {
       .then((data) => {
         if (data) setRepos(Array.isArray(data) ? data : data.items || []);
       })
-      .catch(() => {})
+      .catch((err) => console.warn('[krate]', err.message || err))
       .finally(() => { setLoading(false); setLoaded(true); });
   }, [open, org, loaded]);
 
@@ -545,7 +545,7 @@ function ModelInferenceSection({ org, selectedInference, onSelectInference }) {
       .then(data => {
         if (data) setServices(data.items || (Array.isArray(data) ? data : []));
       })
-      .catch(() => {})
+      .catch((err) => console.warn('[krate]', err.message || err))
       .finally(() => setLoading(false));
   }, [open, org, services.length]);
 

@@ -275,7 +275,7 @@ export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ spec: { warmReplicas: newWarm } }),
-    }).catch(() => {});
+    }).catch((err) => console.warn('[krate]', err.message || err));
   }
 
   async function handleToggleAutoScale(poolName, enabled) {
@@ -289,7 +289,7 @@ export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ spec: { autoScale: enabled } }),
-    }).catch(() => {});
+    }).catch((err) => console.warn('[krate]', err.message || err));
   }
 
   return (

@@ -1108,8 +1108,15 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     const hermesProvider = hermesProviderMap[targetProvider] ?? 'custom';
     const targetModel = plan.proxy?.targetModel ?? plan.model;
     plan.args.push('--provider', hermesProvider, '--model', targetModel);
-    await prepareHermesConfig({ model: targetModel, provider: hermesProvider });
-    console.error(`[amux launch] hermes: provider=${hermesProvider} model=${targetModel}`);
+    const hermesBaseUrl = hermesProvider === 'azure-foundry'
+      ? (process.env['AMUX_API_BASE'] ?? plan.env['AMUX_API_BASE'] ?? '')
+      : undefined;
+    await prepareHermesConfig({
+      model: targetModel,
+      provider: hermesProvider,
+      baseUrl: hermesBaseUrl || undefined,
+    });
+    console.error(`[amux launch] hermes: provider=${hermesProvider} model=${targetModel} baseUrl=${hermesBaseUrl ?? 'default'}`);
   }
 
   // OpenCode: write config file from OPENCODE_CONFIG_CONTENT env var.

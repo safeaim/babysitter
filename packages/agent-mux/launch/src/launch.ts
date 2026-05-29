@@ -428,7 +428,7 @@ async function prepareHermesProxyConfig(input: {
   const hermesHome = await fs.mkdtemp(join(tmpdir(), 'amux-hermes-'));
   const yamlValue = (value: string) => JSON.stringify(value);
   await fs.writeFile(
-    join(hermesHome, 'config.yaml'),
+    join(hermesHome, 'cli-config.yaml'),
     [
       'model:',
       `  default: ${yamlValue(input.model)}`,

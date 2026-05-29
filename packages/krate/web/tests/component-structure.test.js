@@ -271,7 +271,7 @@ test('inference-helpers.jsx exports relativeTime and style objects', () => {
   assert.ok(src.includes('export const btnStyle'), 'must export btnStyle');
   assert.ok(src.includes('export const inputStyle'), 'must export inputStyle');
   assert.ok(src.includes('export function CopyButton'), 'must export CopyButton');
-  assert.ok(src.includes('export function StatusBadge'), 'must export StatusBadge');
+  assert.ok(src.includes('export const StatusBadge'), 'must export StatusBadge');
 });
 
 test('artifact-registry-helpers.jsx exports format utilities and styles', () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
   relativeTime, getDefaultPayload, getServiceStatus,
   cardStyle, btnStyle, btnOutlineStyle, inputStyle, labelStyle, badgeStyle,
@@ -10,7 +10,7 @@ import {
 
 // ─── Service Card ───────────────────────────────────────────────────────────
 
-export function ServiceCard({ service, onView, onDelete }) {
+export const ServiceCard = memo(function ServiceCard({ service, onView, onDelete }) {
   const name = service.metadata?.name || service.name || 'unknown';
   const modelFormat = service.spec?.predictor?.model?.modelFormat?.name || 'custom';
   const endpoint = service.status?.url || service.status?.address?.url;
@@ -55,7 +55,7 @@ export function ServiceCard({ service, onView, onDelete }) {
       </div>
     </div>
   );
-}
+});
 
 // ─── Create Service Form ────────────────────────────────────────────────────
 

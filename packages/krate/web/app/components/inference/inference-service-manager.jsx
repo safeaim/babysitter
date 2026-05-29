@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { btnStyle } from './inference-helpers.jsx';
 import { ServiceCard, CreateServiceForm, ServiceDetailPanel } from './inference-service-list.jsx';
 import { RuntimeCard, CreateRuntimeForm } from './inference-runtime-list.jsx';
@@ -76,7 +76,7 @@ export function InferenceServiceManager({ org, initialServiceName }) {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleCreate = async (endpoint, closeFn, body) => {
+  const handleCreate = useCallback(async (endpoint, closeFn, body) => {
     setCreateLoading(true);
     setCreateError(null);
     try {
@@ -88,11 +88,11 @@ export function InferenceServiceManager({ org, initialServiceName }) {
     } finally {
       setCreateLoading(false);
     }
-  };
+  }, [org, fetchData]);
 
-  const confirmDelete = (type, item) => {
+  const confirmDelete = useCallback((type, item) => {
     setDeleteConfirm({ type, name: item.metadata?.name || item.name, item });
-  };
+  }, []);
 
   const executeDelete = async () => {
     if (!deleteConfirm) return;
@@ -112,19 +112,19 @@ export function InferenceServiceManager({ org, initialServiceName }) {
     }
   };
 
-  const tabButtons = [
+  const tabButtons = useMemo(() => [
     { key: 'services', label: 'Services' },
     { key: 'runtimes', label: 'Runtimes' },
     { key: 'routes', label: 'Model Routes' },
     { key: 'virtual-models', label: 'Virtual Models' },
-  ];
+  ], []);
 
-  const createButtons = {
+  const createButtons = useMemo(() => ({
     services: { show: !showCreateForm, label: '+ Create Service', fn: () => setShowCreateForm(true) },
     runtimes: { show: !showRuntimeForm, label: '+ Add Runtime', fn: () => setShowRuntimeForm(true) },
     routes: { show: !showRouteForm, label: '+ Create Model Route', fn: () => setShowRouteForm(true) },
     'virtual-models': { show: !showVirtualModelForm, label: '+ Create Virtual Model', fn: () => setShowVirtualModelForm(true) },
-  };
+  }), [showCreateForm, showRuntimeForm, showRouteForm, showVirtualModelForm]);
 
   const cb = createButtons[activeTab];
 

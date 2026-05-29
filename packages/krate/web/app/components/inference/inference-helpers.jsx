@@ -140,14 +140,14 @@ export const panelStyle = {
 
 // ─── Shared sub-components ──────────────────────────────────────────────────
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
-export function FrameworkBadge({ format }) {
+export const FrameworkBadge = memo(function FrameworkBadge({ format }) {
   const color = FORMAT_COLORS[format] || '#6b7280';
   return <span style={badgeStyle(color)}>{format || 'custom'}</span>;
-}
+});
 
-export function StatusBadge({ status }) {
+export const StatusBadge = memo(function StatusBadge({ status }) {
   const color = statusColor(status);
   return (
     <span style={{ ...badgeStyle(color), fontSize: '0.6875rem' }}>
@@ -155,7 +155,7 @@ export function StatusBadge({ status }) {
       {status}
     </span>
   );
-}
+});
 
 export function CopyButton({ text, label }) {
   const [copied, setCopied] = useState(false);

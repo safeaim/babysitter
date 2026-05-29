@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { CURATED_MODELS, MODEL_CATEGORIES } from '../../lib/model-catalog-data.js';
 import {
   cardStyle, btnStyle, btnOutlineStyle, badgeStyle,
@@ -26,11 +26,16 @@ export function UnifiedModelCatalogSection({ org }) {
     return () => { cancelled = true; };
   }, [org]);
 
+  const { internalCount, externalCount } = useMemo(() => {
+    if (!catalog?.models?.length) return { internalCount: 0, externalCount: 0 };
+    return {
+      internalCount: catalog.models.filter(m => m.type === 'internal').length,
+      externalCount: catalog.models.filter(m => m.type === 'external').length,
+    };
+  }, [catalog]);
+
   if (loading) return <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', padding: '1rem', textAlign: 'center' }}>Loading catalog...</div>;
   if (!catalog || !catalog.models?.length) return null;
-
-  const internalCount = catalog.models.filter(m => m.type === 'internal').length;
-  const externalCount = catalog.models.filter(m => m.type === 'external').length;
 
   return (
     <div style={{ marginBottom: '1.5rem' }}>
@@ -66,17 +71,17 @@ export function CuratedModelCatalog({ org, services, onDeploy }) {
   const [hideDeployed, setHideDeployed] = useState(false);
 
   // Build a set of deployed model IDs by matching on service name
-  const deployedNames = new Set(
+  const deployedNames = useMemo(() => new Set(
     (services || []).map(s => (s.metadata?.name || s.name || '').toLowerCase())
-  );
+  ), [services]);
 
   const isDeployed = (model) => deployedNames.has(model.id.toLowerCase());
 
-  const filtered = CURATED_MODELS.filter(m => {
+  const filtered = useMemo(() => CURATED_MODELS.filter(m => {
     if (activeCategory !== 'All' && m.category !== activeCategory) return false;
-    if (hideDeployed && isDeployed(m)) return false;
+    if (hideDeployed && deployedNames.has(m.id.toLowerCase())) return false;
     return true;
-  });
+  }), [activeCategory, hideDeployed, deployedNames]);
 
   const handleDeploy = async (model) => {
     setDeploying(true);

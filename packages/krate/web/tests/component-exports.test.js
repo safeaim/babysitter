@@ -48,11 +48,11 @@ test('inference-helpers.jsx exports CopyButton', () => {
 });
 
 test('inference-helpers.jsx exports FrameworkBadge', () => {
-  assert.ok(inferenceHelpersSrc.includes('export function FrameworkBadge'), 'FrameworkBadge should be exported');
+  assert.ok(inferenceHelpersSrc.includes('export const FrameworkBadge'), 'FrameworkBadge should be exported');
 });
 
 test('inference-helpers.jsx exports StatusBadge', () => {
-  assert.ok(inferenceHelpersSrc.includes('export function StatusBadge'), 'StatusBadge should be exported');
+  assert.ok(inferenceHelpersSrc.includes('export const StatusBadge'), 'StatusBadge should be exported');
 });
 
 // ── pagination.jsx exports ──────────────────────────────────────────────────
@@ -60,7 +60,7 @@ test('inference-helpers.jsx exports StatusBadge', () => {
 const paginationSrc = fs.readFileSync(path.join(webRoot, 'app', 'components', 'shell', 'pagination.jsx'), 'utf8');
 
 test('pagination.jsx exports Pagination', () => {
-  assert.ok(paginationSrc.includes('export function Pagination'), 'Pagination should be exported');
+  assert.ok(paginationSrc.includes('export const Pagination'), 'Pagination should be exported');
 });
 
 // ── agent-pages.jsx barrel exports ──────────────────────────────────────────

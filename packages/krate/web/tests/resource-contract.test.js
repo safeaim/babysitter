@@ -354,7 +354,7 @@ test('inference virtual-models GET route supports limit/offset pagination', () =
 
 test('Pagination component exists with expected props', () => {
   const source = readFile('app', 'components', 'shell', 'pagination.jsx');
-  assert.match(source, /export function Pagination/);
+  assert.match(source, /export const Pagination/);
   assert.match(source, /total/);
   assert.match(source, /limit/);
   assert.match(source, /offset/);

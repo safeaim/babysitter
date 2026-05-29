@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
   relativeTime,
   cardStyle, btnStyle, btnOutlineStyle, inputStyle, labelStyle, badgeStyle,
@@ -8,7 +8,7 @@ import {
 
 // ─── Virtual Model Card ─────────────────────────────────────────────────────
 
-export function VirtualModelCard({ vm, onDelete }) {
+export const VirtualModelCard = memo(function VirtualModelCard({ vm, onDelete }) {
   const name = vm.metadata?.name || vm.name || 'unknown';
   const spec = vm.spec || {};
   const modelName = spec.modelName || name;
@@ -43,7 +43,7 @@ export function VirtualModelCard({ vm, onDelete }) {
       </div>
     </div>
   );
-}
+});
 
 // ─── Collapsible Section ────────────────────────────────────────────────────
 

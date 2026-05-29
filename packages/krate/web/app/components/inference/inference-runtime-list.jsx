@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
   cardStyle, btnStyle, btnOutlineStyle, inputStyle, labelStyle,
   FrameworkBadge,
@@ -8,7 +8,7 @@ import {
 
 // ─── Runtime Card ───────────────────────────────────────────────────────────
 
-export function RuntimeCard({ runtime }) {
+export const RuntimeCard = memo(function RuntimeCard({ runtime }) {
   const name = runtime.metadata?.name || runtime.name || 'unknown';
   const image = runtime.spec?.containers?.[0]?.image || '';
   const formats = runtime.spec?.supportedModelFormats || [];
@@ -26,7 +26,7 @@ export function RuntimeCard({ runtime }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Create Runtime Form ────────────────────────────────────────────────────
 

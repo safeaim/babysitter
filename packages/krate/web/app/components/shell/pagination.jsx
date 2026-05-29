@@ -1,8 +1,10 @@
 'use client';
 
+import { memo } from 'react';
+
 const PAGE_SIZES = [10, 25, 50, 100];
 
-export function Pagination({ total, limit, offset, onPageChange, onLimitChange }) {
+export const Pagination = memo(function Pagination({ total, limit, offset, onPageChange, onLimitChange }) {
   if (!total || total === 0) return null;
 
   const start = Math.min(offset + 1, total);
@@ -86,4 +88,4 @@ export function Pagination({ total, limit, offset, onPageChange, onLimitChange }
       )}
     </nav>
   );
-}
+});

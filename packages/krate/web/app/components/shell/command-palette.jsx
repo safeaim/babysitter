@@ -1,6 +1,7 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDebounce } from '../../hooks/use-debounce.js';
 
 const RECENT_COMMANDS_KEY = 'krate:recentCommands';
 const MAX_RECENT = 5;
@@ -70,7 +71,8 @@ export function CommandPalette({ org, isOpen, onClose }) {
   const actionErrorTimerRef = useRef(null);
   const inputRef = useRef(null);
 
-  const allCommands = buildCommands(org);
+  const allCommands = useMemo(() => buildCommands(org), [org]);
+  const debouncedQuery = useDebounce(query, 150);
 
   // Load recent commands when opened
   useEffect(() => {
@@ -95,18 +97,18 @@ export function CommandPalette({ org, isOpen, onClose }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const filteredCommands = query
-    ? allCommands.filter((cmd) => fuzzyMatch(query, cmd.label) || fuzzyMatch(query, cmd.hint || ''))
-    : allCommands;
+  const filteredCommands = useMemo(() => debouncedQuery
+    ? allCommands.filter((cmd) => fuzzyMatch(debouncedQuery, cmd.label) || fuzzyMatch(debouncedQuery, cmd.hint || ''))
+    : allCommands, [debouncedQuery, allCommands]);
 
   // Group filtered commands
   const groups = ['Navigate', 'Create', 'Actions'];
-  const grouped = groups
+  const grouped = useMemo(() => groups
     .map((g) => ({ group: g, commands: filteredCommands.filter((c) => c.group === g) }))
-    .filter((g) => g.commands.length > 0);
+    .filter((g) => g.commands.length > 0), [filteredCommands]);
 
   // Flat list for keyboard navigation
-  const flatList = grouped.flatMap((g) => g.commands);
+  const flatList = useMemo(() => grouped.flatMap((g) => g.commands), [grouped]);
 
   // Show recent commands when query is empty
   const showRecent = !query && recentCommandIds.length > 0;

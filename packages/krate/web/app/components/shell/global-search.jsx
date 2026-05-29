@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDebounce } from '../../hooks/use-debounce.js';
 
 const KIND_COLORS = {
   AgentStack: '#3b82f6',
@@ -59,7 +60,7 @@ export function GlobalSearch({ org }) {
   const [recentSearches, setRecentSearches] = useState([]);
   const wrapperRef = useRef(null);
   const inputRef = useRef(null);
-  const debounceRef = useRef(null);
+  const debouncedQuery = useDebounce(query, 300);
 
   // Load recent searches on focus
   const handleFocus = useCallback(() => {
@@ -79,20 +80,28 @@ export function GlobalSearch({ org }) {
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, []);
 
-  // Debounced search
+  // Set loading state immediately when query changes
   useEffect(() => {
-    clearTimeout(debounceRef.current);
-    if (query.length < 2) {
+    if (query.length >= 2) {
+      setLoading(true);
+    } else {
       setResults([]);
       setNoResults(false);
       setSearchError(false);
       setLoading(false);
+    }
+  }, [query]);
+
+  // Fetch search results when debounced query updates
+  useEffect(() => {
+    if (debouncedQuery.length < 2) {
       return;
     }
-    setLoading(true);
-    debounceRef.current = setTimeout(async () => {
+    let cancelled = false;
+    (async () => {
       try {
-        const res = await fetch(`/api/orgs/${org}/search?q=${encodeURIComponent(query)}&limit=20`);
+        const res = await fetch(`/api/orgs/${org}/search?q=${encodeURIComponent(debouncedQuery)}&limit=20`);
+        if (cancelled) return;
         if (res.ok) {
           const data = await res.json();
           setResults(data.results || []);
@@ -104,15 +113,16 @@ export function GlobalSearch({ org }) {
           setSearchError(true);
         }
       } catch {
+        if (cancelled) return;
         setResults([]);
         setNoResults(false);
         setSearchError(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
-    }, 300);
-    return () => clearTimeout(debounceRef.current);
-  }, [query, org]);
+    })();
+    return () => { cancelled = true; };
+  }, [debouncedQuery, org]);
 
   const flatResults = results;
 

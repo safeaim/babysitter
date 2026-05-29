@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import {
   relativeTime,
   cardStyle, btnStyle, btnOutlineStyle, inputStyle, labelStyle, badgeStyle,
@@ -9,21 +9,21 @@ import {
 
 // ─── Route Type Badge ───────────────────────────────────────────────────────
 
-export function RouteTypeBadge({ type }) {
+export const RouteTypeBadge = memo(function RouteTypeBadge({ type }) {
   const color = ROUTE_TYPE_COLORS[type] || '#6b7280';
   return <span style={badgeStyle(color)}>{type || 'unknown'}</span>;
-}
+});
 
 // ─── Provider Badge ─────────────────────────────────────────────────────────
 
-export function ProviderBadge({ provider }) {
+export const ProviderBadge = memo(function ProviderBadge({ provider }) {
   const color = PROVIDER_COLORS[provider] || '#6b7280';
   return <span style={badgeStyle(color)}>{provider || 'unknown'}</span>;
-}
+});
 
 // ─── Catalog Status Pill ────────────────────────────────────────────────────
 
-export function CatalogStatusPill({ status }) {
+export const CatalogStatusPill = memo(function CatalogStatusPill({ status }) {
   const color = status === 'available' ? '#16a34a' : '#d97706';
   return (
     <span style={{ ...badgeStyle(color), fontSize: '0.6875rem' }}>
@@ -31,11 +31,11 @@ export function CatalogStatusPill({ status }) {
       {status}
     </span>
   );
-}
+});
 
 // ─── Model Route Card ───────────────────────────────────────────────────────
 
-export function ModelRouteCard({ route, onDelete }) {
+export const ModelRouteCard = memo(function ModelRouteCard({ route, onDelete }) {
   const name = route.metadata?.name || route.name || 'unknown';
   const spec = route.spec || {};
   const routeType = spec.routeType || 'unknown';
@@ -71,7 +71,7 @@ export function ModelRouteCard({ route, onDelete }) {
       </div>
     </div>
   );
-}
+});
 
 // ─── Create Model Route Form ────────────────────────────────────────────────
 

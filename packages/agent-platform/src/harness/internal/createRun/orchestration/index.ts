@@ -152,7 +152,7 @@ async function runCliOrchestration(args: RunOrchestrationPhaseArgs): Promise<num
 }
 
 async function resolveAndPostEffect(
-  action: { effectId: string; kind: string; taskDef?: { agent?: { prompt?: { instructions?: string[] } }; shell?: { command?: string }; title?: string } },
+  action: { effectId: string; kind: string; taskDef?: { agent?: { prompt?: string | { instructions?: string[] } }; shell?: { command?: string }; title?: string } },
   runDir: string,
   workspace: string,
   model?: string,
@@ -167,9 +167,12 @@ async function resolveAndPostEffect(
   let value: string;
 
   if (action.kind === "agent" || action.kind === "skill") {
-    const prompt = action.taskDef?.agent?.prompt?.instructions?.join("\n")
-      ?? action.taskDef?.title
-      ?? "Execute this task";
+    const agentPrompt = action.taskDef?.agent?.prompt;
+    const prompt = typeof agentPrompt === "string"
+      ? agentPrompt
+      : agentPrompt?.instructions?.join("\n")
+        ?? action.taskDef?.title
+        ?? "Execute this task";
 
     const session = createAgentCoreSession({
       workspace,

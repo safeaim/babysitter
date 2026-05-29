@@ -1,73 +1,13 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-
-// ---------------------------------------------------------------------------
-// Helpers (inlined from ui-shell.jsx — server component cannot be imported)
-// ---------------------------------------------------------------------------
-
-const TOOL_RENDERERS = {
-  bash: { label: 'Shell', prefix: '>', renderInput: (i) => i?.command || 'command', renderOutput: (o) => typeof o === 'string' ? truncateText(o, 300) : o?.stdout || String(o) },
-  read: { label: 'Read', prefix: '[R]', renderInput: (i) => i?.file_path || i?.path || 'file', renderOutput: (o) => truncateText(String(o), 300) },
-  write: { label: 'Write', prefix: '[W]', renderInput: (i) => i?.file_path || 'file', renderOutput: () => 'File written' },
-  edit: { label: 'Edit', prefix: '[E]', renderInput: (i) => i?.file_path || 'file', renderOutput: () => 'File edited' },
-  glob: { label: 'Search', prefix: '[G]', renderInput: (i) => i?.pattern || 'pattern', renderOutput: (o) => Array.isArray(o) ? o.length + ' matches' : String(o) },
-  grep: { label: 'Grep', prefix: '[?]', renderInput: (i) => i?.pattern || 'pattern', renderOutput: (o) => Array.isArray(o) ? o.length + ' matches' : String(o) },
-  web_fetch: { label: 'Fetch', prefix: '[F]', renderInput: (i) => i?.url || 'url', renderOutput: (o) => truncateText(String(o), 200) },
-  web_search: { label: 'Search', prefix: '[S]', renderInput: (i) => i?.query || 'query', renderOutput: (o) => truncateText(String(o), 200) },
-};
-
-function truncateText(text, maxLen) {
-  if (!text || text.length <= maxLen) return text || '';
-  return text.slice(0, maxLen) + '...';
-}
-
-function resolveToolRenderer(toolName) {
-  const normalized = (toolName || '').toLowerCase().replace(/[^a-z_]/g, '');
-  return TOOL_RENDERERS[normalized] || { label: toolName || 'Tool', prefix: '[T]', renderInput: (i) => truncateText(JSON.stringify(i), 200), renderOutput: (o) => truncateText(JSON.stringify(o), 200) };
-}
-
-function tryParseJson(text) {
-  try { return JSON.parse(text); } catch { return text; }
-}
-
-const SEGMENT_KINDS = {
-  user: { label: 'User', color: '#3b82f6' },
-  assistant: { label: 'Assistant', color: 'var(--text-muted)' },
-  thinking: { label: 'Thinking', color: '#a855f7' },
-  tool: { label: 'Tool', color: '#f59e0b' },
-  error: { label: 'Error', color: 'var(--danger)' },
-  lifecycle: { label: 'Lifecycle', color: '#94a3b8' },
-};
-
-function classifyMessageKind(message) {
-  const role = message.role || 'unknown';
-  if (role === 'user') return 'user';
-  if (role === 'assistant') return 'assistant';
-  if (role === 'thinking') return 'thinking';
-  if (role === 'tool' || role === 'tool_use' || role === 'tool_result') return 'tool';
-  if (role === 'error') return 'error';
-  if (role === 'system' || role === 'lifecycle') return 'lifecycle';
-  return 'lifecycle';
-}
-
-function deriveSegments(messages) {
-  if (!messages || !messages.length) return [];
-  const segments = [];
-  let currentKind = null;
-  let currentCount = 0;
-  for (const msg of messages) {
-    const kind = classifyMessageKind(msg);
-    if (kind === currentKind) {
-      currentCount++;
-    } else {
-      if (currentKind) segments.push({ kind: currentKind, count: currentCount });
-      currentKind = kind;
-      currentCount = 1;
-    }
-  }
-  if (currentKind) segments.push({ kind: currentKind, count: currentCount });
-  return segments;
-}
+import {
+  TOOL_RENDERERS,
+  resolveToolRenderer,
+  tryParseJson,
+  SEGMENT_KINDS,
+  deriveSegments,
+  phaseTone as computePhaseTone,
+} from '../lib/agent-utils.js';
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -257,12 +197,12 @@ function FlowLaneItem({ run, transcript }) {
   const runName = run?.metadata?.name || 'unknown';
   const stackName = run?.spec?.stackRef || run?.spec?.targetStack || null;
   const phase = run?.status?.phase || 'Pending';
-  const phaseTone = !phase || phase === 'Queued' || phase === 'Pending' ? 'neutral' : phase === 'Running' ? 'warn' : phase === 'Completed' || phase === 'Succeeded' ? 'good' : phase === 'Failed' ? 'danger' : 'neutral';
+  const tone = computePhaseTone(phase);
   const msgs = transcript?.spec?.messages || [];
   const segments = deriveSegments(msgs);
-  const phaseColor = phaseTone === 'good' ? '#22c55e' : phaseTone === 'warn' ? '#f59e0b' : phaseTone === 'danger' ? '#ef4444' : '#94a3b8';
-  const pillColor = phaseTone === 'good' ? '#dcfce7' : phaseTone === 'warn' ? '#fef9c3' : phaseTone === 'danger' ? '#fee2e2' : '#f1f5f9';
-  const pillText = phaseTone === 'good' ? '#166534' : phaseTone === 'warn' ? '#854d0e' : phaseTone === 'danger' ? '#991b1b' : '#475569';
+  const phaseColor = tone === 'good' ? '#22c55e' : tone === 'warn' ? '#f59e0b' : tone === 'danger' ? '#ef4444' : '#94a3b8';
+  const pillColor = tone === 'good' ? '#dcfce7' : tone === 'warn' ? '#fef9c3' : tone === 'danger' ? '#fee2e2' : '#f1f5f9';
+  const pillText = tone === 'good' ? '#166534' : tone === 'warn' ? '#854d0e' : tone === 'danger' ? '#991b1b' : '#475569';
 
   return (
     <div style={{ marginBottom: 16 }}>

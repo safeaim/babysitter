@@ -156,7 +156,21 @@ export function sanitizeAction(value) {
   return sanitizeCopy(value).replace('pod events', 'run events');
 }
 
+// ---------------------------------------------------------------------------
+// In-memory cache for loadKrateUi — prevents 30+ server pages from each
+// hitting kubectl independently during a single render pass.
+// ---------------------------------------------------------------------------
+let _cachedModel = null;
+let _cacheExpiry = 0;
+const CACHE_TTL_MS = 5000;
+
 export async function loadKrateUi(org = null) {
+  const cacheKey = org || 'default';
+  const now = Date.now();
+  if (_cachedModel && _cachedModel._cacheKey === cacheKey && now < _cacheExpiry) {
+    return _cachedModel;
+  }
+
   let model;
   try {
     model = await fetchControllerUiModel({ organization: org, useCache: true, swrOptions: { staleMs: 5 * 60_000 } });
@@ -169,7 +183,7 @@ export async function loadKrateUi(org = null) {
   syncHydratedModel(model, resourceByKind);
   const repositoryResource = resourceByKind.get('Repository');
   const repositories = repositoryResource?.items?.length ? repositoryResource.items : model.views.dashboard.repositories || [];
-  return {
+  const result = {
     model,
     repositories,
     repository: repositories[0] || null,
@@ -186,8 +200,14 @@ export async function loadKrateUi(org = null) {
     policyProfiles: resourceByKind.get('PolicyProfile'),
     policyTemplates: resourceByKind.get('PolicyTemplate'),
     policyBindings: resourceByKind.get('PolicyBinding'),
-    policyExceptionRequests: resourceByKind.get('PolicyExceptionRequest')
+    policyExceptionRequests: resourceByKind.get('PolicyExceptionRequest'),
+    _cacheKey: cacheKey,
   };
+
+  _cachedModel = result;
+  _cacheExpiry = now + CACHE_TTL_MS;
+
+  return result;
 }
 
 function syncHydratedModel(model, resourceByKind) {

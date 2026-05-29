@@ -31,7 +31,7 @@ export const GET = withAuth(async (request, { params }) => {
       limit,
       offset,
       hasMore: offset + limit < allItems.length,
-    }, { headers: { 'Cache-Control': 'no-store' } });
+    }, { headers: { 'Cache-Control': 'private, max-age=5' } });
   } catch (error) {
     return errorResponse(error.message, error.message?.includes('not found') ? 404 : 500);
   }

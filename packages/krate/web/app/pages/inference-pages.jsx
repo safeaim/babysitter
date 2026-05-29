@@ -1,7 +1,7 @@
 // Routes: /orgs/[org]/inference — inference services, runtimes, model routes, and virtual models.
 import { loadKrateUi, DegradedBanner } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { InferenceServiceManager } from '../components/inference-service-manager.jsx';
+import { InferenceServiceManager } from '../components/inference/inference-service-manager.jsx';
 
 export async function InferenceServicesPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);

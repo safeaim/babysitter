@@ -2,12 +2,12 @@
 import { loadKrateUi, orgHref, StatusPill, DegradedBanner, EmptyState, InfoList } from '../lib/krate-ui.jsx';
 import { resourceToYaml } from '@a5c-ai/krate-sdk';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { DispatchButton } from '../components/dispatch-button.jsx';
-import { GraphStackBuilder } from '../components/stack-builder-graph.jsx';
-import { LiveUpdates } from '../components/live-updates.jsx';
-import { StackActions } from '../components/stack-actions.jsx';
-import { StackEditForm } from '../components/stack-edit-form.jsx';
-import { CopyButton } from '../components/inference-helpers.jsx';
+import { DispatchButton } from '../components/agent/dispatch-button.jsx';
+import { GraphStackBuilder } from '../components/agent/stack-builder-graph.jsx';
+import { LiveUpdates } from '../components/agent/live-updates.jsx';
+import { StackActions } from '../components/agent/stack-actions.jsx';
+import { StackEditForm } from '../components/agent/stack-edit-form.jsx';
+import { CopyButton } from '../components/inference/inference-helpers.jsx';
 import { phaseTone } from './agent-helpers.jsx';
 
 export async function AgentsDashboardPage({ org = null } = {}) {

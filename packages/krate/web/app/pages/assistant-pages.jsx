@@ -1,8 +1,8 @@
 // Routes: /orgs/[org]/assistant — AI assistant chat and structured generation.
 import { loadKrateUi, DegradedBanner } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { AssistantChat } from '../components/assistant-chat.jsx';
-import { AssistantGenerate } from '../components/assistant-generate.jsx';
+import { AssistantChat } from '../components/assistant/assistant-chat.jsx';
+import { AssistantGenerate } from '../components/assistant/assistant-generate.jsx';
 
 export async function AssistantPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);
@@ -32,7 +32,7 @@ export async function AssistantPage({ org = null } = {}) {
 }
 
 // Client wrapper for tab switching between Chat and Generate
-import { AssistantTabs } from '../components/assistant-tabs.jsx';
+import { AssistantTabs } from '../components/assistant/assistant-tabs.jsx';
 
 function AssistantShell({ org, stacks }) {
   return <AssistantTabs org={org} stacks={stacks} />;

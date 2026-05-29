@@ -37,7 +37,7 @@ test('org resources API uses org-scoped listing', () => {
 });
 
 test('repository code browser uses CodeMirror syntax highlighting', () => {
-  const browser = readWebFile('app', 'components', 'repo-code-browser.jsx');
+  const browser = readWebFile('app', 'components', 'repo', 'repo-code-browser.jsx');
   assert.match(browser, /@uiw\/react-codemirror/);
   assert.match(browser, /@codemirror\/lang-javascript/);
   assert.match(browser, /@codemirror\/lang-yaml/);
@@ -46,7 +46,7 @@ test('repository code browser uses CodeMirror syntax highlighting', () => {
 });
 test('degraded Krate UI renders recovery loader only for controller fetch failures', () => {
   const ui = readWebFile('app', 'lib', 'krate-ui.jsx');
-  const loader = readWebFile('app', 'components', 'krate-loading.jsx');
+  const loader = readWebFile('app', 'components', 'shell', 'krate-loading.jsx');
   const controllerRoute = readWebFile('app', 'api', 'controller', 'route.js');
   assert.match(ui, /shouldShowControllerRecovery/);
   assert.doesNotMatch(ui, /localFallback: false/);
@@ -84,7 +84,7 @@ test('degraded Krate UI renders recovery loader only for controller fetch failur
 test('recovery overlay progresses without covering normal route navigation', () => {
   const loading = readWebFile('app', 'loading.jsx');
   const css = readWebFile('app', 'globals.css');
-  const loader = readWebFile('app', 'components', 'krate-loading.jsx');
+  const loader = readWebFile('app', 'components', 'shell', 'krate-loading.jsx');
   assert.match(loading, /krateSpinner/);
   assert.match(loading, /krateLoadingLabel/);
   assert.doesNotMatch(loading, /KrateDelayedRouteLoading/);
@@ -105,8 +105,8 @@ test('recovery overlay progresses without covering normal route navigation', () 
 
 test('theme setting applies across full page loads', () => {
   const layout = readWebFile('app', 'layout.jsx');
-  const settings = readWebFile('app', 'components', 'app-settings.jsx');
-  const runtime = readWebFile('app', 'components', 'theme-runtime.jsx');
+  const settings = readWebFile('app', 'components', 'settings', 'app-settings.jsx');
+  const runtime = readWebFile('app', 'components', 'shell', 'theme-runtime.jsx');
   const css = readWebFile('app', 'globals.css');
   assert.match(layout, /ThemeRuntime/);
   assert.match(layout, /themeInitScript/);
@@ -160,7 +160,7 @@ test('webhook manager has delete button per webhook', () => {
 });
 
 test('external provider wizard navigates after success', () => {
-  const source = readWebFile('app', 'components', 'external-provider-wizard.jsx');
+  const source = readWebFile('app', 'components', 'external', 'external-provider-wizard.jsx');
   assert.match(source, /handleSuccess/);
   assert.match(source, /handleCancel/);
   assert.match(source, /defaultNav/);
@@ -169,10 +169,10 @@ test('external provider wizard navigates after success', () => {
 test('stack builder graph splits tools into internal and external sub-sections', () => {
   // Read all split modules that compose the stack builder graph
   const source = [
-    readWebFile('app', 'components', 'stack-builder-graph.jsx'),
-    readWebFile('app', 'components', 'stack-builder-graph-styles.jsx'),
-    readWebFile('app', 'components', 'stack-builder-graph-nodes.jsx'),
-    readWebFile('app', 'components', 'stack-builder-graph-panels.jsx'),
+    readWebFile('app', 'components', 'agent', 'stack-builder-graph.jsx'),
+    readWebFile('app', 'components', 'agent', 'stack-builder-graph-styles.jsx'),
+    readWebFile('app', 'components', 'agent', 'stack-builder-graph-nodes.jsx'),
+    readWebFile('app', 'components', 'agent', 'stack-builder-graph-panels.jsx'),
   ].join('\n');
   // STACK_LAYERS should include subcategories on tools layer
   assert.match(source, /subcategories/);
@@ -193,9 +193,9 @@ test('stack builder graph splits tools into internal and external sub-sections',
 test('stack builder graph includes memory repository section', () => {
   // Read all split modules that compose the stack builder graph
   const source = [
-    readWebFile('app', 'components', 'stack-builder-graph.jsx'),
-    readWebFile('app', 'components', 'stack-builder-graph-styles.jsx'),
-    readWebFile('app', 'components', 'stack-builder-graph-panels.jsx'),
+    readWebFile('app', 'components', 'agent', 'stack-builder-graph.jsx'),
+    readWebFile('app', 'components', 'agent', 'stack-builder-graph-styles.jsx'),
+    readWebFile('app', 'components', 'agent', 'stack-builder-graph-panels.jsx'),
   ].join('\n');
   // MemoryRepositorySection component
   assert.match(source, /function MemoryRepositorySection/);
@@ -207,7 +207,7 @@ test('stack builder graph includes memory repository section', () => {
 });
 
 test('stack edit form includes memory repository refs field', () => {
-  const source = readWebFile('app', 'components', 'stack-edit-form.jsx');
+  const source = readWebFile('app', 'components', 'agent', 'stack-edit-form.jsx');
   assert.match(source, /memoryRepositoryRefs/);
   assert.match(source, /Memory repository refs/);
   assert.match(source, /org-memory, shared-knowledge/);

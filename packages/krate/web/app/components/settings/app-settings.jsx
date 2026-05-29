@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { applyTheme, readStoredTheme, storeTheme } from './theme-runtime.jsx';
+import { applyTheme, readStoredTheme, storeTheme } from '../shell/theme-runtime.jsx';
 
 const THEMES = ['light', 'dark', 'system'];
 const DENSITIES = ['compact', 'default', 'spacious'];

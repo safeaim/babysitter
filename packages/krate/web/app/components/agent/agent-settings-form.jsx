@@ -1,9 +1,9 @@
 'use client';
 
-import { GatewaySection } from './settings-gateway.jsx';
-import { AdaptersSection } from './settings-adapters.jsx';
-import { ProvidersSection } from './settings-providers.jsx';
-import { RbacSection } from './settings-rbac.jsx';
+import { GatewaySection } from '../settings/settings-gateway.jsx';
+import { AdaptersSection } from '../settings/settings-adapters.jsx';
+import { ProvidersSection } from '../settings/settings-providers.jsx';
+import { RbacSection } from '../settings/settings-rbac.jsx';
 
 export function AgentSettingsForm({ org, gateway, adapters, providers, secrets, serviceAccounts }) {
   return (

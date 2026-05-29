@@ -1,5 +1,5 @@
 import './globals.css';
-import { ThemeRuntime } from './components/theme-runtime.jsx';
+import { ThemeRuntime } from './components/shell/theme-runtime.jsx';
 
 export const metadata = { title: 'a5c.ai Krate Console', description: 'a5c.ai Krate forge and delivery console.' };
 

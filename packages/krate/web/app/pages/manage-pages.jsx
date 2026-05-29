@@ -3,9 +3,9 @@ import { createAuthProviderConfig, listEnabledAuthProviders } from '@a5c-ai/krat
 import { loadKrateUi, orgHref, publicResource, StatusPill, DegradedBanner, EmptyState } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
 import { SectionPage } from './repo-pages.jsx';
-import { SecretManager } from '../components/secret-manager.jsx';
+import { SecretManager } from '../components/settings/secret-manager.jsx';
 import { ResourceActions, InlineCreateForm } from '../components/resource-crud-actions.jsx';
-import { HealthMonitor } from '../components/health-monitor.jsx';
+import { HealthMonitor } from '../components/observability/health-monitor.jsx';
 
 const AUTH_ERROR_MESSAGES = {
   provider_not_found: 'This sign-in provider is not available. Please choose another method or contact your administrator.',

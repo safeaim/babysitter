@@ -161,18 +161,29 @@ test('web smoke: components directory has expected .jsx files', () => {
     `components directory must exist at ${componentsPath}`
   );
 
-  const files = fs.readdirSync(componentsPath);
-  const jsxFiles = files.filter((f) => f.endsWith('.jsx'));
+  // Collect .jsx files recursively across root and subdirectories
+  function collectJsx(dir) {
+    const results = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        results.push(...collectJsx(path.join(dir, entry.name)));
+      } else if (entry.name.endsWith('.jsx')) {
+        results.push(path.relative(componentsPath, path.join(dir, entry.name)).replace(/\\/g, '/'));
+      }
+    }
+    return results;
+  }
+  const jsxFiles = collectJsx(componentsPath);
 
   assert.ok(
     jsxFiles.length >= 10,
     `components/ must have at least 10 .jsx files, found ${jsxFiles.length}: ${jsxFiles.join(', ')}`
   );
 
-  // Verify specific expected components
+  // Verify specific expected components (paths relative to components/)
   const expectedComponents = [
-    'code-editor.jsx',
-    'dispatch-button.jsx',
+    'repo/code-editor.jsx',
+    'agent/dispatch-button.jsx',
     'resource-actions.jsx',
   ];
 
@@ -181,11 +192,5 @@ test('web smoke: components directory has expected .jsx files', () => {
       jsxFiles.includes(component),
       `components/ must include ${component}`
     );
-  }
-
-  // Verify all listed components are actually files (not directories)
-  for (const file of jsxFiles) {
-    const stat = fs.statSync(path.join(componentsPath, file));
-    assert.ok(stat.isFile(), `${file} must be a file, not a directory`);
   }
 });

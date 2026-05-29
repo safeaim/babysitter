@@ -1,8 +1,8 @@
 // Routes: /orgs/[org]/agents/rules, /agents/rules/[name], /agents/rules/new — trigger rule management.
 import { loadKrateUi, orgHref, StatusPill, DegradedBanner, EmptyState } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { TriggerRuleForm } from '../components/trigger-rule-form.jsx';
-import { EnableDisableToggle, DeleteRuleButton } from '../components/rule-actions.jsx';
+import { TriggerRuleForm } from '../components/agent/trigger-rule-form.jsx';
+import { EnableDisableToggle, DeleteRuleButton } from '../components/agent/rule-actions.jsx';
 
 export async function AgentRulesPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);

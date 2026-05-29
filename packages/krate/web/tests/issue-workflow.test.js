@@ -39,7 +39,7 @@ test('issue PATCH merge preserves scoped metadata while updating comments and re
 
 test('issue detail UI exposes shared editor and comment patch affordances', () => {
   const shell = readWebFile('app', 'ui-shell.jsx');
-  const editor = readWebFile('app', 'components', 'issue-editor.jsx');
+  const editor = readWebFile('app', 'components', 'repo', 'issue-editor.jsx');
   const route = readWebFile('app', 'api', 'orgs', '[org]', 'resources', '[kind]', '[name]', 'route.js');
 
   assert.match(shell, /IssueWorkspace[\s\S]*<IssueCreateForm/);

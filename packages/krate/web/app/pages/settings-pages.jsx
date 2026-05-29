@@ -2,8 +2,8 @@
 import { loadKrateUi, DegradedBanner } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
 import { getSignedInUser } from '../lib/krate-ui.jsx';
-import { AppSettingsForm } from '../components/app-settings.jsx';
-import { UserProfileForm } from '../components/user-profile.jsx';
+import { AppSettingsForm } from '../components/settings/app-settings.jsx';
+import { UserProfileForm } from '../components/settings/user-profile.jsx';
 
 export async function AppSettingsPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);

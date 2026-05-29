@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CURATED_MODELS, MODEL_CATEGORIES } from '../lib/model-catalog-data.js';
+import { CURATED_MODELS, MODEL_CATEGORIES } from '../../lib/model-catalog-data.js';
 import {
   cardStyle, btnStyle, btnOutlineStyle, badgeStyle,
   overlayStyle, panelStyle,

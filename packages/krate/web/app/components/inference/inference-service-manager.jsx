@@ -7,8 +7,8 @@ import { RuntimeCard, CreateRuntimeForm } from './inference-runtime-list.jsx';
 import { ModelRouteCard, CreateModelRouteForm } from './model-route-manager.jsx';
 import { VirtualModelCard, CreateVirtualModelForm } from './virtual-model-manager.jsx';
 import { CuratedModelCatalog, UnifiedModelCatalogSection } from './curated-model-catalog.jsx';
-import { ConfirmDialog } from './confirm-dialog.jsx';
-import { dedupFetch } from '../lib/fetch-dedup.js';
+import { ConfirmDialog } from '../shell/confirm-dialog.jsx';
+import { dedupFetch } from '../../lib/fetch-dedup.js';
 import { tabStyle, createResource, ResourceTabContent } from './inference-service-helpers.jsx';
 
 export function InferenceServiceManager({ org, initialServiceName }) {

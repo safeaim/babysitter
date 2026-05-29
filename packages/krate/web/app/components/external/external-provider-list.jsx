@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { statusTone } from '../lib/status-tones.js';
+import { statusTone } from '../../lib/status-tones.js';
 
 const TYPED_PROVIDER_KINDS = ['GitProvider', 'CiProvider', 'IssueTrackerProvider', 'AppHostingProvider', 'ArtifactRegistryProvider'];
 

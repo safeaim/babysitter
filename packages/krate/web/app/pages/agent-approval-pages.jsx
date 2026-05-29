@@ -1,8 +1,8 @@
 // Routes: /orgs/[org]/agents/approvals — pending and resolved agent approval views.
 import { loadKrateUi, orgHref, StatusPill, DegradedBanner, EmptyState } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { ApprovalDecisionButtons } from '../components/approval-actions.jsx';
-import { LiveUpdates } from '../components/live-updates.jsx';
+import { ApprovalDecisionButtons } from '../components/agent/approval-actions.jsx';
+import { LiveUpdates } from '../components/agent/live-updates.jsx';
 import { relativeTime, ResolvedApprovalsSection } from './agent-helpers.jsx';
 
 export async function AgentApprovalsPage({ org = null } = {}) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { cardStyle, btnStyle } from './inference-helpers.jsx';
-import { Pagination } from './pagination.jsx';
+import { Pagination } from '../shell/pagination.jsx';
 
 export const tabStyle = (active) => ({
   padding: '0.5rem 1rem',

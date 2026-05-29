@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { statusTone } from '../lib/status-tones.js';
+import { statusTone } from '../../lib/status-tones.js';
 
 const REVIEW_TONES = { approved: 'good', 'changes-requested': 'danger', pending: 'neutral' };
 

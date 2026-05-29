@@ -12,12 +12,12 @@ const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 // ── inference-helpers.jsx exports ───────────────────────────────────────────
 
-const inferenceHelpersUrl = pathToFileURL(path.join(webRoot, 'app', 'components', 'inference-helpers.jsx')).href;
+const inferenceHelpersUrl = pathToFileURL(path.join(webRoot, 'app', 'components', 'inference', 'inference-helpers.jsx')).href;
 
 // We cannot import JSX in plain Node, but we can read and verify exported identifiers via source.
 import fs from 'node:fs';
 
-const inferenceHelpersSrc = fs.readFileSync(path.join(webRoot, 'app', 'components', 'inference-helpers.jsx'), 'utf8');
+const inferenceHelpersSrc = fs.readFileSync(path.join(webRoot, 'app', 'components', 'inference', 'inference-helpers.jsx'), 'utf8');
 
 test('inference-helpers.jsx exports relativeTime', () => {
   assert.ok(inferenceHelpersSrc.includes('export function relativeTime'), 'relativeTime should be exported');
@@ -57,7 +57,7 @@ test('inference-helpers.jsx exports StatusBadge', () => {
 
 // ── pagination.jsx exports ──────────────────────────────────────────────────
 
-const paginationSrc = fs.readFileSync(path.join(webRoot, 'app', 'components', 'pagination.jsx'), 'utf8');
+const paginationSrc = fs.readFileSync(path.join(webRoot, 'app', 'components', 'shell', 'pagination.jsx'), 'utf8');
 
 test('pagination.jsx exports Pagination', () => {
   assert.ok(paginationSrc.includes('export function Pagination'), 'Pagination should be exported');

@@ -141,7 +141,7 @@ test('loading.jsx files exist for major route groups', () => {
 // ── Module Existence & Export Tests ───────────────────────────────────────
 
 test('confirm-dialog.jsx exists and exports ConfirmDialog', () => {
-  const filePath = path.join(webRoot, 'app', 'components', 'confirm-dialog.jsx');
+  const filePath = path.join(webRoot, 'app', 'components', 'shell', 'confirm-dialog.jsx');
   assert.ok(fs.existsSync(filePath), 'confirm-dialog.jsx must exist');
   const content = fs.readFileSync(filePath, 'utf8');
   assert.match(content, /export\s+function\s+ConfirmDialog/, 'must export ConfirmDialog');

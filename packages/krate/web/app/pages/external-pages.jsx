@@ -1,10 +1,10 @@
 // Routes: /orgs/[org]/external, /external/sync, /external/conflicts — external provider management.
 import { loadKrateUi, orgHref, DegradedBanner } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { ExternalProviderList } from '../components/external-provider-list.jsx';
-import { ExternalProviderWizard } from '../components/external-provider-wizard.jsx';
-import { ExternalSyncDashboard } from '../components/external-sync-dashboard.jsx';
-import { ExternalConflictResolver } from '../components/external-conflict-resolver.jsx';
+import { ExternalProviderList } from '../components/external/external-provider-list.jsx';
+import { ExternalProviderWizard } from '../components/external/external-provider-wizard.jsx';
+import { ExternalSyncDashboard } from '../components/external/external-sync-dashboard.jsx';
+import { ExternalConflictResolver } from '../components/external/external-conflict-resolver.jsx';
 
 const TYPED_PROVIDER_KINDS = ['GitProvider', 'CiProvider', 'IssueTrackerProvider', 'AppHostingProvider', 'ArtifactRegistryProvider'];
 

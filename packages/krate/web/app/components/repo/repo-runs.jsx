@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { statusTone } from '../lib/status-tones.js';
+import { statusTone } from '../../lib/status-tones.js';
 
 function formatDuration(startedAt, finishedAt) {
   if (!startedAt) return '--';

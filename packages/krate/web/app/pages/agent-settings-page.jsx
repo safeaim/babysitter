@@ -1,7 +1,7 @@
 // Routes: /orgs/[org]/agents/settings — gateway, adapter, provider, and RBAC configuration.
 import { loadKrateUi, orgHref, StatusPill, DegradedBanner } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { AgentSettingsForm } from '../components/agent-settings-form.jsx';
+import { AgentSettingsForm } from '../components/agent/agent-settings-form.jsx';
 
 export async function AgentSettingsPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);

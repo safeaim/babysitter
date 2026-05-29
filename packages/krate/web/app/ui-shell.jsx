@@ -17,4 +17,4 @@ export * from './pages/playground-pages.jsx';
 // IssueWorkspace, IssueDetailView, IssueDetailPage, IssueScopePage, issuesForScope
 // are already covered by `export * from './pages/agent-pages.jsx'` above.
 // IssueCreateForm and IssueEditor live in the component layer:
-export { IssueCreateForm, IssueEditor } from './components/issue-editor.jsx';
+export { IssueCreateForm, IssueEditor } from './components/repo/issue-editor.jsx';

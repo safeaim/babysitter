@@ -1,9 +1,9 @@
 import { orgHref, orgNavigationGroups, getSignedInUser } from './krate-ui.jsx';
-import { GlobalSearch } from '../components/global-search.jsx';
-import { NotificationBell } from '../components/notification-bell.jsx';
-import { CommandPaletteWrapper } from '../components/command-palette.jsx';
-import { KeyboardShortcuts } from '../components/keyboard-shortcuts.jsx';
-import { MobileNavToggle } from '../components/mobile-nav-toggle.jsx';
+import { GlobalSearch } from '../components/shell/global-search.jsx';
+import { NotificationBell } from '../components/shell/notification-bell.jsx';
+import { CommandPaletteWrapper } from '../components/shell/command-palette.jsx';
+import { KeyboardShortcuts } from '../components/shell/keyboard-shortcuts.jsx';
+import { MobileNavToggle } from '../components/shell/mobile-nav-toggle.jsx';
 
 export function AppShell({ children, org = 'default', orgs = [], currentPath = '/', currentUser = null, loadError = null }) {
   const visibleOrgs = orgs.length ? orgs : [{ slug: org, displayName: org }];

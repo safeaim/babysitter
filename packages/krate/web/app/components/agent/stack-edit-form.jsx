@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUnsavedChanges } from '../hooks/use-unsaved-changes.js';
+import { useUnsavedChanges } from '../../hooks/use-unsaved-changes.js';
 
 export function StackEditForm({ org, stack }) {
   const router = useRouter();

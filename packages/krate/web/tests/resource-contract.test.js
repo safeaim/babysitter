@@ -57,10 +57,10 @@ test('validateResource accepts resources with all required fields', () => {
 test('stack builder graph emits all required AgentStack spec fields', () => {
   // Read all split modules that compose the stack builder graph
   const source = [
-    readFile('app', 'components', 'stack-builder-graph.jsx'),
-    readFile('app', 'components', 'stack-builder-graph-styles.jsx'),
-    readFile('app', 'components', 'stack-builder-graph-nodes.jsx'),
-    readFile('app', 'components', 'stack-builder-graph-panels.jsx'),
+    readFile('app', 'components', 'agent', 'stack-builder-graph.jsx'),
+    readFile('app', 'components', 'agent', 'stack-builder-graph-styles.jsx'),
+    readFile('app', 'components', 'agent', 'stack-builder-graph-nodes.jsx'),
+    readFile('app', 'components', 'agent', 'stack-builder-graph-panels.jsx'),
   ].join('\n');
   const requiredFields = RESOURCE_DEFINITIONS.AgentStack.requiredSpec;
   for (const field of requiredFields) {
@@ -93,7 +93,7 @@ test('resources POST route calls validateResource before applyResource', () => {
 // ── Contract: trigger rule form sends all required fields ─────────────────
 
 test('trigger rule form emits all required AgentTriggerRule spec fields', () => {
-  const source = readFile('app', 'components', 'trigger-rule-form.jsx');
+  const source = readFile('app', 'components', 'agent', 'trigger-rule-form.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.AgentTriggerRule.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -107,7 +107,7 @@ test('trigger rule form emits all required AgentTriggerRule spec fields', () => 
 // ── Contract: external provider wizard sends typed provider kinds ─────────
 
 test('external provider wizard references typed provider kinds (GitProvider, CiProvider, etc.)', () => {
-  const source = readFile('app', 'components', 'external-provider-wizard.jsx');
+  const source = readFile('app', 'components', 'external', 'external-provider-wizard.jsx');
   assert.match(source, /GitProvider/, 'wizard must reference GitProvider');
   assert.match(source, /CiProvider/, 'wizard must reference CiProvider');
   assert.match(source, /IssueTrackerProvider/, 'wizard must reference IssueTrackerProvider');
@@ -120,14 +120,14 @@ test('external provider wizard references typed provider kinds (GitProvider, CiP
 });
 
 test('external provider wizard creates multiple resources via Promise.all', () => {
-  const source = readFile('app', 'components', 'external-provider-wizard.jsx');
+  const source = readFile('app', 'components', 'external', 'external-provider-wizard.jsx');
   assert.match(source, /Promise\.all/, 'wizard must use Promise.all for parallel resource creation');
 });
 
 // ── Contract: memory ontology editor sends required fields ────────────────
 
 test('memory ontology editor emits required AgentMemoryOntology fields', () => {
-  const source = readFile('app', 'components', 'memory-ontology-editor.jsx');
+  const source = readFile('app', 'components', 'workspace', 'memory-ontology-editor.jsx');
   assert.match(source, /memoryRepository/);
   assert.match(source, /ontologyPath/);
   assert.match(source, /AgentMemoryOntology/);
@@ -150,7 +150,7 @@ test('ExternalWebhookConfig is in RESOURCE_DEFINITIONS', () => {
 // ── Contract: adapter form sends required fields ──────────────────────────
 
 test('adapter settings form emits required AgentAdapter fields', () => {
-  const source = readFile('app', 'components', 'settings-adapters.jsx');
+  const source = readFile('app', 'components', 'settings', 'settings-adapters.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.AgentAdapter.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -164,7 +164,7 @@ test('adapter settings form emits required AgentAdapter fields', () => {
 // ── Contract: provider config form sends required fields ──────────────────
 
 test('provider settings form emits required AgentProviderConfig fields', () => {
-  const source = readFile('app', 'components', 'settings-providers.jsx');
+  const source = readFile('app', 'components', 'settings', 'settings-providers.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.AgentProviderConfig.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -178,7 +178,7 @@ test('provider settings form emits required AgentProviderConfig fields', () => {
 // ── Contract: gateway form sends required fields ──────────────────────────
 
 test('gateway settings form emits required AgentGatewayConfig fields', () => {
-  const source = readFile('app', 'components', 'settings-gateway.jsx');
+  const source = readFile('app', 'components', 'settings', 'settings-gateway.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.AgentGatewayConfig.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -192,7 +192,7 @@ test('gateway settings form emits required AgentGatewayConfig fields', () => {
 // ── Contract: RBAC form sends required AgentServiceAccount fields ─────────
 
 test('RBAC settings form emits required AgentServiceAccount fields', () => {
-  const source = readFile('app', 'components', 'settings-rbac.jsx');
+  const source = readFile('app', 'components', 'settings', 'settings-rbac.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.AgentServiceAccount.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -214,7 +214,7 @@ test('agent pages reference required KrateProject fields', () => {
 // ── Contract: pull request form sends required fields ─────────────────────
 
 test('pull request list form emits required PullRequest fields', () => {
-  const source = readFile('app', 'components', 'pull-request-list.jsx');
+  const source = readFile('app', 'components', 'repo', 'pull-request-list.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.PullRequest.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -228,7 +228,7 @@ test('pull request list form emits required PullRequest fields', () => {
 // ── Contract: issue create form sends required fields ─────────────────────
 
 test('issue editor form emits required Issue fields', () => {
-  const source = readFile('app', 'components', 'issue-editor.jsx');
+  const source = readFile('app', 'components', 'repo', 'issue-editor.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.Issue.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -249,8 +249,8 @@ test('webhook manager references ExternalWebhookConfig kind', () => {
 // ── Contract: inference service form sends required fields ─────────────────
 
 test('inference service manager emits required KrateInferenceService fields', () => {
-  const source = readFile('app', 'components', 'inference-service-manager.jsx')
-    + readFile('app', 'components', 'inference-service-list.jsx');
+  const source = readFile('app', 'components', 'inference', 'inference-service-manager.jsx')
+    + readFile('app', 'components', 'inference', 'inference-service-list.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.KrateInferenceService.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -264,8 +264,8 @@ test('inference service manager emits required KrateInferenceService fields', ()
 // ── Contract: model route creation form sends required fields ────────────
 
 test('model route form emits required KrateModelRoute spec fields', () => {
-  const source = readFile('app', 'components', 'inference-service-manager.jsx')
-    + readFile('app', 'components', 'model-route-manager.jsx');
+  const source = readFile('app', 'components', 'inference', 'inference-service-manager.jsx')
+    + readFile('app', 'components', 'inference', 'model-route-manager.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.KrateModelRoute.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -291,8 +291,8 @@ test('model routes API route creates KrateModelRoute with required fields', () =
 // ── Contract: virtual model form references required KrateVirtualModel fields ──
 
 test('virtual model form references required KrateVirtualModel fields', () => {
-  const source = readFile('app', 'components', 'inference-service-manager.jsx')
-    + readFile('app', 'components', 'virtual-model-manager.jsx');
+  const source = readFile('app', 'components', 'inference', 'inference-service-manager.jsx')
+    + readFile('app', 'components', 'inference', 'virtual-model-manager.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.KrateVirtualModel.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue; // added by API route
@@ -353,7 +353,7 @@ test('inference virtual-models GET route supports limit/offset pagination', () =
 // ── Contract: Pagination component exists ───────────────────────────────────
 
 test('Pagination component exists with expected props', () => {
-  const source = readFile('app', 'components', 'pagination.jsx');
+  const source = readFile('app', 'components', 'shell', 'pagination.jsx');
   assert.match(source, /export function Pagination/);
   assert.match(source, /total/);
   assert.match(source, /limit/);
@@ -365,9 +365,9 @@ test('Pagination component exists with expected props', () => {
 });
 
 test('inference-service-manager uses Pagination via ResourceTabContent', () => {
-  const manager = readFile('app', 'components', 'inference-service-manager.jsx');
+  const manager = readFile('app', 'components', 'inference', 'inference-service-manager.jsx');
   assert.match(manager, /ResourceTabContent/);
-  const helpers = readFile('app', 'components', 'inference-service-helpers.jsx');
+  const helpers = readFile('app', 'components', 'inference', 'inference-service-helpers.jsx');
   assert.match(helpers, /import.*Pagination.*from.*pagination/);
   assert.match(helpers, /<Pagination/);
 });

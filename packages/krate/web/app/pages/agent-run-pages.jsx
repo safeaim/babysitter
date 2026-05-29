@@ -2,10 +2,10 @@
 import { loadKrateUi, orgHref, StatusPill, DegradedBanner, EmptyState } from '../lib/krate-ui.jsx';
 import { resourceToYaml } from '@a5c-ai/krate-sdk';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { DispatchButton } from '../components/dispatch-button.jsx';
-import { LiveUpdates } from '../components/live-updates.jsx';
-import { ManualDispatchButton, RunActions } from '../components/run-actions.jsx';
-import { CopyButton } from '../components/inference-helpers.jsx';
+import { DispatchButton } from '../components/agent/dispatch-button.jsx';
+import { LiveUpdates } from '../components/agent/live-updates.jsx';
+import { ManualDispatchButton, RunActions } from '../components/agent/run-actions.jsx';
+import { CopyButton } from '../components/inference/inference-helpers.jsx';
 import { phaseTone, FlowVisualization } from './agent-helpers.jsx';
 
 export async function AgentRunsPage({ org = null, linkToDetail = false } = {}) {

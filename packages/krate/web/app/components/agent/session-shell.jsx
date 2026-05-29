@@ -7,7 +7,7 @@ import {
   SEGMENT_KINDS,
   deriveSegments,
   phaseTone as computePhaseTone,
-} from '../lib/agent-utils.js';
+} from '../../lib/agent-utils.js';
 
 // ---------------------------------------------------------------------------
 // Sub-components

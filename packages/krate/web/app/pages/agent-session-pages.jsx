@@ -1,10 +1,10 @@
 // Routes: /orgs/[org]/agents/sessions, /agents/sessions/[name] — agent session list and live detail.
 import { loadKrateUi, orgHref, StatusPill, DegradedBanner, EmptyState } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { LiveUpdates } from '../components/live-updates.jsx';
-import { ApprovalModeToggle } from '../components/approval-mode-toggle.jsx';
-import { SessionShell } from '../components/session-shell.jsx';
-import { SessionCost } from '../components/session-cost.jsx';
+import { LiveUpdates } from '../components/agent/live-updates.jsx';
+import { ApprovalModeToggle } from '../components/agent/approval-mode-toggle.jsx';
+import { SessionShell } from '../components/agent/session-shell.jsx';
+import { SessionCost } from '../components/agent/session-cost.jsx';
 import { ResourceActions } from '../components/resource-crud-actions.jsx';
 import { phaseTone } from './agent-helpers.jsx';
 

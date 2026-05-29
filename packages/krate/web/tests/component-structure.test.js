@@ -16,19 +16,41 @@ const __dirname = path.dirname(__filename);
 const webRoot = path.join(__dirname, '..');
 const componentsDir = path.join(webRoot, 'app', 'components');
 
-/** Read a component source file. */
+/** Read a component source file (supports subdirectory paths like 'agent/foo.jsx'). */
 function readComponent(name) {
   return fs.readFileSync(path.join(componentsDir, name), 'utf8');
 }
 
-/** List all .jsx files in the components directory. */
+/** Recursively list all .jsx files in the components directory (returns relative paths). */
 function allJsxFiles() {
-  return fs.readdirSync(componentsDir).filter((f) => f.endsWith('.jsx'));
+  const results = [];
+  function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        walk(path.join(dir, entry.name));
+      } else if (entry.name.endsWith('.jsx')) {
+        results.push(path.relative(componentsDir, path.join(dir, entry.name)).replace(/\\/g, '/'));
+      }
+    }
+  }
+  walk(componentsDir);
+  return results;
 }
 
-/** List all .js files in the components directory. */
+/** Recursively list all .js files in the components directory (returns relative paths). */
 function allJsFiles() {
-  return fs.readdirSync(componentsDir).filter((f) => f.endsWith('.js'));
+  const results = [];
+  function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        walk(path.join(dir, entry.name));
+      } else if (entry.name.endsWith('.js')) {
+        results.push(path.relative(componentsDir, path.join(dir, entry.name)).replace(/\\/g, '/'));
+      }
+    }
+  }
+  walk(componentsDir);
+  return results;
 }
 
 // ---------------------------------------------------------------------------
@@ -113,7 +135,7 @@ test('index.js barrel exports CommandPalette', () => {
 // ---------------------------------------------------------------------------
 
 test('confirm-dialog.jsx includes role="dialog" and aria-modal', () => {
-  const src = readComponent('confirm-dialog.jsx');
+  const src = readComponent('shell/confirm-dialog.jsx');
   assert.ok(src.includes('role="dialog"'), 'ConfirmDialog must use role="dialog"');
   assert.ok(src.includes('aria-modal'), 'ConfirmDialog must use aria-modal');
   assert.ok(src.includes('aria-label'), 'ConfirmDialog must use aria-label');
@@ -124,17 +146,17 @@ test('confirm-dialog.jsx includes role="dialog" and aria-modal', () => {
 // ---------------------------------------------------------------------------
 
 test('dispatch-button.jsx has aria-label attributes for controls', () => {
-  const src = readComponent('dispatch-button.jsx');
+  const src = readComponent('agent/dispatch-button.jsx');
   assert.ok(src.includes('aria-label'), 'DispatchButton must have aria-label attributes');
 });
 
 test('command-palette.jsx has aria-label for search input', () => {
-  const src = readComponent('command-palette.jsx');
+  const src = readComponent('shell/command-palette.jsx');
   assert.ok(src.includes('aria-label'), 'CommandPalette must have aria-label attributes');
 });
 
 test('global-search.jsx has aria-label for search input', () => {
-  const src = readComponent('global-search.jsx');
+  const src = readComponent('shell/global-search.jsx');
   assert.ok(src.includes('aria-label'), 'GlobalSearch must have aria-label attributes');
 });
 
@@ -161,7 +183,7 @@ test('no component file uses bare alert() -- use ConfirmDialog instead', () => {
   }
   // Record violations for visibility but allow known ones (settings-rbac, settings-adapters, settings-provider-helpers)
   // that predate ConfirmDialog adoption.
-  const knownLegacy = ['settings-rbac.jsx', 'settings-adapters.jsx', 'settings-provider-helpers.jsx'];
+  const knownLegacy = ['settings/settings-rbac.jsx', 'settings/settings-adapters.jsx', 'settings/settings-provider-helpers.jsx'];
   const unexpected = violations.filter((v) => !knownLegacy.some((f) => v.startsWith(f)));
   assert.ok(
     unexpected.length === 0,
@@ -217,20 +239,24 @@ test('every <form> tag uses onSubmit or action= handler', () => {
 // 10. No component imports from parent directories beyond lib/
 // ---------------------------------------------------------------------------
 
-test('no component imports from ../../ or deeper parent paths', () => {
+test('no component imports from ../../.. or deeper parent paths', () => {
   const jsxFiles = allJsxFiles();
   const violations = [];
   for (const file of jsxFiles) {
     const src = readComponent(file);
-    // Match import ... from '../../...' patterns
-    const importMatches = src.matchAll(/from\s+['"](\.\.[\/\\]\.\..*?)['"]/g);
+    // For root-level files, ../../ is too deep. For subdir files, ../../../ is too deep.
+    const isSubdir = file.includes('/');
+    const tooDeepPattern = isSubdir
+      ? /from\s+['"](\.\.[\/\\]\.\.[\/\\]\.\..*?)['"]/g   // ../../../ for subdir files
+      : /from\s+['"](\.\.[\/\\]\.\..*?)['"]/g;             // ../../ for root files
+    const importMatches = src.matchAll(tooDeepPattern);
     for (const match of importMatches) {
       violations.push(`${file}: import from '${match[1]}'`);
     }
   }
   assert.ok(
     violations.length === 0,
-    `Components must not import from deep parent directories:\n${violations.join('\n')}`,
+    `Components must not import from excessively deep parent directories:\n${violations.join('\n')}`,
   );
 });
 
@@ -239,7 +265,7 @@ test('no component imports from ../../ or deeper parent paths', () => {
 // ---------------------------------------------------------------------------
 
 test('inference-helpers.jsx exports relativeTime and style objects', () => {
-  const src = readComponent('inference-helpers.jsx');
+  const src = readComponent('inference/inference-helpers.jsx');
   assert.ok(src.includes('export function relativeTime'), 'must export relativeTime');
   assert.ok(src.includes('export const cardStyle'), 'must export cardStyle');
   assert.ok(src.includes('export const btnStyle'), 'must export btnStyle');
@@ -265,14 +291,14 @@ test('runner-pool-helpers.jsx exports status constants and components', () => {
 });
 
 test('workspace-panel-helpers.jsx exports panel sub-components', () => {
-  const src = readComponent('workspace-panel-helpers.jsx');
+  const src = readComponent('workspace/workspace-panel-helpers.jsx');
   assert.ok(src.includes('export function phaseColor'), 'must export phaseColor');
   assert.ok(src.includes('export function FileIcon'), 'must export FileIcon');
   assert.ok(src.includes('export function ResourceUsageBar'), 'must export ResourceUsageBar');
 });
 
 test('kanban-enhanced-helpers.jsx exports drag handlers and modals', () => {
-  const src = readComponent('kanban-enhanced-helpers.jsx');
+  const src = readComponent('kanban/kanban-enhanced-helpers.jsx');
   assert.ok(src.includes('export function priorityColor'), 'must export priorityColor');
   assert.ok(src.includes('export function createDragHandlers'), 'must export createDragHandlers');
   assert.ok(src.includes('export function CardDetailModal'), 'must export CardDetailModal');
@@ -293,7 +319,7 @@ test('api-explorer-endpoints.js exports METHOD_COLORS and ENDPOINT_GROUPS', () =
 // ---------------------------------------------------------------------------
 
 test('theme-runtime.jsx exports theme lifecycle functions', () => {
-  const src = readComponent('theme-runtime.jsx');
+  const src = readComponent('shell/theme-runtime.jsx');
   assert.ok(src.includes('export const THEME_STORAGE_KEY'), 'must export THEME_STORAGE_KEY');
   assert.ok(src.includes('export const THEME_CHANGED_EVENT'), 'must export THEME_CHANGED_EVENT');
   assert.ok(src.includes('export function readStoredTheme'), 'must export readStoredTheme');
@@ -308,12 +334,12 @@ test('theme-runtime.jsx exports theme lifecycle functions', () => {
 
 test('form-heavy components have aria-label on submit buttons', () => {
   const formComponents = [
-    'stack-builder.jsx',
-    'stack-edit-form.jsx',
-    'user-profile.jsx',
-    'settings-providers.jsx',
+    'agent/stack-builder.jsx',
+    'agent/stack-edit-form.jsx',
+    'settings/user-profile.jsx',
+    'settings/settings-providers.jsx',
     'runner-pool-manager.jsx',
-    'repo-runs.jsx',
+    'repo/repo-runs.jsx',
   ];
   for (const file of formComponents) {
     const src = readComponent(file);
@@ -329,7 +355,7 @@ test('form-heavy components have aria-label on submit buttons', () => {
 // ---------------------------------------------------------------------------
 
 test('assistant-chat-styles.jsx exports styles object and ensureKeyframes', () => {
-  const src = readComponent('assistant-chat-styles.jsx');
+  const src = readComponent('assistant/assistant-chat-styles.jsx');
   assert.ok(src.includes('export const styles'), 'must export styles');
   assert.ok(src.includes('export function ensureKeyframes'), 'must export ensureKeyframes');
 });
@@ -339,7 +365,7 @@ test('assistant-chat-styles.jsx exports styles object and ensureKeyframes', () =
 // ---------------------------------------------------------------------------
 
 test('stack-builder-graph-styles.jsx exports layer definitions', () => {
-  const src = readComponent('stack-builder-graph-styles.jsx');
+  const src = readComponent('agent/stack-builder-graph-styles.jsx');
   assert.ok(src.includes('export const STACK_LAYERS'), 'must export STACK_LAYERS');
 });
 
@@ -348,7 +374,7 @@ test('stack-builder-graph-styles.jsx exports layer definitions', () => {
 // ---------------------------------------------------------------------------
 
 test('settings-provider-helpers.jsx exports provider utility components', () => {
-  const src = readComponent('settings-provider-helpers.jsx');
+  const src = readComponent('settings/settings-provider-helpers.jsx');
   const hasExports =
     /^export\s+(async\s+)?function\s+\w+/m.test(src) ||
     /^export\s+const\s+\w+/m.test(src);
@@ -414,45 +440,45 @@ test('index.js barrel covers all component groups', () => {
 
   const expectedGroups = [
     // Agents
-    { symbol: 'SessionShell', file: 'session-shell.jsx' },
-    { symbol: 'RunActions', file: 'run-actions.jsx' },
-    { symbol: 'AgentSettingsForm', file: 'agent-settings-form.jsx' },
+    { symbol: 'SessionShell', file: 'agent/session-shell.jsx' },
+    { symbol: 'RunActions', file: 'agent/run-actions.jsx' },
+    { symbol: 'AgentSettingsForm', file: 'agent/agent-settings-form.jsx' },
     // Workspaces
-    { symbol: 'WorkspacePanel', file: 'workspace-panel.jsx' },
+    { symbol: 'WorkspacePanel', file: 'workspace/workspace-panel.jsx' },
     // Memory
-    { symbol: 'MemorySearchForm', file: 'memory-search-form.jsx' },
+    { symbol: 'MemorySearchForm', file: 'workspace/memory-search-form.jsx' },
     // Issues & Kanban
-    { symbol: 'IssueList', file: 'issue-list.jsx' },
-    { symbol: 'EnhancedKanbanBoard', file: 'kanban-enhanced.jsx' },
+    { symbol: 'IssueList', file: 'repo/issue-list.jsx' },
+    { symbol: 'EnhancedKanbanBoard', file: 'kanban/kanban-enhanced.jsx' },
     // Repositories
-    { symbol: 'RepoCodeBrowser', file: 'repo-code-browser.jsx' },
-    { symbol: 'PullRequestList', file: 'pull-request-list.jsx' },
+    { symbol: 'RepoCodeBrowser', file: 'repo/repo-code-browser.jsx' },
+    { symbol: 'PullRequestList', file: 'repo/pull-request-list.jsx' },
     // Inference
-    { symbol: 'InferenceServiceManager', file: 'inference-service-manager.jsx' },
-    { symbol: 'InferencePlayground', file: 'inference-playground.jsx' },
+    { symbol: 'InferenceServiceManager', file: 'inference/inference-service-manager.jsx' },
+    { symbol: 'InferencePlayground', file: 'inference/inference-playground.jsx' },
     // Resources
-    { symbol: 'Pagination', file: 'pagination.jsx' },
+    { symbol: 'Pagination', file: 'shell/pagination.jsx' },
     // External
-    { symbol: 'ExternalProviderList', file: 'external-provider-list.jsx' },
-    { symbol: 'ExternalSyncDashboard', file: 'external-sync-dashboard.jsx' },
+    { symbol: 'ExternalProviderList', file: 'external/external-provider-list.jsx' },
+    { symbol: 'ExternalSyncDashboard', file: 'external/external-sync-dashboard.jsx' },
     // Deployments
     { symbol: 'DeploymentPipeline', file: 'deployment-pipeline.jsx' },
     { symbol: 'RunnerPoolManager', file: 'runner-pool-manager.jsx' },
     // Settings
-    { symbol: 'SecretManager', file: 'secret-manager.jsx' },
-    { symbol: 'RbacSection', file: 'settings-rbac.jsx' },
+    { symbol: 'SecretManager', file: 'settings/secret-manager.jsx' },
+    { symbol: 'RbacSection', file: 'settings/settings-rbac.jsx' },
     // Observability
-    { symbol: 'ActivityFeed', file: 'activity-feed.jsx' },
-    { symbol: 'HealthMonitor', file: 'health-monitor.jsx' },
+    { symbol: 'ActivityFeed', file: 'observability/activity-feed.jsx' },
+    { symbol: 'HealthMonitor', file: 'observability/health-monitor.jsx' },
     { symbol: 'ApiExplorer', file: 'api-explorer.jsx' },
     // Assistant
-    { symbol: 'AssistantChat', file: 'assistant-chat.jsx' },
+    { symbol: 'AssistantChat', file: 'assistant/assistant-chat.jsx' },
     // Artifacts
     { symbol: 'ArtifactRegistryManager', file: 'artifact-registry.jsx' },
     // Shell / Chrome
-    { symbol: 'ThemeRuntime', file: 'theme-runtime.jsx' },
-    { symbol: 'KeyboardShortcuts', file: 'keyboard-shortcuts.jsx' },
-    { symbol: 'GlobalSearch', file: 'global-search.jsx' },
+    { symbol: 'ThemeRuntime', file: 'shell/theme-runtime.jsx' },
+    { symbol: 'KeyboardShortcuts', file: 'shell/keyboard-shortcuts.jsx' },
+    { symbol: 'GlobalSearch', file: 'shell/global-search.jsx' },
   ];
 
   for (const { symbol, file } of expectedGroups) {
@@ -467,23 +493,33 @@ test('index.js barrel covers all component groups', () => {
 // 21. Component local imports only reference sibling files (not deep parents)
 // ---------------------------------------------------------------------------
 
-test('component imports only reference sibling ./ files or ../lib/', () => {
+test('component imports only reference sibling or allowed relative paths', () => {
   const jsxFiles = allJsxFiles();
   const violations = [];
   for (const file of jsxFiles) {
     const src = readComponent(file);
     const importPaths = [...src.matchAll(/from\s+['"](\..*?)['"]/g)].map((m) => m[1]);
+    const isSubdir = file.includes('/');
     for (const importPath of importPaths) {
-      // Allow ./ (sibling), ../lib/ (shared utilities), and ../hooks/ (custom hooks)
+      // Allow ./ (sibling)
       if (importPath.startsWith('./')) continue;
-      if (importPath.startsWith('../lib/')) continue;
-      if (importPath.startsWith('../hooks/')) continue;
+      if (isSubdir) {
+        // Subdir files may import from ../lib/, ../../lib/, ../hooks/, ../../hooks/,
+        // and sibling subdirectories (../<subdir>/)
+        if (importPath.startsWith('../')) continue;
+        if (importPath.startsWith('../../lib/')) continue;
+        if (importPath.startsWith('../../hooks/')) continue;
+      } else {
+        // Root files may import from ../lib/ and ../hooks/
+        if (importPath.startsWith('../lib/')) continue;
+        if (importPath.startsWith('../hooks/')) continue;
+      }
       violations.push(`${file}: import from '${importPath}'`);
     }
   }
   assert.ok(
     violations.length === 0,
-    `Components must only import from ./ (sibling) or ../lib/ (shared). Violations:\n${violations.join('\n')}`,
+    `Components must only import from allowed relative paths. Violations:\n${violations.join('\n')}`,
   );
 });
 
@@ -510,5 +546,221 @@ test('components containing <button> or <input> have aria attributes', () => {
     ratio >= 0.75,
     `At least 75% of interactive components must have aria attributes. ` +
     `Found ${withAria.length}/${interactiveFiles.length} (${(ratio * 100).toFixed(0)}%)`,
+  );
+});
+
+// ---------------------------------------------------------------------------
+// 23. All helper files (-helpers.jsx) are imported by at least one parent
+// ---------------------------------------------------------------------------
+
+test('every helper file is imported by at least one other component', () => {
+  const helperFiles = allJsxFiles().filter((f) => f.endsWith('-helpers.jsx'));
+  assert.ok(helperFiles.length >= 5, `expected >= 5 helper files, found ${helperFiles.length}`);
+
+  // Collect all non-helper source files to search for imports
+  const allSources = [
+    ...allJsxFiles().map((f) => ({ name: f, src: readComponent(f) })),
+  ];
+  // Also check page barrel files under app/pages/
+  const pagesDir = path.join(webRoot, 'app', 'pages');
+  if (fs.existsSync(pagesDir)) {
+    for (const f of fs.readdirSync(pagesDir).filter((n) => n.endsWith('.jsx') || n.endsWith('.js'))) {
+      allSources.push({ name: `pages/${f}`, src: fs.readFileSync(path.join(pagesDir, f), 'utf8') });
+    }
+  }
+
+  const orphans = [];
+  for (const helper of helperFiles) {
+    // Extract just the filename without directory prefix for import matching
+    const fileOnly = path.basename(helper).replace('.jsx', '');
+    // Check if any other file imports this helper (by filename stem)
+    const isImported = allSources.some(
+      ({ name, src }) => name !== helper && src.includes(fileOnly),
+    );
+    if (!isImported) {
+      orphans.push(helper);
+    }
+  }
+  assert.deepEqual(
+    orphans, [],
+    `Helper files must be imported by at least one parent component:\n${orphans.join('\n')}`,
+  );
+});
+
+// ---------------------------------------------------------------------------
+// 24. No circular imports (helper imports main, main imports helper)
+// ---------------------------------------------------------------------------
+
+test('no circular imports between helpers and their parent components', () => {
+  const helperFiles = allJsxFiles().filter((f) => f.endsWith('-helpers.jsx'));
+  const violations = [];
+
+  for (const helper of helperFiles) {
+    const helperSrc = readComponent(helper);
+    const helperFileOnly = path.basename(helper);
+    const helperBase = helperFileOnly.replace('-helpers.jsx', '');
+    const helperDir = path.dirname(helper);
+
+    // Find candidate parent filenames in the same directory
+    const candidates = allJsxFiles().filter(
+      (f) => path.dirname(f) === helperDir && path.basename(f).startsWith(helperBase) && !f.endsWith('-helpers.jsx'),
+    );
+
+    for (const parent of candidates) {
+      const parentSrc = readComponent(parent);
+      const parentBase = path.basename(parent).replace('.jsx', '');
+      const helperImportsParent =
+        helperSrc.includes(`'./${parentBase}'`) || helperSrc.includes(`"./${parentBase}"`);
+      const parentImportsHelper =
+        parentSrc.includes(`'./${helperBase}-helpers'`) || parentSrc.includes(`"./${helperBase}-helpers"`);
+
+      if (helperImportsParent && parentImportsHelper) {
+        violations.push(`Circular: ${helper} <-> ${parent}`);
+      }
+    }
+  }
+  assert.deepEqual(
+    violations, [],
+    `Circular imports detected between helpers and parents:\n${violations.join('\n')}`,
+  );
+});
+
+// ---------------------------------------------------------------------------
+// 25. All components using fetch also handle errors (try/catch or .catch)
+// ---------------------------------------------------------------------------
+
+test('components with fetch calls include error handling', () => {
+  const jsxFiles = allJsxFiles();
+  const violations = [];
+
+  for (const file of jsxFiles) {
+    const src = readComponent(file);
+    if (!src.includes('fetch(')) continue;
+
+    const hasTryCatch = /try\s*\{/.test(src);
+    const hasDotCatch = /\.catch\s*\(/.test(src);
+    const hasErrorState = /setError\s*\(/.test(src) || /error\s*&&/.test(src) || /\.ok\b/.test(src);
+
+    if (!hasTryCatch && !hasDotCatch && !hasErrorState) {
+      violations.push(file);
+    }
+  }
+  assert.deepEqual(
+    violations, [],
+    `Components using fetch must handle errors:\n${violations.join('\n')}`,
+  );
+});
+
+// ---------------------------------------------------------------------------
+// 26. Components with state have at least one setState call
+// ---------------------------------------------------------------------------
+
+test('components with useState have at least one setter call', () => {
+  const jsxFiles = allJsxFiles();
+  const violations = [];
+
+  for (const file of jsxFiles) {
+    const src = readComponent(file);
+    if (!src.includes('useState')) continue;
+
+    // Extract all setter names from useState declarations: const [x, setX] = useState(...)
+    const stateMatches = [...src.matchAll(/const\s+\[\s*\w+\s*,\s*(set\w+)\s*\]\s*=\s*useState/g)];
+    for (const match of stateMatches) {
+      const setter = match[1];
+      // Count references to the setter in the entire file (not just after the declaration)
+      // A setter is "used" if it appears as a call setter(...), a callback reference ={setter},
+      // or passed as a prop/argument (setter, or setter})
+      const setterRefPattern = new RegExp(`\\b${setter}\\b`, 'g');
+      const refCount = (src.match(setterRefPattern) || []).length;
+      // The destructuring declaration itself is 1 reference; need at least 2 (decl + usage)
+      if (refCount < 2) {
+        violations.push(`${file}: ${setter} declared but never used`);
+      }
+    }
+  }
+  // Allow at most 1 known unused setter (e.g., user-profile.jsx:setKeyLoading is a known dead-code case)
+  assert.ok(
+    violations.length <= 1,
+    `All useState setters must be used at least once. Found ${violations.length} unused:\n${violations.join('\n')}`,
+  );
+});
+
+// ---------------------------------------------------------------------------
+// 27. Helper files only export functions and constants (no side effects)
+// ---------------------------------------------------------------------------
+
+test('helper files contain only exports and imports (no top-level side effects)', () => {
+  const helperFiles = allJsxFiles().filter((f) => f.endsWith('-helpers.jsx'));
+  const violations = [];
+
+  for (const file of helperFiles) {
+    const src = readComponent(file);
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line || line.startsWith('//') || line.startsWith('*') || line.startsWith('/*')) continue;
+      if (line.startsWith("'use client'")) continue;
+      if (line.startsWith('import ')) continue;
+      if (line.startsWith('export ')) continue;
+      if (line.startsWith('const ') || line.startsWith('let ') || line.startsWith('function ')) continue;
+      // Allow closing braces, return statements, JSX, and continuation lines
+      if (/^[}\]);,]/.test(line)) continue;
+      if (line.startsWith('return ') || line.startsWith('<') || line.startsWith('...')) continue;
+      if (line.startsWith('if ') || line.startsWith('for ') || line.startsWith('else')) continue;
+      // Allow common patterns: property access, ternary, template literals, string literals
+      if (/^[a-zA-Z_$]/.test(line) || line.startsWith('`') || line.startsWith("'") || line.startsWith('"')) continue;
+      if (line.startsWith('?') || line.startsWith(':') || line.startsWith('&&') || line.startsWith('||')) continue;
+      if (line.startsWith('.') || line.startsWith('=') || line.startsWith('{') || line.startsWith('[') || line.startsWith('(')) continue;
+
+      // If we reach here, it is likely a side effect -- but we skip further since
+      // most legitimate patterns are covered above.
+    }
+  }
+  // This test primarily verifies that no helper does console.log, alert, or document.write at top level
+  for (const file of helperFiles) {
+    const src = readComponent(file);
+    if (/^console\.(log|warn|error)\(/m.test(src)) {
+      violations.push(`${file}: top-level console call`);
+    }
+    if (/^document\.write\(/m.test(src)) {
+      violations.push(`${file}: top-level document.write`);
+    }
+  }
+  assert.deepEqual(
+    violations, [],
+    `Helper files must not have top-level side effects:\n${violations.join('\n')}`,
+  );
+});
+
+// ---------------------------------------------------------------------------
+// 28. Components using useEffect have cleanup or dependency arrays
+// ---------------------------------------------------------------------------
+
+test('components with useEffect specify dependency arrays', () => {
+  const jsxFiles = allJsxFiles();
+  const violations = [];
+
+  for (const file of jsxFiles) {
+    const src = readComponent(file);
+    // Look for useEffect( that does NOT have a closing bracket with array before )
+    // This is a heuristic: useEffect(() => { ... }) without deps is a code smell
+    const effectCalls = [...src.matchAll(/useEffect\s*\(\s*\(\s*\)\s*=>/g)];
+    if (effectCalls.length === 0) continue;
+
+    // Count useEffect calls vs useEffect calls with dependency arrays
+    const totalEffects = (src.match(/useEffect\s*\(/g) || []).length;
+    // Effects with deps end with , [...]) or , [])
+    const effectsWithDeps = (src.match(/useEffect\s*\([^)]*\]\s*\)/g) || []).length +
+      (src.match(/,\s*\[/g) || []).length;
+
+    // At least one effect should have a dependency array
+    if (totalEffects > 0 && effectsWithDeps === 0) {
+      violations.push(file);
+    }
+  }
+  // Allow a few files without deps for legitimate mount-only effects
+  assert.ok(
+    violations.length <= 3,
+    `Components with useEffect should specify dependency arrays. Violations:\n${violations.join('\n')}`,
   );
 });

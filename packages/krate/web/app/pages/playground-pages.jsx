@@ -1,7 +1,7 @@
 // Routes: /orgs/[org]/playground — side-by-side model comparison playground.
 import { loadKrateUi, DegradedBanner } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
-import { InferencePlayground } from '../components/inference-playground.jsx';
+import { InferencePlayground } from '../components/inference/inference-playground.jsx';
 
 export async function PlaygroundPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);

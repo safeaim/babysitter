@@ -2,17 +2,17 @@
 import { loadKrateUi, orgHref, modelHref, publicResource, resourceJson, sanitizeCopy, sanitizeAction, displayKind, displayRole, displayCommand, deploymentKind, StatusPill, DegradedBanner, EmptyState, InfoList, PlanCard, ResourceTable } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
 import { IssueWorkspace, IssueDetailView, issuesForScope, IssueDetailPage, IssueScopePage } from './agent-pages.jsx';
-import { CodeEditor, LiveWatchPanel } from '../components/code-editor.jsx';
+import { CodeEditor, LiveWatchPanel } from '../components/repo/code-editor.jsx';
 import { DeploymentManager, RepositoryManager, ResourceApplyPanel, UserManagementPanel } from '../components/resource-actions.jsx';
 import { ResourceActions, InlineCreateForm } from '../components/resource-crud-actions.jsx';
-import { RepoCodeBrowser } from '../components/repo-code-browser.jsx';
-import { PullRequestList } from '../components/pull-request-list.jsx';
-import { RepoRuns } from '../components/repo-runs.jsx';
+import { RepoCodeBrowser } from '../components/repo/repo-code-browser.jsx';
+import { PullRequestList } from '../components/repo/pull-request-list.jsx';
+import { RepoRuns } from '../components/repo/repo-runs.jsx';
 import { WebhookManager } from '../components/webhook-manager.jsx';
 import { DeploymentPipeline } from '../components/deployment-pipeline.jsx';
 import { RunnerPoolManager } from '../components/runner-pool-manager.jsx';
-import { ActivityFeed } from '../components/activity-feed.jsx';
-import { HealthMonitor } from '../components/health-monitor.jsx';
+import { ActivityFeed } from '../components/observability/activity-feed.jsx';
+import { HealthMonitor } from '../components/observability/health-monitor.jsx';
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
 

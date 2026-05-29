@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ConfirmDialog } from './confirm-dialog.jsx';
+import { ConfirmDialog } from './shell/confirm-dialog.jsx';
 
 /**
  * ResourceActions — terminate / archive / delete buttons for any resource.

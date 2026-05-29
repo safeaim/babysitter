@@ -43,13 +43,13 @@ const PROVIDER_FIELDS = {
 };
 
 const labelStyle = { display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' };
-const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem', boxSizing: 'border-box' };
-const selectStyle = { ...inputStyle, background: '#fff' };
+const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid var(--border)', fontSize: '0.875rem', boxSizing: 'border-box' };
+const selectStyle = { ...inputStyle, background: 'var(--surface)' };
 const fieldGroupStyle = { display: 'flex', flexDirection: 'column', gap: '1rem' };
 const rowStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' };
 const buttonStyle = { padding: '8px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600 };
 const primaryStyle = { ...buttonStyle, backgroundColor: '#2563eb', color: '#fff' };
-const secondaryStyle = { ...buttonStyle, backgroundColor: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' };
+const secondaryStyle = { ...buttonStyle, backgroundColor: '#f3f4f6', color: 'var(--text)', border: '1px solid var(--border)' };
 const disabledStyle = { ...primaryStyle, opacity: 0.5, cursor: 'not-allowed' };
 
 function StatusMsg({ status, message }) {
@@ -67,7 +67,7 @@ function SecretRefField({ label, value, onChange, secrets, required }) {
 
   return (
     <div>
-      <label style={labelStyle}>{label} <small style={{ fontWeight: 400, color: '#6b7280' }}>(from Secret)</small></label>
+      <label style={labelStyle}>{label} <small style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(from Secret)</small></label>
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <select
           value={secretName}
@@ -141,8 +141,8 @@ function ProviderRow({ org, provider, onDeleted }) {
   return (
     <div className="resourceRow" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
       <strong style={{ flex: '1 1 auto' }}>{name}</strong>
-      <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{provider.spec?.provider || 'unknown'}</span>
-      <span style={{ color: '#6b7280', fontFamily: 'var(--font-mono, monospace)', fontSize: '0.8125rem' }}>
+      <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{provider.spec?.provider || 'unknown'}</span>
+      <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono, monospace)', fontSize: '0.8125rem' }}>
         {provider.spec?.authType || 'token'}
       </span>
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem' }}>
@@ -153,7 +153,7 @@ function ProviderRow({ org, provider, onDeleted }) {
         type="button"
         onClick={handleDelete}
         disabled={delStatus === 'deleting'}
-        style={{ ...secondaryStyle, padding: '4px 12px', fontSize: 12, color: '#dc2626', borderColor: '#fca5a5' }}
+        style={{ ...secondaryStyle, padding: '4px 12px', fontSize: 12, color: 'var(--danger)', borderColor: '#fca5a5' }}
       >
         {delStatus === 'deleting' ? 'Deleting...' : 'Delete'}
       </button>
@@ -257,7 +257,7 @@ function AddProviderForm({ org, onCreated, secrets }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1rem', marginTop: '0.75rem' }}>
+      <div style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border)', borderRadius: '0.5rem', padding: '1rem', marginTop: '0.75rem' }}>
         <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.875rem', fontWeight: 700 }}>New provider</h4>
         <div style={fieldGroupStyle}>
           <div style={rowStyle}>
@@ -281,7 +281,7 @@ function AddProviderForm({ org, onCreated, secrets }) {
 
           {/* Provider-specific fields */}
           <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem' }}>
-            <h5 style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', fontWeight: 600, color: '#374151' }}>
+            <h5 style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text)' }}>
               {providerType} configuration
             </h5>
             <div style={fieldGroupStyle}>
@@ -303,7 +303,7 @@ function AddProviderForm({ org, onCreated, secrets }) {
                   <div key={field.name}>
                     <label style={labelStyle}>
                       {field.label}
-                      {!field.required && <small style={{ fontWeight: 400, color: '#6b7280' }}> (optional)</small>}
+                      {!field.required && <small style={{ fontWeight: 400, color: 'var(--text-muted)' }}> (optional)</small>}
                     </label>
                     <input
                       type={field.name.toLowerCase().includes('url') || field.name.toLowerCase().includes('endpoint') ? 'url' : 'text'}
@@ -314,7 +314,7 @@ function AddProviderForm({ org, onCreated, secrets }) {
                       style={inputStyle}
                     />
                     {field.default && !fieldValues[field.name] && (
-                      <small style={{ color: '#9ca3af', fontSize: '0.75rem' }}>Default: {field.default}</small>
+                      <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Default: {field.default}</small>
                     )}
                   </div>
                 );
@@ -391,7 +391,7 @@ export function ProvidersSection({ org, initialProviders, secrets: initialSecret
           ))}
         </div>
       ) : !showForm ? (
-        <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
           <p>No providers configured. Click <strong>+ Add provider</strong> to define LLM access credentials and default models.</p>
         </div>
       ) : null}

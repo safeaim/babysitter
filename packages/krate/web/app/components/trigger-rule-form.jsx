@@ -6,8 +6,8 @@ const EVENT_TYPES = ['push', 'pull_request', 'issue', 'comment', 'schedule', 'we
 const TASK_KINDS = ['diagnostic', 'repair', 'review', 'custom'];
 
 const labelStyle = { display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' };
-const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem', boxSizing: 'border-box' };
-const selectStyle = { ...inputStyle, background: '#fff' };
+const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid var(--border)', fontSize: '0.875rem', boxSizing: 'border-box' };
+const selectStyle = { ...inputStyle, background: 'var(--surface)' };
 const fieldGroupStyle = { display: 'flex', flexDirection: 'column', gap: '1rem' };
 
 export function TriggerRuleForm({ org, stacks = [] }) {
@@ -82,7 +82,7 @@ export function TriggerRuleForm({ org, stacks = [] }) {
         </div>
         <div style={fieldGroupStyle}>
           <div>
-            <label htmlFor="trigger-name" style={labelStyle}>Name <span aria-hidden="true" style={{ color: '#dc2626' }}>*</span></label>
+            <label htmlFor="trigger-name" style={labelStyle}>Name <span aria-hidden="true" style={{ color: 'var(--danger)' }}>*</span></label>
             <input
               id="trigger-name"
               type="text"
@@ -115,7 +115,7 @@ export function TriggerRuleForm({ org, stacks = [] }) {
           </div>
 
           <div>
-            <label htmlFor="trigger-stack" style={labelStyle}>Target stack <span aria-hidden="true" style={{ color: '#dc2626' }}>*</span></label>
+            <label htmlFor="trigger-stack" style={labelStyle}>Target stack <span aria-hidden="true" style={{ color: 'var(--danger)' }}>*</span></label>
             <select
               id="trigger-stack"
               value={stackRef}
@@ -146,7 +146,7 @@ export function TriggerRuleForm({ org, stacks = [] }) {
           </div>
 
           <div>
-            <label htmlFor="trigger-repository" style={labelStyle}>Repository filter <small style={{ fontWeight: 400, color: '#6b7280' }}>(optional — leave empty for all repos)</small></label>
+            <label htmlFor="trigger-repository" style={labelStyle}>Repository filter <small style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional — leave empty for all repos)</small></label>
             <input
               id="trigger-repository"
               type="text"
@@ -158,7 +158,7 @@ export function TriggerRuleForm({ org, stacks = [] }) {
           </div>
 
           <div>
-            <label htmlFor="trigger-condition" style={labelStyle}>Condition expression <small style={{ fontWeight: 400, color: '#6b7280' }}>(optional)</small></label>
+            <label htmlFor="trigger-condition" style={labelStyle}>Condition expression <small style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional)</small></label>
             <input
               id="trigger-condition"
               type="text"
@@ -181,7 +181,7 @@ export function TriggerRuleForm({ org, stacks = [] }) {
               <span style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>{message}</span>
             )}
             {status === 'error' && (
-              <span style={{ fontSize: 13, color: '#dc2626' }}>{message}</span>
+              <span style={{ fontSize: 13, color: 'var(--danger)' }}>{message}</span>
             )}
           </div>
         </div>

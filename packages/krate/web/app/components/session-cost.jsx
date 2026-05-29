@@ -98,12 +98,12 @@ function TurnCostRow({ turn, index }) {
           listStyle: 'none',
         }}
       >
-        <span style={{ color: '#6b7280', flexShrink: 0, fontSize: 11 }}>Turn {index + 1}</span>
+        <span style={{ color: 'var(--text-muted)', flexShrink: 0, fontSize: 11 }}>Turn {index + 1}</span>
         <span
           style={{
             fontFamily: 'monospace',
             fontSize: 11,
-            color: '#374151',
+            color: 'var(--text)',
             flex: 1,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -123,7 +123,7 @@ function TurnCostRow({ turn, index }) {
         >
           {cost != null ? formatCost(cost) : '—'}
         </span>
-        <span style={{ fontSize: 10, color: '#9ca3af', flexShrink: 0 }}>
+        <span style={{ fontSize: 10, color: 'var(--text-muted)', flexShrink: 0 }}>
           {open ? '▲' : '▼'}
         </span>
       </summary>
@@ -140,27 +140,27 @@ function TurnCostRow({ turn, index }) {
         <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
           <tbody>
             <tr>
-              <td style={{ padding: '2px 8px 2px 0', color: '#6b7280' }}>Input tokens</td>
+              <td style={{ padding: '2px 8px 2px 0', color: 'var(--text-muted)' }}>Input tokens</td>
               <td style={{ fontFamily: 'monospace', textAlign: 'right' }}>{formatTokens(inputTokens)}</td>
             </tr>
             <tr>
-              <td style={{ padding: '2px 8px 2px 0', color: '#6b7280' }}>Output tokens</td>
+              <td style={{ padding: '2px 8px 2px 0', color: 'var(--text-muted)' }}>Output tokens</td>
               <td style={{ fontFamily: 'monospace', textAlign: 'right' }}>{formatTokens(outputTokens)}</td>
             </tr>
             {cacheRead > 0 && (
               <tr>
-                <td style={{ padding: '2px 8px 2px 0', color: '#6b7280' }}>Cache read</td>
+                <td style={{ padding: '2px 8px 2px 0', color: 'var(--text-muted)' }}>Cache read</td>
                 <td style={{ fontFamily: 'monospace', textAlign: 'right' }}>{formatTokens(cacheRead)}</td>
               </tr>
             )}
             {cacheWrite > 0 && (
               <tr>
-                <td style={{ padding: '2px 8px 2px 0', color: '#6b7280' }}>Cache write</td>
+                <td style={{ padding: '2px 8px 2px 0', color: 'var(--text-muted)' }}>Cache write</td>
                 <td style={{ fontFamily: 'monospace', textAlign: 'right' }}>{formatTokens(cacheWrite)}</td>
               </tr>
             )}
             <tr style={{ borderTop: '1px solid #e2e8f0' }}>
-              <td style={{ padding: '4px 8px 2px 0', color: '#374151', fontWeight: 600 }}>
+              <td style={{ padding: '4px 8px 2px 0', color: 'var(--text)', fontWeight: 600 }}>
                 Estimated cost
               </td>
               <td
@@ -177,7 +177,7 @@ function TurnCostRow({ turn, index }) {
           </tbody>
         </table>
         {!known && (
-          <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 6 }}>
+          <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6 }}>
             Pricing not available for model "{model}". Cost cannot be estimated.
           </p>
         )}
@@ -226,17 +226,17 @@ export function SessionCost({ turns = [], totalCost, compact = false }) {
           borderRadius: 4,
         }}
       >
-        <span style={{ color: '#6b7280' }}>Session cost</span>
+        <span style={{ color: 'var(--text-muted)' }}>Session cost</span>
         <strong style={{ fontFamily: 'monospace', color: '#1e293b' }}>{displayTotal}</strong>
         {totalInputTokens > 0 && (
           <>
             <span style={{ color: '#d1d5db' }}>|</span>
-            <span style={{ color: '#6b7280', fontSize: 11 }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
               {formatTokens(totalInputTokens)} in / {formatTokens(totalOutputTokens)} out
             </span>
           </>
         )}
-        <span style={{ color: '#9ca3af', fontSize: 11 }}>{turnsWithUsage.length} turns</span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>{turnsWithUsage.length} turns</span>
       </div>
     );
   }
@@ -278,7 +278,7 @@ export function SessionCost({ turns = [], totalCost, compact = false }) {
           ))}
         </div>
       ) : (
-        <p style={{ fontSize: 13, color: '#9ca3af', padding: '8px 0' }}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', padding: '8px 0' }}>
           No per-turn token usage data available for this session.
         </p>
       )}

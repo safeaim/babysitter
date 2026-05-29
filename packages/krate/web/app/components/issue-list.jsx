@@ -99,17 +99,17 @@ export function IssueList({ org, repo, issues = [] }) {
     }
   }
 
-  const inputStyle = { padding: '0.375rem 0.5rem', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.875rem', width: '100%', boxSizing: 'border-box' };
+  const inputStyle = { padding: '0.375rem 0.5rem', border: '1px solid var(--border)', borderRadius: '4px', fontSize: '0.875rem', width: '100%', boxSizing: 'border-box' };
   const btnStyle = (variant) => {
     const base = { border: 'none', padding: '0.375rem 0.75rem', borderRadius: '4px', cursor: busy ? 'wait' : 'pointer', fontSize: '0.8125rem', fontWeight: 600, opacity: busy ? 0.6 : 1 };
     if (variant === 'primary') return { ...base, background: 'var(--color-accent, #2563eb)', color: '#fff' };
-    if (variant === 'close') return { ...base, background: 'transparent', border: '1px solid #d1d5db', color: '#374151' };
+    if (variant === 'close') return { ...base, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)' };
     if (variant === 'danger') return { ...base, background: 'var(--color-danger, #cb2431)', color: '#fff' };
     if (variant === 'reopen') return { ...base, background: 'var(--color-good, #16a34a)', color: '#fff' };
-    return { ...base, background: '#f3f4f6', color: '#374151' };
+    return { ...base, background: 'var(--bg-subtle)', color: 'var(--text)' };
   };
   const pillStyle = (tone) => {
-    const colors = { good: { bg: '#dcfce7', color: '#166534' }, neutral: { bg: '#f3f4f6', color: '#374151' }, warn: { bg: '#fef3c7', color: '#92400e' }, danger: { bg: '#fee2e2', color: '#991b1b' } };
+    const colors = { good: { bg: '#dcfce7', color: '#166534' }, neutral: { bg: '#f3f4f6', color: 'var(--text)' }, warn: { bg: '#fef3c7', color: '#92400e' }, danger: { bg: '#fee2e2', color: '#991b1b' } };
     const c = colors[tone] || colors.neutral;
     return { display: 'inline-block', padding: '0.125rem 0.5rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600, background: c.bg, color: c.color };
   };
@@ -129,7 +129,7 @@ export function IssueList({ org, repo, issues = [] }) {
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} style={{ margin: '1rem 0', padding: '1rem', background: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb', display: 'grid', gap: '0.75rem' }}>
+        <form onSubmit={handleCreate} style={{ margin: '1rem 0', padding: '1rem', background: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)', display: 'grid', gap: '0.75rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             <label style={{ fontSize: '0.8125rem' }}>
               <span style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>Name (slug) *</span>
@@ -154,7 +154,7 @@ export function IssueList({ org, repo, issues = [] }) {
               <input style={inputStyle} value={form.assignee} onChange={e => setForm(f => ({ ...f, assignee: e.target.value }))} placeholder="username" />
             </label>
           </div>
-          {message && <p style={{ color: '#dc2626', fontSize: '0.8125rem', margin: 0 }}>{message}</p>}
+          {message && <p style={{ color: 'var(--danger)', fontSize: '0.8125rem', margin: 0 }}>{message}</p>}
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button type="submit" style={btnStyle('primary')} disabled={busy}>{busy ? 'Creating...' : 'Create issue'}</button>
             <button type="button" style={btnStyle('close')} onClick={() => setShowForm(false)}>Cancel</button>
@@ -163,7 +163,7 @@ export function IssueList({ org, repo, issues = [] }) {
       )}
 
       {items.length === 0 ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
           <p>No issues yet.</p>
           <p style={{ fontSize: '0.875rem' }}>Create an issue to track bugs, features, or tasks.</p>
         </div>
@@ -184,7 +184,7 @@ export function IssueList({ org, repo, issues = [] }) {
                     <strong style={{ fontSize: '0.9375rem' }}>{title}</strong>
                     <span style={pillStyle(isOpen ? 'good' : 'neutral')}>{status}</span>
                   </div>
-                  <div style={{ marginTop: '0.25rem', fontSize: '0.8125rem', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
+                  <div style={{ marginTop: '0.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
                     <span>#{name}</span>
                     {assignee && <><span>·</span><span>assigned to {assignee}</span></>}
                     {labels.length > 0 && (
@@ -213,7 +213,7 @@ export function IssueList({ org, repo, issues = [] }) {
           })}
         </ul>
       )}
-      {message && !showForm && <p style={{ color: '#dc2626', fontSize: '0.8125rem', marginTop: '0.5rem' }}>{message}</p>}
+      {message && !showForm && <p style={{ color: 'var(--danger)', fontSize: '0.8125rem', marginTop: '0.5rem' }}>{message}</p>}
     </div>
   );
 }

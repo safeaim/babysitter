@@ -6,7 +6,7 @@ function phaseTone(phase) {
   if (['Collecting', 'Redacting', 'Normalizing', 'Validating'].includes(phase)) return { bg: '#fef3c7', color: '#b45309' };
   if (phase === 'AwaitingReview') return { bg: '#dbeafe', color: '#1d4ed8' };
   if (phase === 'Merged') return { bg: '#dcfce7', color: '#15803d' };
-  if (phase === 'Rejected' || phase === 'Failed') return { bg: '#fee2e2', color: '#dc2626' };
+  if (phase === 'Rejected' || phase === 'Failed') return { bg: '#fee2e2', color: 'var(--danger)' };
   return { bg: '#f1f5f9', color: '#334151' };
 }
 
@@ -61,18 +61,18 @@ function ImportCard({ imp, org, onDecision }) {
   }
 
   return (
-    <div style={{ border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
+    <div style={{ border: '1px solid var(--border)', borderRadius: '0.5rem', overflow: 'hidden' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', background: 'var(--bg-subtle)', borderBottom: '1px solid #e5e7eb' }}>
         <strong style={{ fontSize: '0.875rem', flex: 1 }}>{name}</strong>
         <PhaseBadge phase={decision ? (decision === 'approve' ? 'Merged' : 'Rejected') : phase} />
-        {created && <small style={{ color: '#9ca3af', fontSize: '0.75rem' }}>{new Date(created).toLocaleString()}</small>}
+        {created && <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{new Date(created).toLocaleString()}</small>}
       </div>
 
       {/* Body */}
       <div style={{ padding: '0.75rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {/* Source info */}
-        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8125rem', color: '#6b7280' }}>
+        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
           {source.kind && <span><strong>Source:</strong> {source.kind}</span>}
           {runId && <span><strong>Run:</strong> {runId}</span>}
           {imp.spec?.repositoryRef && <span><strong>Repo:</strong> {imp.spec.repositoryRef}</span>}
@@ -96,16 +96,16 @@ function ImportCard({ imp, org, onDecision }) {
 
         {/* Summary */}
         {summary && (
-          <p style={{ fontSize: '0.8125rem', color: '#374151', margin: 0 }}>{summary}</p>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--text)', margin: 0 }}>{summary}</p>
         )}
 
         {/* Key findings */}
         {findings.length > 0 && (
           <div>
-            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', margin: '0 0 0.25rem' }}>Key findings:</p>
-            <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.8125rem', color: '#374151' }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', margin: '0 0 0.25rem' }}>Key findings:</p>
+            <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.8125rem', color: 'var(--text)' }}>
               {findings.slice(0, 3).map((f, i) => <li key={i}>{typeof f === 'string' ? f : f.text || f.summary || JSON.stringify(f)}</li>)}
-              {findings.length > 3 && <li style={{ color: '#9ca3af' }}>+{findings.length - 3} more</li>}
+              {findings.length > 3 && <li style={{ color: 'var(--text-muted)' }}>+{findings.length - 3} more</li>}
             </ul>
           </div>
         )}
@@ -140,8 +140,8 @@ function ImportCard({ imp, org, onDecision }) {
             disabled={localStatus === 'approving' || localStatus === 'rejecting'}
             style={{
               padding: '0.375rem 0.875rem',
-              background: '#fff',
-              color: '#dc2626',
+              background: 'var(--surface)',
+              color: 'var(--danger)',
               border: '1px solid #fca5a5',
               borderRadius: '0.375rem',
               fontSize: '0.8125rem',
@@ -153,11 +153,11 @@ function ImportCard({ imp, org, onDecision }) {
             {localStatus === 'rejecting' ? 'Rejecting...' : 'Reject'}
           </button>
           {localStatus === 'error' && (
-            <span style={{ fontSize: '0.8125rem', color: '#dc2626' }}>{localError}</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--danger)' }}>{localError}</span>
           )}
         </div>
       ) : (
-        <div style={{ padding: '0.5rem 1rem', borderTop: '1px solid #e5e7eb', fontSize: '0.75rem', color: '#9ca3af' }}>
+        <div style={{ padding: '0.5rem 1rem', borderTop: '1px solid #e5e7eb', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
           {phase === 'Merged' ? 'Already merged' : phase === 'Rejected' ? 'Already rejected' : `Review available when phase is AwaitingReview (currently: ${phase})`}
         </div>
       )}
@@ -189,7 +189,7 @@ export function MemoryImportReview({ org, imports = [] }) {
 
   if (imports.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem', color: '#9ca3af', fontSize: '0.875rem', background: '#f9fafb', borderRadius: '0.5rem' }}>
+      <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)', fontSize: '0.875rem', background: 'var(--bg-subtle)', borderRadius: '0.5rem' }}>
         No memory imports found. Imports appear when agent runs produce knowledge artifacts.
       </div>
     );
@@ -199,7 +199,7 @@ export function MemoryImportReview({ org, imports = [] }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {pending.length > 0 && (
         <div>
-          <h4 style={{ fontWeight: 600, fontSize: '0.8125rem', color: '#374151', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h4 style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--text)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             Awaiting review
             <span style={{ background: '#dbeafe', color: '#1d4ed8', fontSize: '0.75rem', fontWeight: 600, padding: '0.125rem 0.5rem', borderRadius: '9999px' }}>{pending.length}</span>
           </h4>
@@ -212,7 +212,7 @@ export function MemoryImportReview({ org, imports = [] }) {
       )}
       {reviewed.length > 0 && (
         <div>
-          <h4 style={{ fontWeight: 600, fontSize: '0.8125rem', color: '#6b7280', marginBottom: '0.75rem' }}>Other imports</h4>
+          <h4 style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>Other imports</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {reviewed.map((imp) => (
               <ImportCard key={imp.metadata?.name} imp={imp} org={org} onDecision={handleDecision} />

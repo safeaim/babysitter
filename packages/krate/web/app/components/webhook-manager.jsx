@@ -7,22 +7,22 @@ const WEBHOOK_EVENT_TYPES = ['push', 'pull_request', 'issues', 'workflow_run', '
 const PROVIDERS = ['GitHub', 'Gitea', 'Generic'];
 
 const labelStyle = { display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' };
-const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem', boxSizing: 'border-box' };
-const selectStyle = { ...inputStyle, background: '#fff' };
+const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid var(--border)', fontSize: '0.875rem', boxSizing: 'border-box' };
+const selectStyle = { ...inputStyle, background: 'var(--surface)' };
 const fieldGroupStyle = { display: 'flex', flexDirection: 'column', gap: '1rem' };
 const buttonStyle = { padding: '7px 16px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600 };
 const primaryStyle = { ...buttonStyle, backgroundColor: '#2563eb', color: '#fff' };
-const ghostStyle = { ...buttonStyle, backgroundColor: 'transparent', color: '#2563eb', border: '1px solid #2563eb' };
-const smallGhostStyle = { ...buttonStyle, padding: '4px 10px', fontSize: 12, backgroundColor: 'transparent', color: '#6b7280', border: '1px solid #d1d5db' };
+const ghostStyle = { ...buttonStyle, backgroundColor: 'transparent', color: 'var(--accent)', border: '1px solid #2563eb' };
+const smallGhostStyle = { ...buttonStyle, padding: '4px 10px', fontSize: 12, backgroundColor: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)' };
 
 function Badge({ children, tone = 'neutral' }) {
   const colors = {
     good: { background: '#dcfce7', color: '#16a34a' },
     warn: { background: '#fef9c3', color: '#a16207' },
-    bad: { background: '#fee2e2', color: '#dc2626' },
-    danger: { background: '#fee2e2', color: '#dc2626' },
-    neutral: { background: '#f3f4f6', color: '#6b7280' },
-    info: { background: '#dbeafe', color: '#2563eb' },
+    bad: { background: '#fee2e2', color: 'var(--danger)' },
+    danger: { background: '#fee2e2', color: 'var(--danger)' },
+    neutral: { background: 'var(--bg-subtle)', color: 'var(--text-muted)' },
+    info: { background: '#dbeafe', color: 'var(--accent)' },
   };
   const { background, color } = colors[tone] || colors.neutral;
   return (
@@ -41,7 +41,7 @@ function CopyableUrl({ url }) {
     });
   }
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f9fafb', borderRadius: 6, padding: '6px 10px', border: '1px solid #e5e7eb', fontSize: 12, fontFamily: 'monospace' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-subtle)', borderRadius: 6, padding: '6px 10px', border: '1px solid var(--border)', fontSize: 12, fontFamily: 'monospace' }}>
       <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
       <button onClick={copy} style={{ ...smallGhostStyle, flexShrink: 0 }}>{copied ? 'Copied!' : 'Copy'}</button>
     </div>
@@ -85,7 +85,7 @@ function WebhookRow({ webhook, org, onPingResult, onDeleted }) {
   }
 
   return (
-    <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: '0.875rem', marginBottom: '0.75rem' }}>
+    <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: '0.875rem', marginBottom: '0.75rem' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
         <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{webhook.metadata?.name || 'unnamed'}</div>
         <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
@@ -96,13 +96,13 @@ function WebhookRow({ webhook, org, onPingResult, onDeleted }) {
       </div>
 
       <div style={{ marginBottom: '0.5rem' }}>
-        <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, marginBottom: '0.25rem' }}>INGEST URL</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.25rem' }}>INGEST URL</div>
         <CopyableUrl url={ingestUrl} />
       </div>
 
       {events.length > 0 && (
         <div style={{ marginBottom: '0.5rem' }}>
-          <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, marginBottom: '0.25rem' }}>EVENT TYPES</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.25rem' }}>EVENT TYPES</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
             {events.map(ev => <Badge key={ev} tone="neutral">{ev}</Badge>)}
           </div>
@@ -120,7 +120,7 @@ function WebhookRow({ webhook, org, onPingResult, onDeleted }) {
             const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources/ExternalWebhookConfig/${encodeURIComponent(webhook.metadata?.name)}`, { method: 'DELETE' });
             if (res.ok) { if (onDeleted) onDeleted(webhook.metadata?.name); }
           } catch {} finally { setDeleting(false); }
-        }} disabled={deleting} style={{ ...smallGhostStyle, color: '#dc2626', borderColor: '#fca5a5', opacity: deleting ? 0.6 : 1 }}>
+        }} disabled={deleting} style={{ ...smallGhostStyle, color: 'var(--danger)', borderColor: '#fca5a5', opacity: deleting ? 0.6 : 1 }}>
           {deleting ? 'Deleting...' : 'Delete'}
         </button>
         {pingMsg && (
@@ -197,7 +197,7 @@ function AddWebhookForm({ org, onCreated }) {
         <div style={{ fontWeight: 700, fontSize: '0.875rem', marginBottom: '0.75rem', color: '#1d4ed8' }}>Add Webhook</div>
         <div style={fieldGroupStyle}>
           <div>
-            <label style={labelStyle}>Name <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={labelStyle}>Name <span style={{ color: 'var(--danger)' }}>*</span></label>
             <input
               type="text"
               value={name}
@@ -228,7 +228,7 @@ function AddWebhookForm({ org, onCreated }) {
           </div>
 
           <div>
-            <label style={labelStyle}>Secret <small style={{ fontWeight: 400, color: '#6b7280' }}>(optional — used for HMAC verification)</small></label>
+            <label style={labelStyle}>Secret <small style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional — used for HMAC verification)</small></label>
             <input
               type="password"
               value={secret}
@@ -254,7 +254,7 @@ function AddWebhookForm({ org, onCreated }) {
               {status === 'saving' ? 'Creating...' : 'Create Webhook'}
             </button>
             {status === 'success' && <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>{message}</span>}
-            {status === 'error' && <span style={{ fontSize: 12, color: '#dc2626' }}>{message}</span>}
+            {status === 'error' && <span style={{ fontSize: 12, color: 'var(--danger)' }}>{message}</span>}
           </div>
         </div>
       </div>
@@ -272,11 +272,11 @@ function DeliveryHistoryList({ deliveries = [] }) {
 
   return (
     <div style={{ marginTop: '1rem' }}>
-      <div style={{ fontWeight: 700, fontSize: '0.8125rem', color: '#374151', marginBottom: '0.5rem' }}>
+      <div style={{ fontWeight: 700, fontSize: '0.8125rem', color: 'var(--text)', marginBottom: '0.5rem' }}>
         Recent Deliveries (last 10)
       </div>
       {recent.length === 0 ? (
-        <p style={{ fontSize: '0.8125rem', color: '#9ca3af', margin: 0 }}>No delivery history yet.</p>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', margin: 0 }}>No delivery history yet.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
           {recent.map((d, i) => {
@@ -286,9 +286,9 @@ function DeliveryHistoryList({ deliveries = [] }) {
             const st = d.status || d.status?.phase || 'received';
             return (
               <div key={id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: 12, padding: '5px 0', borderBottom: '1px solid #f3f4f6' }}>
-                <code style={{ flex: '0 0 auto', color: '#6b7280' }}>{truncateId(id)}</code>
+                <code style={{ flex: '0 0 auto', color: 'var(--text-muted)' }}>{truncateId(id)}</code>
                 <Badge tone="neutral">{evType}</Badge>
-                <span style={{ color: '#9ca3af', flex: 1, fontSize: 11 }}>{ts ? new Date(ts).toLocaleString() : ''}</span>
+                <span style={{ color: 'var(--text-muted)', flex: 1, fontSize: 11 }}>{ts ? new Date(ts).toLocaleString() : ''}</span>
                 <Badge tone={statusTone(typeof st === 'string' ? st : 'received')}>{typeof st === 'string' ? st : 'received'}</Badge>
               </div>
             );
@@ -329,9 +329,9 @@ export function WebhookManager({ org, webhooks = [] }) {
 
       {/* Configured webhooks */}
       {localWebhooks.length === 0 && !showAddForm ? (
-        <div style={{ color: '#9ca3af', fontSize: '0.8125rem', padding: '0.5rem 0' }}>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', padding: '0.5rem 0' }}>
           No webhooks configured yet.{' '}
-          <button onClick={() => setShowAddForm(true)} style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: 600, padding: 0 }}>
+          <button onClick={() => setShowAddForm(true)} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: 600, padding: 0 }}>
             Add one
           </button>{' '}
           to receive events from GitHub or Gitea.

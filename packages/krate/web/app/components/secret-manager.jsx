@@ -175,7 +175,7 @@ export function SecretManager({ org = 'default', secrets = [], configMaps = [], 
   return (
     <div className="secretManager">
       {/* Tab toggle */}
-      <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1rem', background: '#f3f4f6', borderRadius: '0.5rem', padding: '0.25rem', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1rem', background: 'var(--bg-subtle)', borderRadius: '0.5rem', padding: '0.25rem', width: 'fit-content' }}>
         <button
           type="button"
           onClick={() => { setActiveTab('secrets'); setShowCreateForm(false); setError(null); }}
@@ -310,7 +310,7 @@ export function SecretManager({ org = 'default', secrets = [], configMaps = [], 
                   <strong className="secretName">{item.name}</strong>
                   <span className="secretType pill neutral">{item.type || (isSecrets ? 'Opaque' : 'ConfigMap')}</span>
                   {item.keys && item.keys.length > 0 && (
-                    <small className="secretDate" style={{ color: '#6b7280' }}>{item.keys.length} key{item.keys.length !== 1 ? 's' : ''}</small>
+                    <small className="secretDate" style={{ color: 'var(--text-muted)' }}>{item.keys.length} key{item.keys.length !== 1 ? 's' : ''}</small>
                   )}
                   {item.createdAt && (
                     <small className="secretDate">Created {new Date(item.createdAt).toLocaleDateString()}</small>

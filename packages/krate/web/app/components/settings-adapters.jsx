@@ -7,13 +7,13 @@ const TRANSPORT_TYPES = ['stdio', 'websocket', 'http', 'unix'];
 const ADAPTER_CAPABILITIES = ['chat', 'tools', 'streaming', 'files', 'code-execution'];
 
 const labelStyle = { display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' };
-const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem', boxSizing: 'border-box' };
-const selectStyle = { ...inputStyle, background: '#fff' };
+const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid var(--border)', fontSize: '0.875rem', boxSizing: 'border-box' };
+const selectStyle = { ...inputStyle, background: 'var(--surface)' };
 const fieldGroupStyle = { display: 'flex', flexDirection: 'column', gap: '1rem' };
 const rowStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' };
 const buttonStyle = { padding: '8px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600 };
 const primaryStyle = { ...buttonStyle, backgroundColor: '#2563eb', color: '#fff' };
-const secondaryStyle = { ...buttonStyle, backgroundColor: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' };
+const secondaryStyle = { ...buttonStyle, backgroundColor: '#f3f4f6', color: 'var(--text)', border: '1px solid var(--border)' };
 const disabledStyle = { ...primaryStyle, opacity: 0.5, cursor: 'not-allowed' };
 
 function StatusMsg({ status, message }) {
@@ -56,8 +56,8 @@ function AdapterRow({ org, adapter, onDeleted }) {
   return (
     <div className="resourceRow" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
       <strong style={{ flex: '1 1 auto' }}>{name}</strong>
-      <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{adapter.spec?.adapterType || 'subprocess'}</span>
-      <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{adapter.spec?.transport || 'default'}</span>
+      <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{adapter.spec?.adapterType || 'subprocess'}</span>
+      <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{adapter.spec?.transport || 'default'}</span>
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem' }}>
         <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', backgroundColor: phaseTone(adapter.status?.phase) }} />
         {adapter.status?.phase || 'Pending'}
@@ -66,7 +66,7 @@ function AdapterRow({ org, adapter, onDeleted }) {
         type="button"
         onClick={handleDelete}
         disabled={delStatus === 'deleting'}
-        style={{ ...secondaryStyle, padding: '4px 12px', fontSize: 12, color: '#dc2626', borderColor: '#fca5a5' }}
+        style={{ ...secondaryStyle, padding: '4px 12px', fontSize: 12, color: 'var(--danger)', borderColor: '#fca5a5' }}
       >
         {delStatus === 'deleting' ? 'Deleting...' : 'Delete'}
       </button>
@@ -134,7 +134,7 @@ function AddAdapterForm({ org, onCreated }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1rem', marginTop: '0.75rem' }}>
+      <div style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border)', borderRadius: '0.5rem', padding: '1rem', marginTop: '0.75rem' }}>
         <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.875rem', fontWeight: 700 }}>New adapter</h4>
         <div style={fieldGroupStyle}>
           <div style={rowStyle}>
@@ -209,7 +209,7 @@ export function AdaptersSection({ org, initialAdapters }) {
           ))}
         </div>
       ) : !showForm ? (
-        <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
           <p>No adapters configured. Click <strong>+ Add adapter</strong> to define how the workspace connects to agent runtimes.</p>
         </div>
       ) : null}

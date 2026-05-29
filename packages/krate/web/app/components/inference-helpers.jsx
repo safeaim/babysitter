@@ -1,3 +1,4 @@
+'use client';
 // ─── Shared helpers, styles, and constants for inference components ──────────
 
 export function relativeTime(timestamp) {
@@ -58,7 +59,7 @@ export const cardStyle = {
   border: '1px solid #e2e8f0',
   borderRadius: '0.5rem',
   padding: '1rem',
-  background: '#fff',
+  background: 'var(--surface)',
   display: 'flex',
   flexDirection: 'column',
   gap: '0.5rem',
@@ -78,9 +79,9 @@ export const btnStyle = (color = '#2563eb') => ({
 export const btnOutlineStyle = {
   padding: '0.375rem 0.75rem',
   borderRadius: '0.375rem',
-  border: '1px solid #d1d5db',
-  background: '#fff',
-  color: '#374151',
+  border: '1px solid var(--border)',
+  background: 'var(--surface)',
+  color: 'var(--text)',
   fontSize: '0.8125rem',
   cursor: 'pointer',
   fontWeight: 500,
@@ -90,7 +91,7 @@ export const inputStyle = {
   width: '100%',
   padding: '0.5rem',
   borderRadius: '0.375rem',
-  border: '1px solid #d1d5db',
+  border: '1px solid var(--border)',
   fontSize: '0.875rem',
   boxSizing: 'border-box',
 };
@@ -100,7 +101,7 @@ export const labelStyle = {
   fontWeight: 600,
   fontSize: '0.8125rem',
   marginBottom: '0.25rem',
-  color: '#374151',
+  color: 'var(--text)',
 };
 
 export const badgeStyle = (color = '#2563eb') => ({
@@ -129,7 +130,7 @@ export const panelStyle = {
   width: '520px',
   maxWidth: '95vw',
   minHeight: '100vh',
-  background: '#fff',
+  background: 'var(--surface)',
   padding: '1.5rem',
   display: 'flex',
   flexDirection: 'column',

@@ -161,13 +161,13 @@ export function MemoryOntologyEditor({ org, initialOntology = null, memoryReposi
     width: '100%',
     padding: '0.375rem 0.5rem',
     borderRadius: '0.375rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border)',
     fontSize: '0.8125rem',
     boxSizing: 'border-box',
   };
   const btnPrimary = {
     padding: '0.375rem 0.875rem',
-    background: '#2563eb',
+    background: 'var(--accent)',
     color: '#fff',
     border: 'none',
     borderRadius: '0.375rem',
@@ -177,9 +177,9 @@ export function MemoryOntologyEditor({ org, initialOntology = null, memoryReposi
   };
   const btnSecondary = {
     padding: '0.375rem 0.875rem',
-    background: '#f3f4f6',
-    color: '#374151',
-    border: '1px solid #d1d5db',
+    background: 'var(--bg-subtle)',
+    color: 'var(--text)',
+    border: '1px solid var(--border)',
     borderRadius: '0.375rem',
     fontSize: '0.8125rem',
     fontWeight: 500,
@@ -188,7 +188,7 @@ export function MemoryOntologyEditor({ org, initialOntology = null, memoryReposi
   const btnDanger = {
     padding: '0.25rem 0.5rem',
     background: 'transparent',
-    color: '#dc2626',
+    color: 'var(--danger)',
     border: '1px solid #fca5a5',
     borderRadius: '0.375rem',
     fontSize: '0.75rem',
@@ -225,18 +225,18 @@ export function MemoryOntologyEditor({ org, initialOntology = null, memoryReposi
         {nodeKinds.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
             {nodeKinds.map((kind) => (
-              <div key={kind.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', background: '#f9fafb', borderRadius: '0.375rem', border: '1px solid #e5e7eb' }}>
+              <div key={kind.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', background: 'var(--bg-subtle)', borderRadius: '0.375rem', border: '1px solid var(--border)' }}>
                 <NodeKindBadge kind={kind} />
-                <span style={{ flex: 1, fontSize: '0.8125rem', color: '#6b7280' }}>{kind.description || <em>No description</em>}</span>
+                <span style={{ flex: 1, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{kind.description || <em>No description</em>}</span>
                 <button style={btnDanger} onClick={() => removeNodeKind(kind.name)}>Remove</button>
               </div>
             ))}
           </div>
         )}
         {showNodeForm ? (
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border)', borderRadius: '0.5rem', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Name <span style={{ color: '#dc2626' }}>*</span></label>
+              <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Name <span style={{ color: 'var(--danger)' }}>*</span></label>
               <input type="text" value={newNodeName} onChange={(e) => setNewNodeName(e.target.value)} placeholder="e.g. Service" style={inputStyle} />
             </div>
             <div>
@@ -266,9 +266,9 @@ export function MemoryOntologyEditor({ org, initialOntology = null, memoryReposi
         {edgeKinds.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
             {edgeKinds.map((kind) => (
-              <div key={kind.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', background: '#f9fafb', borderRadius: '0.375rem', border: '1px solid #e5e7eb' }}>
+              <div key={kind.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', background: 'var(--bg-subtle)', borderRadius: '0.375rem', border: '1px solid var(--border)' }}>
                 <span style={{ fontWeight: 600, fontSize: '0.8125rem', minWidth: 120 }}>{kind.name}</span>
-                <span style={{ fontSize: '0.75rem', color: '#6b7280', flex: 1 }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', flex: 1 }}>
                   {kind.sourceKinds?.length ? <><strong>from:</strong> {kind.sourceKinds.join(', ')}</> : 'any source'}
                   {' '}
                   {kind.targetKinds?.length ? <> → <strong>to:</strong> {kind.targetKinds.join(', ')}</> : '→ any target'}
@@ -279,9 +279,9 @@ export function MemoryOntologyEditor({ org, initialOntology = null, memoryReposi
           </div>
         )}
         {showEdgeForm ? (
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border)', borderRadius: '0.5rem', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Name <span style={{ color: '#dc2626' }}>*</span></label>
+              <label style={{ display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>Name <span style={{ color: 'var(--danger)' }}>*</span></label>
               <input type="text" value={newEdgeName} onChange={(e) => setNewEdgeName(e.target.value)} placeholder="e.g. depends_on" style={inputStyle} />
             </div>
             <div>
@@ -315,7 +315,7 @@ export function MemoryOntologyEditor({ org, initialOntology = null, memoryReposi
           <span style={{ color: '#15803d', fontSize: '0.875rem', fontWeight: 500 }}>Saved successfully</span>
         )}
         {saveStatus === 'error' && (
-          <span style={{ color: '#dc2626', fontSize: '0.875rem' }}>{saveError}</span>
+          <span style={{ color: 'var(--danger)', fontSize: '0.875rem' }}>{saveError}</span>
         )}
       </div>
     </div>

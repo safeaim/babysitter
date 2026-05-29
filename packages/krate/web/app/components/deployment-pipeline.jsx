@@ -53,16 +53,16 @@ function StageCard({ stage, status, startedAt, finishedAt, artifactUrl, onDeploy
         </span>
         <StatusBadge tone={status}>{status}</StatusBadge>
       </div>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>{STAGE_DESCRIPTIONS[stage]}</p>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{STAGE_DESCRIPTIONS[stage]}</p>
       {durationLabel && (
-        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Duration: {durationLabel}</span>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Duration: {durationLabel}</span>
       )}
       {startedAt && !finishedAt && (
-        <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>Started: {new Date(startedAt).toLocaleTimeString()}</span>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Started: {new Date(startedAt).toLocaleTimeString()}</span>
       )}
       {artifactUrl && (
         <a href={artifactUrl} target="_blank" rel="noopener noreferrer"
-          style={{ fontSize: '0.8125rem', color: '#2563eb', textDecoration: 'underline' }}>
+          style={{ fontSize: '0.8125rem', color: 'var(--accent)', textDecoration: 'underline' }}>
           View artifact
         </a>
       )}
@@ -71,7 +71,7 @@ function StageCard({ stage, status, startedAt, finishedAt, artifactUrl, onDeploy
           onClick={onDeploy}
           style={{
             marginTop: '0.25rem', padding: '0.375rem 0.75rem', fontSize: '0.8125rem',
-            fontWeight: 600, background: '#2563eb', color: '#fff', border: 'none',
+            fontWeight: 600, background: 'var(--accent)', color: '#fff', border: 'none',
             borderRadius: '0.375rem', cursor: 'pointer', alignSelf: 'flex-start'
           }}>
           Deploy to {env}
@@ -253,7 +253,7 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
         </StatusBadge>
       </div>
 
-      <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>
+      <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.875rem' }}>
         {kubeVelaAvailable
           ? 'KubeVela is available. Pipeline stages map to OAM Application resources.'
           : 'KubeVela not detected — using native pipeline stages for deployment management.'}
@@ -262,7 +262,7 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
       {/* Environment selector + actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }} htmlFor="env-select">
+          <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }} htmlFor="env-select">
             Environment:
           </label>
           <select
@@ -271,7 +271,7 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
             onChange={(e) => setEnv(e.target.value)}
             style={{
               padding: '0.375rem 0.625rem', borderRadius: '0.375rem',
-              border: '1px solid #d1d5db', fontSize: '0.875rem', background: '#fff'
+              border: '1px solid var(--border)', fontSize: '0.875rem', background: 'var(--surface)'
             }}>
             {ENVIRONMENTS.map((e) => <option key={e} value={e}>{e}</option>)}
           </select>
@@ -330,7 +330,7 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
 
       {/* Pipeline ID and message */}
       {pipelineId && (
-        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>
+        <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
           Pipeline: <code style={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>{pipelineId}</code>
         </p>
       )}

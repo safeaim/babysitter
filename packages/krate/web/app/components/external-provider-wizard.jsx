@@ -48,9 +48,9 @@ function isScopeFixed(platform, scope) {
 const TOTAL_STEPS = 5;
 
 const labelStyle = { display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' };
-const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem', boxSizing: 'border-box' };
-const btnPrimaryStyle = { padding: '0.5rem 1.25rem', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' };
-const btnSecondaryStyle = { padding: '0.5rem 1.25rem', background: '#fff', color: '#374151', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' };
+const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid var(--border)', fontSize: '0.875rem', boxSizing: 'border-box' };
+const btnPrimaryStyle = { padding: '0.5rem 1.25rem', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' };
+const btnSecondaryStyle = { padding: '0.5rem 1.25rem', background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' };
 
 function StepIndicator({ current, total }) {
   return (
@@ -81,7 +81,7 @@ function Step1Platform({ value, onChange }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Select platform</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Choose the platform to connect.</p>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Choose the platform to connect.</p>
       {PROVIDER_TYPES.map((pt) => (
         <label key={pt.value} style={{
           display: 'flex',
@@ -103,7 +103,7 @@ function Step1Platform({ value, onChange }) {
           />
           <div>
             <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{pt.label}</div>
-            <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>{pt.description}</div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{pt.description}</div>
           </div>
         </label>
       ))}
@@ -115,7 +115,7 @@ function Step2Hosting({ hosting, setHosting, baseUrl, setBaseUrl, platform }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Hosting configuration</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Specify whether this is a SaaS or self-hosted instance.</p>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Specify whether this is a SaaS or self-hosted instance.</p>
 
       <div style={{ display: 'flex', gap: '0.75rem' }}>
         {['saas', 'self-hosted'].map((h) => (
@@ -140,7 +140,7 @@ function Step2Hosting({ hosting, setHosting, baseUrl, setBaseUrl, platform }) {
             />
             <div>
               <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{h === 'saas' ? 'SaaS / Cloud' : 'Self-hosted'}</div>
-              <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{h === 'saas' ? 'Use default public endpoint' : 'Custom base URL'}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{h === 'saas' ? 'Use default public endpoint' : 'Custom base URL'}</div>
             </div>
           </label>
         ))}
@@ -157,7 +157,7 @@ function Step2Hosting({ hosting, setHosting, baseUrl, setBaseUrl, platform }) {
             placeholder={`https://${platform}.example.com`}
             style={inputStyle}
           />
-          <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#6b7280' }}>The root URL of your self-hosted instance.</p>
+          <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>The root URL of your self-hosted instance.</p>
         </div>
       )}
     </div>
@@ -173,7 +173,7 @@ function Step3Scopes({ platform, selected, onChange }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Select scopes</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Choose which provider kinds to create for this platform.</p>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Choose which provider kinds to create for this platform.</p>
       {available.map((scope) => {
         const def = SCOPE_DEFS[scope];
         const fixed = isScopeFixed(platform, scope);
@@ -200,15 +200,15 @@ function Step3Scopes({ platform, selected, onChange }) {
             <div>
               <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>
                 {def.label}
-                <span style={{ fontWeight: 400, fontSize: '0.75rem', color: '#9ca3af', marginLeft: '0.5rem' }}>{def.kind}</span>
+                <span style={{ fontWeight: 400, fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>{def.kind}</span>
               </div>
-              <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>{def.description}</div>
+              <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{def.description}</div>
             </div>
           </label>
         );
       })}
       {selected.length === 0 && (
-        <p style={{ fontSize: '0.8125rem', color: '#dc2626' }}>Select at least one scope.</p>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--danger)' }}>Select at least one scope.</p>
       )}
     </div>
   );
@@ -218,10 +218,10 @@ function Step4Auth({ secretRef, setSecretRef, platform }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Auth configuration</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Configure the secret reference for API credentials.</p>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Configure the secret reference for API credentials.</p>
 
       <div>
-        <label htmlFor="provider-secret-ref" style={labelStyle}>Secret name (for API key / App credentials) <span aria-hidden="true" style={{ color: '#dc2626' }}>*</span></label>
+        <label htmlFor="provider-secret-ref" style={labelStyle}>Secret name (for API key / App credentials) <span aria-hidden="true" style={{ color: 'var(--danger)' }}>*</span></label>
         <input
           id="provider-secret-ref"
           type="text"
@@ -232,7 +232,7 @@ function Step4Auth({ secretRef, setSecretRef, platform }) {
           aria-required="true"
           style={inputStyle}
         />
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#6b7280' }}>
+        <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
           Name of the Kubernetes Secret in the same namespace that holds the provider credentials.
         </p>
       </div>
@@ -259,7 +259,7 @@ function Step5Review({ platform, hosting, baseUrl, scopes, secretRef, org }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Review &amp; submit</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
         {resources.length} resource{resources.length !== 1 ? 's' : ''} will be created: {resources.map((r) => r.kind).join(', ')}
       </p>
       <pre style={{
@@ -360,7 +360,7 @@ export function ExternalProviderWizard({ org, onCancel, onSuccess }) {
       {step === 4 && <Step5Review platform={platform} hosting={hosting} baseUrl={baseUrl} scopes={scopes} secretRef={secretRef} org={org} />}
 
       {status === 'error' && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: '#dc2626', fontSize: '0.875rem' }}>
+        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
           {errorMsg}
         </div>
       )}

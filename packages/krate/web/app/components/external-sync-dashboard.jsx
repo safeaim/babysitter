@@ -157,7 +157,7 @@ export function ExternalSyncDashboard({ org, bindings = [] }) {
 
       {bindings.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
-          No external backend bindings found. Configure an ExternalBackendProvider to enable sync.
+          No external backend bindings found. Configure a provider (GitProvider, CiProvider, etc.) to enable sync.
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

@@ -3,11 +3,11 @@
 import { useState } from 'react';
 
 const labelStyle = { display: 'block', fontWeight: 600, fontSize: '0.8125rem', marginBottom: '0.25rem' };
-const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem', boxSizing: 'border-box' };
+const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid var(--border)', fontSize: '0.875rem', boxSizing: 'border-box' };
 const fieldGroupStyle = { display: 'flex', flexDirection: 'column', gap: '1rem' };
 const buttonStyle = { padding: '8px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600 };
 const primaryStyle = { ...buttonStyle, backgroundColor: '#2563eb', color: '#fff' };
-const secondaryStyle = { ...buttonStyle, backgroundColor: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' };
+const secondaryStyle = { ...buttonStyle, backgroundColor: '#f3f4f6', color: 'var(--text)', border: '1px solid var(--border)' };
 const disabledStyle = { ...primaryStyle, opacity: 0.5, cursor: 'not-allowed' };
 
 function StatusMsg({ status, message }) {
@@ -94,7 +94,7 @@ export function GatewaySection({ org, gateway }) {
         </div>
         <div style={fieldGroupStyle}>
           <div>
-            <label style={labelStyle}>Gateway URL <span aria-hidden="true" style={{ color: '#dc2626' }}>*</span></label>
+            <label style={labelStyle}>Gateway URL <span aria-hidden="true" style={{ color: 'var(--danger)' }}>*</span></label>
             <input
               type="url"
               value={url}
@@ -104,7 +104,7 @@ export function GatewaySection({ org, gateway }) {
               aria-required="true"
               style={inputStyle}
             />
-            <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
               The base URL of your Agent Mux gateway. Must be reachable from the Krate server.
             </p>
           </div>

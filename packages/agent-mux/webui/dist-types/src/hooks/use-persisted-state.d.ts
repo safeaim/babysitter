@@ -8,3 +8,4 @@
  * so the persisted value appears with no visible flash.
  */
 export declare function usePersistedState<T>(key: string, defaultValue: T): [T, (value: T | ((prev: T) => T)) => void];
+//# sourceMappingURL=use-persisted-state.d.ts.map

@@ -3,3 +3,4 @@ export interface ApproveBreakpointResult {
     error?: string;
 }
 export declare function approveBreakpoint(runId: string, effectId: string, answer: string): Promise<ApproveBreakpointResult>;
+//# sourceMappingURL=approve-breakpoint.d.ts.map

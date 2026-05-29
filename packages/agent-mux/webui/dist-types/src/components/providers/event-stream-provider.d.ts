@@ -9,3 +9,4 @@ export declare function EventStreamProvider({ children }: {
 }): import("react/jsx-runtime").JSX.Element;
 export declare function useEventStreamContext(): EventStreamContextValue;
 export {};
+//# sourceMappingURL=event-stream-provider.d.ts.map

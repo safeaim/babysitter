@@ -1,5 +1,5 @@
-import type { Attachment } from "@a5c-ai/agent-mux-core";
-import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
+import type { Attachment } from "@a5c-ai/agent-comm-mux";
+import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-comm-mux";
 import type { SessionCost, SessionFlowModel } from "@a5c-ai/agent-mux-ui/session-flow";
 import { type WorkspacePanelSizes } from "@/lib/workspace-layout-state";
 type EventBuffer = {
@@ -39,3 +39,4 @@ type SessionWorkspaceShellProps = {
 };
 export declare function SessionWorkspaceShell(props: SessionWorkspaceShellProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=session-workspace-shell.d.ts.map

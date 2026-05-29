@@ -12,3 +12,4 @@ export declare function getWatcherStats(): {
     watchedPaths: string[];
     pendingDebounces: number;
 };
+//# sourceMappingURL=watcher.d.ts.map

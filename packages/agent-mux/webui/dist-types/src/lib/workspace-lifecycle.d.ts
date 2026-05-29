@@ -2,9 +2,9 @@ import { promises as fs } from "node:fs";
 import { type DiscoveredRun } from "@/lib/source-discovery";
 import type { Run } from "@/types";
 import type { WatchSource } from "@/lib/config-loader";
-import type { WorkspaceService } from "@a5c-ai/agent-mux-core";
-import type { KanbanReviewSummary } from "@a5c-ai/agent-mux-core";
-import type { KanbanWorkspaceOwnershipHostSummary, KanbanWorkspaceOwnershipIssueSummary, KanbanWorkspaceOwnershipProjectSummary, KanbanWorkspaceAction, KanbanWorkspaceActionResult, KanbanWorkspaceInventory, KanbanWorkspaceIssueSummary, KanbanWorkspaceSessionSummary, KanbanWorkspaceSummary } from "@a5c-ai/agent-mux-core/kanban";
+import type { WorkspaceService } from "@a5c-ai/agent-comm-mux";
+import type { KanbanReviewSummary } from "@a5c-ai/agent-comm-mux";
+import type { KanbanWorkspaceOwnershipHostSummary, KanbanWorkspaceOwnershipIssueSummary, KanbanWorkspaceOwnershipProjectSummary, KanbanWorkspaceAction, KanbanWorkspaceActionResult, KanbanWorkspaceInventory, KanbanWorkspaceIssueSummary, KanbanWorkspaceSessionSummary, KanbanWorkspaceSummary } from "@a5c-ai/agent-comm-mux/kanban";
 type WorkspaceAction = KanbanWorkspaceAction;
 export type WorkspaceSessionSnapshot = KanbanWorkspaceSessionSummary;
 export type WorkspaceIssueLink = KanbanWorkspaceIssueSummary;
@@ -66,3 +66,4 @@ export declare class WorkspaceLifecycleService {
     }): Promise<WorkspaceActionResult>;
 }
 export {};
+//# sourceMappingURL=workspace-lifecycle.d.ts.map

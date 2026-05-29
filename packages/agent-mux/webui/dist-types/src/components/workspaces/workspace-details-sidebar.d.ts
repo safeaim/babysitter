@@ -1,5 +1,5 @@
-import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
-import type { KanbanIntegrationProvider, KanbanReviewArtifact } from "@a5c-ai/agent-mux-core/kanban";
+import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-comm-mux";
+import type { KanbanIntegrationProvider, KanbanReviewArtifact } from "@a5c-ai/agent-comm-mux/kanban";
 import type { WorkspaceInventoryItem } from "@/lib/workspace-lifecycle";
 type WorkspaceSidebarAction = "rebase-start" | "rebase-auto-resolve" | "rebase-open-in-editor" | "rebase-mark-resolved" | "rebase-abort";
 export interface WorkspaceSidebarFeedback {
@@ -35,3 +35,4 @@ export declare function WorkspaceDetailsSidebar(props: {
     }) => void;
 }): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=workspace-details-sidebar.d.ts.map

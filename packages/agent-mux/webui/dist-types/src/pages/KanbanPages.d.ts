@@ -12,3 +12,4 @@ export declare function HostWorkspaceCreatePage(): JSX.Element;
 export declare function KanbanRunsPage(): JSX.Element;
 export declare function KanbanWorkspacesPage(): JSX.Element;
 export declare function KanbanInboxPage(): JSX.Element;
+//# sourceMappingURL=KanbanPages.d.ts.map

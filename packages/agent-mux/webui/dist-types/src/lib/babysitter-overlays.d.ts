@@ -1,4 +1,4 @@
-import type { KanbanBacklogSnapshot, KanbanBoardSnapshot, KanbanReviewDecision, KanbanReviewArtifact, KanbanWorkflowState } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanBacklogSnapshot, KanbanBoardSnapshot, KanbanReviewDecision, KanbanReviewArtifact, KanbanWorkflowState } from "@a5c-ai/agent-comm-mux/kanban";
 import type { Run } from "@/types";
 export type BabysitterOverlayStage = "dispatch" | "executing" | "review" | "recovery" | "done";
 export interface BoardExecutionOverlay {
@@ -72,3 +72,4 @@ export declare function buildRunHealthRecords(runs: Run[], nowMs?: number): RunH
 export declare function buildRunArtifactShortcuts(runs: Array<Record<string, unknown>>): RunArtifactShortcut[];
 export declare function buildSessionTimeline(runs: Array<Record<string, unknown>>, eventBuffers: Record<string, SessionEventBuffer | undefined>): SessionTimelineItem[];
 export {};
+//# sourceMappingURL=babysitter-overlays.d.ts.map

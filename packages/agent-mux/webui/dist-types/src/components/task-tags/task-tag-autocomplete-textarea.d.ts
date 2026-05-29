@@ -1,5 +1,5 @@
 import type { ReactNode, TextareaHTMLAttributes } from "react";
-import type { KanbanTaskTag } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanTaskTag } from "@a5c-ai/agent-comm-mux/kanban";
 interface TaskTagAutocompleteTextareaProps {
     value: string;
     onValueChange: (value: string) => void;
@@ -11,3 +11,4 @@ interface TaskTagAutocompleteTextareaProps {
 }
 export declare function TaskTagAutocompleteTextarea({ value, onValueChange, taskTags, disabled, className, emptyText, renderTextarea, }: TaskTagAutocompleteTextareaProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=task-tag-autocomplete-textarea.d.ts.map

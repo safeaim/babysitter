@@ -5,3 +5,4 @@ interface EventStreamProps {
 }
 export declare const EventStream: import("react").NamedExoticComponent<EventStreamProps>;
 export {};
+//# sourceMappingURL=event-stream.d.ts.map

@@ -6,3 +6,4 @@ interface FilePreviewProps {
 }
 export declare function FilePreview({ files, runId, effectId }: FilePreviewProps): import("react/jsx-runtime").JSX.Element | null;
 export {};
+//# sourceMappingURL=file-preview.d.ts.map

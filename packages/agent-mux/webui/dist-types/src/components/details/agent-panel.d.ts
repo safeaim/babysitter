@@ -1,8 +1,9 @@
 import type { DispatchContextAuditRecord } from "@/lib/dispatch-context-audit";
 import type { TaskDetail } from "@/types";
-import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-comm-mux/kanban";
 export declare function AgentPanel({ task, executionContexts, executionAudits, }: {
     task: TaskDetail | null;
     executionContexts?: readonly KanbanExecutionContextEnvelope[];
     executionAudits?: readonly DispatchContextAuditRecord[];
 }): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=agent-panel.d.ts.map

@@ -1,4 +1,4 @@
-import type { KanbanBacklogSnapshot, KanbanBoardSnapshot, KanbanCollaboratorRole, KanbanDispatchContextLabelDefinition, KanbanPermissionGrant, KanbanProjectSettings, KanbanTaskTag, KanbanWorkflowState } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanBacklogSnapshot, KanbanBoardSnapshot, KanbanCollaboratorRole, KanbanDispatchContextLabelDefinition, KanbanPermissionGrant, KanbanProjectSettings, KanbanTaskTag, KanbanWorkflowState } from "@a5c-ai/agent-comm-mux/kanban";
 export interface BacklogOverviewSummary {
     projectCount: number;
     issueCount: number;
@@ -190,3 +190,4 @@ export declare function useBacklog(interval?: number): {
         message: string;
     } | null;
 };
+//# sourceMappingURL=use-backlog.d.ts.map

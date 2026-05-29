@@ -1,5 +1,5 @@
 import { promises as fs } from "node:fs";
-import { type KanbanCiGate, type KanbanIntegrationProvider, type KanbanMergeStatus, type KanbanPublishStatus, type KanbanPullRequestStatus, type KanbanReviewArtifact, type KanbanReviewCommentAnchor, type KanbanReviewFeedbackSource, type KanbanReviewDecision, type KanbanReviewStatus, type KanbanReviewSnapshot } from "@a5c-ai/agent-mux-core/kanban";
+import { type KanbanCiGate, type KanbanIntegrationProvider, type KanbanMergeStatus, type KanbanPublishStatus, type KanbanPullRequestStatus, type KanbanReviewArtifact, type KanbanReviewCommentAnchor, type KanbanReviewFeedbackSource, type KanbanReviewDecision, type KanbanReviewStatus, type KanbanReviewSnapshot } from "@a5c-ai/agent-comm-mux/kanban";
 export interface ReviewServiceDeps {
     readFile: typeof fs.readFile;
     writeFile: typeof fs.writeFile;
@@ -61,3 +61,4 @@ export declare class ReviewService {
     }): Promise<KanbanReviewSnapshot>;
     applyAction(input: ReviewActionInput): Promise<KanbanReviewSnapshot>;
 }
+//# sourceMappingURL=review-service.d.ts.map

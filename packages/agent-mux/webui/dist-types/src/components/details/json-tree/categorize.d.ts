@@ -24,3 +24,4 @@ export interface CategorizedData {
     }>;
 }
 export declare function categorizeData(data: unknown): CategorizedData;
+//# sourceMappingURL=categorize.d.ts.map

@@ -1,4 +1,4 @@
-import type { McpServerConfig } from "@a5c-ai/agent-mux-core";
+import type { McpServerConfig } from "@a5c-ai/agent-comm-mux";
 export interface StoredAgentConfiguration {
     model?: string;
     provider?: string;
@@ -11,3 +11,4 @@ export interface SettingsSectionStorage {
 }
 export declare function loadSettingsSectionStorage(): Promise<SettingsSectionStorage>;
 export declare function writeSettingsSectionStorage(data: SettingsSectionStorage): Promise<void>;
+//# sourceMappingURL=settings-section-storage.d.ts.map

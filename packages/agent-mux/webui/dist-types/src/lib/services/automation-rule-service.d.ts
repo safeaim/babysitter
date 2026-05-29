@@ -1,5 +1,5 @@
-import type { AutomationExecutionRecord, AutomationRule, AutomationRuleLifecycleState } from '@a5c-ai/agent-mux-core';
-import type { KanbanIssue } from '@a5c-ai/agent-mux-core/kanban';
+import type { AutomationExecutionRecord, AutomationRule, AutomationRuleLifecycleState } from '@a5c-ai/agent-comm-mux';
+import type { KanbanIssue } from '@a5c-ai/agent-comm-mux/kanban';
 import { BacklogQueryService } from './backlog-query-service';
 import { type KanbanStorageDeps } from './kanban-storage';
 export declare const AUTOMATION_RULE_STATES: readonly ["draft", "active", "paused", "disabled", "archived"];
@@ -95,3 +95,4 @@ export declare class AutomationRuleService {
     materializeEvent(ruleId: string, body: Record<string, unknown>): Promise<MaterializeAutomationEventResponse>;
 }
 export {};
+//# sourceMappingURL=automation-rule-service.d.ts.map

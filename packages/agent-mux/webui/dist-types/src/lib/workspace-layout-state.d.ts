@@ -18,3 +18,4 @@ export declare function resizeWorkspacePanels(args: {
     deltaPercentage: number;
     minPercentage?: number;
 }): WorkspacePanelSizes;
+//# sourceMappingURL=workspace-layout-state.d.ts.map

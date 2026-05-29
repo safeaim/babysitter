@@ -1,4 +1,4 @@
-import { type KanbanDispatchContextLabelDefinition } from "@a5c-ai/agent-mux-core/kanban";
+import { type KanbanDispatchContextLabelDefinition } from "@a5c-ai/agent-comm-mux/kanban";
 import { type KanbanStorageDeps } from "./kanban-storage";
 export interface CreateDispatchContextLabelInput {
     readonly key: string;
@@ -37,3 +37,4 @@ export declare class DispatchContextLabelService {
     deleteDispatchContextLabel(dispatchContextLabelId: string): Promise<DispatchContextLabelDeleteResult>;
 }
 export {};
+//# sourceMappingURL=dispatch-context-label-service.d.ts.map

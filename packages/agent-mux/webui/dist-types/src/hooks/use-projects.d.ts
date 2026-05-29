@@ -6,3 +6,4 @@ export declare function useProjects(interval?: number, suppressSseRefetch?: bool
     error: string | null;
     refresh: () => Promise<void>;
 };
+//# sourceMappingURL=use-projects.d.ts.map

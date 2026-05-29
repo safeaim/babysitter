@@ -6,3 +6,4 @@ export interface ShortcutEntry {
 export declare const SHORTCUTS: ShortcutEntry[];
 export declare const SHORTCUT_SECTION_LABELS: Record<string, string>;
 export declare function ShortcutsHelp(): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=shortcuts-help.d.ts.map

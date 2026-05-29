@@ -69,3 +69,4 @@ export declare function clearGlobal<K extends keyof GlobalRegistryMap>(key: K): 
  * Primarily useful in tests.
  */
 export declare function clearAllGlobals(): void;
+//# sourceMappingURL=global-registry.d.ts.map

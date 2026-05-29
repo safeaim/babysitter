@@ -1,4 +1,4 @@
-import type { KanbanReviewArtifact, KanbanReviewCommentAnchor, KanbanReviewDecision, KanbanReviewFeedbackSource, KanbanReviewSnapshot } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanReviewArtifact, KanbanReviewCommentAnchor, KanbanReviewDecision, KanbanReviewFeedbackSource, KanbanReviewSnapshot } from "@a5c-ai/agent-comm-mux/kanban";
 export declare function ReviewPanel(props: {
     title: string;
     description: string;
@@ -24,3 +24,4 @@ export declare function ReviewPanel(props: {
         feedbackSource?: KanbanReviewFeedbackSource;
     }) => void | Promise<void>;
 }): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=review-panel.d.ts.map

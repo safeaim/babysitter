@@ -1,5 +1,5 @@
 import { type SessionFlowModel } from "@a5c-ai/agent-mux-ui/session-flow";
-import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
+import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-comm-mux";
 interface EventBuffer {
     events: Array<Record<string, unknown>>;
 }
@@ -12,3 +12,4 @@ export declare function SessionObservabilityPanel(props: {
     flowModelOverride?: SessionFlowModel;
 }): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=session-observability-panel.d.ts.map

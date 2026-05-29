@@ -7,3 +7,4 @@ interface ProgressBarProps {
 }
 export declare function ProgressBar({ value, variant, glow, className }: ProgressBarProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=progress-bar.d.ts.map

@@ -1,5 +1,5 @@
-import type { Attachment } from "@a5c-ai/agent-mux-core";
-import type { KanbanIntegrationProvider, KanbanReviewArtifact } from "@a5c-ai/agent-mux-core/kanban";
+import type { Attachment } from "@a5c-ai/agent-comm-mux";
+import type { KanbanIntegrationProvider, KanbanReviewArtifact } from "@a5c-ai/agent-comm-mux/kanban";
 import type { WorkspaceInventoryItem, WorkspaceSessionSnapshot } from "@/lib/workspace-lifecycle";
 import { type WorkspaceSidebarFeedback } from "@/components/workspaces/workspace-details-sidebar";
 type EventBuffer = {
@@ -49,3 +49,4 @@ type WorkspaceDetailShellProps = {
 };
 export declare function WorkspaceDetailShell(props: WorkspaceDetailShellProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=workspace-detail-shell.d.ts.map

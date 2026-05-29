@@ -1,4 +1,4 @@
-import type { KanbanCiGate, KanbanIntegrationProvider, KanbanMergeStatus, KanbanPublishStatus, KanbanPullRequestStatus, KanbanReviewArtifact, KanbanReviewCommentAnchor, KanbanReviewDecision, KanbanReviewFeedbackSource, KanbanReviewStatus, KanbanReviewSnapshot, KanbanReviewTargetType } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanCiGate, KanbanIntegrationProvider, KanbanMergeStatus, KanbanPublishStatus, KanbanPullRequestStatus, KanbanReviewArtifact, KanbanReviewCommentAnchor, KanbanReviewDecision, KanbanReviewFeedbackSource, KanbanReviewStatus, KanbanReviewSnapshot, KanbanReviewTargetType } from "@a5c-ai/agent-comm-mux/kanban";
 export interface ReviewQuery {
     targetType?: KanbanReviewTargetType;
     targetId?: string;
@@ -50,7 +50,7 @@ export declare function submitReviewAction(input: {
 export declare function useReviews(query?: ReviewQuery, interval?: number): {
     snapshot: KanbanReviewSnapshot | null;
     artifacts: readonly KanbanReviewArtifact[];
-    queue: readonly import("@a5c-ai/agent-mux-core").KanbanReviewQueueItem[];
+    queue: readonly import("@a5c-ai/agent-comm-mux").KanbanReviewQueueItem[];
     summary: {
         readonly total: number;
         readonly issueCount: number;
@@ -109,3 +109,4 @@ export declare function useReviews(query?: ReviewQuery, interval?: number): {
     pendingArtifactId: string | null;
     selectedArtifact: (artifactId: string | null | undefined) => KanbanReviewArtifact | null;
 };
+//# sourceMappingURL=use-reviews.d.ts.map

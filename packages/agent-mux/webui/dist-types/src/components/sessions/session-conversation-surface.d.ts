@@ -1,4 +1,4 @@
-import type { Attachment, WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
+import type { Attachment, WorkspaceRuntimeSurface } from "@a5c-ai/agent-comm-mux";
 import type { SessionCost, SessionFlowModel } from "@a5c-ai/agent-mux-ui/session-flow";
 type EventBuffer = {
     events: Array<Record<string, unknown>>;
@@ -34,3 +34,4 @@ type SessionConversationSurfaceProps = {
 };
 export type { ComposerSubmitInput };
 export declare function SessionConversationSurface(props: SessionConversationSurfaceProps): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=session-conversation-surface.d.ts.map

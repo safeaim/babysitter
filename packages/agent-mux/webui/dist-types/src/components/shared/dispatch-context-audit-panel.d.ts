@@ -5,3 +5,4 @@ export declare function DispatchContextAuditPanel(props: {
     emptyText: string;
     className?: string;
 }): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=dispatch-context-audit-panel.d.ts.map

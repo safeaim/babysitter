@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
-import type { AutomationExecutionRecord, AutomationRule } from '@a5c-ai/agent-mux-core';
-import type { KanbanActivityEntry, KanbanCollaborator, KanbanDispatchContextLabelDefinition, KanbanDispatchContextLabelRef, KanbanIssue, KanbanPermissionGrant, KanbanProject, KanbanProjectSettings, KanbanTaskTag, KanbanTeam } from '@a5c-ai/agent-mux-core/kanban';
+import type { AutomationExecutionRecord, AutomationRule } from '@a5c-ai/agent-comm-mux';
+import type { KanbanActivityEntry, KanbanCollaborator, KanbanDispatchContextLabelDefinition, KanbanDispatchContextLabelRef, KanbanIssue, KanbanPermissionGrant, KanbanProject, KanbanProjectSettings, KanbanTaskTag, KanbanTeam } from '@a5c-ai/agent-comm-mux/kanban';
 export declare const KANBAN_BACKLOG_FILE_PATH: string;
 export type StoredKanbanProject = Omit<KanbanProject, 'metrics' | 'team' | 'settings' | 'permissions' | 'activity'> & {
     readonly team?: Partial<KanbanTeam>;
@@ -34,3 +34,4 @@ export interface KanbanStorageDeps {
 export declare const defaultKanbanStorageDeps: KanbanStorageDeps;
 export declare function readKanbanStorageFile(deps: KanbanStorageDeps): Promise<KanbanStoragePayload | null>;
 export declare function writeKanbanStorageFile(deps: KanbanStorageDeps, payload: KanbanStoragePayload): Promise<void>;
+//# sourceMappingURL=kanban-storage.d.ts.map

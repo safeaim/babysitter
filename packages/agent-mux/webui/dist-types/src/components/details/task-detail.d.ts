@@ -1,4 +1,4 @@
-import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-comm-mux/kanban";
 import type { DispatchContextAuditRecord } from "@/lib/dispatch-context-audit";
 interface TaskDetailPanelProps {
     runId: string;
@@ -12,3 +12,4 @@ interface TaskDetailPanelProps {
 }
 export declare function TaskDetailPanel({ runId, effectId, activeTab, onTabChange, runDuration, allTasks, executionContexts, executionAudits, }: TaskDetailPanelProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=task-detail.d.ts.map

@@ -7,3 +7,4 @@ interface StatusBadgeProps {
 }
 export declare function StatusBadge({ status, className, waitingKind, isStale }: StatusBadgeProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=status-badge.d.ts.map

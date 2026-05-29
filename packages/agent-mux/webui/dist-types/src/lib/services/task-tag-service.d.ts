@@ -1,4 +1,4 @@
-import { type KanbanTaskTag } from "@a5c-ai/agent-mux-core/kanban";
+import { type KanbanTaskTag } from "@a5c-ai/agent-comm-mux/kanban";
 import { type KanbanStorageDeps } from "./kanban-storage";
 export interface CreateTaskTagInput {
     readonly key: string;
@@ -37,3 +37,4 @@ export declare class TaskTagService {
     deleteTaskTag(taskTagId: string): Promise<TaskTagDeleteResult>;
 }
 export {};
+//# sourceMappingURL=task-tag-service.d.ts.map

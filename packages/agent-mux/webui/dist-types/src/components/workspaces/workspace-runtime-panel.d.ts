@@ -1,5 +1,5 @@
-import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-mux-core";
-import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-mux-core/kanban";
+import type { WorkspaceRuntimeSurface } from "@a5c-ai/agent-comm-mux";
+import type { KanbanExecutionContextEnvelope } from "@a5c-ai/agent-comm-mux/kanban";
 import type { DispatchContextAuditRecord } from "@/lib/dispatch-context-audit";
 export declare function WorkspaceRuntimePanel(props: {
     runtime: WorkspaceRuntimeSurface;
@@ -10,3 +10,4 @@ export declare function WorkspaceRuntimePanel(props: {
     className?: string;
     executionContexts?: readonly KanbanExecutionContextEnvelope[];
 }): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=workspace-runtime-panel.d.ts.map

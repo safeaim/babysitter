@@ -13,3 +13,4 @@ export declare function useSmartPolling<T>(url: string, options?: UseSmartPollin
     refresh: () => Promise<void>;
 };
 export {};
+//# sourceMappingURL=use-smart-polling.d.ts.map

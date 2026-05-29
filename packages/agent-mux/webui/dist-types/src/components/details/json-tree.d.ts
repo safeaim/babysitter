@@ -7,3 +7,4 @@
  * existing imports like `from "../json-tree"` continue to work.
  */
 export { JsonTree, JsonTreeView } from "./json-tree/index";
+//# sourceMappingURL=json-tree.d.ts.map

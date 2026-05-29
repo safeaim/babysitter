@@ -15,3 +15,4 @@ export declare function useProjectRuns(projectName: string, options?: UseProject
     refresh: () => Promise<void>;
 };
 export {};
+//# sourceMappingURL=use-project-runs.d.ts.map

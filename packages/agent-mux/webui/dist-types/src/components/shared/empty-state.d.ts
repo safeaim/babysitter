@@ -6,3 +6,4 @@ interface EmptyStateProps {
 }
 export declare function EmptyState({ title, description, className, compact, }: EmptyStateProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=empty-state.d.ts.map

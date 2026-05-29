@@ -52,3 +52,4 @@ export declare function MetadataGrid({ metadata, }: {
 export declare function CollapsibleRawJson({ data }: {
     data: unknown;
 }): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=smart-summary.d.ts.map

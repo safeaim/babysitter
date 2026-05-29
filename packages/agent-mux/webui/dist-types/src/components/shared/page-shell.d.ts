@@ -15,3 +15,4 @@ export declare function PageHeroGrid(props: {
     children: React.ReactNode;
     className?: string;
 }): import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=page-shell.d.ts.map

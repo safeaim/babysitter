@@ -1,6 +1,7 @@
-import type { KanbanTaskTag } from "@a5c-ai/agent-mux-core/kanban";
+import type { KanbanTaskTag } from "@a5c-ai/agent-comm-mux/kanban";
 export declare function useTaskTags(): {
     taskTags: readonly KanbanTaskTag[];
     loading: boolean;
     error: string | null;
 };
+//# sourceMappingURL=use-task-tags.d.ts.map

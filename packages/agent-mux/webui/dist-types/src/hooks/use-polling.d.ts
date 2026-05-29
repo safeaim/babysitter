@@ -9,3 +9,4 @@ export declare function usePolling<T>(url: string, options?: UsePollingOptions):
     refresh: () => void;
 };
 export {};
+//# sourceMappingURL=use-polling.d.ts.map

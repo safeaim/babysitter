@@ -1,4 +1,4 @@
-import type { Attachment } from "@a5c-ai/agent-mux-core";
+import type { Attachment } from "@a5c-ai/agent-comm-mux";
 import type { WorkspaceInventoryItem, WorkspaceInventoryResponse, WorkspaceSessionSnapshot } from "@/lib/workspace-lifecycle";
 type WorkspaceSurfaceMode = "full" | "attention";
 export declare function getWorkspaceOwnershipLabel(isAuthenticated: boolean, sessions: WorkspaceSessionSnapshot[], workspaces?: WorkspaceInventoryItem[]): string;
@@ -28,3 +28,4 @@ export declare function WorkspacesPageContent(props: {
     mode?: WorkspaceSurfaceMode;
 }): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=workspaces-page.d.ts.map

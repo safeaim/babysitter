@@ -10,3 +10,4 @@ interface BacklogOverviewProps {
 }
 export declare function BacklogOverview({ projectId: requestedProjectId, routeBasePath, forcedPresentation, routeMode, initialIssueId, initialIssueKey, initialProjectId, }?: BacklogOverviewProps): import("react/jsx-runtime").JSX.Element | null;
 export {};
+//# sourceMappingURL=backlog-overview.d.ts.map

@@ -5,3 +5,4 @@ export declare function WorkspaceProvisioningPage(props: {
     issueId?: string;
 }): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=workspace-provisioning-page.d.ts.map

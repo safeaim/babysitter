@@ -5,3 +5,4 @@ interface BreakpointPanelProps {
 }
 export declare function BreakpointPanel({ task, runId }: BreakpointPanelProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=breakpoint-panel.d.ts.map

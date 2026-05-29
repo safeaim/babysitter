@@ -1,4 +1,4 @@
-import type { AutomationExecutionRecord, AutomationExecutionStatus, AutomationRule } from "@a5c-ai/agent-mux-core/automation";
+import type { AutomationExecutionRecord, AutomationExecutionStatus, AutomationRule } from "@a5c-ai/agent-comm-mux/automation";
 import { type KanbanStorageDeps, type StoredKanbanIssue } from "./kanban-storage";
 type WebhookHeaders = Pick<Headers, "get">;
 export type AutomationWebhookDeliveryOutcome = AutomationExecutionStatus;
@@ -42,3 +42,4 @@ export declare class AutomationWebhookService {
     deliver(input: AutomationWebhookDeliveryInput): Promise<AutomationWebhookDeliveryResponse>;
 }
 export {};
+//# sourceMappingURL=automation-webhook-service.d.ts.map

@@ -9,3 +9,4 @@ interface ProjectSectionHeaderProps {
 }
 export declare function ProjectSectionHeader({ projectName, activeRuns, completedRuns, failedRuns, totalRuns, latestUpdate, className, }: ProjectSectionHeaderProps): import("react/jsx-runtime").JSX.Element;
 export {};
+//# sourceMappingURL=project-section-header.d.ts.map

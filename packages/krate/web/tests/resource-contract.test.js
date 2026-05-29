@@ -98,14 +98,24 @@ test('trigger rule form emits all required AgentTriggerRule spec fields', () => 
   }
 });
 
-// ── Contract: external provider wizard sends required fields ──────────────
+// ── Contract: external provider wizard sends typed provider kinds ─────────
 
-test('external provider wizard emits all required ExternalBackendProvider fields', () => {
+test('external provider wizard references typed provider kinds (GitProvider, CiProvider, etc.)', () => {
   const source = readFile('app', 'components', 'external-provider-wizard.jsx');
-  assert.match(source, /providerType/);
-  assert.match(source, /endpoint:/);
-  assert.doesNotMatch(source, /spec:\s*\{[^}]*baseUrl:/, 'should use "endpoint" not "baseUrl" in spec');
-  assert.match(source, /ExternalBackendProvider/);
+  assert.match(source, /GitProvider/, 'wizard must reference GitProvider');
+  assert.match(source, /CiProvider/, 'wizard must reference CiProvider');
+  assert.match(source, /IssueTrackerProvider/, 'wizard must reference IssueTrackerProvider');
+  assert.match(source, /AppHostingProvider/, 'wizard must reference AppHostingProvider');
+  assert.match(source, /ArtifactRegistryProvider/, 'wizard must reference ArtifactRegistryProvider');
+  assert.match(source, /platform/, 'wizard must reference platform field');
+  assert.match(source, /endpoint/, 'wizard must reference endpoint field');
+  assert.match(source, /organizationRef/, 'wizard must include organizationRef in spec');
+  assert.doesNotMatch(source, /kind:\s*['"]ExternalBackendProvider['"]/, 'wizard must not use ExternalBackendProvider kind');
+});
+
+test('external provider wizard creates multiple resources via Promise.all', () => {
+  const source = readFile('app', 'components', 'external-provider-wizard.jsx');
+  assert.match(source, /Promise\.all/, 'wizard must use Promise.all for parallel resource creation');
 });
 
 // ── Contract: memory ontology editor sends required fields ────────────────

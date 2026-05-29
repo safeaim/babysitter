@@ -8,7 +8,7 @@ export async function ArtifactRegistriesPage({ org = null } = {}) {
   const allResources = ui.model.resources || [];
   const registries = allResources.filter((r) => r.kind === 'ArtifactRegistry').flatMap((r) => r.items || []);
   const feeds = allResources.filter((r) => r.kind === 'ArtifactFeed').flatMap((r) => r.items || []);
-  const externalProviders = allResources.filter((r) => r.kind === 'ExternalBackendProvider').flatMap((r) => r.items || []);
+  const externalProviders = allResources.filter((r) => r.kind === 'ArtifactRegistryProvider').flatMap((r) => r.items || []);
   return (
     <PageFrame
       org={activeOrg}
@@ -32,7 +32,7 @@ export async function ArtifactRegistryDetailPage({ org = null, registryName = nu
   const allResources = ui.model.resources || [];
   const registries = allResources.filter((r) => r.kind === 'ArtifactRegistry').flatMap((r) => r.items || []);
   const feeds = allResources.filter((r) => r.kind === 'ArtifactFeed').flatMap((r) => r.items || []);
-  const externalProviders = allResources.filter((r) => r.kind === 'ExternalBackendProvider').flatMap((r) => r.items || []);
+  const externalProviders = allResources.filter((r) => r.kind === 'ArtifactRegistryProvider').flatMap((r) => r.items || []);
   const registry = registryName ? registries.find((r) => r.metadata?.name === registryName) : null;
   const registryFeeds = registry ? feeds.filter((f) => f.spec?.registryRef === registryName) : feeds;
   return (

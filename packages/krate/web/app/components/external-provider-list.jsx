@@ -1,28 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { statusTone } from '../lib/status-tones.js';
 
-const PROVIDER_ICONS = {
+const TYPED_PROVIDER_KINDS = ['GitProvider', 'CiProvider', 'IssueTrackerProvider', 'AppHostingProvider', 'ArtifactRegistryProvider'];
+
+const SCOPE_LABELS = {
+  GitProvider: 'Git',
+  CiProvider: 'CI/CD',
+  IssueTrackerProvider: 'Issues',
+  AppHostingProvider: 'Hosting',
+  ArtifactRegistryProvider: 'Artifacts',
+};
+
+const PLATFORM_ICONS = {
   github: 'GH',
   gitlab: 'GL',
   bitbucket: 'BB',
   gitea: 'GT',
   azure_devops: 'AZ',
+  vercel: 'VR',
+  cloudflare: 'CF',
+  firebase: 'FB',
+  netlify: 'NL',
 };
 
-function ProviderCard({ provider, onDelete }) {
-  const spec = provider.spec || {};
-  const status = provider.status || {};
-  const name = provider.metadata?.name || 'unnamed';
-  const providerType = spec.providerType || spec.type || 'github';
-  const icon = PROVIDER_ICONS[providerType] || providerType.slice(0, 2).toUpperCase();
-  const phase = status.phase || 'Pending';
-  const tone = statusTone(phase);
-  const lastSync = status.lastSyncTime || status.lastSync || null;
-  const rateLimitRemaining = status.rateLimitRemaining;
-  const rateLimitReset = status.rateLimitReset;
-  const interfaces = spec.interfaces || [];
+function scopeBadgeColor(kind) {
+  const colors = {
+    GitProvider: { bg: '#dbeafe', color: '#1e40af' },
+    CiProvider: { bg: '#fef3c7', color: '#92400e' },
+    IssueTrackerProvider: { bg: '#d1fae5', color: '#065f46' },
+    AppHostingProvider: { bg: '#ede9fe', color: '#5b21b6' },
+    ArtifactRegistryProvider: { bg: '#fce7f3', color: '#9d174d' },
+  };
+  return colors[kind] || { bg: '#f3f4f6', color: '#374151' };
+}
+
+function PlatformGroupCard({ platform, providers, onDelete, removing }) {
+  const icon = PLATFORM_ICONS[platform] || platform.slice(0, 2).toUpperCase();
+  const endpoint = providers[0]?.spec?.endpoint || '';
+  const secretRef = providers[0]?.spec?.secretRef || '';
 
   const cardStyle = {
     border: '1px solid #e5e7eb',
@@ -54,16 +71,6 @@ function ProviderCard({ provider, onDelete }) {
     flexShrink: 0,
   };
 
-  const pillStyle = (t) => ({
-    display: 'inline-block',
-    padding: '0.125rem 0.5rem',
-    borderRadius: '9999px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    background: t === 'good' ? '#dcfce7' : t === 'warn' ? '#fef9c3' : t === 'danger' ? '#fee2e2' : '#f3f4f6',
-    color: t === 'good' ? '#166534' : t === 'warn' ? '#713f12' : t === 'danger' ? '#991b1b' : '#374151',
-  });
-
   const metaStyle = { fontSize: '0.8125rem', color: '#6b7280' };
 
   return (
@@ -71,47 +78,70 @@ function ProviderCard({ provider, onDelete }) {
       <div style={headerStyle}>
         <div style={iconStyle}>{icon}</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{name}</div>
-          <div style={metaStyle}>{providerType}{spec.baseUrl ? ` · ${spec.baseUrl}` : ''}</div>
+          <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{platform}</div>
+          <div style={metaStyle}>{endpoint}</div>
         </div>
-        <span style={pillStyle(tone)}>{phase}</span>
       </div>
 
-      {interfaces.length > 0 && (
-        <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
-          {interfaces.map((iface) => (
-            <span key={iface} style={{ ...pillStyle('neutral'), fontWeight: 400 }}>{iface}</span>
-          ))}
-        </div>
-      )}
+      {/* Scope badges */}
+      <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
+        {providers.map((p) => {
+          const badge = scopeBadgeColor(p.kind);
+          const phase = p.status?.phase || 'Pending';
+          const tone = statusTone(phase);
+          return (
+            <span key={p.kind} style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.375rem',
+              padding: '0.125rem 0.5rem',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              background: badge.bg,
+              color: badge.color,
+            }}>
+              {SCOPE_LABELS[p.kind] || p.kind}
+              <span style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: tone === 'good' ? '#16a34a' : tone === 'warn' ? '#d97706' : tone === 'danger' ? '#dc2626' : '#9ca3af',
+              }} />
+            </span>
+          );
+        })}
+      </div>
 
+      {/* Metadata */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.8125rem', color: '#6b7280' }}>
-        {lastSync && (
-          <span>Last sync: <strong style={{ color: '#374151' }}>{lastSync}</strong></span>
-        )}
-        {rateLimitRemaining !== undefined && (
-          <span>
-            Rate limit: <strong style={{ color: rateLimitRemaining < 100 ? '#dc2626' : '#374151' }}>
-              {rateLimitRemaining} remaining
-            </strong>
-            {rateLimitReset && <> · resets {rateLimitReset}</>}
-          </span>
-        )}
-        {spec.secretRef && (
-          <span>Secret: <code style={{ background: '#f3f4f6', padding: '0.0625rem 0.25rem', borderRadius: '0.25rem', fontSize: '0.75rem' }}>{spec.secretRef}</code></span>
+        {secretRef && (
+          <span>Secret: <code style={{ background: '#f3f4f6', padding: '0.0625rem 0.25rem', borderRadius: '0.25rem', fontSize: '0.75rem' }}>{secretRef}</code></span>
         )}
       </div>
 
-      {onDelete && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      {/* Individual provider delete buttons */}
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        {providers.map((p) => (
           <button
-            onClick={() => onDelete(name)}
-            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: '0.375rem', padding: '0.25rem 0.625rem', fontSize: '0.8125rem', color: '#6b7280', cursor: 'pointer' }}
+            key={`${p.kind}-${p.metadata?.name}`}
+            onClick={() => onDelete(p.kind, p.metadata?.name)}
+            disabled={!!removing}
+            style={{
+              background: 'none',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0.375rem',
+              padding: '0.25rem 0.625rem',
+              fontSize: '0.75rem',
+              color: '#6b7280',
+              cursor: removing ? 'not-allowed' : 'pointer',
+              opacity: removing ? 0.5 : 1,
+            }}
           >
-            Remove
+            Remove {SCOPE_LABELS[p.kind] || p.kind}
           </button>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
@@ -120,12 +150,12 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
   const [removing, setRemoving] = useState(null);
   const [error, setError] = useState('');
 
-  async function handleDelete(name) {
-    if (!confirm(`Remove external provider "${name}"?`)) return;
+  async function handleDelete(kind, name) {
+    if (!confirm(`Remove ${kind} "${name}"?`)) return;
     setRemoving(name);
     setError('');
     try {
-      const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources/ExternalBackendProvider/${encodeURIComponent(name)}`, {
+      const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources/${encodeURIComponent(kind)}/${encodeURIComponent(name)}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -138,6 +168,15 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
       setRemoving(null);
     }
   }
+
+  // Group providers by platform
+  const byPlatform = {};
+  for (const provider of providers) {
+    const platform = provider.spec?.platform || provider.spec?.providerType || 'unknown';
+    if (!byPlatform[platform]) byPlatform[platform] = [];
+    byPlatform[platform].push(provider);
+  }
+  const platformGroups = Object.entries(byPlatform).sort(([a], [b]) => a.localeCompare(b));
 
   const containerStyle = { display: 'flex', flexDirection: 'column', gap: '1rem' };
   const headerStyle = { display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
@@ -153,7 +192,7 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
   };
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
     gap: '1rem',
   };
 
@@ -163,7 +202,7 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
         <div>
           <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>External providers</h3>
           <p style={{ margin: '0.25rem 0 0', fontSize: '0.8125rem', color: '#6b7280' }}>
-            {providers.length} configured
+            {providers.length} configured across {platformGroups.length} platform{platformGroups.length !== 1 ? 's' : ''}
           </p>
         </div>
         {addHref && !onAdd ? (
@@ -181,19 +220,41 @@ export function ExternalProviderList({ org, providers = [], onAdd, addHref }) {
 
       {providers.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
-          No external providers configured. Click &quot;Add provider&quot; to connect a forge or issue tracker.
+          No external providers configured. Click &quot;Add provider&quot; to connect a platform.
         </div>
       ) : (
         <div style={gridStyle}>
-          {providers.map((provider) => (
-            <ProviderCard
-              key={provider.metadata?.name}
-              provider={provider}
-              onDelete={removing ? null : handleDelete}
+          {platformGroups.map(([platform, group]) => (
+            <PlatformGroupCard
+              key={platform}
+              platform={platform}
+              providers={group}
+              onDelete={handleDelete}
+              removing={removing}
             />
           ))}
         </div>
       )}
     </div>
   );
+}
+
+/**
+ * Fetch all typed provider kinds for an org, returning a merged array with kind attached.
+ */
+export async function fetchAllTypedProviders(org) {
+  const results = await Promise.all(
+    TYPED_PROVIDER_KINDS.map(async (kind) => {
+      try {
+        const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources?kind=${encodeURIComponent(kind)}`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        const items = data.items || data || [];
+        return (Array.isArray(items) ? items : []).map((item) => ({ ...item, kind }));
+      } catch {
+        return [];
+      }
+    })
+  );
+  return results.flat();
 }

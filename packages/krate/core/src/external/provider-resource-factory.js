@@ -2,7 +2,8 @@
 //
 // Provides:
 //   - createDefaultProviderRegistry() — auto-registers GitHub provider
-//   - createExternalBackendProvider() — creates ExternalBackendProvider CRD resources
+//   - createTypedProvider() — creates typed provider CRD resources (GitProvider, CiProvider, etc.)
+//   - createExternalBackendProvider() — DEPRECATED, use createTypedProvider()
 
 import { createProviderRegistry } from './provider-adapter.js';
 import { GitHubGitForge } from './github/git-forge.js';
@@ -11,6 +12,15 @@ import { GitHubCicd } from './github/cicd.js';
 
 // Re-export for consumers that want the real classes from this module
 export { GitHubGitForge, GitHubIssueTracking, GitHubCicd };
+
+// Valid typed provider kinds
+const TYPED_PROVIDER_KINDS = new Set([
+  'GitProvider',
+  'CiProvider',
+  'IssueTrackerProvider',
+  'AppHostingProvider',
+  'ArtifactRegistryProvider',
+]);
 
 // ---------------------------------------------------------------------------
 // GitHub provider descriptor — wraps real GitHub classes
@@ -114,16 +124,66 @@ export function createDefaultProviderRegistry() {
 }
 
 // ---------------------------------------------------------------------------
-// D1: createExternalBackendProvider
+// D1: createTypedProvider
 // ---------------------------------------------------------------------------
 
 /**
- * Create an ExternalBackendProvider CRD resource.
+ * Create a typed provider CRD resource (GitProvider, CiProvider, etc.).
  * Used by the external backend wizard to persist provider registrations.
+ *
+ * @param {string} kind - One of GitProvider, CiProvider, IssueTrackerProvider, AppHostingProvider, ArtifactRegistryProvider
+ * @param {string} platform - Platform identifier (e.g. 'github', 'gitlab', 'vercel')
+ * @param {{ name?: string, namespace?: string, organizationRef?: string, endpoint?: string, secretRef?: string }} spec
+ * @returns {object} K8s-style typed provider resource
+ */
+export function createTypedProvider(kind, platform, {
+  name,
+  namespace = 'default',
+  organizationRef = 'default',
+  endpoint = '',
+  secretRef = '',
+} = {}) {
+  if (!kind) throw new Error('createTypedProvider: kind is required');
+  if (!TYPED_PROVIDER_KINDS.has(kind)) throw new Error(`createTypedProvider: unknown kind "${kind}", expected one of ${[...TYPED_PROVIDER_KINDS].join(', ')}`);
+  if (!platform) throw new Error('createTypedProvider: platform is required');
+  const resourceName = name || `${platform}-${kind.toLowerCase()}`;
+
+  const now = new Date().toISOString();
+
+  return {
+    apiVersion: 'krate.a5c.ai/v1alpha1',
+    kind,
+    metadata: {
+      name: resourceName,
+      namespace,
+      labels: {},
+      annotations: {}
+    },
+    spec: {
+      organizationRef,
+      platform,
+      endpoint,
+      ...(secretRef ? { secretRef } : {}),
+    },
+    status: {
+      phase: 'Pending',
+      createdAt: now
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// D1: createExternalBackendProvider (DEPRECATED — use createTypedProvider)
+// ---------------------------------------------------------------------------
+
+/**
+ * @deprecated Use createTypedProvider() instead.
+ * Create an ExternalBackendProvider CRD resource.
+ * Retained for backward compatibility. Maps to createTypedProvider('GitProvider', ...).
  *
  * @param {{ name: string, namespace?: string, providerType: string,
  *           displayName: string, config?: object, organizationRef?: string }} opts
- * @returns {object} K8s-style ExternalBackendProvider resource
+ * @returns {object} K8s-style provider resource
  */
 export function createExternalBackendProvider({
   name,

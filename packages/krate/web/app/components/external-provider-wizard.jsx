@@ -14,13 +14,36 @@ const PROVIDER_TYPES = [
   { value: 'netlify', label: 'Netlify', description: 'Netlify hosting and edge functions' },
 ];
 
-const INTERFACES = [
-  { value: 'gitForge', label: 'Git forge', description: 'Repository management and webhooks' },
-  { value: 'issueTracking', label: 'Issue tracking', description: 'Issues, milestones, and labels' },
-  { value: 'cicd', label: 'CI/CD', description: 'Pipelines, jobs, and run triggers' },
-  { value: 'artifactRegistry', label: 'Artifact registry', description: 'Package feeds, container images, and build artifacts' },
-  { value: 'appHosting', label: 'Application hosting', description: 'Deploy targets like Vercel, Cloudflare, Firebase, or Netlify' },
-];
+// Platforms that are forges (support git, ci, issues)
+const FORGE_PLATFORMS = new Set(['github', 'gitlab', 'bitbucket', 'gitea', 'azure_devops']);
+// Platforms that are hosting-only
+const HOSTING_PLATFORMS = new Set(['vercel', 'cloudflare', 'firebase', 'netlify']);
+
+// Scope definitions: scope key -> { label, description, kind }
+const SCOPE_DEFS = {
+  git: { label: 'Git', description: 'Repository management and webhooks', kind: 'GitProvider' },
+  cicd: { label: 'CI/CD', description: 'Pipelines, jobs, and run triggers', kind: 'CiProvider' },
+  issues: { label: 'Issues', description: 'Issues, milestones, and labels', kind: 'IssueTrackerProvider' },
+  hosting: { label: 'App Hosting', description: 'Deploy targets and hosting', kind: 'AppHostingProvider' },
+  artifacts: { label: 'Artifact Registry', description: 'Package feeds, container images, and build artifacts', kind: 'ArtifactRegistryProvider' },
+};
+
+function defaultScopesForPlatform(platform) {
+  if (FORGE_PLATFORMS.has(platform)) return ['git', 'cicd', 'issues'];
+  if (HOSTING_PLATFORMS.has(platform)) return ['hosting'];
+  return [];
+}
+
+function availableScopesForPlatform(platform) {
+  if (FORGE_PLATFORMS.has(platform)) return ['git', 'cicd', 'issues', 'artifacts'];
+  if (HOSTING_PLATFORMS.has(platform)) return ['hosting', 'artifacts'];
+  return ['artifacts'];
+}
+
+function isScopeFixed(platform, scope) {
+  // Hosting platforms have hosting auto-selected and not changeable
+  return HOSTING_PLATFORMS.has(platform) && scope === 'hosting';
+}
 
 const TOTAL_STEPS = 5;
 
@@ -54,11 +77,11 @@ function StepIndicator({ current, total }) {
   );
 }
 
-function Step1ProviderType({ value, onChange }) {
+function Step1Platform({ value, onChange }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Select provider type</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Choose the forge platform to connect.</p>
+      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Select platform</h3>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Choose the platform to connect.</p>
       {PROVIDER_TYPES.map((pt) => (
         <label key={pt.value} style={{
           display: 'flex',
@@ -72,7 +95,7 @@ function Step1ProviderType({ value, onChange }) {
         }}>
           <input
             type="radio"
-            name="providerType"
+            name="platform"
             value={pt.value}
             checked={value === pt.value}
             onChange={() => onChange(pt.value)}
@@ -88,7 +111,7 @@ function Step1ProviderType({ value, onChange }) {
   );
 }
 
-function Step2Hosting({ hosting, setHosting, baseUrl, setBaseUrl, providerType }) {
+function Step2Hosting({ hosting, setHosting, baseUrl, setBaseUrl, platform }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Hosting configuration</h3>
@@ -131,7 +154,7 @@ function Step2Hosting({ hosting, setHosting, baseUrl, setBaseUrl, providerType }
             type="url"
             value={baseUrl}
             onChange={(e) => setBaseUrl(e.target.value)}
-            placeholder={`https://${providerType}.example.com`}
+            placeholder={`https://${platform}.example.com`}
             style={inputStyle}
           />
           <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#6b7280' }}>The root URL of your self-hosted instance.</p>
@@ -141,64 +164,61 @@ function Step2Hosting({ hosting, setHosting, baseUrl, setBaseUrl, providerType }
   );
 }
 
-function Step3Interfaces({ selected, onChange }) {
-  function toggle(value) {
-    onChange(selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value]);
+function Step3Scopes({ platform, selected, onChange }) {
+  const available = availableScopesForPlatform(platform);
+  function toggle(scope) {
+    if (isScopeFixed(platform, scope)) return;
+    onChange(selected.includes(scope) ? selected.filter((s) => s !== scope) : [...selected, scope]);
   }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Select interfaces</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Choose which capabilities to enable for this provider.</p>
-      {INTERFACES.map((iface) => (
-        <label key={iface.value} style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem',
-          padding: '0.75rem',
-          border: `1px solid ${selected.includes(iface.value) ? '#2563eb' : '#e5e7eb'}`,
-          borderRadius: '0.5rem',
-          cursor: 'pointer',
-          background: selected.includes(iface.value) ? '#eff6ff' : '#fff',
-        }}>
-          <input
-            type="checkbox"
-            checked={selected.includes(iface.value)}
-            onChange={() => toggle(iface.value)}
-            style={{ accentColor: '#2563eb', width: 16, height: 16, flexShrink: 0 }}
-          />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{iface.label}</div>
-            <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>{iface.description}</div>
-          </div>
-        </label>
-      ))}
+      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Select scopes</h3>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Choose which provider kinds to create for this platform.</p>
+      {available.map((scope) => {
+        const def = SCOPE_DEFS[scope];
+        const fixed = isScopeFixed(platform, scope);
+        const checked = selected.includes(scope);
+        return (
+          <label key={scope} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            padding: '0.75rem',
+            border: `1px solid ${checked ? '#2563eb' : '#e5e7eb'}`,
+            borderRadius: '0.5rem',
+            cursor: fixed ? 'default' : 'pointer',
+            background: checked ? '#eff6ff' : '#fff',
+            opacity: fixed ? 0.85 : 1,
+          }}>
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={() => toggle(scope)}
+              disabled={fixed}
+              style={{ accentColor: '#2563eb', width: 16, height: 16, flexShrink: 0 }}
+            />
+            <div>
+              <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                {def.label}
+                <span style={{ fontWeight: 400, fontSize: '0.75rem', color: '#9ca3af', marginLeft: '0.5rem' }}>{def.kind}</span>
+              </div>
+              <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>{def.description}</div>
+            </div>
+          </label>
+        );
+      })}
       {selected.length === 0 && (
-        <p style={{ fontSize: '0.8125rem', color: '#dc2626' }}>Select at least one interface.</p>
+        <p style={{ fontSize: '0.8125rem', color: '#dc2626' }}>Select at least one scope.</p>
       )}
     </div>
   );
 }
 
-function Step4Auth({ name, setName, secretRef, setSecretRef, providerType }) {
+function Step4Auth({ secretRef, setSecretRef, platform }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Auth configuration</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Configure the resource name and secret reference for API credentials.</p>
-
-      <div>
-        <label htmlFor="provider-resource-name" style={labelStyle}>Provider resource name <span aria-hidden="true" style={{ color: '#dc2626' }}>*</span></label>
-        <input
-          id="provider-resource-name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
-          placeholder={`${providerType}-provider`}
-          required
-          aria-required="true"
-          style={inputStyle}
-        />
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#6b7280' }}>Kubernetes resource name (lowercase, hyphens only).</p>
-      </div>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Configure the secret reference for API credentials.</p>
 
       <div>
         <label htmlFor="provider-secret-ref" style={labelStyle}>Secret name (for API key / App credentials) <span aria-hidden="true" style={{ color: '#dc2626' }}>*</span></label>
@@ -207,7 +227,7 @@ function Step4Auth({ name, setName, secretRef, setSecretRef, providerType }) {
           type="text"
           value={secretRef}
           onChange={(e) => setSecretRef(e.target.value)}
-          placeholder={`${providerType}-credentials`}
+          placeholder={`${platform}-credentials`}
           required
           aria-required="true"
           style={inputStyle}
@@ -220,34 +240,28 @@ function Step4Auth({ name, setName, secretRef, setSecretRef, providerType }) {
   );
 }
 
-function buildYaml({ name, providerType, hosting, baseUrl, interfaces, secretRef }) {
-  const lines = [
-    'apiVersion: krate.a5c.ai/v1alpha1',
-    'kind: ExternalBackendProvider',
-    'metadata:',
-    `  name: ${name || '<name>'}`,
-    'spec:',
-    `  providerType: ${providerType}`,
-  ];
-  if (hosting === 'self-hosted' && baseUrl) {
-    lines.push(`  baseUrl: ${baseUrl}`);
-  }
-  if (interfaces.length) {
-    lines.push('  interfaces:');
-    interfaces.forEach((iface) => lines.push(`    - ${iface}`));
-  }
-  if (secretRef) {
-    lines.push(`  secretRef: ${secretRef}`);
-  }
-  return lines.join('\n');
+function defaultEndpointForPlatform(platform) {
+  const endpoints = { github: 'https://api.github.com', gitlab: 'https://gitlab.com', bitbucket: 'https://api.bitbucket.org', gitea: 'https://gitea.example.com', azure_devops: 'https://dev.azure.com', vercel: 'https://api.vercel.com', cloudflare: 'https://api.cloudflare.com', firebase: 'https://firebase.googleapis.com', netlify: 'https://api.netlify.com' };
+  return endpoints[platform] || 'https://api.github.com';
 }
 
-function Step5Review({ name, providerType, hosting, baseUrl, interfaces, secretRef }) {
-  const yaml = buildYaml({ name, providerType, hosting, baseUrl, interfaces, secretRef });
+function Step5Review({ platform, hosting, baseUrl, scopes, secretRef, org }) {
+  const endpoint = hosting === 'self-hosted' && baseUrl ? baseUrl : defaultEndpointForPlatform(platform);
+  const resources = scopes.map((scope) => {
+    const def = SCOPE_DEFS[scope];
+    return {
+      apiVersion: 'krate.a5c.ai/v1alpha1',
+      kind: def.kind,
+      metadata: { name: `${platform}-${scope}` },
+      spec: { organizationRef: org, platform, endpoint, secretRef },
+    };
+  });
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Review &amp; submit</h3>
-      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>Review the generated resource definition before submitting.</p>
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>
+        {resources.length} resource{resources.length !== 1 ? 's' : ''} will be created: {resources.map((r) => r.kind).join(', ')}
+      </p>
       <pre style={{
         background: '#1e1e2e',
         color: '#cdd6f4',
@@ -258,14 +272,9 @@ function Step5Review({ name, providerType, hosting, baseUrl, interfaces, secretR
         overflow: 'auto',
         whiteSpace: 'pre',
         margin: 0,
-      }}>{yaml}</pre>
+      }}>{JSON.stringify(resources, null, 2)}</pre>
     </div>
   );
-}
-
-function defaultEndpointForProvider(type) {
-  const endpoints = { github: 'https://api.github.com', gitlab: 'https://gitlab.com', bitbucket: 'https://api.bitbucket.org', gitea: 'https://gitea.example.com', azure_devops: 'https://dev.azure.com', vercel: 'https://api.vercel.com', cloudflare: 'https://api.cloudflare.com', firebase: 'https://firebase.googleapis.com', netlify: 'https://api.netlify.com' };
-  return endpoints[type] || 'https://api.github.com';
 }
 
 export function ExternalProviderWizard({ org, onCancel, onSuccess }) {
@@ -273,50 +282,63 @@ export function ExternalProviderWizard({ org, onCancel, onSuccess }) {
   const handleCancel = onCancel || defaultNav;
   const handleSuccess = onSuccess || defaultNav;
   const [step, setStep] = useState(0);
-  const [providerType, setProviderType] = useState('github');
+  const [platform, setPlatform] = useState('github');
   const [hosting, setHosting] = useState('saas');
   const [baseUrl, setBaseUrl] = useState('');
-  const [interfaces, setInterfaces] = useState(['gitForge']);
-  const [name, setName] = useState('');
+  const [scopes, setScopes] = useState(defaultScopesForPlatform('github'));
   const [secretRef, setSecretRef] = useState('');
   const [status, setStatus] = useState('idle'); // idle | saving | error
   const [errorMsg, setErrorMsg] = useState('');
 
+  function handlePlatformChange(newPlatform) {
+    setPlatform(newPlatform);
+    setScopes(defaultScopesForPlatform(newPlatform));
+  }
+
   function canNext() {
-    if (step === 0) return !!providerType;
+    if (step === 0) return !!platform;
     if (step === 1) return hosting === 'saas' || !!baseUrl;
-    if (step === 2) return interfaces.length > 0;
-    if (step === 3) return !!name && !!secretRef;
+    if (step === 2) return scopes.length > 0;
+    if (step === 3) return !!secretRef;
     return true;
   }
 
   async function handleSubmit() {
     setStatus('saving');
     setErrorMsg('');
-    const resource = {
-      apiVersion: 'krate.a5c.ai/v1alpha1',
-      kind: 'ExternalBackendProvider',
-      metadata: { name },
-      spec: {
-        providerType,
-        endpoint: hosting === 'self-hosted' && baseUrl ? baseUrl : defaultEndpointForProvider(providerType),
-        interfaces,
-        secretRef,
-      },
-    };
+    const endpoint = hosting === 'self-hosted' && baseUrl ? baseUrl : defaultEndpointForPlatform(platform);
+    const resources = scopes.map((scope) => {
+      const def = SCOPE_DEFS[scope];
+      return {
+        apiVersion: 'krate.a5c.ai/v1alpha1',
+        kind: def.kind,
+        metadata: { name: `${platform}-${scope}` },
+        spec: { organizationRef: org, platform, endpoint, secretRef },
+      };
+    });
     try {
-      const res = await fetch(`/api/orgs/${encodeURIComponent(org)}/resources`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(resource),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
+      const results = await Promise.all(
+        resources.map((resource) =>
+          fetch(`/api/orgs/${encodeURIComponent(org)}/resources`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(resource),
+          })
+        )
+      );
+      const failures = [];
+      for (const res of results) {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          failures.push(data.message || data.error || `HTTP ${res.status}`);
+        }
+      }
+      if (failures.length > 0) {
+        setErrorMsg(failures.join('; '));
+        setStatus('error');
+      } else {
         setStatus('idle');
         handleSuccess();
-      } else {
-        setErrorMsg(data.message || data.error || `HTTP ${res.status}`);
-        setStatus('error');
       }
     } catch (err) {
       setErrorMsg(err.message);
@@ -331,11 +353,11 @@ export function ExternalProviderWizard({ org, onCancel, onSuccess }) {
     <div style={wrapStyle}>
       <StepIndicator current={step} total={TOTAL_STEPS} />
 
-      {step === 0 && <Step1ProviderType value={providerType} onChange={setProviderType} />}
-      {step === 1 && <Step2Hosting hosting={hosting} setHosting={setHosting} baseUrl={baseUrl} setBaseUrl={setBaseUrl} providerType={providerType} />}
-      {step === 2 && <Step3Interfaces selected={interfaces} onChange={setInterfaces} />}
-      {step === 3 && <Step4Auth name={name} setName={setName} secretRef={secretRef} setSecretRef={setSecretRef} providerType={providerType} />}
-      {step === 4 && <Step5Review name={name} providerType={providerType} hosting={hosting} baseUrl={baseUrl} interfaces={interfaces} secretRef={secretRef} />}
+      {step === 0 && <Step1Platform value={platform} onChange={handlePlatformChange} />}
+      {step === 1 && <Step2Hosting hosting={hosting} setHosting={setHosting} baseUrl={baseUrl} setBaseUrl={setBaseUrl} platform={platform} />}
+      {step === 2 && <Step3Scopes platform={platform} selected={scopes} onChange={setScopes} />}
+      {step === 3 && <Step4Auth secretRef={secretRef} setSecretRef={setSecretRef} platform={platform} />}
+      {step === 4 && <Step5Review platform={platform} hosting={hosting} baseUrl={baseUrl} scopes={scopes} secretRef={secretRef} org={org} />}
 
       {status === 'error' && (
         <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: '#dc2626', fontSize: '0.875rem' }}>
@@ -353,11 +375,11 @@ export function ExternalProviderWizard({ org, onCancel, onSuccess }) {
           </button>
         ) : (
           <button
-            style={{ ...btnPrimaryStyle, opacity: (status === 'saving' || !name) ? 0.6 : 1, cursor: (status === 'saving' || !name) ? 'not-allowed' : 'pointer' }}
+            style={{ ...btnPrimaryStyle, opacity: (status === 'saving' || scopes.length === 0) ? 0.6 : 1, cursor: (status === 'saving' || scopes.length === 0) ? 'not-allowed' : 'pointer' }}
             onClick={handleSubmit}
-            disabled={status === 'saving' || !name}
+            disabled={status === 'saving' || scopes.length === 0}
           >
-            {status === 'saving' ? 'Creating...' : 'Create provider'}
+            {status === 'saving' ? 'Creating...' : `Create ${scopes.length} provider${scopes.length !== 1 ? 's' : ''}`}
           </button>
         )}
       </div>

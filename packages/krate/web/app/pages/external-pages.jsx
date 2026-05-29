@@ -5,11 +5,31 @@ import { ExternalProviderWizard } from '../components/external-provider-wizard.j
 import { ExternalSyncDashboard } from '../components/external-sync-dashboard.jsx';
 import { ExternalConflictResolver } from '../components/external-conflict-resolver.jsx';
 
+const TYPED_PROVIDER_KINDS = ['GitProvider', 'CiProvider', 'IssueTrackerProvider', 'AppHostingProvider', 'ArtifactRegistryProvider'];
+
+function collectTypedProviders(resources) {
+  const items = [];
+  for (const kind of TYPED_PROVIDER_KINDS) {
+    const group = (resources || []).find((r) => r.kind === kind);
+    if (group?.items) {
+      for (const item of group.items) {
+        items.push({ ...item, kind });
+      }
+    }
+  }
+  return items;
+}
+
 export async function ExternalProvidersPage({ org = null } = {}) {
   const ui = await loadKrateUi(org);
   const activeOrg = ui.model.org?.slug || org || 'default';
   const externalView = ui.model.external || {};
-  const providers = externalView.providers?.items || (ui.model.resources || []).find((r) => r.kind === 'ExternalBackendProvider')?.items || [];
+  const providers = externalView.providers?.items
+    ? TYPED_PROVIDER_KINDS.flatMap((kind) => {
+        const group = (externalView.providers?.items || []).filter((p) => TYPED_PROVIDER_KINDS.includes(p.kind));
+        return group.map((p) => ({ ...p }));
+      })
+    : collectTypedProviders(ui.model.resources);
   return <PageFrame org={activeOrg} orgs={ui.model.orgs} currentPath="/external" eyebrow="external backends" title="External backend providers" text="Connect external forges, issue trackers, and CI/CD systems as Krate-managed provider backends." actions={[['/external/providers/new', 'Add provider'], ['/external/sync', 'Sync status'], ['/external/conflicts', 'Conflicts']]} breadcrumbs={[['/', 'Krate'], ['/external', 'Providers']]}>
     <DegradedBanner model={ui.model} />
     <div className="card">

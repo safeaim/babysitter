@@ -42,13 +42,19 @@ export const GET = withAuth(async (_request, { params }) => {
     }
 
     try {
-      const providers = await controller.listResourceForOrg(org, 'ExternalBackendProvider');
-      const items = providers?.items || providers || [];
-      health.externalProviders = (Array.isArray(items) ? items : []).map((p) => ({
-        name: p.metadata?.name,
-        type: p.spec?.providerType,
-        status: p.status?.phase || 'Unknown',
-      }));
+      const typedKinds = ['GitProvider', 'CiProvider', 'IssueTrackerProvider', 'AppHostingProvider', 'ArtifactRegistryProvider'];
+      const results = await Promise.all(
+        typedKinds.map((kind) => controller.listResourceForOrg(org, kind).catch(() => []))
+      );
+      health.externalProviders = results.flatMap((providers, i) => {
+        const items = providers?.items || providers || [];
+        return (Array.isArray(items) ? items : []).map((p) => ({
+          name: p.metadata?.name,
+          kind: typedKinds[i],
+          type: p.spec?.platform,
+          status: p.status?.phase || 'Unknown',
+        }));
+      });
     } catch {}
 
     return Response.json({ health, org, timestamp: new Date().toISOString() }, { headers: { 'Cache-Control': 'no-store' } });

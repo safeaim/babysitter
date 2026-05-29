@@ -233,7 +233,8 @@ test('webhook manager references ExternalWebhookConfig kind', () => {
 // ── Contract: inference service form sends required fields ─────────────────
 
 test('inference service manager emits required KrateInferenceService fields', () => {
-  const source = readFile('app', 'components', 'inference-service-manager.jsx');
+  const source = readFile('app', 'components', 'inference-service-manager.jsx')
+    + readFile('app', 'components', 'inference-service-list.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.KrateInferenceService.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -247,7 +248,8 @@ test('inference service manager emits required KrateInferenceService fields', ()
 // ── Contract: model route creation form sends required fields ────────────
 
 test('model route form emits required KrateModelRoute spec fields', () => {
-  const source = readFile('app', 'components', 'inference-service-manager.jsx');
+  const source = readFile('app', 'components', 'inference-service-manager.jsx')
+    + readFile('app', 'components', 'model-route-manager.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.KrateModelRoute.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue;
@@ -273,7 +275,8 @@ test('model routes API route creates KrateModelRoute with required fields', () =
 // ── Contract: virtual model form references required KrateVirtualModel fields ──
 
 test('virtual model form references required KrateVirtualModel fields', () => {
-  const source = readFile('app', 'components', 'inference-service-manager.jsx');
+  const source = readFile('app', 'components', 'inference-service-manager.jsx')
+    + readFile('app', 'components', 'virtual-model-manager.jsx');
   const requiredFields = RESOURCE_DEFINITIONS.KrateVirtualModel.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue; // added by API route

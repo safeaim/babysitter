@@ -9,6 +9,7 @@ export const orgNavigationGroups = [
     title: 'Ship',
     items: [
       ['/', 'Home', 'Start or continue work'],
+      ['/getting-started', 'Get Started', 'Setup guide'],
       ['/repositories', 'Code', 'Repositories and files'],
       ['/inbox', 'Reviews & issues', 'Pull requests and triage'],
       ['/runs', 'Runs', 'Checks and jobs'],

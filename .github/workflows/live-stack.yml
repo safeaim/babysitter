@@ -462,6 +462,7 @@ jobs:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.TAL_GH_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AZURE_FOUNDRY_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
         run: |
           # Verify omni can start — capture and echo output for debugging
           echo "::group::Omni startup check"

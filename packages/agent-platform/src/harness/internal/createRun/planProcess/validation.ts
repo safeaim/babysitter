@@ -139,15 +139,16 @@ export async function validateProcessExport(filePath: string): Promise<void> {
   } finally {
     resetGlobalTaskRegistry();
   }
-  const fn = mod.process;
+  const fn = mod.process ?? (typeof mod.default === "function" ? mod.default : undefined);
   if (typeof fn !== "function") {
     throw new BabysitterRuntimeError(
       "InvalidProcessExportError",
-      `Process file at ${filePath} does not export a function named 'process'`,
+      `Process file at ${filePath} does not export a function named 'process'. Available exports: ${Object.keys(mod).join(", ") || "(none)"}`,
       {
         category: ErrorCategory.Validation,
         nextSteps: [
-          "Ensure the file exports: async function process(inputs, ctx) { ... }",
+          "Ensure the file exports: export async function process(inputs, ctx) { ... }",
+          "A default export is also accepted: export default async function(inputs, ctx) { ... }",
         ],
       },
     );

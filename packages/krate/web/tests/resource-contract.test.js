@@ -55,13 +55,19 @@ test('validateResource accepts resources with all required fields', () => {
 // ── Contract: frontend stack builder sends all required AgentStack fields ──
 
 test('stack builder graph emits all required AgentStack spec fields', () => {
-  const source = readFile('app', 'components', 'stack-builder-graph.jsx');
+  // Read all split modules that compose the stack builder graph
+  const source = [
+    readFile('app', 'components', 'stack-builder-graph.jsx'),
+    readFile('app', 'components', 'stack-builder-graph-styles.jsx'),
+    readFile('app', 'components', 'stack-builder-graph-nodes.jsx'),
+    readFile('app', 'components', 'stack-builder-graph-panels.jsx'),
+  ].join('\n');
   const requiredFields = RESOURCE_DEFINITIONS.AgentStack.requiredSpec;
   for (const field of requiredFields) {
     if (field === 'organizationRef') continue; // added by API route
     assert.ok(
       source.includes(field),
-      `stack-builder-graph.jsx does not reference required AgentStack field: ${field}`
+      `stack-builder-graph modules do not reference required AgentStack field: ${field}`
     );
   }
 });

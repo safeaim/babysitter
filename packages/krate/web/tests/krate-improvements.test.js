@@ -167,7 +167,13 @@ test('external provider wizard navigates after success', () => {
 });
 
 test('stack builder graph splits tools into internal and external sub-sections', () => {
-  const source = readWebFile('app', 'components', 'stack-builder-graph.jsx');
+  // Read all split modules that compose the stack builder graph
+  const source = [
+    readWebFile('app', 'components', 'stack-builder-graph.jsx'),
+    readWebFile('app', 'components', 'stack-builder-graph-styles.jsx'),
+    readWebFile('app', 'components', 'stack-builder-graph-nodes.jsx'),
+    readWebFile('app', 'components', 'stack-builder-graph-panels.jsx'),
+  ].join('\n');
   // STACK_LAYERS should include subcategories on tools layer
   assert.match(source, /subcategories/);
   assert.match(source, /Internal Platform Tools/);
@@ -185,7 +191,11 @@ test('stack builder graph splits tools into internal and external sub-sections',
 });
 
 test('stack builder graph includes memory repository section', () => {
-  const source = readWebFile('app', 'components', 'stack-builder-graph.jsx');
+  // Read all split modules that compose the stack builder graph
+  const source = [
+    readWebFile('app', 'components', 'stack-builder-graph.jsx'),
+    readWebFile('app', 'components', 'stack-builder-graph-panels.jsx'),
+  ].join('\n');
   // MemoryRepositorySection component
   assert.match(source, /function MemoryRepositorySection/);
   assert.match(source, /AgentMemoryRepository/);

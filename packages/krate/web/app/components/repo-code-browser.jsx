@@ -6,62 +6,14 @@ import { javascript } from '@codemirror/lang-javascript';
 import { yaml } from '@codemirror/lang-yaml';
 import { EditorView } from '@codemirror/view';
 
-const LANG_MAP = {
-  js: 'javascript', jsx: 'javascript', ts: 'typescript', tsx: 'typescript',
-  py: 'python', rb: 'ruby', go: 'go', rs: 'rust', java: 'java',
-  md: 'markdown', json: 'json', yaml: 'yaml', yml: 'yaml',
-  css: 'css', html: 'html', sh: 'shell', bash: 'shell', zsh: 'shell',
-  toml: 'toml', xml: 'xml', svg: 'xml', graphql: 'graphql', gql: 'graphql',
-  sql: 'sql', dockerfile: 'dockerfile', makefile: 'makefile',
-  c: 'c', cpp: 'cpp', h: 'c', hpp: 'cpp', cs: 'csharp', php: 'php',
-  swift: 'swift', kt: 'kotlin', scala: 'scala', r: 'r', lua: 'lua',
-};
-
-function detectLanguage(filePath) {
-  if (!filePath) return 'text';
-  const base = filePath.split('/').pop().toLowerCase();
-  if (base === 'dockerfile') return 'dockerfile';
-  if (base === 'makefile' || base === 'gnumakefile') return 'makefile';
-  const ext = base.split('.').pop();
-  return LANG_MAP[ext] || 'text';
-}
-
-function formatSize(bytes) {
-  if (!bytes) return '0 B';
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-}
-
-function languageExtension(language) {
-  if (language === 'yaml') return yaml();
-  if (['javascript', 'typescript', 'json'].includes(language)) return javascript({ jsx: true, typescript: language === 'typescript' });
-  return [];
-}
-
-const repoCodeTheme = EditorView.theme({
-  '&': {
-    minHeight: '100%',
-    backgroundColor: '#1e1e2e',
-    color: '#cdd6f4',
-  },
-  '.cm-scroller': {
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-    fontSize: '0.8125rem',
-    lineHeight: '1.65',
-  },
-  '.cm-gutters': {
-    backgroundColor: '#181825',
-    color: '#6c7086',
-    borderRight: '1px solid rgba(205, 214, 244, 0.12)',
-  },
-  '.cm-activeLine, .cm-activeLineGutter': {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
-    backgroundColor: 'rgba(137, 180, 250, 0.36)',
-  },
-});
+import {
+  detectLanguage,
+  formatSize,
+  languageExtension,
+  repoCodeTheme,
+  BreadcrumbNav,
+  FileTreeItem,
+} from './repo-code-helpers.jsx';
 
 export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
   const [branch, setBranch] = useState(defaultBranch);
@@ -178,8 +130,9 @@ export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
         fontFamily: 'system-ui, -apple-system, sans-serif',
       }}
     >
-      {/* ── Sidebar: file tree ── */}
+      {/* Sidebar: file tree */}
       <aside
+        aria-label="Repository file browser sidebar"
         style={{
           width: '220px',
           minWidth: '180px',
@@ -199,6 +152,7 @@ export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
           <select
             value={branch}
             onChange={(e) => handleBranchChange(e.target.value)}
+            aria-label="Select branch"
             style={{
               width: '100%',
               padding: '0.25rem 0.375rem',
@@ -216,53 +170,7 @@ export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
         </div>
 
         {/* Breadcrumb navigation */}
-        <nav
-          aria-label="Directory path"
-          style={{
-            padding: '0.375rem 0.5rem',
-            borderBottom: '1px solid #e5e7eb',
-            fontSize: '0.6875rem',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.125rem',
-            alignItems: 'center',
-            minHeight: '1.75rem',
-          }}
-        >
-          <button
-            onClick={() => navigateTo(-1)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.6875rem',
-              color: pathSegments.length === 0 ? '#374151' : '#2563eb',
-              padding: 0,
-              fontWeight: pathSegments.length === 0 ? 700 : 400,
-            }}
-          >
-            {repo}
-          </button>
-          {pathSegments.map((seg, idx) => (
-            <span key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.125rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>/</span>
-              <button
-                onClick={() => navigateTo(idx)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '0.6875rem',
-                  color: idx === pathSegments.length - 1 ? '#374151' : '#2563eb',
-                  padding: 0,
-                  fontWeight: idx === pathSegments.length - 1 ? 700 : 400,
-                }}
-              >
-                {seg}
-              </button>
-            </span>
-          ))}
-        </nav>
+        <BreadcrumbNav repo={repo} pathSegments={pathSegments} onNavigate={navigateTo} />
 
         {/* File tree list */}
         <div
@@ -272,7 +180,7 @@ export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
         >
           {treeLoading ? (
             <p style={{ padding: '0.75rem 0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-              Loading…
+              Loading...
             </p>
           ) : treeError ? (
             <p style={{ padding: '0.5rem', fontSize: '0.75rem', color: 'var(--danger)' }}>
@@ -299,65 +207,19 @@ export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
               Empty directory
             </p>
           ) : (
-            tree.map((item) => {
-              const isDir = item.type === 'tree';
-              const displayName = item.path.split('/').pop();
-              const isSelected = selectedFile === item.path;
-              return (
-                <button
-                  key={item.path}
-                  role="treeitem"
-                  aria-selected={isSelected}
-                  onClick={() => handleTreeItemClick(item)}
-                  title={item.path}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.375rem',
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '0.25rem 0.625rem',
-                    fontSize: '0.75rem',
-                    border: 'none',
-                    cursor: 'pointer',
-                    background: isSelected ? '#dbeafe' : 'transparent',
-                    color: isSelected ? '#1d4ed8' : '#374151',
-                    fontWeight: isDir ? 600 : 400,
-                    transition: 'background 0.1s',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSelected) e.currentTarget.style.background = '#f3f4f6';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSelected) e.currentTarget.style.background = 'transparent';
-                  }}
-                >
-                  <span style={{ flexShrink: 0, fontSize: '0.75rem', lineHeight: 1 }}>
-                    {isDir ? '📁' : '📄'}
-                  </span>
-                  <span
-                    style={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      flex: 1,
-                    }}
-                  >
-                    {displayName}
-                  </span>
-                  {!isDir && item.size ? (
-                    <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', flexShrink: 0 }}>
-                      {formatSize(item.size)}
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })
+            tree.map((item) => (
+              <FileTreeItem
+                key={item.path}
+                item={item}
+                isSelected={selectedFile === item.path}
+                onClick={handleTreeItemClick}
+              />
+            ))
           )}
         </div>
       </aside>
 
-      {/* ── Main: file viewer ── */}
+      {/* Main: file viewer */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
         {tree?.source === 'not-configured' ? (
           <div
@@ -449,6 +311,7 @@ export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
                   <a
                     href={`/api/orgs/${encodeURIComponent(org)}/repositories/${encodeURIComponent(repo)}/blob/${selectedFile}?branch=${encodeURIComponent(branch)}&raw=1`}
                     download={selectedFile.split('/').pop()}
+                    aria-label={`Download raw file: ${selectedFile.split('/').pop()}`}
                     style={{
                       marginLeft: 'auto',
                       color: 'var(--accent)',
@@ -471,7 +334,7 @@ export function RepoCodeBrowser({ org, repo, defaultBranch = 'main' }) {
             <div style={{ flex: 1, overflow: 'auto' }}>
               {fileLoading ? (
                 <p style={{ padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'center' }}>
-                  Loading file…
+                  Loading file...
                 </p>
               ) : fileError ? (
                 <p style={{ padding: '1rem', color: 'var(--danger)', fontSize: '0.875rem' }}>

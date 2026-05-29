@@ -481,6 +481,9 @@ export async function AgentRunDetailPage({ org = null, runId } = {}) {
   const repository = run?.spec?.repository || null;
   const phases = run?.status?.phaseTransitions || run?.status?.history || [];
   const runTranscripts = agentView.transcripts?.items || [];
+  const sessionRef = run?.status?.sessionRef || run?.spec?.sessionRef || null;
+  const runTranscript = runTranscripts.find((t) => t.spec?.sessionRef === sessionRef || t.spec?.runRef === runId) || null;
+  const runTranscriptMessages = runTranscript?.spec?.messages || [];
   const phaseTone = (phase) => {
     if (!phase || phase === 'Queued' || phase === 'Pending') return 'neutral';
     if (phase === 'Running') return 'warn';
@@ -570,6 +573,29 @@ export async function AgentRunDetailPage({ org = null, runId } = {}) {
         <div className="card">
           <div className="cardTitle"><h3>Execution flow</h3><StatusPill tone={run ? 'good' : 'neutral'}>segments</StatusPill></div>
           <FlowVisualization runs={[run]} transcripts={runTranscripts} />
+        </div>
+      </section>
+      <section className="routeGrid one">
+        <div className="card">
+          <div className="cardTitle"><h3>Transcript</h3><StatusPill tone={runTranscriptMessages.length ? 'good' : 'neutral'}>{runTranscriptMessages.length} messages</StatusPill></div>
+          {runTranscriptMessages.length ? <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '600px', overflow: 'auto', padding: '0.5rem 0' }}>
+            {runTranscriptMessages.map((msg, i) => {
+              const isUser = msg.role === 'user';
+              const isSystem = msg.role === 'system';
+              const isTool = msg.role === 'tool' || msg.role === 'tool_result';
+              return <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', padding: '0.75rem', borderRadius: 'var(--radius-md)', background: isUser ? 'var(--surface-raised, rgba(37,99,235,0.05))' : isSystem ? 'var(--surface-overlay, rgba(0,0,0,0.02))' : isTool ? 'var(--surface-overlay, rgba(0,0,0,0.02))' : 'var(--surface)', border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: isUser ? 'var(--accent)' : isTool ? '#d97706' : 'var(--text-muted)' }}>{msg.role || 'unknown'}</span>
+                  {msg.timestamp && <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{msg.timestamp}</span>}
+                </div>
+                <div style={{ fontSize: '0.85rem', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: 'var(--text)' }}>{typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content, null, 2)}</div>
+                {msg.usage && <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', gap: '0.75rem' }}>
+                  {msg.usage.input_tokens != null && <span>In: {msg.usage.input_tokens}</span>}
+                  {msg.usage.output_tokens != null && <span>Out: {msg.usage.output_tokens}</span>}
+                </div>}
+              </div>;
+            })}
+          </div> : <p className="emptyText">No transcript messages recorded. Messages appear after the agent session produces output.</p>}
         </div>
       </section>
     </> : <EmptyState title={`Run ${runId} not found`} text="This dispatch run does not exist in the current workspace. Dispatch runs are created when agent stacks are triggered by rules or manual dispatch." />}

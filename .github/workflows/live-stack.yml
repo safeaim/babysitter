@@ -457,10 +457,11 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           GOOGLE_CLOUD_LOCATION: global
           GOOGLE_GENAI_USE_VERTEXAI: True
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.TAL_GH_TOKEN || github.token }}
+          GITHUB_TOKEN: ${{ secrets.TAL_GH_TOKEN || github.token }}
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.TAL_GH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           # Verify omni can start — capture and echo output for debugging
           echo "::group::Omni startup check"

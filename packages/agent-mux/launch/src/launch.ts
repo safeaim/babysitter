@@ -417,29 +417,27 @@ async function writeJsonObject(filePath: string, value: Record<string, unknown>)
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-async function prepareHermesProxyConfig(input: {
+async function prepareHermesConfig(input: {
   readonly model: string;
-  readonly baseUrl: string;
-  readonly apiKey: string;
-}): Promise<string> {
+  readonly provider: string;
+  readonly baseUrl?: string;
+  readonly apiKey?: string;
+}): Promise<void> {
   const { homedir } = await import('node:os');
   const { join } = await import('node:path');
   const fs = await import('node:fs/promises');
   const hermesHome = join(homedir(), '.hermes');
   await fs.mkdir(hermesHome, { recursive: true });
   const yamlValue = (value: string) => JSON.stringify(value);
-  await fs.writeFile(
-    join(hermesHome, 'cli-config.yaml'),
-    [
-      'model:',
-      `  default: ${yamlValue(input.model)}`,
-      '  provider: openrouter',
-      `  base_url: ${yamlValue(input.baseUrl)}`,
-      `  api_key: ${yamlValue(input.apiKey)}`,
-      '',
-    ].join('\n'),
-  );
-  return hermesHome;
+  const lines = [
+    'model:',
+    `  default: ${yamlValue(input.model)}`,
+    `  provider: ${yamlValue(input.provider)}`,
+  ];
+  if (input.baseUrl) lines.push(`  base_url: ${yamlValue(input.baseUrl)}`);
+  if (input.apiKey) lines.push(`  api_key: ${yamlValue(input.apiKey)}`);
+  lines.push('');
+  await fs.writeFile(join(hermesHome, 'config.yaml'), lines.join('\n'));
 }
 
 function recordObject(value: unknown): Record<string, unknown> {
@@ -1056,12 +1054,32 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
           ]);
         }
         if (plan.harness === 'hermes') {
-          // Hermes v0.15.x hardcodes OpenRouter as its endpoint and ignores
-          // OPENAI_BASE_URL and cli-config.yaml. For providers hermes can
-          // call directly (Google via GOOGLE_API_KEY), bypass the proxy.
-          // For providers requiring proxy (foundry, anthropic), hermes cannot
-          // be redirected — this is tracked in #468.
-          console.error(`[amux launch] hermes: provider=${plan.proxy?.targetProvider}, proxy cannot redirect hermes endpoint`);
+          // Hermes supports --provider CLI flag and reads ~/.hermes/config.yaml.
+          // For foundry: use azure-foundry provider (built-in to hermes).
+          // For google: use gemini provider.
+          // For anthropic: use anthropic provider.
+          // For others: use custom provider with proxy base_url.
+          const hermesProviderMap: Record<string, string> = {
+            'foundry': 'azure-foundry',
+            'foundry-openai': 'azure-foundry',
+            'google': 'gemini',
+            'anthropic': 'anthropic',
+          };
+          const targetProvider = plan.proxy?.targetProvider ?? '';
+          const hermesProvider = hermesProviderMap[targetProvider] ?? 'custom';
+          const targetModel = plan.proxy?.targetModel ?? plan.model;
+          plan.args.push('--provider', hermesProvider, '--model', targetModel);
+          if (hermesProvider === 'custom') {
+            await prepareHermesConfig({
+              model: targetModel,
+              provider: 'custom',
+              baseUrl: `${proxyRuntime.url}/v1`,
+              apiKey: 'proxy-token',
+            });
+          } else {
+            await prepareHermesConfig({ model: targetModel, provider: hermesProvider });
+          }
+          console.error(`[amux launch] hermes: provider=${hermesProvider} model=${targetModel}`);
         }
         console.error(`[amux launch] ${plan.harness} proxy: OPENAI_BASE_URL=${proxyRuntime.url}/v1`);
       }

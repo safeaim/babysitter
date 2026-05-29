@@ -3,34 +3,34 @@ id: provider-translation:hermes:foundry
 attributes:
   harness: hermes
   provider: foundry
-  proxyRequired: true
-  proxyExposedTransport: openai-chat
+  proxyRequired: false
   envMapping:
-    - envVar: OPENAI_API_KEY
+    - envVar: AZURE_API_KEY
+      source: auth.apiKey
+      condition: present
+    - envVar: AZURE_OPENAI_API_KEY
       source: auth.apiKey
       condition: present
   suppressNonAnthropicKey: true
   args: []
   notes: >
-    Hermes cannot call Azure Foundry directly — Foundry uses api-key header
-    (Azure style) while hermes sends Authorization: Bearer (OpenAI style).
-    Route through transport-mux proxy which handles the auth header translation.
+    Hermes has a built-in azure-foundry provider. Pass AZURE_API_KEY
+    and use --provider azure-foundry CLI flag. No proxy needed.
 ---
 nodeKind: ProviderTranslation
 id: provider-translation:hermes:anthropic
 attributes:
   harness: hermes
   provider: anthropic
-  proxyRequired: true
-  proxyExposedTransport: openai-chat
+  proxyRequired: false
   envMapping:
-    - envVar: OPENAI_API_KEY
+    - envVar: ANTHROPIC_API_KEY
       source: auth.apiKey
       condition: present
   suppressNonAnthropicKey: false
   args: []
   notes: >
-    Hermes speaks OpenAI protocol, not Anthropic. Route through proxy.
+    Hermes has a built-in anthropic provider. No proxy needed.
 ---
 nodeKind: ProviderTranslation
 id: provider-translation:hermes:google
@@ -45,5 +45,4 @@ attributes:
   suppressNonAnthropicKey: true
   args: []
   notes: >
-    Hermes can call Google directly via GOOGLE_API_KEY. No proxy needed.
-    Hermes v0.15.x verified working with Google (run 26605537270).
+    Hermes has a built-in gemini provider. No proxy needed.

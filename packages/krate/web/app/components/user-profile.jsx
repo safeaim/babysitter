@@ -30,7 +30,6 @@ export function UserProfileForm({ org, user }) {
   const [saveMessage, setSaveMessage] = useState('');
 
   const [apiKeys, setApiKeys] = useState([]);
-  const [keyLoading, setKeyLoading] = useState(false);
   const [keyName, setKeyName] = useState('');
   const [keyStatus, setKeyStatus] = useState('idle');
   const [keyMessage, setKeyMessage] = useState('');

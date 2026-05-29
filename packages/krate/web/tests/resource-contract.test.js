@@ -358,8 +358,10 @@ test('Pagination component exists with expected props', () => {
   assert.match(source, /Next/);
 });
 
-test('inference-service-manager imports and uses Pagination component', () => {
-  const source = readFile('app', 'components', 'inference-service-manager.jsx');
-  assert.match(source, /import.*Pagination.*from.*pagination/);
-  assert.match(source, /<Pagination/);
+test('inference-service-manager uses Pagination via ResourceTabContent', () => {
+  const manager = readFile('app', 'components', 'inference-service-manager.jsx');
+  assert.match(manager, /ResourceTabContent/);
+  const helpers = readFile('app', 'components', 'inference-service-helpers.jsx');
+  assert.match(helpers, /import.*Pagination.*from.*pagination/);
+  assert.match(helpers, /<Pagination/);
 });

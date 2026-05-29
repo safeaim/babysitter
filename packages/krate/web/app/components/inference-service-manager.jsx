@@ -1,22 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { cardStyle, btnStyle } from './inference-helpers.jsx';
+import { btnStyle } from './inference-helpers.jsx';
 import { ServiceCard, CreateServiceForm, ServiceDetailPanel } from './inference-service-list.jsx';
 import { RuntimeCard, CreateRuntimeForm } from './inference-runtime-list.jsx';
 import { ModelRouteCard, CreateModelRouteForm } from './model-route-manager.jsx';
 import { VirtualModelCard, CreateVirtualModelForm } from './virtual-model-manager.jsx';
 import { CuratedModelCatalog, UnifiedModelCatalogSection } from './curated-model-catalog.jsx';
-import { Pagination } from './pagination.jsx';
 import { ConfirmDialog } from './confirm-dialog.jsx';
 import { dedupFetch } from '../lib/fetch-dedup.js';
-
-// ─── Main Component ───────────────────────────────────────────────────────────
-//
-// Resource contract fields referenced by this module and its sub-components:
-//   KrateInferenceService: modelFormat, storageUri
-//   KrateModelRoute: modelName, routeType
-//   KrateVirtualModel: modelName, routes
+import { tabStyle, createResource, ResourceTabContent } from './inference-service-helpers.jsx';
 
 export function InferenceServiceManager({ org, initialServiceName }) {
   const [services, setServices] = useState([]);
@@ -33,9 +26,8 @@ export function InferenceServiceManager({ org, initialServiceName }) {
   const [selectedService, setSelectedService] = useState(null);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // { type, name, item }
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  // Pagination state per resource type
   const [svcLimit, setSvcLimit] = useState(25);
   const [svcOffset, setSvcOffset] = useState(0);
   const [svcTotal, setSvcTotal] = useState(0);
@@ -67,12 +59,10 @@ export function InferenceServiceManager({ org, initialServiceName }) {
       setRuntimes(rtData?.items || (Array.isArray(rtData) ? rtData : []));
       setRoutes(routeData?.items || (Array.isArray(routeData) ? routeData : []));
       setVirtualModels(vmData?.items || (Array.isArray(vmData) ? vmData : []));
-
       if (svcData?.total != null) setSvcTotal(svcData.total);
       if (rtData?.total != null) setRtTotal(rtData.total);
       if (routeData?.total != null) setRouteTotal(routeData.total);
       if (vmData?.total != null) setVmTotal(vmData.total);
-
       if (initialServiceName) {
         const found = (svcData?.items || []).find(s => (s.metadata?.name || s.name) === initialServiceName);
         if (found) setSelectedService(found);
@@ -86,20 +76,12 @@ export function InferenceServiceManager({ org, initialServiceName }) {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleCreateService = async (body) => {
+  const handleCreate = async (endpoint, closeFn, body) => {
     setCreateLoading(true);
     setCreateError(null);
     try {
-      const res = await fetch(`/api/orgs/${org}/inference/services`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `Failed with status ${res.status}`);
-      }
-      setShowCreateForm(false);
+      await createResource(org, endpoint, body);
+      closeFn();
       await fetchData();
     } catch (err) {
       setCreateError(err.message);
@@ -108,53 +90,8 @@ export function InferenceServiceManager({ org, initialServiceName }) {
     }
   };
 
-  const handleCreateRuntime = async (body) => {
-    setCreateLoading(true);
-    setCreateError(null);
-    try {
-      const res = await fetch(`/api/orgs/${org}/inference/runtimes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `Failed with status ${res.status}`);
-      }
-      setShowRuntimeForm(false);
-      await fetchData();
-    } catch (err) {
-      setCreateError(err.message);
-    } finally {
-      setCreateLoading(false);
-    }
-  };
-
-  const handleCreateRoute = async (body) => {
-    setCreateLoading(true);
-    setCreateError(null);
-    try {
-      const res = await fetch(`/api/orgs/${org}/inference/routes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `Failed with status ${res.status}`);
-      }
-      setShowRouteForm(false);
-      await fetchData();
-    } catch (err) {
-      setCreateError(err.message);
-    } finally {
-      setCreateLoading(false);
-    }
-  };
-
-  const handleDelete = (service) => {
-    const name = service.metadata?.name || service.name;
-    setDeleteConfirm({ type: 'service', name, item: service });
+  const confirmDelete = (type, item) => {
+    setDeleteConfirm({ type, name: item.metadata?.name || item.name, item });
   };
 
   const executeDelete = async () => {
@@ -162,302 +99,116 @@ export function InferenceServiceManager({ org, initialServiceName }) {
     const { type, name } = deleteConfirm;
     setDeleteConfirm(null);
     try {
-      let url;
-      if (type === 'service') url = `/api/orgs/${org}/inference/services/${encodeURIComponent(name)}`;
-      else if (type === 'route') url = `/api/orgs/${org}/resources/KrateModelRoute/${encodeURIComponent(name)}`;
-      else if (type === 'virtual-model') url = `/api/orgs/${org}/resources/KrateVirtualModel/${encodeURIComponent(name)}`;
-      const res = await fetch(url, { method: 'DELETE' });
+      const urls = {
+        service: `/api/orgs/${org}/inference/services/${encodeURIComponent(name)}`,
+        route: `/api/orgs/${org}/resources/KrateModelRoute/${encodeURIComponent(name)}`,
+        'virtual-model': `/api/orgs/${org}/resources/KrateVirtualModel/${encodeURIComponent(name)}`,
+      };
+      const res = await fetch(urls[type], { method: 'DELETE' });
       if (!res.ok) throw new Error('Delete failed');
       await fetchData();
     } catch (err) {
-      alert(err.message || 'Delete failed');
+      setCreateError(err.message || 'Delete failed');
     }
   };
 
-  const handleCreateVirtualModel = async (body) => {
-    setCreateLoading(true);
-    setCreateError(null);
-    try {
-      const res = await fetch(`/api/orgs/${org}/inference/virtual-models`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `Failed with status ${res.status}`);
-      }
-      setShowVirtualModelForm(false);
-      await fetchData();
-    } catch (err) {
-      setCreateError(err.message);
-    } finally {
-      setCreateLoading(false);
-    }
+  const tabButtons = [
+    { key: 'services', label: 'Services' },
+    { key: 'runtimes', label: 'Runtimes' },
+    { key: 'routes', label: 'Model Routes' },
+    { key: 'virtual-models', label: 'Virtual Models' },
+  ];
+
+  const createButtons = {
+    services: { show: !showCreateForm, label: '+ Create Service', fn: () => setShowCreateForm(true) },
+    runtimes: { show: !showRuntimeForm, label: '+ Add Runtime', fn: () => setShowRuntimeForm(true) },
+    routes: { show: !showRouteForm, label: '+ Create Model Route', fn: () => setShowRouteForm(true) },
+    'virtual-models': { show: !showVirtualModelForm, label: '+ Create Virtual Model', fn: () => setShowVirtualModelForm(true) },
   };
 
-  const handleDeleteRoute = (route) => {
-    const name = route.metadata?.name || route.name;
-    setDeleteConfirm({ type: 'route', name, item: route });
-  };
-
-  const handleDeleteVirtualModel = (vm) => {
-    const name = vm.metadata?.name || vm.name;
-    setDeleteConfirm({ type: 'virtual-model', name, item: vm });
-  };
-
-  const tabStyle = (active) => ({
-    padding: '0.5rem 1rem',
-    border: 'none',
-    borderBottom: active ? '2px solid #2563eb' : '2px solid transparent',
-    background: 'none',
-    cursor: 'pointer',
-    fontWeight: active ? 700 : 500,
-    color: active ? '#2563eb' : '#6b7280',
-    fontSize: '0.875rem',
-  });
+  const cb = createButtons[activeTab];
 
   return (
     <div style={{ fontFamily: 'inherit' }}>
-      {/* Curated Model Catalog */}
       <CuratedModelCatalog org={org} services={services} onDeploy={fetchData} />
-
-      {/* Unified Model Catalog (API-fetched) */}
       <UnifiedModelCatalogSection org={org} />
 
-      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0' }} role="tablist" aria-label="Inference resource tabs">
-          <button style={tabStyle(activeTab === 'services')} onClick={() => setActiveTab('services')} role="tab" aria-selected={activeTab === 'services'} aria-label="Services tab">Services</button>
-          <button style={tabStyle(activeTab === 'runtimes')} onClick={() => setActiveTab('runtimes')} role="tab" aria-selected={activeTab === 'runtimes'} aria-label="Runtimes tab">Runtimes</button>
-          <button style={tabStyle(activeTab === 'routes')} onClick={() => setActiveTab('routes')} role="tab" aria-selected={activeTab === 'routes'} aria-label="Model Routes tab">Model Routes</button>
-          <button style={tabStyle(activeTab === 'virtual-models')} onClick={() => setActiveTab('virtual-models')} role="tab" aria-selected={activeTab === 'virtual-models'} aria-label="Virtual Models tab">Virtual Models</button>
+          {tabButtons.map(({ key, label }) => (
+            <button key={key} style={tabStyle(activeTab === key)} onClick={() => setActiveTab(key)} role="tab" aria-selected={activeTab === key} aria-label={`${label} tab`}>{label}</button>
+          ))}
         </div>
-        {activeTab === 'services' && !showCreateForm && (
-          <button style={btnStyle()} onClick={() => setShowCreateForm(true)}>+ Create Service</button>
-        )}
-        {activeTab === 'runtimes' && !showRuntimeForm && (
-          <button style={btnStyle()} onClick={() => setShowRuntimeForm(true)}>+ Add Runtime</button>
-        )}
-        {activeTab === 'routes' && !showRouteForm && (
-          <button style={btnStyle()} onClick={() => setShowRouteForm(true)}>+ Create Model Route</button>
-        )}
-        {activeTab === 'virtual-models' && !showVirtualModelForm && (
-          <button style={btnStyle()} onClick={() => setShowVirtualModelForm(true)}>+ Create Virtual Model</button>
-        )}
+        {cb?.show && <button style={btnStyle()} onClick={cb.fn}>{cb.label}</button>}
       </div>
 
-      {/* Error */}
       {error && (
         <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.375rem', padding: '0.75rem', fontSize: '0.875rem', color: '#dc2626', marginBottom: '1rem' }}>
           {error}
         </div>
       )}
 
-      {/* Loading */}
       {loading && (
         <div style={{ fontSize: '0.875rem', color: '#9ca3af', padding: '2rem', textAlign: 'center' }}>Loading...</div>
       )}
 
-      {/* Services Tab */}
       {!loading && activeTab === 'services' && (
-        <>
-          {showCreateForm && (
-            <div style={{ ...cardStyle, marginBottom: '1rem', background: '#f8fafc' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.9375rem', marginBottom: '0.5rem' }}>Create Inference Service</div>
-              {createError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.375rem', padding: '0.5rem', fontSize: '0.8125rem', color: '#dc2626', marginBottom: '0.5rem' }}>
-                  {createError}
-                </div>
-              )}
-              <CreateServiceForm
-                runtimes={runtimes}
-                onSubmit={handleCreateService}
-                onCancel={() => { setShowCreateForm(false); setCreateError(null); }}
-                loading={createLoading}
-              />
-            </div>
-          )}
-          {services.length === 0 && !showCreateForm ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#9ca3af' }}>
-              <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>No inference services</div>
-              <div style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Deploy a model to get started.</div>
-              <button style={btnStyle()} onClick={() => setShowCreateForm(true)}>Create Service</button>
-            </div>
-          ) : (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '0.75rem' }}>
-                {services.map((svc, i) => (
-                  <ServiceCard
-                    key={svc.metadata?.name || i}
-                    service={svc}
-                    onView={setSelectedService}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </div>
-              <Pagination
-                total={svcTotal}
-                limit={svcLimit}
-                offset={svcOffset}
-                onPageChange={(o) => setSvcOffset(o)}
-                onLimitChange={(l) => { setSvcLimit(l); setSvcOffset(0); }}
-              />
-            </>
-          )}
-        </>
-      )}
-
-      {/* Runtimes Tab */}
-      {!loading && activeTab === 'runtimes' && (
-        <>
-          {showRuntimeForm && (
-            <div style={{ ...cardStyle, marginBottom: '1rem', background: '#f8fafc' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.9375rem', marginBottom: '0.5rem' }}>Add Serving Runtime</div>
-              {createError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.375rem', padding: '0.5rem', fontSize: '0.8125rem', color: '#dc2626', marginBottom: '0.5rem' }}>
-                  {createError}
-                </div>
-              )}
-              <CreateRuntimeForm
-                onSubmit={handleCreateRuntime}
-                onCancel={() => { setShowRuntimeForm(false); setCreateError(null); }}
-                loading={createLoading}
-              />
-            </div>
-          )}
-          {runtimes.length === 0 && !showRuntimeForm ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#9ca3af' }}>
-              <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>No serving runtimes</div>
-              <div style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Add a custom serving runtime to use with your models.</div>
-              <button style={btnStyle()} onClick={() => setShowRuntimeForm(true)}>Add Runtime</button>
-            </div>
-          ) : (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
-                {runtimes.map((rt, i) => (
-                  <RuntimeCard key={rt.metadata?.name || i} runtime={rt} />
-                ))}
-              </div>
-              <Pagination
-                total={rtTotal}
-                limit={rtLimit}
-                offset={rtOffset}
-                onPageChange={(o) => setRtOffset(o)}
-                onLimitChange={(l) => { setRtLimit(l); setRtOffset(0); }}
-              />
-            </>
-          )}
-        </>
-      )}
-
-      {/* Model Routes Tab */}
-      {!loading && activeTab === 'routes' && (
-        <>
-          {showRouteForm && (
-            <div style={{ ...cardStyle, marginBottom: '1rem', background: '#f8fafc' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.9375rem', marginBottom: '0.5rem' }}>Create Model Route</div>
-              {createError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.375rem', padding: '0.5rem', fontSize: '0.8125rem', color: '#dc2626', marginBottom: '0.5rem' }}>
-                  {createError}
-                </div>
-              )}
-              <CreateModelRouteForm
-                org={org}
-                services={services}
-                onSubmit={handleCreateRoute}
-                onCancel={() => { setShowRouteForm(false); setCreateError(null); }}
-                loading={createLoading}
-              />
-            </div>
-          )}
-          {routes.length === 0 && !showRouteForm ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#9ca3af' }}>
-              <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>No model routes</div>
-              <div style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Create a model route to map logical model names to internal services or external LLM endpoints.</div>
-              <button style={btnStyle()} onClick={() => setShowRouteForm(true)}>Create Model Route</button>
-            </div>
-          ) : (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '0.75rem' }}>
-                {routes.map((route, i) => (
-                  <ModelRouteCard
-                    key={route.metadata?.name || i}
-                    route={route}
-                    onDelete={handleDeleteRoute}
-                  />
-                ))}
-              </div>
-              <Pagination
-                total={routeTotal}
-                limit={routeLimit}
-                offset={routeOffset}
-                onPageChange={(o) => setRouteOffset(o)}
-                onLimitChange={(l) => { setRouteLimit(l); setRouteOffset(0); }}
-              />
-            </>
-          )}
-        </>
-      )}
-
-      {/* Virtual Models Tab */}
-      {!loading && activeTab === 'virtual-models' && (
-        <>
-          {showVirtualModelForm && (
-            <div style={{ ...cardStyle, marginBottom: '1rem', background: '#f8fafc' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.9375rem', marginBottom: '0.5rem' }}>Create Virtual Model</div>
-              {createError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.375rem', padding: '0.5rem', fontSize: '0.8125rem', color: '#dc2626', marginBottom: '0.5rem' }}>
-                  {createError}
-                </div>
-              )}
-              <CreateVirtualModelForm
-                routes={routes}
-                onSubmit={handleCreateVirtualModel}
-                onCancel={() => { setShowVirtualModelForm(false); setCreateError(null); }}
-                loading={createLoading}
-              />
-            </div>
-          )}
-          {virtualModels.length === 0 && !showVirtualModelForm ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#9ca3af' }}>
-              <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>No virtual models</div>
-              <div style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Create a virtual model to add programmable routing rules, hooks, and session management over your model routes.</div>
-              <button style={btnStyle()} onClick={() => setShowVirtualModelForm(true)}>Create Virtual Model</button>
-            </div>
-          ) : (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '0.75rem' }}>
-                {virtualModels.map((vm, i) => (
-                  <VirtualModelCard
-                    key={vm.metadata?.name || i}
-                    vm={vm}
-                    onDelete={handleDeleteVirtualModel}
-                  />
-                ))}
-              </div>
-              <Pagination
-                total={vmTotal}
-                limit={vmLimit}
-                offset={vmOffset}
-                onPageChange={(o) => setVmOffset(o)}
-                onLimitChange={(l) => { setVmLimit(l); setVmOffset(0); }}
-              />
-            </>
-          )}
-        </>
-      )}
-
-      {/* Service Detail Panel */}
-      {selectedService && (
-        <ServiceDetailPanel
-          service={selectedService}
-          org={org}
-          onClose={() => setSelectedService(null)}
+        <ResourceTabContent
+          items={services} total={svcTotal} limit={svcLimit} offset={svcOffset}
+          onPageChange={setSvcOffset} onLimitChange={(l) => { setSvcLimit(l); setSvcOffset(0); }}
+          showForm={showCreateForm} formTitle="Create Inference Service"
+          createError={createError} createLoading={createLoading}
+          FormComponent={CreateServiceForm} formProps={{ runtimes, onSubmit: (b) => handleCreate('services', () => setShowCreateForm(false), b) }}
+          onShowForm={() => setShowCreateForm(true)} onHideForm={() => setShowCreateForm(false)} onClearError={() => setCreateError(null)}
+          emptyTitle="No inference services" emptyText="Deploy a model to get started."
+          renderCard={(svc, i) => <ServiceCard key={svc.metadata?.name || i} service={svc} onView={setSelectedService} onDelete={(s) => confirmDelete('service', s)} />}
         />
       )}
 
-      {/* Confirm Delete Dialog */}
+      {!loading && activeTab === 'runtimes' && (
+        <ResourceTabContent
+          items={runtimes} total={rtTotal} limit={rtLimit} offset={rtOffset}
+          onPageChange={setRtOffset} onLimitChange={(l) => { setRtLimit(l); setRtOffset(0); }}
+          showForm={showRuntimeForm} formTitle="Add Serving Runtime"
+          createError={createError} createLoading={createLoading}
+          FormComponent={CreateRuntimeForm} formProps={{ onSubmit: (b) => handleCreate('runtimes', () => setShowRuntimeForm(false), b) }}
+          onShowForm={() => setShowRuntimeForm(true)} onHideForm={() => setShowRuntimeForm(false)} onClearError={() => setCreateError(null)}
+          emptyTitle="No serving runtimes" emptyText="Add a custom serving runtime to use with your models."
+          gridMinWidth="280px"
+          renderCard={(rt, i) => <RuntimeCard key={rt.metadata?.name || i} runtime={rt} />}
+        />
+      )}
+
+      {!loading && activeTab === 'routes' && (
+        <ResourceTabContent
+          items={routes} total={routeTotal} limit={routeLimit} offset={routeOffset}
+          onPageChange={setRouteOffset} onLimitChange={(l) => { setRouteLimit(l); setRouteOffset(0); }}
+          showForm={showRouteForm} formTitle="Create Model Route"
+          createError={createError} createLoading={createLoading}
+          FormComponent={CreateModelRouteForm} formProps={{ org, services, onSubmit: (b) => handleCreate('routes', () => setShowRouteForm(false), b) }}
+          onShowForm={() => setShowRouteForm(true)} onHideForm={() => setShowRouteForm(false)} onClearError={() => setCreateError(null)}
+          emptyTitle="No model routes" emptyText="Create a model route to map logical model names to internal services or external LLM endpoints."
+          renderCard={(route, i) => <ModelRouteCard key={route.metadata?.name || i} route={route} onDelete={(r) => confirmDelete('route', r)} />}
+        />
+      )}
+
+      {!loading && activeTab === 'virtual-models' && (
+        <ResourceTabContent
+          items={virtualModels} total={vmTotal} limit={vmLimit} offset={vmOffset}
+          onPageChange={setVmOffset} onLimitChange={(l) => { setVmLimit(l); setVmOffset(0); }}
+          showForm={showVirtualModelForm} formTitle="Create Virtual Model"
+          createError={createError} createLoading={createLoading}
+          FormComponent={CreateVirtualModelForm} formProps={{ routes, onSubmit: (b) => handleCreate('virtual-models', () => setShowVirtualModelForm(false), b) }}
+          onShowForm={() => setShowVirtualModelForm(true)} onHideForm={() => setShowVirtualModelForm(false)} onClearError={() => setCreateError(null)}
+          emptyTitle="No virtual models" emptyText="Create a virtual model to add programmable routing rules, hooks, and session management over your model routes."
+          renderCard={(vm, i) => <VirtualModelCard key={vm.metadata?.name || i} vm={vm} onDelete={(v) => confirmDelete('virtual-model', v)} />}
+        />
+      )}
+
+      {selectedService && (
+        <ServiceDetailPanel service={selectedService} org={org} onClose={() => setSelectedService(null)} />
+      )}
+
       <ConfirmDialog
         open={!!deleteConfirm}
         title={`Delete ${deleteConfirm?.type === 'virtual-model' ? 'virtual model' : deleteConfirm?.type || 'resource'}`}

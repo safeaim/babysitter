@@ -1,6 +1,6 @@
-import { createKrateApiController, orgNamespaceName } from '@a5c-ai/krate-sdk';
+import { createKrateApiController, orgNamespaceName, clearSnapshotCache } from '@a5c-ai/krate-sdk';
 import { requireAuth, withAuth } from '../../../../lib/api-auth.js';
-import { errorResponse } from '../../../../lib/api-errors.js';
+import { errorResponse, invalidateApiCache } from '../../../../lib/api-errors.js';
 
 export const dynamic = 'force-dynamic';
 

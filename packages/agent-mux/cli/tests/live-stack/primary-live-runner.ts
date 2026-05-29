@@ -315,6 +315,7 @@ export async function runPrimaryLiveStackScenario(options: PrimaryLiveRunOptions
           try {
             const content = await fs.readFile(expectedFile, 'utf8');
             if (isValidOdysseyArtifactContent(content)) {
+              console.warn(`[live-stack] command exited ${result.status} but artifact is valid — proceeding with verification (stderr: ${result.stderr.slice(-200)})`);
               break;
             }
           } catch { /* file doesn't exist — fall through */ }

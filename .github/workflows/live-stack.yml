@@ -230,7 +230,10 @@ jobs:
               function modelFor(entry) {
                 const selected = models[entry.model];
                 if (!selected) throw new Error(`Unknown model '${entry.model}' in matrix. Available: ${Object.keys(models).join(', ')}`);
-                return selected.model === 'gpt-5.4-mini' && !miniBpSupported(entry) ? models['foundry-gpt55'] : selected;
+                if (selected.model === 'gpt-5.4-mini' && !miniBpSupported(entry)) {
+                  throw new Error(`gpt-5.4-mini is not supported for ${entry.agent}/${entry.mode}/${entry.install}. Use a different model or fix miniBpSupported().`);
+                }
+                return selected;
               }
 
               function toScenario(entry) {

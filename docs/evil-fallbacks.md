@@ -201,8 +201,8 @@ Git command failures return `[]`. "No changes" indistinguishable from "git faile
 
 ### High
 
-**Silent model substitution** — `.github/workflows/live-stack.yml:230-233`
-If model doesn't support mini, silently substitutes `foundry-gpt55`. No warning logged.
+~~**Silent model substitution**~~ — `.github/workflows/live-stack.yml:230-233` **(hardened)**
+Now throws instead of silently substituting. If mini isn't supported, the matrix entry fails at generation time.
 
 ~~**Missing model config → foundry-gpt55**~~ — `.github/workflows/live-stack.yml:231` **(hardened)**
 Now throws `Error('Unknown model ...')` instead of silently defaulting. Typos fail fast.

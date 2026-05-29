@@ -11,11 +11,14 @@ attributes:
     - envVar: AZURE_OPENAI_API_KEY
       source: auth.apiKey
       condition: present
+    - envVar: AZURE_FOUNDRY_API_KEY
+      source: auth.apiKey
+      condition: present
   suppressNonAnthropicKey: true
   args: []
   notes: >
-    Hermes has a built-in azure-foundry provider. Pass AZURE_API_KEY
-    and use --provider azure-foundry CLI flag. No proxy needed.
+    Hermes azure-foundry provider reads AZURE_FOUNDRY_API_KEY env var.
+    Pass --provider azure-foundry CLI flag. No proxy needed.
 ---
 nodeKind: ProviderTranslation
 id: provider-translation:hermes:anthropic

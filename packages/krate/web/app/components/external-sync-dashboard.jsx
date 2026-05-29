@@ -57,7 +57,7 @@ function BindingRow({ binding, org, onSync }) {
         </div>
         {lastSync && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>Last sync: {lastSync}</div>}
       </div>
-      <span style={pillStyle(t)}>{syncStatus}</span>
+      <span style={pillStyle(t)} aria-label={`Sync status for ${name}: ${syncStatus}`}>{syncStatus}</span>
       <span style={{ fontSize: '0.8125rem', color: pendingWrites > 0 ? '#d97706' : '#9ca3af' }}>
         {pendingWrites} pending write{pendingWrites !== 1 ? 's' : ''}
       </span>
@@ -66,6 +66,7 @@ function BindingRow({ binding, org, onSync }) {
       </span>
       <button
         onClick={() => onSync(name)}
+        aria-label={`Sync now for binding ${name}`}
         style={{ padding: '0.25rem 0.625rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '0.375rem', fontSize: '0.8125rem', cursor: 'pointer', color: 'var(--text)' }}
       >
         Sync now
@@ -144,13 +145,13 @@ export function ExternalSyncDashboard({ org, bindings = [] }) {
       </div>
 
       {error && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
+        <div role="alert" style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
           {error}
         </div>
       )}
 
       {successMsg && (
-        <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '0.375rem', padding: '0.75rem', color: '#166534', fontSize: '0.875rem' }}>
+        <div role="status" aria-live="polite" style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '0.375rem', padding: '0.75rem', color: '#166534', fontSize: '0.875rem' }}>
           {successMsg}
         </div>
       )}

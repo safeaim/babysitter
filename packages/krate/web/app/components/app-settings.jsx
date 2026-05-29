@@ -127,11 +127,11 @@ export function AppSettingsForm() {
       <div className="card" style={cardStyle}>
         <div className="cardTitle"><h2>Appearance</h2></div>
         <div>
-          <label style={labelStyle}>Theme</label>
-          <div style={radioGroupStyle}>
+          <label style={labelStyle} id="theme-group-label">Theme</label>
+          <div style={radioGroupStyle} role="radiogroup" aria-labelledby="theme-group-label">
             {THEMES.map(t => (
               <label key={t} style={radioLabelStyle}>
-                <input type="radio" name="theme" value={t} checked={theme === t} onChange={() => handleThemeChange(t)} />
+                <input type="radio" name="theme" value={t} checked={theme === t} onChange={() => handleThemeChange(t)} aria-label={`Set theme to ${t}`} />
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </label>
             ))}
@@ -139,11 +139,11 @@ export function AppSettingsForm() {
           <p style={descStyle}>Choose a color scheme. System follows your OS preference.</p>
         </div>
         <div>
-          <label style={labelStyle}>Display density</label>
-          <div style={radioGroupStyle}>
+          <label style={labelStyle} id="density-group-label">Display density</label>
+          <div style={radioGroupStyle} role="radiogroup" aria-labelledby="density-group-label">
             {DENSITIES.map(d => (
               <label key={d} style={radioLabelStyle}>
-                <input type="radio" name="density" value={d} checked={density === d} onChange={() => handleDensityChange(d)} />
+                <input type="radio" name="density" value={d} checked={density === d} onChange={() => handleDensityChange(d)} aria-label={`Set display density to ${d}`} />
                 {d.charAt(0).toUpperCase() + d.slice(1)}
               </label>
             ))}
@@ -242,7 +242,7 @@ export function AppSettingsForm() {
       </div>
 
       {saved && (
-        <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.5rem', background: 'var(--accent, #2563eb)', color: '#fff', fontWeight: 700, fontSize: '0.875rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', zIndex: 50 }}>
+        <div role="status" aria-live="polite" style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.5rem', background: 'var(--accent, #2563eb)', color: '#fff', fontWeight: 700, fontSize: '0.875rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', zIndex: 50 }}>
           Settings saved
         </div>
       )}

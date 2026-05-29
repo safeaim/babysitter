@@ -382,6 +382,7 @@ export function InferencePlayground({ org }) {
             onClick={handleSend}
             disabled={!prompt.trim() || sending}
             style={s.sendBtn(!prompt.trim() || sending)}
+            aria-label="Send prompt to both models for comparison"
           >
             {sending ? 'Sending...' : 'Send'}
           </button>
@@ -389,9 +390,9 @@ export function InferencePlayground({ org }) {
       </div>
 
       {/* Side-by-side panels */}
-      <div style={s.grid} className="pg-grid">
+      <div style={s.grid} className="pg-grid" role="region" aria-label="Model comparison panels">
         {/* Left panel */}
-        <div style={s.panel(true)}>
+        <div style={s.panel(true)} aria-label={`Response from ${leftModel || 'left model'}`}>
           <select
             value={leftModel}
             onChange={(e) => setLeftModel(e.target.value)}
@@ -441,7 +442,7 @@ export function InferencePlayground({ org }) {
         </div>
 
         {/* Right panel */}
-        <div style={s.panel(false)}>
+        <div style={s.panel(false)} aria-label={`Response from ${rightModel || 'right model'}`}>
           <select
             value={rightModel}
             onChange={(e) => setRightModel(e.target.value)}

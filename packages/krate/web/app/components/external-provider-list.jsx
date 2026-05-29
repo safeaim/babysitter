@@ -127,6 +127,7 @@ function PlatformGroupCard({ platform, providers, onDelete, removing }) {
             key={`${p.kind}-${p.metadata?.name}`}
             onClick={() => onDelete(p.kind, p.metadata?.name)}
             disabled={!!removing}
+            aria-label={`Remove ${SCOPE_LABELS[p.kind] || p.kind} provider ${p.metadata?.name || ''} from ${platform}`}
             style={{
               background: 'none',
               border: '1px solid var(--border)',

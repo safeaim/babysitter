@@ -23,7 +23,7 @@ const stageIcon = { pending: '○', running: '◎', success: '✓', failed: '✕
 function StatusBadge({ tone, children }) {
   const p = tonePalette[tone] || tonePalette.pending;
   return (
-    <span style={{
+    <span role="status" aria-label={`Pipeline stage status: ${children}`} style={{
       display: 'inline-block', padding: '0.125rem 0.5rem', borderRadius: '9999px',
       fontSize: '0.75rem', fontWeight: 600, color: p.badge, background: p.badgeBg
     }}>
@@ -69,6 +69,7 @@ function StageCard({ stage, status, startedAt, finishedAt, artifactUrl, onDeploy
       {isDeployStage && status === 'pending' && (
         <button
           onClick={onDeploy}
+          aria-label={`Deploy ${stage} stage to ${env} environment`}
           style={{
             marginTop: '0.25rem', padding: '0.375rem 0.75rem', fontSize: '0.8125rem',
             fontWeight: 600, background: 'var(--accent)', color: '#fff', border: 'none',
@@ -280,6 +281,7 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
         <button
           onClick={handleCreatePipeline}
           disabled={deploying || isRunning}
+          aria-label={`Create deployment pipeline for ${env} environment`}
           style={{
             padding: '0.375rem 0.875rem', fontSize: '0.875rem', fontWeight: 600,
             background: deploying || isRunning ? '#9ca3af' : '#2563eb',
@@ -293,6 +295,7 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
           <button
             onClick={handleRollback}
             disabled={rollingBack}
+            aria-label={`Rollback deployment in ${env} environment`}
             style={{
               padding: '0.375rem 0.875rem', fontSize: '0.875rem', fontWeight: 600,
               background: rollingBack ? '#9ca3af' : '#ef4444',
@@ -305,12 +308,12 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
       </div>
 
       {/* Pipeline stage visualization */}
-      <div style={{
+      <div role="list" aria-label="Pipeline stages" style={{
         display: 'flex', alignItems: 'stretch', gap: 0,
         overflowX: 'auto', paddingBottom: '0.25rem'
       }}>
         {STAGES.map((stage, idx) => (
-          <div key={stage} style={{ display: 'flex', alignItems: 'center', minWidth: 0, flex: 1 }}>
+          <div role="listitem" key={stage} style={{ display: 'flex', alignItems: 'center', minWidth: 0, flex: 1 }}>
             <StageCard
               stage={stage}
               status={stages[stage]?.status || 'pending'}
@@ -335,7 +338,7 @@ export function DeploymentPipeline({ org = 'default', repository = null, kubeVel
         </p>
       )}
       {message && (
-        <p style={{ margin: 0, fontSize: '0.875rem', color: anyFailed ? '#b91c1c' : '#15803d' }}>
+        <p aria-live="polite" style={{ margin: 0, fontSize: '0.875rem', color: anyFailed ? '#b91c1c' : '#15803d' }}>
           {message}
         </p>
       )}

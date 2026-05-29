@@ -77,6 +77,7 @@ function AddCardRow({ onAdd }) {
   return (
     <button
       onClick={() => setAdding(true)}
+      aria-label={`Add a new card`}
       style={{
         width: '100%',
         padding: '0.375rem',
@@ -116,16 +117,17 @@ function Swimlane({ label, items, columnColor, draggingId, onDragStart, onDragEn
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
         {items.map((item) => (
-          <KanbanCard
-            key={item.metadata?.name || item.spec?.title}
-            item={item}
-            columnColor={columnColor}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            isDragging={draggingId === (item.metadata?.name || item.spec?.title)}
-            onCardClick={onCardClick}
-            onStartWork={onStartWork}
-          />
+          <div role="listitem" key={item.metadata?.name || item.spec?.title}>
+            <KanbanCard
+              item={item}
+              columnColor={columnColor}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              isDragging={draggingId === (item.metadata?.name || item.spec?.title)}
+              onCardClick={onCardClick}
+              onStartWork={onStartWork}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -173,6 +175,8 @@ export function KanbanColumn({
   return (
     <section
       className="kanbanColumn"
+      role="list"
+      aria-label={`${col.label} column, ${items.length} cards`}
       onDragOver={(e) => onDragOver(e, col.id)}
       onDragLeave={onDragLeave}
       onDrop={(e) => onDrop(e, col.id)}
@@ -261,16 +265,17 @@ export function KanbanColumn({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
           {items.map((item) => (
-            <KanbanCard
-              key={item.metadata?.name || item.spec?.title}
-              item={item}
-              columnColor={col.color}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-              isDragging={draggingId === (item.metadata?.name || item.spec?.title)}
-              onCardClick={onCardClick}
-              onStartWork={onStartWork}
-            />
+            <div role="listitem" key={item.metadata?.name || item.spec?.title}>
+              <KanbanCard
+                item={item}
+                columnColor={col.color}
+                onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
+                isDragging={draggingId === (item.metadata?.name || item.spec?.title)}
+                onCardClick={onCardClick}
+                onStartWork={onStartWork}
+              />
+            </div>
           ))}
         </div>
       )}

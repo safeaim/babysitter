@@ -67,7 +67,7 @@ export function ModelRouteCard({ route, onDelete }) {
       )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
-        <button style={btnStyle('#dc2626')} onClick={() => onDelete(route)}>Delete</button>
+        <button style={btnStyle('#dc2626')} onClick={() => onDelete(route)} aria-label={`Delete model route ${name}`}>Delete</button>
       </div>
     </div>
   );
@@ -171,6 +171,8 @@ export function CreateModelRouteForm({ org, services, onSubmit, onCancel, loadin
                 borderColor: form.routeType === t ? 'transparent' : '#d1d5db',
               }}
               onClick={() => setForm(f => ({ ...f, routeType: t }))}
+              aria-label={`Set route type to ${t}`}
+              aria-pressed={form.routeType === t}
             >
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>

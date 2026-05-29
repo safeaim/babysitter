@@ -191,6 +191,8 @@ export function CuratedModelCatalog({ org, services, onDeploy }) {
         <button
           style={categoryPillStyle('All', activeCategory === 'All')}
           onClick={() => setActiveCategory('All')}
+          aria-label="Filter models: show all categories"
+          aria-pressed={activeCategory === 'All'}
         >
           All
         </button>
@@ -199,6 +201,8 @@ export function CuratedModelCatalog({ org, services, onDeploy }) {
             key={cat}
             style={categoryPillStyle(cat, activeCategory === cat)}
             onClick={() => setActiveCategory(cat)}
+            aria-label={`Filter models by category: ${cat}`}
+            aria-pressed={activeCategory === cat}
           >
             {cat}
           </button>
@@ -263,6 +267,7 @@ export function CuratedModelCatalog({ org, services, onDeploy }) {
                 <button
                   style={{ ...btnStyle('#2563eb'), width: '100%', padding: '0.5rem' }}
                   onClick={() => { setDeployTarget(model); setDeployResult(null); }}
+                  aria-label={`Deploy model ${model.name}`}
                 >
                   Deploy
                 </button>
@@ -280,7 +285,7 @@ export function CuratedModelCatalog({ org, services, onDeploy }) {
 
       {/* Deploy confirmation panel */}
       {deployTarget && (
-        <div style={overlayStyle} onClick={e => { if (e.target === e.currentTarget) { setDeployTarget(null); setDeployResult(null); } }}>
+        <div style={overlayStyle} role="dialog" aria-label={`Deploy confirmation for ${deployTarget.name}`} onClick={e => { if (e.target === e.currentTarget) { setDeployTarget(null); setDeployResult(null); } }}>
           <div style={{ ...panelStyle, maxWidth: '480px', minHeight: 'auto', padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700 }}>Deploy {deployTarget.name}</h2>
@@ -342,6 +347,7 @@ export function CuratedModelCatalog({ org, services, onDeploy }) {
                   style={{ ...btnStyle('#2563eb'), width: '100%', padding: '0.625rem', marginTop: '1rem', fontSize: '0.875rem' }}
                   onClick={() => handleDeploy(deployTarget)}
                   disabled={deploying}
+                  aria-label={`Confirm deploy ${deployTarget.name} to cluster`}
                 >
                   {deploying ? 'Deploying...' : 'Deploy to Cluster'}
                 </button>

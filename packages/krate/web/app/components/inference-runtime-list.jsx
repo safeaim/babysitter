@@ -76,8 +76,8 @@ export function CreateRuntimeForm({ onSubmit, onCancel, loading }) {
         </div>
       </div>
       <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <button type="submit" style={btnStyle()} disabled={loading}>{loading ? 'Adding...' : 'Add Runtime'}</button>
-        <button type="button" style={btnOutlineStyle} onClick={onCancel}>Cancel</button>
+        <button type="submit" style={btnStyle()} disabled={loading} aria-label={form.name ? `Add runtime ${form.name}` : 'Add new inference runtime'}>{loading ? 'Adding...' : 'Add Runtime'}</button>
+        <button type="button" style={btnOutlineStyle} onClick={onCancel} aria-label="Cancel adding runtime">Cancel</button>
       </div>
     </form>
   );

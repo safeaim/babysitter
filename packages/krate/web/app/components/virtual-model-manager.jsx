@@ -39,7 +39,7 @@ export function VirtualModelCard({ vm, onDelete }) {
       )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
-        <button style={btnStyle('#dc2626')} onClick={() => onDelete(vm)}>Delete</button>
+        <button style={btnStyle('#dc2626')} onClick={() => onDelete(vm)} aria-label={`Delete virtual model ${name}`}>Delete</button>
       </div>
     </div>
   );
@@ -54,6 +54,8 @@ export function CollapsibleSection({ title, children, defaultOpen = false }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-label={`${open ? 'Collapse' : 'Expand'} ${title} section`}
         style={{ width: '100%', padding: '0.5rem 0.75rem', background: '#f8fafc', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text)' }}
       >
         {title}
@@ -196,7 +198,7 @@ export function CreateVirtualModelForm({ routes: availableRoutes, onSubmit, onCa
             <input style={{ ...inputStyle, flex: 1 }} type="number" min="0" value={route.weight} onChange={(e) => updateRoute(idx, 'weight', e.target.value)} placeholder="Weight" title="Weight" />
             <input style={{ ...inputStyle, flex: 1 }} type="number" min="0" value={route.priority} onChange={(e) => updateRoute(idx, 'priority', e.target.value)} placeholder="Priority" title="Priority" />
             {form.routes.length > 1 && (
-              <button type="button" style={{ ...btnStyle('#dc2626'), padding: '0.375rem 0.5rem', fontSize: '0.75rem' }} onClick={() => removeRoute(idx)}>X</button>
+              <button type="button" style={{ ...btnStyle('#dc2626'), padding: '0.375rem 0.5rem', fontSize: '0.75rem' }} onClick={() => removeRoute(idx)} aria-label={`Remove route ${route.modelRouteRef || idx + 1}`}>X</button>
             )}
           </div>
         ))}
@@ -314,8 +316,8 @@ export function CreateVirtualModelForm({ routes: availableRoutes, onSubmit, onCa
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-        <button type="submit" style={btnStyle()} disabled={loading}>{loading ? 'Creating...' : 'Create Virtual Model'}</button>
-        <button type="button" style={btnOutlineStyle} onClick={onCancel}>Cancel</button>
+        <button type="submit" style={btnStyle()} disabled={loading} aria-label={form.modelName ? `Create virtual model ${form.modelName}` : 'Create new virtual model'}>{loading ? 'Creating...' : 'Create Virtual Model'}</button>
+        <button type="button" style={btnOutlineStyle} onClick={onCancel} aria-label="Cancel creating virtual model">Cancel</button>
       </div>
     </form>
   );

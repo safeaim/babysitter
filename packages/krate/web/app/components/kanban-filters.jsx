@@ -32,6 +32,7 @@ export function KanbanFilters({
         placeholder="Search cards..."
         value={searchText}
         onChange={(e) => onSearchChange(e.target.value)}
+        aria-label="Search kanban cards by title or content"
         style={{
           padding: '0.375rem 0.625rem',
           fontSize: '0.8125rem',
@@ -45,6 +46,7 @@ export function KanbanFilters({
         <select
           value={filterAssignee}
           onChange={(e) => onAssigneeChange(e.target.value)}
+          aria-label="Filter cards by assignee"
           style={{
             padding: '0.375rem 0.625rem',
             fontSize: '0.8125rem',
@@ -61,6 +63,7 @@ export function KanbanFilters({
         <select
           value={filterLabel}
           onChange={(e) => onLabelChange(e.target.value)}
+          aria-label="Filter cards by label"
           style={{
             padding: '0.375rem 0.625rem',
             fontSize: '0.8125rem',
@@ -76,6 +79,7 @@ export function KanbanFilters({
       <select
         value={groupBy}
         onChange={(e) => onGroupByChange(e.target.value)}
+        aria-label="Group cards by attribute"
         style={{
           padding: '0.375rem 0.625rem',
           fontSize: '0.8125rem',
@@ -91,6 +95,7 @@ export function KanbanFilters({
       {hasActiveFilter ? (
         <button
           onClick={onClearFilters}
+          aria-label="Clear all active kanban filters"
           style={{
             padding: '0.375rem 0.75rem',
             fontSize: '0.75rem',

@@ -198,14 +198,14 @@ export function IssueList({ org, repo, issues = [] }) {
                   {isOpen ? (
                     isConfirmingClose ? (
                       <>
-                        <button type="button" style={btnStyle('danger')} disabled={busy} onClick={() => handleToggleStatus(name, status)}>{busy ? '...' : 'Confirm close'}</button>
-                        <button type="button" style={btnStyle('close')} onClick={() => setConfirmClose(null)}>Cancel</button>
+                        <button type="button" style={btnStyle('danger')} disabled={busy} onClick={() => handleToggleStatus(name, status)} aria-label={`Confirm closing issue ${title}`}>{busy ? '...' : 'Confirm close'}</button>
+                        <button type="button" style={btnStyle('close')} onClick={() => setConfirmClose(null)} aria-label={`Cancel closing issue ${title}`}>Cancel</button>
                       </>
                     ) : (
-                      <button type="button" style={btnStyle('close')} onClick={() => handleToggleStatus(name, status)}>Close</button>
+                      <button type="button" style={btnStyle('close')} onClick={() => handleToggleStatus(name, status)} aria-label={`Close issue ${title}`}>Close</button>
                     )
                   ) : (
-                    <button type="button" style={btnStyle('reopen')} disabled={busy} onClick={() => handleToggleStatus(name, status)}>{busy ? '...' : 'Reopen'}</button>
+                    <button type="button" style={btnStyle('reopen')} disabled={busy} onClick={() => handleToggleStatus(name, status)} aria-label={`Reopen issue ${title}`}>{busy ? '...' : 'Reopen'}</button>
                   )}
                 </div>
               </li>

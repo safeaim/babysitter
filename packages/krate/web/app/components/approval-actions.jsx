@@ -41,12 +41,12 @@ export function ApprovalDecisionButtons({ org, approvalName }) {
   }
 
   return <div className="heroActions" style={{ justifyContent: 'flex-start', gap: '0.5rem', marginTop: '0.75rem' }}>
-    <button type="button" onClick={() => handleDecision('approve')} disabled={status === 'loading'} style={{ background: 'var(--color-good, #22863a)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: status === 'loading' ? 'wait' : 'pointer', opacity: status === 'loading' ? 0.7 : 1, fontWeight: 600 }}>
+    <button type="button" onClick={() => handleDecision('approve')} disabled={status === 'loading'} aria-label={`Approve approval request ${approvalName}`} style={{ background: 'var(--color-good, #22863a)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: status === 'loading' ? 'wait' : 'pointer', opacity: status === 'loading' ? 0.7 : 1, fontWeight: 600 }}>
       {status === 'loading' ? 'Deciding...' : 'Approve'}
     </button>
-    <button type="button" onClick={() => handleDecision('deny')} disabled={status === 'loading'} style={{ background: 'var(--color-danger, #cb2431)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: status === 'loading' ? 'wait' : 'pointer', opacity: status === 'loading' ? 0.7 : 1, fontWeight: 600 }}>
+    <button type="button" onClick={() => handleDecision('deny')} disabled={status === 'loading'} aria-label={`Deny approval request ${approvalName}`} style={{ background: 'var(--color-danger, #cb2431)', color: '#fff', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: status === 'loading' ? 'wait' : 'pointer', opacity: status === 'loading' ? 0.7 : 1, fontWeight: 600 }}>
       {status === 'loading' ? 'Deciding...' : 'Deny'}
     </button>
-    {status === 'error' && message ? <span style={{ color: 'var(--color-danger, #cb2431)', fontSize: '0.85rem' }}>{message}</span> : null}
+    {status === 'error' && message ? <span role="alert" style={{ color: 'var(--color-danger, #cb2431)', fontSize: '0.85rem' }}>{message}</span> : null}
   </div>;
 }

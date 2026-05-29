@@ -44,22 +44,24 @@ export function Pagination({ total, limit, offset, onPageChange, onLimitChange }
   };
 
   return (
-    <div style={containerStyle}>
+    <nav aria-label="Pagination" style={containerStyle}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <button
           style={navButtonStyle(!hasPrev)}
           disabled={!hasPrev}
           onClick={() => hasPrev && onPageChange(Math.max(0, offset - limit))}
+          aria-label="Go to previous page"
         >
           Prev
         </button>
-        <span>
+        <span aria-current="page" aria-label={`Showing items ${start} through ${end} of ${total}`}>
           Showing {start}&ndash;{end} of {total}
         </span>
         <button
           style={navButtonStyle(!hasNext)}
           disabled={!hasNext}
           onClick={() => hasNext && onPageChange(offset + limit)}
+          aria-label="Go to next page"
         >
           Next
         </button>
@@ -70,6 +72,7 @@ export function Pagination({ total, limit, offset, onPageChange, onLimitChange }
           <select
             style={selectStyle}
             value={limit}
+            aria-label="Select number of items per page"
             onChange={(e) => {
               const newLimit = parseInt(e.target.value, 10);
               onLimitChange(newLimit);
@@ -81,6 +84,6 @@ export function Pagination({ total, limit, offset, onPageChange, onLimitChange }
           </select>
         </div>
       )}
-    </div>
+    </nav>
   );
 }

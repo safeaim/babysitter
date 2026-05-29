@@ -49,8 +49,8 @@ export function ServiceCard({ service, onView, onDelete }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{createdAt ? relativeTime(createdAt) : ''}</span>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button style={btnStyle()} onClick={() => onView(service)}>Details</button>
-          <button style={btnStyle('#dc2626')} onClick={() => onDelete(service)}>Delete</button>
+          <button style={btnStyle()} onClick={() => onView(service)} aria-label={`View details for service ${name}`}>Details</button>
+          <button style={btnStyle('#dc2626')} onClick={() => onDelete(service)} aria-label={`Delete service ${name}`}>Delete</button>
         </div>
       </div>
     </div>
@@ -163,8 +163,8 @@ export function CreateServiceForm({ runtimes, onSubmit, onCancel, loading }) {
         ))}
       </div>
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-        <button type="submit" style={btnStyle()} disabled={loading}>{loading ? 'Creating...' : 'Create Service'}</button>
-        <button type="button" style={btnOutlineStyle} onClick={onCancel}>Cancel</button>
+        <button type="submit" style={btnStyle()} disabled={loading} aria-label={form.name ? `Create inference service ${form.name}` : 'Create new inference service'}>{loading ? 'Creating...' : 'Create Service'}</button>
+        <button type="button" style={btnOutlineStyle} onClick={onCancel} aria-label="Cancel creating service">Cancel</button>
       </div>
     </form>
   );
@@ -210,7 +210,7 @@ export function ServiceDetailPanel({ service, org, onClose }) {
     : `/orgs/${org}/agents/stacks/new?providerType=kserve&modelName=${encodeURIComponent(name)}`;
 
   return (
-    <div style={overlayStyle} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div style={overlayStyle} role="dialog" aria-label={`Service details for ${name}`} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={panelStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -220,7 +220,7 @@ export function ServiceDetailPanel({ service, org, onClose }) {
               <StatusBadge status={status} />
             </div>
           </div>
-          <button style={btnOutlineStyle} onClick={onClose}>Close</button>
+          <button style={btnOutlineStyle} onClick={onClose} aria-label={`Close detail panel for service ${name}`}>Close</button>
         </div>
 
         {/* Endpoint */}
@@ -284,6 +284,7 @@ export function ServiceDetailPanel({ service, org, onClose }) {
             style={{ ...btnStyle('#7c3aed'), marginTop: '0.5rem', width: '100%' }}
             onClick={handleTest}
             disabled={testLoading || !endpoint}
+            aria-label={`Send test inference request to service ${name}`}
           >
             {testLoading ? 'Sending...' : endpoint ? 'Send Test Request' : 'Service not ready'}
           </button>

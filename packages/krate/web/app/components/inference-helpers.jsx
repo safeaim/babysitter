@@ -168,7 +168,7 @@ export function CopyButton({ text }) {
     }
   };
   return (
-    <button onClick={handleCopy} style={{ ...btnOutlineStyle, padding: '2px 8px', fontSize: '0.75rem' }}>
+    <button onClick={handleCopy} aria-label={`Copy ${text.length > 40 ? text.substring(0, 40) + '...' : text} to clipboard`} style={{ ...btnOutlineStyle, padding: '2px 8px', fontSize: '0.75rem' }}>
       {copied ? 'Copied!' : 'Copy'}
     </button>
   );

@@ -121,6 +121,7 @@ function ImportCard({ imp, org, onDecision }) {
           <button
             onClick={() => handleDecision('approve')}
             disabled={localStatus === 'approving' || localStatus === 'rejecting'}
+            aria-label={`Approve memory import ${name}`}
             style={{
               padding: '0.375rem 0.875rem',
               background: '#16a34a',
@@ -138,6 +139,7 @@ function ImportCard({ imp, org, onDecision }) {
           <button
             onClick={() => handleDecision('reject')}
             disabled={localStatus === 'approving' || localStatus === 'rejecting'}
+            aria-label={`Reject memory import ${name}`}
             style={{
               padding: '0.375rem 0.875rem',
               background: 'var(--surface)',

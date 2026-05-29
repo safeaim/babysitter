@@ -27,10 +27,10 @@ function StatusDot({ status }) {
 function StatusRow({ label, status, text }) {
   const statusText = text || (status === 'ok' ? 'Connected' : status === 'notConfigured' ? 'Not configured' : status === 'error' ? 'Error' : 'Unknown');
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', padding: '0.5rem 0', borderBottom: '1px solid var(--line, #d0d7de)' }}>
+    <div aria-live="polite" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', padding: '0.5rem 0', borderBottom: '1px solid var(--line, #d0d7de)' }}>
       <StatusDot status={status} />
       <span style={{ flex: 1, fontSize: '0.875rem', color: 'var(--text)', fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{statusText}</span>
+      <span aria-label={`${label} status: ${statusText}`} style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{statusText}</span>
     </div>
   );
 }
@@ -187,6 +187,7 @@ export function HealthMonitor({ org }) {
           type="button"
           onClick={fetchHealth}
           disabled={loading}
+          aria-label="Refresh system health status"
           style={{
             padding: '0.25rem 0.625rem',
             borderRadius: '0.375rem',
@@ -209,6 +210,7 @@ export function HealthMonitor({ org }) {
             <button
               type="button"
               onClick={fetchHealth}
+              aria-label="Retry fetching health data"
               style={{ marginLeft: '0.5rem', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: '1px solid #ef4444', background: 'transparent', cursor: 'pointer', fontSize: '0.75rem', color: '#ef4444' }}
             >
               Retry

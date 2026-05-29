@@ -102,10 +102,10 @@ function ConflictCard({ conflict, onResolve, resolving }) {
         </div>
       </div>
 
-      <div style={actionsStyle}>
-        <button style={btnStyle('ignore')} onClick={() => !resolving && onResolve(id, 'ignore')}>Ignore</button>
-        <button style={btnStyle('local')} onClick={() => !resolving && onResolve(id, 'keep-local')}>Keep local</button>
-        <button style={btnStyle('external')} onClick={() => !resolving && onResolve(id, 'keep-external')}>Keep external</button>
+      <div style={actionsStyle} role="group" aria-label={`Resolution actions for conflict on ${fieldName}`}>
+        <button style={btnStyle('ignore')} aria-label={`Ignore conflict on ${fieldName} for ${resource || 'resource'}`} onClick={() => !resolving && onResolve(id, 'ignore')}>Ignore</button>
+        <button style={btnStyle('local')} aria-label={`Keep local value for ${fieldName} on ${resource || 'resource'}`} onClick={() => !resolving && onResolve(id, 'keep-local')}>Keep local</button>
+        <button style={btnStyle('external')} aria-label={`Keep external value for ${fieldName} on ${resource || 'resource'}`} onClick={() => !resolving && onResolve(id, 'keep-external')}>Keep external</button>
       </div>
     </div>
   );
@@ -172,7 +172,7 @@ export function ExternalConflictResolver({ org, conflicts = [] }) {
       </div>
 
       {error && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
+        <div role="alert" style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
           {error}
         </div>
       )}

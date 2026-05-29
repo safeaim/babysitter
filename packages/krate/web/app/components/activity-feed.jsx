@@ -161,6 +161,8 @@ export function ActivityFeed({ org }) {
             key={key}
             type="button"
             onClick={() => setFilter(key)}
+            aria-label={`Filter activity feed: ${label}`}
+            aria-pressed={filter === key}
             style={{
               padding: '0.25rem 0.625rem',
               borderRadius: '1rem',
@@ -180,15 +182,16 @@ export function ActivityFeed({ org }) {
       </div>
 
       {/* Activity list */}
-      <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+      <div role="feed" aria-label="Organization activity feed" style={{ maxHeight: '400px', overflowY: 'auto' }}>
         {filtered.length === 0 ? (
           <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
             No activity yet. Events will appear here as they occur.
           </div>
         ) : (
           filtered.map((item) => (
-            <div
+            <article
               key={item.id}
+              aria-label={`${item.label}: ${item.description}`}
               style={{
                 display: 'flex',
                 gap: '0.75rem',
@@ -208,7 +211,7 @@ export function ActivityFeed({ org }) {
                   {timeAgo(item.timestamp)} · by <strong>{item.user}</strong>
                 </div>
               </div>
-            </div>
+            </article>
           ))
         )}
         <div ref={bottomRef} />

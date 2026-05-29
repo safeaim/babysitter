@@ -1104,6 +1104,19 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     }
   }
 
+  // OpenCode: write config file from OPENCODE_CONFIG_CONTENT env var.
+  // OpenCode reads opencode.json from the project root, not an env var.
+  if (plan.harness === 'opencode' && plan.env['OPENCODE_CONFIG_CONTENT']) {
+    const { writeFileSync, mkdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const configContent = plan.env['OPENCODE_CONFIG_CONTENT'];
+    writeFileSync(join(launchCwd, 'opencode.json'), configContent);
+    const homeConfig = join(process.env['HOME'] ?? process.env['USERPROFILE'] ?? '/tmp', '.config', 'opencode');
+    mkdirSync(homeConfig, { recursive: true });
+    writeFileSync(join(homeConfig, 'opencode.json'), configContent);
+    console.error(`[amux launch] opencode: wrote config to opencode.json and ${homeConfig}/opencode.json`);
+  }
+
   // Cursor: pre-create ~/.cursor/auth.json so cursor-agent skips browser OAuth.
   // Runs outside the proxy block because cursor always needs auth, regardless
   // of whether the proxy was started.

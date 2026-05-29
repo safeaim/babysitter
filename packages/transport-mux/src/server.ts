@@ -1056,6 +1056,7 @@ async function handleOpenAiResponsesWebSocketMessage(
   config: ProxyConfig,
   completionEngine: CompletionEngine | undefined,
   metrics: MetricsTracker,
+  thoughtSignatureStore?: Map<string, string>,
 ): Promise<void> {
   let envelope: unknown;
   try {
@@ -1079,7 +1080,7 @@ async function handleOpenAiResponsesWebSocketMessage(
   const body = toRecord(record['response']) ?? toRecord(record['payload']) ?? record;
   const plan: CompletionExecutionPlan = {
     body,
-    request: buildCompletionRequest(body, 'openai-responses', true),
+    request: buildCompletionRequest(body, 'openai-responses', true, thoughtSignatureStore),
     streamRequested: true,
   };
   plan.request.model = config.targetModel;
@@ -1530,7 +1531,7 @@ export function createTransportMuxApp({ config, completionEngine }: CreateTransp
 
   app.post('/v1/responses', async (c) => {
     console.error(`[transport-mux] POST /v1/responses (HTTP SSE)`);
-    const plan = await createExecutionPlan(c.req.raw, 'openai-responses');
+    const plan = await createExecutionPlan(c.req.raw, 'openai-responses', { thoughtSignatureStore });
     if (plan instanceof Response) {
       return plan;
     }
@@ -1683,6 +1684,7 @@ export async function startProxyServer(
   completionEngine?: CompletionEngine,
 ): Promise<RunningProxyServer> {
   const webSocketMetrics = new MetricsTracker();
+  const webSocketThoughtSignatureStore = new Map<string, string>();
   const app = createTransportMuxApp({ config, completionEngine });
 
   const server = http.createServer((req, res) => {
@@ -1730,7 +1732,7 @@ export async function startProxyServer(
   });
   webSocketServer.on('connection', (ws) => {
     ws.on('message', (data) => {
-      void handleOpenAiResponsesWebSocketMessage(ws, data, config, completionEngine, webSocketMetrics);
+      void handleOpenAiResponsesWebSocketMessage(ws, data, config, completionEngine, webSocketMetrics, webSocketThoughtSignatureStore);
     });
   });
 

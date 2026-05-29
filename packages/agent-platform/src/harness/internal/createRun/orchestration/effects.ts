@@ -197,7 +197,7 @@ export async function resolveEffect(
     return { status: "ok", value: { sleptUntil: new Date().toISOString() } };
   }
   if (kind === "agent") {
-    const prompt = buildAgentPrompt(action.taskDef as unknown as Record<string, unknown>);
+    const prompt = buildAgentPrompt(action.taskDef as Record<string, unknown>);
     const taskHarness = discovered ? resolveTaskHarness(action, harnessName, discovered) : harnessName;
     if (taskHarness !== harnessName && !isInternalHarness(taskHarness)) {
       return invokeAgentHarness(action, taskHarness, prompt, options);
@@ -213,7 +213,7 @@ export async function resolveEffect(
         status: piResult.success ? "ok" : "error",
         value: piResult.success
           ? coerceAgentResultValue(
-            action.taskDef as unknown as Record<string, unknown>,
+            action.taskDef as Record<string, unknown>,
             piResult.output,
           )
           : undefined,
@@ -306,10 +306,7 @@ async function disposeWorkerSession(session: AgentCoreSessionHandle | null | und
   if (!session) {
     return;
   }
-  const maybeAbort = session as unknown as { abort?: () => Promise<void> };
-  if (typeof maybeAbort.abort === "function") {
-    await maybeAbort.abort().catch(() => undefined);
-  }
+  await session.abort().catch(() => undefined);
   session.dispose();
 }
 

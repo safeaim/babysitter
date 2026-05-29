@@ -51,10 +51,15 @@ export async function appendCostEvent(
     enriched.timestamp = new Date().toISOString();
   }
 
+  // Convert CostEventData to JsonRecord (Record<string, unknown>) without a
+  // double-cast.  Spread produces a plain object whose type satisfies the
+  // index signature that CostEventData's interface lacks.
+  const eventRecord: Record<string, unknown> = { ...enriched };
+
   return appendEvent({
     runDir,
     eventType: COST_TRACKED_EVENT_TYPE,
-    event: enriched as unknown as Record<string, unknown>,
+    event: eventRecord,
   });
 }
 
@@ -98,7 +103,24 @@ export function computeRunCostStats(
   };
 
   for (const event of costEvents) {
-    const data = event.data as unknown as CostEventData;
+    // Validate the expected shape before treating data as CostEventData.
+    // journal event data is typed as JsonRecord (Record<string, unknown>),
+    // so we perform a runtime check on the critical numeric fields.
+    const raw = event.data;
+    if (typeof raw !== "object" || raw === null) {
+      continue; // skip malformed events
+    }
+    const data: CostEventData = {
+      model: typeof raw.model === "string" ? raw.model : "unknown",
+      inputTokens: typeof raw.inputTokens === "number" ? raw.inputTokens : 0,
+      outputTokens: typeof raw.outputTokens === "number" ? raw.outputTokens : 0,
+      cacheCreationTokens: typeof raw.cacheCreationTokens === "number" ? raw.cacheCreationTokens : 0,
+      cacheReadTokens: typeof raw.cacheReadTokens === "number" ? raw.cacheReadTokens : 0,
+      cacheCreation5mTokens: typeof raw.cacheCreation5mTokens === "number" ? raw.cacheCreation5mTokens : 0,
+      cacheCreation1hTokens: typeof raw.cacheCreation1hTokens === "number" ? raw.cacheCreation1hTokens : 0,
+      costUsd: typeof raw.costUsd === "number" ? raw.costUsd : undefined,
+      taskKind: typeof raw.taskKind === "string" ? raw.taskKind : undefined,
+    };
 
     const inputTokens = data.inputTokens ?? 0;
     const outputTokens = data.outputTokens ?? 0;

@@ -202,11 +202,34 @@ export class AgentLoopImpl<TInput = string, TOutput = unknown>
 
       case "concurrent": {
         const runner = this.getConcurrentRunner();
-        // The concurrent runner returns ConcurrentIterationOutput<TOutput>,
-        // which we cast to TOutput to satisfy the interface.  Callers using
-        // the concurrent strategy know the shape of the output.
         const result = await runner.run(input, iterationIndex);
-        return result as unknown as AgentLoopIterationResult<TOutput>;
+
+        // Runtime shape check: the concurrent runner wraps TOutput inside
+        // ConcurrentIterationOutput<TOutput>.  Validate the envelope before
+        // re-typing so callers get a clear error instead of silent corruption.
+        if (
+          typeof result !== "object" ||
+          result === null ||
+          typeof result.index !== "number" ||
+          typeof result.agentId !== "string" ||
+          typeof result.durationMs !== "number" ||
+          typeof result.output !== "object" ||
+          result.output === null ||
+          !Array.isArray((result.output as ConcurrentIterationOutput<TOutput>).results)
+        ) {
+          throw new Error(
+            `ConcurrentLoopRunner returned an unexpected shape at iteration ${iterationIndex}. ` +
+            `Expected AgentLoopIterationResult<ConcurrentIterationOutput<TOutput>> with ` +
+            `{index, agentId, durationMs, output: {results: [...]}}. ` +
+            `Got keys: ${result ? Object.keys(result).join(", ") : "null"}`,
+          );
+        }
+
+        // The output is ConcurrentIterationOutput<TOutput>, not bare TOutput.
+        // Callers using the concurrent strategy are expected to handle this
+        // wrapped shape.  We narrow through a validated structural cast rather
+        // than a blind double-cast.
+        return result as AgentLoopIterationResult<ConcurrentIterationOutput<TOutput>> as AgentLoopIterationResult<TOutput>;
       }
 
       case "group-chat": {

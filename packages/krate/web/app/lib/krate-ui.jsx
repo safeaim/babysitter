@@ -49,7 +49,8 @@ export const orgNavigationGroups = [
     title: 'ML',
     items: [
       ['/models', 'Models', 'Browse and deploy models'],
-      ['/inference', 'Inference', 'Model serving and endpoints']
+      ['/inference', 'Inference', 'Model serving and endpoints'],
+      ['/playground', 'Playground', 'Compare models side-by-side']
     ]
   },
   {

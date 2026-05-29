@@ -195,7 +195,12 @@ async function loadProcessFunction(options: OrchestrateOptions, defaults: Entryp
   }
   let mod: Record<string, unknown>;
   try { mod = await dynamicImportModule(moduleUrl); }
-  catch (error) { throw new RunFailedError(`Failed to load process module at ${resolvedPath}`, { details: { error: serializeUnknownError(error) }, cause: error instanceof Error ? error : undefined }); }
+  catch {
+    // ESM import may fail on some Node/CJS configurations. Fall back to require().
+    try { delete require.cache[require.resolve(resolvedPath)]; } catch { /* */ }
+    try { mod = require(resolvedPath) as Record<string, unknown>; }
+    catch (error) { throw new RunFailedError(`Failed to load process module at ${resolvedPath}`, { details: { error: serializeUnknownError(error) }, cause: error instanceof Error ? error : undefined }); }
+  }
   const candidate = (exportName && mod[exportName]) ?? (!exportName && mod.default) ?? mod.process ?? mod.default;
   if (typeof candidate !== "function") throw new RunFailedError(`Export '${exportName}' was not a function in ${resolvedPath}`);
   return candidate as ProcessFunction;

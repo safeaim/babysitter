@@ -115,8 +115,8 @@ async function runCliOrchestration(args: RunOrchestrationPhaseArgs): Promise<num
         timeout: 120_000,
         env: { ...process.env },
       });
-      process.stderr.write(`[omni-orchestration] iterate result: ${iterResult.slice(0, 500)}\n`);
       const parsed = JSON.parse(iterResult);
+      process.stderr.write(`[omni-orchestration] iterate result: status=${parsed.status} actions=${parsed.nextActions?.length ?? 0} reason=${parsed.reason ?? 'n/a'}\n`);
 
       if (parsed.status === "completed") {
         if (!args.json) {

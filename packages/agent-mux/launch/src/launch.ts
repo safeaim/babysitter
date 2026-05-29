@@ -1053,34 +1053,7 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
             '-c', 'model_providers.amux-proxy.wire_api="responses"',
           ]);
         }
-        if (plan.harness === 'hermes') {
-          // Hermes supports --provider CLI flag and reads ~/.hermes/config.yaml.
-          // For foundry: use azure-foundry provider (built-in to hermes).
-          // For google: use gemini provider.
-          // For anthropic: use anthropic provider.
-          // For others: use custom provider with proxy base_url.
-          const hermesProviderMap: Record<string, string> = {
-            'foundry': 'azure-foundry',
-            'foundry-openai': 'azure-foundry',
-            'google': 'gemini',
-            'anthropic': 'anthropic',
-          };
-          const targetProvider = plan.proxy?.targetProvider ?? '';
-          const hermesProvider = hermesProviderMap[targetProvider] ?? 'custom';
-          const targetModel = plan.proxy?.targetModel ?? plan.model;
-          plan.args.push('--provider', hermesProvider, '--model', targetModel);
-          if (hermesProvider === 'custom') {
-            await prepareHermesConfig({
-              model: targetModel,
-              provider: 'custom',
-              baseUrl: `${proxyRuntime.url}/v1`,
-              apiKey: 'proxy-token',
-            });
-          } else {
-            await prepareHermesConfig({ model: targetModel, provider: hermesProvider });
-          }
-          console.error(`[amux launch] hermes: provider=${hermesProvider} model=${targetModel}`);
-        }
+        // hermes provider flags handled outside the proxy block (below)
         console.error(`[amux launch] ${plan.harness} proxy: OPENAI_BASE_URL=${proxyRuntime.url}/v1`);
       }
 
@@ -1120,6 +1093,23 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       else printError(`Failed to launch transport runtime: ${msg}`);
       return ExitCode.GENERAL_ERROR;
     }
+  }
+
+  // Hermes: pass --provider and --model CLI flags for native provider support.
+  // Runs outside the proxy block because hermes calls providers directly.
+  if (plan.harness === 'hermes') {
+    const hermesProviderMap: Record<string, string> = {
+      'foundry': 'azure-foundry',
+      'foundry-openai': 'azure-foundry',
+      'google': 'gemini',
+      'anthropic': 'anthropic',
+    };
+    const targetProvider = plan.proxy?.targetProvider ?? plan.provider ?? '';
+    const hermesProvider = hermesProviderMap[targetProvider] ?? 'custom';
+    const targetModel = plan.proxy?.targetModel ?? plan.model;
+    plan.args.push('--provider', hermesProvider, '--model', targetModel);
+    await prepareHermesConfig({ model: targetModel, provider: hermesProvider });
+    console.error(`[amux launch] hermes: provider=${hermesProvider} model=${targetModel}`);
   }
 
   // OpenCode: write config file from OPENCODE_CONFIG_CONTENT env var.

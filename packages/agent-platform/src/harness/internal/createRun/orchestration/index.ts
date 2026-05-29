@@ -108,7 +108,7 @@ async function runCliOrchestration(args: RunOrchestrationPhaseArgs): Promise<num
       const iterResult = execFileSync(babysitterCmd, [...babysitterPrefix, "run:iterate", runDir, "--json", "--iteration", String(i)], {
         cwd: workspace,
         encoding: "utf8",
-        timeout: 60_000,
+        timeout: 120_000,
         env: { ...process.env },
       });
       const parsed = JSON.parse(iterResult);

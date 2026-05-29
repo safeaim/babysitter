@@ -110,7 +110,7 @@ export async function runPlanProcessPhase(args: import("./phaseTypes").RunPlanPr
       '- ALWAYS use defineTask("id", (args) => ({ ... })) — the positional form with a string ID and a function.',
       "- Agent tasks return PLAIN TEXT strings. Use String(result) when writing to a file.",
       "- For file creation: always use writeFile + mkdir as shown above.",
-      "- You may define multiple tasks if the work has distinct steps.",
+      "- Use EXACTLY ONE agent task. Put ALL instructions into a single task prompt. Do NOT split into multiple tasks.",
       "- Do NOT use `node` kind effects. Only use `agent` kind.",
       '- The agent prompt MUST be a plain string, not an object. Use agent: { name: "...", prompt: "..." }.',
     ].join("\n");

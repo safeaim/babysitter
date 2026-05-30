@@ -26,7 +26,8 @@ id: provider-translation:hermes:anthropic
 attributes:
   harness: hermes
   provider: anthropic
-  proxyRequired: false
+  proxyRequired: true
+  proxyExposedTransport: openai-chat
   envMapping:
     - envVar: ANTHROPIC_API_KEY
       source: auth.apiKey
@@ -34,14 +35,15 @@ attributes:
   suppressNonAnthropicKey: false
   args: []
   notes: >
-    Hermes has a built-in anthropic provider. No proxy needed.
+    Route through proxy — hermes custom provider with proxy baseURL.
 ---
 nodeKind: ProviderTranslation
 id: provider-translation:hermes:google
 attributes:
   harness: hermes
   provider: google
-  proxyRequired: false
+  proxyRequired: true
+  proxyExposedTransport: openai-chat
   envMapping:
     - envVar: GOOGLE_API_KEY
       source: auth.apiKey

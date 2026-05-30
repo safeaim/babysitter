@@ -1120,7 +1120,17 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     console.error(`[amux launch] hermes: provider=${hermesProvider} model=${targetModel} baseUrl=${proxyUrl ?? 'default'}`);
   }
 
-  // OpenCode: write config file and inject proxy URL if available.
+  // OpenCode: prefix model with provider ID and write config file.
+  // OpenCode model format is "provider/model" (e.g., "openai/gpt-5.5").
+  if (plan.harness === 'opencode') {
+    const modelIdx = plan.args.indexOf('--model');
+    if (modelIdx >= 0 && modelIdx + 1 < plan.args.length) {
+      const rawModel = plan.args[modelIdx + 1]!;
+      if (!rawModel.includes('/')) {
+        plan.args[modelIdx + 1] = `openai/${rawModel}`;
+      }
+    }
+  }
   if (plan.harness === 'opencode' && plan.env['OPENCODE_CONFIG_CONTENT']) {
     const { writeFileSync, mkdirSync } = await import('node:fs');
     const { join } = await import('node:path');

@@ -7,6 +7,8 @@
 {{- $assistantKrate := $assistant.krateAssistant | default dict -}}
 {{- $giteaToken := .Values.gitea.token | default dict -}}
 {{- $agentMux := .Values.agentMux | default dict -}}
+{{- $nats := .Values.externalDependencies.nats | default dict -}}
+{{- $natsEvents := $nats.eventTransport | default dict -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -77,6 +79,26 @@ spec:
             {{- if $agentMux.gatewayUrl }}
             - name: AGENT_GATEWAY_URL
               value: {{ $agentMux.gatewayUrl | quote }}
+            {{- end }}
+            {{- if or $natsEvents.enabled $nats.url $nats.existingSecret }}
+            - name: KRATE_EVENT_TRANSPORT
+              value: "nats"
+            - name: KRATE_EVENT_NATS_URL
+              {{- if $nats.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $nats.existingSecret | quote }}
+                  key: {{ default "url" $nats.key | quote }}
+                  optional: true
+              {{- else }}
+              value: {{ $nats.url | quote }}
+              {{- end }}
+            - name: KRATE_EVENT_NATS_SUBJECT
+              value: {{ $natsEvents.subject | default "krate.events" | quote }}
+            - name: KRATE_EVENT_NATS_STREAM
+              value: {{ $natsEvents.stream | default "KRATE_EVENTS" | quote }}
+            - name: KRATE_EVENT_REQUIRE_BROKER
+              value: {{ $natsEvents.requireBroker | default false | quote }}
             {{- end }}
             - name: KRATE_AUTH_COOKIE_NAME
               value: {{ .Values.auth.session.cookieName | quote }}
@@ -224,6 +246,26 @@ spec:
             {{- if $agentMux.gatewayUrl }}
             - name: AGENT_GATEWAY_URL
               value: {{ $agentMux.gatewayUrl | quote }}
+            {{- end }}
+            {{- if or $natsEvents.enabled $nats.url $nats.existingSecret }}
+            - name: KRATE_EVENT_TRANSPORT
+              value: "nats"
+            - name: KRATE_EVENT_NATS_URL
+              {{- if $nats.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $nats.existingSecret | quote }}
+                  key: {{ default "url" $nats.key | quote }}
+                  optional: true
+              {{- else }}
+              value: {{ $nats.url | quote }}
+              {{- end }}
+            - name: KRATE_EVENT_NATS_SUBJECT
+              value: {{ $natsEvents.subject | default "krate.events" | quote }}
+            - name: KRATE_EVENT_NATS_STREAM
+              value: {{ $natsEvents.stream | default "KRATE_EVENTS" | quote }}
+            - name: KRATE_EVENT_REQUIRE_BROKER
+              value: {{ $natsEvents.requireBroker | default false | quote }}
             {{- end }}
             - name: KRATE_AUTH_COOKIE_NAME
               value: {{ .Values.auth.session.cookieName | quote }}
@@ -373,6 +415,26 @@ spec:
             {{- if $agentMux.gatewayUrl }}
             - name: AGENT_GATEWAY_URL
               value: {{ $agentMux.gatewayUrl | quote }}
+            {{- end }}
+            {{- if or $natsEvents.enabled $nats.url $nats.existingSecret }}
+            - name: KRATE_EVENT_TRANSPORT
+              value: "nats"
+            - name: KRATE_EVENT_NATS_URL
+              {{- if $nats.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $nats.existingSecret | quote }}
+                  key: {{ default "url" $nats.key | quote }}
+                  optional: true
+              {{- else }}
+              value: {{ $nats.url | quote }}
+              {{- end }}
+            - name: KRATE_EVENT_NATS_SUBJECT
+              value: {{ $natsEvents.subject | default "krate.events" | quote }}
+            - name: KRATE_EVENT_NATS_STREAM
+              value: {{ $natsEvents.stream | default "KRATE_EVENTS" | quote }}
+            - name: KRATE_EVENT_REQUIRE_BROKER
+              value: {{ $natsEvents.requireBroker | default false | quote }}
             {{- end }}
             {{- if $assistantAnthropic.existingSecret }}
             - name: ANTHROPIC_API_KEY

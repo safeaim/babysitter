@@ -204,6 +204,35 @@ test('staging service env vars are opt-in and render secret references without p
   assert.doesNotMatch(configured, /sk-ant-|ghp_|github_pat_|glpat-|AKIA[0-9A-Z]{16}/);
 });
 
+test('NATS event transport renders inline and secret-backed broker URLs', () => {
+  const inline = execFileSync('helm', [
+    'template', 'krate', '../charts', '-n', 'krate-system',
+    '--set', 'argocd.enabled=false',
+    '--set', 'externalDependencies.nats.eventTransport.enabled=true',
+    '--set', 'externalDependencies.nats.url=nats://nats.krate-system.svc.cluster.local:4222',
+    '--set', 'externalDependencies.nats.eventTransport.subject=krate.staging.events',
+    '--set', 'externalDependencies.nats.eventTransport.stream=KRATE_STAGING_EVENTS',
+    '--set', 'externalDependencies.nats.eventTransport.requireBroker=true'
+  ], { encoding: 'utf8' });
+
+  assert.match(inline, /name: KRATE_EVENT_TRANSPORT\s+value: "nats"/);
+  assert.match(inline, /name: KRATE_EVENT_NATS_URL\s+value: "nats:\/\/nats\.krate-system\.svc\.cluster\.local:4222"/);
+  assert.match(inline, /name: KRATE_EVENT_NATS_SUBJECT\s+value: "krate\.staging\.events"/);
+  assert.match(inline, /name: KRATE_EVENT_NATS_STREAM\s+value: "KRATE_STAGING_EVENTS"/);
+  assert.match(inline, /name: KRATE_EVENT_REQUIRE_BROKER\s+value: "true"/);
+
+  const secretBacked = execFileSync('helm', [
+    'template', 'krate', '../charts', '-n', 'krate-system',
+    '--set', 'argocd.enabled=false',
+    '--set', 'externalDependencies.nats.eventTransport.enabled=true',
+    '--set', 'externalDependencies.nats.existingSecret=krate-nats',
+    '--set', 'externalDependencies.nats.key=connection-url'
+  ], { encoding: 'utf8' });
+
+  assert.match(secretBacked, /name: KRATE_EVENT_NATS_URL[\s\S]*?secretKeyRef:[\s\S]*?name: "krate-nats"[\s\S]*?key: "connection-url"[\s\S]*?optional: true/);
+  assert.doesNotMatch(secretBacked, /nats:\/\/[^"\s]+/);
+});
+
 
 test('web UI and controller API expose live Kubernetes deployment and publishing metadata', async () => {
   const controller = fixtureKubernetesController();

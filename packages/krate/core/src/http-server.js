@@ -290,17 +290,25 @@ export function createKrateHttpHandler({ runtime = createKrateRuntime(), control
 
       const sseMatch = url.pathname.match(/^\/api\/orgs\/([^/]+)\/agents\/events\/stream$/);
       if (request.method === 'GET' && sseMatch) {
+        const replayCursor = request.headers['last-event-id'] || url.searchParams.get('cursor') || '';
+        const sentIds = new Set();
         response.writeHead(200, {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
           'X-Accel-Buffering': 'no',
         });
-        response.write('data: {"type":"connected"}\n\n');
         const writer = (event) => {
+          if (event?.id) {
+            if (sentIds.has(event.id)) return;
+            sentIds.add(event.id);
+          }
+          if (event?.id) response.write(`id: ${event.id}\n`);
           response.write(`data: ${JSON.stringify(event)}\n\n`);
         };
         globalEventBus.subscribe(writer);
+        response.write('data: {"type":"connected"}\n\n');
+        for (const event of await globalEventBus.replaySince(replayCursor)) writer(event);
         const interval = setInterval(() => {
           response.write('data: {"type":"heartbeat"}\n\n');
         }, 30000);

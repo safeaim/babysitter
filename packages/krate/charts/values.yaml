@@ -186,6 +186,12 @@ externalDependencies:
     enabled: false
     url: ""
     existingSecret: ""
+    key: url
+    eventTransport:
+      enabled: false
+      subject: krate.events
+      stream: KRATE_EVENTS
+      requireBroker: false
   arc:
     enabled: false
     runnerScaleSet: ""

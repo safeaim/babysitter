@@ -131,6 +131,11 @@ test('agents events stream route exists for EventSource consumers', () => {
   assert.match(route, /globalEventBus/);
   assert.match(route, /KRATE_CONTROLLER_URL/);
   assert.match(route, /type: 'connected'/);
+  assert.match(route, /Last-Event-ID/);
+  assert.match(route, /searchParams\.get\('cursor'\)/);
+  assert.match(route, /replaySince/);
+  assert.match(route, /id: \$\{payload\.id\}/);
+  assert.ok(route.indexOf('globalEventBus.subscribe(listener)') < route.indexOf('replaySince(cursor)'), 'fallback subscribes before replay to avoid handoff gaps');
 });
 
 test('approval decide route handles approve and deny', () => {
@@ -217,10 +222,15 @@ test('stack edit form includes memory repository refs field', () => {
 
 test('snapshot route provides health data for insights page', () => {
   const route = readWebFile('app', 'api', 'orgs', '[org]', 'snapshot', 'route.js');
+  const probes = fs.readFileSync(path.join(webRoot, '..', 'core', 'src', 'health-probes.js'), 'utf8');
   assert.match(route, /kubernetes/);
   assert.match(route, /gitea/);
   assert.match(route, /agentMux/);
+  assert.match(route, /controller/);
+  assert.match(route, /assistant/);
+  assert.match(route, /collectKrateHealthProbes/);
   assert.match(route, /externalProviders/);
-  assert.match(route, /AbortSignal\.timeout/);
   assert.match(route, /Cache-Control.*no-store/);
+  assert.match(probes, /healthz/);
+  assert.match(probes, /AbortSignal\.timeout/);
 });

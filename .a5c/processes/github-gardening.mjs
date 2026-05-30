@@ -10,61 +10,75 @@ import { defineTask } from '@a5c-ai/babysitter-sdk';
 export async function process(inputs, ctx) {
   const repo = inputs.repo ?? 'a5c-ai/babysitter';
   const excludePatterns = inputs.excludePatterns ?? ['live-stack', 'Live-stack', 'Live Stack', 'graph update', 'atlas.*version', 'atlas.*track'];
+  const maxRounds = inputs.maxRounds ?? 10;
+  const totals = { triaged: 0, planned: 0, agentsDispatched: 0, reviewed: 0, conflictFixed: 0, merged: 0, closed: 0 };
 
-  // Phase 1: Assess current state
-  const state = await ctx.task(assessStateTask, { repo, excludePatterns });
+  for (let round = 1; round <= maxRounds; round++) {
+    // Assess current state
+    const state = await ctx.task(assessStateTask, { repo, excludePatterns, round });
 
-  // Phase 2: Triage untriaged issues
-  if (state.untriaged?.length > 0) {
-    await ctx.task(triageIssuesTask, { repo, issues: state.untriaged });
+    const workToDo =
+      (state.untriaged?.length ?? 0) +
+      (state.issuesWithoutPRs?.length ?? 0) +
+      (state.planPRs?.length ?? 0) +
+      (state.stalledAgentPRs?.length ?? 0) +
+      (state.conflictedPRs?.length ?? 0) +
+      (state.implementedPRs?.length ?? 0) +
+      (state.mergeablePRs?.length ?? 0);
+
+    if (workToDo === 0 && (state.openIssueCount ?? 0) === 0 && (state.openPRCount ?? 0) === 0) {
+      return { ...totals, rounds: round, converged: true };
+    }
+
+    if (state.untriaged?.length > 0) {
+      await ctx.task(triageIssuesTask, { repo, issues: state.untriaged });
+      totals.triaged += state.untriaged.length;
+    }
+
+    if (state.issuesWithoutPRs?.length > 0) {
+      await ctx.task(dispatchPlansTask, { repo, issues: state.issuesWithoutPRs });
+      totals.planned += state.issuesWithoutPRs.length;
+    }
+
+    if (state.planPRs?.length > 0) {
+      await ctx.task(dispatchAgentsOnPlanPRsTask, { repo, prs: state.planPRs });
+      totals.agentsDispatched += state.planPRs.length;
+    }
+
+    if (state.stalledAgentPRs?.length > 0) {
+      await ctx.task(redispatchStalledAgentsTask, { repo, prs: state.stalledAgentPRs });
+      totals.agentsDispatched += state.stalledAgentPRs.length;
+    }
+
+    if (state.conflictedPRs?.length > 0) {
+      await ctx.task(fixConflictsTask, { repo, prs: state.conflictedPRs });
+      totals.conflictFixed += state.conflictedPRs.length;
+    }
+
+    if (state.implementedPRs?.length > 0) {
+      await ctx.task(dispatchReviewsTask, { repo, prs: state.implementedPRs });
+      totals.reviewed += state.implementedPRs.length;
+    }
+
+    if (state.mergeablePRs?.length > 0) {
+      await ctx.task(mergePRsTask, { repo, prs: state.mergeablePRs });
+      totals.merged += state.mergeablePRs.length;
+    }
+
+    const closeResult = await ctx.task(closeResolvedIssuesTask, { repo, excludePatterns });
+    totals.closed += closeResult?.closed ?? 0;
+
+    if (workToDo === 0) {
+      return { ...totals, rounds: round, converged: true, note: 'No actionable work but items still open — waiting on async workflows' };
+    }
   }
 
-  // Phase 3: Dispatch plans for issues without PRs
-  if (state.issuesWithoutPRs?.length > 0) {
-    await ctx.task(dispatchPlansTask, { repo, issues: state.issuesWithoutPRs });
-  }
-
-  // Phase 4: Rename Plan: PRs and dispatch agents
-  if (state.planPRs?.length > 0) {
-    await ctx.task(dispatchAgentsOnPlanPRsTask, { repo, prs: state.planPRs });
-  }
-
-  // Phase 5: Dispatch agents on 1-commit PRs where agent may have stalled
-  if (state.stalledAgentPRs?.length > 0) {
-    await ctx.task(redispatchStalledAgentsTask, { repo, prs: state.stalledAgentPRs });
-  }
-
-  // Phase 6: Fix conflicts on implemented PRs that can't merge
-  if (state.conflictedPRs?.length > 0) {
-    await ctx.task(fixConflictsTask, { repo, prs: state.conflictedPRs });
-  }
-
-  // Phase 7: Dispatch reviews on implemented PRs (2+ commits, no conflicts)
-  if (state.implementedPRs?.length > 0) {
-    await ctx.task(dispatchReviewsTask, { repo, prs: state.implementedPRs });
-  }
-
-  // Phase 8: Merge approved/reviewed PRs
-  if (state.mergeablePRs?.length > 0) {
-    await ctx.task(mergePRsTask, { repo, prs: state.mergeablePRs });
-  }
-
-  // Phase 9: Close issues linked to merged PRs
-  await ctx.task(closeResolvedIssuesTask, { repo, excludePatterns });
-
-  return {
-    triaged: state.untriaged?.length ?? 0,
-    planned: state.issuesWithoutPRs?.length ?? 0,
-    agentsDispatched: (state.planPRs?.length ?? 0) + (state.stalledAgentPRs?.length ?? 0),
-    reviewed: state.implementedPRs?.length ?? 0,
-    conflictFixed: state.conflictedPRs?.length ?? 0,
-    merged: state.mergeablePRs?.length ?? 0,
-  };
+  return { ...totals, rounds: maxRounds, converged: false };
 }
 
 const assessStateTask = defineTask('assess-state', (args) => ({
   kind: 'agent',
-  title: 'Assess GitHub issue and PR state',
+  title: `Assess GitHub issue and PR state (round ${args.round ?? 1})`,
   agent: {
     name: 'State Assessor',
     prompt: [
@@ -87,7 +101,9 @@ const assessStateTask = defineTask('assess-state', (args) => ({
       '   - implementedPRs: PRs with 2+ commits and mergeable=MERGEABLE (need review)',
       '   - mergeablePRs: PRs with 2+ commits that are mergeable and have review comments',
       '',
-      'Return JSON with arrays of issue/PR numbers for each category.',
+      'Return JSON with arrays of issue/PR numbers for each category, plus:',
+      '   - openIssueCount: total number of open issues in scope',
+      '   - openPRCount: total number of open PRs',
       'IMPORTANT: Do NOT close, merge, or modify anything. Only assess and categorize.',
     ].join('\n'),
   },

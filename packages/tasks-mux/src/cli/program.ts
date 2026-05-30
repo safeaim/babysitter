@@ -5,6 +5,7 @@ import { createBreakpointsCommand } from "./commands/breakpoints.js";
 import { createServerCommand } from "./commands/server.js";
 import { createResponderLoopCommand } from "./commands/responder-loop.js";
 import { createAuthCommand } from "./commands/auth.js";
+import { createTasksCommand } from "./commands/tasks.js";
 import { DEFAULT_BMUX_SERVER_URL } from "../client/index.js";
 
 /**
@@ -40,6 +41,7 @@ export function createProgram(): Command {
   program.addCommand(createAskCommand());
   program.addCommand(createRespondersCommand());
   program.addCommand(createBreakpointsCommand());
+  program.addCommand(createTasksCommand());
   program.addCommand(createServerCommand());
   program.addCommand(createResponderLoopCommand());
   program.addCommand(createAuthCommand());

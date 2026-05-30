@@ -36,16 +36,28 @@ import {
 import {
   assignTaskDescription,
   assignTaskParams,
+  addCommentDescription,
+  addCommentParams,
+  bulkUpdateTasksDescription,
+  bulkUpdateTasksParams,
   createTodoDescription,
   createTodoParams,
   escalateDescription,
   escalateParams,
+  exportTasksDescription,
+  exportTasksParams,
   handleAssignTask,
+  handleAddComment,
+  handleBulkUpdateTasks,
   handleCreateTodo,
   handleEscalate,
+  handleExportTasks,
   handleSearchTasks,
+  handleTaskStats,
   searchTasksDescription,
   searchTasksParams,
+  taskStatsDescription,
+  taskStatsParams,
 } from "./tools/native-tasks.js";
 import {
   claimBreakpointDescription,
@@ -171,6 +183,58 @@ export function createBreakpointMcpServer(): McpServer {
     async (args) => {
       const backend = resolveToolBackend(args);
       const result = await handleSearchTasks(args as Parameters<typeof handleSearchTasks>[0], backend);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  server.tool(
+    "add_comment",
+    addCommentDescription,
+    toCompatShape(addCommentParams),
+    async (args) => {
+      const backend = resolveToolBackend(args);
+      const result = await handleAddComment(args as Parameters<typeof handleAddComment>[0], backend);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  server.tool(
+    "bulk_update_tasks",
+    bulkUpdateTasksDescription,
+    toCompatShape(bulkUpdateTasksParams),
+    async (args) => {
+      const backend = resolveToolBackend(args);
+      const result = await handleBulkUpdateTasks(args as Parameters<typeof handleBulkUpdateTasks>[0], backend);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  server.tool(
+    "task_stats",
+    taskStatsDescription,
+    toCompatShape(taskStatsParams),
+    async (args) => {
+      const backend = resolveToolBackend(args);
+      const result = await handleTaskStats(args as Parameters<typeof handleTaskStats>[0], backend);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  server.tool(
+    "export_tasks",
+    exportTasksDescription,
+    toCompatShape(exportTasksParams),
+    async (args) => {
+      const backend = resolveToolBackend(args);
+      const result = await handleExportTasks(args as Parameters<typeof handleExportTasks>[0], backend);
       return {
         content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
       };

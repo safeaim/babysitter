@@ -170,6 +170,10 @@ describe("Section 3: Domain Types and Zod Schemas", () => {
       "completed",
       "expired",
       "cancelled",
+      "assigned",
+      "in-progress",
+      "blocked",
+      "escalated",
     ];
 
     it.each(validStatuses)("accepts valid status '%s'", (status) => {
@@ -187,8 +191,8 @@ describe("Section 3: Domain Types and Zod Schemas", () => {
       expect(BreakpointStatusSchema.safeParse(null).success).toBe(false);
     });
 
-    it("contains exactly 7 status values", () => {
-      expect(BreakpointStatusSchema.options).toHaveLength(7);
+    it("contains exactly 11 status values", () => {
+      expect(BreakpointStatusSchema.options).toHaveLength(11);
     });
   });
 

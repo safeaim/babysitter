@@ -1,4 +1,5 @@
 import {
+  BreakpointSchema,
   DEFAULT_TIMEOUT_MS,
   DEFAULT_POLL_INTERVAL_MS,
 } from "../types.js";
@@ -222,7 +223,7 @@ export class AnswerPoller {
       // If we can't even fetch the breakpoint, return a minimal result
       return {
         answered: false,
-        breakpoint: {
+        breakpoint: BreakpointSchema.parse({
           id: breakpointId,
           text: "",
           context: { description: "", codeSnippets: [], fileReferences: [], tags: [] },
@@ -232,7 +233,7 @@ export class AnswerPoller {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           expiresAt: new Date().toISOString(),
-        },
+        }),
         allAnswers: [],
         resolution: "error",
         elapsedMs: Date.now() - startTime,

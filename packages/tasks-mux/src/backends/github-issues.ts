@@ -2,12 +2,16 @@ import { execSync } from "node:child_process";
 
 import type {
   BreakpointBackend,
+  BreakpointBackendCapabilities,
   SubmitBreakpointParams,
   WaitForAnswerOptions,
   SubmitAnswerParams,
   ListRespondersParams,
 } from "../backend.js";
-import { unsupportedBackendFeatureMessage } from "../backend.js";
+import {
+  unsupportedBackendFeatureMessage,
+  unsupportedBreakpointBackendCapabilities,
+} from "../backend.js";
 
 import type {
   Breakpoint,
@@ -22,6 +26,7 @@ import type {
 } from "../types.js";
 
 import {
+  BreakpointSchema,
   BreakpointContextSchema,
   BreakpointRoutingSchema,
   BreakpointSubmitterSchema,
@@ -418,6 +423,15 @@ export class GitHubIssuesBackend implements BreakpointBackend {
     this.defaultTimeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 
+  capabilities(): BreakpointBackendCapabilities {
+    return {
+      ...unsupportedBreakpointBackendCapabilities,
+      comments: true,
+      history: true,
+      export: true,
+    };
+  }
+
   /**
    * Override the token resolution for testing.
    * @internal
@@ -516,7 +530,7 @@ export class GitHubIssuesBackend implements BreakpointBackend {
       status = "pending";
     }
 
-    return {
+    return BreakpointSchema.parse({
       id: breakpointId,
       text: parsedPayload?.text ?? issue.title,
       context: parsedPayload?.context ?? legacyContext,
@@ -531,7 +545,7 @@ export class GitHubIssuesBackend implements BreakpointBackend {
       expiresAt: new Date(
         new Date(issue.created_at).getTime() + routing.timeoutMs,
       ).toISOString(),
-    };
+    });
   }
 
   private buildAnswerFromComment(

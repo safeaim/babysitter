@@ -2,10 +2,14 @@ import { describe, expect, it, vi } from "vitest";
 import type { BreakpointBackend } from "../backend.js";
 import type { Breakpoint, BreakpointPublicAnswer, BreakpointWaitResult } from "../types.js";
 import {
+  handleAddComment,
   handleAssignTask,
+  handleBulkUpdateTasks,
   handleCreateTodo,
   handleEscalate,
+  handleExportTasks,
   handleSearchTasks,
+  handleTaskStats,
 } from "../mcp/tools/native-tasks.js";
 
 const NOW = "2026-05-30T00:00:00.000Z";
@@ -36,6 +40,8 @@ function makeBreakpoint(overrides: Partial<Breakpoint> = {}): Breakpoint {
     createdAt: overrides.createdAt ?? NOW,
     updatedAt: overrides.updatedAt ?? NOW,
     expiresAt: overrides.expiresAt ?? NOW,
+    assigneeId: overrides.assigneeId,
+    assigneeName: overrides.assigneeName,
     claimedByResponderId: overrides.claimedByResponderId,
     claimedByResponderName: overrides.claimedByResponderName,
     createdBy: overrides.createdBy,
@@ -82,6 +88,48 @@ function createMockBackend(existing: Breakpoint[] = []): BreakpointBackend {
       answeredAt: NOW,
     } satisfies BreakpointPublicAnswer)),
     cancelBreakpoint: vi.fn(async () => {}),
+    searchBreakpoints: vi.fn(async () => ({
+      items: [...byId.values()],
+      total: byId.size,
+      offset: 0,
+      limit: byId.size,
+    })),
+    assignBreakpoint: vi.fn(async (id, params) => {
+      const breakpoint = byId.get(id);
+      if (!breakpoint) throw new Error("not found");
+      const updated = makeBreakpoint({
+        ...breakpoint,
+        status: "assigned",
+        assigneeId: params.assigneeId,
+        assigneeName: params.assigneeName,
+      });
+      byId.set(id, updated);
+      return updated;
+    }),
+    addBreakpointComment: vi.fn(async (_id, params) => ({
+      id: "comment-1",
+      authorId: params.authorId,
+      authorName: params.authorName,
+      text: params.text,
+      createdAt: NOW,
+    })),
+    bulkUpdateBreakpoints: vi.fn(async (params) => ({
+      total: params.ids.length,
+      succeeded: params.ids.length,
+      failed: 0,
+      items: params.ids.map((id) => ({ id, ok: true })),
+    })),
+    getBreakpointMetrics: vi.fn(async () => ({
+      total: byId.size,
+      byStatus: { pending: byId.size },
+      byPriority: { medium: byId.size },
+    })),
+    exportBreakpoints: vi.fn(async () => ({
+      schemaVersion: 1,
+      exportedAt: NOW,
+      total: byId.size,
+      items: [...byId.values()],
+    })),
   };
 }
 
@@ -174,9 +222,51 @@ describe("native task MCP handlers", () => {
 
     expect(result).toMatchObject({
       tool: "search_tasks",
-      count: 1,
-      tasks: [{ id: "bp-alpha" }],
+      count: 2,
+      tasks: [{ id: "bp-alpha" }, { id: "bp-beta" }],
     });
+    expect(backend.searchBreakpoints).toHaveBeenCalledWith(expect.objectContaining({
+      query: "docs",
+      tags: ["docs"],
+      responderId: "maintainer",
+      limit: 1,
+    }));
+  });
+
+  it("assign_task reassigns an existing backend task when taskId is provided", async () => {
+    const backend = createMockBackend([makeBreakpoint({ id: "bp-existing" })]);
+
+    const result = await handleAssignTask({
+      taskId: "bp-existing",
+      title: "Reassign existing",
+      assignee: "maintainer",
+    }, backend);
+
+    expect(result.taskId).toBe("bp-existing");
+    expect(result.breakpoint.assigneeId).toBe("maintainer");
+    expect(backend.assignBreakpoint).toHaveBeenCalledWith("bp-existing", {
+      assigneeId: "maintainer",
+      actorId: undefined,
+    });
+  });
+
+  it("delegates comments, bulk updates, stats, and export to backend task-management methods", async () => {
+    const backend = createMockBackend([makeBreakpoint({ id: "bp-existing" })]);
+
+    await expect(handleAddComment({
+      taskId: "bp-existing",
+      authorId: "maintainer",
+      text: "Ready for review",
+    }, backend)).resolves.toMatchObject({ tool: "add_comment", comment: { id: "comment-1" } });
+
+    await expect(handleBulkUpdateTasks({
+      ids: ["bp-existing"],
+      action: "reassign",
+      assigneeId: "codex",
+    }, backend)).resolves.toMatchObject({ tool: "bulk_update_tasks", total: 1, succeeded: 1 });
+
+    await expect(handleTaskStats({}, backend)).resolves.toMatchObject({ tool: "task_stats", total: 1 });
+    await expect(handleExportTasks({}, backend)).resolves.toMatchObject({ tool: "export_tasks", schemaVersion: 1, total: 1 });
   });
 
   it("escalate creates a high urgency intervention referencing an existing task", async () => {

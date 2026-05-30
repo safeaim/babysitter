@@ -1,18 +1,30 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import type {
+  AddBreakpointCommentParams,
+  AssignBreakpointParams,
   BreakpointBackend,
+  BreakpointBackendCapabilities,
+  BreakpointExport,
+  BreakpointMetricsSummary,
+  BreakpointSearchQuery,
+  BulkBreakpointOperationResult,
+  BulkUpdateBreakpointsParams,
   SubmitBreakpointParams,
+  TransitionBreakpointParams,
   WaitForAnswerOptions,
   SubmitAnswerParams,
 } from "../backend.js";
 import type {
   Breakpoint,
   BreakpointAnswer,
+  BreakpointComment,
   BreakpointPublicAnswer,
+  BreakpointStatus,
   BreakpointWaitResult,
   ProvenBreakpointAnswer,
   ProvenVerificationResult,
+  TaskPriority,
 } from "../types.js";
 import {
   generateBreakpointId,
@@ -23,6 +35,7 @@ import {
   BreakpointPublicAnswerSchema,
   ProvenBreakpointAnswerSchema,
   isProvenBreakpointAnswer,
+  validateBreakpointTransition,
 } from "../types.js";
 import { signAnswer, signAnswerWithKeyRecord } from "../proven/sign.js";
 import { verifyAnswer as verifyProvenAnswer } from "../proven/verify.js";
@@ -66,6 +79,21 @@ export class GitNativeBackend implements BreakpointBackend {
 
   private provenPath(id: string): string {
     return path.join(this.breakpointsDir, `${id}.proven.json`);
+  }
+
+  capabilities(): BreakpointBackendCapabilities {
+    return {
+      search: true,
+      bulkOperations: true,
+      assignment: true,
+      comments: true,
+      history: true,
+      metrics: true,
+      export: true,
+      forms: true,
+      notifications: false,
+      escalation: true,
+    };
   }
 
   /**
@@ -112,6 +140,68 @@ export class GitNativeBackend implements BreakpointBackend {
     return provenAnswer ?? storedAnswer;
   }
 
+  private async writeBreakpoint(breakpoint: Breakpoint): Promise<void> {
+    await fs.writeFile(
+      this.breakpointPath(breakpoint.id),
+      JSON.stringify(breakpoint, null, 2) + "\n",
+      "utf-8",
+    );
+  }
+
+  private historyEntry(args: {
+    type: Breakpoint["history"][number]["type"];
+    actorId?: string;
+    fromStatus?: BreakpointStatus;
+    toStatus?: BreakpointStatus;
+    message?: string;
+    metadata?: Record<string, unknown>;
+  }): Breakpoint["history"][number] {
+    return {
+      id: generateBreakpointId(),
+      at: new Date().toISOString(),
+      ...args,
+    };
+  }
+
+  private auditEntry(args: {
+    action: string;
+    actorId?: string;
+    redacted?: boolean;
+    metadata?: Record<string, unknown>;
+  }): Breakpoint["auditLog"][number] {
+    return {
+      id: generateBreakpointId(),
+      at: new Date().toISOString(),
+      redacted: args.redacted ?? false,
+      action: args.action,
+      actorId: args.actorId,
+      metadata: args.metadata,
+    };
+  }
+
+  private async listAllBreakpoints(): Promise<Breakpoint[]> {
+    let files: string[];
+    try {
+      files = await fs.readdir(this.breakpointsDir);
+    } catch {
+      return [];
+    }
+
+    const breakpoints: Breakpoint[] = [];
+    for (const file of files) {
+      if (!file.endsWith(".json") || file.includes(".answer.") || file.includes(".proven.")) {
+        continue;
+      }
+      try {
+        const raw = await fs.readFile(path.join(this.breakpointsDir, file), "utf-8");
+        breakpoints.push(BreakpointSchema.parse(JSON.parse(raw)));
+      } catch {
+        // Preserve existing malformed-file tolerance.
+      }
+    }
+    return breakpoints;
+  }
+
   async submitBreakpoint(params: SubmitBreakpointParams): Promise<Breakpoint> {
     await fs.mkdir(this.breakpointsDir, { recursive: true });
 
@@ -124,10 +214,37 @@ export class GitNativeBackend implements BreakpointBackend {
       text: params.text,
       context: params.context,
       status: "pending",
+      priority: params.priority,
+      dependsOn: params.dependsOn ?? [],
       routing: params.routing,
       answers: [],
       projectId: params.projectId,
       repoId: params.repoId,
+      comments: [],
+      history: [
+        {
+          id: generateBreakpointId(),
+          type: "created",
+          at: now,
+          toStatus: "pending",
+          message: "Breakpoint created",
+        },
+      ],
+      auditLog: [
+        {
+          id: generateBreakpointId(),
+          action: "breakpoint.created",
+          at: now,
+          redacted: false,
+        },
+      ],
+      forms: [],
+      formSubmissions: [],
+      notifications: [],
+      metrics: {
+        answerCount: 0,
+        commentCount: 0,
+      },
       createdAt: now,
       updatedAt: now,
       expiresAt: new Date(Date.now() + timeoutMs).toISOString(),
@@ -136,11 +253,7 @@ export class GitNativeBackend implements BreakpointBackend {
     // Validate before writing
     BreakpointSchema.parse(breakpoint);
 
-    await fs.writeFile(
-      this.breakpointPath(id),
-      JSON.stringify(breakpoint, null, 2) + "\n",
-      "utf-8",
-    );
+    await this.writeBreakpoint(BreakpointSchema.parse(breakpoint));
 
     return breakpoint;
   }
@@ -298,7 +411,12 @@ export class GitNativeBackend implements BreakpointBackend {
     answer: SubmitAnswerParams,
   ): Promise<BreakpointPublicAnswer> {
     // Verify breakpoint exists
-    await this.getBreakpoint(id);
+    const existing = await this.getBreakpoint(id);
+    const validation = validateBreakpointTransition(existing.status, "answered");
+    if (!validation.valid) {
+      throw new Error(validation.reason);
+    }
+    const fromStatus = existing.status;
 
     const answerId = generateBreakpointId();
     const now = new Date().toISOString();
@@ -363,11 +481,23 @@ export class GitNativeBackend implements BreakpointBackend {
     delete breakpoint.provenVerification;
     breakpoint.status = "answered";
     breakpoint.updatedAt = now;
-    await fs.writeFile(
-      this.breakpointPath(id),
-      JSON.stringify(breakpoint, null, 2) + "\n",
-      "utf-8",
-    );
+    breakpoint.history.push(this.historyEntry({
+      type: "answer",
+      actorId: answer.responderId,
+      fromStatus,
+      toStatus: "answered",
+      message: "Breakpoint answered",
+    }));
+    breakpoint.auditLog.push(this.auditEntry({
+      action: "breakpoint.answered",
+      actorId: answer.responderId,
+    }));
+    breakpoint.metrics = {
+      ...breakpoint.metrics,
+      answerCount: breakpoint.answers.length,
+      responseTimeMs: Date.parse(now) - Date.parse(breakpoint.createdAt),
+    };
+    await this.writeBreakpoint(BreakpointSchema.parse(breakpoint));
 
     return publicAnswer;
   }
@@ -375,30 +505,264 @@ export class GitNativeBackend implements BreakpointBackend {
   async cancelBreakpoint(id: string): Promise<void> {
     const breakpoint = await this.getBreakpoint(id) as Breakpoint & { provenVerification?: ProvenVerificationResult };
     delete breakpoint.provenVerification;
+    const validation = validateBreakpointTransition(breakpoint.status, "cancelled");
+    if (!validation.valid) {
+      throw new Error(validation.reason);
+    }
+    const fromStatus = breakpoint.status;
     breakpoint.status = "cancelled";
     breakpoint.updatedAt = new Date().toISOString();
 
-    await fs.writeFile(
-      this.breakpointPath(id),
-      JSON.stringify(breakpoint, null, 2) + "\n",
-      "utf-8",
-    );
+    breakpoint.history.push(this.historyEntry({
+      type: "status",
+      fromStatus,
+      toStatus: "cancelled",
+      message: "Breakpoint cancelled",
+    }));
+    breakpoint.auditLog.push(this.auditEntry({ action: "breakpoint.cancelled" }));
+    await this.writeBreakpoint(BreakpointSchema.parse(breakpoint));
   }
 
   async claimBreakpoint(id: string, responderId: string): Promise<Breakpoint> {
     const breakpoint = await this.getBreakpoint(id) as Breakpoint & { provenVerification?: ProvenVerificationResult };
     delete breakpoint.provenVerification;
+    const validation = validateBreakpointTransition(breakpoint.status, "claimed");
+    if (!validation.valid) {
+      throw new Error(validation.reason);
+    }
+    const fromStatus = breakpoint.status;
     breakpoint.status = "claimed";
     breakpoint.claimedByResponderId = responderId;
     breakpoint.updatedAt = new Date().toISOString();
 
-    await fs.writeFile(
-      this.breakpointPath(id),
-      JSON.stringify(breakpoint, null, 2) + "\n",
-      "utf-8",
-    );
+    breakpoint.history.push(this.historyEntry({
+      type: "status",
+      actorId: responderId,
+      fromStatus,
+      toStatus: "claimed",
+      message: "Breakpoint claimed",
+    }));
+    breakpoint.auditLog.push(this.auditEntry({
+      action: "breakpoint.claimed",
+      actorId: responderId,
+    }));
+    await this.writeBreakpoint(BreakpointSchema.parse(breakpoint));
 
     return breakpoint;
+  }
+
+  async assignBreakpoint(id: string, params: AssignBreakpointParams): Promise<Breakpoint> {
+    const breakpoint = await this.getBreakpoint(id) as Breakpoint & { provenVerification?: ProvenVerificationResult };
+    delete breakpoint.provenVerification;
+    const validation = validateBreakpointTransition(breakpoint.status, "assigned");
+    if (!validation.valid) {
+      throw new Error(validation.reason);
+    }
+
+    const fromStatus = breakpoint.status;
+    breakpoint.status = "assigned";
+    breakpoint.assigneeId = params.assigneeId;
+    breakpoint.assigneeName = params.assigneeName;
+    breakpoint.updatedAt = new Date().toISOString();
+    breakpoint.history.push(this.historyEntry({
+      type: "assigned",
+      actorId: params.actorId,
+      fromStatus,
+      toStatus: "assigned",
+      message: `Assigned to ${params.assigneeName ?? params.assigneeId}`,
+    }));
+    breakpoint.auditLog.push(this.auditEntry({
+      action: "breakpoint.assigned",
+      actorId: params.actorId,
+      metadata: { assigneeId: params.assigneeId },
+    }));
+
+    const parsed = BreakpointSchema.parse(breakpoint);
+    await this.writeBreakpoint(parsed);
+    return parsed;
+  }
+
+  async transitionBreakpoint(id: string, params: TransitionBreakpointParams): Promise<Breakpoint> {
+    const breakpoint = await this.getBreakpoint(id) as Breakpoint & { provenVerification?: ProvenVerificationResult };
+    delete breakpoint.provenVerification;
+    const validation = validateBreakpointTransition(breakpoint.status, params.status);
+    if (!validation.valid) {
+      throw new Error(validation.reason);
+    }
+
+    const fromStatus = breakpoint.status;
+    breakpoint.status = params.status;
+    breakpoint.updatedAt = new Date().toISOString();
+    breakpoint.history.push(this.historyEntry({
+      type: "status",
+      actorId: params.actorId,
+      fromStatus,
+      toStatus: params.status,
+      message: params.message,
+      metadata: params.metadata,
+    }));
+    breakpoint.auditLog.push(this.auditEntry({
+      action: "status.changed",
+      actorId: params.actorId,
+      metadata: { fromStatus, toStatus: params.status },
+    }));
+    if (params.status === "completed") {
+      breakpoint.metrics = {
+        ...breakpoint.metrics,
+        completionTimeMs: Date.parse(breakpoint.updatedAt) - Date.parse(breakpoint.createdAt),
+      };
+    }
+
+    const parsed = BreakpointSchema.parse(breakpoint);
+    await this.writeBreakpoint(parsed);
+    return parsed;
+  }
+
+  async addBreakpointComment(
+    id: string,
+    params: AddBreakpointCommentParams,
+  ): Promise<BreakpointComment> {
+    const breakpoint = await this.getBreakpoint(id) as Breakpoint & { provenVerification?: ProvenVerificationResult };
+    delete breakpoint.provenVerification;
+    const comment: BreakpointComment = {
+      id: generateBreakpointId(),
+      authorId: params.authorId,
+      authorName: params.authorName,
+      text: params.text,
+      createdAt: new Date().toISOString(),
+      metadata: params.metadata,
+    };
+
+    breakpoint.comments.push(comment);
+    breakpoint.updatedAt = comment.createdAt;
+    breakpoint.history.push(this.historyEntry({
+      type: "comment",
+      actorId: params.authorId,
+      message: "Comment added",
+      metadata: { commentId: comment.id },
+    }));
+    breakpoint.auditLog.push(this.auditEntry({
+      action: "comment.added",
+      actorId: params.authorId,
+      metadata: { commentId: comment.id },
+    }));
+    breakpoint.metrics = {
+      ...breakpoint.metrics,
+      commentCount: breakpoint.comments.length,
+    };
+    await this.writeBreakpoint(BreakpointSchema.parse(breakpoint));
+    return comment;
+  }
+
+  async searchBreakpoints(query: BreakpointSearchQuery): Promise<{
+    items: Breakpoint[];
+    total: number;
+    offset: number;
+    limit: number;
+  }> {
+    const all = await this.listAllBreakpoints();
+    const filtered = all.filter((breakpoint) => matchesSearchQuery(breakpoint, query));
+    const sorted = filtered.sort((left, right) => compareBreakpoints(left, right, query));
+    const offset = query.offset ?? 0;
+    const limit = query.limit ?? sorted.length;
+    return {
+      items: sorted.slice(offset, offset + limit),
+      total: sorted.length,
+      offset,
+      limit,
+    };
+  }
+
+  async bulkUpdateBreakpoints(params: BulkUpdateBreakpointsParams): Promise<BulkBreakpointOperationResult> {
+    const items: BulkBreakpointOperationResult["items"] = [];
+
+    for (const id of params.ids) {
+      try {
+        let breakpoint: Breakpoint;
+        if (params.action === "reassign") {
+          if (!params.assigneeId) throw new Error("assigneeId is required for reassign");
+          breakpoint = await this.assignBreakpoint(id, {
+            assigneeId: params.assigneeId,
+            assigneeName: params.assigneeName,
+            actorId: params.actorId,
+          });
+        } else if (params.action === "cancel") {
+          await this.cancelBreakpoint(id);
+          breakpoint = await this.getBreakpoint(id);
+        } else if (params.action === "close") {
+          breakpoint = await this.transitionBreakpoint(id, {
+            status: "completed",
+            actorId: params.actorId,
+            message: params.message,
+          });
+        } else if (params.action === "transition") {
+          if (!params.status) throw new Error("status is required for transition");
+          breakpoint = await this.transitionBreakpoint(id, {
+            status: params.status,
+            actorId: params.actorId,
+            message: params.message,
+          });
+        } else {
+          if (!params.answer) throw new Error("answer is required for approve");
+          await this.answerBreakpoint(id, { ...params.answer, approved: true });
+          breakpoint = await this.getBreakpoint(id);
+        }
+        items.push({ id, ok: true, breakpoint });
+      } catch (error) {
+        items.push({
+          id,
+          ok: false,
+          errorCode: isNotFoundError(error) ? "not_found" : isInvalidTransitionError(error) ? "invalid_transition" : "error",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    const succeeded = items.filter((item) => item.ok).length;
+    return {
+      total: params.ids.length,
+      succeeded,
+      failed: params.ids.length - succeeded,
+      items,
+    };
+  }
+
+  async getBreakpointMetrics(query: BreakpointSearchQuery = {}): Promise<BreakpointMetricsSummary> {
+    const result = await this.searchBreakpoints(query);
+    const byStatus: Partial<Record<BreakpointStatus, number>> = {};
+    const byPriority: Partial<Record<TaskPriority, number>> = {};
+    const responseTimes: number[] = [];
+    const completionTimes: number[] = [];
+
+    for (const breakpoint of result.items) {
+      byStatus[breakpoint.status] = (byStatus[breakpoint.status] ?? 0) + 1;
+      const priority = breakpoint.priority ?? "medium";
+      byPriority[priority] = (byPriority[priority] ?? 0) + 1;
+      if (typeof breakpoint.metrics?.responseTimeMs === "number") {
+        responseTimes.push(breakpoint.metrics.responseTimeMs);
+      }
+      if (typeof breakpoint.metrics?.completionTimeMs === "number") {
+        completionTimes.push(breakpoint.metrics.completionTimeMs);
+      }
+    }
+
+    return {
+      total: result.total,
+      byStatus,
+      byPriority,
+      responseTimeAverageMs: average(responseTimes),
+      completionTimeAverageMs: average(completionTimes),
+    };
+  }
+
+  async exportBreakpoints(query: BreakpointSearchQuery = {}): Promise<BreakpointExport> {
+    const result = await this.searchBreakpoints(query);
+    return {
+      schemaVersion: 1,
+      exportedAt: new Date().toISOString(),
+      total: result.total,
+      items: result.items.map(redactBreakpointForExport),
+    };
   }
 
   /**
@@ -427,4 +791,125 @@ export class GitNativeBackend implements BreakpointBackend {
     // Our breakpointsDir IS the .breakpoints directory, so we pass it as baseDir.
     return verifyProvenAnswer(provenAnswer, this.breakpointsDir);
   }
+}
+
+const PRIORITY_WEIGHT: Record<TaskPriority, number> = {
+  low: 0,
+  medium: 1,
+  high: 2,
+  critical: 3,
+};
+
+function matchesSearchQuery(breakpoint: Breakpoint, query: BreakpointSearchQuery): boolean {
+  if (query.status && !query.status.includes(breakpoint.status)) return false;
+  if (query.priority && !query.priority.includes(breakpoint.priority ?? "medium")) return false;
+  if (query.assigneeId && breakpoint.assigneeId !== query.assigneeId) return false;
+  if (query.responderId && !matchesResponder(breakpoint, query.responderId)) return false;
+  if (query.domain && !breakpoint.context.domain?.toLowerCase().includes(query.domain.toLowerCase())) return false;
+  if (query.tags && query.tags.length > 0) {
+    const tags = new Set(breakpoint.context.tags.map((tag) => tag.toLowerCase()));
+    if (!query.tags.every((tag) => tags.has(tag.toLowerCase()))) return false;
+  }
+  if (query.createdAfter && Date.parse(breakpoint.createdAt) < Date.parse(query.createdAfter)) return false;
+  if (query.createdBefore && Date.parse(breakpoint.createdAt) > Date.parse(query.createdBefore)) return false;
+  if (query.updatedAfter && Date.parse(breakpoint.updatedAt) < Date.parse(query.updatedAfter)) return false;
+  if (query.updatedBefore && Date.parse(breakpoint.updatedAt) > Date.parse(query.updatedBefore)) return false;
+  if (query.query && !searchText(breakpoint).includes(query.query.toLowerCase())) return false;
+  return true;
+}
+
+function matchesResponder(breakpoint: Breakpoint, responderId: string): boolean {
+  return breakpoint.routing.targetResponders.includes(responderId) ||
+    breakpoint.claimedByResponderId === responderId ||
+    breakpoint.assigneeId === responderId ||
+    breakpoint.answers.some((answer) => answer.responderId === responderId);
+}
+
+function searchText(breakpoint: Breakpoint): string {
+  return [
+    breakpoint.id,
+    breakpoint.text,
+    breakpoint.assigneeId,
+    breakpoint.assigneeName,
+    breakpoint.context.title,
+    breakpoint.context.summary,
+    breakpoint.context.description,
+    breakpoint.context.domain,
+    ...breakpoint.context.tags,
+    ...breakpoint.comments.map((comment) => comment.text),
+  ].filter(Boolean).join("\n").toLowerCase();
+}
+
+function compareBreakpoints(
+  left: Breakpoint,
+  right: Breakpoint,
+  query: BreakpointSearchQuery,
+): number {
+  const direction = query.sortDirection === "asc" ? 1 : -1;
+  const sortBy = query.sortBy ?? "createdAt";
+  if (sortBy === "priority") {
+    return (PRIORITY_WEIGHT[left.priority ?? "medium"] - PRIORITY_WEIGHT[right.priority ?? "medium"]) * direction;
+  }
+  const leftValue = sortBy === "status" ? left.status : left[sortBy];
+  const rightValue = sortBy === "status" ? right.status : right[sortBy];
+  return String(leftValue).localeCompare(String(rightValue)) * direction;
+}
+
+function average(values: number[]): number | undefined {
+  if (values.length === 0) return undefined;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function isNotFoundError(error: unknown): boolean {
+  return error instanceof Error && (
+    "code" in error && error.code === "ENOENT" ||
+    /no such file|not found/i.test(error.message)
+  );
+}
+
+function isInvalidTransitionError(error: unknown): boolean {
+  return error instanceof Error && /transition|terminal/i.test(error.message);
+}
+
+function redactBreakpointForExport(breakpoint: Breakpoint): Breakpoint {
+  return BreakpointSchema.parse({
+    ...breakpoint,
+    context: {
+      ...breakpoint.context,
+      metadata: redactSecrets(breakpoint.context.metadata),
+    },
+    comments: breakpoint.comments.map((comment) => ({
+      ...comment,
+      metadata: redactSecrets(comment.metadata),
+    })),
+    auditLog: breakpoint.auditLog.map((entry) => ({
+      ...entry,
+      metadata: redactSecrets(entry.metadata),
+      redacted: entry.metadata ? true : entry.redacted,
+    })),
+    notifications: breakpoint.notifications.map((notification) => ({
+      ...notification,
+      target: notification.target ? "[redacted]" : undefined,
+      secretEnv: notification.secretEnv ? "[redacted]" : undefined,
+    })),
+  });
+}
+
+function redactSecrets<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => redactSecrets(item)) as T;
+  }
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+
+  const redacted: Record<string, unknown> = {};
+  for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+    if (/token|secret|password|authorization|apiKey|apiToken/i.test(key)) {
+      redacted[key] = "[redacted]";
+    } else {
+      redacted[key] = redactSecrets(nested);
+    }
+  }
+  return redacted as T;
 }

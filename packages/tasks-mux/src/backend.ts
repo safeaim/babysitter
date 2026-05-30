@@ -1,10 +1,14 @@
 import type {
   Breakpoint,
+  BreakpointComment,
+  BreakpointDependency,
   BreakpointPublicAnswer,
   BreakpointContext,
   BreakpointRouting,
+  BreakpointStatus,
   BreakpointWaitResult,
   ResponderProfile,
+  TaskPriority,
 } from "./types.js";
 
 /**
@@ -17,6 +21,10 @@ export interface SubmitBreakpointParams {
   context: BreakpointContext;
   /** Routing configuration. */
   routing: BreakpointRouting;
+  /** Optional task-management priority. */
+  priority?: TaskPriority;
+  /** Optional dependency list that can block completion. */
+  dependsOn?: BreakpointDependency[];
   /** Whether the requester requires a signed answer. */
   proven?: boolean;
   /** Optional project scope. */
@@ -73,6 +81,134 @@ export interface ListRespondersParams {
   repoId?: string;
 }
 
+export interface BreakpointBackendCapabilities {
+  search: boolean;
+  bulkOperations: boolean;
+  assignment: boolean;
+  comments: boolean;
+  history: boolean;
+  metrics: boolean;
+  export: boolean;
+  forms: boolean;
+  notifications: boolean;
+  escalation: boolean;
+}
+
+export interface BreakpointSearchQuery {
+  query?: string;
+  status?: BreakpointStatus[];
+  priority?: TaskPriority[];
+  assigneeId?: string;
+  responderId?: string;
+  tags?: string[];
+  domain?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+  updatedAfter?: string;
+  updatedBefore?: string;
+  sortBy?: "createdAt" | "updatedAt" | "priority" | "status";
+  sortDirection?: "asc" | "desc";
+  offset?: number;
+  limit?: number;
+}
+
+export interface SearchBreakpointsResult {
+  items: Breakpoint[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+
+export interface AssignBreakpointParams {
+  assigneeId: string;
+  assigneeName?: string;
+  actorId?: string;
+}
+
+export interface TransitionBreakpointParams {
+  status: BreakpointStatus;
+  actorId?: string;
+  message?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface AddBreakpointCommentParams {
+  authorId: string;
+  authorName?: string;
+  text: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface BulkUpdateBreakpointsParams {
+  ids: string[];
+  action: "approve" | "close" | "cancel" | "reassign" | "transition";
+  actorId?: string;
+  assigneeId?: string;
+  assigneeName?: string;
+  status?: BreakpointStatus;
+  answer?: SubmitAnswerParams;
+  message?: string;
+}
+
+export interface BulkUpdateBreakpointItemResult {
+  id: string;
+  ok: boolean;
+  breakpoint?: Breakpoint;
+  errorCode?: "not_found" | "invalid_transition" | "unsupported" | "error";
+  error?: string;
+}
+
+export interface BulkBreakpointOperationResult {
+  total: number;
+  succeeded: number;
+  failed: number;
+  items: BulkUpdateBreakpointItemResult[];
+}
+
+export interface BreakpointMetricsSummary {
+  total: number;
+  byStatus: Partial<Record<BreakpointStatus, number>>;
+  byPriority: Partial<Record<TaskPriority, number>>;
+  responseTimeAverageMs?: number;
+  completionTimeAverageMs?: number;
+}
+
+export interface BreakpointExport {
+  schemaVersion: 1;
+  exportedAt: string;
+  total: number;
+  items: Breakpoint[];
+}
+
+export class UnsupportedBreakpointFeatureError extends Error {
+  readonly backendName: string;
+  readonly feature: string;
+
+  constructor(backendName: string, feature: string) {
+    super(`Backend "${backendName}" does not support ${feature}`);
+    this.name = "UnsupportedBreakpointFeatureError";
+    this.backendName = backendName;
+    this.feature = feature;
+  }
+}
+
+export const unsupportedBreakpointBackendCapabilities: BreakpointBackendCapabilities = {
+  search: false,
+  bulkOperations: false,
+  assignment: false,
+  comments: false,
+  history: false,
+  metrics: false,
+  export: false,
+  forms: false,
+  notifications: false,
+  escalation: false,
+};
+
+export function unsupportedBreakpointFeature(backendName: string, feature: string): never {
+  throw new UnsupportedBreakpointFeatureError(backendName, feature);
+}
+
 /**
  * Backend-agnostic interface for breakpoint lifecycle operations.
  *
@@ -127,6 +263,46 @@ export interface BreakpointBackend {
    * Optional -- not all backends support explicit claiming.
    */
   claimBreakpoint?(id: string, responderId: string): Promise<Breakpoint>;
+
+  /**
+   * Report task-management capabilities supported by this backend.
+   */
+  capabilities?(): Promise<BreakpointBackendCapabilities> | BreakpointBackendCapabilities;
+
+  /**
+   * Search and filter breakpoints across lifecycle states.
+   */
+  searchBreakpoints?(query: BreakpointSearchQuery): Promise<SearchBreakpointsResult>;
+
+  /**
+   * Assign or reassign a breakpoint to a responder.
+   */
+  assignBreakpoint?(id: string, params: AssignBreakpointParams): Promise<Breakpoint>;
+
+  /**
+   * Transition a breakpoint through the validated task lifecycle.
+   */
+  transitionBreakpoint?(id: string, params: TransitionBreakpointParams): Promise<Breakpoint>;
+
+  /**
+   * Append a discussion comment to a breakpoint.
+   */
+  addBreakpointComment?(id: string, params: AddBreakpointCommentParams): Promise<BreakpointComment>;
+
+  /**
+   * Apply an operation to many breakpoints and report item-level outcomes.
+   */
+  bulkUpdateBreakpoints?(params: BulkUpdateBreakpointsParams): Promise<BulkBreakpointOperationResult>;
+
+  /**
+   * Compute deterministic metrics for matching breakpoints.
+   */
+  getBreakpointMetrics?(query?: BreakpointSearchQuery): Promise<BreakpointMetricsSummary>;
+
+  /**
+   * Export matching breakpoint data with credentials redacted.
+   */
+  exportBreakpoints?(query?: BreakpointSearchQuery): Promise<BreakpointExport>;
 }
 
 export function selectBreakpointAnswer(

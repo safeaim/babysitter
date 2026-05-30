@@ -42,9 +42,17 @@ Current CLI commands:
 - `tasks-mux breakpoints answer <breakpointId> --answer <text> --responder <responderId> [--confidence <0-100>]`
 - `tasks-mux breakpoints status <breakpointId>`
 - `tasks-mux breakpoints poll <breakpointId> [--timeout <seconds>] [--interval <seconds>]`
+- `tasks-mux tasks search [--query <text>] [--status <csv>] [--priority <csv>] [--assignee <id>]`
+- `tasks-mux tasks assign <taskId> --assignee <id> [--assignee-name <name>]`
+- `tasks-mux tasks close <taskId> [--message <text>]`
+- `tasks-mux tasks comment <taskId> --author <id> --text <text>`
+- `tasks-mux tasks stats`
+- `tasks-mux tasks export`
 - `tasks-mux responder-loop --responder <responderId> [--interval <seconds>] [--once]`
 - `tasks-mux server start`
 - `tasks-mux auth login|logout|status|server set|server clear|token set|token clear|keygen|key-push|keys`
+
+The `tasks` command group is backed by the local git-native backend and supports additive task-management fields on breakpoint JSON: `priority`, `dependsOn`, `assigneeId`, comments, history, audit log, metrics, and redacted export data. Existing breakpoint files without these fields remain valid.
 
 ## MCP Tools
 
@@ -58,6 +66,16 @@ The MCP server currently registers these tools:
 - `list_responders`
 - `claim_breakpoint`
 - `poll_breakpoints`
+- `create_todo`
+- `assign_task`
+- `search_tasks`
+- `add_comment`
+- `bulk_update_tasks`
+- `task_stats`
+- `export_tasks`
+- `escalate`
+
+Backends advertise task-management capabilities. The git-native backend implements search/filtering, bulk updates, assignment/reassignment, comments, history/audit, metrics, and export. Other backends expose partial capability metadata and should return explicit unsupported-feature errors for operations they cannot safely map to their external API.
 
 ## Package Exports
 

@@ -60,6 +60,14 @@ describe("CLI Program", () => {
       expect(commands).toContain("breakpoints");
     });
 
+    it("registers tasks subcommand", async () => {
+      const { createProgram } = await importProgram();
+      const program = createProgram();
+      const commands = program.commands.map((c) => c.name());
+
+      expect(commands).toContain("tasks");
+    });
+
     it("does not register adjacent breakpoints claim lifecycle command", async () => {
       const { createProgram } = await importProgram();
       const program = createProgram();
@@ -93,11 +101,11 @@ describe("CLI Program", () => {
       expect(commands).toContain("auth");
     });
 
-    it("has 6 registered subcommands", async () => {
+    it("has 7 registered subcommands", async () => {
       const { createProgram } = await importProgram();
       const program = createProgram();
 
-      expect(program.commands).toHaveLength(6);
+      expect(program.commands).toHaveLength(7);
     });
 
     it("defines --server-url global option", async () => {

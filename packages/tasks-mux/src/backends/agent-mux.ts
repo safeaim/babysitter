@@ -1,16 +1,18 @@
 import type {
   BreakpointBackend,
+  BreakpointBackendCapabilities,
   SubmitAnswerParams,
   SubmitBreakpointParams,
   WaitForAnswerOptions,
 } from "../backend.js";
+import { unsupportedBreakpointBackendCapabilities } from "../backend.js";
 import type {
   Breakpoint,
   BreakpointPublicAnswer,
   DecisionMemory,
   ResponderProfile,
 } from "../types.js";
-import { generateBreakpointId } from "../types.js";
+import { BreakpointSchema, generateBreakpointId } from "../types.js";
 
 export interface AgentMuxRunOptions {
   agent: string;
@@ -116,6 +118,14 @@ export class AgentMuxResponderBackend implements BreakpointBackend {
     this.clientFactory = config.clientFactory;
   }
 
+  capabilities(): BreakpointBackendCapabilities {
+    return {
+      ...unsupportedBreakpointBackendCapabilities,
+      assignment: true,
+      metrics: true,
+    };
+  }
+
   async submitBreakpoint(params: SubmitBreakpointParams): Promise<Breakpoint> {
     const breakpointId = params.routing.breakpointId ?? generateBreakpointId();
     const createdAt = new Date().toISOString();
@@ -159,7 +169,7 @@ export class AgentMuxResponderBackend implements BreakpointBackend {
       now: new Date().toISOString(),
     });
 
-    const breakpoint: Breakpoint = {
+    const breakpoint = BreakpointSchema.parse({
       id: breakpointId,
       text: params.text,
       context: {
@@ -178,7 +188,7 @@ export class AgentMuxResponderBackend implements BreakpointBackend {
       createdAt,
       updatedAt: answer.answeredAt,
       expiresAt,
-    };
+    });
 
     this.breakpoints.set(breakpoint.id, breakpoint);
     return breakpoint;

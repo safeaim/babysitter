@@ -1,11 +1,16 @@
 import type {
   BreakpointBackend,
+  BreakpointBackendCapabilities,
   ListRespondersParams,
   SubmitAnswerParams,
   SubmitBreakpointParams,
   WaitForAnswerOptions,
 } from "../backend.js";
-import { selectBreakpointAnswer, unsupportedBackendFeatureMessage } from "../backend.js";
+import {
+  selectBreakpointAnswer,
+  unsupportedBackendFeatureMessage,
+  unsupportedBreakpointBackendCapabilities,
+} from "../backend.js";
 import { GitHubIssuesBackend } from "./github-issues.js";
 import type {
   Breakpoint,
@@ -19,6 +24,7 @@ import type {
   ResponderProfile,
 } from "../types.js";
 import {
+  BreakpointSchema,
   DEFAULT_POLL_INTERVAL_MS,
   DEFAULT_TIMEOUT_MS,
 } from "../types.js";
@@ -575,6 +581,16 @@ export class ExternalTrackerBackend implements BreakpointBackend {
     }
   }
 
+  capabilities(): BreakpointBackendCapabilities {
+    return {
+      ...unsupportedBreakpointBackendCapabilities,
+      assignment: true,
+      comments: true,
+      history: true,
+      export: this.config.provider === "github-issues",
+    };
+  }
+
   async submitBreakpoint(params: SubmitBreakpointParams): Promise<Breakpoint> {
     if (this.delegatedGitHub) return this.delegatedGitHub.submitBreakpoint(params);
     if (params.proven) {
@@ -757,7 +773,7 @@ export class ExternalTrackerBackend implements BreakpointBackend {
     const answers = issue.comments
       .map((comment) => answerFromComment(comment, id))
       .filter((answer): answer is BreakpointAnswer => answer !== null);
-    return {
+    return BreakpointSchema.parse({
       id,
       text: issue.title,
       context: submitted
@@ -803,7 +819,7 @@ export class ExternalTrackerBackend implements BreakpointBackend {
       createdAt: issue.createdAt,
       updatedAt: issue.updatedAt,
       expiresAt: new Date(new Date(issue.createdAt).getTime() + (submitted?.routing.timeoutMs ?? this.defaultTimeoutMs)).toISOString(),
-    };
+    });
   }
 
   private mapStatusToBreakpoint(status: ExternalTrackerStatus): Breakpoint["status"] {

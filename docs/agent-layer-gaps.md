@@ -146,35 +146,35 @@ Comprehensive inventory of missing capabilities, stub implementations, and archi
 | Not wired into agent stack | `agent-core/tools/delegation.ts:86-98` | `task` tool uses generic `taskHandler` callback, NOT tasks-mux. Breakpoints, responders, routing all disconnected from agent execution. |
 | MCP tools not auto-discovered | `agent-platform/mcp/client/toolRegistry.ts` | Marked "NOT INTEGRATED YET". tasks-mux MCP server has 8 tools but agent harness doesn't know they exist. |
 | Breakpoint delegation disconnected | `agent-platform/breakpoints/delegation.ts:1-8` | Marked "NOT INTEGRATED YET". Webhook routing exists but not connected to tasks-mux backends. |
-| No native agent-core tools wrapping tasks-mux | — | No `create_todo`, `assign_task`, `search_tasks`, `escalate` tools. Agent can't create work items for humans. |
+| Native agent-core tools wrapping tasks-mux are partial | — | tasks-mux now exposes MCP tools such as `create_todo`, `assign_task`, `search_tasks`, `add_comment`, `bulk_update_tasks`, `task_stats`, `export_tasks`, and `escalate`; direct agent-core tool wrapping and auto-discovery remain separate integration work. |
 | Approval chains not integrated | `agent-platform/breakpoints/approvalChains.ts` | Sequential/quorum approvals defined but never invoked during orchestration. |
 
 ### High (major task management gaps)
 
 | Gap | Description |
 |-----|-------------|
-| No task priorities | Breakpoint schema has no priority field. Can't route high-priority to senior responders. |
-| No task dependencies | No `dependsOn[]` between breakpoints. Can't block resolution until prerequisites done. |
-| No search/filter API | Git-native backend only scans filesystem. No `searchBreakpoints(query)`. |
-| No bulk operations | Can't bulk approve, close, or reassign. |
+| Task priorities are partially implemented | Breakpoint schema now has `priority` (`low`, `medium`, `high`, `critical`) and git-native search can filter/sort by priority. Routing policy integration remains follow-up work. |
+| Task dependencies are partially implemented | Breakpoint schema now has `dependsOn[]`; dependency-aware routing/blocking policy remains follow-up work. |
+| Search/filter API is partially implemented | Git-native now exposes `searchBreakpoints(query)` with text/status/priority/assignee/responder/tag/domain/date filters, sorting, and pagination. External backend parity remains capability-gated. |
+| Bulk operations are partially implemented | Git-native now supports bulk cancel/close/reassign/transition/approve with per-item results. External backend parity remains capability-gated. |
 | No subagent spawning via task system | Agent-to-agent delegation doesn't route through responder discovery/matching. |
 | No escalation chains | No fallback responders when initial responder times out. |
-| Missing MCP tools | No `create_todo`, `assign_task`, `search_tasks`, `cancel_breakpoint`, `add_comment`, `escalate` exposed as MCP tools. |
-| No interactive forms | Only simple question/answer. No structured multi-field forms, conditional fields, or file review. |
+| MCP tools are partially implemented | tasks-mux exposes native task tools including `create_todo`, `assign_task`, `search_tasks`, `add_comment`, `bulk_update_tasks`, `task_stats`, `export_tasks`, and `escalate`; cancellation remains covered by breakpoint APIs rather than a dedicated native-task alias. |
+| Interactive forms are schema-only | Breakpoint schema includes form definitions/submissions, but no full conditional form UX or file review flow exists yet. |
 
 ### Medium
 
 | Gap | Description |
 |-----|-------------|
-| Missing task states | No "assigned", "in-progress", "blocked", "escalated" — only basic lifecycle states. |
-| No status history/timeline | Can't see when a breakpoint moved between states. |
-| No notifications | No email, Slack, Discord, or webhook notifications on state changes. |
-| No task metrics/SLA | No response time tracking, completion rates, or responder performance. |
-| No discussion threads | Can't add comments to a breakpoint. |
+| Task states are partially implemented | Breakpoint status now includes `assigned`, `in-progress`, `blocked`, and `escalated`; broader routing semantics remain follow-up work. |
+| Status history/timeline is partially implemented | Git-native appends history entries for create/assign/status/comment/answer operations. Cross-backend parity remains capability-gated. |
+| Notifications are schema-only | Notification provider config exists and is disabled by default; real email, Slack, Discord, and webhook dispatch remains follow-up work. |
+| Task metrics/SLA are partially implemented | Git-native computes deterministic status/priority counts and response/completion timing where available; responder performance analytics remain follow-up work. |
+| Discussion threads are partially implemented | Git-native supports comments on breakpoints and MCP exposes `add_comment`; richer threaded UX remains follow-up work. |
 | No offline queue | Server backend has no local fallback if server is down. |
-| No state machine validation | Backend accepts invalid state transitions. |
-| No audit log | No record of who changed what and when. |
-| Missing CLI commands | No `search`, `assign`, `reassign`, `close`, `approve`, `stats`, `templates`, `rules` commands. |
+| State machine validation is partially implemented | Shared transition validation rejects invalid terminal-state changes and git-native uses it for lifecycle transitions. |
+| Audit log is partially implemented | Git-native appends audit entries for core task-management mutations. Cross-backend audit parity remains follow-up work. |
+| CLI commands are partially implemented | `tasks-mux tasks search|assign|close|comment|stats|export` cover local git-native task-management operations. Dedicated approve/templates/rules commands remain follow-up work. |
 | Only 3 backends | git-native, server, github-issues. Missing: database, S3, Slack, Linear/Jira. |
 | No schema migration | Can't upgrade breakpoint format across versions. |
 | Responder matching not integrated | `responder-matcher.ts` exists but only used in CLI, not in agent routing decisions. |

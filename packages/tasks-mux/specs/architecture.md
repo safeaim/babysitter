@@ -54,6 +54,12 @@ Supported command paths:
 - `tasks-mux breakpoints answer <breakpointId> --answer <text> --responder <responderId> [--confidence <0-100>]`
 - `tasks-mux breakpoints status <breakpointId>`
 - `tasks-mux breakpoints poll <breakpointId> [--timeout <seconds>] [--interval <seconds>]`
+- `tasks-mux tasks search [--query <text>] [--status <csv>] [--priority <csv>] [--assignee <id>]`
+- `tasks-mux tasks assign <taskId> --assignee <id> [--assignee-name <name>]`
+- `tasks-mux tasks close <taskId> [--message <text>]`
+- `tasks-mux tasks comment <taskId> --author <id> --text <text>`
+- `tasks-mux tasks stats`
+- `tasks-mux tasks export`
 - `tasks-mux responder-loop --responder <responderId> [--interval <seconds>] [--once]`
 - `tasks-mux server start`
 - `tasks-mux auth login|logout|status|server set|server clear|token set|token clear|keygen|key-push|keys`
@@ -71,7 +77,7 @@ Global options on the top-level program:
 
 ## Current MCP Tool Surface
 
-The stdio MCP server registers exactly eight tools:
+The stdio MCP server registers these tools:
 
 | Tool | Current parameters |
 | --- | --- |
@@ -83,6 +89,20 @@ The stdio MCP server registers exactly eight tools:
 | `list_responders` | `domain`, `tags`, `backend`, `breakpointsDir` |
 | `claim_breakpoint` | `breakpointId`, `responderId`, `backend`, `breakpointsDir` |
 | `poll_breakpoints` | `responderId`, `waitSeconds`, `backend`, `breakpointsDir` |
+| `create_todo` | `title`, `description`, routing/context fields, `priority`, `dependsOn`, `backend`, `breakpointsDir` |
+| `assign_task` | `taskId`, `title`, `instructions`, `assignee`, routing/context fields, `priority`, `dependsOn`, `backend`, `breakpointsDir` |
+| `search_tasks` | `query`, `status`, `priority`, `assigneeId`, `responderId`, `domain`, `tags`, `sortBy`, `sortDirection`, `offset`, `limit`, `backend`, `breakpointsDir` |
+| `add_comment` | `taskId`, `authorId`, `authorName`, `text`, `metadata`, `backend`, `breakpointsDir` |
+| `bulk_update_tasks` | `ids`, `action`, `actorId`, `assigneeId`, `assigneeName`, `status`, `message`, `backend`, `breakpointsDir` |
+| `task_stats` | `status`, `priority`, `assigneeId`, `responderId`, `tags`, `domain`, `backend`, `breakpointsDir` |
+| `export_tasks` | `status`, `priority`, `assigneeId`, `responderId`, `tags`, `domain`, `backend`, `breakpointsDir` |
+| `escalate` | `taskId`, `title`, `reason`, `targetResponderId`, routing/context fields, `backend`, `breakpointsDir` |
+
+## Task Management Contract
+
+`Breakpoint` remains the canonical persisted shape. Task-management fields are additive: `priority`, `dependsOn`, `assigneeId`, `assigneeName`, `comments`, `history`, `auditLog`, `forms`, `formSubmissions`, `sla`, `metrics`, `notifications`, and `escalation`. Existing breakpoint JSON without these fields remains valid and receives defaults when parsed.
+
+The git-native backend implements the local durable task-management contract: search/filter/sort/pagination, assignment/reassignment, validated lifecycle transitions, discussion comments, history/audit append, bulk operations with per-item results, metrics grouped by status/priority, and redacted export. Server, GitHub Issues, external-tracker, and agent-mux backends expose capability metadata and should return explicit unsupported-feature errors for operations that cannot be mapped safely.
 
 ## Packaging Facts
 

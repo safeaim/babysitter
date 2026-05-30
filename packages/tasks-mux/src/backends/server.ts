@@ -9,6 +9,7 @@
 
 import type {
   BreakpointBackend,
+  BreakpointBackendCapabilities,
   SubmitBreakpointParams,
   WaitForAnswerOptions,
   SubmitAnswerParams,
@@ -21,8 +22,11 @@ import type {
   BreakpointWaitResult,
   ResponderProfile,
 } from "../types.js";
-import { DEFAULT_POLL_INTERVAL_MS, DEFAULT_TIMEOUT_MS } from "../types.js";
-import { unsupportedBackendFeatureMessage as unsupportedFeatureMessage } from "../backend.js";
+import { BreakpointSchema, DEFAULT_POLL_INTERVAL_MS, DEFAULT_TIMEOUT_MS } from "../types.js";
+import {
+  unsupportedBackendFeatureMessage as unsupportedFeatureMessage,
+  unsupportedBreakpointBackendCapabilities,
+} from "../backend.js";
 
 const API_BASE_PATH = "/api/v1";
 
@@ -141,7 +145,7 @@ function mapServerAnswerToBreakpointAnswer(answer: ServerAnswer): BreakpointAnsw
 function mapServerQuestionToBreakpoint(question: ServerQuestion): Breakpoint {
   const context = question.context as unknown as BreakpointContext;
 
-  return {
+  return BreakpointSchema.parse({
     id: question.id,
     text: question.text,
     context,
@@ -162,7 +166,7 @@ function mapServerQuestionToBreakpoint(question: ServerQuestion): Breakpoint {
     createdAt: question.createdAt,
     updatedAt: question.updatedAt,
     expiresAt: question.expiresAt,
-  };
+  });
 }
 
 function mapExpertProfileToResponderProfile(expert: ServerExpertProfile): ResponderProfile {
@@ -195,6 +199,13 @@ export class ServerBreakpointBackend implements BreakpointBackend {
     this.authToken = config.authToken;
     this.projectId = config.projectId;
     this.repoId = config.repoId;
+  }
+
+  capabilities(): BreakpointBackendCapabilities {
+    return {
+      ...unsupportedBreakpointBackendCapabilities,
+      assignment: true,
+    };
   }
 
   private buildUrl(path: string, params?: Record<string, string | undefined>): string {

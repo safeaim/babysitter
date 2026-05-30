@@ -4,14 +4,22 @@ import type {
   Breakpoint,
   BreakpointContext,
   BreakpointRouting,
+  BreakpointStatus,
   InteractionKind,
   ResponderType,
+  TaskPriority,
   Urgency,
 } from "../../types.js";
-import { DEFAULT_TIMEOUT_MS } from "../../types.js";
+import {
+  BreakpointStatusSchema,
+  DEFAULT_TIMEOUT_MS,
+  TaskPrioritySchema,
+} from "../../types.js";
 
 const responderTypeSchema = z.enum(["human", "agent", "tracker", "internal", "auto"]);
 const urgencySchema = z.enum(["low", "medium", "high"]);
+const taskPrioritySchema = TaskPrioritySchema;
+const taskStatusSchema = BreakpointStatusSchema;
 
 const nativeRoutingParams = {
   responderId: z.string().min(1).optional(),
@@ -27,6 +35,8 @@ const nativeContextParams = {
   tags: z.array(z.string()).optional(),
   domain: z.string().min(1).optional(),
   urgency: urgencySchema.optional(),
+  priority: taskPrioritySchema.optional(),
+  dependsOn: z.array(z.string().min(1)).optional(),
   sourceUrl: z.string().url().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
   projectId: z.string().min(1).optional(),
@@ -49,6 +59,7 @@ export const assignTaskDescription =
   "Assign a task through tasks-mux responder routing. Use this instead of direct agent delegation when the work should be visible to the task router.";
 
 export const assignTaskParams = {
+  taskId: z.string().min(1).optional().describe("Existing task or breakpoint id to assign. If omitted, creates a new task."),
   title: z.string().min(1).describe("Task title."),
   instructions: z.string().optional().describe("Task instructions or acceptance notes."),
   assignee: z.string().min(1).optional().describe("Responder id to assign to."),
@@ -63,11 +74,72 @@ export const searchTasksDescription =
 
 export const searchTasksParams = {
   query: z.string().optional(),
-  status: z.string().optional(),
+  status: z.union([taskStatusSchema, z.array(taskStatusSchema)]).optional(),
+  priority: z.union([taskPrioritySchema, z.array(taskPrioritySchema)]).optional(),
+  assigneeId: z.string().optional(),
   responderId: z.string().optional(),
   domain: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  sortBy: z.enum(["createdAt", "updatedAt", "priority", "status"]).optional(),
+  sortDirection: z.enum(["asc", "desc"]).optional(),
+  offset: z.number().int().nonnegative().optional(),
   limit: z.number().int().positive().optional(),
+  backend: z.string().optional(),
+  breakpointsDir: z.string().optional(),
+};
+
+export const addCommentDescription =
+  "Add a discussion comment to a task-like breakpoint through the configured BreakpointBackend.";
+
+export const addCommentParams = {
+  taskId: z.string().min(1),
+  authorId: z.string().min(1),
+  authorName: z.string().min(1).optional(),
+  text: z.string().min(1),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+  backend: z.string().optional(),
+  breakpointsDir: z.string().optional(),
+};
+
+export const bulkUpdateTasksDescription =
+  "Apply a backend-agnostic bulk operation to task-like breakpoints with per-item success and failure details.";
+
+export const bulkUpdateTasksParams = {
+  ids: z.array(z.string().min(1)).min(1),
+  action: z.enum(["approve", "close", "cancel", "reassign", "transition"]),
+  actorId: z.string().min(1).optional(),
+  assigneeId: z.string().min(1).optional(),
+  assigneeName: z.string().min(1).optional(),
+  status: taskStatusSchema.optional(),
+  message: z.string().optional(),
+  backend: z.string().optional(),
+  breakpointsDir: z.string().optional(),
+};
+
+export const taskStatsDescription =
+  "Compute deterministic task metrics grouped by status and priority.";
+
+export const taskStatsParams = {
+  status: z.union([taskStatusSchema, z.array(taskStatusSchema)]).optional(),
+  priority: z.union([taskPrioritySchema, z.array(taskPrioritySchema)]).optional(),
+  assigneeId: z.string().optional(),
+  responderId: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  domain: z.string().optional(),
+  backend: z.string().optional(),
+  breakpointsDir: z.string().optional(),
+};
+
+export const exportTasksDescription =
+  "Export matching task-like breakpoints with credential-bearing notification targets redacted.";
+
+export const exportTasksParams = {
+  status: z.union([taskStatusSchema, z.array(taskStatusSchema)]).optional(),
+  priority: z.union([taskPrioritySchema, z.array(taskPrioritySchema)]).optional(),
+  assigneeId: z.string().optional(),
+  responderId: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  domain: z.string().optional(),
   backend: z.string().optional(),
   breakpointsDir: z.string().optional(),
 };
@@ -120,6 +192,8 @@ export async function handleCreateTodo(
       metadata: parsed.metadata,
     }),
     routing: buildRouting(parsed),
+    priority: parsed.priority,
+    dependsOn: parsed.dependsOn?.map((id) => ({ id, blocking: true })),
     projectId: parsed.projectId,
     repoId: parsed.repoId,
   });
@@ -133,6 +207,14 @@ export async function handleAssignTask(
 ): Promise<NativeTaskResult> {
   const parsed = z.object(assignTaskParams).parse(params);
   const responderId = parsed.assignee ?? parsed.responderId;
+  if (parsed.taskId && responderId && backend.assignBreakpoint) {
+    const breakpoint = await backend.assignBreakpoint(parsed.taskId, {
+      assigneeId: responderId,
+      actorId: parsed.metadata?.actorId as string | undefined,
+    });
+    return nativeResult("assign_task", breakpoint);
+  }
+
   const breakpoint = await backend.submitBreakpoint({
     text: parsed.title,
     context: buildContext({
@@ -148,6 +230,8 @@ export async function handleAssignTask(
       metadata: { ...parsed.metadata, assignee: responderId },
     }),
     routing: buildRouting({ ...parsed, responderId }),
+    priority: parsed.priority,
+    dependsOn: parsed.dependsOn?.map((id) => ({ id, blocking: true })),
     projectId: parsed.projectId,
     repoId: parsed.repoId,
   });
@@ -160,12 +244,33 @@ export async function handleSearchTasks(
   backend: BreakpointBackend,
 ): Promise<SearchTasksResult> {
   const parsed = z.object(searchTasksParams).parse(params);
+  if (backend.searchBreakpoints) {
+    const result = await backend.searchBreakpoints({
+      query: parsed.query,
+      status: normalizeArray(parsed.status),
+      priority: normalizeArray(parsed.priority),
+      assigneeId: parsed.assigneeId,
+      responderId: parsed.responderId,
+      domain: parsed.domain,
+      tags: parsed.tags,
+      sortBy: parsed.sortBy,
+      sortDirection: parsed.sortDirection,
+      offset: parsed.offset,
+      limit: parsed.limit,
+    });
+    return { tool: "search_tasks", count: result.total, tasks: result.items };
+  }
+
   const pending = await backend.listPendingBreakpoints(parsed.responderId);
   const query = parsed.query?.toLowerCase();
   const tags = parsed.tags?.map((tag) => tag.toLowerCase()) ?? [];
   const domain = parsed.domain?.toLowerCase();
+  const statuses = normalizeArray(parsed.status);
+  const priorities = normalizeArray(parsed.priority);
   const filtered = pending.filter((task) => {
-    if (parsed.status && task.status !== parsed.status) return false;
+    if (statuses && !statuses.includes(task.status)) return false;
+    if (priorities && !priorities.includes(task.priority ?? "medium")) return false;
+    if (parsed.assigneeId && task.assigneeId !== parsed.assigneeId) return false;
     if (parsed.responderId && !matchesResponder(task, parsed.responderId)) return false;
     if (domain && !task.context.domain?.toLowerCase().includes(domain)) return false;
     if (tags.length > 0) {
@@ -186,6 +291,15 @@ export async function handleEscalate(
 ): Promise<NativeTaskResult> {
   const parsed = z.object(escalateParams).parse(params);
   const existing = parsed.taskId ? await getExistingTask(backend, parsed.taskId) : undefined;
+  if (existing && backend.transitionBreakpoint) {
+    const breakpoint = await backend.transitionBreakpoint(existing.id, {
+      status: "escalated",
+      actorId: parsed.metadata?.actorId as string | undefined,
+      message: parsed.reason,
+    });
+    return nativeResult("escalate", breakpoint);
+  }
+
   const title = parsed.title ?? (existing ? `Escalate: ${existing.text}` : "Escalation required");
   const responderId = parsed.targetResponderId ?? parsed.responderId;
   const breakpoint = await backend.submitBreakpoint({
@@ -209,11 +323,86 @@ export async function handleEscalate(
       responderId,
       responderType: parsed.responderType ?? "human",
     }),
+    priority: "critical",
+    dependsOn: parsed.taskId ? [{ id: parsed.taskId, blocking: false }] : undefined,
     projectId: parsed.projectId,
     repoId: parsed.repoId,
   });
 
   return nativeResult("escalate", breakpoint);
+}
+
+export async function handleAddComment(
+  params: z.infer<z.ZodObject<typeof addCommentParams>>,
+  backend: BreakpointBackend,
+) {
+  const parsed = z.object(addCommentParams).parse(params);
+  if (!backend.addBreakpointComment) {
+    throw new Error(`Backend "${backend.name}" does not support task comments`);
+  }
+  const comment = await backend.addBreakpointComment(parsed.taskId, {
+    authorId: parsed.authorId,
+    authorName: parsed.authorName,
+    text: parsed.text,
+    metadata: parsed.metadata,
+  });
+  return { tool: "add_comment", taskId: parsed.taskId, comment };
+}
+
+export async function handleBulkUpdateTasks(
+  params: z.infer<z.ZodObject<typeof bulkUpdateTasksParams>>,
+  backend: BreakpointBackend,
+) {
+  const parsed = z.object(bulkUpdateTasksParams).parse(params);
+  if (!backend.bulkUpdateBreakpoints) {
+    throw new Error(`Backend "${backend.name}" does not support bulk task operations`);
+  }
+  return {
+    tool: "bulk_update_tasks",
+    ...(await backend.bulkUpdateBreakpoints(parsed)),
+  };
+}
+
+export async function handleTaskStats(
+  params: z.infer<z.ZodObject<typeof taskStatsParams>>,
+  backend: BreakpointBackend,
+) {
+  const parsed = z.object(taskStatsParams).parse(params);
+  if (!backend.getBreakpointMetrics) {
+    throw new Error(`Backend "${backend.name}" does not support task stats`);
+  }
+  return {
+    tool: "task_stats",
+    ...(await backend.getBreakpointMetrics({
+      status: normalizeArray(parsed.status),
+      priority: normalizeArray(parsed.priority),
+      assigneeId: parsed.assigneeId,
+      responderId: parsed.responderId,
+      tags: parsed.tags,
+      domain: parsed.domain,
+    })),
+  };
+}
+
+export async function handleExportTasks(
+  params: z.infer<z.ZodObject<typeof exportTasksParams>>,
+  backend: BreakpointBackend,
+) {
+  const parsed = z.object(exportTasksParams).parse(params);
+  if (!backend.exportBreakpoints) {
+    throw new Error(`Backend "${backend.name}" does not support task export`);
+  }
+  return {
+    tool: "export_tasks",
+    ...(await backend.exportBreakpoints({
+      status: normalizeArray(parsed.status),
+      priority: normalizeArray(parsed.priority),
+      assigneeId: parsed.assigneeId,
+      responderId: parsed.responderId,
+      tags: parsed.tags,
+      domain: parsed.domain,
+    })),
+  };
 }
 
 function buildContext(args: {
@@ -312,4 +501,9 @@ function searchText(task: Breakpoint): string {
     task.context.domain,
     ...task.context.tags,
   ].filter(Boolean).join("\n").toLowerCase();
+}
+
+function normalizeArray<T>(value: T | T[] | undefined): T[] | undefined {
+  if (value === undefined) return undefined;
+  return Array.isArray(value) ? value : [value];
 }

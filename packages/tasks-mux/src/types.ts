@@ -11,6 +11,10 @@ export const BreakpointStatusSchema = z.enum([
   "completed",
   "expired",
   "cancelled",
+  "assigned",
+  "in-progress",
+  "blocked",
+  "escalated",
 ]);
 export type BreakpointStatus = z.infer<typeof BreakpointStatusSchema>;
 
@@ -35,6 +39,9 @@ export type ResponderType = z.infer<typeof ResponderTypeSchema>;
 
 export const UrgencySchema = z.enum(["low", "medium", "high"]);
 export type Urgency = z.infer<typeof UrgencySchema>;
+
+export const TaskPrioritySchema = z.enum(["low", "medium", "high", "critical"]);
+export type TaskPriority = z.infer<typeof TaskPrioritySchema>;
 
 // ── InteractionKind ──────────────────────────────────────────────────────
 
@@ -211,24 +218,196 @@ export const BreakpointSubmitterSchema = z.object({
 });
 export type BreakpointSubmitter = z.infer<typeof BreakpointSubmitterSchema>;
 
+export const BreakpointDependencySchema = z.object({
+  id: z.string().min(1),
+  requiredStatus: BreakpointStatusSchema.default("completed").optional(),
+  blocking: z.boolean().default(true),
+}).catchall(z.unknown());
+export type BreakpointDependency = z.infer<typeof BreakpointDependencySchema>;
+
+export const BreakpointCommentSchema = z.object({
+  id: z.string().min(1),
+  authorId: z.string().min(1),
+  authorName: z.string().min(1).optional(),
+  text: z.string().min(1),
+  createdAt: z.string().datetime(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+}).catchall(z.unknown());
+export type BreakpointComment = z.infer<typeof BreakpointCommentSchema>;
+
+export const BreakpointHistoryEntrySchema = z.object({
+  id: z.string().min(1),
+  type: z.enum([
+    "created",
+    "assigned",
+    "status",
+    "comment",
+    "answer",
+    "bulk",
+    "audit",
+    "escalation",
+  ]),
+  at: z.string().datetime(),
+  actorId: z.string().min(1).optional(),
+  fromStatus: BreakpointStatusSchema.optional(),
+  toStatus: BreakpointStatusSchema.optional(),
+  message: z.string().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+}).catchall(z.unknown());
+export type BreakpointHistoryEntry = z.infer<typeof BreakpointHistoryEntrySchema>;
+
+export const BreakpointAuditEntrySchema = z.object({
+  id: z.string().min(1),
+  action: z.string().min(1),
+  at: z.string().datetime(),
+  actorId: z.string().min(1).optional(),
+  redacted: z.boolean().default(false),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+}).catchall(z.unknown());
+export type BreakpointAuditEntry = z.infer<typeof BreakpointAuditEntrySchema>;
+
+export const BreakpointFormFieldSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  type: z.enum(["text", "textarea", "number", "boolean", "select", "multiselect", "file"]),
+  required: z.boolean().default(false).optional(),
+  options: z.array(z.string()).optional(),
+}).catchall(z.unknown());
+export type BreakpointFormField = z.infer<typeof BreakpointFormFieldSchema>;
+
+export const BreakpointFormDefinitionSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  fields: z.array(BreakpointFormFieldSchema),
+}).catchall(z.unknown());
+export type BreakpointFormDefinition = z.infer<typeof BreakpointFormDefinitionSchema>;
+
+export const BreakpointFormSubmissionSchema = z.object({
+  formId: z.string().min(1),
+  submittedBy: z.string().min(1),
+  submittedAt: z.string().datetime(),
+  values: z.record(z.string(), z.unknown()),
+}).catchall(z.unknown());
+export type BreakpointFormSubmission = z.infer<typeof BreakpointFormSubmissionSchema>;
+
+export const BreakpointSlaSchema = z.object({
+  responseDueAt: z.string().datetime().optional(),
+  completionDueAt: z.string().datetime().optional(),
+  breached: z.boolean().default(false).optional(),
+}).catchall(z.unknown());
+export type BreakpointSla = z.infer<typeof BreakpointSlaSchema>;
+
+export const BreakpointMetricsSchema = z.object({
+  responseTimeMs: z.number().nonnegative().optional(),
+  completionTimeMs: z.number().nonnegative().optional(),
+  answerCount: z.number().int().nonnegative().default(0).optional(),
+  commentCount: z.number().int().nonnegative().default(0).optional(),
+}).catchall(z.unknown());
+export type BreakpointMetrics = z.infer<typeof BreakpointMetricsSchema>;
+
+export const NotificationProviderSchema = z.enum(["email", "slack", "discord", "webhook"]);
+export type NotificationProvider = z.infer<typeof NotificationProviderSchema>;
+
+export const NotificationConfigSchema = z.object({
+  provider: NotificationProviderSchema,
+  enabled: z.boolean().default(false),
+  target: z.string().min(1).optional(),
+  secretEnv: z.string().min(1).optional(),
+}).catchall(z.unknown());
+export type NotificationConfig = z.infer<typeof NotificationConfigSchema>;
+
+export const EscalationStepSchema = z.object({
+  responderId: z.string().min(1).optional(),
+  afterMs: z.number().int().positive(),
+  notification: NotificationConfigSchema.optional(),
+}).catchall(z.unknown());
+export type EscalationStep = z.infer<typeof EscalationStepSchema>;
+
+export const EscalationChainSchema = z.object({
+  enabled: z.boolean().default(false),
+  steps: z.array(EscalationStepSchema).default([]),
+}).catchall(z.unknown());
+export type EscalationChain = z.infer<typeof EscalationChainSchema>;
+
 export const BreakpointSchema = z.object({
   id: z.string().min(1),
   text: z.string().min(1),
   context: BreakpointContextSchema,
   status: BreakpointStatusSchema,
+  priority: TaskPrioritySchema.optional(),
+  dependsOn: z.array(BreakpointDependencySchema).default([]),
   routing: BreakpointRoutingSchema,
   answers: z.array(BreakpointPublicAnswerSchema),
   selectedAnswer: z.string().optional(),
   projectId: z.string().optional(),
   repoId: z.string().optional(),
   createdBy: BreakpointSubmitterSchema.optional(),
+  assigneeId: z.string().min(1).optional(),
+  assigneeName: z.string().min(1).optional(),
   claimedByResponderId: z.string().min(1).optional(),
   claimedByResponderName: z.string().min(1).optional(),
+  comments: z.array(BreakpointCommentSchema).default([]),
+  history: z.array(BreakpointHistoryEntrySchema).default([]),
+  auditLog: z.array(BreakpointAuditEntrySchema).default([]),
+  forms: z.array(BreakpointFormDefinitionSchema).default([]),
+  formSubmissions: z.array(BreakpointFormSubmissionSchema).default([]),
+  sla: BreakpointSlaSchema.optional(),
+  metrics: BreakpointMetricsSchema.optional(),
+  notifications: z.array(NotificationConfigSchema).default([]),
+  escalation: EscalationChainSchema.optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   expiresAt: z.string().datetime(),
 });
 export type Breakpoint = z.infer<typeof BreakpointSchema>;
+
+export interface BreakpointTransitionValidation {
+  valid: boolean;
+  reason?: string;
+}
+
+const TERMINAL_BREAKPOINT_STATUSES = new Set<BreakpointStatus>([
+  "answered",
+  "completed",
+  "expired",
+  "cancelled",
+]);
+
+const ALLOWED_BREAKPOINT_TRANSITIONS: Record<BreakpointStatus, readonly BreakpointStatus[]> = {
+  pending: ["routed", "claimed", "assigned", "answered", "completed", "expired", "cancelled", "blocked", "escalated"],
+  routed: ["claimed", "assigned", "answered", "completed", "expired", "cancelled", "blocked", "escalated"],
+  claimed: ["in-progress", "answered", "completed", "expired", "cancelled", "blocked", "escalated"],
+  assigned: ["claimed", "in-progress", "answered", "completed", "expired", "cancelled", "blocked", "escalated"],
+  "in-progress": ["answered", "completed", "expired", "cancelled", "blocked", "escalated"],
+  blocked: ["assigned", "in-progress", "cancelled", "escalated"],
+  escalated: ["assigned", "claimed", "in-progress", "answered", "completed", "expired", "cancelled", "blocked"],
+  answered: [],
+  completed: [],
+  expired: [],
+  cancelled: [],
+};
+
+export function validateBreakpointTransition(
+  fromStatus: BreakpointStatus,
+  toStatus: BreakpointStatus,
+): BreakpointTransitionValidation {
+  if (fromStatus === toStatus) {
+    return { valid: true };
+  }
+  if (TERMINAL_BREAKPOINT_STATUSES.has(fromStatus)) {
+    return {
+      valid: false,
+      reason: `Cannot transition from terminal status "${fromStatus}" to "${toStatus}"`,
+    };
+  }
+  if (!ALLOWED_BREAKPOINT_TRANSITIONS[fromStatus]?.includes(toStatus)) {
+    return {
+      valid: false,
+      reason: `Invalid breakpoint status transition from "${fromStatus}" to "${toStatus}"`,
+    };
+  }
+  return { valid: true };
+}
 
 // ── BreakpointWaitResult ─────────────────────────────────────────────────
 

@@ -454,6 +454,8 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           AZURE_FOUNDRY_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
         run: |
+          # Pre-create .a5c directory — omni atomic write needs it on Windows
+          mkdir -p "$HOME/.a5c" .a5c 2>/dev/null || true
           # Verify omni can start — capture and echo output for debugging
           echo "::group::Omni startup check"
           OMNI_CHECK=$(node packages/omni/dist/cli/main.js version 2>&1) && echo "omni ok: $OMNI_CHECK" || echo "OMNI STARTUP FAILED: $OMNI_CHECK"

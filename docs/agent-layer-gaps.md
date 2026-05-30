@@ -141,6 +141,50 @@ Comprehensive inventory of missing capabilities, stub implementations, and archi
 
 ---
 
+## tasks-mux (Human-in-the-Loop & Task System) — 51 gaps
+
+### Critical (blocks agent stack integration)
+
+| Gap | File | Description |
+|-----|------|-------------|
+| Not wired into agent stack | `agent-core/tools/delegation.ts:86-98` | `task` tool uses generic `taskHandler` callback, NOT tasks-mux. Breakpoints, responders, routing all disconnected from agent execution. |
+| MCP tools not auto-discovered | `agent-platform/mcp/client/toolRegistry.ts` | Marked "NOT INTEGRATED YET". tasks-mux MCP server has 8 tools but agent harness doesn't know they exist. |
+| Breakpoint delegation disconnected | `agent-platform/breakpoints/delegation.ts:1-8` | Marked "NOT INTEGRATED YET". Webhook routing exists but not connected to tasks-mux backends. |
+| No native agent-core tools wrapping tasks-mux | — | No `create_todo`, `assign_task`, `search_tasks`, `escalate` tools. Agent can't create work items for humans. |
+| Approval chains not integrated | `agent-platform/breakpoints/approvalChains.ts` | Sequential/quorum approvals defined but never invoked during orchestration. |
+
+### High (major task management gaps)
+
+| Gap | Description |
+|-----|-------------|
+| No task priorities | Breakpoint schema has no priority field. Can't route high-priority to senior responders. |
+| No task dependencies | No `dependsOn[]` between breakpoints. Can't block resolution until prerequisites done. |
+| No search/filter API | Git-native backend only scans filesystem. No `searchBreakpoints(query)`. |
+| No bulk operations | Can't bulk approve, close, or reassign. |
+| No subagent spawning via task system | Agent-to-agent delegation doesn't route through responder discovery/matching. |
+| No escalation chains | No fallback responders when initial responder times out. |
+| Missing MCP tools | No `create_todo`, `assign_task`, `search_tasks`, `cancel_breakpoint`, `add_comment`, `escalate` exposed as MCP tools. |
+| No interactive forms | Only simple question/answer. No structured multi-field forms, conditional fields, or file review. |
+
+### Medium
+
+| Gap | Description |
+|-----|-------------|
+| Missing task states | No "assigned", "in-progress", "blocked", "escalated" — only basic lifecycle states. |
+| No status history/timeline | Can't see when a breakpoint moved between states. |
+| No notifications | No email, Slack, Discord, or webhook notifications on state changes. |
+| No task metrics/SLA | No response time tracking, completion rates, or responder performance. |
+| No discussion threads | Can't add comments to a breakpoint. |
+| No offline queue | Server backend has no local fallback if server is down. |
+| No state machine validation | Backend accepts invalid state transitions. |
+| No audit log | No record of who changed what and when. |
+| Missing CLI commands | No `search`, `assign`, `reassign`, `close`, `approve`, `stats`, `templates`, `rules` commands. |
+| Only 3 backends | git-native, server, github-issues. Missing: database, S3, Slack, Linear/Jira. |
+| No schema migration | Can't upgrade breakpoint format across versions. |
+| Responder matching not integrated | `responder-matcher.ts` exists but only used in CLI, not in agent routing decisions. |
+
+---
+
 ## Cross-Layer Integration Gaps
 
 | Gap | Layers | Description |
@@ -152,6 +196,10 @@ Comprehensive inventory of missing capabilities, stub implementations, and archi
 | Session state fragmented | L5↔L6 | Runtime has session types, platform has session management — not integrated |
 | Telemetry isolated | L5 | In-memory only, never exported to L6 or external systems |
 | Resource limits advisory | L5→L6 | Budgets exist in L5, capability routing in L6 — neither enforced at spawn time |
+| tasks-mux isolated from agent stack | L4↔tasks-mux | Agent tools (task, ask) don't route through tasks-mux. Breakpoints, responder discovery, routing all disconnected. |
+| Breakpoint delegation disconnected | L6↔tasks-mux | agent-platform breakpoint system and tasks-mux backends are parallel implementations, not integrated |
+| MCP tools not registered | L6↔tasks-mux | tasks-mux MCP server has 8 tools but agent harness doesn't discover or register them |
+| Approval chains orphaned | L6↔tasks-mux | Sequential/quorum approval logic in L6 is not wired to tasks-mux routing/answering |
 
 ---
 
@@ -161,15 +209,18 @@ Comprehensive inventory of missing capabilities, stub implementations, and archi
 1. Streaming responses in agent-core session
 2. Multi-turn conversation history
 3. Wire MCP into agent-platform orchestration
-4. Implement ConcurrentEffects (parallel within-harness)
-5. Token usage tracking end-to-end
+4. Wire tasks-mux into agent stack (native tools for todo/task/ask/approve)
+5. Implement ConcurrentEffects (parallel within-harness)
+6. Token usage tracking end-to-end
 
 **P1 — Unblock platform features:**
 1. Structured output / JSON mode
 2. Vision/multimodal input
-3. Breakpoint integration into governance
-4. Cost budget enforcement in orchestration
-5. Background effects (non-blocking dispatch)
+3. Wire breakpoint delegation → tasks-mux backends
+4. Wire approval chains → tasks-mux routing
+5. Cost budget enforcement in orchestration
+6. Background effects (non-blocking dispatch)
+7. tasks-mux search/filter API + task priorities + dependencies
 
 **P2 — Production hardening:**
 1. K8s executor implementation
@@ -177,3 +228,4 @@ Comprehensive inventory of missing capabilities, stub implementations, and archi
 3. Process isolation/sandboxing
 4. Distributed tracing (OTLP)
 5. Tool cancellation via AbortSignal
+6. tasks-mux notifications, escalation chains, approval workflows

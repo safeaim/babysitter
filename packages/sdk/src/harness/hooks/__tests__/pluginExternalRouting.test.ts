@@ -1,9 +1,24 @@
-import { describe, expect, it, vi } from "vitest";
-vi.unmock("@a5c-ai/tasks-mux");
-import { isHostDelegableRoute, routeTask } from "@a5c-ai/tasks-mux";
+import { describe, expect, it } from "vitest";
+
+/**
+ * These tests verify routing classification WITHOUT importing from
+ * @a5c-ai/tasks-mux at the module level — vitest thread pooling can
+ * leak vi.mock overrides from other test files. Instead we dynamically
+ * require the real module at test time.
+ */
+
+async function loadRealTasksMux() {
+  const modulePath = require.resolve("@a5c-ai/tasks-mux");
+  delete require.cache[modulePath];
+  return require(modulePath) as {
+    routeTask: (task: unknown, context?: unknown) => Record<string, unknown>;
+    isHostDelegableRoute: (decision: unknown) => boolean;
+  };
+}
 
 describe("plugin tasks-mux external routing classification", () => {
-  it("keeps agent responder effects inside tasks-mux so plugin mode can resolve them internally", () => {
+  it("keeps agent responder effects inside tasks-mux so plugin mode can resolve them internally", async () => {
+    const { routeTask, isHostDelegableRoute } = await loadRealTasksMux();
     const decision = routeTask(
       {
         kind: "agent",
@@ -32,10 +47,12 @@ describe("plugin tasks-mux external routing classification", () => {
       responderType: "agent",
       route: "agent-mux",
     });
+    expect(decision.responderType).not.toBe("internal");
     expect(isHostDelegableRoute(decision)).toBe(false);
   });
 
-  it("classifies tracker responder effects as externally waiting when no tracker backend is available", () => {
+  it("classifies tracker responder effects as externally waiting when no tracker backend is available", async () => {
+    const { routeTask, isHostDelegableRoute } = await loadRealTasksMux();
     const decision = routeTask({
       kind: "agent",
       metadata: {

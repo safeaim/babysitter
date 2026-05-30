@@ -92,6 +92,11 @@ jobs:
           set -euo pipefail
           npm run test:architecture 2>&1 | tee artifacts/test-logs/architecture.log
 
+      - name: Build tasks-mux
+        run: |
+          set -euo pipefail
+          npm run build --workspace=@a5c-ai/tasks-mux 2>&1 | tee artifacts/test-logs/tasks-mux-build.log
+
       - name: Build runtime graph
         run: |
           set -euo pipefail
@@ -101,11 +106,6 @@ jobs:
         run: |
           set -euo pipefail
           npm run test:sdk 2>&1 | tee artifacts/test-logs/unit-tests.log
-
-      - name: Build tasks-mux
-        run: |
-          set -euo pipefail
-          npm run build --workspace=@a5c-ai/tasks-mux 2>&1 | tee artifacts/test-logs/tasks-mux-build.log
 
       - name: Typecheck tasks-mux
         run: |

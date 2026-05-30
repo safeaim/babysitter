@@ -6,32 +6,42 @@ Allow babysitter processes to discover what agents and models are available in t
 
 ## Architecture
 
+**tasks-mux** is the unified routing hub. The SDK routes ALL task dispatch through tasks-mux, which decides how to resolve each task based on responder type.
+
 ```
 Process Definition (defineTask)
   │
-  ├─ kind: "agent" (internal)
-  │   → agent-core session (direct API call, current behavior)
+  ctx.task(myTask)
   │
-  └─ kind: "agent", external: true, agent: "claude-code"
-      → SDK detects agent-mux availability
-      → agent-platform resolveEffect routes to amuxBridge
-      → agent-mux spawns claude-code with prompt
-      → result streamed back through journal
+  ↓ tasks-mux routes by responderType:
+  │
+  ├─ responderType: "internal"  → agent-core session (direct API)
+  ├─ responderType: "human"     → breakpoint → human responder (existing)
+  ├─ responderType: "agent"     → agent-mux adapter (claude-code, codex, etc.)
+  ├─ responderType: "tracker"   → external issue tracker (Jira, Linear)
+  └─ responderType: "auto"      → tasks-mux picks best available
 ```
+
+This works identically in both modes:
+- **Standalone** (omni, agent-platform CLI): tasks-mux resolves directly
+- **Plugin** (inside claude-code, codex): tasks-mux resolves agent/tracker tasks internally; host-resolvable tasks delegated via stop-hook
 
 ## Capability Layers
 
 ### Layer 1: Discovery (SDK)
-SDK optionally detects agent-mux and queries available agents/models. This information is injected into process creation context so the LLM can make informed decisions about task delegation.
+SDK optionally detects agent-mux and queries available agents/models. This information is injected into process creation context so the LLM can make informed decisions about task routing.
 
 ### Layer 2: Task Definition (SDK)
-`defineTask` gains support for `agent` kind tasks with an `external` flag. The `agent` field specifies which agent-mux adapter to use. The `model` field specifies which model to request.
+`defineTask` gains `responderType` field. Tasks specify what kind of responder they need — internal, human, agent, tracker, or auto. tasks-mux handles the routing.
 
-### Layer 3: Effect Resolution (agent-platform)
-When `orchestrateIteration` encounters an external agent effect, it routes through the existing amuxBridge infrastructure in agent-platform, which already handles harness→adapter mapping, event streaming, and cost tracking.
+### Layer 3: Routing (tasks-mux)
+tasks-mux matches tasks to responders based on type, availability, capabilities, and priority. Agent responders wrap agent-mux adapters. Tracker responders wrap external issue tracker APIs. Human responders use existing breakpoint infrastructure.
 
-### Layer 4: Process Authoring (SDK + agent-platform)
-Process creation prompts and templates are updated to include available agents/models when agent-mux is detected. The conformance validation is updated to accept external agent tasks.
+### Layer 4: Effect Resolution (agent-platform + tasks-mux)
+When `orchestrateIteration` encounters a task effect, it delegates to tasks-mux for routing. tasks-mux resolves via the appropriate backend (agent-mux, breakpoint, tracker, internal).
+
+### Layer 5: Process Authoring (SDK + agent-platform)
+Process creation prompts include available responders (agents, humans, trackers) when detected. The LLM chooses routing based on task requirements.
 
 ## Key Constraint
 
@@ -41,11 +51,12 @@ Agent-mux is **optional**. The SDK must work without it. Discovery returns empty
 
 | Package | Changes |
 |---------|---------|
-| `packages/sdk` | Discovery API, agent task kind, task intrinsic, process template context |
-| `packages/agent-platform` | Effect resolution routing, process prompt updates, validation |
+| `packages/tasks-mux` | Agent responder backend, task router, responder types, agent-mux integration |
+| `packages/sdk` | Discovery API, responderType on tasks, route through tasks-mux |
+| `packages/agent-platform` | Effect resolution delegates to tasks-mux, process prompt updates |
 | `packages/agent-core` | None (internal agent tasks unchanged) |
-| `packages/agent-mux` | None (existing run/launch API sufficient) |
-| `packages/agent-mux/core` | Optional: expose adapter-registry as importable module |
+| `packages/agent-mux` | None (existing run/launch API consumed by tasks-mux) |
+| `packages/hooks-mux` | Host tool discovery, capability extensions |
 
 ## Non-Goals (This Phase)
 

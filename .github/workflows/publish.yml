@@ -1457,6 +1457,9 @@ jobs:
       - name: Build agent-core workspace
         run: |
           set -euo pipefail
+          npm run build --workspace=@a5c-ai/atlas
+          npm run build --workspace=@a5c-ai/agent-catalog
+          npm run build --workspace=@a5c-ai/tasks-mux
           node scripts/agent-mux-build.cjs build packages/agent-mux/sdk
           npm run build:sdk
           npm run build --workspace=@a5c-ai/agent-core
@@ -1508,6 +1511,9 @@ jobs:
       - name: Build agent-platform workspace
         run: |
           set -euo pipefail
+          npm run build --workspace=@a5c-ai/atlas
+          npm run build --workspace=@a5c-ai/agent-catalog
+          npm run build --workspace=@a5c-ai/tasks-mux
           node scripts/agent-mux-build.cjs build packages/agent-mux/sdk
           npm run build:sdk
           npm run build --workspace=@a5c-ai/agent-core

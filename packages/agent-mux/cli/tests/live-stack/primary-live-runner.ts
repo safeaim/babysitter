@@ -506,7 +506,7 @@ function buildPrompt(scenario: LiveStackScenario, traceId: string, env: Record<s
   }
 
   if (scenario.agent.agent === 'omni') {
-    return `Write a concise summary of Homer's Odyssey and save it to .a5c-live-test/${traceId}-odyssey.md`;
+    return `Write a concise 6-section markdown summary of Homer's Odyssey with markdown headers (# and ##). After each section, add one sentence in Greek (using Greek alphabet characters). Save the entire result to .a5c-live-test/${traceId}-odyssey.md. The .a5c-live-test directory already exists.`;
   }
 
   if (scenario.agent.installMode === 'babysitter-plugin') {

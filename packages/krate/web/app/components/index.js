@@ -14,6 +14,7 @@ export { StackActions } from './agent/stack-actions.jsx';
 export { StackEditForm } from './agent/stack-edit-form.jsx';
 export { TriggerRuleForm } from './agent/trigger-rule-form.jsx';
 export { TriggerRuleEditForm } from './agent/trigger-rule-edit-form.jsx';
+export { ProjectEditForm } from './agent/project-edit-form.jsx';
 export { EnableDisableToggle, DeleteRuleButton } from './agent/rule-actions.jsx';
 export { ApprovalDecisionButtons } from './agent/approval-actions.jsx';
 export { ApprovalModeToggle } from './agent/approval-mode-toggle.jsx';
@@ -22,6 +23,7 @@ export { AgentSettingsForm } from './agent/agent-settings-form.jsx';
 
 // ── Workspaces ──────────────────────────────────────────────────────────────
 export { WorkspacePanel } from './workspace/workspace-panel.jsx';
+export { WorkspaceEditForm } from './workspace/workspace-edit-form.jsx';
 export { AssociationsSection } from './workspace/workspace-associations.jsx';
 export { CodespaceSection } from './workspace/workspace-codespace.jsx';
 export { RunHistorySection } from './workspace/workspace-run-history.jsx';
@@ -30,6 +32,7 @@ export { RunHistorySection } from './workspace/workspace-run-history.jsx';
 export { MemorySearchForm } from './workspace/memory-search-form.jsx';
 export { MemoryOntologyEditor } from './workspace/memory-ontology-editor.jsx';
 export { MemoryImportReview } from './workspace/memory-import-review.jsx';
+export { MemoryRepoEditForm } from './workspace/memory-repo-edit-form.jsx';
 
 // ── Issues & Kanban ─────────────────────────────────────────────────────────
 export { IssueCreateForm, IssueEditor } from './repo/issue-editor.jsx';

@@ -2,7 +2,8 @@
 import { loadKrateUi, orgHref, StatusPill, DegradedBanner, EmptyState } from '../lib/krate-ui.jsx';
 import { PageFrame } from '../lib/page-frame.jsx';
 import { WorkspacePanel } from '../components/workspace/workspace-panel.jsx';
-import { ResourceActions } from '../components/resource-crud-actions.jsx';
+import { WorkspaceEditForm } from '../components/workspace/workspace-edit-form.jsx';
+import { ResourceActions, InlineCreateForm } from '../components/resource-crud-actions.jsx';
 import { phaseTone } from './agent-helpers.jsx';
 
 export async function AgentWorkspacesPage({ org = null } = {}) {

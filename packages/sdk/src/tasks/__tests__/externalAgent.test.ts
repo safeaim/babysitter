@@ -28,7 +28,7 @@ describe("external agent task definitions", () => {
         prompt: { task: "Review the diff" },
       },
     });
-    expect(def.agent).not.toHaveProperty("external");
+    expect(def.agent).toHaveProperty("external", true);
   });
 
   it("rejects agent responder tasks without a non-empty adapter", async () => {

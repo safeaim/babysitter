@@ -55,7 +55,7 @@ describe('vertex native transport', () => {
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({
-      error: { message: 'Streaming is not supported for vertex-native.' },
+      error: { message: 'Google streaming requires the dedicated :streamGenerateContent route.' },
     });
   });
 });

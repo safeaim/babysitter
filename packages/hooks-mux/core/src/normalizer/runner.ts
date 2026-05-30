@@ -1,11 +1,15 @@
 import { exec, spawn } from 'child_process';
 import type { UnifiedHookEvent } from '../types/event';
 import type { UnifiedHookResult } from '../types/result';
-import type { HandlerRef, HookPlanEntry } from '../types/plan';
+import type { CommandHandlerRef, HandlerRef, HookPlanEntry } from '../types/plan';
 import type { CanonicalPhase } from '../types/lifecycle';
 import type { AdapterCapabilities } from '../types/adapter';
 import { HandlerError, HandlerTimeoutError } from './errors';
 import { evaluateWhen } from './plan-resolver';
+import { runHttpHandler } from '../handlers/http';
+import { runMcpToolHandler, type McpToolExecutor } from '../handlers/mcp-tool';
+import { runPromptHandler, type PromptExecutor } from '../handlers/prompt';
+import { runAgentHandler, type AgentExecutor } from '../handlers/agent';
 
 /**
  * Error handling policy for handler failures.
@@ -36,6 +40,18 @@ export interface AsyncHandlerRecord {
   rewakeDeferred?: boolean;
 }
 
+export interface HandlerExecutors {
+  mcpTool?: McpToolExecutor;
+  prompt?: PromptExecutor;
+  agent?: AgentExecutor;
+}
+
+export interface HandlerExecutionOptions {
+  executors?: HandlerExecutors;
+  currentDepth?: number;
+  shell?: string;
+}
+
 /**
  * Options for runPlan execution.
  */
@@ -52,6 +68,10 @@ export interface RunPlanOptions {
   capabilities?: AdapterCapabilities;
   /** Skip all hook execution and return a noop diagnostic result. */
   disableAllHooks?: boolean;
+  /** Injectable typed-handler executors supplied by host integrations. */
+  executors?: HandlerExecutors;
+  /** Current typed-handler recursion depth. */
+  currentDepth?: number;
 }
 
 /**
@@ -79,6 +99,10 @@ export function getAsyncHandlerRecords(): AsyncHandlerRecord[] {
 
 export function clearAsyncHandlerRecords(): void {
   asyncHandlerRecords.clear();
+}
+
+function isCommandHandler(handler: HandlerRef): handler is CommandHandlerRef {
+  return handler.type == null || handler.type === 'command' || handler.type === 'shell';
 }
 
 /**
@@ -305,9 +329,37 @@ export async function runHandler(
   handler: HandlerRef,
   timeoutMs?: number,
   capabilities?: AdapterCapabilities,
-  shell?: string,
+  shellOrOptions?: string | HandlerExecutionOptions,
 ): Promise<UnifiedHookResult> {
-  return runShellHandler(handler.source, event, timeoutMs, capabilities, shell ?? handler.shell);
+  const options = typeof shellOrOptions === 'string'
+    ? { shell: shellOrOptions }
+    : shellOrOptions;
+  const context = {
+    event,
+    timeoutMs: timeoutMs ?? 30000,
+    currentDepth: options?.currentDepth ?? 0,
+  };
+
+  if (isCommandHandler(handler)) {
+    return runShellHandler(handler.source, event, timeoutMs, capabilities, options?.shell ?? handler.shell);
+  }
+
+  switch (handler.type) {
+    case 'http':
+      return runHttpHandler(handler, context);
+    case 'mcp_tool':
+      return runMcpToolHandler(handler, context, options?.executors?.mcpTool);
+    case 'prompt':
+      return runPromptHandler(handler, context, options?.executors?.prompt);
+    case 'agent':
+      return runAgentHandler(handler, context, options?.executors?.agent);
+  }
+
+  throw new HandlerError(`Unsupported handler type: ${String((handler as { type?: unknown }).type)}`, {
+    source: String((handler as { type?: unknown }).type ?? 'unknown'),
+    handler: 'unknown',
+    code: 'UNSUPPORTED_HANDLER_TYPE',
+  });
 }
 
 function onceContextKey(entry: HookPlanEntry): string {
@@ -373,7 +425,7 @@ export async function runPlan(
       continue;
     }
 
-    if (entry.async) {
+    if (entry.async && isCommandHandler(entry.handler)) {
       const asyncRecordId = runAsyncShellHandler(entry, entry.handler.source, event, options?.capabilities, shell);
       results.push({
         decision: 'noop',
@@ -391,7 +443,11 @@ export async function runPlan(
     }
 
     try {
-      const result = await runHandler(event, entry.handler, timeout, options?.capabilities, shell);
+      const result = await runHandler(event, entry.handler, timeout, options?.capabilities, {
+        executors: options?.executors,
+        currentDepth: options?.currentDepth,
+        shell,
+      });
       results.push({
         ...result,
         contextVars: entry.once

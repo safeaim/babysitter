@@ -18,6 +18,74 @@ const KNOWN_ADAPTERS = new Set([
   'amp', 'roo-code', 'kilo-code', 'cline', 'cursor',
 ]);
 
+const JITSI_SOCKET_PATH = '/tmp/jitsi-agent.sock';
+
+function jitsiResourceProfile(audioMode = 'listen') {
+  if (audioMode === 'both') {
+    return {
+      requests: { cpu: '500m', memory: '512Mi' },
+      limits: { cpu: '2000m', memory: '2Gi' },
+    };
+  }
+  if (audioMode === 'speak') {
+    return {
+      requests: { cpu: '500m', memory: '512Mi' },
+      limits: { cpu: '2000m', memory: '2Gi' },
+    };
+  }
+  if (audioMode === 'listen') {
+    return {
+      requests: { cpu: '200m', memory: '256Mi' },
+      limits: { cpu: '1000m', memory: '1Gi' },
+    };
+  }
+  return {
+    requests: { cpu: '50m', memory: '128Mi' },
+    limits: { cpu: '200m', memory: '256Mi' },
+  };
+}
+
+function createJitsiSidecarContainer(jitsi = {}) {
+  const capabilities = jitsi.capabilities || {};
+  const tts = jitsi.tts || {};
+  const stt = jitsi.stt || {};
+  const vad = jitsi.vad || {};
+  const audioMode = capabilities.audio || jitsi.audioMode || 'listen';
+  const chatMode = capabilities.chat || jitsi.chatMode || 'read';
+  const screenshareMode = capabilities.screenshare || jitsi.screenshareMode || 'none';
+  const env = [
+    { name: 'JITSI_ROOM_URL', value: jitsi.roomUrl || '' },
+    { name: 'JITSI_JWT', value: jitsi.jwt || '' },
+    { name: 'JITSI_ROOM_ID', value: jitsi.roomId || '' },
+    { name: 'JITSI_PARTICIPANT_NAME', value: jitsi.participantName || jitsi.stackName || 'Krate Agent' },
+    { name: 'JITSI_PARTICIPANT_ROLE', value: jitsi.role || 'observer' },
+    { name: 'JITSI_AUDIO_MODE', value: audioMode },
+    { name: 'JITSI_CHAT_MODE', value: chatMode },
+    { name: 'JITSI_SCREENSHARE_MODE', value: screenshareMode },
+    { name: 'AGENT_SOCKET_PATH', value: JITSI_SOCKET_PATH },
+  ];
+  if (tts.provider) env.push({ name: 'JITSI_TTS_PROVIDER', value: tts.provider });
+  if (tts.voice) env.push({ name: 'JITSI_TTS_VOICE', value: tts.voice });
+  if (tts.speed) env.push({ name: 'JITSI_TTS_SPEED', value: String(tts.speed) });
+  if (stt.provider) env.push({ name: 'JITSI_STT_PROVIDER', value: stt.provider });
+  if (vad.provider) env.push({ name: 'JITSI_VAD_PROVIDER', value: vad.provider });
+
+  return {
+    name: 'jitsi-agent-sidecar',
+    image: jitsi.sidecarImage || 'krate/jitsi-agent-sidecar:latest',
+    env,
+    resources: jitsi.resources || jitsiResourceProfile(audioMode),
+    volumeMounts: [{ name: 'agent-socket', mountPath: '/tmp' }],
+    lifecycle: {
+      preStop: {
+        exec: {
+          command: ['node', 'bin/graceful-leave.mjs'],
+        },
+      },
+    },
+  };
+}
+
 /**
  * Internal HTTP request helper. Zero external deps — uses node:http / node:https.
  * @param {string} url
@@ -271,7 +339,7 @@ export function createAgentMuxClient(options = {}) {
      * Generate a Kubernetes Job manifest to run an agent as an isolated Job
      * instead of a subprocess of the API server.
      *
-     * @param {{ adapter: string, provider?: string, model?: string, workspace?: { pvcName?: string }, prompt?: { system?: string, task?: string }, env?: Record<string,string>, org: string, runId?: string, stackName?: string, budget?: { maxDurationSeconds?: number }, resources?: object, image?: string, serviceAccount?: string, callbackUrl?: string }} config
+     * @param {{ adapter: string, provider?: string, model?: string, workspace?: { pvcName?: string }, prompt?: { system?: string, task?: string }, env?: Record<string,string>, org: string, runId?: string, stackName?: string, budget?: { maxDurationSeconds?: number }, resources?: object, image?: string, serviceAccount?: string, callbackUrl?: string, jitsi?: object }} config
      * @returns {{ jobManifest: object, jobName: string }}
      */
     createAgentJob(config = {}) {
@@ -291,6 +359,7 @@ export function createAgentMuxClient(options = {}) {
         workspace,
         resources: resourceLimits,
         transportBindings = [],
+        jitsi,
       } = config;
 
       // Validate adapter
@@ -324,6 +393,30 @@ export function createAgentMuxClient(options = {}) {
         ...(prompt?.task ? [{ name: 'AGENT_TASK', value: prompt.task }] : []),
         ...Object.entries(env).map(([name, value]) => ({ name, value: String(value) })),
       ];
+      const volumes = pvcName ? [{ name: 'workspace', persistentVolumeClaim: { claimName: pvcName } }] : [];
+      const agentVolumeMounts = pvcName ? [{ name: 'workspace', mountPath: '/workspace' }] : [];
+      const containers = [{
+        name: 'agent',
+        image: image || 'ghcr.io/a5c-ai/agent-mux:latest',
+        command: ['node', 'dist/cli/index.js', 'launch', adapter, provider],
+        args: model ? ['--model', model] : [],
+        env: containerEnv,
+        resources: resourceLimits || {
+          requests: { cpu: '500m', memory: '1Gi' },
+          limits: { cpu: '2', memory: '4Gi' },
+        },
+        volumeMounts: agentVolumeMounts,
+      }];
+
+      if (jitsi) {
+        containerEnv.push(
+          { name: 'JITSI_AGENT_SOCKET', value: JITSI_SOCKET_PATH },
+          { name: 'JITSI_MEETING_ACTIVE', value: 'true' },
+        );
+        agentVolumeMounts.push({ name: 'agent-socket', mountPath: '/tmp' });
+        volumes.push({ name: 'agent-socket', emptyDir: {} });
+        containers.push(createJitsiSidecarContainer({ ...jitsi, stackName }));
+      }
 
       const jobManifest = {
         apiVersion: 'batch/v1',
@@ -351,19 +444,8 @@ export function createAgentMuxClient(options = {}) {
             spec: {
               restartPolicy: 'Never',
               serviceAccountName: serviceAccount || 'krate',
-              containers: [{
-                name: 'agent',
-                image: image || 'ghcr.io/a5c-ai/agent-mux:latest',
-                command: ['node', 'dist/cli/index.js', 'launch', adapter, provider],
-                args: model ? ['--model', model] : [],
-                env: containerEnv,
-                resources: resourceLimits || {
-                  requests: { cpu: '500m', memory: '1Gi' },
-                  limits: { cpu: '2', memory: '4Gi' },
-                },
-                volumeMounts: pvcName ? [{ name: 'workspace', mountPath: '/workspace' }] : [],
-              }],
-              volumes: pvcName ? [{ name: 'workspace', persistentVolumeClaim: { claimName: pvcName } }] : [],
+              containers,
+              volumes,
             },
           },
         },

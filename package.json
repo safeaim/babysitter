@@ -22,7 +22,8 @@
     "packages/krate/core",
     "packages/krate/sdk",
     "packages/krate/cli",
-    "packages/krate/web"
+    "packages/krate/web",
+    "packages/krate/jitsi-agent-sidecar"
   ],
   "scripts": {
     "check:library-syntax": "node ./scripts/validate-library-js-syntax.cjs",

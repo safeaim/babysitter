@@ -328,3 +328,60 @@ describe('createAgentMuxClient — createAgentJob transport env vars', () => {
     assert.equal(endpoint, undefined);
   });
 });
+
+describe('createAgentMuxClient — Jitsi sidecar job contract from docs/jitsi/06-agent-meeting-participation.md', () => {
+  it('adds the documented sidecar container, socket env vars, shared volume, lifecycle, and resources', () => {
+    const client = createAgentMuxClient();
+    const { jobManifest } = client.createAgentJob({
+      adapter: 'claude-code',
+      provider: 'anthropic',
+      org: 'test-org',
+      runId: 'run-jitsi',
+      stackName: 'standup-summarizer',
+      jitsi: {
+        roomUrl: 'https://meet.example.test/standup',
+        jwt: 'jwt-token',
+        roomId: 'standup',
+        participantName: 'Standup Bot',
+        role: 'observer',
+        capabilities: { audio: 'listen', chat: 'readwrite', screenshare: 'none' },
+        tts: { provider: 'openai', voice: 'nova', speed: '1.0' },
+        stt: { provider: 'deepgram' },
+        vad: { provider: 'local-vad' },
+      },
+    });
+
+    const podSpec = jobManifest.spec.template.spec;
+    const agent = podSpec.containers.find((container) => container.name === 'agent');
+    const sidecar = podSpec.containers.find((container) => container.name === 'jitsi-agent-sidecar');
+    assert.ok(sidecar, 'meeting-aware jobs must include jitsi-agent-sidecar');
+
+    const agentEnv = Object.fromEntries(agent.env.map((entry) => [entry.name, entry.value]));
+    assert.equal(agentEnv.JITSI_AGENT_SOCKET, '/tmp/jitsi-agent.sock');
+    assert.equal(agentEnv.JITSI_MEETING_ACTIVE, 'true');
+
+    const sidecarEnv = Object.fromEntries(sidecar.env.map((entry) => [entry.name, entry.value]));
+    assert.equal(sidecar.image, 'krate/jitsi-agent-sidecar:latest');
+    assert.equal(sidecarEnv.JITSI_ROOM_URL, 'https://meet.example.test/standup');
+    assert.equal(sidecarEnv.JITSI_JWT, 'jwt-token');
+    assert.equal(sidecarEnv.JITSI_ROOM_ID, 'standup');
+    assert.equal(sidecarEnv.JITSI_PARTICIPANT_NAME, 'Standup Bot');
+    assert.equal(sidecarEnv.JITSI_PARTICIPANT_ROLE, 'observer');
+    assert.equal(sidecarEnv.JITSI_AUDIO_MODE, 'listen');
+    assert.equal(sidecarEnv.JITSI_CHAT_MODE, 'readwrite');
+    assert.equal(sidecarEnv.JITSI_SCREENSHARE_MODE, 'none');
+    assert.equal(sidecarEnv.JITSI_TTS_PROVIDER, 'openai');
+    assert.equal(sidecarEnv.JITSI_TTS_VOICE, 'nova');
+    assert.equal(sidecarEnv.JITSI_TTS_SPEED, '1.0');
+    assert.equal(sidecarEnv.JITSI_STT_PROVIDER, 'deepgram');
+    assert.equal(sidecarEnv.JITSI_VAD_PROVIDER, 'local-vad');
+    assert.equal(sidecarEnv.AGENT_SOCKET_PATH, '/tmp/jitsi-agent.sock');
+
+    assert.deepEqual(agent.volumeMounts.find((mount) => mount.name === 'agent-socket'), { name: 'agent-socket', mountPath: '/tmp' });
+    assert.deepEqual(sidecar.volumeMounts, [{ name: 'agent-socket', mountPath: '/tmp' }]);
+    assert.deepEqual(podSpec.volumes.find((volume) => volume.name === 'agent-socket'), { name: 'agent-socket', emptyDir: {} });
+    assert.deepEqual(sidecar.lifecycle.preStop.exec.command, ['node', 'bin/graceful-leave.mjs']);
+    assert.deepEqual(sidecar.resources.requests, { cpu: '200m', memory: '256Mi' });
+    assert.deepEqual(sidecar.resources.limits, { cpu: '1000m', memory: '1Gi' });
+  });
+});

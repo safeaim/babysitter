@@ -61,62 +61,12 @@ jobs:
           interaction-mode: bridged-hooks
           babysitter-plugin: 'true'
           max-turns: '9999'
+          process-file: .a5c/processes/ci-pr-review.mjs
           babysitter-prompt-prefix: '$babysitter:yolo '
           prompt: |
-            You are an adversarial PR review agent. Your job is to thoroughly review,
-            test, and either approve+merge or request changes on a pull request.
-
-            PR: #${{ inputs.pr_number || github.event.issue.number }}
+            Execute the predefined adversarial review process at .a5c/processes/ci-pr-review.mjs with these inputs:
+            { "prNumber": ${{ inputs.pr_number || github.event.issue.number }} }
             ${{ inputs.instructions || '' }}
-
-            PHASE 1 — ADVERSARIAL CODE REVIEW:
-            1. Read the PR: `gh pr view ${{ inputs.pr_number || github.event.issue.number }} --json title,body,files,comments,labels,headRefName,baseRefName`
-            2. Read every changed file: `gh pr diff ${{ inputs.pr_number || github.event.issue.number }}`
-            3. Check the linked issue (if any) for requirements.
-            4. Review the code adversarially. Look for:
-               - Security vulnerabilities (injection, XSS, secrets, OWASP top 10)
-               - Logic errors, off-by-one, race conditions, unhandled edge cases
-               - Breaking changes to public APIs without migration
-               - Missing or incorrect tests
-               - Performance issues (N+1 queries, unbounded allocations, blocking I/O)
-               - Error handling gaps (swallowed errors, missing cleanup)
-               - Type safety (any escapes, unsafe casts, missing null checks)
-               - Consistency with existing codebase patterns
-            5. Classify each finding:
-               - **blocker**: must fix before merge (security, correctness, data loss)
-               - **major**: should fix before merge (breaking changes, missing tests for new paths)
-               - **minor**: nice-to-have, can be deferred (style, naming, small refactors)
-               - **debt**: track as a follow-up issue (cleanup, optimization, documentation gaps)
-
-            PHASE 2 — DISPATCH QA:
-            1. Determine which live-stack scenarios to test based on the changed files.
-            2. Get the PR head branch: extract headRefName from the PR data.
-            3. Dispatch the QA workflow:
-               `gh workflow run qa-dispatch.yml --ref staging -f branch=<headRefName> -f pr_number=${{ inputs.pr_number || github.event.issue.number }} -f instructions="QA for review agent"`
-            4. Wait for the QA run to complete:
-               Poll with `gh run list --workflow=qa-dispatch.yml --limit=1 --json databaseId,status,conclusion` every 60s, timeout after 25 minutes.
-            5. Read the QA results and any comments it posted on the PR.
-
-            PHASE 3 — DECISION:
-            Based on review findings and QA results, decide:
-
-            IF there are **blockers** or **major** issues:
-            - Post a review requesting changes: `gh pr review ${{ inputs.pr_number || github.event.issue.number }} --request-changes --body "<review>"`
-            - List all blockers and majors with file:line references.
-            - Do NOT merge. Do NOT approve.
-
-            IF there are only **minor** or **debt** issues (or none):
-            - For each **debt** item, create a tracking issue:
-              `gh issue create --label "debt" --title "<brief description>" --body "<details and file references>"`
-              Create the 'debt' label if it doesn't exist: `gh label create "debt" --description "Technical debt for follow-up" --color "FBCA04" 2>/dev/null || true`
-            - Post an approving review: `gh pr review ${{ inputs.pr_number || github.event.issue.number }} --approve --body "<review summary>"`
-            - Merge the PR: `gh pr merge ${{ inputs.pr_number || github.event.issue.number }} --squash --auto`
-            - Post a summary comment listing: what was reviewed, QA results, any debt issues created.
-
-            IF QA failed:
-            - Do NOT approve or merge.
-            - Post a comment explaining the QA failure and link to the failed run.
-            - Request changes with the QA failure details.
           trigger-query: ''
         env:
           AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}

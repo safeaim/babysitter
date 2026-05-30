@@ -23,7 +23,11 @@ export async function process(inputs, ctx) {
   const wiki = await ctx.task(gardenWikiTask, { repo: inputs.repo, wikiPath: inputs.wikiPath, results, state });
   const issues = await ctx.task(gardenIssuesTask, { repo: inputs.repo, results, harvest, wiki });
 
-  return { passCount: wiki.passCount, totalCount: wiki.totalCount, complete: wiki.passCount === wiki.totalCount };
+  if (wiki.passCount !== wiki.totalCount) {
+    throw new Error(`NOT COMPLETE: ${wiki.passCount}/${wiki.totalCount} cells passing (${wiki.totalCount - wiki.passCount} remaining). Process cannot complete until ALL cells show PASS.`);
+  }
+
+  return { passCount: wiki.passCount, totalCount: wiki.totalCount, complete: true };
 }
 
 const assessMatrixTask = defineTask('assess-matrix', async (args) => ({

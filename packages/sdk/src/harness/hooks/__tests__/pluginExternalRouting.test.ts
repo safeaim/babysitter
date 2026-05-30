@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+vi.unmock("@a5c-ai/tasks-mux");
 import { isHostDelegableRoute, routeTask } from "@a5c-ai/tasks-mux";
 
 describe("plugin tasks-mux external routing classification", () => {

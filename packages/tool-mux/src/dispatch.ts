@@ -172,7 +172,7 @@ export class ToolDispatcher {
       output = await executor(descriptor, effectiveContext);
     } catch (err: unknown) {
       error = err instanceof ToolExecutionError
-        ? serializeToolError(err).message
+        ? serializeToolError(err)
         : err instanceof Error ? err.message : String(err);
     }
 

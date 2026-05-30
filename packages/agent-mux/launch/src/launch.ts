@@ -999,8 +999,8 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
         port: plan.proxy.port,
         apiBase: plan.proxy.apiBase,
         completionEngine,
-        // Gemini CLI and hermes don't send auth headers — disable proxy auth
-        ...(['gemini', 'hermes'].includes(plan.harness) ? { authToken: null } : {}),
+        // Gemini CLI, hermes, opencode don't send auth headers — disable proxy auth
+        ...(['gemini', 'hermes', 'opencode'].includes(plan.harness) ? { authToken: null } : {}),
       });
       proxyRuntime.applyHarnessEnv(plan.env);
       if (plan.env['ANTHROPIC_API_KEY']) {
@@ -1120,7 +1120,12 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
     console.error(`[amux launch] hermes: provider=${hermesProvider} model=${targetModel} baseUrl=${proxyUrl ?? 'default'}`);
   }
 
-  // OpenCode: prefix model with provider ID and write config file.
+  // OpenCode: clear real OPENAI_API_KEY so it can't bypass proxy,
+  // then prefix model with provider ID and write config file.
+  if (plan.harness === 'opencode' && proxyRuntime) {
+    delete plan.env['OPENAI_API_KEY'];
+    plan.env['OPENAI_API_KEY'] = '';
+  }
   // OpenCode model format is "provider/model" (e.g., "openai/gpt-5.5").
   if (plan.harness === 'opencode') {
     const modelIdx = plan.args.indexOf('--model');

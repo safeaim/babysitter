@@ -1151,11 +1151,14 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       plan.env['OPENAI_BASE_URL'] = proxyBase;
       console.error(`[amux launch] opencode: injected proxy baseURL=${proxyBase}`);
     }
-    writeFileSync(join(launchCwd, 'opencode.json'), configContent);
+    const configPath = join(launchCwd, 'opencode.json');
+    writeFileSync(configPath, configContent);
+    plan.env['OPENCODE_CONFIG'] = configPath;
     const homeConfig = join(process.env['HOME'] ?? process.env['USERPROFILE'] ?? '/tmp', '.config', 'opencode');
     mkdirSync(homeConfig, { recursive: true });
     writeFileSync(join(homeConfig, 'opencode.json'), configContent);
-    console.error(`[amux launch] opencode: wrote config to opencode.json and ${homeConfig}/opencode.json`);
+    console.error(`[amux launch] opencode: wrote config to ${configPath} (OPENCODE_CONFIG set) and ${homeConfig}/opencode.json`);
+    console.error(`[amux launch] opencode: config content: ${configContent}`);
   }
 
   // Cursor: pre-create ~/.cursor/auth.json so cursor-agent skips browser OAuth.

@@ -143,7 +143,7 @@ export function CreateServiceForm({ runtimes, onSubmit, onCancel, loading }) {
         <input type="checkbox" id="gpuEnabled" checked={form.gpuEnabled} onChange={set('gpuEnabled')} />
         <label htmlFor="gpuEnabled" style={{ fontSize: '0.875rem', cursor: 'pointer' }}>Enable GPU</label>
         {form.gpuEnabled && (
-          <input style={{ ...inputStyle, width: '5rem', marginLeft: '0.5rem' }} type="number" min="1" value={form.gpuCount} onChange={set('gpuCount')} />
+          <input style={{ ...inputStyle, width: '5rem', marginLeft: '0.5rem' }} type="number" min="1" value={form.gpuCount} onChange={set('gpuCount')} aria-label="GPU count" />
         )}
       </div>
       <div>

@@ -95,6 +95,7 @@ export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = 
   }
 
   async function handleScale(poolName, newWarm) {
+    const prevPools = localPools;
     setLocalPools((prev) => prev.map((p) =>
       p.metadata?.name === poolName
         ? { ...p, spec: { ...p.spec, warmReplicas: newWarm } }
@@ -105,10 +106,14 @@ export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ spec: { warmReplicas: newWarm } }),
-    }).catch((err) => console.warn('[krate]', err.message || err));
+    }).catch((err) => {
+      setMessage(`Failed to scale pool "${poolName}": ${err.message || err}`);
+      setLocalPools(prevPools);
+    });
   }
 
   async function handleToggleAutoScale(poolName, enabled) {
+    const prevPools = localPools;
     setLocalPools((prev) => prev.map((p) =>
       p.metadata?.name === poolName
         ? { ...p, spec: { ...p.spec, autoScale: enabled } }
@@ -119,7 +124,10 @@ export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ spec: { autoScale: enabled } }),
-    }).catch((err) => console.warn('[krate]', err.message || err));
+    }).catch((err) => {
+      setMessage(`Failed to toggle auto-scale for pool "${poolName}": ${err.message || err}`);
+      setLocalPools(prevPools);
+    });
   }
 
   return (
@@ -258,7 +266,7 @@ export function RunnerPoolManager({ org = 'default', pools = [], onPoolChange = 
       )}
 
       {message && !showForm && (
-        <p style={{ margin: 0, fontSize: '0.875rem', color: '#15803d' }}>{message}</p>
+        <p role={message.startsWith('Failed') ? 'alert' : undefined} style={{ margin: 0, fontSize: '0.875rem', color: message.startsWith('Failed') ? 'var(--danger, #dc2626)' : '#15803d' }}>{message}</p>
       )}
     </div>
   );

@@ -360,7 +360,7 @@ export function ExternalProviderWizard({ org, onCancel, onSuccess }) {
       {step === 4 && <Step5Review platform={platform} hosting={hosting} baseUrl={baseUrl} scopes={scopes} secretRef={secretRef} org={org} />}
 
       {status === 'error' && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
+        <div role="alert" style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.75rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
           {errorMsg}
         </div>
       )}

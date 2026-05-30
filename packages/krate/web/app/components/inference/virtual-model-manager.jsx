@@ -195,8 +195,8 @@ export function CreateVirtualModelForm({ routes: availableRoutes, onSubmit, onCa
               <option value="">Select route...</option>
               {routeOptions.map(n => <option key={n} value={n}>{n}</option>)}
             </select>
-            <input style={{ ...inputStyle, flex: 1 }} type="number" min="0" value={route.weight} onChange={(e) => updateRoute(idx, 'weight', e.target.value)} placeholder="Weight" title="Weight" />
-            <input style={{ ...inputStyle, flex: 1 }} type="number" min="0" value={route.priority} onChange={(e) => updateRoute(idx, 'priority', e.target.value)} placeholder="Priority" title="Priority" />
+            <input style={{ ...inputStyle, flex: 1 }} type="number" min="0" value={route.weight} onChange={(e) => updateRoute(idx, 'weight', e.target.value)} placeholder="Weight" title="Weight" aria-label={`Weight for route ${route.modelRouteRef || idx + 1}`} />
+            <input style={{ ...inputStyle, flex: 1 }} type="number" min="0" value={route.priority} onChange={(e) => updateRoute(idx, 'priority', e.target.value)} placeholder="Priority" title="Priority" aria-label={`Priority for route ${route.modelRouteRef || idx + 1}`} />
             {form.routes.length > 1 && (
               <button type="button" style={{ ...btnStyle('#dc2626'), padding: '0.375rem 0.5rem', fontSize: '0.75rem' }} onClick={() => removeRoute(idx)} aria-label={`Remove route ${route.modelRouteRef || idx + 1}`}>X</button>
             )}
@@ -225,7 +225,7 @@ export function CreateVirtualModelForm({ routes: availableRoutes, onSubmit, onCa
         {form.rules.map((rule, rIdx) => (
           <div key={rIdx} style={{ ...cardStyle, padding: '0.75rem', background: '#f8fafc' }}>
             <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '0.5rem' }}>
-              <input style={{ ...inputStyle, flex: 2 }} value={rule.name} onChange={(e) => updateRule(rIdx, 'name', e.target.value)} placeholder="Rule name" />
+              <input style={{ ...inputStyle, flex: 2 }} value={rule.name} onChange={(e) => updateRule(rIdx, 'name', e.target.value)} placeholder="Rule name" aria-label={`Rule ${rIdx + 1} name`} />
               <select style={{ ...inputStyle, flex: 2 }} value={rule.action.route} onChange={(e) => updateRule(rIdx, 'action.route', e.target.value)}>
                 <option value="">Action route...</option>
                 {routeOptions.map(n => <option key={n} value={n}>{n}</option>)}
@@ -235,11 +235,11 @@ export function CreateVirtualModelForm({ routes: availableRoutes, onSubmit, onCa
             <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Conditions:</div>
             {rule.conditions.map((cond, cIdx) => (
               <div key={cIdx} style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.25rem', alignItems: 'center' }}>
-                <input style={{ ...inputStyle, flex: 1 }} value={cond.field} onChange={(e) => updateCondition(rIdx, cIdx, 'field', e.target.value)} placeholder="field" />
+                <input style={{ ...inputStyle, flex: 1 }} value={cond.field} onChange={(e) => updateCondition(rIdx, cIdx, 'field', e.target.value)} placeholder="field" aria-label={`Rule ${rIdx + 1} condition ${cIdx + 1} field`} />
                 <select style={{ ...inputStyle, flex: 1 }} value={cond.operator} onChange={(e) => updateCondition(rIdx, cIdx, 'operator', e.target.value)}>
                   {['eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'in', 'contains', 'matches'].map(op => <option key={op} value={op}>{op}</option>)}
                 </select>
-                <input style={{ ...inputStyle, flex: 1 }} value={cond.value} onChange={(e) => updateCondition(rIdx, cIdx, 'value', e.target.value)} placeholder="value" />
+                <input style={{ ...inputStyle, flex: 1 }} value={cond.value} onChange={(e) => updateCondition(rIdx, cIdx, 'value', e.target.value)} placeholder="value" aria-label={`Rule ${rIdx + 1} condition ${cIdx + 1} value`} />
                 {rule.conditions.length > 1 && (
                   <button type="button" style={{ ...btnStyle('#dc2626'), padding: '0.25rem 0.375rem', fontSize: '0.6875rem' }} onClick={() => removeCondition(rIdx, cIdx)}>X</button>
                 )}

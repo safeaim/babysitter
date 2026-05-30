@@ -71,7 +71,7 @@ export const KANBAN_PULSE_STYLE = `
 
 // ── CardDetailModal ────────────────────────────────────────────────────────
 
-export function CardDetailModal({ item, onClose, columnColor }) {
+export function CardDetailModal({ item, onClose, columnColor, org = 'default' }) {
   const name = item.metadata?.name || item.spec?.title || 'Untitled';
   const title = item.spec?.title || name;
   const description = item.spec?.description || item.spec?.body || null;
@@ -194,7 +194,7 @@ export function CardDetailModal({ item, onClose, columnColor }) {
               <>
                 <dt style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Session</dt>
                 <dd style={{ margin: 0 }}>
-                  <a href={`/agents/sessions/${sessionRef}`} aria-label={`View session ${sessionRef.slice(0, 16)}`} style={{ color: 'var(--accent)', fontSize: '0.75rem' }}>
+                  <a href={`/orgs/${encodeURIComponent(org)}/agents/sessions/${sessionRef}`} aria-label={`View session ${sessionRef.slice(0, 16)}`} style={{ color: 'var(--accent)', fontSize: '0.75rem' }}>
                     {sessionRef.slice(0, 16)}…
                   </a>
                   {sessionStatus ? <span style={{ marginLeft: '0.375rem', color: 'var(--text-muted)', fontSize: '0.6875rem' }}>{sessionStatus}</span> : null}
@@ -205,7 +205,7 @@ export function CardDetailModal({ item, onClose, columnColor }) {
               <>
                 <dt style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Run</dt>
                 <dd style={{ margin: 0 }}>
-                  <a href={`/agents/runs/${dispatchRunRef}`} aria-label={`View run ${dispatchRunRef.slice(0, 16)}`} style={{ color: '#7c3aed', fontSize: '0.75rem' }}>
+                  <a href={`/orgs/${encodeURIComponent(org)}/agents/runs/${dispatchRunRef}`} aria-label={`View run ${dispatchRunRef.slice(0, 16)}`} style={{ color: '#7c3aed', fontSize: '0.75rem' }}>
                     {dispatchRunRef.slice(0, 16)}…
                   </a>
                 </dd>

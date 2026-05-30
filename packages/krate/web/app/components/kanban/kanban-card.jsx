@@ -10,7 +10,7 @@ function priorityColor(priority) {
   }
 }
 
-export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDragging, onCardClick, onStartWork }) {
+export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDragging, onCardClick, onStartWork, org = 'default' }) {
   const name = item.metadata?.name || item.spec?.title;
   const title = item.spec?.title || name || 'Untitled';
   const priority = item.spec?.priority;
@@ -90,7 +90,7 @@ export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDraggi
       {/* Session link */}
       {sessionRef ? (
         <a
-          href={`/agents/sessions/${sessionRef}`}
+          href={`/orgs/${encodeURIComponent(org)}/agents/sessions/${sessionRef}`}
           onClick={(e) => e.stopPropagation()}
           style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem', fontSize: '0.6875rem', color: 'var(--accent)', textDecoration: 'none' }}
         >
@@ -107,7 +107,7 @@ export function KanbanCard({ item, columnColor, onDragStart, onDragEnd, isDraggi
       {/* Run link */}
       {dispatchRunRef ? (
         <a
-          href={`/agents/runs/${dispatchRunRef}`}
+          href={`/orgs/${encodeURIComponent(org)}/agents/runs/${dispatchRunRef}`}
           onClick={(e) => e.stopPropagation()}
           style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.125rem', fontSize: '0.6875rem', color: '#7c3aed', textDecoration: 'none' }}
         >

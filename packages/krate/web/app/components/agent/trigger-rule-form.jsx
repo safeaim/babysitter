@@ -31,7 +31,11 @@ export function TriggerRuleForm({ org, stacks = [] }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!name || !stackRef) return;
+    if (!name || !stackRef) {
+      setStatus('error');
+      setMessage(!name ? 'Name is required.' : 'Target stack is required.');
+      return;
+    }
     setStatus('saving');
     setMessage('');
 
@@ -181,7 +185,7 @@ export function TriggerRuleForm({ org, stacks = [] }) {
               <span style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>{message}</span>
             )}
             {status === 'error' && (
-              <span style={{ fontSize: 13, color: 'var(--danger)' }}>{message}</span>
+              <span role="alert" style={{ fontSize: 13, color: 'var(--danger)' }}>{message}</span>
             )}
           </div>
         </div>

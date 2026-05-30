@@ -98,7 +98,7 @@ function AddCardRow({ onAdd }) {
   );
 }
 
-function Swimlane({ label, items, columnColor, draggingId, onDragStart, onDragEnd, onCardClick, onStartWork }) {
+function Swimlane({ label, items, columnColor, draggingId, onDragStart, onDragEnd, onCardClick, onStartWork, org }) {
   return (
     <div style={{ marginBottom: '0.5rem' }}>
       <div
@@ -126,6 +126,7 @@ function Swimlane({ label, items, columnColor, draggingId, onDragStart, onDragEn
               isDragging={draggingId === (item.metadata?.name || item.spec?.title)}
               onCardClick={onCardClick}
               onStartWork={onStartWork}
+              org={org}
             />
           </div>
         ))}
@@ -148,6 +149,7 @@ export function KanbanColumn({
   onAddCard,
   onStartWork,
   groupBy,
+  org = 'default',
 }) {
   const isOver = dragOverCol === col.id;
   const wipExceeded = col.wipLimit != null && items.length > col.wipLimit;
@@ -260,6 +262,7 @@ export function KanbanColumn({
             onDragEnd={onDragEnd}
             onCardClick={onCardClick}
             onStartWork={onStartWork}
+            org={org}
           />
         ))
       ) : (
@@ -274,6 +277,7 @@ export function KanbanColumn({
                 isDragging={draggingId === (item.metadata?.name || item.spec?.title)}
                 onCardClick={onCardClick}
                 onStartWork={onStartWork}
+                org={org}
               />
             </div>
           ))}

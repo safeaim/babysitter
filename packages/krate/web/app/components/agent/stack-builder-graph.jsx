@@ -77,7 +77,11 @@ export function GraphStackBuilder({ org, atlasBaseUrl, existingStack = null }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!name) return;
+    if (!name) {
+      setStatus('error');
+      setMessage('Stack name is required.');
+      return;
+    }
     setStatus('saving');
     setMessage('');
 
@@ -332,7 +336,7 @@ export function GraphStackBuilder({ org, atlasBaseUrl, existingStack = null }) {
               <span style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>{message}</span>
             )}
             {status === 'error' && (
-              <span style={{ fontSize: 13, color: 'var(--danger)' }}>{message}</span>
+              <span role="alert" style={{ fontSize: 13, color: 'var(--danger)' }}>{message}</span>
             )}
           </div>
         </div>

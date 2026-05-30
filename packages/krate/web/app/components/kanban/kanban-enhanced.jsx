@@ -36,6 +36,7 @@ export function EnhancedKanbanBoard({
   const [searchText, setSearchText] = useState('');
   const [groupBy, setGroupBy] = useState('none');
   const [pendingWorkspaceItem, setPendingWorkspaceItem] = useState(null);
+  const [boardError, setBoardError] = useState(null);
   const dragItemRef = useRef(null);
 
   const projectName = project?.metadata?.name;
@@ -112,7 +113,18 @@ export function EnhancedKanbanBoard({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: { column: targetColId } }),
-        }).catch((err) => console.warn('[krate]', err.message || err));
+        }).catch((err) => {
+          setBoardError(`Failed to move card: ${err.message || err}`);
+          setIssues((prev) =>
+            prev.map((i) => {
+              const iId = i.metadata?.name || i.spec?.title;
+              if (iId === id) {
+                return { ...i, _column: prevColumn, status: { ...(i.status || {}), column: prevColumn } };
+              }
+              return i;
+            })
+          );
+        });
       }
 
       if (targetColId === 'in-progress' && !item.workspaceRef && !item.spec?.workspaceRef) {
@@ -132,7 +144,7 @@ export function EnhancedKanbanBoard({
             _projectRef: projectName,
           }),
         }).catch((err) => {
-          console.warn('[krate] board item column update failed:', err.message ?? err);
+          setBoardError(`Failed to update board item column: ${err.message ?? err}`);
           setIssues((prev) =>
             prev.map((i) => {
               const iId = i.metadata?.name || i.spec?.title;
@@ -237,6 +249,14 @@ export function EnhancedKanbanBoard({
         onClearFilters={() => { setFilterAssignee(''); setFilterLabel(''); setSearchText(''); }}
       />
 
+      {/* Board error */}
+      {boardError && (
+        <div role="alert" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.375rem', padding: '0.5rem 0.75rem', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--danger, #dc2626)' }}>
+          <span>{boardError}</span>
+          <button onClick={() => setBoardError(null)} aria-label="Dismiss error" style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--danger, #dc2626)', padding: '0 0.25rem' }}>&times;</button>
+        </div>
+      )}
+
       {/* Board */}
       <div
         className="kanbanBoard"
@@ -260,6 +280,7 @@ export function EnhancedKanbanBoard({
             onAddCard={handleAddCard}
             onStartWork={handleStartWorkFromButton}
             groupBy={groupBy}
+            org={org}
           />
         ))}
         {issues.length === 0 ? (
@@ -275,6 +296,7 @@ export function EnhancedKanbanBoard({
           item={selectedCard}
           columnColor={getColumnColor(selectedCard._column)}
           onClose={() => setSelectedCard(null)}
+          org={org}
         />
       ) : null}
 

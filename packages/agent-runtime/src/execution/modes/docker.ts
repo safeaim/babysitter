@@ -13,6 +13,10 @@ import type {
   ExecutionHandle,
   DockerExecutionConfig,
 } from "../types";
+import {
+  resolveExecutionEnvironment,
+  validateFilesystemMounts,
+} from "../policy";
 import type { Executor } from "./local";
 
 // ---------------------------------------------------------------------------
@@ -37,6 +41,11 @@ interface MutableHandle {
 
 export class DockerExecutor implements Executor<DockerExecutionConfig> {
   private readonly processes = new Map<string, DockerProcess>();
+  private readonly preflight: (config: DockerExecutionConfig) => Promise<void>;
+
+  constructor(options?: { preflight?: (config: DockerExecutionConfig) => Promise<void> }) {
+    this.preflight = options?.preflight ?? (async () => {});
+  }
 
   async spawn(
     command: string,
@@ -44,6 +53,10 @@ export class DockerExecutor implements Executor<DockerExecutionConfig> {
     config: DockerExecutionConfig,
   ): Promise<ExecutionHandle> {
     const id = randomUUID();
+
+    if (config.policy?.docker?.skipPreflight !== true) {
+      await this.preflight(config);
+    }
 
     const dockerArgs = this._buildDockerArgs(id, command, args, config);
     const child = spawn("docker", dockerArgs, {
@@ -115,6 +128,28 @@ export class DockerExecutor implements Executor<DockerExecutionConfig> {
     config: DockerExecutionConfig,
   ): string[] {
     const dockerArgs: string[] = ["run", "--rm", "--name", `babysitter-${id.slice(0, 8)}`];
+    const policy = config.policy;
+    validateFilesystemMounts(policy);
+
+    const dockerPolicy = policy?.docker;
+    const insecureDocker = dockerPolicy?.insecureAllowPrivilegedOptions === true;
+
+    const readOnlyRoot = dockerPolicy?.readOnlyRootFilesystem ?? policy?.filesystem?.readOnlyRootFilesystem ?? true;
+    if (readOnlyRoot) {
+      dockerArgs.push("--read-only");
+    } else if (!insecureDocker) {
+      throw new Error("Writable Docker root filesystem requires insecureAllowPrivilegedOptions");
+    }
+
+    for (const cap of dockerPolicy?.capDrop ?? ["ALL"]) {
+      dockerArgs.push("--cap-drop", cap);
+    }
+
+    for (const opt of dockerPolicy?.securityOpt ?? ["no-new-privileges"]) {
+      dockerArgs.push("--security-opt", opt);
+    }
+
+    dockerArgs.push("--user", dockerPolicy?.user ?? "65532:65532");
 
     // Volume mounts.
     if (config.volumes) {
@@ -122,17 +157,37 @@ export class DockerExecutor implements Executor<DockerExecutionConfig> {
         dockerArgs.push("-v", vol);
       }
     }
+    for (const mount of policy?.filesystem?.mounts ?? []) {
+      const suffix = mount.readOnly ?? true ? ":ro" : "";
+      dockerArgs.push("-v", `${mount.hostPath}:${mount.containerPath}${suffix}`);
+    }
 
     // Network.
-    if (config.network) {
-      dockerArgs.push("--network", config.network);
+    const network = this._dockerNetwork(config);
+    if (network === "host" && !insecureDocker) {
+      throw new Error("Docker host network requires insecureAllowPrivilegedOptions");
+    }
+    dockerArgs.push("--network", network);
+
+    for (const dns of policy?.network?.dns ?? []) {
+      dockerArgs.push("--dns", dns);
+    }
+
+    if (policy?.resources?.cpuCount !== undefined) {
+      dockerArgs.push("--cpus", String(policy.resources.cpuCount));
+    }
+    if (policy?.resources?.memoryBytes !== undefined) {
+      dockerArgs.push("--memory", String(policy.resources.memoryBytes));
+    }
+    if (policy?.resources?.pidsLimit !== undefined) {
+      dockerArgs.push("--pids-limit", String(policy.resources.pidsLimit));
     }
 
     // Environment variables.
-    if (config.env) {
-      for (const [key, value] of Object.entries(config.env)) {
-        dockerArgs.push("-e", `${key}=${value}`);
-      }
+    for (const [key, value] of Object.entries(
+      resolveExecutionEnvironment(config.env, policy),
+    )) {
+      dockerArgs.push("-e", `${key}=${value}`);
     }
 
     // Image.
@@ -142,6 +197,23 @@ export class DockerExecutor implements Executor<DockerExecutionConfig> {
     dockerArgs.push(command, ...args);
 
     return dockerArgs;
+  }
+
+  private _dockerNetwork(config: DockerExecutionConfig): string {
+    if (config.network) {
+      return config.network;
+    }
+    const network = config.policy?.network;
+    if (!network) {
+      return "none";
+    }
+    if (network.mode === "custom") {
+      if (!network.name) {
+        throw new Error("Docker custom network policy requires a network name");
+      }
+      return network.name;
+    }
+    return network.mode ?? "none";
   }
 
   private _toPublicHandle(entry: DockerProcess): ExecutionHandle {

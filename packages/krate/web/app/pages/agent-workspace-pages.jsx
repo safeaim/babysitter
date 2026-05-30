@@ -25,7 +25,7 @@ export async function AgentWorkspacesPage({ org = null } = {}) {
           {ws.status?.runRef ? <small style={{ color: '#2563eb' }}>mounted: {ws.status.runRef}</small> : null}
         </a>
         <ResourceActions org={activeOrg} apiPath={`resources/KrateWorkspace/${ws.metadata?.name}`} actions={ws.status?.phase === 'Archived' ? ['delete'] : ws.status?.phase === 'InUse' ? ['archive', 'delete'] : ['archive', 'delete']} />
-      </div>)}</div> : <EmptyState title="No agent workspaces" text="Workspaces are provisioned when runs start. Configure agent stacks and dispatch runs to begin provisioning." info />}
+      </div>)}</div> : <EmptyState title="No agent workspaces" text="Workspaces are provisioned when runs start. Configure agent stacks and dispatch runs to begin provisioning." cta={orgHref(activeOrg, '/agents/runs')} ctaLabel="Dispatch a run" />}
     </div>
   </PageFrame>;
 }

@@ -40,7 +40,7 @@ export async function AgentSessionsPage({ org = null } = {}) {
         ) : (
           <ResourceActions org={activeOrg} apiPath={`resources/AgentSession/${session.metadata?.name}`} actions={['delete']} />
         )}
-      </div>)}</div> : <EmptyState title="No agent sessions" text="Sessions are created automatically when agents run. Configure agent stacks and trigger rules to start sessions." info />}
+      </div>)}</div> : <EmptyState title="No agent sessions" text="Sessions are created automatically when agents run. Configure agent stacks and trigger rules to start sessions." cta={orgHref(activeOrg, '/agents/stacks/new')} ctaLabel="Create a stack" />}
     </div>
   </PageFrame>;
 }

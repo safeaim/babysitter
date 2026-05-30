@@ -165,7 +165,7 @@ export async function AgentMemoryImportsPage({ org = null } = {}) {
           <span>{imp.spec?.source?.repositoryRef || imp.spec?.repositoryRef || 'unassigned'}</span>
           <small>{imp.metadata?.creationTimestamp || ''}</small>
         </a>)}
-      </div> : <EmptyState title="No memory imports yet" text="Memory imports appear when agent runs produce knowledge artifacts. Each import progresses through collection, redaction, normalization, validation, and review before merging into a memory repository." />}
+      </div> : <EmptyState title="No memory imports yet" text="Memory imports appear when agent runs produce knowledge artifacts. Each import progresses through collection, redaction, normalization, validation, and review before merging into a memory repository." cta={orgHref(activeOrg, '/agents/runs')} ctaLabel="Dispatch a run" />}
     </div>
   </PageFrame>;
 }

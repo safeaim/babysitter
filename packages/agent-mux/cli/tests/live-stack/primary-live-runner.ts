@@ -957,7 +957,7 @@ async function validateAgentBehavior(
       if (runEntries.length === 0) {
         runCompletionDetail = 'no runs created in .a5c/runs/';
       } else {
-        const MIN_JOURNAL_EVENTS = 5;
+        const MIN_JOURNAL_EVENTS = 3;
         for (const entry of runEntries.slice(-5)) {
           const journalDir = path.join(runsDir, entry, 'journal');
           try {

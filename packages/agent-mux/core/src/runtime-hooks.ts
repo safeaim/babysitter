@@ -5,10 +5,20 @@ import type { RuntimeHookDispatcher } from './runtime-hook-dispatcher.js';
 export type RuntimeHookKind =
   | 'preToolUse'
   | 'postToolUse'
+  | 'postToolUseFailure'
+  | 'postToolBatch'
   | 'sessionStart'
   | 'sessionEnd'
+  | 'setup'
+  | 'instructionsLoaded'
+  | 'configChange'
   | 'stop'
-  | 'userPromptSubmit';
+  | 'stopFailure'
+  | 'userPromptSubmit'
+  | 'userPromptExpansion'
+  | 'taskCreated'
+  | 'taskCompleted'
+  | 'messageDisplay';
 
 /** How an adapter supports a given runtime hook kind. */
 export type RuntimeHookMode = 'unsupported' | 'nonblocking' | 'blocking';
@@ -17,10 +27,20 @@ export type RuntimeHookMode = 'unsupported' | 'nonblocking' | 'blocking';
 export interface RuntimeHookCapabilities {
   preToolUse: RuntimeHookMode;
   postToolUse: RuntimeHookMode;
+  postToolUseFailure?: RuntimeHookMode;
+  postToolBatch?: RuntimeHookMode;
   sessionStart: RuntimeHookMode;
   sessionEnd: RuntimeHookMode;
+  setup?: RuntimeHookMode;
+  instructionsLoaded?: RuntimeHookMode;
+  configChange?: RuntimeHookMode;
   stop: RuntimeHookMode;
+  stopFailure?: RuntimeHookMode;
   userPromptSubmit: RuntimeHookMode;
+  userPromptExpansion?: RuntimeHookMode;
+  taskCreated?: RuntimeHookMode;
+  taskCompleted?: RuntimeHookMode;
+  messageDisplay?: RuntimeHookMode;
 }
 
 /** Context passed to runtime hook handlers. */
@@ -61,10 +81,20 @@ export type NotificationHook<TPayload = unknown> = (
 export interface RuntimeHooks {
   preToolUse?: PreToolUseHook;
   postToolUse?: NotificationHook;
+  postToolUseFailure?: NotificationHook;
+  postToolBatch?: PreToolUseHook;
   sessionStart?: NotificationHook;
   sessionEnd?: NotificationHook;
+  setup?: NotificationHook;
+  instructionsLoaded?: NotificationHook;
+  configChange?: PreToolUseHook;
   stop?: NotificationHook;
+  stopFailure?: NotificationHook;
   userPromptSubmit?: UserPromptSubmitHook;
+  userPromptExpansion?: UserPromptSubmitHook;
+  taskCreated?: PreToolUseHook;
+  taskCompleted?: PreToolUseHook;
+  messageDisplay?: NotificationHook;
 }
 
 /** Optional native harness bridge returned by adapters that support runtime hooks. */

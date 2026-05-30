@@ -6,10 +6,20 @@ import type { RuntimeHookDispatcher } from '@a5c-ai/agent-comm-mux';
 const HOOK_EVENT_MAP = {
   PreToolUse: { kind: 'preToolUse', mode: 'blocking' },
   PostToolUse: { kind: 'postToolUse', mode: 'nonblocking' },
+  PostToolUseFailure: { kind: 'postToolUseFailure', mode: 'nonblocking' },
+  PostToolBatch: { kind: 'postToolBatch', mode: 'blocking' },
   UserPromptSubmit: { kind: 'userPromptSubmit', mode: 'blocking' },
+  UserPromptExpansion: { kind: 'userPromptExpansion', mode: 'blocking' },
   SessionStart: { kind: 'sessionStart', mode: 'nonblocking' },
   SessionEnd: { kind: 'sessionEnd', mode: 'nonblocking' },
+  Setup: { kind: 'setup', mode: 'nonblocking' },
+  InstructionsLoaded: { kind: 'instructionsLoaded', mode: 'nonblocking' },
+  ConfigChange: { kind: 'configChange', mode: 'blocking' },
   Stop: { kind: 'stop', mode: 'nonblocking' },
+  StopFailure: { kind: 'stopFailure', mode: 'nonblocking' },
+  TaskCreated: { kind: 'taskCreated', mode: 'blocking' },
+  TaskCompleted: { kind: 'taskCompleted', mode: 'blocking' },
+  MessageDisplay: { kind: 'messageDisplay', mode: 'nonblocking' },
 } as const;
 
 type HookEventName = keyof typeof HOOK_EVENT_MAP;

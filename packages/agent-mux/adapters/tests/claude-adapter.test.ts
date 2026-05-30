@@ -277,6 +277,24 @@ describe('ClaudeAdapter', () => {
   describe('runtime hooks', () => {
     const previousHome = process.env['HOME'];
     const previousUserProfile = process.env['USERPROFILE'];
+    const expectedClaudeRuntimeHookEvents = [
+      'PreToolUse',
+      'PostToolUse',
+      'PostToolUseFailure',
+      'PostToolBatch',
+      'UserPromptSubmit',
+      'UserPromptExpansion',
+      'SessionStart',
+      'SessionEnd',
+      'Setup',
+      'InstructionsLoaded',
+      'ConfigChange',
+      'Stop',
+      'StopFailure',
+      'TaskCreated',
+      'TaskCompleted',
+      'MessageDisplay',
+    ];
 
     afterEach(() => {
       process.env['HOME'] = previousHome;
@@ -315,6 +333,8 @@ describe('ClaudeAdapter', () => {
       const settingsPath = path.join(configDir, 'settings.json');
       const shimPath = path.join(configDir, 'hook-shim.mjs');
       const settings = JSON.parse(await fs.readFile(settingsPath, 'utf8'));
+      expect(Object.keys(settings.hooks).sort()).toEqual([...expectedClaudeRuntimeHookEvents].sort());
+      expect(settings.hooks.TeammateIdle).toBeUndefined();
       expect(settings.hooks.PreToolUse[0].hooks[0].command).toContain('hook-shim.mjs');
 
       const shimResult = await runNodeScript(
@@ -333,6 +353,89 @@ describe('ClaudeAdapter', () => {
       expect(afterStat.mtimeMs).toBe(beforeStat.mtimeMs);
       expect(emitted).toEqual([]);
       await fs.rm(fakeHome, { recursive: true, force: true });
+    });
+
+    it('advertises runtime hook capabilities for native Claude events with concrete sources', () => {
+      expect(adapter.capabilities.runtimeHooks).toMatchObject({
+        preToolUse: 'blocking',
+        postToolUse: 'nonblocking',
+        postToolUseFailure: 'nonblocking',
+        postToolBatch: 'blocking',
+        userPromptSubmit: 'blocking',
+        userPromptExpansion: 'blocking',
+        sessionStart: 'nonblocking',
+        sessionEnd: 'nonblocking',
+        setup: 'nonblocking',
+        instructionsLoaded: 'nonblocking',
+        configChange: 'blocking',
+        stop: 'nonblocking',
+        stopFailure: 'nonblocking',
+        taskCreated: 'blocking',
+        taskCompleted: 'blocking',
+        messageDisplay: 'nonblocking',
+      });
+      expect((adapter.capabilities.runtimeHooks as any).teammateIdle).toBeUndefined();
+    });
+
+    it('routes expanded native Claude hook requests through the matching runtime handlers', async () => {
+      const seen: string[] = [];
+      const dispatcher = new RuntimeHookDispatcher({
+        hooks: {
+          postToolUseFailure: async (payload: unknown) => {
+            seen.push(`failure:${(payload as any).tool_name}`);
+          },
+          postToolBatch: () => ({ decision: 'deny', reason: 'batch blocked' }),
+          configChange: () => ({ decision: 'deny', reason: 'config blocked' }),
+        } as any,
+        runId: 'run-claude-expanded-runtime',
+        agent: 'claude',
+        emit: () => {},
+      });
+
+      const setup = await adapter.setupRuntimeHooks!(
+        {
+          agent: 'claude',
+          prompt: 'test',
+          hooks: {
+            postToolUseFailure: async () => {},
+            postToolBatch: async () => ({ decision: 'allow' }),
+            configChange: async () => ({ decision: 'allow' }),
+          } as any,
+        },
+        dispatcher,
+      );
+
+      const configDir = setup!.env!.CLAUDE_CONFIG_DIR!;
+      const shimPath = path.join(configDir, 'hook-shim.mjs');
+      const failureResult = await runNodeScript(
+        shimPath,
+        ['PostToolUseFailure'],
+        { ...process.env, ...setup!.env },
+        JSON.stringify({ tool_name: 'Bash', error: 'failed', exit_code: 2 }),
+      );
+      expect(failureResult.exitCode).toBe(0);
+      await vi.waitFor(() => expect(seen).toEqual(['failure:Bash']));
+
+      const batchResult = await runNodeScript(
+        shimPath,
+        ['PostToolBatch'],
+        { ...process.env, ...setup!.env },
+        JSON.stringify({ batch_results: [] }),
+      );
+      expect(batchResult.exitCode).toBe(2);
+      expect(batchResult.stdout).toContain('"decision":"deny"');
+      expect(batchResult.stdout).toContain('batch blocked');
+
+      const configResult = await runNodeScript(
+        shimPath,
+        ['ConfigChange'],
+        { ...process.env, ...setup!.env },
+        JSON.stringify({ config_path: 'settings.json', change_type: 'update' }),
+      );
+      expect(configResult.exitCode).toBe(2);
+      expect(configResult.stdout).toContain('config blocked');
+
+      await setup!.cleanup?.();
     });
   });
 

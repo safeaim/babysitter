@@ -8,10 +8,20 @@ const STALE_RUNTIME_HOOK_AGE_MS = 24 * 60 * 60 * 1000;
 const CLAUDE_HOOK_EVENTS = [
   'PreToolUse',
   'PostToolUse',
+  'PostToolUseFailure',
+  'PostToolBatch',
   'UserPromptSubmit',
+  'UserPromptExpansion',
   'SessionStart',
   'SessionEnd',
+  'Setup',
+  'InstructionsLoaded',
+  'ConfigChange',
   'Stop',
+  'StopFailure',
+  'TaskCreated',
+  'TaskCompleted',
+  'MessageDisplay',
 ] as const;
 const CLAUDE_HOOK_SHIM_SOURCE = [
   "import fs from 'node:fs/promises';",

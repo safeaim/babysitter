@@ -1,7 +1,7 @@
 {
   "issueNumber": 636,
   "baseBranch": "staging",
-  "branchName": "agent/issue-636-hooks-mux-missing-events",
+  "branchName": "staging",
   "planArtifactBranch": "plan/issue-636",
   "relatedIssues": [580, 637, 638],
   "processLibraryFindings": {

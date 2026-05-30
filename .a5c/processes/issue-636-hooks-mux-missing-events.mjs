@@ -265,21 +265,21 @@ const repairTask = defineTask('issue-636.repair', (args, taskCtx) => ({
 
 const deliveryTask = defineTask('issue-636.delivery', (args, taskCtx) => ({
   kind: 'agent',
-  title: 'Commit, push, PR, and issue update',
+  title: 'Commit, push, and issue update',
   labels: ['issue-636', 'delivery', 'github'],
   agent: {
     name: 'github-delivery-engineer',
     prompt: {
       role: 'senior maintainer responsible for GitHub delivery',
-      task: 'Prepare the implementation branch for review after all gates pass.',
+      task: 'Prepare the direct staging implementation for delivery after all gates pass.',
       instructions: [
         'Only proceed if verification.passed is true and review.approved is true.',
         'Do not stage unrelated dirty worktree files.',
-        `Use branch ${args.branchName} based on ${args.baseBranch}.`,
+        `Use branch ${args.branchName}. The current manual dispatch explicitly requested direct implementation on ${args.baseBranch}, so do not create a feature branch or PR.`,
         'Commit the scoped implementation and tests with a concise issue-linked message.',
-        `Push the branch and create a PR against ${args.baseBranch} with a title that starts with "Fix:". Link to #${args.issueNumber}.`,
-        `Post a comment on #${args.issueNumber} summarizing implemented events, verification commands, residual gaps if any, and the PR link.`,
-        'Return JSON: { delivered, commit, prUrl, issueCommentUrl, skippedReason }.',
+        `Push ${args.baseBranch} directly.`,
+        `Post a comment on #${args.issueNumber} summarizing implemented events, verification commands, residual gaps if any, and the pushed commit.`,
+        'Return JSON: { delivered, commit, pushedBranch, issueCommentUrl, skippedReason }.',
       ],
     },
   },
@@ -292,7 +292,7 @@ const deliveryTask = defineTask('issue-636.delivery', (args, taskCtx) => ({
 export async function process(inputs, ctx) {
   const issueNumber = inputs?.issueNumber ?? 636;
   const baseBranch = inputs?.baseBranch ?? 'staging';
-  const branchName = inputs?.branchName ?? 'agent/issue-636-hooks-mux-missing-events';
+  const branchName = inputs?.branchName ?? baseBranch;
   const targetEvents = inputs?.targetEvents ?? [];
   const verificationCommands = inputs?.verificationCommands ?? [
     'npm run build:hooks-mux',
@@ -320,18 +320,7 @@ export async function process(inputs, ctx) {
   });
 
   if (contract?.needsMaintainerDecision === true) {
-    await ctx.breakpoint({
-      title: 'Issue #636 Hook Contract Decision',
-      question: contract.question,
-      options: ['Use documented issue contract', 'Use atlas graph contract', 'Pause for maintainer guidance'],
-      expert: 'maintainer',
-      tags: ['issue-636', 'contract', 'hooks-mux'],
-      context: {
-        issueNumber,
-        branchName,
-        conflicts: contract?.risks ?? [],
-      },
-    });
+    ctx.log('warn', 'Contract task reported a maintainer-decision need; non-interactive yolo mode continues with the reconciled contract returned by the task.');
   }
 
   const regressionTests = await ctx.task(authorRegressionTestsTask, {
@@ -403,19 +392,7 @@ export async function process(inputs, ctx) {
   }
 
   if (!approved(verification) || !approved(review)) {
-    await ctx.breakpoint({
-      title: 'Issue #636 Quality Gate Failed',
-      question: 'Verification or review is still failing after repair attempts. Choose how to proceed.',
-      options: ['Pause for maintainer guidance', 'Continue repairs manually in this run'],
-      expert: 'maintainer',
-      tags: ['issue-636', 'quality-gate'],
-      context: {
-        issueNumber,
-        verification,
-        review,
-        repairs,
-      },
-    });
+    ctx.log('error', 'Issue #636 quality gate failed after bounded repair attempts; non-interactive yolo mode will skip delivery.');
   }
 
   const delivery = approved(verification) && approved(review)

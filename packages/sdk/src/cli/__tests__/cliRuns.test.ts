@@ -17,7 +17,7 @@ import {
   __setAncestorResolverForTests,
   getSessionMarkerPath,
 } from "../../utils/sessionMarker";
-import { validateProcessEntrypoint } from "../main/runSupport";
+import * as runSupportModule from "../main/runSupport";
 
 const realReadRunMetadata = readRunMetadata;
 
@@ -247,6 +247,7 @@ describe("babysitter run:create CLI", () => {
       "processes/claude-first-iteration.mjs",
       `export async function process() { return true; }\n`,
     );
+    await writeFakeSdkPackage(path.join(runsRoot, "node_modules", "@a5c-ai", "babysitter-sdk"), "seed-test");
     const globalStateRoot = await fs.mkdtemp(path.join(os.tmpdir(), "cli-run-create-claude-first-"));
     const currentSessionId = "current-claude-first-iteration";
     const firstEffectId = "ef-issue-170-first";
@@ -263,6 +264,7 @@ describe("babysitter run:create CLI", () => {
             taskId: "issue-170-first-effect",
             kind: "agent",
             label: "agent",
+            taskDefRef: `tasks/${firstEffectId}/task.json`,
           },
         });
         return {
@@ -504,7 +506,7 @@ describe("babysitter run:create CLI", () => {
     );
 
     await expect(
-      validateProcessEntrypoint(entryFile, "process", {
+      runSupportModule.validateProcessEntrypoint(entryFile, "process", {
         resolveSdkPackageDir: () => fallbackSdkDir,
       }),
     ).resolves.toBeUndefined();
@@ -540,7 +542,7 @@ describe("babysitter run:create CLI", () => {
     );
 
     await expect(
-      validateProcessEntrypoint(entryFile, "process", {
+      runSupportModule.validateProcessEntrypoint(entryFile, "process", {
         resolveSdkPackageDir: () => fallbackSdkDir,
       }),
     ).resolves.toBeUndefined();

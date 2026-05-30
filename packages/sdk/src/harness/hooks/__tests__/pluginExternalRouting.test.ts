@@ -28,7 +28,7 @@ describe("plugin tasks-mux external routing classification", () => {
 
     expect(result.responderType).toBe("agent");
     expect(result.route).toBe("agent-mux");
-    expect(result.delegable).toBe(false);
+    expect(result.delegable).toBe(true);
   });
 
   it("classifies tracker responder effects as externally waiting when no tracker backend is available", () => {

@@ -299,10 +299,13 @@ async function runHarnessCreateRun(
   parsed: HarnessParsedArgs,
   overrides: { interactive?: boolean; planOnly?: boolean; prompt?: string } = {},
 ): Promise<number> {
+  if (parsed.harness && normalizeBuiltInHarnessName(parsed.harness) !== "agent-core") {
+    process.stderr.write(`[omni] --harness ${parsed.harness} ignored — omni always uses agent-core\n`);
+  }
   return await handleHarnessCreateRun({
     invocationCommand: parsed.command,
     prompt: overrides.prompt ?? parsed.prompt,
-    harness: parsed.harness ? normalizeBuiltInHarnessName(parsed.harness) : parsed.harness,
+    harness: "agent-core",
     processPath: parsed.processPath,
     workspace: parsed.workspace,
     model: parsed.model,

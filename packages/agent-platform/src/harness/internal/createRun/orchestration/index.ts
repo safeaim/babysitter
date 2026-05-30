@@ -76,7 +76,7 @@ async function runCliOrchestration(args: RunOrchestrationPhaseArgs): Promise<num
     "--process-id", path.basename(processPath, path.extname(processPath)),
     "--prompt", prompt,
     "--inputs", inputsFile,
-    "--harness", "claude-code",
+    "--harness", "agent-core",
     "--json",
   ];
   if (runsDir) createArgs.push("--runs-dir", runsDir);

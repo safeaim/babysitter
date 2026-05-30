@@ -108,7 +108,7 @@ describe("task kind helpers", () => {
         fallbackType: externalAgentKindFixtures.fallbackType,
         fallbackToInternal: true,
       });
-      expect(def.agent).not.toHaveProperty("external");
+      expect(def.agent).toHaveProperty("external", true);
     });
 
     it("humanTask emits breakpoint responder metadata", async () => {

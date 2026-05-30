@@ -1107,6 +1107,11 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
 
   // Hermes: pass --provider and --model CLI flags for native provider support.
   // Runs outside the proxy block because hermes calls providers directly.
+  // On Windows, clear TERM to avoid prompt_toolkit NoConsoleScreenBufferError.
+  if (plan.harness === 'hermes' && process.platform === 'win32') {
+    plan.env['TERM'] = '';
+    plan.env['PYTHONUNBUFFERED'] = '1';
+  }
   if (plan.harness === 'hermes') {
     const targetProvider = plan.proxy?.targetProvider ?? plan.provider ?? '';
     const targetModel = plan.proxy?.targetModel ?? plan.model;

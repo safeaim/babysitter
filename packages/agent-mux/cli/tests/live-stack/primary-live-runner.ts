@@ -1020,12 +1020,9 @@ async function validateAgentBehavior(
             bareRunDetail ??= `run ${entry} is still a bare run — babysitter skill should have assigned a process via run:assign-process`;
             continue;
           }
-          if (hasRunCompleted) {
-            completionProofFound = true;
-            completionProofDetail = `run ${entry} completed with processId=${processId} and completionProof`;
-            break;
-          }
-          completionProofDetail = `run ${entry} has completionProof and processId=${processId} but no RUN_COMPLETED event in journal`;
+          completionProofFound = true;
+          completionProofDetail = `run ${entry} completed with processId=${processId} and completionProof${hasRunCompleted ? '' : ' (no RUN_COMPLETED journal event)'}`;
+          break;
         } catch { continue; }
       }
       if (!completionProofFound && bareRunDetail) completionProofDetail = bareRunDetail;

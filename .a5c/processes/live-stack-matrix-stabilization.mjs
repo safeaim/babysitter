@@ -2,184 +2,246 @@ import { defineTask } from '@a5c-ai/babysitter-sdk';
 
 /**
  * @process processes/live-stack/live-stack-matrix-stabilization
- * @description Stabilize the live-stack test matrix — collect failures, investigate root causes,
- *   fix code, dispatch parallel tests, update wiki and issues, repeat until convergence.
+ * @description Stabilize the live-stack test matrix to 100% PASS. No blocked cells excused —
+ *   every blocker must be investigated, fixed, and verified. Iterate until ALL cells show PASS.
  * @trigger manual
  * @inputs { repo: string, wikiPath: string }
- * @outputs { passCount: number, failCount: number, blockedCount: number, fixesLanded: number }
+ * @outputs { passCount: number, totalCount: number, complete: boolean }
  */
 
 export async function process(inputs, ctx) {
   const state = await ctx.task(assessMatrixTask, { repo: inputs.repo, wikiPath: inputs.wikiPath });
 
+  if (state.passCount === state.totalCount) {
+    return { passCount: state.passCount, totalCount: state.totalCount, complete: true };
+  }
+
   const harvest = await ctx.task(harvestAndTriageTask, { repo: inputs.repo, state });
+  const fixes = await ctx.task(fixBlockersTask, { repo: inputs.repo, harvest, state });
+  const dispatches = await ctx.task(parallelDispatchTask, { repo: inputs.repo, harvest, fixes, state });
+  const results = await ctx.task(collectResultsTask, { repo: inputs.repo, dispatches });
+  const wiki = await ctx.task(gardenWikiTask, { repo: inputs.repo, wikiPath: inputs.wikiPath, results, state });
+  const issues = await ctx.task(gardenIssuesTask, { repo: inputs.repo, results, harvest, wiki });
 
-  const fixes = await ctx.task(fixAndBuildTask, { repo: inputs.repo, harvest });
-
-  const dispatches = await ctx.task(parallelDispatchTask, { repo: inputs.repo, harvest, fixes });
-
-  const results = await ctx.task(collectAndVerifyTask, { repo: inputs.repo, dispatches });
-
-  const wiki = await ctx.task(updateAllTask, { repo: inputs.repo, wikiPath: inputs.wikiPath, results, state, harvest });
-
-  return {
-    passCount: wiki.passCount,
-    failCount: wiki.failCount,
-    blockedCount: wiki.blockedCount,
-    fixesLanded: fixes.count,
-  };
+  return { passCount: wiki.passCount, totalCount: wiki.totalCount, complete: wiki.passCount === wiki.totalCount };
 }
 
 const assessMatrixTask = defineTask('assess-matrix', async (args) => ({
   kind: 'node',
-  title: 'Assess current matrix state from wiki + CI',
+  title: 'Assess matrix — count every cell, no excuses',
   labels: ['gardening', 'assess'],
   io: {
-    instruction: `Assess the live-stack test matrix state.
+    instruction: `Assess the live-stack test matrix with ZERO tolerance for blocked cells.
 
-1. Pull the wiki: cd ${args.wikiPath} && git pull
-2. Read QA-Evidence.md — count PASS, FAIL, blocked (by issue), pending (---) cells
-3. List open live-stack issues: gh issue list --state open --label live-stack --json number,title,labels
-4. Check recent CI runs: gh run list --workflow=live-stack.yml --limit=15 --json databaseId,status,conclusion
-5. For completed runs, harvest all SUCCESS and FAILURE job names
-6. Identify the top 5 blockers by cell count and determine which are code-fixable vs external
+1. Pull wiki: cd ${args.wikiPath} && git pull
+2. Read QA-Evidence.md — count EVERY cell:
+   - PASS: cells with [PASS](...)
+   - FAIL: cells with [FAIL](...) without blocked prefix
+   - BLOCKED: cells with "blocked [#NNN]" — these are NOT acceptable, they must be fixed
+   - PENDING: cells showing "---"
+3. For each blocked issue, check if the issue is still open or was closed:
+   gh issue view {number} --json state
+4. List open live-stack issues with their cell counts
+5. Check recent CI runs for unharvested results
 
-Return { passCount, failCount, blockedCount, pendingCount, topBlockers: [{issue, cells, fixable}], newResults: [{agent, model, os, mode, result, runId}] }.`,
+Every blocked cell is a problem to solve, not an excuse to skip.
+
+Return {
+  passCount: number,
+  failCount: number,
+  blockedCount: number,
+  pendingCount: number,
+  totalCount: number,
+  blockersByIssue: [{issue: number, cells: number, title: string, state: string, fixable: string}],
+  closedBlockers: [{issue: number, cells: number}],
+  newResults: [{agent, model, os, mode, result, runId}]
+}.`,
   },
 }));
 
 const harvestAndTriageTask = defineTask('harvest-and-triage', async (args) => ({
   kind: 'node',
-  title: 'Harvest failures, download artifacts, triage root causes',
+  title: 'Harvest failures, triage EVERY blocker — none excused',
   labels: ['gardening', 'triage'],
   io: {
-    instruction: `For the top 5 failure patterns, download artifacts and investigate.
+    instruction: `Investigate EVERY blocker. The goal is 100% PASS — no cell left behind.
 
-For each failure:
-1. Download the artifact: gh run download {runId} -n "{artifactName}" -D /tmp/failure-{runId}
-2. Read verification-report.md — check which verification steps passed/failed:
-   - install-check: did the agent install?
-   - proxy-communication: did the proxy receive requests?
-   - model-response: did the model produce output?
-   - file-creation: was the expected file created?
-3. Read agent-output.txt for error messages
-4. Read plugin-command-transcript.json for spawn args and stderr
+For each blocking issue (sorted by cell count, highest first):
 
-Classify each failure:
-- **code-fixable**: launch.ts, atlas graph, workflow, translations
-- **config**: needs CI secrets or env vars
-- **upstream**: needs external party action
-- **model-behavior**: prompt engineering needed
-- **platform**: OS-specific limitation (e.g. prompt_toolkit on Windows)
+1. Read the issue: gh issue view {number} --json title,body,comments,state
+2. If the issue is CLOSED, dispatch verification tests immediately
+3. If the issue is OPEN, investigate the root cause:
+   - Download a failure artifact and read verification-report.md
+   - Identify what exactly fails: install? proxy? model response? file creation?
+   - Determine the fix: code change, config, env var, or workaround
 
-For code-fixable issues, identify the SPECIFIC file and change needed.
+4. For issues previously marked "external/upstream":
+   - Challenge that assumption — is there REALLY no code-level workaround?
+   - Can we route through the proxy differently?
+   - Can we use a different auth method?
+   - Can we write a config file the agent reads?
+   - Can we use CLI flags instead of env vars?
+   - Can we change the test scenario to work around the limitation?
 
-Return { failures: [{pattern, category, file, change, impact, evidence}], fixableCount: number }.`,
+5. For "model behavior" issues (#563, #487):
+   - Can we improve the prompt?
+   - Can we increase max-turns?
+   - Can we simplify the test scenario?
+   - Can we retry flaky tests?
+
+Classify each blocker as:
+- **fix-now**: code change ready to implement
+- **fix-config**: needs CI secret or env var (specify exactly what)
+- **fix-prompt**: needs prompt/scenario improvement
+- **fix-retry**: flaky test, just needs re-dispatch
+- **genuinely-blocked**: explain WHY there is absolutely no workaround
+
+Return { blockers: [{issue, cells, category, action, file, change}], fixNowCount: number, retryCount: number }.`,
   },
 }));
 
-const fixAndBuildTask = defineTask('fix-and-build', async (args) => ({
+const fixBlockersTask = defineTask('fix-blockers', async (args) => ({
   kind: 'node',
-  title: 'Implement code fixes, build, commit, push',
+  title: 'Fix every fixable blocker — code, config, prompts',
   labels: ['gardening', 'fix'],
   io: {
-    instruction: `Implement fixes for all code-fixable issues (sorted by impact).
+    instruction: `Implement fixes for ALL fixable blockers. Don't stop at "easy" fixes.
 
-For each fix:
-1. Read the current code in the identified file
-2. Make the minimal change to fix the issue
-3. Build: npm run build --workspace=<affected-package>
-4. If build fails, fix the build error
-5. Commit with descriptive message referencing the issue
-6. File new GitHub issues for non-code-fixable problems:
-   gh issue create --title "..." --body "..." --label live-stack
+For each fix-now blocker (sorted by cell impact):
+1. Read the affected code
+2. Implement the fix
+3. Build: npm run build --workspace=<package>
+4. Commit with descriptive message
+5. Push to staging
 
-After all fixes: git push origin staging
+For fix-prompt blockers:
+1. Read the current test prompt in primary-live-runner.ts
+2. Identify why the model doesn't follow instructions
+3. Improve the prompt clarity, add explicit file-write instructions
+4. Build and commit
 
-Rules:
-- Never write fallbacks
-- Keep changes minimal
-- One commit per fix
-- Build must pass before pushing
+For fix-config blockers:
+1. Add missing env vars to .github/workflows/live-stack.yml
+2. Document what secrets need to be added to repo settings
+3. Commit workflow changes
 
-Return { count: number, commits: [{sha, message, impact}], issuesFiled: number }.`,
+For fix-retry blockers:
+1. Note which agent/model/os/mode combos to re-dispatch
+2. These will be handled in the dispatch step
+
+Rules: never write fallbacks, keep changes minimal, build must pass.
+
+Return { fixesLanded: number, promptsImproved: number, configsUpdated: number, retriesToDispatch: [{agent, model, os, mode}] }.`,
   },
 }));
 
 const parallelDispatchTask = defineTask('parallel-dispatch', async (args) => ({
   kind: 'node',
-  title: 'Dispatch tests in parallel across all OS',
+  title: 'Dispatch ALL pending/blocked/retry tests in parallel',
   labels: ['gardening', 'dispatch'],
   io: {
-    instruction: `Dispatch live-stack tests in PARALLEL to maximize throughput.
+    instruction: `Dispatch tests for EVERY non-PASS cell. Be aggressive — dispatch everything.
 
-Strategy:
-1. For each fix, dispatch the specific agent/model/mode that was broken
-2. For blocked cells with recently-closed issues, dispatch verification
-3. For pending (---) cells, dispatch to fill coverage gaps
-4. Group by OS and send one dispatch per OS with multiple matrix entries
+1. For each fix landed: dispatch the affected agent/model/os/mode
+2. For each closed blocker: dispatch all cells that were blocked by it
+3. For each retry candidate: dispatch the flaky combo
+4. For pending (---) cells: dispatch to fill coverage
+5. For blocked cells where fix-config was applied: dispatch to verify
 
-Dispatch format:
-gh workflow run live-stack.yml --ref staging -f os=<os> -f 'matrix=[{"agent":"...","model":"...","mode":"...","install":"...","live":true},...]'
+Group by OS and send parallel dispatches:
+gh workflow run live-stack.yml --ref staging -f os=<os> -f 'matrix=[...]'
 
+Matrix format: {"agent":"...","model":"...","mode":"...","install":"...","live":true}
 Agent names: claude, codex, pi, gemini, hermes, opencode, copilot, cursor, omni
 Model names: foundry-gpt55, foundry-gpt54mini, google-gemini31, anthropic-sonnet46, foundry-deepseek
-Modes: ni, bridged-interactive, interactive, bridged-hooks
-Install: vanilla, bp
 
-Send ALL dispatches at once — don't wait between them.
+Send ALL dispatches at once. Don't wait between them.
 
-Return { dispatched: number, runs: [{os, count}] }.`,
+Return { dispatched: number, cellsCovered: number }.`,
   },
 }));
 
-const collectAndVerifyTask = defineTask('collect-and-verify', async (args) => ({
+const collectResultsTask = defineTask('collect-results', async (args) => ({
   kind: 'node',
-  title: 'Poll for results and verify fixes',
-  labels: ['gardening', 'verify'],
+  title: 'Poll for results — wait up to 20 minutes',
+  labels: ['gardening', 'collect'],
   io: {
-    instruction: `Poll for dispatched test results (max 20 minutes).
+    instruction: `Poll for test results. Wait up to 20 minutes for dispatched tests.
 
 Every 60 seconds:
-1. Check run status: gh run list --workflow=live-stack.yml --limit=10 --json databaseId,status,conclusion
-2. For completed runs, extract job results
-3. For failures, download artifacts and read verification reports
+1. gh run list --workflow=live-stack.yml --limit=15 --json databaseId,status,conclusion
+2. For completed runs, extract SUCCESS/FAILURE job names
+3. For failures, download top 3 artifacts to understand why
 
-Collect:
-- New PASS cells (to update wiki)
-- Confirmed FAIL cells (to update wiki with evidence)
-- Fixes verified (to close issues)
-- Fixes not working (to keep issues open with new findings)
+Collect all results into:
+- passes: cells that should flip to PASS in wiki
+- failures: cells that still fail (with reason)
+- flaky: cells that sometimes pass, sometimes fail
 
-Return { passes: [{agent, model, os, mode, runId}], failures: [{agent, model, os, mode, runId, reason}], verified: number, stillBroken: number }.`,
+Return { passes: [{agent, model, os, mode, runId}], failures: [{agent, model, os, mode, runId, reason}], totalPasses: number, totalFailures: number }.`,
   },
 }));
 
-const updateAllTask = defineTask('update-all', async (args) => ({
+const gardenWikiTask = defineTask('garden-wiki', async (args) => ({
   kind: 'node',
-  title: 'Update wiki, issues, and report',
-  labels: ['gardening', 'update'],
+  title: 'Garden the wiki — update every cell with evidence',
+  labels: ['gardening', 'wiki'],
   io: {
-    instruction: `Update everything with the collected results.
+    instruction: `Update the QA Evidence wiki with ALL collected results.
 
-1. **Wiki**: Pull, update cells, commit, push
-   - PASS results: change FAIL/blocked/--- to [PASS](run URL)
-   - New FAIL results without issue: add blocked [#NNN](...) — [FAIL](...)
-   - Recount all cells
+1. cd ${args.wikiPath} && git pull
 
-2. **Issues**: Update open live-stack issues
-   - Close verified fixes: gh issue close {number} --reason completed
-   - Update partial fixes with progress comment
-   - File new issues for new failure patterns
+2. For each new PASS:
+   - Find the section/model/agent/OS cell
+   - Update from FAIL/blocked/--- to [PASS](run URL)
+   - If the cell was blocked by an issue, the issue may now be closeable
 
-3. **Report**: Print summary to stdout:
-   - Cells flipped this iteration
-   - Current PASS/FAIL/blocked counts
-   - Top remaining blockers
-   - Next steps
+3. For cells blocked by CLOSED issues that still show blocked:
+   - If we have a PASS result: update to PASS
+   - If we have a FAIL result: update the blocked reference to a new/current issue
+   - If no test was run: change to --- (pending) for next iteration
 
-cd ${args.wikiPath} && git pull && git add -A && git commit -m "Gardening: ..." && git push
+4. Remove stale blocked references — if an issue was closed and the cell should work,
+   don't leave it as blocked
 
-Return { passCount, failCount, blockedCount, cellsFlipped, issuesClosed, issuesCreated }.`,
+5. Ensure EVERY cell has a status (no empty cells)
+
+6. Recount: PASS, FAIL, blocked, pending
+
+7. git add -A && git commit -m "Gardening: X cells flipped to PASS (Y/Z total)" && git push
+
+Return { passCount: number, failCount: number, blockedCount: number, pendingCount: number, totalCount: number, cellsFlipped: number }.`,
+  },
+}));
+
+const gardenIssuesTask = defineTask('garden-issues', async (args) => ({
+  kind: 'node',
+  title: 'Garden issues — close verified, update stale, file new',
+  labels: ['gardening', 'issues'],
+  io: {
+    instruction: `Garden all live-stack GitHub issues.
+
+1. **Close verified issues**: For each blocker where ALL blocked cells now show PASS:
+   - Post verification comment with run links
+   - gh issue close {number} --reason completed
+
+2. **Update partial fixes**: For blockers where SOME cells flipped:
+   - Post progress comment: "X of Y cells now PASS, Z still failing"
+   - Update issue body/labels if needed
+
+3. **Challenge stale issues**: For issues open >7 days with no progress:
+   - Re-investigate: is the root cause still valid?
+   - Can we try a different approach?
+   - Post a comment with updated investigation
+
+4. **File new issues**: For new failure patterns not covered by existing issues:
+   - gh issue create --title "..." --body "..." --label live-stack
+   - Include failure evidence, affected cells, and suggested fix
+
+5. **Update issue labels**: Add/remove labels based on current state:
+   - ready-for-dev if investigation is complete
+   - priority labels based on cell count impact
+
+Return { closed: number, updated: number, created: number, challenged: number }.`,
   },
 }));

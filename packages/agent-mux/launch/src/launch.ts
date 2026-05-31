@@ -1807,14 +1807,52 @@ export async function launchCommand(client: AgentMuxClient, args: ParsedArgs): P
       });
       (child as any).__bridgeExitPromise = exitPromise;
     }
+  } else if (process.platform === 'win32' && plan.harness === 'hermes') {
+    // Hermes on Windows NI: use ConPTY so prompt_toolkit gets a console.
+    // Without ConPTY, Win32Input can't read stdin from a pipe.
+    try {
+      const nodePty: any = await import('node-pty');
+      const resolved = await resolveSpawnCommand(plan.command, plan.args);
+      spawnedArgsForPromptCheck = resolved.args;
+      console.error(`[amux launch] hermes Windows: using ConPTY for stdin delivery`);
+      ptyProcess = nodePty.spawn(resolved.command, resolved.args, {
+        name: 'xterm-256color',
+        cols: 120,
+        rows: 30,
+        cwd: launchCwd,
+        env: { ...process.env, ...plan.env } as Record<string, string>,
+      });
+      let niOutputBuf = '';
+      ptyProcess.onData((data: string) => {
+        process.stdout.write(data);
+        capturedOutputChunks.push(data);
+        niOutputBuf += data;
+      });
+      const fakeChild: any = { pid: ptyProcess.pid, stdin: null, stdout: null, stderr: null, kill: (sig: string) => ptyProcess.kill(sig) };
+      fakeChild.on = (event: string, handler: (...args: any[]) => void) => {
+        if (event === 'exit' || event === 'close') {
+          ptyProcess.onExit?.((e: { exitCode: number }) => handler(e.exitCode, null));
+        }
+      };
+      child = fakeChild;
+    } catch (err) {
+      console.error(`[amux launch] hermes Windows ConPTY failed, falling back to stdio: ${err instanceof Error ? err.message : err}`);
+      const { spawn } = await import('node:child_process');
+      const resolvedSpawn = await resolveSpawnCommand(plan.command, plan.args);
+      spawnedArgsForPromptCheck = resolvedSpawn.args;
+      child = spawn(resolvedSpawn.command, resolvedSpawn.args, {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: { ...process.env, ...plan.env },
+        cwd: launchCwd,
+        shell: resolvedSpawn.shell,
+      });
+    }
   } else {
     // Non-interactive: plain spawn. Each harness handles non-interactive mode
     // internally (claude -p, codex exec, gemini --prompt, pi -p).
     const { spawn } = await import('node:child_process');
     const resolvedSpawn = await resolveSpawnCommand(plan.command, plan.args);
     spawnedArgsForPromptCheck = resolvedSpawn.args;
-    // No special Windows prompt override needed — Bun binaries are handled via
-    // .cmd shim fallback in resolveSpawnCommand (shell:true + escapeCmdArg).
     console.error(`[amux launch] spawn: ${resolvedSpawn.command} shell=${resolvedSpawn.shell} args[0..2]=${resolvedSpawn.args.slice(0, 3).join(' ')} totalArgs=${resolvedSpawn.args.length}${stdinPromptOverride ? ' (prompt→stdin)' : ''}`);
     child = spawn(resolvedSpawn.command, resolvedSpawn.args, {
       stdio: ['pipe', 'pipe', 'pipe'],

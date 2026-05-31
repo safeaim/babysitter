@@ -203,8 +203,11 @@ export class BridgeHookEmulator {
       : nativeEvent === 'SessionEnd' ? 'session-end'
       : nativeEvent.toLowerCase().replace(/([A-Z])/g, '-$1').replace(/^-/, '');
 
-    // Build the babysitter hook:run command that the hook script would call
-    const sdkHarness = harnessToSdkHarness(this.ctx.harness);
+    // Build the babysitter hook:run command that the hook script would call.
+    // The generated plugin scripts use --harness unified for session hooks.
+    const sdkHarness = hookType === 'session-start' || hookType === 'session-end'
+      ? 'unified'
+      : harnessToSdkHarness(this.ctx.harness);
     const babysitterCmd = [
       this.babysitterBin,
       'hook:run',

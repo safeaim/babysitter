@@ -1559,6 +1559,12 @@ jobs:
       - name: Build agent-runtime
         run: |
           set -euo pipefail
+          npm run build --workspace=@a5c-ai/atlas
+          npm run build --workspace=@a5c-ai/agent-catalog
+          npm run build --workspace=@a5c-ai/tasks-mux
+          node scripts/agent-mux-build.cjs build packages/agent-mux/sdk
+          npm run build:sdk
+          npm run build --workspace=@a5c-ai/agent-core
           npm run build --workspace=@a5c-ai/agent-runtime
 
       - name: Publish agent-runtime
@@ -1601,8 +1607,13 @@ jobs:
       - name: Build omni
         run: |
           set -euo pipefail
-          npm run build --workspace=@a5c-ai/agent-runtime
+          npm run build --workspace=@a5c-ai/atlas
+          npm run build --workspace=@a5c-ai/agent-catalog
+          npm run build --workspace=@a5c-ai/tasks-mux
+          node scripts/agent-mux-build.cjs build packages/agent-mux/sdk
+          npm run build:sdk
           npm run build --workspace=@a5c-ai/agent-core
+          npm run build --workspace=@a5c-ai/agent-runtime
           npm run build --workspace=@a5c-ai/agent-platform
           npm run build --workspace=@a5c-ai/omni
 

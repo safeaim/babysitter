@@ -112,19 +112,19 @@ The Process Library is organized into four main areas. Click any link to view th
 
 | Area | Description | Link |
 |------|-------------|------|
-| **methodologies/** | Development methodologies (TDD, Agile, Devin, etc.) | [Browse →](../../../plugins/babysitter/skills/babysit/process/methodologies/) |
-| **gsd/** | Get Shit Done workflows | [Browse →](../../../plugins/babysitter/skills/babysit/process/gsd/) |
-| **specializations/** | Domain-specific processes (30+ categories) | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/) |
-| **tdd-quality-convergence** | Featured TDD workflow | [View →](../../../plugins/babysitter/skills/babysit/process/tdd-quality-convergence.js) |
+| **methodologies/** | Development methodologies (TDD, Agile, Devin, etc.) | [Browse →](../../../library/methodologies/) |
+| **gsd/** | Get Shit Done workflows | [Browse →](../../../library/methodologies/gsd/) |
+| **specializations/** | Domain-specific processes (30+ categories) | [Browse →](../../../library/specializations/) |
+| **tdd-quality-convergence** | Featured TDD workflow | [View →](../../../library/tdd-quality-convergence.js) |
 
 ### Specializations Sub-Structure
 
 | Category | Description | Link |
 |----------|-------------|------|
-| **Development Processes** | Web, mobile, DevOps, AI, security, etc. | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/) |
-| **domains/business/** | Finance, HR, Marketing, Sales, etc. | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/) |
-| **domains/science/** | Physics, Chemistry, Engineering, etc. | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/) |
-| **meta/** | Process creation and validation | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/meta/) |
+| **Development Processes** | Web, mobile, DevOps, AI, security, etc. | [Browse →](../../../library/specializations/) |
+| **domains/business/** | Finance, HR, Marketing, Sales, etc. | [Browse →](../../../library/specializations/domains/business/) |
+| **domains/science/** | Physics, Chemistry, Engineering, etc. | [Browse →](../../../library/specializations/domains/science/) |
+| **meta/** | Process creation and validation | [Browse →](../../../library/specializations/meta/) |
 
 ## Browsing and Discovering Processes
 
@@ -164,152 +164,152 @@ Process files follow a consistent naming pattern:
 
 | Category | Processes | Description | Browse |
 |----------|-----------|-------------|--------|
-| **web-development** | 66 | Full-stack web development, frameworks, deployment | [→](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/) |
-| **algorithms-optimization** | 50 | Algorithm implementation, performance tuning | [→](../../../plugins/babysitter/skills/babysit/process/specializations/algorithms-optimization/) |
-| **ai-agents-conversational** | 44 | LLM applications, RAG, multi-agent systems | [→](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/) |
-| **cryptography-blockchain** | 38 | Smart contracts, DeFi, cryptographic protocols | [→](../../../plugins/babysitter/skills/babysit/process/specializations/cryptography-blockchain/) |
-| **security-research** | 37 | Penetration testing, vulnerability research | [→](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/) |
-| **robotics-simulation** | 35 | ROS2, simulation, autonomous systems | [→](../../../plugins/babysitter/skills/babysit/process/specializations/robotics-simulation/) |
-| **performance-optimization** | 35 | Profiling, optimization, benchmarking | [→](../../../plugins/babysitter/skills/babysit/process/specializations/performance-optimization/) |
-| **network-programming** | 35 | Protocols, distributed systems, networking | [→](../../../plugins/babysitter/skills/babysit/process/specializations/network-programming/) |
-| **game-development** | 35 | Game engines, mechanics, production | [→](../../../plugins/babysitter/skills/babysit/process/specializations/game-development/) |
-| **cli-mcp-development** | 35 | CLI tools, MCP servers, developer tooling | [→](../../../plugins/babysitter/skills/babysit/process/specializations/cli-mcp-development/) |
-| **mobile-development** | 31 | iOS, Android, React Native, Flutter | [→](../../../plugins/babysitter/skills/babysit/process/specializations/mobile-development/) |
-| **embedded-systems** | 31 | Firmware, drivers, real-time systems | [→](../../../plugins/babysitter/skills/babysit/process/specializations/embedded-systems/) |
-| **sdk-platform-development** | 30 | SDKs, APIs, platform engineering | [→](../../../plugins/babysitter/skills/babysit/process/specializations/sdk-platform-development/) |
-| **programming-languages** | 30 | Compilers, interpreters, language design | [→](../../../plugins/babysitter/skills/babysit/process/specializations/programming-languages/) |
-| **gpu-programming** | 30 | CUDA, compute shaders, parallel processing | [→](../../../plugins/babysitter/skills/babysit/process/specializations/gpu-programming/) |
-| **fpga-programming** | 30 | HDL, synthesis, hardware design | [→](../../../plugins/babysitter/skills/babysit/process/specializations/fpga-programming/) |
-| **code-migration-modernization** | 30 | Legacy modernization, framework upgrades | [→](../../../plugins/babysitter/skills/babysit/process/specializations/code-migration-modernization/) |
-| **security-compliance** | 29 | Security standards, compliance automation | [→](../../../plugins/babysitter/skills/babysit/process/specializations/security-compliance/) |
-| **desktop-development** | 28 | Electron, native apps, cross-platform | [→](../../../plugins/babysitter/skills/babysit/process/specializations/desktop-development/) |
-| **ux-ui-design** | 26 | Design systems, accessibility, prototyping | [→](../../../plugins/babysitter/skills/babysit/process/specializations/ux-ui-design/) |
-| **technical-documentation** | 26 | API docs, guides, documentation systems | [→](../../../plugins/babysitter/skills/babysit/process/specializations/technical-documentation/) |
-| **software-architecture** | 25 | System design, patterns, architecture reviews | [→](../../../plugins/babysitter/skills/babysit/process/specializations/software-architecture/) |
-| **qa-testing-automation** | 25 | Test automation, quality assurance | [→](../../../plugins/babysitter/skills/babysit/process/specializations/qa-testing-automation/) |
-| **devops-sre-platform** | 25 | CI/CD, infrastructure, observability | [→](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/) |
-| **data-science-ml** | 23 | ML pipelines, model training, MLOps | [→](../../../plugins/babysitter/skills/babysit/process/specializations/data-science-ml/) |
-| **data-engineering-analytics** | 23 | Data pipelines, analytics, ETL | [→](../../../plugins/babysitter/skills/babysit/process/specializations/data-engineering-analytics/) |
-| **product-management** | 22 | Roadmaps, specifications, product strategy | [→](../../../plugins/babysitter/skills/babysit/process/specializations/product-management/) |
-| **meta** | 10 | Process creation, validation, tooling | [→](../../../plugins/babysitter/skills/babysit/process/specializations/meta/) |
+| **web-development** | 66 | Full-stack web development, frameworks, deployment | [→](../../../library/specializations/web-development/) |
+| **algorithms-optimization** | 50 | Algorithm implementation, performance tuning | [→](../../../library/specializations/algorithms-optimization/) |
+| **ai-agents-conversational** | 44 | LLM applications, RAG, multi-agent systems | [→](../../../library/specializations/ai-agents-conversational/) |
+| **cryptography-blockchain** | 38 | Smart contracts, DeFi, cryptographic protocols | [→](../../../library/specializations/cryptography-blockchain/) |
+| **security-research** | 37 | Penetration testing, vulnerability research | [→](../../../library/specializations/security-research/) |
+| **robotics-simulation** | 35 | ROS2, simulation, autonomous systems | [→](../../../library/specializations/robotics-simulation/) |
+| **performance-optimization** | 35 | Profiling, optimization, benchmarking | [→](../../../library/specializations/performance-optimization/) |
+| **network-programming** | 35 | Protocols, distributed systems, networking | [→](../../../library/specializations/network-programming/) |
+| **game-development** | 35 | Game engines, mechanics, production | [→](../../../library/specializations/game-development/) |
+| **cli-mcp-development** | 35 | CLI tools, MCP servers, developer tooling | [→](../../../library/specializations/cli-mcp-development/) |
+| **mobile-development** | 31 | iOS, Android, React Native, Flutter | [→](../../../library/specializations/mobile-development/) |
+| **embedded-systems** | 31 | Firmware, drivers, real-time systems | [→](../../../library/specializations/embedded-systems/) |
+| **sdk-platform-development** | 30 | SDKs, APIs, platform engineering | [→](../../../library/specializations/sdk-platform-development/) |
+| **programming-languages** | 30 | Compilers, interpreters, language design | [→](../../../library/specializations/programming-languages/) |
+| **gpu-programming** | 30 | CUDA, compute shaders, parallel processing | [→](../../../library/specializations/gpu-programming/) |
+| **fpga-programming** | 30 | HDL, synthesis, hardware design | [→](../../../library/specializations/fpga-programming/) |
+| **code-migration-modernization** | 30 | Legacy modernization, framework upgrades | [→](../../../library/specializations/code-migration-modernization/) |
+| **security-compliance** | 29 | Security standards, compliance automation | [→](../../../library/specializations/security-compliance/) |
+| **desktop-development** | 28 | Electron, native apps, cross-platform | [→](../../../library/specializations/desktop-development/) |
+| **ux-ui-design** | 26 | Design systems, accessibility, prototyping | [→](../../../library/specializations/ux-ui-design/) |
+| **technical-documentation** | 26 | API docs, guides, documentation systems | [→](../../../library/specializations/technical-documentation/) |
+| **software-architecture** | 25 | System design, patterns, architecture reviews | [→](../../../library/specializations/software-architecture/) |
+| **qa-testing-automation** | 25 | Test automation, quality assurance | [→](../../../library/specializations/qa-testing-automation/) |
+| **devops-sre-platform** | 25 | CI/CD, infrastructure, observability | [→](../../../library/specializations/devops-sre-platform/) |
+| **data-science-ml** | 23 | ML pipelines, model training, MLOps | [→](../../../library/specializations/data-science-ml/) |
+| **data-engineering-analytics** | 23 | Data pipelines, analytics, ETL | [→](../../../library/specializations/data-engineering-analytics/) |
+| **product-management** | 22 | Roadmaps, specifications, product strategy | [→](../../../library/specializations/product-management/) |
+| **meta** | 10 | Process creation, validation, tooling | [→](../../../library/specializations/meta/) |
 
 ### Business Domains (430+ processes)
-[Browse all business domains →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/)
+[Browse all business domains →](../../../library/specializations/domains/business/)
 
 | Category | Processes | Description | Browse |
 |----------|-----------|-------------|--------|
-| **decision-intelligence** | 33 | Decision frameworks, analysis models | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/decision-intelligence/) |
-| **legal** | 28 | Contract analysis, compliance, legal ops | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/legal/) |
-| **operations** | 26 | Business process optimization | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/operations/) |
-| **business-strategy** | 26 | Strategic planning, competitive analysis | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/business-strategy/) |
-| **venture-capital** | 25 | Due diligence, portfolio management | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/venture-capital/) |
-| **supply-chain** | 25 | Logistics, inventory, procurement | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/supply-chain/) |
-| **sales** | 25 | Sales processes, CRM workflows | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/sales/) |
-| **public-relations** | 25 | Communications, media relations | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/public-relations/) |
-| **marketing** | 25 | Campaigns, analytics, content strategy | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/marketing/) |
-| **logistics** | 25 | Distribution, routing, fulfillment | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/logistics/) |
-| **knowledge-management** | 25 | Documentation, wikis, knowledge bases | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/knowledge-management/) |
-| **human-resources** | 25 | Recruiting, onboarding, HR processes | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/human-resources/) |
-| **finance-accounting** | 25 | Financial analysis, reporting, auditing | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/finance-accounting/) |
-| **entrepreneurship** | 25 | Startup workflows, business planning | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/entrepreneurship/) |
-| **digital-marketing** | 25 | SEO, PPC, social media, analytics | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/digital-marketing/) |
-| **customer-experience** | 25 | CX design, feedback loops, journey mapping | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/customer-experience/) |
-| **project-management** | 5 | Project planning, tracking, delivery | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/project-management/) |
+| **decision-intelligence** | 33 | Decision frameworks, analysis models | [→](../../../library/specializations/domains/business/decision-intelligence/) |
+| **legal** | 28 | Contract analysis, compliance, legal ops | [→](../../../library/specializations/domains/business/legal/) |
+| **operations** | 26 | Business process optimization | [→](../../../library/specializations/domains/business/operations/) |
+| **business-strategy** | 26 | Strategic planning, competitive analysis | [→](../../../library/specializations/domains/business/business-strategy/) |
+| **venture-capital** | 25 | Due diligence, portfolio management | [→](../../../library/specializations/domains/business/venture-capital/) |
+| **supply-chain** | 25 | Logistics, inventory, procurement | [→](../../../library/specializations/domains/business/supply-chain/) |
+| **sales** | 25 | Sales processes, CRM workflows | [→](../../../library/specializations/domains/business/sales/) |
+| **public-relations** | 25 | Communications, media relations | [→](../../../library/specializations/domains/business/public-relations/) |
+| **marketing** | 25 | Campaigns, analytics, content strategy | [→](../../../library/specializations/domains/business/marketing/) |
+| **logistics** | 25 | Distribution, routing, fulfillment | [→](../../../library/specializations/domains/business/logistics/) |
+| **knowledge-management** | 25 | Documentation, wikis, knowledge bases | [→](../../../library/specializations/domains/business/knowledge-management/) |
+| **human-resources** | 25 | Recruiting, onboarding, HR processes | [→](../../../library/specializations/domains/business/human-resources/) |
+| **finance-accounting** | 25 | Financial analysis, reporting, auditing | [→](../../../library/specializations/domains/business/finance-accounting/) |
+| **entrepreneurship** | 25 | Startup workflows, business planning | [→](../../../library/specializations/domains/business/entrepreneurship/) |
+| **digital-marketing** | 25 | SEO, PPC, social media, analytics | [→](../../../library/specializations/domains/business/digital-marketing/) |
+| **customer-experience** | 25 | CX design, feedback loops, journey mapping | [→](../../../library/specializations/domains/business/customer-experience/) |
+| **project-management** | 5 | Project planning, tracking, delivery | [→](../../../library/specializations/domains/business/project-management/) |
 
 ### Science and Engineering (550+ processes)
-[Browse all science domains →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/)
+[Browse all science domains →](../../../library/specializations/domains/science/)
 
 | Category | Processes | Description | Browse |
 |----------|-----------|-------------|--------|
-| **scientific-discovery** | 168 | Research methodologies, reasoning patterns | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/) |
-| **quantum-computing** | 27 | Quantum algorithms, circuit design | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/quantum-computing/) |
-| **mechanical-engineering** | 26 | CAD, simulation, manufacturing | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/mechanical-engineering/) |
-| **computer-science** | 25 | Theory, algorithms, formal methods | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/computer-science/) |
-| **civil-engineering** | 25 | Structural analysis, infrastructure | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/civil-engineering/) |
-| **chemical-engineering** | 25 | Process design, reaction engineering | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/chemical-engineering/) |
-| **biomedical-engineering** | 25 | Medical devices, biomechanics | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/biomedical-engineering/) |
-| **automotive-engineering** | 25 | Vehicle systems, ADAS, EV | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/automotive-engineering/) |
-| **aerospace-engineering** | 25 | Flight systems, propulsion, avionics | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/aerospace-engineering/) |
-| **physics** | 24 | Simulation, modeling, analysis | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/physics/) |
-| **nanotechnology** | 24 | Nanofabrication, characterization | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/nanotechnology/) |
-| **mathematics** | 24 | Proofs, modeling, computation | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/mathematics/) |
-| **materials-science** | 24 | Material characterization, discovery | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/materials-science/) |
-| **industrial-engineering** | 24 | Process optimization, operations research | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/industrial-engineering/) |
-| **environmental-engineering** | 24 | Environmental modeling, sustainability | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/environmental-engineering/) |
-| **electrical-engineering** | 24 | Circuit design, signal processing | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/electrical-engineering/) |
-| **bioinformatics** | 12 | Genomics, proteomics, computational biology | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/bioinformatics/) |
+| **scientific-discovery** | 168 | Research methodologies, reasoning patterns | [→](../../../library/specializations/domains/science/scientific-discovery/) |
+| **quantum-computing** | 27 | Quantum algorithms, circuit design | [→](../../../library/specializations/domains/science/quantum-computing/) |
+| **mechanical-engineering** | 26 | CAD, simulation, manufacturing | [→](../../../library/specializations/domains/science/mechanical-engineering/) |
+| **computer-science** | 25 | Theory, algorithms, formal methods | [→](../../../library/specializations/domains/science/computer-science/) |
+| **civil-engineering** | 25 | Structural analysis, infrastructure | [→](../../../library/specializations/domains/science/civil-engineering/) |
+| **chemical-engineering** | 25 | Process design, reaction engineering | [→](../../../library/specializations/domains/science/chemical-engineering/) |
+| **biomedical-engineering** | 25 | Medical devices, biomechanics | [→](../../../library/specializations/domains/science/biomedical-engineering/) |
+| **automotive-engineering** | 25 | Vehicle systems, ADAS, EV | [→](../../../library/specializations/domains/science/automotive-engineering/) |
+| **aerospace-engineering** | 25 | Flight systems, propulsion, avionics | [→](../../../library/specializations/domains/science/aerospace-engineering/) |
+| **physics** | 24 | Simulation, modeling, analysis | [→](../../../library/specializations/domains/science/physics/) |
+| **nanotechnology** | 24 | Nanofabrication, characterization | [→](../../../library/specializations/domains/science/nanotechnology/) |
+| **mathematics** | 24 | Proofs, modeling, computation | [→](../../../library/specializations/domains/science/mathematics/) |
+| **materials-science** | 24 | Material characterization, discovery | [→](../../../library/specializations/domains/science/materials-science/) |
+| **industrial-engineering** | 24 | Process optimization, operations research | [→](../../../library/specializations/domains/science/industrial-engineering/) |
+| **environmental-engineering** | 24 | Environmental modeling, sustainability | [→](../../../library/specializations/domains/science/environmental-engineering/) |
+| **electrical-engineering** | 24 | Circuit design, signal processing | [→](../../../library/specializations/domains/science/electrical-engineering/) |
+| **bioinformatics** | 12 | Genomics, proteomics, computational biology | [→](../../../library/specializations/domains/science/bioinformatics/) |
 
 ### Social Sciences and Humanities (150+ processes)
-[Browse social sciences domains →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/social-sciences-humanities/)
+[Browse social sciences domains →](../../../library/specializations/domains/social-sciences-humanities/)
 
 Processes for research methodologies, analysis frameworks, and academic workflows in social sciences, humanities, and interdisciplinary fields.
 
 ## Example Processes by Category
 
 ### Web Development
-[Browse all web-development processes →](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/)
+[Browse all web-development processes →](../../../library/specializations/web-development/)
 
 | Process | Description | Source |
 |---------|-------------|--------|
-| nextjs-fullstack-app | Complete Next.js application | [View](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/nextjs-fullstack-app.js) |
-| graphql-api-apollo | GraphQL API with Apollo | [View](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/graphql-api-apollo.js) |
-| jwt-authentication | JWT auth implementation | [View](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/jwt-authentication.js) |
-| e2e-testing-playwright | Playwright E2E testing | [View](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/e2e-testing-playwright.js) |
-| micro-frontend-module-federation | Micro-frontend architecture | [View](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/micro-frontend-module-federation.js) |
-| accessibility-audit-remediation | WCAG compliance | [View](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/accessibility-audit-remediation.js) |
-| docker-containerization | Docker deployment | [View](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/docker-containerization.js) |
+| nextjs-fullstack-app | Complete Next.js application | [View](../../../library/specializations/web-development/nextjs-fullstack-app.js) |
+| graphql-api-apollo | GraphQL API with Apollo | [View](../../../library/specializations/web-development/graphql-api-apollo.js) |
+| jwt-authentication | JWT auth implementation | [View](../../../library/specializations/web-development/jwt-authentication.js) |
+| e2e-testing-playwright | Playwright E2E testing | [View](../../../library/specializations/web-development/e2e-testing-playwright.js) |
+| micro-frontend-module-federation | Micro-frontend architecture | [View](../../../library/specializations/web-development/micro-frontend-module-federation.js) |
+| accessibility-audit-remediation | WCAG compliance | [View](../../../library/specializations/web-development/accessibility-audit-remediation.js) |
+| docker-containerization | Docker deployment | [View](../../../library/specializations/web-development/docker-containerization.js) |
 
 ### AI Agents and Conversational
-[Browse all ai-agents-conversational processes →](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/)
+[Browse all ai-agents-conversational processes →](../../../library/specializations/ai-agents-conversational/)
 
 | Process | Description | Source |
 |---------|-------------|--------|
-| multi-agent-system | Multi-agent orchestration | [View](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/multi-agent-system.js) |
-| advanced-rag-patterns | Advanced RAG implementation | [View](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/advanced-rag-patterns.js) |
-| langgraph-workflow-design | LangGraph workflows | [View](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/langgraph-workflow-design.js) |
-| conversational-memory-system | Long-term memory for agents | [View](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/conversational-memory-system.js) |
-| function-calling-agent | Tool-using agents | [View](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/function-calling-agent.js) |
-| agent-evaluation-framework | Agent testing and eval | [View](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/agent-evaluation-framework.js) |
-| llm-observability-monitoring | LLM monitoring setup | [View](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/llm-observability-monitoring.js) |
+| multi-agent-system | Multi-agent orchestration | [View](../../../library/specializations/ai-agents-conversational/multi-agent-system.js) |
+| advanced-rag-patterns | Advanced RAG implementation | [View](../../../library/specializations/ai-agents-conversational/advanced-rag-patterns.js) |
+| langgraph-workflow-design | LangGraph workflows | [View](../../../library/specializations/ai-agents-conversational/langgraph-workflow-design.js) |
+| conversational-memory-system | Long-term memory for agents | [View](../../../library/specializations/ai-agents-conversational/conversational-memory-system.js) |
+| function-calling-agent | Tool-using agents | [View](../../../library/specializations/ai-agents-conversational/function-calling-agent.js) |
+| agent-evaluation-framework | Agent testing and eval | [View](../../../library/specializations/ai-agents-conversational/agent-evaluation-framework.js) |
+| llm-observability-monitoring | LLM monitoring setup | [View](../../../library/specializations/ai-agents-conversational/llm-observability-monitoring.js) |
 
 ### Security Research
-[Browse all security-research processes →](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/)
+[Browse all security-research processes →](../../../library/specializations/security-research/)
 
 | Process | Description | Source |
 |---------|-------------|--------|
-| binary-reverse-engineering | Binary analysis | [View](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/binary-reverse-engineering.js) |
-| exploit-development | Exploit writing workflow | [View](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/exploit-development.js) |
-| fuzzing-campaign | Fuzzing setup and execution | [View](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/fuzzing-campaign.js) |
-| malware-analysis | Malware analysis workflow | [View](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/malware-analysis.js) |
-| network-penetration-testing | Network pentesting | [View](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/network-penetration-testing.js) |
-| capture-the-flag-challenges | CTF solving workflow | [View](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/capture-the-flag-challenges.js) |
-| bug-bounty-workflow | Bug bounty methodology | [View](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/bug-bounty-workflow.js) |
+| binary-reverse-engineering | Binary analysis | [View](../../../library/specializations/security-research/binary-reverse-engineering.js) |
+| exploit-development | Exploit writing workflow | [View](../../../library/specializations/security-research/exploit-development.js) |
+| fuzzing-campaign | Fuzzing setup and execution | [View](../../../library/specializations/security-research/fuzzing-campaign.js) |
+| malware-analysis | Malware analysis workflow | [View](../../../library/specializations/security-research/malware-analysis.js) |
+| network-penetration-testing | Network pentesting | [View](../../../library/specializations/security-research/network-penetration-testing.js) |
+| capture-the-flag-challenges | CTF solving workflow | [View](../../../library/specializations/security-research/capture-the-flag-challenges.js) |
+| bug-bounty-workflow | Bug bounty methodology | [View](../../../library/specializations/security-research/bug-bounty-workflow.js) |
 
 ### DevOps and SRE
-[Browse all devops-sre-platform processes →](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/)
+[Browse all devops-sre-platform processes →](../../../library/specializations/devops-sre-platform/)
 
 | Process | Description | Source |
 |---------|-------------|--------|
-| kubernetes-setup | Kubernetes cluster setup | [View](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/kubernetes-setup.js) |
-| cicd-pipeline-setup | CI/CD pipeline creation | [View](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/cicd-pipeline-setup.js) |
-| monitoring-setup | Observability stack | [View](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/monitoring-setup.js) |
-| incident-response | Incident management | [View](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/incident-response.js) |
-| disaster-recovery-plan | DR planning and testing | [View](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/disaster-recovery-plan.js) |
-| slo-sli-tracking | SLO/SLI implementation | [View](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/slo-sli-tracking.js) |
-| secrets-management | Secrets management setup | [View](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/secrets-management.js) |
+| kubernetes-setup | Kubernetes cluster setup | [View](../../../library/specializations/devops-sre-platform/kubernetes-setup.js) |
+| cicd-pipeline-setup | CI/CD pipeline creation | [View](../../../library/specializations/devops-sre-platform/cicd-pipeline-setup.js) |
+| monitoring-setup | Observability stack | [View](../../../library/specializations/devops-sre-platform/monitoring-setup.js) |
+| incident-response | Incident management | [View](../../../library/specializations/devops-sre-platform/incident-response.js) |
+| disaster-recovery-plan | DR planning and testing | [View](../../../library/specializations/devops-sre-platform/disaster-recovery-plan.js) |
+| slo-sli-tracking | SLO/SLI implementation | [View](../../../library/specializations/devops-sre-platform/slo-sli-tracking.js) |
+| secrets-management | Secrets management setup | [View](../../../library/specializations/devops-sre-platform/secrets-management.js) |
 
 ### Scientific Discovery
-[Browse all scientific-discovery processes →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/)
+[Browse all scientific-discovery processes →](../../../library/specializations/domains/science/scientific-discovery/)
 
 | Process | Description | Source |
 |---------|-------------|--------|
-| hypothesis-formulation-testing | Scientific method | [View](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/hypothesis-formulation-testing.js) |
-| causal-inference | Causal analysis | [View](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/causal-inference.js) |
-| bayesian-probabilistic-reasoning | Bayesian reasoning | [View](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/bayesian-probabilistic-reasoning.js) |
-| experiment-design-reasoning | Experiment planning | [View](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/experiment-design-reasoning.js) |
-| literature-review-synthesis | Literature review | [View](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/literature-review-synthesis.js) |
-| reproducible-research-pipeline | Reproducibility | [View](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/reproducible-research-pipeline.js) |
-| systems-thinking | Systems analysis | [View](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/systems-thinking.js) |
+| hypothesis-formulation-testing | Scientific method | [View](../../../library/specializations/domains/science/scientific-discovery/hypothesis-formulation-testing.js) |
+| causal-inference | Causal analysis | [View](../../../library/specializations/domains/science/scientific-discovery/causal-inference.js) |
+| bayesian-probabilistic-reasoning | Bayesian reasoning | [View](../../../library/specializations/domains/science/scientific-discovery/bayesian-probabilistic-reasoning.js) |
+| experiment-design-reasoning | Experiment planning | [View](../../../library/specializations/domains/science/scientific-discovery/experiment-design-reasoning.js) |
+| literature-review-synthesis | Literature review | [View](../../../library/specializations/domains/science/scientific-discovery/literature-review-synthesis.js) |
+| reproducible-research-pipeline | Reproducibility | [View](../../../library/specializations/domains/science/scientific-discovery/reproducible-research-pipeline.js) |
+| systems-thinking | Systems analysis | [View](../../../library/specializations/domains/science/scientific-discovery/systems-thinking.js) |
 
 ## Using a Pre-Built Process
 
@@ -324,61 +324,61 @@ Babysitter will find the `nextjs-fullstack-app` process and configure it based o
 ## Methodologies Reference
 
 The library includes 38+ development methodologies that can be applied to any project.
-[Browse all methodologies →](../../../plugins/babysitter/skills/babysit/process/methodologies/)
+[Browse all methodologies →](../../../library/methodologies/)
 
 ### Core Methodologies
 
 | Methodology | Description | Best For | Source |
 |-------------|-------------|----------|--------|
-| **devin** | Plan -> Code -> Debug -> Deploy with autonomous iteration | Full feature implementation | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/devin.js) |
-| **ralph** | Simple iterative loop until task completion | Persistent tasks with unclear scope | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/ralph.js) |
-| **plan-and-execute** | Detailed planning phase followed by execution | Complex, well-defined features | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/plan-and-execute.js) |
-| **tdd-quality-convergence** | TDD with iterative quality scoring | High-quality, tested code | [View](../../../plugins/babysitter/skills/babysit/process/tdd-quality-convergence.js) |
-| **spec-driven-development** | Executable specifications drive implementation | Enterprise, governance-heavy projects | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/spec-driven-development.js) |
+| **devin** | Plan -> Code -> Debug -> Deploy with autonomous iteration | Full feature implementation | [View](../../../library/methodologies/devin.js) |
+| **ralph** | Simple iterative loop until task completion | Persistent tasks with unclear scope | [View](../../../library/methodologies/ralph.js) |
+| **plan-and-execute** | Detailed planning phase followed by execution | Complex, well-defined features | [View](../../../library/methodologies/plan-and-execute.js) |
+| **tdd-quality-convergence** | TDD with iterative quality scoring | High-quality, tested code | [View](../../../library/tdd-quality-convergence.js) |
+| **spec-driven-development** | Executable specifications drive implementation | Enterprise, governance-heavy projects | [View](../../../library/methodologies/spec-driven-development.js) |
 
 ### Agile and Iterative
 
 | Methodology | Description | Best For | Source |
 |-------------|-------------|----------|--------|
-| **agile** | Sprint-based iterative development | Team-based projects | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/agile.js) |
-| **scrum** | Full Scrum implementation with ceremonies | Scrum teams | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/scrum/) |
-| **kanban** | Continuous flow with WIP limits | Continuous delivery | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/kanban/) |
-| **extreme-programming** | XP practices (pair programming, TDD) | High-quality code | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/extreme-programming/) |
-| **feature-driven-development** | Feature-centric development | Large codebases | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/feature-driven-development/) |
+| **agile** | Sprint-based iterative development | Team-based projects | [View](../../../library/methodologies/agile.js) |
+| **scrum** | Full Scrum implementation with ceremonies | Scrum teams | [View](../../../library/methodologies/scrum/) |
+| **kanban** | Continuous flow with WIP limits | Continuous delivery | [View](../../../library/methodologies/kanban/) |
+| **extreme-programming** | XP practices (pair programming, TDD) | High-quality code | [View](../../../library/methodologies/extreme-programming/) |
+| **feature-driven-development** | Feature-centric development | Large codebases | [View](../../../library/methodologies/feature-driven-development/) |
 
 ### Architecture and Design
 
 | Methodology | Description | Best For | Source |
 |-------------|-------------|----------|--------|
-| **top-down** | Architecture-first development | New systems, clear requirements | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/top-down.js) |
-| **bottom-up** | Component-first development | Exploratory, uncertain requirements | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/bottom-up.js) |
-| **domain-driven-design** | DDD strategic and tactical patterns | Complex business domains | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/domain-driven-design/) |
-| **event-storming** | Collaborative domain discovery | Domain modeling | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/event-storming/) |
-| **evolutionary** | Incremental architecture evolution | Legacy modernization | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/evolutionary.js) |
+| **top-down** | Architecture-first development | New systems, clear requirements | [View](../../../library/methodologies/top-down.js) |
+| **bottom-up** | Component-first development | Exploratory, uncertain requirements | [View](../../../library/methodologies/bottom-up.js) |
+| **domain-driven-design** | DDD strategic and tactical patterns | Complex business domains | [View](../../../library/methodologies/domain-driven-design/) |
+| **event-storming** | Collaborative domain discovery | Domain modeling | [View](../../../library/methodologies/event-storming/) |
+| **evolutionary** | Incremental architecture evolution | Legacy modernization | [View](../../../library/methodologies/evolutionary.js) |
 
 ### Specialized Approaches
 
 | Methodology | Description | Best For | Source |
 |-------------|-------------|----------|--------|
-| **graph-of-thoughts** | Multi-path reasoning exploration | Complex problem solving | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/graph-of-thoughts.js) |
-| **adversarial-spec-debates** | Red team/blue team specification | Critical systems | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/adversarial-spec-debates.js) |
-| **consensus-and-voting-mechanisms** | Multi-agent consensus building | Distributed decisions | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/consensus-and-voting-mechanisms.js) |
-| **state-machine-orchestration** | State-based workflow management | Complex state transitions | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/state-machine-orchestration.js) |
-| **build-realtime-remediation** | Real-time error detection and fixing | CI/CD pipelines | [View](../../../plugins/babysitter/skills/babysit/process/methodologies/build-realtime-remediation.js) |
+| **graph-of-thoughts** | Multi-path reasoning exploration | Complex problem solving | [View](../../../library/methodologies/graph-of-thoughts.js) |
+| **adversarial-spec-debates** | Red team/blue team specification | Critical systems | [View](../../../library/methodologies/adversarial-spec-debates.js) |
+| **consensus-and-voting-mechanisms** | Multi-agent consensus building | Distributed decisions | [View](../../../library/methodologies/consensus-and-voting-mechanisms.js) |
+| **state-machine-orchestration** | State-based workflow management | Complex state transitions | [View](../../../library/methodologies/state-machine-orchestration.js) |
+| **build-realtime-remediation** | Real-time error detection and fixing | CI/CD pipelines | [View](../../../library/methodologies/build-realtime-remediation.js) |
 
 ### GSD (Get Shit Done) Workflows
-[Browse GSD workflows →](../../../plugins/babysitter/skills/babysit/process/gsd/)
+[Browse GSD workflows →](../../../library/methodologies/gsd/)
 
 | Workflow | Purpose | Source |
 |----------|---------|--------|
-| **new-project** | Project initialization with vision capture | [View](../../../plugins/babysitter/skills/babysit/process/gsd/new-project.js) |
-| **discuss-phase** | Capture implementation preferences | [View](../../../plugins/babysitter/skills/babysit/process/gsd/discuss-phase.js) |
-| **plan-phase** | Generate verified task plans | [View](../../../plugins/babysitter/skills/babysit/process/gsd/plan-phase.js) |
-| **execute-phase** | Parallel task execution with commits | [View](../../../plugins/babysitter/skills/babysit/process/gsd/execute-phase.js) |
-| **verify-work** | User acceptance testing | [View](../../../plugins/babysitter/skills/babysit/process/gsd/verify-work.js) |
-| **audit-milestone** | Milestone completion verification | [View](../../../plugins/babysitter/skills/babysit/process/gsd/audit-milestone.js) |
-| **map-codebase** | Brownfield project analysis | [View](../../../plugins/babysitter/skills/babysit/process/gsd/map-codebase.js) |
-| **iterative-convergence** | Quality-gated development loop | [View](../../../plugins/babysitter/skills/babysit/process/gsd/iterative-convergence.js) |
+| **new-project** | Project initialization with vision capture | [View](../../../library/methodologies/gsd/new-project.js) |
+| **discuss-phase** | Capture implementation preferences | [View](../../../library/methodologies/gsd/discuss-phase.js) |
+| **plan-phase** | Generate verified task plans | [View](../../../library/methodologies/gsd/plan-phase.js) |
+| **execute-phase** | Parallel task execution with commits | [View](../../../library/methodologies/gsd/execute-phase.js) |
+| **verify-work** | User acceptance testing | [View](../../../library/methodologies/gsd/verify-work.js) |
+| **audit-milestone** | Milestone completion verification | [View](../../../library/methodologies/gsd/audit-milestone.js) |
+| **map-codebase** | Brownfield project analysis | [View](../../../library/methodologies/gsd/map-codebase.js) |
+| **iterative-convergence** | Quality-gated development loop | [View](../../../library/methodologies/gsd/iterative-convergence.js) |
 
 ## Customizing Processes
 
@@ -460,39 +460,39 @@ Most processes accept configuration through inputs:
 
 | Category | Count | Focus Area | Browse |
 |----------|-------|------------|--------|
-| scientific-discovery | 168 | Research reasoning patterns | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/scientific-discovery/) |
-| web-development | 66 | Full-stack web development | [→](../../../plugins/babysitter/skills/babysit/process/specializations/web-development/) |
-| algorithms-optimization | 50 | Algorithm implementation | [→](../../../plugins/babysitter/skills/babysit/process/specializations/algorithms-optimization/) |
-| ai-agents-conversational | 44 | LLM and agent development | [→](../../../plugins/babysitter/skills/babysit/process/specializations/ai-agents-conversational/) |
-| cryptography-blockchain | 38 | Blockchain and crypto | [→](../../../plugins/babysitter/skills/babysit/process/specializations/cryptography-blockchain/) |
-| security-research | 37 | Security research and testing | [→](../../../plugins/babysitter/skills/babysit/process/specializations/security-research/) |
-| robotics-simulation | 35 | Robotics and simulation | [→](../../../plugins/babysitter/skills/babysit/process/specializations/robotics-simulation/) |
-| performance-optimization | 35 | Performance tuning | [→](../../../plugins/babysitter/skills/babysit/process/specializations/performance-optimization/) |
-| network-programming | 35 | Network and protocols | [→](../../../plugins/babysitter/skills/babysit/process/specializations/network-programming/) |
-| game-development | 35 | Game development | [→](../../../plugins/babysitter/skills/babysit/process/specializations/game-development/) |
-| cli-mcp-development | 35 | CLI and MCP tools | [→](../../../plugins/babysitter/skills/babysit/process/specializations/cli-mcp-development/) |
-| decision-intelligence | 33 | Decision frameworks | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/decision-intelligence/) |
-| mobile-development | 31 | Mobile app development | [→](../../../plugins/babysitter/skills/babysit/process/specializations/mobile-development/) |
-| embedded-systems | 31 | Embedded and firmware | [→](../../../plugins/babysitter/skills/babysit/process/specializations/embedded-systems/) |
-| sdk-platform-development | 30 | SDK development | [→](../../../plugins/babysitter/skills/babysit/process/specializations/sdk-platform-development/) |
-| programming-languages | 30 | Language implementation | [→](../../../plugins/babysitter/skills/babysit/process/specializations/programming-languages/) |
-| gpu-programming | 30 | GPU and parallel computing | [→](../../../plugins/babysitter/skills/babysit/process/specializations/gpu-programming/) |
-| fpga-programming | 30 | FPGA design | [→](../../../plugins/babysitter/skills/babysit/process/specializations/fpga-programming/) |
-| code-migration-modernization | 30 | Code modernization | [→](../../../plugins/babysitter/skills/babysit/process/specializations/code-migration-modernization/) |
-| security-compliance | 29 | Security compliance | [→](../../../plugins/babysitter/skills/babysit/process/specializations/security-compliance/) |
-| legal | 28 | Legal operations | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/legal/) |
-| desktop-development | 28 | Desktop applications | [→](../../../plugins/babysitter/skills/babysit/process/specializations/desktop-development/) |
-| quantum-computing | 27 | Quantum computing | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/quantum-computing/) |
-| mechanical-engineering | 26 | Mechanical engineering | [→](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/mechanical-engineering/) |
-| ux-ui-design | 26 | UX/UI design | [→](../../../plugins/babysitter/skills/babysit/process/specializations/ux-ui-design/) |
-| technical-documentation | 26 | Documentation | [→](../../../plugins/babysitter/skills/babysit/process/specializations/technical-documentation/) |
-| software-architecture | 25 | Architecture design | [→](../../../plugins/babysitter/skills/babysit/process/specializations/software-architecture/) |
-| qa-testing-automation | 25 | Test automation | [→](../../../plugins/babysitter/skills/babysit/process/specializations/qa-testing-automation/) |
-| devops-sre-platform | 25 | DevOps and SRE | [→](../../../plugins/babysitter/skills/babysit/process/specializations/devops-sre-platform/) |
-| data-science-ml | 23 | Machine learning | [→](../../../plugins/babysitter/skills/babysit/process/specializations/data-science-ml/) |
-| data-engineering-analytics | 23 | Data engineering | [→](../../../plugins/babysitter/skills/babysit/process/specializations/data-engineering-analytics/) |
-| product-management | 22 | Product management | [→](../../../plugins/babysitter/skills/babysit/process/specializations/product-management/) |
-| meta | 10 | Process tooling | [→](../../../plugins/babysitter/skills/babysit/process/specializations/meta/) |
+| scientific-discovery | 168 | Research reasoning patterns | [→](../../../library/specializations/domains/science/scientific-discovery/) |
+| web-development | 66 | Full-stack web development | [→](../../../library/specializations/web-development/) |
+| algorithms-optimization | 50 | Algorithm implementation | [→](../../../library/specializations/algorithms-optimization/) |
+| ai-agents-conversational | 44 | LLM and agent development | [→](../../../library/specializations/ai-agents-conversational/) |
+| cryptography-blockchain | 38 | Blockchain and crypto | [→](../../../library/specializations/cryptography-blockchain/) |
+| security-research | 37 | Security research and testing | [→](../../../library/specializations/security-research/) |
+| robotics-simulation | 35 | Robotics and simulation | [→](../../../library/specializations/robotics-simulation/) |
+| performance-optimization | 35 | Performance tuning | [→](../../../library/specializations/performance-optimization/) |
+| network-programming | 35 | Network and protocols | [→](../../../library/specializations/network-programming/) |
+| game-development | 35 | Game development | [→](../../../library/specializations/game-development/) |
+| cli-mcp-development | 35 | CLI and MCP tools | [→](../../../library/specializations/cli-mcp-development/) |
+| decision-intelligence | 33 | Decision frameworks | [→](../../../library/specializations/domains/business/decision-intelligence/) |
+| mobile-development | 31 | Mobile app development | [→](../../../library/specializations/mobile-development/) |
+| embedded-systems | 31 | Embedded and firmware | [→](../../../library/specializations/embedded-systems/) |
+| sdk-platform-development | 30 | SDK development | [→](../../../library/specializations/sdk-platform-development/) |
+| programming-languages | 30 | Language implementation | [→](../../../library/specializations/programming-languages/) |
+| gpu-programming | 30 | GPU and parallel computing | [→](../../../library/specializations/gpu-programming/) |
+| fpga-programming | 30 | FPGA design | [→](../../../library/specializations/fpga-programming/) |
+| code-migration-modernization | 30 | Code modernization | [→](../../../library/specializations/code-migration-modernization/) |
+| security-compliance | 29 | Security compliance | [→](../../../library/specializations/security-compliance/) |
+| legal | 28 | Legal operations | [→](../../../library/specializations/domains/business/legal/) |
+| desktop-development | 28 | Desktop applications | [→](../../../library/specializations/desktop-development/) |
+| quantum-computing | 27 | Quantum computing | [→](../../../library/specializations/domains/science/quantum-computing/) |
+| mechanical-engineering | 26 | Mechanical engineering | [→](../../../library/specializations/domains/science/mechanical-engineering/) |
+| ux-ui-design | 26 | UX/UI design | [→](../../../library/specializations/ux-ui-design/) |
+| technical-documentation | 26 | Documentation | [→](../../../library/specializations/technical-documentation/) |
+| software-architecture | 25 | Architecture design | [→](../../../library/specializations/software-architecture/) |
+| qa-testing-automation | 25 | Test automation | [→](../../../library/specializations/qa-testing-automation/) |
+| devops-sre-platform | 25 | DevOps and SRE | [→](../../../library/specializations/devops-sre-platform/) |
+| data-science-ml | 23 | Machine learning | [→](../../../library/specializations/data-science-ml/) |
+| data-engineering-analytics | 23 | Data engineering | [→](../../../library/specializations/data-engineering-analytics/) |
+| product-management | 22 | Product management | [→](../../../library/specializations/product-management/) |
+| meta | 10 | Process tooling | [→](../../../library/specializations/meta/) |
 
 ## Best Practices
 

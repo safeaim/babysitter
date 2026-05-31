@@ -605,7 +605,7 @@ High-level approaches you can apply to any project:
 
 **Browse methodologies:**
 - [All 19+ with source code](../reference/glossary.md#methodology)
-- [Methodologies folder](../../../plugins/babysitter/skills/babysit/process/methodologies/)
+- [Methodologies folder](../../../library/methodologies/)
 
 ### Domain Processes (2,000+) - Task-Specific Workflows
 
@@ -613,9 +613,9 @@ Complete process definitions for specific domains:
 
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development** | 680+ | [specializations/](../../../plugins/babysitter/skills/babysit/process/specializations/) |
-| **Business** | 430+ | [domains/business/](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/) |
-| **Science & Engineering** | 550+ | [domains/science/](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/) |
+| **Development** | 680+ | [specializations/](../../../library/specializations/) |
+| **Business** | 430+ | [domains/business/](../../../library/specializations/domains/business/) |
+| **Science & Engineering** | 550+ | [domains/science/](../../../library/specializations/domains/science/) |
 
 See the full catalog with descriptions in the [Process Library](./process-library.md).
 

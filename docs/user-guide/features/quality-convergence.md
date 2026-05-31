@@ -1084,7 +1084,7 @@ Babysitter offers two levels of reusable workflows:
 
 **Browse methodologies:**
 - [All 19+ methodologies with source code](../reference/glossary.md#methodology)
-- [Methodologies folder](../../../plugins/babysitter/skills/babysit/process/methodologies/)
+- [Methodologies folder](../../../library/methodologies/)
 
 ### Domain Processes (2,000+) - The "What"
 
@@ -1099,7 +1099,7 @@ Beyond methodologies, Babysitter includes **2,000+ domain-specific processes** f
 
 **Browse processes:**
 - [Process Library](./process-library.md) - Full catalog with descriptions
-- [Specializations folder](../../../plugins/babysitter/skills/babysit/process/specializations/)
+- [Specializations folder](../../../library/specializations/)
 
 ---
 

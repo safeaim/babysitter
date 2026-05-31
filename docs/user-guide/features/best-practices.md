@@ -1417,7 +1417,7 @@ Not sure which methodology to use? Here's a quick guide:
 
 **Browse methodologies:**
 - [All 19+ methodologies with source code](../reference/glossary.md#methodology)
-- [Methodologies folder](../../../plugins/babysitter/skills/babysit/process/methodologies/)
+- [Methodologies folder](../../../library/methodologies/)
 
 ### Domain Processes (2,000+) - Ready-to-Use Workflows
 
@@ -1425,9 +1425,9 @@ Beyond methodologies, explore 2,000+ domain-specific processes:
 
 | Domain | Processes | Browse |
 |--------|-----------|--------|
-| **Development** | 680+ (web, mobile, DevOps, AI, security) | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/) |
-| **Business** | 430+ (legal, HR, marketing, finance) | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/business/) |
-| **Science & Engineering** | 550+ (physics, aerospace, biomedical) | [Browse →](../../../plugins/babysitter/skills/babysit/process/specializations/domains/science/) |
+| **Development** | 680+ (web, mobile, DevOps, AI, security) | [Browse →](../../../library/specializations/) |
+| **Business** | 430+ (legal, HR, marketing, finance) | [Browse →](../../../library/specializations/domains/business/) |
+| **Science & Engineering** | 550+ (physics, aerospace, biomedical) | [Browse →](../../../library/specializations/domains/science/) |
 
 See the full catalog in the [Process Library](./process-library.md).
 

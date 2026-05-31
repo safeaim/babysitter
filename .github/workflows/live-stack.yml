@@ -415,6 +415,11 @@ jobs:
           rm -rf .codex .claude/commands .gemini CLAUDE.md GEMINI.md AGENTS.md 2>/dev/null || true
           echo "Cleaned agent skill directories to prevent test interference"
 
+      - name: Generate a5c GitHub App token
+        id: a5c-token
+        continue-on-error: true
+        uses: a5c-ai/generate-token-action@main
+
       - name: Run selected live stack E2E
         timeout-minutes: 30
         env:
@@ -461,7 +466,7 @@ jobs:
           GH_TOKEN: ${{ secrets.TAL_GH_TOKEN || github.token }}
           GITHUB_TOKEN: ${{ secrets.TAL_GH_TOKEN || github.token }}
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          COPILOT_GITHUB_TOKEN: ${{ secrets.TAL_GH_TOKEN }}
+          COPILOT_GITHUB_TOKEN: ${{ steps.a5c-token.outputs.a5c_token || secrets.TAL_GH_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           AZURE_FOUNDRY_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
         run: |

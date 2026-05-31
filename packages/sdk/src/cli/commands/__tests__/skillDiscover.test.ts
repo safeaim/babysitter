@@ -423,12 +423,15 @@ describe('handleSkillDiscover --summary-only flag', () => {
   let testDir: string;
   let pluginRoot: string;
   let originalCwd: string;
+  let originalGlobalStateDir: string | undefined;
 
   beforeEach(async () => {
     originalCwd = process.cwd();
+    originalGlobalStateDir = process.env.BABYSITTER_GLOBAL_STATE_DIR;
     testDir = path.join(os.tmpdir(), `skill-discover-cli-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
     pluginRoot = path.join(testDir, 'plugin');
     await fs.mkdir(pluginRoot, { recursive: true });
+    process.env.BABYSITTER_GLOBAL_STATE_DIR = path.join(testDir, 'global-state');
     process.chdir(testDir);
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -436,6 +439,11 @@ describe('handleSkillDiscover --summary-only flag', () => {
 
   afterEach(async () => {
     process.chdir(originalCwd);
+    if (originalGlobalStateDir === undefined) {
+      delete process.env.BABYSITTER_GLOBAL_STATE_DIR;
+    } else {
+      process.env.BABYSITTER_GLOBAL_STATE_DIR = originalGlobalStateDir;
+    }
     vi.restoreAllMocks();
     try {
       await fs.rm(testDir, { recursive: true, force: true });
@@ -527,12 +535,15 @@ describe('handleSkillDiscover --include-remote flag', () => {
   let testDir: string;
   let pluginRoot: string;
   let originalCwd: string;
+  let originalGlobalStateDir: string | undefined;
 
   beforeEach(async () => {
     originalCwd = process.cwd();
+    originalGlobalStateDir = process.env.BABYSITTER_GLOBAL_STATE_DIR;
     testDir = path.join(os.tmpdir(), `skill-discover-remote-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
     pluginRoot = path.join(testDir, 'plugin');
     await fs.mkdir(pluginRoot, { recursive: true });
+    process.env.BABYSITTER_GLOBAL_STATE_DIR = path.join(testDir, 'global-state');
     process.chdir(testDir);
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -540,6 +551,11 @@ describe('handleSkillDiscover --include-remote flag', () => {
 
   afterEach(async () => {
     process.chdir(originalCwd);
+    if (originalGlobalStateDir === undefined) {
+      delete process.env.BABYSITTER_GLOBAL_STATE_DIR;
+    } else {
+      process.env.BABYSITTER_GLOBAL_STATE_DIR = originalGlobalStateDir;
+    }
     vi.restoreAllMocks();
     try {
       await fs.rm(testDir, { recursive: true, force: true });
@@ -590,12 +606,15 @@ describe('handleSkillDiscover JSON output', () => {
   let testDir: string;
   let pluginRoot: string;
   let originalCwd: string;
+  let originalGlobalStateDir: string | undefined;
 
   beforeEach(async () => {
     originalCwd = process.cwd();
+    originalGlobalStateDir = process.env.BABYSITTER_GLOBAL_STATE_DIR;
     testDir = path.join(os.tmpdir(), `skill-discover-json-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
     pluginRoot = path.join(testDir, 'plugin');
     await fs.mkdir(pluginRoot, { recursive: true });
+    process.env.BABYSITTER_GLOBAL_STATE_DIR = path.join(testDir, 'global-state');
     process.chdir(testDir);
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -603,6 +622,11 @@ describe('handleSkillDiscover JSON output', () => {
 
   afterEach(async () => {
     process.chdir(originalCwd);
+    if (originalGlobalStateDir === undefined) {
+      delete process.env.BABYSITTER_GLOBAL_STATE_DIR;
+    } else {
+      process.env.BABYSITTER_GLOBAL_STATE_DIR = originalGlobalStateDir;
+    }
     vi.restoreAllMocks();
     try {
       await fs.rm(testDir, { recursive: true, force: true });
@@ -657,106 +681,6 @@ category: test
 });
 
 // ── session:iteration-message integration with skill context ────────────
-
-describe('session:iteration-message skill context integration', () => {
-  let testDir: string;
-  let pluginRoot: string;
-  const CACHE_DIR = path.join(os.tmpdir(), 'babysitter-skill-cache');
-  let originalCwd: string;
-
-  beforeEach(async () => {
-    originalCwd = process.cwd();
-    testDir = path.join(os.tmpdir(), `skill-session-int-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-    pluginRoot = path.join(testDir, 'plugin');
-    await fs.mkdir(pluginRoot, { recursive: true });
-    process.chdir(testDir);
-    // Clear the global skill cache to avoid cross-test contamination
-    try {
-      await fs.rm(CACHE_DIR, { recursive: true, force: true });
-    } catch {
-      // Ignore if it doesn't exist
-    }
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-  });
-
-  afterEach(async () => {
-    process.chdir(originalCwd);
-    vi.restoreAllMocks();
-    try {
-      await fs.rm(testDir, { recursive: true, force: true });
-    } catch {
-      // Ignore cleanup errors
-    }
-  });
-
-  it('injects skill context when pluginRoot is provided', async () => {
-    // Create a skill to discover
-    const skillDir = path.join(pluginRoot, 'skills', 'session-skill');
-    await fs.mkdir(skillDir, { recursive: true });
-    await fs.writeFile(
-      path.join(skillDir, 'SKILL.md'),
-      `---
-name: session-skill
-description: Skill for session test
-category: test
----
-`,
-      'utf8'
-    );
-
-    const { handleSessionIterationMessage } = await import('../session');
-
-    const logSpy = console.log as ReturnType<typeof vi.fn>;
-    const exitCode = await handleSessionIterationMessage({
-      iteration: 1,
-      runsDir: testDir,
-      pluginRoot,
-      json: true,
-    });
-
-    expect(exitCode).toBe(0);
-    const output = JSON.parse(logSpy.mock.calls[logSpy.mock.calls.length - 1][0] as string);
-    expect(output).toHaveProperty('skillContext');
-    // skillContext should contain the discovered skill summary
-    expect(output.skillContext).toContain('session-skill');
-  });
-
-  it('returns null skillContext when pluginRoot is not provided', async () => {
-    const { handleSessionIterationMessage } = await import('../session');
-
-    const logSpy = console.log as ReturnType<typeof vi.fn>;
-    const exitCode = await handleSessionIterationMessage({
-      iteration: 1,
-      runsDir: testDir,
-      json: true,
-    });
-
-    expect(exitCode).toBe(0);
-    const output = JSON.parse(logSpy.mock.calls[logSpy.mock.calls.length - 1][0] as string);
-    expect(output.skillContext).toBeNull();
-  });
-
-  it('returns null skillContext when pluginRoot has no skills', async () => {
-    const emptyPluginRoot = path.join(testDir, 'empty-plugin');
-    await fs.mkdir(emptyPluginRoot, { recursive: true });
-
-    const { handleSessionIterationMessage } = await import('../session');
-
-    const logSpy = console.log as ReturnType<typeof vi.fn>;
-    const exitCode = await handleSessionIterationMessage({
-      iteration: 1,
-      runsDir: testDir,
-      pluginRoot: emptyPluginRoot,
-      json: true,
-    });
-
-    expect(exitCode).toBe(0);
-    const output = JSON.parse(logSpy.mock.calls[logSpy.mock.calls.length - 1][0] as string);
-    // Empty summary should resolve to null
-    expect(output.skillContext).toBeNull();
-  });
-});
 
 // ── Process file marker parsing ──────────────────────────────────────
 

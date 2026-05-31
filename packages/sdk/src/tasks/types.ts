@@ -1,7 +1,7 @@
 import { JsonRecord } from "../storage/types";
 
 // Known task kinds (custom kinds are also allowed as any string)
-export type KnownTaskKind = "node" | "breakpoint" | "orchestrator_task" | "sleep";
+export type KnownTaskKind = "node" | "breakpoint" | "orchestrator_task" | "sleep" | "subprocess";
 
 // TaskKind accepts any string (including custom task kinds)
 export type TaskKind = string;
@@ -11,6 +11,34 @@ export interface TaskIOHints {
   outputJsonPath?: string;
   stdoutPath?: string;
   stderrPath?: string;
+}
+
+export type ResponderType = "internal" | "human" | "agent" | "tracker" | "auto";
+
+export interface ResponderRoutingOptions {
+  external?: boolean;
+  responderType?: ResponderType;
+  adapter?: string;
+  fallbackType?: ResponderType;
+  fallbackToInternal?: boolean;
+  targetResponders?: string[];
+  trackerBackend?: string;
+  capabilities?: string[];
+  timeout?: number;
+  timeoutMs?: number;
+}
+
+export type AgentPrompt = string | JsonRecord;
+
+export interface AgentTaskOptions extends ResponderRoutingOptions {
+  name?: string;
+  prompt?: AgentPrompt;
+  outputSchema?: Record<string, unknown>;
+  model?: string;
+  provider?: string;
+  approvalMode?: string;
+  maxTurns?: number;
+  [key: string]: unknown;
 }
 
 export interface NodeTaskOptions {
@@ -24,6 +52,11 @@ export interface NodeTaskOptions {
 export interface BreakpointTaskOptions {
   payload?: unknown;
   confirmationRequired?: boolean;
+  responderType?: ResponderType;
+  fallbackType?: ResponderType;
+  targetResponders?: string[];
+  trackerBackend?: string;
+  timeoutMs?: number;
 }
 
 export interface OrchestratorTaskOptions {
@@ -36,12 +69,27 @@ export interface SleepTaskOptions {
   targetEpochMs: number;
 }
 
+export interface SubprocessTaskOptions {
+  processPath: string;
+  exportName?: string;
+  processId?: string;
+  prompt?: string;
+  inputs?: unknown;
+  inputSchema?: Record<string, unknown>;
+  outputSchema?: Record<string, unknown>;
+  harness?: string;
+  model?: string;
+  maxIterations?: number;
+  shareSession?: boolean;
+  metadata?: JsonRecord;
+}
+
 export interface EffectExecutionHints {
-  /** Preferred harness CLI (e.g., 'pi', 'claude-code'). Only used by internal harness. */
+  /** Preferred internal harness CLI (e.g., 'pi', 'claude-code'). Not a universal cross-plugin contract. */
   harness?: string;
   /** Preferred model identifier (e.g., 'claude-opus-4-6'). Used for subagent model selection. */
   model?: string;
-  /** Free-form permission list. Only used by internal harness. */
+  /** Internal harness permission hints. Plugins may ignore them; do not treat them as a security boundary. */
   permissions?: string[];
 }
 
@@ -50,13 +98,17 @@ export interface TaskDef {
   title?: string;
   description?: string;
   labels?: string[];
+  inputSchema?: Record<string, unknown>;
+  outputSchema?: Record<string, unknown> | false | null;
   io?: TaskIOHints;
   metadata?: JsonRecord;
   execution?: EffectExecutionHints;
+  agent?: AgentTaskOptions;
   node?: NodeTaskOptions;
   breakpoint?: BreakpointTaskOptions;
   orchestratorTask?: OrchestratorTaskOptions;
   sleep?: SleepTaskOptions;
+  subprocess?: SubprocessTaskOptions;
   [key: string]: unknown;
 }
 
@@ -130,6 +182,15 @@ export interface DefinedTask<TArgs = unknown, _TResult = unknown> {
 
 export interface TaskInvokeOptions {
   label?: string;
+  /**
+   * Explicit invocation key for retry/idempotent patterns. When provided, the ReplayCursor
+   * is NOT advanced - all calls with the same key resolve to the same effect slot.
+   * Use dotted-namespace kebab-case (e.g., 'bootstrap.fetch-data') unique within the process.
+   * This prevents the phantom duplicate effects bug when ctx.task() is inside a retry loop.
+   */
+  key?: string;
+  /** @deprecated Use `key`. */
+  stableKey?: string;
 }
 
 export interface TaskSerializerContext {
@@ -153,6 +214,28 @@ export interface NodeTaskDefinitionOptions<TArgs = unknown> {
   timeoutMs?: TaskValueOrFactory<TArgs, number | undefined>;
 }
 
+export interface AgentTaskDefinitionOptions<TArgs = unknown> {
+  title?: TaskValueOrFactory<TArgs, string | undefined>;
+  description?: TaskValueOrFactory<TArgs, string | undefined>;
+  labels?: TaskValueOrFactory<TArgs, string[] | undefined>;
+  metadata?: TaskValueOrFactory<TArgs, JsonRecord | undefined>;
+  io?: TaskValueOrFactory<TArgs, TaskIOHints | undefined>;
+  name?: TaskValueOrFactory<TArgs, string | undefined>;
+  prompt?: TaskValueOrFactory<TArgs, AgentPrompt | undefined>;
+  outputSchema?: TaskValueOrFactory<TArgs, Record<string, unknown> | undefined>;
+  external?: TaskValueOrFactory<TArgs, boolean | undefined>;
+  responderType?: TaskValueOrFactory<TArgs, ResponderType | undefined>;
+  adapter?: TaskValueOrFactory<TArgs, string | undefined>;
+  fallbackType?: TaskValueOrFactory<TArgs, ResponderType | undefined>;
+  fallbackToInternal?: TaskValueOrFactory<TArgs, boolean | undefined>;
+  model?: TaskValueOrFactory<TArgs, string | undefined>;
+  provider?: TaskValueOrFactory<TArgs, string | undefined>;
+  approvalMode?: TaskValueOrFactory<TArgs, string | undefined>;
+  maxTurns?: TaskValueOrFactory<TArgs, number | undefined>;
+  timeout?: TaskValueOrFactory<TArgs, number | undefined>;
+  timeoutMs?: TaskValueOrFactory<TArgs, number | undefined>;
+}
+
 export interface BreakpointTaskDefinitionOptions<TArgs = unknown> {
   title?: TaskValueOrFactory<TArgs, string | undefined>;
   description?: TaskValueOrFactory<TArgs, string | undefined>;
@@ -160,6 +243,11 @@ export interface BreakpointTaskDefinitionOptions<TArgs = unknown> {
   metadata?: TaskValueOrFactory<TArgs, JsonRecord | undefined>;
   payload?: TaskValueOrFactory<TArgs, unknown>;
   confirmationRequired?: TaskValueOrFactory<TArgs, boolean | undefined>;
+  responderType?: TaskValueOrFactory<TArgs, ResponderType | undefined>;
+  fallbackType?: TaskValueOrFactory<TArgs, ResponderType | undefined>;
+  targetResponders?: TaskValueOrFactory<TArgs, string[] | undefined>;
+  trackerBackend?: TaskValueOrFactory<TArgs, string | undefined>;
+  timeoutMs?: TaskValueOrFactory<TArgs, number | undefined>;
 }
 
 export interface OrchestratorTaskDefinitionOptions<TArgs = JsonRecord> {

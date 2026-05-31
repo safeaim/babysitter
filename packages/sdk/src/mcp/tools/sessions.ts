@@ -1,6 +1,7 @@
 import * as path from "path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v3";
+import { DEFAULTS } from "../../config";
 import {
   readSessionFile,
   sessionFileExists,
@@ -10,34 +11,39 @@ import {
 } from "../../session";
 import type { SessionState } from "../../session";
 import { loadJournal } from "../../storage";
+import { countPendingEffectsFromJournal, deriveObservedRunState } from "../../runtime/runLifecycleState";
 import { toolResult, toolError } from "../util/errors";
 import { resolveRunDir } from "../util/resolve-run-dir";
+import { registerMcpTool } from "../util/registerTool";
 
 export function registerSessionTools(server: McpServer): void {
   // ── session_init ────────────────────────────────────────────────────
-  server.tool(
+  registerMcpTool(
+    server,
     "session_init",
-    "Initialize a new session state for orchestration",
     {
-      sessionId: z.string().describe("The session ID to initialize"),
-      stateDir: z.string().describe("Directory to store session state files"),
-      maxIterations: z
-        .number()
-        .optional()
-        .describe("Maximum number of iterations (default 256)"),
-      runId: z
-        .string()
-        .optional()
-        .describe("Optional run ID to associate immediately"),
-      prompt: z
-        .string()
-        .optional()
-        .describe("Optional prompt text for the session"),
+      description: "Initialize a new session state for orchestration",
+      inputSchema: {
+        sessionId: z.string().describe("The session ID to initialize"),
+        stateDir: z.string().describe("Directory to store session state files"),
+        maxIterations: z
+          .number()
+          .optional()
+          .describe("Maximum number of iterations (default 65000)"),
+        runId: z
+          .string()
+          .optional()
+          .describe("Optional run ID to associate immediately"),
+        prompt: z
+          .string()
+          .optional()
+          .describe("Optional prompt text for the session"),
+      },
     },
     async (args) => {
       try {
         const stateDir = path.resolve(args.stateDir);
-        const maxIterations = args.maxIterations ?? 256;
+        const maxIterations = args.maxIterations ?? DEFAULTS.maxIterations;
         const runId = args.runId ?? "";
         const prompt = args.prompt ?? "";
 
@@ -68,6 +74,7 @@ export function registerSessionTools(server: McpServer): void {
           iteration: 1,
           maxIterations,
           runId,
+          runIds: [],
           startedAt: now,
           lastIterationAt: now,
           iterationTimes: [],
@@ -88,13 +95,16 @@ export function registerSessionTools(server: McpServer): void {
   );
 
   // ── session_associate ───────────────────────────────────────────────
-  server.tool(
+  registerMcpTool(
+    server,
     "session_associate",
-    "Associate a session with a run ID",
     {
-      sessionId: z.string().describe("The session ID to associate"),
-      stateDir: z.string().describe("Directory containing session state files"),
-      runId: z.string().describe("The run ID to associate with"),
+      description: "Associate a session with a run ID",
+      inputSchema: {
+        sessionId: z.string().describe("The session ID to associate"),
+        stateDir: z.string().describe("Directory containing session state files"),
+        runId: z.string().describe("The run ID to associate with"),
+      },
     },
     async (args) => {
       try {
@@ -134,35 +144,34 @@ export function registerSessionTools(server: McpServer): void {
   );
 
   // ── session_resume ──────────────────────────────────────────────────
-  server.tool(
+  registerMcpTool(
+    server,
     "session_resume",
-    "Resume an existing run in a new session",
     {
-      sessionId: z.string().describe("The session ID for the new session"),
-      stateDir: z.string().describe("Directory to store session state files"),
-      runId: z.string().describe("The run ID to resume"),
-      maxIterations: z
-        .number()
-        .optional()
-        .describe("Maximum number of iterations (default 256)"),
-      runsDir: z.string().optional().describe("Override runs directory path"),
+      description: "Resume an existing run in a new session",
+      inputSchema: {
+        sessionId: z.string().describe("The session ID for the new session"),
+        stateDir: z.string().describe("Directory to store session state files"),
+        runId: z.string().describe("The run ID to resume"),
+        maxIterations: z
+          .number()
+          .optional()
+          .describe("Maximum number of iterations (default 65000)"),
+        runsDir: z.string().optional().describe("Override runs directory path"),
+      },
     },
     async (args) => {
       try {
         const stateDir = path.resolve(args.stateDir);
         const runsDir = resolveRunDir(args.runsDir);
         const runDir = path.join(runsDir, args.runId);
-        const maxIterations = args.maxIterations ?? 256;
+        const maxIterations = args.maxIterations ?? DEFAULTS.maxIterations;
 
         // Check run state from journal
         let runState = "unknown";
         try {
           const journal = await loadJournal(runDir);
-          const hasCompleted = journal.some((e) => e.type === "RUN_COMPLETED");
-          const hasFailed = journal.some((e) => e.type === "RUN_FAILED");
-          if (hasCompleted) runState = "completed";
-          else if (hasFailed) runState = "failed";
-          else runState = "waiting";
+          runState = deriveObservedRunState(journal, countPendingEffectsFromJournal(journal));
         } catch {
           return toolError(`Run not found: ${args.runId}`);
         }
@@ -182,6 +191,7 @@ export function registerSessionTools(server: McpServer): void {
           iteration: 1,
           maxIterations,
           runId: args.runId,
+          runIds: [],
           startedAt: now,
           lastIterationAt: now,
           iterationTimes: [],
@@ -201,12 +211,15 @@ export function registerSessionTools(server: McpServer): void {
   );
 
   // ── session_state ───────────────────────────────────────────────────
-  server.tool(
+  registerMcpTool(
+    server,
     "session_state",
-    "Get the current state of a session",
     {
-      sessionId: z.string().describe("The session ID to query"),
-      stateDir: z.string().describe("Directory containing session state files"),
+      description: "Get the current state of a session",
+      inputSchema: {
+        sessionId: z.string().describe("The session ID to query"),
+        stateDir: z.string().describe("Directory containing session state files"),
+      },
     },
     async (args) => {
       try {

@@ -10,13 +10,23 @@ import path from "node:path";
 import { MigrationDescriptor, isNodeError } from "./types";
 
 /**
- * Regex for migration filenames: `<from>_to_<to>.<ext>`
- * Versions may contain digits, dots, dashes, and pre-release identifiers.
- *
- * Examples: "1.0.0_to_1.1.0.md", "2.0.0-beta_to_2.0.0.js"
+ * Migration filenames use `<from>_to_<to>.<ext>`.
+ * Versions may contain digits, letters, dots, underscores, dashes, and
+ * pre-release identifiers.
  */
-const MIGRATION_FILENAME_REGEX =
-  /^([a-zA-Z0-9._-]+)_to_([a-zA-Z0-9._-]+)\.(md|js)$/;
+function isMigrationVersionSegment(value: string): boolean {
+  if (!value) return false;
+  for (const char of value) {
+    const code = char.charCodeAt(0);
+    const isDigit = code >= 48 && code <= 57;
+    const isUpper = code >= 65 && code <= 90;
+    const isLower = code >= 97 && code <= 122;
+    if (!isDigit && !isUpper && !isLower && char !== "." && char !== "_" && char !== "-") {
+      return false;
+    }
+  }
+  return true;
+}
 
 /**
  * Parses a migration filename into its constituent version parts.
@@ -27,16 +37,26 @@ const MIGRATION_FILENAME_REGEX =
 export function parseMigrationFilename(
   filename: string
 ): MigrationDescriptor | undefined {
-  const match = MIGRATION_FILENAME_REGEX.exec(filename);
-  if (!match) {
-    return undefined;
-  }
-  const [, from, to, ext] = match;
+  const extensionIndex = filename.lastIndexOf(".");
+  if (extensionIndex <= 0) return undefined;
+
+  const ext = filename.slice(extensionIndex + 1);
+  if (ext !== "md" && ext !== "js") return undefined;
+
+  const base = filename.slice(0, extensionIndex);
+  const separator = "_to_";
+  const separatorIndex = base.indexOf(separator);
+  if (separatorIndex <= 0 || separatorIndex !== base.lastIndexOf(separator)) return undefined;
+
+  const from = base.slice(0, separatorIndex);
+  const to = base.slice(separatorIndex + separator.length);
+  if (!isMigrationVersionSegment(from) || !isMigrationVersionSegment(to)) return undefined;
+
   return {
     from,
     to,
     file: filename,
-    type: ext as "md" | "js",
+    type: ext,
   };
 }
 

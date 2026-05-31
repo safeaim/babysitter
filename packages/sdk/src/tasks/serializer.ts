@@ -23,9 +23,10 @@ export interface SerializeTaskResultOptions extends TaskSerializerContext {
 }
 
 export interface TaskResultPayload {
-  status: "ok" | "error";
+  status: "ok" | "error" | "cancelled";
   result?: unknown;
   error?: SerializedErrorPayload;
+  reason?: string;
   stdout?: string;
   stderr?: string;
   stdoutRef?: string;
@@ -60,14 +61,18 @@ export interface SerializedTaskDefinition extends JsonRecord {
   title?: string;
   description?: string;
   labels?: string[];
+  inputSchema?: JsonRecord;
+  outputSchema?: JsonRecord | false | null;
   inputs?: unknown;
   inputsRef?: string;
   io?: JsonRecord;
+  agent?: JsonRecord;
   node?: JsonRecord;
   breakpoint?: JsonRecord;
   orchestratorTask?: JsonRecord;
   sleep?: JsonRecord;
   metadata?: JsonRecord;
+  autoApproval?: JsonRecord;
 }
 
 export async function serializeAndWriteTaskDefinition(
@@ -98,7 +103,10 @@ export async function serializeTaskDefinition(
     title: normalized.title,
     description: normalized.description,
     labels: normalized.labels,
+    inputSchema: normalized.inputSchema,
+    outputSchema: normalized.outputSchema,
     io: normalized.io,
+    agent: normalized.agent,
     node: normalized.node,
     breakpoint: normalized.breakpoint,
     orchestratorTask: normalized.orchestratorTask,
@@ -153,6 +161,7 @@ export async function serializeTaskResult(
     error: normalizeError(options.payload.error),
     stdoutRef: options.payload.stdoutRef,
     stderrRef: options.payload.stderrRef,
+    reason: options.payload.reason,
     startedAt: options.payload.startedAt,
     finishedAt: options.payload.finishedAt,
     metadata: options.payload.metadata ? stableClone(options.payload.metadata) : undefined,
@@ -187,13 +196,23 @@ function normalizeTaskDef(task: TaskDef) {
     title: typeof task.title === "string" ? task.title : undefined,
     description: typeof task.description === "string" ? task.description : undefined,
     labels: normalizeLabels(task.labels),
+    inputSchema: normalizeJson(task.inputSchema),
+    outputSchema: normalizeOutputSchema(task.outputSchema),
     io: normalizeJson(task.io),
+    agent: normalizeJson(task.agent),
     node: normalizeJson(task.node),
     breakpoint: normalizeJson(task.breakpoint),
     orchestratorTask: normalizeJson(task.orchestratorTask),
     sleep: normalizeJson(task.sleep),
     metadata: normalizeJson(task.metadata),
   };
+}
+
+function normalizeOutputSchema(value: unknown): JsonRecord | false | null | undefined {
+  if (value === false || value === null) {
+    return value;
+  }
+  return normalizeJson(value);
 }
 
 function normalizeLabels(labels?: string[]) {

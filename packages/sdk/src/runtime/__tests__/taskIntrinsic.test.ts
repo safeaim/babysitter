@@ -8,14 +8,18 @@ import { buildEffectIndex } from "../replay/effectIndex";
 import { ReplayCursor } from "../replay/replayCursor";
 import { runTaskIntrinsic } from "../intrinsics/task";
 import {
+  EffectCancelledError,
   EffectPendingError,
   EffectRequestedError,
   RunFailedError,
 } from "../exceptions";
-import { commitEffectResult } from "../commitEffectResult";
+import { commitEffectCancellation, commitEffectResult } from "../commitEffectResult";
 import { DefinedTask } from "../types";
 import { TaskIntrinsicContext } from "../intrinsics/task";
 import { globalTaskRegistry } from "../../tasks/registry";
+import { serializeAndWriteTaskDefinition } from "../../tasks/serializer";
+import { hashInvocationKey } from "../invocation/hashInvocationKey";
+import * as runtimeHooks from "../hooks/runtime";
 
 const sampleTask: DefinedTask<{ value: number }, number> = {
   id: "sample-task",
@@ -26,6 +30,24 @@ const sampleTask: DefinedTask<{ value: number }, number> = {
   }),
 };
 
+const shellTask: DefinedTask<{ command: string }, {
+  success: false;
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+  error: string;
+}> = {
+  id: "shell-task",
+  build: async (args) => ({
+    kind: "shell",
+    title: "verify shell task",
+    shell: {
+      command: args.command,
+      expectedExitCode: 0,
+    },
+  }),
+};
+
 let tmpRoot: string;
 
 beforeEach(async () => {
@@ -33,6 +55,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await fs.rm(tmpRoot, { recursive: true, force: true });
 });
 
@@ -62,6 +85,61 @@ async function buildContext(runDir: string, runId: string): Promise<TaskIntrinsi
 }
 
 describe("runTaskIntrinsic", () => {
+  test("emits task.created runtime hook with task metadata before requesting an effect", async () => {
+    const { runDir, runId } = await createRun("run-created-hook");
+    const context = await buildContext(runDir, runId);
+    const hookSpy = vi.spyOn(runtimeHooks, "callRuntimeHook").mockResolvedValue({
+      hookType: "task.created",
+      success: true,
+      executedHooks: [],
+    });
+
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 2 },
+        context,
+      }),
+    ).rejects.toThrow(EffectRequestedError);
+
+    expect(hookSpy).toHaveBeenCalledWith(
+      "task.created",
+      expect.objectContaining({
+        runId: "run-created-hook",
+        processId: "demo-process",
+        task_id: expect.any(String),
+        task_kind: "node",
+        task_title: "sample",
+        task_labels: undefined,
+        taskId: "sample-task",
+        effectId: expect.any(String),
+        kind: "node",
+        title: "sample",
+        labels: undefined,
+      }),
+      expect.objectContaining({ cwd: runDir }),
+    );
+  });
+
+  test("honors blocking task.created runtime hook decisions", async () => {
+    const { runDir, runId } = await createRun("run-created-blocked");
+    const context = await buildContext(runDir, runId);
+    vi.spyOn(runtimeHooks, "callRuntimeHook").mockResolvedValue({
+      hookType: "task.created",
+      success: true,
+      output: { decision: "deny", reason: "task blocked" },
+      executedHooks: [],
+    });
+
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 2 },
+        context,
+      }),
+    ).rejects.toThrow(/task blocked/);
+  });
+
   test("requests new effect, then short-circuits after resolution", async () => {
     const { runDir, runId } = await createRun();
     const context = await buildContext(runDir, runId);
@@ -105,6 +183,44 @@ describe("runTaskIntrinsic", () => {
         context: replayCtx,
       })
     ).resolves.toBe(4);
+  });
+
+  test("replaying a cancelled task throws EffectCancelledError with details", async () => {
+    const { runDir, runId } = await createRun("run-cancelled-replay");
+    const context = await buildContext(runDir, runId);
+
+    let effectId = "";
+    try {
+      await runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 2 },
+        context,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(EffectRequestedError);
+      effectId = (error as EffectRequestedError).action.effectId;
+    }
+
+    await commitEffectCancellation({
+      runDir,
+      effectId,
+      reason: "host cancelled",
+    });
+
+    const replayCtx = await buildContext(runDir, runId);
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 2 },
+        context: replayCtx,
+      })
+    ).rejects.toMatchObject({
+      name: "EffectCancelledError",
+      details: {
+        effectId,
+        reason: "host cancelled",
+      },
+    } satisfies Partial<EffectCancelledError>);
   });
 
   test("throws when task result missing from disk", async () => {
@@ -177,7 +293,7 @@ describe("runTaskIntrinsic", () => {
     ).resolves.toEqual(largeValue);
   });
 
-  test("throws when a resolved ok effect is missing its result payload", async () => {
+  test("returns null when a resolved ok effect is missing its result payload", async () => {
     const { runDir, runId } = await createRun("run-undefined-result");
     const context = await buildContext(runDir, runId);
 
@@ -221,13 +337,261 @@ describe("runTaskIntrinsic", () => {
     });
 
     const replayCtx = await buildContext(runDir, runId);
+    // Missing result payload returns null gracefully instead of crashing
     await expect(
       runTaskIntrinsic({
         task: sampleTask,
         args: { value: 5 },
         context: replayCtx,
       })
-    ).rejects.toThrow(RunFailedError);
+    ).resolves.toBeNull();
+  });
+
+  test("returns success:false shell result without throwing", async () => {
+    const { runDir, runId } = await createRun("run-shell-fail");
+    const context = await buildContext(runDir, runId);
+
+    let effectId = "";
+    try {
+      await runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 7 },
+        context,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(EffectRequestedError);
+      effectId = (error as EffectRequestedError).action.effectId;
+    }
+
+    // Simulate a shell task that failed but was posted as ok with structured failure value
+    const failureValue = {
+      success: false,
+      exitCode: 1,
+      stdout: "",
+      stderr: "SyntaxError: Invalid regular expression",
+      error: "Shell command exited with code 1: SyntaxError: Invalid regular expression",
+    };
+    await commitEffectResult({
+      runDir,
+      effectId,
+      result: { status: "ok", value: failureValue },
+    });
+
+    const replayCtx = await buildContext(runDir, runId);
+    // The process gets the failure value back instead of the run crashing
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 7 },
+        context: replayCtx,
+      })
+    ).resolves.toEqual(failureValue);
+  });
+
+  test("returns structured shell failures when a shell effect was committed with status:error", async () => {
+    const { runDir, runId } = await createRun("run-shell-resolved-error");
+    const context = await buildContext(runDir, runId);
+
+    let effectId = "";
+    try {
+      await runTaskIntrinsic({
+        task: shellTask,
+        args: { command: "npm test" },
+        context,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(EffectRequestedError);
+      effectId = (error as EffectRequestedError).action.effectId;
+    }
+
+    await commitEffectResult({
+      runDir,
+      effectId,
+      result: {
+        status: "error",
+        error: {
+          name: "ShellCommandFailed",
+          message: "Shell command exited with code 2",
+          data: {
+            exitCode: 2,
+            stdout: "",
+            stderr: "tsc failed",
+          },
+        },
+        stderr: "tsc failed",
+      },
+    });
+
+    const replayCtx = await buildContext(runDir, runId);
+    await expect(
+      runTaskIntrinsic({
+        task: shellTask,
+        args: { command: "npm test" },
+        context: replayCtx,
+      })
+    ).resolves.toEqual({
+      success: false,
+      exitCode: 2,
+      stdout: "",
+      stderr: "tsc failed",
+      error: "Shell command exited with code 2",
+    });
+  });
+
+  test("replays a task after a new task is inserted before it", async () => {
+    const { runDir, runId } = await createRun("run-stable-derived-insert");
+    const context = await buildContext(runDir, runId);
+
+    let requestedEffectId = "";
+    let firstError: unknown;
+    try {
+      await runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 1 },
+        context,
+      });
+    } catch (error) {
+      firstError = error;
+      requestedEffectId = (error as EffectRequestedError).action.effectId;
+    }
+    expect(firstError).toBeInstanceOf(EffectRequestedError);
+
+    await commitEffectResult({
+      runDir,
+      effectId: requestedEffectId,
+      result: { status: "ok", value: 10 },
+    });
+
+    const insertedCtx = await buildContext(runDir, runId);
+    await expect(
+      runTaskIntrinsic({
+        task: shellTask,
+        args: { command: "npm test" },
+        context: insertedCtx,
+      })
+    ).rejects.toThrow(EffectRequestedError);
+
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 2 },
+        context: insertedCtx,
+      })
+    ).resolves.toBe(10);
+  });
+
+  test("uses args shape rather than args values in derived keys", async () => {
+    const { runDir, runId } = await createRun("run-args-shape-stable");
+    const context = await buildContext(runDir, runId);
+
+    let requestedEffectId = "";
+    try {
+      await runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 1 },
+        context,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(EffectRequestedError);
+      requestedEffectId = (error as EffectRequestedError).action.effectId;
+    }
+
+    await commitEffectResult({
+      runDir,
+      effectId: requestedEffectId,
+      result: { status: "ok", value: 4 },
+    });
+
+    const replayCtx = await buildContext(runDir, runId);
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 2 },
+        context: replayCtx,
+      })
+    ).resolves.toBe(4);
+  });
+
+  test("replays legacy stepId-only invocation keys", async () => {
+    const { runDir, runId } = await createRun("run-legacy-stepid");
+    const invocation = hashInvocationKey({
+      processId: "demo-process",
+      stepId: "S000001",
+      taskId: sampleTask.id,
+    });
+    const effectId = "legacy-effect";
+    const { taskRef, inputsRef } = await serializeAndWriteTaskDefinition({
+      runDir,
+      effectId,
+      taskId: sampleTask.id,
+      invocationKey: invocation.key,
+      stepId: "S000001",
+      task: { kind: "node", title: "legacy" },
+      inputs: { value: 1 },
+    });
+    await appendEvent({
+      runDir,
+      eventType: "EFFECT_REQUESTED",
+      event: {
+        effectId,
+        invocationKey: invocation.key,
+        invocationHash: invocation.digest,
+        stepId: "S000001",
+        taskId: sampleTask.id,
+        kind: "node",
+        label: sampleTask.id,
+        taskDefRef: taskRef,
+        inputsRef,
+      },
+    });
+    await commitEffectResult({
+      runDir,
+      effectId,
+      result: { status: "ok", value: 8 },
+    });
+
+    const replayCtx = await buildContext(runDir, runId);
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 999 },
+        context: replayCtx,
+      })
+    ).resolves.toBe(8);
+  });
+
+  test("allows explicit key calls to replay even when arguments differ", async () => {
+    const { runDir, runId } = await createRun("run-key-args-change");
+    const context = await buildContext(runDir, runId);
+
+    let requestedEffectId = "";
+    try {
+      await runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 1 },
+        invokeOptions: { key: "editable.sample" },
+        context,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(EffectRequestedError);
+      requestedEffectId = (error as EffectRequestedError).action.effectId;
+    }
+
+    await commitEffectResult({
+      runDir,
+      effectId: requestedEffectId,
+      result: { status: "ok", value: 4 },
+    });
+
+    const replayCtx = await buildContext(runDir, runId);
+    await expect(
+      runTaskIntrinsic({
+        task: sampleTask,
+        args: { value: 999 },
+        invokeOptions: { key: "editable.sample" },
+        context: replayCtx,
+      })
+    ).resolves.toBe(4);
   });
 
   test("provides TaskBuildContext metadata and records registry entries", async () => {

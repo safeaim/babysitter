@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import path from "path";
 import os from "os";
 import { promises as fs } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { createBabysitterCli } from "../main";
 import { readRunMetadata } from "../../storage/runFiles";
 import { DEFAULT_LAYOUT_VERSION, getStateFile } from "../../storage/paths";
@@ -11,6 +12,12 @@ import { createStateCacheSnapshot, writeStateCache } from "../../runtime/replay/
 import * as orchestrateIterationModule from "../../runtime/orchestrateIteration";
 import * as runFilesModule from "../../storage/runFiles";
 import { deriveCompletionProof } from "../completionProof";
+import {
+  __resetCacheForTests,
+  __setAncestorResolverForTests,
+  getSessionMarkerPath,
+} from "../../utils/sessionMarker";
+import * as runSupportModule from "../main/runSupport";
 
 const realReadRunMetadata = readRunMetadata;
 
@@ -19,7 +26,14 @@ describe("babysitter run:create CLI", () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
   let errorSpy: ReturnType<typeof vi.spyOn>;
   const sessionEnvKeys = [
-    "BABYSITTER_SESSION_ID",
+    "AGENT_SESSION_ID",
+    "AGENT_SESSION_ID",
+    "AGENT_ENABLE_SESSION_PID_MARKERS",
+    "BABYSITTER_ENABLE_SESSION_PID_MARKERS",
+    "BABYSITTER_GLOBAL_STATE_DIR",
+    "AGENT_TRUST_ENV_SESSION",
+    "BABYSITTER_TRUST_ENV_SESSION",
+    "CLAUDE_ENV_FILE",
     "CODEX_THREAD_ID",
     "CODEX_SESSION_ID",
     "CODEX_PLUGIN_ROOT",
@@ -31,7 +45,12 @@ describe("babysitter run:create CLI", () => {
     logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
     errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
     savedSessionEnv = {
-      BABYSITTER_SESSION_ID: process.env.BABYSITTER_SESSION_ID,
+      AGENT_SESSION_ID: process.env.AGENT_SESSION_ID,
+      AGENT_TRUST_ENV_SESSION: process.env.AGENT_TRUST_ENV_SESSION,
+      BABYSITTER_ENABLE_SESSION_PID_MARKERS: process.env.BABYSITTER_ENABLE_SESSION_PID_MARKERS,
+      BABYSITTER_GLOBAL_STATE_DIR: process.env.BABYSITTER_GLOBAL_STATE_DIR,
+      BABYSITTER_TRUST_ENV_SESSION: process.env.BABYSITTER_TRUST_ENV_SESSION,
+      CLAUDE_ENV_FILE: process.env.CLAUDE_ENV_FILE,
       CODEX_THREAD_ID: process.env.CODEX_THREAD_ID,
       CODEX_SESSION_ID: process.env.CODEX_SESSION_ID,
       CODEX_PLUGIN_ROOT: process.env.CODEX_PLUGIN_ROOT,
@@ -51,6 +70,9 @@ describe("babysitter run:create CLI", () => {
         process.env[key] = savedSessionEnv[key];
       }
     }
+    __resetCacheForTests();
+    __setAncestorResolverForTests(undefined);
+    vi.restoreAllMocks();
     await fs.rm(runsRoot, { recursive: true, force: true });
   });
 
@@ -125,6 +147,251 @@ describe("babysitter run:create CLI", () => {
       runDir,
       entry: `${metadata.entrypoint.importPath}#${metadata.entrypoint.exportName}`,
     });
+  });
+
+  it("binds claude-code runs to the current marker-backed session instead of leaked AGENT_SESSION_ID", async () => {
+    const entryFile = await writeEntrypoint("processes/claude-session.mjs", `export async function process() { return true; }\n`);
+    const globalStateRoot = await fs.mkdtemp(path.join(os.tmpdir(), "cli-run-create-claude-state-"));
+    const currentSessionId = "current-claude-session";
+    const leakedSessionId = "leaked-background-shell-session";
+
+    process.env.BABYSITTER_GLOBAL_STATE_DIR = globalStateRoot;
+    process.env.AGENT_ENABLE_SESSION_PID_MARKERS = "1";
+    process.env.AGENT_SESSION_ID = leakedSessionId;
+    __resetCacheForTests();
+    __setAncestorResolverForTests(() => ({ pid: process.pid }));
+
+    const markerPath = getSessionMarkerPath("claude-code", process.pid);
+    await fs.mkdir(path.dirname(markerPath), { recursive: true });
+    await fs.writeFile(markerPath, `${currentSessionId}\n`);
+
+    const cli = createBabysitterCli();
+    const exitCode = await cli.run([
+      "run:create",
+      "--runs-dir",
+      runsRoot,
+      "--process-id",
+      "ci/claude-session",
+      "--entry",
+      `${entryFile}#process`,
+      "--harness",
+      "claude-code",
+      "--json",
+    ]);
+
+    expect(exitCode).toBe(0);
+    const payload = readLastJsonLine(logSpy);
+    expect(payload.session).toMatchObject({
+      harness: "claude-code",
+      sessionId: currentSessionId,
+      resolvedFrom: "pid-marker",
+      ancestorPid: process.pid,
+      ancestorAlive: true,
+    });
+    expect(String(payload.session.stateFile).replace(/\\/g, "/")).toContain(`/state/${currentSessionId}.md`);
+    await expect(
+      fs.access(path.join(globalStateRoot, "state", `${currentSessionId}.md`)),
+    ).resolves.toBeUndefined();
+
+    await fs.rm(globalStateRoot, { recursive: true, force: true });
+  });
+
+  it("keeps claude-code env-first binding when trust-env is explicitly set", async () => {
+    const entryFile = await writeEntrypoint("processes/claude-trust-env.mjs", `export async function process() { return true; }\n`);
+    const globalStateRoot = await fs.mkdtemp(path.join(os.tmpdir(), "cli-run-create-claude-trust-"));
+    const currentSessionId = "current-claude-session";
+    const trustedSessionId = "trusted-ci-session";
+
+    process.env.BABYSITTER_GLOBAL_STATE_DIR = globalStateRoot;
+    process.env.AGENT_ENABLE_SESSION_PID_MARKERS = "1";
+    process.env.AGENT_SESSION_ID = trustedSessionId;
+    process.env.AGENT_TRUST_ENV_SESSION = "1";
+    __resetCacheForTests();
+    __setAncestorResolverForTests(() => ({ pid: process.pid }));
+
+    const markerPath = getSessionMarkerPath("claude-code", process.pid);
+    await fs.mkdir(path.dirname(markerPath), { recursive: true });
+    await fs.writeFile(markerPath, `${currentSessionId}\n`);
+
+    const cli = createBabysitterCli();
+    const exitCode = await cli.run([
+      "run:create",
+      "--runs-dir",
+      runsRoot,
+      "--process-id",
+      "ci/claude-trust-env",
+      "--entry",
+      `${entryFile}#process`,
+      "--harness",
+      "claude-code",
+      "--json",
+    ]);
+
+    expect(exitCode).toBe(0);
+    const payload = readLastJsonLine(logSpy);
+    expect(payload.session).toMatchObject({
+      harness: "claude-code",
+      sessionId: trustedSessionId,
+      resolvedFrom: "env-var",
+    });
+    expect(String(payload.session.stateFile).replace(/\\/g, "/")).toContain(`/state/${trustedSessionId}.md`);
+    await expect(
+      fs.access(path.join(globalStateRoot, "state", `${trustedSessionId}.md`)),
+    ).resolves.toBeUndefined();
+
+    await fs.rm(globalStateRoot, { recursive: true, force: true });
+  });
+
+  it("seeds the first iteration for claude-code run:create when session binding succeeds", async () => {
+    const entryFile = await writeEntrypoint(
+      "processes/claude-first-iteration.mjs",
+      `export async function process() { return true; }\n`,
+    );
+    await writeFakeSdkPackage(path.join(runsRoot, "node_modules", "@a5c-ai", "babysitter-sdk"), "seed-test");
+    const globalStateRoot = await fs.mkdtemp(path.join(os.tmpdir(), "cli-run-create-claude-first-"));
+    const currentSessionId = "current-claude-first-iteration";
+    const firstEffectId = "ef-issue-170-first";
+
+    const orchestrateSpy = vi.spyOn(orchestrateIterationModule, "orchestrateIteration").mockImplementation(
+      async (options) => {
+        await appendEvent({
+          runDir: options.runDir,
+          eventType: "EFFECT_REQUESTED",
+          event: {
+            effectId: firstEffectId,
+            invocationKey: "issue-170:first-effect",
+            stepId: "first-effect",
+            taskId: "issue-170-first-effect",
+            kind: "agent",
+            label: "agent",
+            taskDefRef: `tasks/${firstEffectId}/task.json`,
+          },
+        });
+        return {
+          status: "waiting",
+          nextActions: [
+            {
+              effectId: firstEffectId,
+              invocationKey: "issue-170:first-effect",
+              kind: "agent",
+              label: "agent",
+              taskDef: { kind: "agent", title: "first effect" },
+            },
+          ],
+        };
+      },
+    );
+
+    process.env.BABYSITTER_GLOBAL_STATE_DIR = globalStateRoot;
+    process.env.AGENT_ENABLE_SESSION_PID_MARKERS = "1";
+    __resetCacheForTests();
+    __setAncestorResolverForTests(() => ({ pid: process.pid }));
+
+    const markerPath = getSessionMarkerPath("claude-code", process.pid);
+    await fs.mkdir(path.dirname(markerPath), { recursive: true });
+    await fs.writeFile(markerPath, `${currentSessionId}\n`);
+
+    const cli = createBabysitterCli();
+    const exitCode = await cli.run([
+      "run:create",
+      "--runs-dir",
+      runsRoot,
+      "--process-id",
+      "ci/claude-first-iteration",
+      "--entry",
+      `${entryFile}#process`,
+      "--harness",
+      "claude-code",
+      "--json",
+    ]);
+
+    expect(exitCode).toBe(0);
+    const payload = readLastJsonLine(logSpy);
+    expect(payload.session).toMatchObject({
+      harness: "claude-code",
+      sessionId: currentSessionId,
+    });
+    expect(payload.initialIteration).toMatchObject({
+      iteration: 1,
+      status: "waiting",
+      reason: "agent-pending",
+    });
+    expect(orchestrateSpy).toHaveBeenCalledTimes(1);
+
+    const runDir = await expectSingleRunDir();
+    const journal = await loadJournal(runDir);
+    expect(journal.map((event) => event.type)).toContain("EFFECT_REQUESTED");
+    expect(journal.filter((event) => event.type === "EFFECT_REQUESTED")).toHaveLength(1);
+
+    await fs.rm(globalStateRoot, { recursive: true, force: true });
+    orchestrateSpy.mockRestore();
+  });
+
+  it("does not seed the first iteration for claude-code bare runs", async () => {
+    const globalStateRoot = await fs.mkdtemp(path.join(os.tmpdir(), "cli-run-create-claude-bare-"));
+    const currentSessionId = "current-claude-bare-run";
+
+    process.env.BABYSITTER_GLOBAL_STATE_DIR = globalStateRoot;
+    process.env.AGENT_ENABLE_SESSION_PID_MARKERS = "1";
+    __resetCacheForTests();
+    __setAncestorResolverForTests(() => ({ pid: process.pid }));
+
+    const markerPath = getSessionMarkerPath("claude-code", process.pid);
+    await fs.mkdir(path.dirname(markerPath), { recursive: true });
+    await fs.writeFile(markerPath, `${currentSessionId}\n`);
+
+    const cli = createBabysitterCli();
+    const exitCode = await cli.run([
+      "run:create",
+      "--runs-dir",
+      runsRoot,
+      "--harness",
+      "claude-code",
+      "--json",
+    ]);
+
+    expect(exitCode).toBe(0);
+    const payload = readLastJsonLine(logSpy);
+    expect(payload.initialIteration).toBeUndefined();
+
+    const runDir = await expectSingleRunDir();
+    const journal = await loadJournal(runDir);
+    expect(journal).toHaveLength(1);
+    expect(journal[0].type).toBe("RUN_CREATED");
+
+    await fs.rm(globalStateRoot, { recursive: true, force: true });
+  });
+
+  it("does not seed the first iteration when claude-code session binding is unresolved", async () => {
+    const entryFile = await writeEntrypoint("processes/claude-no-session.mjs", `export async function process() { return true; }\n`);
+
+    const cli = createBabysitterCli();
+    const exitCode = await cli.run([
+      "run:create",
+      "--runs-dir",
+      runsRoot,
+      "--process-id",
+      "ci/claude-no-session",
+      "--entry",
+      `${entryFile}#process`,
+      "--harness",
+      "claude-code",
+      "--json",
+    ]);
+
+    expect(exitCode).toBe(0);
+    const payload = readLastJsonLine(logSpy);
+    expect(payload.initialIteration).toBeUndefined();
+    expect(payload.session).toMatchObject({
+      harness: "claude-code",
+      sessionId: "",
+    });
+    expect(payload.session.error).toContain("session");
+
+    const runDir = await expectSingleRunDir();
+    const journal = await loadJournal(runDir);
+    expect(journal).toHaveLength(1);
+    expect(journal[0].type).toBe("RUN_CREATED");
   });
 
   it("describes dry-run plans without creating run directories", async () => {
@@ -222,6 +489,73 @@ describe("babysitter run:create CLI", () => {
     expect(journal[0].data.prompt).toBe("Build a REST API with user authentication");
   });
 
+  it("validates entry modules that import the SDK by preparing a local fallback dependency", async () => {
+    const entryDir = path.join(runsRoot, "external-process");
+    const entryFile = path.join(entryDir, "process.mjs");
+    const fallbackSdkDir = await writeFakeSdkPackage(path.join(runsRoot, "fallback-sdk"), "fallback");
+    await fs.mkdir(entryDir, { recursive: true });
+    await fs.writeFile(
+      entryFile,
+      [
+        'import { __marker } from "@a5c-ai/babysitter-sdk";',
+        "export const sdkMarker = __marker;",
+        'export async function process() { return "ok"; }',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    await expect(
+      runSupportModule.validateProcessEntrypoint(entryFile, "process", {
+        resolveSdkPackageDir: () => fallbackSdkDir,
+      }),
+    ).resolves.toBeUndefined();
+
+    await expect(fs.realpath(path.join(entryDir, "node_modules", "@a5c-ai", "babysitter-sdk"))).resolves.toBe(
+      fallbackSdkDir,
+    );
+
+    const loaded = await import(`${pathToFileURL(entryFile).href}?marker=fallback`);
+    expect(loaded.sdkMarker).toBe("fallback");
+  });
+
+  it("prefers an existing project-local SDK dependency over the fallback link", async () => {
+    const projectRoot = path.join(runsRoot, "project-local");
+    const entryDir = path.join(projectRoot, "processes");
+    const entryFile = path.join(entryDir, "process.mjs");
+    const localSdkDir = await writeFakeSdkPackage(
+      path.join(projectRoot, "node_modules", "@a5c-ai", "babysitter-sdk"),
+      "local",
+      true,
+    );
+    const fallbackSdkDir = await writeFakeSdkPackage(path.join(runsRoot, "fallback-sdk-local"), "fallback");
+    await fs.mkdir(entryDir, { recursive: true });
+    await fs.writeFile(
+      entryFile,
+      [
+        'import { __marker } from "@a5c-ai/babysitter-sdk";',
+        "export const sdkMarker = __marker;",
+        'export async function process() { return "ok"; }',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    await expect(
+      runSupportModule.validateProcessEntrypoint(entryFile, "process", {
+        resolveSdkPackageDir: () => fallbackSdkDir,
+      }),
+    ).resolves.toBeUndefined();
+
+    await expect(
+      fs.access(path.join(entryDir, "node_modules", "@a5c-ai", "babysitter-sdk")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+
+    const loaded = await import(`${pathToFileURL(entryFile).href}?marker=local`);
+    expect(loaded.sdkMarker).toBe("local");
+    await expect(fs.realpath(localSdkDir)).resolves.toBe(localSdkDir);
+  });
+
   it("persists --harness in run.json and stamps it on journal events", async () => {
     const entryFile = await writeEntrypoint("processes/harnessed.mjs", `export async function process() {\n  return "harnessed";\n}\n`);
 
@@ -280,7 +614,7 @@ describe("babysitter run:create CLI", () => {
     const exitCode = await cli.run(["run:create", "--entry", "./process.mjs"]);
 
     expect(exitCode).toBe(1);
-    expect(errorSpy).toHaveBeenCalledWith("--process-id is required for run:create");
+    expect(errorSpy).toHaveBeenCalledWith("--process-id is required for run:create (unless creating a bare run without --entry)");
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("babysitter run:create"));
   });
 
@@ -289,6 +623,26 @@ describe("babysitter run:create CLI", () => {
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
     await fs.writeFile(absolutePath, contents, "utf8");
     return absolutePath;
+  }
+
+  async function writeFakeSdkPackage(packageRoot: string, marker: string, absolute = false) {
+    const resolvedRoot = absolute ? packageRoot : path.resolve(packageRoot);
+    await fs.mkdir(path.join(resolvedRoot, "dist"), { recursive: true });
+    await fs.writeFile(
+      path.join(resolvedRoot, "package.json"),
+      JSON.stringify({
+        name: "@a5c-ai/babysitter-sdk",
+        type: "commonjs",
+        main: "dist/index.js",
+      }, null, 2),
+      "utf8",
+    );
+    await fs.writeFile(
+      path.join(resolvedRoot, "dist", "index.js"),
+      `exports.__marker = ${JSON.stringify(marker)};\nexports.defineTask = function defineTask() { return null; };\n`,
+      "utf8",
+    );
+    return resolvedRoot;
   }
 
   async function expectSingleRunDir(): Promise<string> {
@@ -337,6 +691,84 @@ describe("run lifecycle inspection commands", () => {
     await fs.rm(runsRoot, { recursive: true, force: true });
   });
 
+  describe("run:iterate", () => {
+    it("enables plugin-local subprocess support when iterating inside plugin mode", async () => {
+      const runDir = await createRunSkeleton("run-plugin-local-iterate");
+      const savedEnv = {
+        AGENT_PLUGIN_ROOT: process.env.AGENT_PLUGIN_ROOT,
+        AGENT_SESSION_ID: process.env.AGENT_SESSION_ID,
+        AGENT_CAPABILITIES_JSON: process.env.AGENT_CAPABILITIES_JSON,
+        BABYSITTER_STATE_DIR: process.env.BABYSITTER_STATE_DIR,
+      };
+      const orchestrateSpy = vi.spyOn(orchestrateIterationModule, "orchestrateIteration").mockResolvedValue({
+        status: "completed",
+        output: { ok: true },
+      });
+
+      process.env.AGENT_PLUGIN_ROOT = path.join(runsRoot, "plugin-root");
+      process.env.AGENT_SESSION_ID = "plugin-session";
+      process.env.AGENT_CAPABILITIES_JSON = JSON.stringify({ tools: ["bash"] });
+      process.env.BABYSITTER_STATE_DIR = path.join(runsRoot, "state");
+
+      try {
+        const exitCode = await cli.run(["run:iterate", runDir, "--json"]);
+
+        expect(exitCode).toBe(0);
+        expect(orchestrateSpy).toHaveBeenCalledWith(expect.objectContaining({
+          runDir,
+          subprocessSupport: "plugin-local",
+        }));
+      } finally {
+        for (const [key, value] of Object.entries(savedEnv)) {
+          if (value === undefined) {
+            delete process.env[key];
+          } else {
+            process.env[key] = value;
+          }
+        }
+        orchestrateSpy.mockRestore();
+      }
+    });
+
+    it("keeps subprocess support disabled for ordinary local iteration", async () => {
+      const runDir = await createRunSkeleton("run-local-iterate");
+      const orchestrateSpy = vi.spyOn(orchestrateIterationModule, "orchestrateIteration").mockResolvedValue({
+        status: "completed",
+        output: { ok: true },
+      });
+
+      const exitCode = await cli.run(["run:iterate", runDir, "--json"]);
+
+      expect(exitCode).toBe(0);
+      expect(orchestrateSpy).toHaveBeenCalledWith(expect.objectContaining({
+        runDir,
+      }));
+      expect(orchestrateSpy.mock.calls[0][0]).not.toHaveProperty("subprocessSupport");
+      orchestrateSpy.mockRestore();
+    });
+
+    it("returns non-zero for halted runs without a completion proof", async () => {
+      const runDir = await createRunSkeleton("run-halted-iterate");
+      const orchestrateSpy = vi.spyOn(orchestrateIterationModule, "orchestrateIteration").mockResolvedValue({
+        status: "halted",
+        reason: "phase-0",
+        payload: { reason: "invalid-input" },
+      });
+
+      const exitCode = await cli.run(["run:iterate", runDir, "--json"]);
+
+      expect(exitCode).toBe(1);
+      const payload = readLastJson(logSpy);
+      expect(payload).toMatchObject({
+        status: "halted",
+        reason: "phase-0",
+        payload: { reason: "invalid-input" },
+      });
+      expect(payload.completionProof).toBeUndefined();
+      orchestrateSpy.mockRestore();
+    });
+  });
+
   describe("run:status", () => {
     it("reports state, last event, and pending counts", async () => {
       const runDir = await createRunWithPendingEffects();
@@ -380,6 +812,25 @@ describe("run lifecycle inspection commands", () => {
       const payload = readLastJson(logSpy);
       expect(payload.state).toBe("completed");
       expect(payload.completionProof).toBe(deriveCompletionProof(runId));
+    });
+
+    it("reports halted runs with reason and no completion proof", async () => {
+      const runId = "run-halted-status";
+      const runDir = await createRunSkeleton(runId);
+      await appendEvent({
+        runDir,
+        eventType: "RUN_HALTED",
+        event: { reason: "phase-0", payload: { reason: "invalid-input" } },
+      });
+
+      const exitCode = await cli.run(["run:status", runDir, "--json"]);
+
+      expect(exitCode).toBe(0);
+      const payload = readLastJson(logSpy);
+      expect(payload.state).toBe("halted");
+      expect(payload.reason).toBe("phase-0");
+      expect(payload.payload).toEqual({ reason: "invalid-input" });
+      expect(payload.completionProof).toBeNull();
     });
 
     it("includes iteration metadata in JSON output", async () => {
@@ -506,6 +957,29 @@ describe("run lifecycle inspection commands", () => {
       expect(line).toContain("state=failed");
       expect(line).toContain("pending[breakpoint]=1");
       expect(line).toContain("last=RUN_FAILED#000005");
+    });
+
+    it("reports PROCESS_RUNTIME_ERROR as a distinct failed state", async () => {
+      const runDir = await createRunWithProcessRuntimeError();
+
+      const exitCode = await cli.run(["run:status", runDir, "--json"]);
+
+      expect(exitCode).toBe(0);
+      const payload = readLastJson(logSpy);
+      expect(payload.state).toBe("failed");
+      expect(payload.reason).toBe("process_runtime_error");
+      expect(payload.lastEvent).toMatchObject({
+        type: "PROCESS_RUNTIME_ERROR",
+        data: {
+          error: {
+            message: "Cannot read properties of undefined",
+          },
+          recovery: {
+            command: "run:recover-process-error",
+            recoverable: true,
+          },
+        },
+      });
     });
   });
 
@@ -647,6 +1121,24 @@ describe("run lifecycle inspection commands", () => {
         })
       );
     });
+
+    it("filters PROCESS_RUNTIME_ERROR events", async () => {
+      const runDir = await createRunWithProcessRuntimeError();
+
+      const exitCode = await cli.run(["run:events", runDir, "--filter-type", "process_runtime_error", "--json"]);
+
+      expect(exitCode).toBe(0);
+      const payload = readLastJson(logSpy);
+      expect(payload.events).toHaveLength(1);
+      expect(payload.events[0]).toMatchObject({
+        type: "PROCESS_RUNTIME_ERROR",
+        data: {
+          error: {
+            message: "Cannot read properties of undefined",
+          },
+        },
+      });
+    });
   });
 
   describe("run:rebuild-state", () => {
@@ -773,6 +1265,121 @@ describe("run lifecycle inspection commands", () => {
     });
   });
 
+  describe("run:recover-process-error", () => {
+    it("supports dry-run JSON without mutating the journal", async () => {
+      const runDir = await createRunWithProcessRuntimeError();
+      const before = await loadJournal(runDir);
+
+      const exitCode = await cli.run(["run:recover-process-error", runDir, "--dry-run", "--json"]);
+
+      expect(exitCode).toBe(0);
+      const payload = readLastJson(logSpy);
+      expect(payload).toMatchObject({
+        dryRun: true,
+        runDir,
+        recovered: false,
+        processError: {
+          type: "PROCESS_RUNTIME_ERROR",
+        },
+      });
+      const after = await loadJournal(runDir);
+      expect(after.map((event) => event.type)).toEqual(before.map((event) => event.type));
+    });
+
+    it("patches the offending task result and clears the latest process error marker", async () => {
+      const runDir = await createRunWithProcessRuntimeError();
+
+      const exitCode = await cli.run([
+        "run:recover-process-error",
+        runDir,
+        "--patch-effect",
+        "ef-process:value.checks=[]",
+        "--json",
+      ]);
+
+      expect(exitCode).toBe(0);
+      const payload = readLastJson(logSpy);
+      expect(payload).toMatchObject({
+        recovered: true,
+        patchedEffect: {
+          effectId: "ef-process",
+          path: "value.checks",
+        },
+      });
+      const result = JSON.parse(await fs.readFile(path.join(runDir, "tasks", "ef-process", "result.json"), "utf8"));
+      expect(result.value.checks).toEqual([]);
+      const journal = await loadJournal(runDir);
+      expect(journal.some((event) => event.type === "PROCESS_RUNTIME_ERROR")).toBe(false);
+    });
+
+    it("patches returned task value paths without requiring the stored artifact wrapper key", async () => {
+      const runDir = await createRunWithProcessRuntimeError();
+
+      const exitCode = await cli.run([
+        "run:recover-process-error",
+        runDir,
+        "--patch-effect",
+        "ef-process:checks=[]",
+        "--json",
+      ]);
+
+      expect(exitCode).toBe(0);
+      const payload = readLastJson(logSpy);
+      expect(payload).toMatchObject({
+        recovered: true,
+        patchedEffect: {
+          effectId: "ef-process",
+          path: "checks",
+        },
+      });
+      const result = JSON.parse(await fs.readFile(path.join(runDir, "tasks", "ef-process", "result.json"), "utf8"));
+      expect(result.value.checks).toEqual([]);
+      expect(result.checks).toBeUndefined();
+    });
+
+    it("clears the marker without a patch so the next iterate can honestly rethrow", async () => {
+      const runDir = await createRunWithProcessRuntimeError();
+
+      const exitCode = await cli.run(["run:recover-process-error", runDir, "--json"]);
+
+      expect(exitCode).toBe(0);
+      const payload = readLastJson(logSpy);
+      expect(payload).toMatchObject({ recovered: true, patchedEffect: null });
+      const journal = await loadJournal(runDir);
+      expect(journal.some((event) => event.type === "PROCESS_RUNTIME_ERROR")).toBe(false);
+      const result = JSON.parse(await fs.readFile(path.join(runDir, "tasks", "ef-process", "result.json"), "utf8"));
+      expect(result.value).toEqual({ verified: true });
+    });
+
+    it("rejects malformed patch input without mutating artifacts", async () => {
+      const runDir = await createRunWithProcessRuntimeError();
+      const beforeJournal = (await loadJournal(runDir)).map((event) => event.type);
+      const beforeResult = await fs.readFile(path.join(runDir, "tasks", "ef-process", "result.json"), "utf8");
+
+      const exitCode = await cli.run([
+        "run:recover-process-error",
+        runDir,
+        "--patch-effect",
+        "ef-process:value.checks",
+        "--json",
+      ]);
+
+      expect(exitCode).toBe(1);
+      expect(hasLineContaining(errorSpy, "[run:recover-process-error]")).toBe(true);
+      expect((await loadJournal(runDir)).map((event) => event.type)).toEqual(beforeJournal);
+      await expect(fs.readFile(path.join(runDir, "tasks", "ef-process", "result.json"), "utf8")).resolves.toBe(beforeResult);
+    });
+
+    it("fails cleanly when no process error marker exists", async () => {
+      const runDir = await createRunSkeleton("run-no-process-error");
+
+      const exitCode = await cli.run(["run:recover-process-error", runDir, "--json"]);
+
+      expect(exitCode).toBe(1);
+      expect(hasLineContaining(errorSpy, "no PROCESS_RUNTIME_ERROR event found")).toBe(true);
+    });
+  });
+
   async function createRunWithPendingEffects() {
     const runDir = await createRunSkeleton("run-pending");
     await appendRequestedEffect(runDir, "ef-node", "node", "build");
@@ -789,6 +1396,57 @@ describe("run lifecycle inspection commands", () => {
       runDir,
       eventType: "RUN_FAILED",
       event: { reason: "boom" },
+    });
+    return runDir;
+  }
+
+  async function createRunWithProcessRuntimeError() {
+    const runDir = await createRunSkeleton("run-process-runtime-error");
+    await appendRequestedEffect(runDir, "ef-process", "node", "verify");
+    const taskDir = path.join(runDir, "tasks", "ef-process");
+    await fs.writeFile(
+      path.join(taskDir, "result.json"),
+      JSON.stringify({
+        schemaVersion: "test",
+        effectId: "ef-process",
+        taskId: "node-task",
+        invocationKey: "ef-process:inv",
+        status: "ok",
+        value: { verified: true },
+      }, null, 2),
+    );
+    await appendEvent({
+      runDir,
+      eventType: "EFFECT_RESOLVED",
+      event: {
+        effectId: "ef-process",
+        status: "ok",
+        resultRef: "tasks/ef-process/result.json",
+      },
+    });
+    await appendEvent({
+      runDir,
+      eventType: "PROCESS_RUNTIME_ERROR",
+      event: {
+        error: { name: "TypeError", message: "Cannot read properties of undefined" },
+        iteration: 2,
+        runId: "run-process-runtime-error",
+        processId: "process-id",
+        journalHead: { seq: 3, ulid: "01HPROCESS0000000000000" },
+        lastEffect: {
+          effectId: "ef-process",
+          invocationKey: "ef-process:inv",
+          taskId: "node-task",
+          stepId: "step-ef-process",
+          kind: "node",
+          status: "resolved_ok",
+          resultRef: "tasks/ef-process/result.json",
+        },
+        recovery: {
+          command: "run:recover-process-error",
+          recoverable: true,
+        },
+      },
     });
     return runDir;
   }

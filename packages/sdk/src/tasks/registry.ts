@@ -1,6 +1,6 @@
 import { JsonRecord } from "../storage/types";
 
-export type TaskStatus = "pending" | "resolved_ok" | "resolved_error";
+export type TaskStatus = "pending" | "resolved_ok" | "resolved_error" | "cancelled";
 
 export interface RegisteredTaskDefinition {
   id: string;
@@ -8,6 +8,8 @@ export interface RegisteredTaskDefinition {
   labels: string[];
   description?: string;
   source?: string;
+  inputSchema?: JsonRecord;
+  outputSchema?: JsonRecord | false | null;
 }
 
 export interface RegistryEffectRecord {
@@ -55,6 +57,8 @@ export class TaskRegistry {
       labels: normalizeLabels(record.labels),
       description: record.description,
       source: record.source,
+      inputSchema: record.inputSchema,
+      outputSchema: record.outputSchema,
     };
     this.definitions.set(record.id, normalized);
     return normalized;

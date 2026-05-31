@@ -1,25 +1,27 @@
 import * as path from "path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { commitEffectResult } from "../../runtime/commitEffectResult";
+import { z } from "zod/v3";
+import { commitEffectCancellation, commitEffectResult } from "../../runtime/commitEffectResult";
 import { loadJournal } from "../../storage";
 import { readTaskDefinition, readTaskResult } from "../../storage/tasks";
 import type { JournalEvent } from "../../storage/types";
 import { toolResult, toolError } from "../util/errors";
 import { resolveRunDir } from "../util/resolve-run-dir";
+import { registerMcpTool } from "../util/registerTool";
 
 /**
- * Build a task list from journal events by tracking EFFECT_REQUESTED and
- * EFFECT_RESOLVED events.
+ * Build a task list from journal events by tracking requested effects and
+ * terminal resolution/cancellation events.
  */
 function buildTaskList(events: JournalEvent[]): Array<{
   effectId: string;
   kind: string;
-  status: "pending" | "resolved";
+  status: "pending" | "resolved" | "cancelled";
   label?: string;
   taskId?: string;
   requestedAt?: string;
   resolvedAt?: string;
+  cancelledAt?: string;
 }> {
   const requested = new Map<
     string,
@@ -31,7 +33,11 @@ function buildTaskList(events: JournalEvent[]): Array<{
       requestedAt?: string;
     }
   >();
-  const resolved = new Map<string, { resolvedAt?: string }>();
+  const terminal = new Map<string, {
+    status: "resolved" | "cancelled";
+    resolvedAt?: string;
+    cancelledAt?: string;
+  }>();
 
   for (const event of events) {
     if (event.type === "EFFECT_REQUESTED") {
@@ -53,7 +59,19 @@ function buildTaskList(events: JournalEvent[]): Array<{
     } else if (event.type === "EFFECT_RESOLVED") {
       const data = event.data as { effectId?: string };
       if (data.effectId) {
-        resolved.set(data.effectId, { resolvedAt: event.recordedAt });
+        terminal.set(data.effectId, {
+          status: "resolved",
+          resolvedAt: event.recordedAt,
+        });
+      }
+    } else if (event.type === "EFFECT_CANCELLED") {
+      const data = event.data as { effectId?: string };
+      if (data.effectId) {
+        terminal.set(data.effectId, {
+          status: "cancelled",
+          resolvedAt: event.recordedAt,
+          cancelledAt: event.recordedAt,
+        });
       }
     }
   }
@@ -61,23 +79,25 @@ function buildTaskList(events: JournalEvent[]): Array<{
   const tasks: Array<{
     effectId: string;
     kind: string;
-    status: "pending" | "resolved";
+    status: "pending" | "resolved" | "cancelled";
     label?: string;
     taskId?: string;
     requestedAt?: string;
     resolvedAt?: string;
+    cancelledAt?: string;
   }> = [];
 
   for (const [effectId, info] of requested) {
-    const resolvedInfo = resolved.get(effectId);
+    const terminalInfo = terminal.get(effectId);
     tasks.push({
       effectId,
       kind: info.kind,
-      status: resolvedInfo ? "resolved" : "pending",
+      status: terminalInfo?.status ?? "pending",
       label: info.label,
       taskId: info.taskId,
       requestedAt: info.requestedAt,
-      resolvedAt: resolvedInfo?.resolvedAt,
+      resolvedAt: terminalInfo?.resolvedAt,
+      cancelledAt: terminalInfo?.cancelledAt,
     });
   }
 
@@ -86,24 +106,27 @@ function buildTaskList(events: JournalEvent[]): Array<{
 
 export function registerTaskTools(server: McpServer): void {
   // ── task_post ───────────────────────────────────────────────────────
-  server.tool(
+  registerMcpTool(
+    server,
     "task_post",
-    "Post a result for a pending task effect",
     {
-      runId: z.string().describe("The run ID the task belongs to"),
-      effectId: z.string().describe("The effect ID of the task to resolve"),
-      status: z
-        .enum(["ok", "error"])
-        .describe("Result status: ok for success, error for failure"),
-      value: z
-        .string()
-        .optional()
-        .describe("JSON-encoded result value (when status=ok)"),
-      error: z
-        .string()
-        .optional()
-        .describe("JSON-encoded error payload (when status=error)"),
-      runsDir: z.string().optional().describe("Override runs directory path"),
+      description: "Post a result for a pending task effect",
+      inputSchema: {
+        runId: z.string().describe("The run ID the task belongs to"),
+        effectId: z.string().describe("The effect ID of the task to resolve"),
+        status: z
+          .enum(["ok", "error"])
+          .describe("Result status: ok for success, error for failure"),
+        value: z
+          .string()
+          .optional()
+          .describe("JSON-encoded result value (when status=ok)"),
+        error: z
+          .string()
+          .optional()
+          .describe("JSON-encoded error payload (when status=error)"),
+        runsDir: z.string().optional().describe("Override runs directory path"),
+      },
     },
     async (args) => {
       try {
@@ -165,17 +188,53 @@ export function registerTaskTools(server: McpServer): void {
     }
   );
 
-  // ── task_list ───────────────────────────────────────────────────────
+  // ── task_cancel ─────────────────────────────────────────────────────
   server.tool(
-    "task_list",
-    "List all tasks for a run, optionally showing only pending tasks",
+    "task_cancel",
+    "Cancel a pending task effect",
     {
-      runId: z.string().describe("The run ID to list tasks for"),
-      pendingOnly: z
-        .boolean()
-        .optional()
-        .describe("If true, only show pending (unresolved) tasks"),
+      runId: z.string().describe("The run ID the task belongs to"),
+      effectId: z.string().describe("The effect ID of the task to cancel"),
+      reason: z.string().optional().describe("Human-readable cancellation reason"),
       runsDir: z.string().optional().describe("Override runs directory path"),
+    },
+    async (args) => {
+      try {
+        const runsDir = resolveRunDir(args.runsDir);
+        const runDir = path.join(runsDir, args.runId);
+
+        const committed = await commitEffectCancellation({
+          runDir,
+          effectId: args.effectId,
+          reason: args.reason,
+        });
+
+        return toolResult({
+          status: "cancelled",
+          effectId: args.effectId,
+          resultRef: committed.resultRef,
+          ...(args.reason !== undefined ? { reason: args.reason } : {}),
+        });
+      } catch (err) {
+        return toolError(err instanceof Error ? err.message : String(err));
+      }
+    }
+  );
+
+  // ── task_list ───────────────────────────────────────────────────────
+  registerMcpTool(
+    server,
+    "task_list",
+    {
+      description: "List all tasks for a run, optionally showing only pending tasks",
+      inputSchema: {
+        runId: z.string().describe("The run ID to list tasks for"),
+        pendingOnly: z
+          .boolean()
+          .optional()
+          .describe("If true, only show pending (unresolved) tasks"),
+        runsDir: z.string().optional().describe("Override runs directory path"),
+      },
     },
     async (args) => {
       try {
@@ -202,13 +261,16 @@ export function registerTaskTools(server: McpServer): void {
   );
 
   // ── task_show ───────────────────────────────────────────────────────
-  server.tool(
+  registerMcpTool(
+    server,
     "task_show",
-    "Show details of a specific task including its definition and result",
     {
-      runId: z.string().describe("The run ID the task belongs to"),
-      effectId: z.string().describe("The effect ID of the task"),
-      runsDir: z.string().optional().describe("Override runs directory path"),
+      description: "Show details of a specific task including its definition and result",
+      inputSchema: {
+        runId: z.string().describe("The run ID the task belongs to"),
+        effectId: z.string().describe("The effect ID of the task"),
+        runsDir: z.string().optional().describe("Override runs directory path"),
+      },
     },
     async (args) => {
       try {
@@ -234,9 +296,9 @@ export function registerTaskTools(server: McpServer): void {
           // Task definition might not exist yet
         }
 
-        // Read task result if resolved
+        // Read task result if terminal
         let taskResultData: unknown = null;
-        if (taskEntry.status === "resolved") {
+        if (taskEntry.status !== "pending") {
           try {
             taskResultData = await readTaskResult(runDir, args.effectId);
           } catch {

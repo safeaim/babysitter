@@ -109,6 +109,42 @@ describe("EffectIndex", () => {
     expect(index.listEffects()).toHaveLength(0);
   });
 
+  test("accepts PROCESS_RUNTIME_ERROR as a typed lifecycle marker", async () => {
+    const events = [
+      makeEvent(1, "EFFECT_REQUESTED", {
+        effectId: "ef-process-error",
+        invocationKey: "proc:S000001:process-error",
+        stepId: "S000001",
+        taskId: "verify",
+        kind: "node",
+        taskDefRef: "tasks/ef-process-error/task.json",
+      }),
+      makeEvent(2, "EFFECT_RESOLVED", {
+        effectId: "ef-process-error",
+        status: "ok",
+        resultRef: "tasks/ef-process-error/result.json",
+      }),
+      makeEvent(3, "PROCESS_RUNTIME_ERROR", {
+        error: { message: "Cannot read properties of undefined" },
+        iteration: 2,
+        runId: "run-process-error",
+        processId: "process-id",
+        lastEffect: {
+          effectId: "ef-process-error",
+          status: "resolved_ok",
+        },
+        recovery: {
+          command: "run:recover-process-error",
+          recoverable: true,
+        },
+      }),
+    ];
+
+    const index = await buildEffectIndex({ runDir, events });
+    expect(index.getJournalHead()).toEqual({ seq: 3, ulid: "01BX0003" });
+    expect(index.getByEffectId("ef-process-error")?.status).toBe("resolved_ok");
+  });
+
   test("validates EFFECT_REQUESTED payload fields", async () => {
     const badEvent = makeEvent(1, "EFFECT_REQUESTED", {
       effectId: "",
@@ -139,6 +175,115 @@ describe("EffectIndex", () => {
       expect(runError.details?.path).toBe(orphan.path);
       return true;
     });
+  });
+
+  test("EFFECT_CANCELLED is a supported event type", async () => {
+    const events = [
+      makeEvent(1, "EFFECT_REQUESTED", {
+        effectId: "ef-cancel",
+        invocationKey: "proc:S000001:cancel",
+        stepId: "S000001",
+        taskId: "cancel",
+        kind: "node",
+        taskDefRef: "tasks/ef-cancel/task.json",
+      }),
+      makeEvent(2, "EFFECT_CANCELLED", {
+        effectId: "ef-cancel",
+        reason: "no longer needed",
+      }),
+    ];
+
+    const index = await buildEffectIndex({ runDir, events });
+    const record = index.getByEffectId("ef-cancel");
+    expect(record).toBeDefined();
+    expect(record?.status).toBe("cancelled");
+  });
+
+  test("handleEffectCancelled sets status to cancelled", async () => {
+    const events = [
+      makeEvent(1, "EFFECT_REQUESTED", {
+        effectId: "ef-cancel-status",
+        invocationKey: "proc:S000001:cancel-status",
+        stepId: "S000001",
+        taskId: "cancel-status",
+        kind: "node",
+        taskDefRef: "tasks/ef-cancel-status/task.json",
+      }),
+      makeEvent(2, "EFFECT_CANCELLED", {
+        effectId: "ef-cancel-status",
+        reason: "superseded",
+      }),
+    ];
+
+    const index = await buildEffectIndex({ runDir, events });
+    const record = index.getByEffectId("ef-cancel-status");
+    expect(record?.status).toBe("cancelled");
+  });
+
+  test("rejects cancel of non-existent effect", async () => {
+    const events = [
+      makeEvent(1, "EFFECT_CANCELLED", {
+        effectId: "ef-nonexistent",
+        reason: "gone",
+      }),
+    ];
+
+    await expect(buildEffectIndex({ runDir, events })).rejects.toSatisfy((error) => {
+      expect(error).toBeInstanceOf(RunFailedError);
+      const runError = error as RunFailedError;
+      expect(runError.message).toContain("unknown effectId");
+      return true;
+    });
+  });
+
+  test("rejects cancel of already-resolved effect", async () => {
+    const events = [
+      makeEvent(1, "EFFECT_REQUESTED", {
+        effectId: "ef-already-done",
+        invocationKey: "proc:S000001:already-done",
+        stepId: "S000001",
+        taskId: "already-done",
+        kind: "node",
+        taskDefRef: "tasks/ef-already-done/task.json",
+      }),
+      makeEvent(2, "EFFECT_RESOLVED", {
+        effectId: "ef-already-done",
+        status: "ok",
+        resultRef: "tasks/ef-already-done/result.json",
+      }),
+      makeEvent(3, "EFFECT_CANCELLED", {
+        effectId: "ef-already-done",
+        reason: "too late",
+      }),
+    ];
+
+    await expect(buildEffectIndex({ runDir, events })).rejects.toSatisfy((error) => {
+      expect(error).toBeInstanceOf(RunFailedError);
+      const runError = error as RunFailedError;
+      expect(runError.message).toContain("already");
+      return true;
+    });
+  });
+
+  test("cancelled effects not in pending list", async () => {
+    const events = [
+      makeEvent(1, "EFFECT_REQUESTED", {
+        effectId: "ef-pending-cancel",
+        invocationKey: "proc:S000001:pending-cancel",
+        stepId: "S000001",
+        taskId: "pending-cancel",
+        kind: "node",
+        taskDefRef: "tasks/ef-pending-cancel/task.json",
+      }),
+      makeEvent(2, "EFFECT_CANCELLED", {
+        effectId: "ef-pending-cancel",
+        reason: "withdrawn",
+      }),
+    ];
+
+    const index = await buildEffectIndex({ runDir, events });
+    const pending = index.listEffects().filter((e: { status: string }) => e.status === "requested");
+    expect(pending).toHaveLength(0);
   });
 
   test("rejects EFFECT_RESOLVED events with invalid status or refs", async () => {

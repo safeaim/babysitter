@@ -9,8 +9,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { handleHookRun } from "../hookRun";
-import type { HookRunCommandArgs } from "../hookRun";
+import { handleHookRun } from "../hooks/run";
+import type { HookRunCommandArgs } from "../hooks/run";
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
@@ -18,8 +18,73 @@ import {
   writeSessionFile,
   getSessionFilePath,
   getCurrentTimestamp,
+  readSessionFile,
 } from "../../../session";
 import type { SessionState } from "../../../session";
+import { appendEvent, loadJournal } from "../../../storage/journal";
+
+vi.mock("@a5c-ai/tasks-mux", () => {
+  class AgentMuxResponderBackend {
+    constructor(readonly config: Record<string, unknown> = {}) {}
+
+    async submitBreakpoint(params: Record<string, unknown>) {
+      return {
+        answers: [{
+          text: `agent-mux answer for ${String((params.context as Record<string, unknown> | undefined)?.description ?? "task")}`,
+          responderId: String(this.config.adapter ?? "codex"),
+          responderName: String(this.config.adapter ?? "codex"),
+        }],
+        context: {
+          metadata: {
+            agentMux: {
+              runId: "amux-run-1",
+              agent: this.config.adapter ?? "codex",
+              model: this.config.model ?? "gpt-test",
+              durationMs: 123,
+              cost: { costUsd: 0.001 },
+              tokenUsage: { inputTokens: 10, outputTokens: 5 },
+            },
+          },
+        },
+      };
+    }
+  }
+
+  function routeTask(task: { kind?: string; agent?: Record<string, unknown>; metadata?: Record<string, unknown> }) {
+    const responderType = task.agent?.responderType ?? task.metadata?.responderType;
+    if (task.kind === "agent" && (responderType === "agent" || task.agent?.external === true)) {
+      return {
+        responderType: "agent",
+        route: "agent-mux",
+        responder: {
+          id: String(task.agent?.adapter ?? task.metadata?.adapter ?? "codex"),
+          adapter: String(task.agent?.adapter ?? task.metadata?.adapter ?? "codex"),
+          model: task.agent?.model as string | undefined,
+        },
+      };
+    }
+    if (responderType === "tracker") {
+      return {
+        responderType: "tracker",
+        route: "external-tracker",
+        unavailable: true,
+        reason: "ExternalTrackerBackend unavailable for test",
+      };
+    }
+    return {
+      responderType: "internal",
+      route: "agent-core",
+      responder: { id: "agent-core" },
+    };
+  }
+
+  return {
+    AgentMuxResponderBackend,
+    routeTask,
+    isHostDelegableRoute: (decision: { responderType: string; backend?: string }) =>
+      decision.responderType === "internal" || (decision.responderType === "agent" && !decision.backend),
+  };
+});
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -97,6 +162,9 @@ beforeEach(async () => {
 afterEach(async () => {
   process.stdout.write = originalStdoutWrite;
   process.stderr.write = originalStderrWrite;
+  delete process.env.BABYSITTER_HOOK_BACKOFF_BASE;
+  delete process.env.BABYSITTER_HOOK_BACKOFF_CAP;
+  vi.useRealTimers();
   vi.restoreAllMocks();
   try {
     await fs.rm(tmpDir, { recursive: true, force: true });
@@ -252,6 +320,17 @@ describe("handleHookRun dispatcher", () => {
     const output = JSON.parse(getStdout().trim());
     expect(output.decision).toBeUndefined();
   });
+
+  it("treats session-end as a stop-hook alias", async () => {
+    const code = await callWithStdin("{}", {
+      hookType: "session-end",
+      harness: "codex",
+      json: true,
+    });
+    expect(code).toBe(0);
+    const output = JSON.parse(getStdout().trim());
+    expect(output.decision).toBeUndefined();
+  });
 });
 
 describe("handleHookRun stop", () => {
@@ -284,6 +363,95 @@ describe("handleHookRun stop", () => {
     expect(output.decision).toBeUndefined();
   });
 
+  it("recovers a missing session state file for a hook-bound non-terminal run", async () => {
+    const sessionId = "recoverable-missing-session";
+    const runId = "recoverable-active-run";
+    const runsDir = path.join(tmpDir, "runs");
+    const runDir = path.join(runsDir, runId);
+    const journalDir = path.join(runDir, "journal");
+    await fs.mkdir(journalDir, { recursive: true });
+
+    await fs.writeFile(path.join(runDir, "run.json"), JSON.stringify({
+      schemaVersion: "2026.01.run-metadata",
+      runId,
+      processId: "test-process",
+      harness: "claude-code",
+      entrypoint: { importPath: "/tmp/test.js", exportName: "process" },
+      layoutVersion: "2026.01-storage-preview",
+      createdAt: new Date().toISOString(),
+    }));
+    await fs.writeFile(
+      path.join(journalDir, "000001.01ARZ3NDEKTSV4RRFFQ69G5FAV.json"),
+      JSON.stringify({
+        type: "RUN_CREATED",
+        recordedAt: new Date().toISOString(),
+        data: { runId, processId: "test-process", harness: "claude-code", sessionId },
+        checksum: "abc123",
+      }),
+    );
+
+    const transcriptPath = path.join(tmpDir, "transcript-recoverable.jsonl");
+    await fs.writeFile(transcriptPath, JSON.stringify({
+      type: "assistant",
+      message: { content: [{ type: "text", text: "Still working." }] },
+    }) + "\n");
+
+    const filePath = getSessionFilePath(stateDir, sessionId);
+    await expect(fs.access(filePath)).rejects.toThrow();
+
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId, transcript_path: transcriptPath }),
+      { ...baseArgs, stateDir, runsDir },
+    );
+
+    expect(code).toBe(0);
+    const output = JSON.parse(getStdout().trim());
+    expect(output.decision).toBe("block");
+    const recovered = await readSessionFile(filePath);
+    expect(recovered.state.active).toBe(true);
+    expect(recovered.state.runId).toBe(runId);
+    expect(recovered.state.runDir).toBe(runDir);
+    expect(recovered.state.metadata?.recoveredFromMissingSessionFile).toBe("true");
+  });
+
+  it("fails loudly when missing-session recovery finds multiple active runs", async () => {
+    const sessionId = "ambiguous-missing-session";
+    const runsDir = path.join(tmpDir, "runs");
+
+    for (const runId of ["ambiguous-run-a", "ambiguous-run-b"]) {
+      const runDir = path.join(runsDir, runId);
+      const journalDir = path.join(runDir, "journal");
+      await fs.mkdir(journalDir, { recursive: true });
+      await fs.writeFile(path.join(runDir, "run.json"), JSON.stringify({
+        schemaVersion: "2026.01.run-metadata",
+        runId,
+        processId: "test-process",
+        harness: "claude-code",
+        entrypoint: { importPath: "/tmp/test.js", exportName: "process" },
+        layoutVersion: "2026.01-storage-preview",
+        createdAt: new Date().toISOString(),
+      }));
+      await fs.writeFile(
+        path.join(journalDir, `000001.${runId}.json`),
+        JSON.stringify({
+          type: "RUN_CREATED",
+          recordedAt: new Date().toISOString(),
+          data: { runId, processId: "test-process", harness: "claude-code", sessionId },
+          checksum: "abc123",
+        }),
+      );
+    }
+
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId }),
+      { ...baseArgs, stateDir, runsDir },
+    );
+
+    expect(code).toBe(1);
+    expect(getStdout().trim()).toBe("{}");
+    expect(stderrChunks.join("")).toContain("Multiple active runs");
+  });
+
   it("allows exit when max iterations reached", async () => {
     const sessionId = "max-iter-session";
     const filePath = getSessionFilePath(stateDir, sessionId);
@@ -293,6 +461,7 @@ describe("handleHookRun stop", () => {
       iteration: 10,
       maxIterations: 10,
       runId: "test-run-1",
+      runIds: [],
       startedAt: now,
       lastIterationAt: now,
       iterationTimes: [],
@@ -306,6 +475,9 @@ describe("handleHookRun stop", () => {
     expect(code).toBe(0);
     const output = JSON.parse(getStdout().trim());
     expect(output.decision).toBeUndefined();
+    const retained = await readSessionFile(filePath);
+    expect(retained.state.active).toBe(false);
+    expect(retained.state.metadata?.hookExitReason).toBe("max_iterations_reached");
   });
 
   it("allows exit when no run is associated", async () => {
@@ -316,6 +488,7 @@ describe("handleHookRun stop", () => {
       active: true,
       iteration: 1,
       maxIterations: 100,
+      runIds: [],
       startedAt: now,
       lastIterationAt: now,
       iterationTimes: [],
@@ -333,6 +506,36 @@ describe("handleHookRun stop", () => {
       JSON.stringify({ session_id: sessionId, transcript_path: transcriptPath }),
       { ...baseArgs, stateDir },
     );
+    expect(code).toBe(0);
+    const output = JSON.parse(getStdout().trim());
+    expect(output.decision).toBeUndefined();
+    const retained = await readSessionFile(filePath);
+    expect(retained.state.active).toBe(false);
+    expect(retained.state.metadata?.hookExitReason).toBe("no_run_id");
+  });
+
+  it("allows exit for inactive retained sessions even when run remains associated", async () => {
+    const sessionId = "inactive-associated-session";
+    const filePath = getSessionFilePath(stateDir, sessionId);
+    const now = getCurrentTimestamp();
+    const state: SessionState = {
+      active: false,
+      iteration: 10,
+      maxIterations: 10,
+      runId: "still-associated-run",
+      runIds: [],
+      startedAt: now,
+      lastIterationAt: now,
+      iterationTimes: [],
+      metadata: { hookExitReason: "completion_proof_matched" },
+    };
+    await writeSessionFile(filePath, state, "Test prompt");
+
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId }),
+      { ...baseArgs, stateDir },
+    );
+
     expect(code).toBe(0);
     const output = JSON.parse(getStdout().trim());
     expect(output.decision).toBeUndefined();
@@ -378,6 +581,8 @@ describe("handleHookRun stop", () => {
       iteration: 2,
       maxIterations: 100,
       runId,
+      runDir,
+      runIds: [],
       startedAt: now,
       lastIterationAt: now,
       iterationTimes: [],
@@ -401,35 +606,477 @@ describe("handleHookRun stop", () => {
     expect(output.systemMessage).toContain("iteration 3");
     expect(output.reason).toBeTruthy();
   });
+
+  it("uses the session's stored absolute runDir when the hook runs from a different cwd", async () => {
+    const runId = "test-run-cross-cwd";
+    const actualRunsDir = path.join(tmpDir, "project-b", ".a5c", "runs");
+    const wrongRunsDir = path.join(tmpDir, "project-a", ".a5c", "runs");
+    const runDir = path.join(actualRunsDir, runId);
+    const journalDir = path.join(runDir, "journal");
+    await fs.mkdir(journalDir, { recursive: true });
+    await fs.mkdir(wrongRunsDir, { recursive: true });
+
+    const runMetadata = {
+      schemaVersion: "2026.01.run-metadata",
+      runId,
+      processId: "test-process",
+      entrypoint: { importPath: "/tmp/test.js", exportName: "process" },
+      layoutVersion: 1,
+      createdAt: new Date().toISOString(),
+    };
+    await fs.writeFile(path.join(runDir, "run.json"), JSON.stringify(runMetadata));
+
+    const event = {
+      type: "RUN_CREATED",
+      recordedAt: new Date().toISOString(),
+      data: { runId, processId: "test-process" },
+      checksum: "abc123",
+    };
+    await fs.writeFile(
+      path.join(journalDir, "000001.01ARZ3NDEKTSV4RRFFQ69G5FAV.json"),
+      JSON.stringify(event),
+    );
+
+    const sessionId = "cross-cwd-session";
+    const filePath = getSessionFilePath(stateDir, sessionId);
+    const now = getCurrentTimestamp();
+    const state: SessionState = {
+      active: true,
+      iteration: 2,
+      maxIterations: 100,
+      runId,
+      runDir,
+      runIds: [],
+      startedAt: now,
+      lastIterationAt: now,
+      iterationTimes: [],
+    };
+    await writeSessionFile(filePath, state, "Continue orchestrating the run");
+
+    const transcriptPath = path.join(tmpDir, "transcript-cross-cwd.jsonl");
+    await fs.writeFile(transcriptPath, JSON.stringify({
+      type: "assistant",
+      message: { content: [{ type: "text", text: "I ran the iteration." }] },
+    }) + "\n");
+
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId, transcript_path: transcriptPath }),
+      { ...baseArgs, stateDir, runsDir: wrongRunsDir },
+    );
+    expect(code).toBe(0);
+    const output = JSON.parse(getStdout().trim());
+    expect(output.decision).toBe("block");
+    expect(output.systemMessage).toContain("iteration 3");
+  });
+
+  it("fails loudly when the stop hook cannot resolve the run directory", async () => {
+    const sessionId = "missing-run-session";
+    const runId = "missing-run";
+    const filePath = getSessionFilePath(stateDir, sessionId);
+    const now = getCurrentTimestamp();
+    const state: SessionState = {
+      active: true,
+      iteration: 2,
+      maxIterations: 100,
+      runId,
+      runIds: [],
+      startedAt: now,
+      lastIterationAt: now,
+      iterationTimes: [],
+    };
+    await writeSessionFile(filePath, state, "Continue orchestrating the run");
+
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId }),
+      { ...baseArgs, stateDir, runsDir: path.join(tmpDir, "wrong-runs") },
+    );
+    expect(code).toBe(1);
+    expect(stderrChunks.join("")).toContain(`Run ${runId} not found`);
+    expect(getStdout().trim()).toBe("{}");
+  });
+
+  async function createRunMetadata(runDir: string, runId: string) {
+    await fs.mkdir(runDir, { recursive: true });
+    await fs.writeFile(path.join(runDir, "run.json"), JSON.stringify({
+      schemaVersion: "2026.01.run-metadata",
+      runId,
+      processId: "test-process",
+      entrypoint: { importPath: "/tmp/test.js", exportName: "process" },
+      layoutVersion: 1,
+      createdAt: new Date().toISOString(),
+      prompt: "test",
+    }));
+    await appendEvent({
+      runDir,
+      eventType: "RUN_CREATED",
+      event: { runId, processId: "test-process" },
+    });
+  }
+
+  async function requestAgentEffect(
+    runDir: string,
+    effectId: string,
+    requestedAt?: string,
+    taskDef: Record<string, unknown> = { kind: "agent", title: `Agent ${effectId}` },
+  ) {
+    const taskPath = path.join(runDir, "tasks", effectId, "task.json");
+    await fs.mkdir(path.dirname(taskPath), { recursive: true });
+    await fs.writeFile(taskPath, JSON.stringify(taskDef));
+    await appendEvent({
+      runDir,
+      eventType: "EFFECT_REQUESTED",
+      event: {
+        effectId,
+        invocationKey: `test:${effectId}`,
+        stepId: `step-${effectId}`,
+        taskId: `task-${effectId}`,
+        taskDefRef: `tasks/${effectId}/task.json`,
+        kind: "agent",
+        label: "agent",
+        ...(requestedAt ? { requestedAt } : {}),
+      },
+    });
+  }
+
+  async function resolveEffect(runDir: string, effectId: string) {
+    await appendEvent({
+      runDir,
+      eventType: "EFFECT_RESOLVED",
+      event: {
+        effectId,
+        status: "ok",
+        resultRef: `tasks/${effectId}/result.json`,
+      },
+    });
+  }
+
+  async function cancelEffect(runDir: string, effectId: string) {
+    await appendEvent({
+      runDir,
+      eventType: "EFFECT_CANCELLED",
+      event: {
+        effectId,
+        reason: "test",
+      },
+    });
+  }
+
+  async function finishRun(runDir: string, eventType: "RUN_COMPLETED" | "RUN_FAILED") {
+    await appendEvent({
+      runDir,
+      eventType,
+      event: eventType === "RUN_COMPLETED"
+        ? { result: { ok: true }, completionProof: "proof" }
+        : { error: "failed" },
+    });
+  }
+
+  async function createActiveSession(sessionId: string, runId: string, runDir: string) {
+    const filePath = getSessionFilePath(stateDir, sessionId);
+    const now = getCurrentTimestamp();
+    const state: SessionState = {
+      active: true,
+      iteration: 2,
+      maxIterations: 100,
+      runId,
+      runDir,
+      runIds: [runId],
+      startedAt: now,
+      lastIterationAt: now,
+      iterationTimes: [],
+    };
+    await writeSessionFile(filePath, state, "Continue orchestrating the run");
+  }
+
+  it("backs off repeated stop-hook blocks for the same pending effect and records metadata", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.09";
+    const runId = "backoff-growth-run";
+    const effectId = "effect-growth";
+    const sessionId = "backoff-growth-session";
+    const runsDir = path.join(tmpDir, "runs");
+    const runDir = path.join(runsDir, runId);
+    await createRunMetadata(runDir, runId);
+    await requestAgentEffect(runDir, effectId);
+    await createActiveSession(sessionId, runId, runDir);
+
+    for (let index = 0; index < 3; index += 1) {
+      stdoutChunks = [];
+      const code = await callWithStdin(
+        JSON.stringify({ session_id: sessionId }),
+        { ...baseArgs, stateDir, runsDir },
+      );
+      expect(code).toBe(0);
+      expect(JSON.parse(getStdout().trim()).decision).toBe("block");
+    }
+
+    const stopEvents = (await loadJournal(runDir)).filter((event) => event.type === "STOP_HOOK_INVOKED");
+    expect(stopEvents.map((event) => event.data.effectId)).toEqual([effectId, effectId, effectId]);
+    expect(stopEvents.map((event) => Number(event.data.hookBackoffDelaySeconds).toFixed(3))).toEqual([
+      "0.001",
+      "0.003",
+      "0.009",
+    ]);
+    expect(stopEvents.map((event) => event.data.hookBackoffFireCount)).toEqual([0, 1, 2]);
+  });
+
+  it("honors stop-hook backoff env overrides and caps repeated delays", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.002";
+    const runId = "backoff-env-run";
+    const effectId = "effect-env";
+    const sessionId = "backoff-env-session";
+    const runsDir = path.join(tmpDir, "runs");
+    const runDir = path.join(runsDir, runId);
+    await createRunMetadata(runDir, runId);
+    await requestAgentEffect(runDir, effectId);
+    await createActiveSession(sessionId, runId, runDir);
+
+    for (let index = 0; index < 3; index += 1) {
+      stdoutChunks = [];
+      await callWithStdin(
+        JSON.stringify({ session_id: sessionId }),
+        { ...baseArgs, stateDir, runsDir },
+      );
+    }
+
+    const stopEvents = (await loadJournal(runDir)).filter((event) => event.type === "STOP_HOOK_INVOKED");
+    expect(stopEvents.map((event) => event.data.hookBackoffDelaySeconds)).toEqual([0.001, 0.002, 0.002]);
+  });
+
+  it("starts fresh after pending effects resolve or cancel", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.06";
+    const runId = "backoff-reset-run";
+    const sessionId = "backoff-reset-session";
+    const runsDir = path.join(tmpDir, "runs");
+    const runDir = path.join(runsDir, runId);
+    await createRunMetadata(runDir, runId);
+    await requestAgentEffect(runDir, "effect-a");
+    await createActiveSession(sessionId, runId, runDir);
+
+    await callWithStdin(JSON.stringify({ session_id: sessionId }), { ...baseArgs, stateDir, runsDir });
+    stdoutChunks = [];
+    await resolveEffect(runDir, "effect-a");
+    await requestAgentEffect(runDir, "effect-b");
+    await callWithStdin(JSON.stringify({ session_id: sessionId }), { ...baseArgs, stateDir, runsDir });
+    stdoutChunks = [];
+    await cancelEffect(runDir, "effect-b");
+    await requestAgentEffect(runDir, "effect-c");
+    await callWithStdin(JSON.stringify({ session_id: sessionId }), { ...baseArgs, stateDir, runsDir });
+
+    const stopEvents = (await loadJournal(runDir)).filter((event) => event.type === "STOP_HOOK_INVOKED");
+    expect(stopEvents.map((event) => [event.data.effectId, event.data.hookBackoffDelaySeconds])).toEqual([
+      ["effect-a", 0.001],
+      ["effect-b", 0.001],
+      ["effect-c", 0.001],
+    ]);
+  });
+
+  it("continues for tasks-mux routed agent effects but exits for externally waiting routes", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.001";
+    const runsDir = path.join(tmpDir, "runs");
+
+    const agentRunId = "routed-agent-run";
+    const agentRunDir = path.join(runsDir, agentRunId);
+    await createRunMetadata(agentRunDir, agentRunId);
+    await requestAgentEffect(agentRunDir, "routed-agent", undefined, {
+      kind: "agent",
+      agent: {
+        responderType: "agent",
+        adapter: "codex",
+        prompt: { task: "review" },
+      },
+    });
+    await createActiveSession("routed-agent-session", agentRunId, agentRunDir);
+
+    let code = await callWithStdin(
+      JSON.stringify({ session_id: "routed-agent-session" }),
+      { ...baseArgs, stateDir, runsDir },
+    );
+    expect(code).toBe(0);
+    expect(JSON.parse(getStdout().trim()).decision).toBe("block");
+    const routedAgentEvents = await loadJournal(agentRunDir);
+    expect(routedAgentEvents.find((event) => event.type === "EFFECT_RESOLVED")?.data).toMatchObject({
+      effectId: "routed-agent",
+      status: "ok",
+    });
+    expect(routedAgentEvents.find((event) => event.type === "COST_TRACKED")?.data).toMatchObject({
+      effectId: "routed-agent",
+      source: "tasks-mux:agent-mux",
+      costUsd: 0.001,
+    });
+
+    stdoutChunks = [];
+
+    const trackerRunId = "routed-tracker-run";
+    const trackerRunDir = path.join(runsDir, trackerRunId);
+    await createRunMetadata(trackerRunDir, trackerRunId);
+    await requestAgentEffect(trackerRunDir, "routed-tracker", undefined, {
+      kind: "agent",
+      metadata: {
+        responderType: "tracker",
+        trackerBackend: "linear",
+      },
+    });
+    await createActiveSession("routed-tracker-session", trackerRunId, trackerRunDir);
+
+    code = await callWithStdin(
+      JSON.stringify({ session_id: "routed-tracker-session" }),
+      { ...baseArgs, stateDir, runsDir },
+    );
+    expect(code).toBe(0);
+    expect(JSON.parse(getStdout().trim()).decision).toBeUndefined();
+  });
+
+  it("resolves external agent effects internally and leaves host-resolvable effects pending", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.001";
+    const runId = "mixed-external-agent-run";
+    const sessionId = "mixed-external-agent-session";
+    const runsDir = path.join(tmpDir, "runs");
+    const runDir = path.join(runsDir, runId);
+    await createRunMetadata(runDir, runId);
+    await requestAgentEffect(runDir, "external-agent", "2026-01-01T00:00:00.000Z", {
+      kind: "agent",
+      title: "External agent",
+      agent: {
+        external: true,
+        adapter: "codex",
+        prompt: { task: "review externally" },
+      },
+    });
+    await requestAgentEffect(runDir, "internal-agent", "2026-01-01T00:00:01.000Z", {
+      kind: "agent",
+      title: "Internal agent",
+      agent: {
+        prompt: { task: "review internally" },
+      },
+    });
+    await createActiveSession(sessionId, runId, runDir);
+
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId }),
+      { ...baseArgs, stateDir, runsDir },
+    );
+
+    expect(code).toBe(0);
+    expect(JSON.parse(getStdout().trim()).decision).toBe("block");
+    const events = await loadJournal(runDir);
+    expect(events.find((event) => event.type === "EFFECT_RESOLVED")?.data).toMatchObject({
+      effectId: "external-agent",
+      status: "ok",
+    });
+    const stopEvent = events.filter((event) => event.type === "STOP_HOOK_INVOKED").at(-1);
+    expect(stopEvent?.data.effectId).toBe("internal-agent");
+    expect(events.filter((event) => event.type === "EFFECT_RESOLVED")).toHaveLength(1);
+  });
+
+  it("does not apply stale backoff metadata after a pending effect resolves", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.06";
+    const runId = "backoff-post-resolve-run";
+    const sessionId = "backoff-post-resolve-session";
+    const runsDir = path.join(tmpDir, "runs");
+    const runDir = path.join(runsDir, runId);
+    await createRunMetadata(runDir, runId);
+    await requestAgentEffect(runDir, "effect-resolved");
+    await createActiveSession(sessionId, runId, runDir);
+
+    await callWithStdin(JSON.stringify({ session_id: sessionId }), { ...baseArgs, stateDir, runsDir });
+    stdoutChunks = [];
+    await resolveEffect(runDir, "effect-resolved");
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: sessionId }),
+      { ...baseArgs, stateDir, runsDir },
+    );
+
+    expect(code).toBe(0);
+    expect(JSON.parse(getStdout().trim()).decision).toBe("block");
+    const stopEvents = (await loadJournal(runDir)).filter((event) => event.type === "STOP_HOOK_INVOKED");
+    expect(stopEvents.at(-1)?.data.effectId).toBeUndefined();
+    expect(stopEvents.at(-1)?.data.hookBackoffDelaySeconds).toBeUndefined();
+  });
+
+  it.each(["RUN_COMPLETED", "RUN_FAILED"] as const)(
+    "does not apply stale backoff metadata after %s",
+    async (eventType) => {
+      process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.001";
+      process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.06";
+      const runId = `backoff-terminal-${eventType.toLowerCase()}`;
+      const sessionId = `backoff-terminal-session-${eventType.toLowerCase()}`;
+      const runsDir = path.join(tmpDir, "runs");
+      const runDir = path.join(runsDir, runId);
+      await createRunMetadata(runDir, runId);
+      await requestAgentEffect(runDir, "effect-terminal");
+      await createActiveSession(sessionId, runId, runDir);
+
+      await callWithStdin(JSON.stringify({ session_id: sessionId }), { ...baseArgs, stateDir, runsDir });
+      stdoutChunks = [];
+      await finishRun(runDir, eventType);
+      const code = await callWithStdin(
+        JSON.stringify({ session_id: sessionId }),
+        { ...baseArgs, stateDir, runsDir },
+      );
+
+      expect(code).toBe(0);
+      const events = await loadJournal(runDir);
+      const terminalIndex = events.findIndex((event) => event.type === eventType);
+      expect(terminalIndex).toBeGreaterThanOrEqual(0);
+      const terminalStopEvents = events
+        .slice(terminalIndex + 1)
+        .filter((event) => event.type === "STOP_HOOK_INVOKED");
+      expect(terminalStopEvents.every((event) => event.data.effectId === undefined)).toBe(true);
+      expect(terminalStopEvents.every((event) => event.data.hookBackoffDelaySeconds === undefined)).toBe(true);
+    },
+  );
+
+  it("interrupts backoff promptly when the effect resolves during the wait", async () => {
+    process.env.BABYSITTER_HOOK_BACKOFF_BASE = "0.05";
+    process.env.BABYSITTER_HOOK_BACKOFF_CAP = "0.06";
+    const runId = "backoff-interrupt-run";
+    const effectId = "effect-interrupt";
+    const sessionId = "backoff-interrupt-session";
+    const runsDir = path.join(tmpDir, "runs");
+    const runDir = path.join(runsDir, runId);
+    await createRunMetadata(runDir, runId);
+    await requestAgentEffect(runDir, effectId);
+    await createActiveSession(sessionId, runId, runDir);
+
+    const promise = callWithStdin(JSON.stringify({ session_id: sessionId }), {
+      ...baseArgs,
+      stateDir,
+      runsDir,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await resolveEffect(runDir, effectId);
+    const code = await promise;
+
+    expect(code).toBe(0);
+    const stopEvents = (await loadJournal(runDir)).filter((event) => event.type === "STOP_HOOK_INVOKED");
+    expect(stopEvents.at(-1)?.data.effectId).toBe(effectId);
+    expect(stopEvents.at(-1)?.data.hookBackoffDelaySeconds).toBeLessThan(0.05);
+    expect(stopEvents.at(-1)?.data.hookBackoffInterrupted).toBe(true);
+  });
 });
 
 describe("handleHookRun session-start", () => {
-  it("writes session ID to CLAUDE_ENV_FILE", async () => {
-    const envFile = path.join(tmpDir, "env.sh");
-    await fs.writeFile(envFile, "");
-    const origEnvFile = process.env.CLAUDE_ENV_FILE;
-    process.env.CLAUDE_ENV_FILE = envFile;
-
-    try {
-      const code = await callWithStdin(
-        JSON.stringify({ session_id: "my-session-42" }),
-        {
-          hookType: "session-start",
-          harness: "claude-code",
-          stateDir,
-          json: true,
-        },
-      );
-      expect(code).toBe(0);
-      const content = await fs.readFile(envFile, "utf8");
-      expect(content).toContain('export BABYSITTER_SESSION_ID="my-session-42"');
-    } finally {
-      if (origEnvFile !== undefined) {
-        process.env.CLAUDE_ENV_FILE = origEnvFile;
-      } else {
-        delete process.env.CLAUDE_ENV_FILE;
-      }
-    }
+  it("initializes session state from stdin session_id (env file writing moved to hooks-mux)", async () => {
+    const code = await callWithStdin(
+      JSON.stringify({ session_id: "my-session-42" }),
+      {
+        hookType: "session-start",
+        harness: "claude-code",
+        stateDir,
+        json: true,
+      },
+    );
+    expect(code).toBe(0);
+    // Session state file should be created (env file writing is now handled by hooks-mux)
+    const sessionPath = getSessionFilePath(stateDir, "my-session-42");
+    const stat = await fs.stat(sessionPath).catch(() => null);
+    expect(stat).not.toBeNull();
   });
 
   it("creates baseline session state file when stateDir is provided", async () => {
@@ -466,6 +1113,7 @@ describe("handleHookRun session-start", () => {
       iteration: 5,
       maxIterations: 100,
       runId: "existing-run",
+      runIds: [],
       startedAt: now,
       lastIterationAt: now,
       iterationTimes: [],
@@ -502,3 +1150,5 @@ describe("handleHookRun session-start", () => {
     expect(getStdout().trim()).toBe("{}");
   });
 });
+
+

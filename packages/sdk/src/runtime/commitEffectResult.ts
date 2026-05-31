@@ -1,4 +1,5 @@
 import { appendEvent } from "../storage/journal";
+import path from "node:path";
 import { withRunLock } from "../storage/lock";
 import { buildEffectIndex } from "./replay/effectIndex";
 import {
@@ -12,6 +13,11 @@ import { toSerializedEffectError } from "./errorUtils";
 import { emitRuntimeMetric } from "./instrumentation";
 import { globalTaskRegistry } from "../tasks/registry";
 import { serializeAndWriteTaskResult } from "../tasks/serializer";
+import { readTaskDefinition } from "../storage/tasks";
+import { rebuildStateCache } from "./replay/stateCache";
+import { checkRunWorkDirLeak } from "./workDirLeak";
+import { assertRuntimeHookAllowed, callRuntimeHook } from "./hooks/runtime";
+import { validateAgainstSchema } from "./schemaValidator";
 
 export async function commitEffectResult(options: CommitEffectResultOptions): Promise<CommitEffectResultArtifacts> {
   return await withRunLock(options.runDir, "runtime:commitEffectResult", async () => {
@@ -30,8 +36,26 @@ export async function commitEffectResult(options: CommitEffectResultOptions): Pr
     }
 
     ensureInvocationKeyMatches(options, record);
+    await validateTaskResultOutputSchema(options, record);
 
     const resultPayload = buildResultPayload(options);
+    const taskCompletedHookResult = await callRuntimeHook(
+      "task.completed",
+      {
+        runId: path.basename(options.runDir),
+        task_id: options.effectId,
+        task_kind: record.kind,
+        task_status: options.result.status,
+        task_result: options.result.status === "ok" ? options.result.value : options.result.error,
+        taskId: record.taskId,
+        effectId: options.effectId,
+        kind: record.kind,
+        status: options.result.status,
+        result: options.result.status === "ok" ? options.result.value : options.result.error,
+      },
+      { cwd: options.runDir, logger: options.logger },
+    );
+    assertRuntimeHookAllowed(taskCompletedHookResult, "task.completed");
 
     const { resultRef, stdoutRef: writtenStdoutRef, stderrRef: writtenStderrRef } = await serializeAndWriteTaskResult({
       runDir: options.runDir,
@@ -43,6 +67,17 @@ export async function commitEffectResult(options: CommitEffectResultOptions): Pr
     const stdoutRef = resultPayload.stdoutRef ?? writtenStdoutRef;
     const stderrRef = resultPayload.stderrRef ?? writtenStderrRef;
     const eventError = resultPayload.status === "error" ? resultPayload.error : undefined;
+
+    // Enrich breakpoint EFFECT_RESOLVED events with breakpointId from task metadata
+    let breakpointId: string | undefined;
+    if (record.kind === "breakpoint" || record.taskId === "__sdk.breakpoint") {
+      try {
+        const taskDef = await readTaskDefinition(options.runDir, options.effectId);
+        breakpointId = (taskDef?.metadata as Record<string, unknown> | undefined)?.breakpointId as string | undefined;
+      } catch {
+        // Non-critical: skip enrichment if task.json is unreadable
+      }
+    }
 
     const resolvedEvent = await appendEvent({
       runDir: options.runDir,
@@ -56,6 +91,7 @@ export async function commitEffectResult(options: CommitEffectResultOptions): Pr
         stderrRef,
         startedAt: resultPayload.startedAt,
         finishedAt: resultPayload.finishedAt,
+        ...(breakpointId ? { breakpointId } : {}),
       },
     });
     globalTaskRegistry.resolveEffect(options.effectId, {
@@ -65,6 +101,7 @@ export async function commitEffectResult(options: CommitEffectResultOptions): Pr
       stderrRef,
       resolvedAt: resolvedEvent.recordedAt,
     });
+    await rebuildStateCache(options.runDir, { reason: "post_effect_resolution" });
 
     emitRuntimeMetric(options.logger, "commit.effect", {
       effectId: options.effectId,
@@ -74,6 +111,7 @@ export async function commitEffectResult(options: CommitEffectResultOptions): Pr
       hasStdout: Boolean(stdoutRef),
       hasStderr: Boolean(stderrRef),
     });
+    await checkRunWorkDirLeak(options.runDir, options.logger, "effect-resolved");
 
     return {
       resultRef,
@@ -83,6 +121,106 @@ export async function commitEffectResult(options: CommitEffectResultOptions): Pr
       finishedAt: resultPayload.finishedAt,
     };
   });
+}
+
+export interface CommitEffectCancellationOptions {
+  runDir: string;
+  effectId: string;
+  reason?: string;
+  logger?: import("./types").ProcessLogger;
+}
+
+export async function commitEffectCancellation(
+  options: CommitEffectCancellationOptions,
+): Promise<{ resultRef: string }> {
+  return await withRunLock(options.runDir, "runtime:commitEffectCancellation", async () => {
+    const effectIndex = await buildEffectIndex({ runDir: options.runDir });
+    const record = effectIndex.getByEffectId(options.effectId);
+
+    if (!record) {
+      throw new RunFailedError(`Unknown effectId ${options.effectId}`);
+    }
+
+    if (record.status !== "requested") {
+      throw new RunFailedError(`Effect ${options.effectId} is not requested (status=${record.status})`);
+    }
+
+    const { resultRef } = await serializeAndWriteTaskResult({
+      runDir: options.runDir,
+      effectId: options.effectId,
+      taskId: requireTaskId(record),
+      invocationKey: record.invocationKey,
+      payload: {
+        status: "cancelled",
+        reason: options.reason,
+        error: { name: "EffectCancelledError", message: options.reason ?? "Effect cancelled" },
+        metadata: { cancelled: true, reason: options.reason },
+      },
+    });
+
+    const cancelledEvent = await appendEvent({
+      runDir: options.runDir,
+      eventType: "EFFECT_CANCELLED",
+      event: {
+        effectId: options.effectId,
+        reason: options.reason,
+      },
+    });
+    await rebuildStateCache(options.runDir, { reason: "post_effect_cancellation" });
+
+    globalTaskRegistry.resolveEffect(options.effectId, {
+      status: "cancelled",
+      resultRef,
+      resolvedAt: cancelledEvent.recordedAt,
+    });
+
+    emitRuntimeMetric(options.logger, "commit.effect.cancel", {
+      effectId: options.effectId,
+      invocationKey: record.invocationKey,
+      status: "cancelled",
+      runDir: options.runDir,
+      reason: options.reason,
+    });
+    await checkRunWorkDirLeak(options.runDir, options.logger, "effect-cancelled");
+
+    return { resultRef };
+  });
+}
+
+async function validateTaskResultOutputSchema(options: CommitEffectResultOptions, record: EffectRecord) {
+  if (record.kind !== "shell" || options.result.status !== "ok") {
+    return;
+  }
+
+  const taskDef = await readTaskDefinition(options.runDir, options.effectId);
+  const outputSchema = taskDef?.outputSchema;
+  if (!isJsonSchemaRecord(outputSchema)) {
+    return;
+  }
+
+  const validation = validateAgainstSchema(options.result.value, outputSchema);
+  if (validation.valid) {
+    return;
+  }
+
+  logCommitFailure(options, "validation_error", {
+    taskId: record.taskId,
+    kind: record.kind,
+    errors: validation.errors,
+  });
+  throw new RunFailedError(`Shell task result failed outputSchema validation for effect ${options.effectId}`, {
+    details: {
+      reason: "validation_error",
+      effectId: options.effectId,
+      taskId: record.taskId,
+      kind: record.kind,
+      errors: validation.errors,
+    },
+  });
+}
+
+function isJsonSchemaRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function ensureInvocationKeyMatches(options: CommitEffectResultOptions, record: EffectRecord) {

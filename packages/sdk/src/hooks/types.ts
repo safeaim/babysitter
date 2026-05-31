@@ -16,6 +16,7 @@ export type KnownHookType =
   | "on-iteration-end"
   // Process-Level Hooks
   | "on-breakpoint"
+  | "on-permission-denied"
   | "pre-commit"
   | "pre-branch"
   | "post-planning"
@@ -64,8 +65,10 @@ export interface OnRunCompletePayload {
 export interface OnRunFailPayload {
   hookType: "on-run-fail";
   runId: string;
-  status: "failed";
+  status: "failed" | "halted";
   error: string;
+  reason?: string;
+  payload?: Record<string, unknown>;
   duration: number;
   timestamp: string;
 }
@@ -110,7 +113,9 @@ export interface OnIterationEndPayload {
   hookType: "on-iteration-end";
   runId: string;
   iteration: number;
-  status: "completed" | "failed" | "waiting";
+  status: "completed" | "halted" | "failed" | "waiting";
+  reason?: string;
+  payload?: Record<string, unknown>;
   timestamp: string;
 }
 
@@ -163,6 +168,22 @@ export interface OnScorePayload {
   timestamp: string;
 }
 
+/**
+ * GAP-SEC-003: Payload for on-permission-denied hook.
+ * Fires when a breakpoint with kind 'approval' or 'intervention' is denied.
+ */
+export interface OnPermissionDeniedPayload {
+  hookType: "on-permission-denied";
+  breakpointId: string;
+  title?: string;
+  kind: string;
+  runId?: string;
+  effectId?: string;
+  respondedBy?: string;
+  feedback?: string;
+  timestamp: string;
+}
+
 export type HookPayload =
   | OnRunStartPayload
   | OnRunCompletePayload
@@ -173,6 +194,7 @@ export type HookPayload =
   | OnIterationStartPayload
   | OnIterationEndPayload
   | OnBreakpointPayload
+  | OnPermissionDeniedPayload
   | PreCommitPayload
   | PreBranchPayload
   | PostPlanningPayload

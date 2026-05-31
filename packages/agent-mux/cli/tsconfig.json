@@ -1,0 +1,28 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@a5c-ai/agent-config-mux": [
+        "../config/src/index.ts"
+      ],
+      "@a5c-ai/agent-launch-mux": [
+        "../launch/src/index.ts"
+      ],
+      "@a5c-ai/transport-mux": [
+        "../../transport-mux/src/index.ts"
+      ]
+    }
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../adapters" },
+    { "path": "../config" },
+    { "path": "../gateway" },
+    { "path": "../launch" },
+    { "path": "../../transport-mux" }
+  ]
+}
